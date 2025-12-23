@@ -1,0 +1,44 @@
+name: iOS CI
+
+on:
+    push:
+        branches: [main, develop]
+    pull_request:
+        branches: [main, develop]
+
+jobs:
+    test:
+        name: Build & Test
+        runs-on: macos-14
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Select Xcode
+              uses: maxim-lobanov/setup-xcode@v1
+              with:
+                  xcode-version: latest-stable
+
+            - name: Show Xcode Version
+              run: xcodebuild -version
+
+            - name: Build
+              run: |
+                  xcodebuild build \
+                    -scheme ios_app \
+                    -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+
+            - name: Run Tests
+              run: |
+                  xcodebuild test \
+                    -scheme ios_app \
+                    -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+                    -resultBundlePath TestResults.xcresult
+
+            - name: Upload Test Results
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: test-results
+                  path: TestResults.xcresult

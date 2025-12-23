@@ -1,0 +1,46 @@
+{
+  "prediction_id": "pred_eda99e6dabb9",
+  "session_id": "sess_8d6c1f373230",
+  "conversation_id": "conv_2001e57b7147",
+  "status": "completed",
+  "answer": "**VERDICT:** Likely; Probability: Medium.\n\n**TIMING:** The most auspicious time frame for career advancements appears to be during the Dasha of Venus-Moon-Mars, starting from November 2025 onward.\n\n**RATIONALE:** The 10th house (career) is ruled by Jupiter in Libra, which is in an enemy sign but possesses adequate strength. The presence of both benefic planets (Moon and Jupiter) in key houses signifies potential growth. Currently, strong Shadbala indicators (Venus and Moon) suggest favorable conditions for professional growth. Venus, the Dasha lord, situated in the 5th house (creativity and intellect), implies opportunities that may arise through creative endeavors or leadership roles.\n\n**CHALLENGES:** However, there are notable challenges, such as the malefic influence of Rahu and Venus, which may create obstacles or delays in progress. The presence of malefic planets in the 8th house could introduce unpredictability in career matters. Additionally, the transitory phases of planets through the 10th house may bring temporary fluctuations in job satisfaction or work dynamics.\n\nOverall, while the chart indicates promising career prospects, be mindful of the changing dynamics and prepare for potential challenges during the coming years.",
+  "answer_summary": "**VERDICT:** Likely; Probability: Medium.\n\n**TIMING:** The most auspicious time frame for career adv...",
+  "timing": {
+    "period": "2025",
+    "dasha": null,
+    "transit": null,
+    "confidence": "MEDIUM"
+  },
+  "confidence": 0.5,
+  "confidence_label": "MEDIUM",
+  "supporting_factors": [
+    "Strong planetary placements indicated",
+    "Benefic influences present"
+  ],
+  "challenging_factors": [
+    "Malefic influences affect the area"
+  ],
+  "reasoning_trace": null,
+  "reasoning_summary": "",
+  "advice": null,
+  "sources": [
+    "BPHS",
+    "Jataka Parijata",
+    "Brihat Parashara Hora Shastra"
+  ],
+  "query": "How is my career?",
+  "life_area": "general",
+  "sub_area": "general",
+  "ascendant": "Pisces",
+  "planner_used": "sub_agents",
+  "execution_time_ms": 10339.585,
+  "llm_calls": 0,
+  "training_sample_id": null,
+  "follow_up_suggestions": [
+    "Tell me more about my chart",
+    "What are the positive aspects of my chart?",
+    "What should I focus on this year?"
+  ],
+  "created_at": "2025-12-23T08:38:01.215530",
+  "completed_at": "2025-12-23T08:38:11.573528"
+}

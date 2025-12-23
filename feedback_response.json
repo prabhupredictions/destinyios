@@ -1,0 +1,46 @@
+{
+  "detail": [
+    {
+      "type": "missing",
+      "loc": [
+        "body",
+        "query"
+      ],
+      "msg": "Field required",
+      "input": {
+        "prediction_id": "pred_eda99e6dabb9",
+        "rating": 5,
+        "feedback_text": "Great accuracy!",
+        "user_email": "prabhukushwaha@gmail.com"
+      }
+    },
+    {
+      "type": "missing",
+      "loc": [
+        "body",
+        "prediction_text"
+      ],
+      "msg": "Field required",
+      "input": {
+        "prediction_id": "pred_eda99e6dabb9",
+        "rating": 5,
+        "feedback_text": "Great accuracy!",
+        "user_email": "prabhukushwaha@gmail.com"
+      }
+    },
+    {
+      "type": "missing",
+      "loc": [
+        "body",
+        "area"
+      ],
+      "msg": "Field required",
+      "input": {
+        "prediction_id": "pred_eda99e6dabb9",
+        "rating": 5,
+        "feedback_text": "Great accuracy!",
+        "user_email": "prabhukushwaha@gmail.com"
+      }
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "prediction_id": "pred_a0c28d3827d7",
+  "session_id": null,
+  "conversation_id": null,
+  "status": "success",
+  "llm_analysis": "**1. Compatibility Overview**\n   - **Score**: 22.5/36 (Ashtakoot) | Mangal: Compatible (Cancelled)\n   - **Verdict**: Average\n   - **Summary**: The couple exhibits a moderate level of compatibility with some auspicious aspects, particularly in Bhakoot. However, the significant Gana mismatch and the presence of severe Mangal Dosha in the girl’s chart present challenges that must be navigated carefully.\n\n**2. Key Strengths (The Glue)**\n   - **Auspicious Bhakoot**: Perfect alignment in Bhakoot (7/7) indicates a beneficial house position.\n   - **Strong Yogas in Boy's Chart**: The boy has multiple active yogas such as Bhadra and Vasumathi, contributing positively to his character and potential for stability.\n   - **Cancellation of Mangal Dosha**: The girl’s severe Mangal Dosha is cancelled due to her Mars being in a benefic nakshatra and sign, offering a path to compatibility.\n\n**3. Critical Challenges (The Friction)**\n   - **Gana Mismatch**: The boy is categorized as Manusha while the girl is Rakshasa, which can lead to power struggles and emotional disconnect.\n   - **Maitri Score**: The low Maitri score (1/5) indicates potential mental incompatibility, which may lead to misunderstandings.\n   - **Nadi Dosha**: Presence of Nadi Dosha (8/8) which could create issues in emotional compatibility unless mitigated.\n\n**4. Mangal Dosha & Synastry Deep Dive**\n   - **Boy**: Absent\n   - **Girl**: Present (Severe) but cancelled due to favorable conditions.\n   - **Conclusion**: Despite the girl having a severe Mangal Dosha, the cancellation factors significantly alleviate the associated risks. The beneficial aspects from Jupiter and Venus towards Mars further enhance the compatibility, though caution is advised due to the challenging aspect from Rahu.\n\n**5. Detailed Guna Analysis**\n   - **Nadi**: 8/8 indicates a critical point; however, the cancellation possibilities should be explored in depth.\n   - **Gana**: 0/6 indicates a significant clash in temperaments and styles of interaction, suggesting the need for conscious efforts to harmonize.\n   - **Varna**: The boy being Brahmin and the girl Vaishya is acceptable but may require understanding and respect for differing values.\n\n**6. Final Verdict & Remedies**\n   - **Verdict**: Not Recommended for a harmonious relationship without significant effort and understanding.\n   - **Remedies**: \n     - **For Nadi Dosha**: Perform a Kumbh Vivah ceremony to mitigate the effects.\n     - **For Gana Mismatch**: Foster mutual respect and understanding. Engage in couples therapy or counseling to address emotional disconnects.\n     - **Enhance Bonding**: Engage in spiritual practices together, such as chanting or attending cultural events, to build emotional and mental compatibility.\n\nIn summary, while there are essential strengths in the charts, the critical challenges present risks that require conscious effort to overcome. Caution is advised, with a focus on remedies to foster harmony in the relationship.",
+  "exact_prompt": "SYSTEM_PROMPT:\n\nYou are a Vedic Astrology Compatibility Expert. Your task is to analyze the marriage compatibility between two charts with classical precision and wisdom.\n\n### INPUT DATA:\n1. JOINT ANALYSIS:\n   - Ashtakoot Matching (Scores, Gunas, Moon signs/Nakshatras)\n   - Mangal Dosha Compatibility (Comparison, Cancellation, Synastry)\n2. BOY'S CHART: D1/D9 Planets, Mangal Dosha, Yogas.\n3. GIRL'S CHART: D1/D9 Planets, Mangal Dosha, Yogas.\n\n### ANALYSIS RULES:\n\n1. **ASHTAKOOT INTERPRETATION** (Critical):\n   - **Nadi (8/36)**: If 0/8 (Nadi Dosha), verify exceptions (e.g., same rashi lords, different nakshatra quarters). If no exception, FLAG AS CRITICAL.\n   - **Bhakoot (7/36)**: If 0/7 (Bhakoot Dosha), check 6-8 (Mrityu shadashtak), 9-5, or 2-12 relationship. 6-8 is most dangerous.\n   - **Gana (6/36)**: Rakshasa vs Deva is difficult. Rakshasa vs Manushya is manageable if Maitri is good.\n   - **Grah Maitri (5/36)**: Planetary friendship is foundational for mental compatibility.\n\n2. **MANGAL DOSHA (MARS AFFLICTION)**:\n   - Check individual status: Present/Absent, Severity (Low/High).\n   - **Cancellation**: Does one partner's strong Mars cancel the other's? Or is there a natural cancellation (e.g., Mars in Aries)?\n   - **Synastry**: Do beneficial aspects (Jupiter/Venus) mitigate the dosha? Do Saturn/Rahu aspects worsen it?\n\n3. **YOGAS & INDIVIDUAL NATURE**:\n   - Synthesize how individual yogas (e.g., Raja Yogas, Kemadruma) impact the relationship.\n   - Example: A partner with \"Ruchaka Yoga\" (Strong Mars) needs a partner who can handle strong energy.\n\n### RESPONSE FORMAT:\n\n**1. Compatibility Overview**\n   - **Score**: X/36 (Ashtakoot) | Mangal: [Compatible/Incompatible]\n   - **Verdict**: [Excellent / Good / Average / Not Recommended] on a single line.\n   - **Summary**: 2-3 sentences summarizing the core dynamic.\n\n**2. Key Strengths (The Glue)**\n   - Bullet points of the strongest factors (e.g., \"Excellent Mental Compatibility (Maitri 5/5)\", \"Strong Emotional Bond\").\n\n**3. Critical Challenges (The Friction)**\n   - Highlight Doshas (Nadi, Bhakoot, Mangal) or personality clashes.\n   - **Exceptions**: If a Dosha is present but cancelled, EXPLAIN WHY clearly.\n\n**4. Mangal Dosha & Synastry Deep Dive**\n   - Detailed analysis of Mars.\n   - Boy: [Status] | Girl: [Status]\n   - Conclusion: How their Mars energies interact.\n\n**5. Detailed Guna Analysis**\n   - Brief comment on key Gunas (Varna to Nadi) where relevant. Do not list all if trivial.\n\n**6. Final Verdict & Remedies**\n   - Clear \"Go / No-Go\" advice (with nuance).\n   - **Remedies**: Practical Vedic remedies for detected issues (e.g., \"Chant Mahamrityunjaya constraint Nadi Dosha\", \"Kumbh Vivah\").\n\n### TONE & STYLE:\n- **Professional, Traditional, Empathetic**.\n- Use Sanskrit terms (Varna, Rashi) but explain them in English.\n- Be honest about risks but constructive.\n\n\nUSER_PROMPT:\n\nANALYZE COMPATIBILITY BETWEEN:\nBOY: 1994-07-01 00:15\nGIRL: 1996-04-20 04:45\n\n=== 1. JOINT ANALYSIS ===\nASHTAKOOT:22.5/36|good\nVARNA=1/1|Boy=Brahmin|Girl=Vaishya|Boy: Brahmin, Girl: Vaishya\nVASHYA=1/2|Boy=Water|Girl=Quadruped|Boy: Water, Girl: Quadruped\nTARA=1.5/3|Boy=Uttara Bhadrapada|Girl=Krittika|Tara 5: Pratyak (Opposition)\nYONI=3/4|Boy=Cow|Girl=Goat|Boy: Cow, Girl: Goat\nMAITRI=1/5|Boy=Jupiter|Girl=Venus|Boy lord: Jupiter, Girl lord: Venus\nGANA=0/6|Boy=Manusha|Girl=Rakshasa|Boy: Manusha, Girl: Rakshasa\nBHAKOOT=7/7|Boy=Pi|Girl=Ta|House positions: 3-11 - auspicious\nNADI=8/8|Boy=Madhya|Girl=Antya|Boy: Madhya, Girl: Antya\nMOON:Boy=Uttara Bhadrapada(Pi)|Girl=Krittika(Ta)\n\nCOMPATIBILITY:0.49/1|moderate|Cancel=True|Strength=0.90/1\n\nBOY_MANGAL_DOSHA:\n  Absent\n\nGIRL_MANGAL_DOSHA:\n  Has=True|Sev=Severe|Score=0.875|Ma:H?/?/?\n\nSYNASTRY:\n  Beneficial:['Jupiter->Mars(trine)', 'Jupiter->Mars(trine)', 'Venus->Mars(conjunction)']\n  Challenging:['Ra->Mars(square)']\n\nCANCEL_REASON:Girl has Mangal Dosha but cancelled by exceptions: mars_in_benefic_nakshatra, mars_in_jupiter_sign, mars_strong_ashtakavarga\n\n=== 2. BOY INDIVIDUAL DATA ===\nD1 PLANETS: As:H1/Pi/348°, Su:H4/Ge/75°, Mo:H1/Pi/345°, Ma:H3/Ta/34°, Me:H4/Ge/67°(comb), Ju:H8/Li/191°, Ve:H5/Ca/114°, Sa:H12/Aq/319°, Ra:H8/Li/208°, Ke:H2/Ar/28°\nD9/DIV: D9: As/H1/Sg, Su/H3/Aq, Mo/H12/Sc, Ma/H3/Aq, Me/H1/Sg, Ju/H2/Cp, Ve/H3/Aq, Sa/H4/Pi, Ra/H7/Ge, Ke/H1/Sg\nMANGAL DOSHA: Absent\nKALA SARPA: Absent\nYOGAS: Bhadra//Active, Adhi//Cancelled, Vasumathi//Active, Sunapha//Reduced, Anapha//Active, Dhurdhura//Reduced, Vesi//Cancelled, Vasi//Cancelled, Obhayachari//Cancelled, Bandhu Pujya (194)//Cancelled, Nishkapata 205//Active, Vimala//Active, Uttama Griha//Active, Kahala//Cancelled, Parijatha//Cancelled\n\n=== 3. GIRL INDIVIDUAL DATA ===\nD1 PLANETS: As:H1/Pi/354°, Su:H2/Ar/7°, Mo:H3/Ta/38°, Ma:H1/Pi/357°(comb), Me:H2/Ar/27°, Ju:H10/Sg/264°, Ve:H3/Ta/51°, Sa:H1/Pi/338°, Ra:H7/Vi/173°, Ke:H1/Pi/353°\nD9/DIV: D9: As/H1/Aq, Su/H5/Ge, Mo/H2/Pi, Ma/H2/Pi, Me/H10/Sc, Ju/H10/Sc, Ve/H6/Cn, Sa/H8/Vi, Ra/H6/Cn, Ke/H12/Cp\nMANGAL DOSHA: Present/Severe/H?/?\nKALA SARPA: Absent\nYOGAS: Hamsa//Active, Adhi//Active, Vasumathi//Active, Anapha//Cancelled, Vesi//Active, Vasi//Cancelled, Obhayachari//Cancelled, Bandhu Pujya (194)//Cancelled, Nishkapata 205//Cancelled, Lakshmi//Active, Amala//Active, Swaveeryadhana//Active, Amaranantha Dhana//Cancelled, Parvata//Active, Parijatha//Active\n",
+  "analysis_data": {
+    "joint": {
+      "ashtakoot_matching": {
+        "total_score": 22.5,
+        "max_score": 36,
+        "percentage": 62.5,
+        "category": "good",
+        "guna_scores": {
+          "varna": {
+            "score": 1,
+            "max": 1,
+            "description": "Boy: Brahmin, Girl: Vaishya",
+            "boy_varna": "Brahmin",
+            "girl_varna": "Vaishya"
+          },
+          "vashya": {
+            "score": 1,
+            "max": 2,
+            "description": "Boy: Water, Girl: Quadruped",
+            "boy_vashya": "Water",
+            "girl_vashya": "Quadruped"
+          },
+          "tara": {
+            "score": 1.5,
+            "max": 3,
+            "description": "Tara 5: Pratyak (Opposition)",
+            "boy_nakshatra": "Uttara Bhadrapada",
+            "girl_nakshatra": "Krittika"
+          },
+          "yoni": {
+            "score": 3,
+            "max": 4,
+            "description": "Boy: Cow, Girl: Goat",
+            "boy_yoni": "Cow",
+            "girl_yoni": "Goat"
+          },
+          "maitri": {
+            "score": 1,
+            "max": 5,
+            "description": "Boy lord: Jupiter, Girl lord: Venus",
+            "boy_lord": "Jupiter",
+            "girl_lord": "Venus"
+          },
+          "gana": {
+            "score": 0,
+            "max": 6,
+            "description": "Boy: Manusha, Girl: Rakshasa",
+            "boy_gana": "Manusha",
+            "girl_gana": "Rakshasa"
+          },
+          "bhakoot": {
+            "score": 7,
+            "max": 7,
+            "description": "House positions: 3-11 - auspicious",
+            "boy_sign": "Pi",
+            "girl_sign": "Ta"
+          },
+          "nadi": {
+            "score": 8,
+            "max": 8,
+            "description": "Boy: Madhya, Girl: Antya",
+            "boy_nadi": "Madhya",
+            "girl_nadi": "Antya"
+          }
+        },
+        "boy_moon": {
+          "sign": "Pi",
+          "nakshatra": "Uttara Bhadrapada"
+        },
+        "girl_moon": {
+          "sign": "Ta",
+          "nakshatra": "Krittika"
+        },
+        "doshas_detected": [],
+        "strengths": [
+          "Varna: Perfect (1/1)",
+          "Yoni: Good (3/4)",
+          "Bhakoot: Perfect (7/7)"
+        ],
+        "challenges": [
+          "Vashya: Partial (1/2)",
+          "Tara: Partial (1.5/3)",
+          "Maitri: Partial (1/5)"
+        ],
+        "recommendations": [
+          "Good compatibility - work on weaker areas",
+          "Gana mismatch: Focus on understanding temperaments",
+          "Consider Muhurta (auspicious timing) for milestones"
+        ],
+        "token_efficient_format": [
+          22.5,
+          36,
+          "good",
+          1,
+          1,
+          1.5,
+          3,
+          1,
+          0,
+          7,
+          8
+        ]
+      },
+      "mangal_compatibility": {
+        "compatibility_score": 0.49,
+        "compatibility_category": "moderate",
+        "cancellation_occurs": true,
+        "cancellation_strength": 0.9,
+        "cancellation_reason": "Girl has Mangal Dosha but cancelled by exceptions: mars_in_benefic_nakshatra, mars_in_jupiter_sign, mars_strong_ashtakavarga",
+        "boy_dosha": {
+          "has_mangal_dosha": false,
+          "severity": "None",
+          "dosha_score": 0.0,
+          "mars_position": {},
+          "exceptions": []
+        },
+        "girl_dosha": {
+          "has_mangal_dosha": true,
+          "severity": "Severe",
+          "dosha_score": 0.875,
+          "mars_position": {},
+          "exceptions": []
+        },
+        "synastry_impact": -0.35,
+        "synastry_details": {
+          "impact_value": -0.35,
+          "description": "Beneficial synastry aspects reduce Mangal Dosha impact",
+          "beneficial_aspects": [
+            {
+              "planet": "Jupiter",
+              "aspect_type": "trine",
+              "direction": "boy_to_girl",
+              "description": "Jupiter in house 8 forming trine with partner's Mars in house 1",
+              "benefic_strength": 0.8
+            },
+            {
+              "planet": "Jupiter",
+              "aspect_type": "trine",
+              "direction": "girl_to_boy",
+              "description": "Jupiter in house 10 forming trine with partner's Mars in house 3",
+              "benefic_strength": 0.8
+            },
+            {
+              "planet": "Venus",
+              "aspect_type": "conjunction",
+              "direction": "girl_to_boy",
+              "description": "Venus in house 3 forming conjunction with partner's Mars in house 3",
+              "benefic_strength": 0.5
+            }
+          ],
+          "challenging_aspects": [
+            {
+              "planet": "Ra",
+              "aspect_type": "square",
+              "direction": "girl_to_boy",
+              "description": "Ra in house 7 forming square with partner's Mars in house 3",
+              "malefic_strength": 0.8
+            }
+          ],
+          "mars_mars_relationship": {}
+        },
+        "dasha_impact": -0.03,
+        "recommendations": [
+          "Moderate compatibility - some remedial measures may be beneficial",
+          "Mangal Dosha cancellation occurs: Girl has Mangal Dosha but cancelled by exceptions: mars_in_benefic_nakshatra, mars_in_jupiter_sign, mars_strong_ashtakavarga",
+          "Significant dosha imbalance - focus on balancing energies through spiritual practices",
+          "Benefic influences (3) help mitigate Mars-related challenges",
+          "Monitor current dasha periods for relationship harmony"
+        ],
+        "token_efficient_format": [
+          0.49,
+          "moderate",
+          true,
+          0.9,
+          false,
+          true
+        ]
+      },
+      "formatted": {
+        "ashtakoot": "ASHTAKOOT:22.5/36|good\nVARNA=1/1|Boy=Brahmin|Girl=Vaishya|Boy: Brahmin, Girl: Vaishya\nVASHYA=1/2|Boy=Water|Girl=Quadruped|Boy: Water, Girl: Quadruped\nTARA=1.5/3|Boy=Uttara Bhadrapada|Girl=Krittika|Tara 5: Pratyak (Opposition)\nYONI=3/4|Boy=Cow|Girl=Goat|Boy: Cow, Girl: Goat\nMAITRI=1/5|Boy=Jupiter|Girl=Venus|Boy lord: Jupiter, Girl lord: Venus\nGANA=0/6|Boy=Manusha|Girl=Rakshasa|Boy: Manusha, Girl: Rakshasa\nBHAKOOT=7/7|Boy=Pi|Girl=Ta|House positions: 3-11 - auspicious\nNADI=8/8|Boy=Madhya|Girl=Antya|Boy: Madhya, Girl: Antya\nMOON:Boy=Uttara Bhadrapada(Pi)|Girl=Krittika(Ta)",
+        "mangal_compatibility": "COMPATIBILITY:0.49/1|moderate|Cancel=True|Strength=0.90/1\n\nBOY_MANGAL_DOSHA:\n  Absent\n\nGIRL_MANGAL_DOSHA:\n  Has=True|Sev=Severe|Score=0.875|Ma:H?/?/?\n\nSYNASTRY:\n  Beneficial:['Jupiter->Mars(trine)', 'Jupiter->Mars(trine)', 'Venus->Mars(conjunction)']\n  Challenging:['Ra->Mars(square)']\n\nCANCEL_REASON:Girl has Mangal Dosha but cancelled by exceptions: mars_in_benefic_nakshatra, mars_in_jupiter_sign, mars_strong_ashtakavarga"
+      }
+    },
+    "boy": {
+      "details": {
+        "dob": "1994-07-01",
+        "time": "00:15",
+        "lat": 18.4386,
+        "lon": 79.1288,
+        "name": "Boy",
+        "place": "Unknown"
+      },
+      "formatted": {
+        "d1_planets": "As:H1/Pi/348°, Su:H4/Ge/75°, Mo:H1/Pi/345°, Ma:H3/Ta/34°, Me:H4/Ge/67°(comb), Ju:H8/Li/191°, Ve:H5/Ca/114°, Sa:H12/Aq/319°, Ra:H8/Li/208°, Ke:H2/Ar/28°",
+        "mangal_dosha": "Absent",
+        "yogas": "Bhadra//Active, Adhi//Cancelled, Vasumathi//Active, Sunapha//Reduced, Anapha//Active, Dhurdhura//Reduced, Vesi//Cancelled, Vasi//Cancelled, Obhayachari//Cancelled, Bandhu Pujya (194)//Cancelled, Nishkapata 205//Active, Vimala//Active, Uttama Griha//Active, Kahala//Cancelled, Parijatha//Cancelled"
+      }
+    },
+    "girl": {
+      "details": {
+        "dob": "1996-04-20",
+        "time": "04:45",
+        "lat": 34.0522,
+        "lon": -118.2437,
+        "name": "Girl",
+        "place": "Unknown"
+      },
+      "formatted": {
+        "d1_planets": "As:H1/Pi/354°, Su:H2/Ar/7°, Mo:H3/Ta/38°, Ma:H1/Pi/357°(comb), Me:H2/Ar/27°, Ju:H10/Sg/264°, Ve:H3/Ta/51°, Sa:H1/Pi/338°, Ra:H7/Vi/173°, Ke:H1/Pi/353°",
+        "mangal_dosha": "Present/Severe/H?/?",
+        "yogas": "Hamsa//Active, Adhi//Active, Vasumathi//Active, Anapha//Cancelled, Vesi//Active, Vasi//Cancelled, Obhayachari//Cancelled, Bandhu Pujya (194)//Cancelled, Nishkapata 205//Cancelled, Lakshmi//Active, Amala//Active, Swaveeryadhana//Active, Amaranantha Dhana//Cancelled, Parvata//Active, Parijatha//Active"
+      }
+    }
+  }
+}
