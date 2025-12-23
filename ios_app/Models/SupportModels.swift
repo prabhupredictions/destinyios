@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Chat Thread (Matches verified API)
-struct ChatThread: Codable, Identifiable {
+struct ChatThread: Codable, Identifiable, Sendable {
     let id: String
     let title: String
     let preview: String
@@ -17,7 +17,7 @@ struct ChatThread: Codable, Identifiable {
 }
 
 // MARK: - Feedback Request (Matches verified API)
-struct FeedbackRequest: Codable {
+struct FeedbackRequest: Codable, Sendable {
     let predictionId: String
     let rating: Int
     let feedbackText: String
@@ -36,7 +36,7 @@ struct FeedbackRequest: Codable {
 }
 
 // MARK: - Compatibility Request
-struct CompatibilityRequest: Codable {
+struct CompatibilityRequest: Codable, Sendable {
     let boy: BirthDetails
     let girl: BirthDetails
     var sessionId: String?
@@ -50,7 +50,7 @@ struct CompatibilityRequest: Codable {
 }
 
 // MARK: - Birth Details (For Compatibility)
-struct BirthDetails: Codable {
+struct BirthDetails: Codable, Sendable {
     let dob: String
     let time: String
     let lat: Double
@@ -60,7 +60,7 @@ struct BirthDetails: Codable {
 }
 
 // MARK: - Compatibility Response
-struct CompatibilityResponse: Codable {
+struct CompatibilityResponse: Codable, Sendable {
     let sessionId: String?
     let status: String
     
@@ -71,7 +71,7 @@ struct CompatibilityResponse: Codable {
 }
 
 // MARK: - User (Placeholder for Auth)
-struct User: Codable, Identifiable {
+struct User: Codable, Identifiable, Sendable {
     let id: String
     var email: String?
     var name: String?

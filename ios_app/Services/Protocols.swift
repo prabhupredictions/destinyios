@@ -38,3 +38,10 @@ protocol AuthServiceProtocol {
     func signInAsGuest() async -> User
     func signOut() async
 }
+
+// MARK: - URLSession Protocol (for testing)
+protocol URLSessionProtocol: Sendable {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: URLSessionProtocol {}
