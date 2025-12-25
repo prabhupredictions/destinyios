@@ -15,6 +15,7 @@ class ChatViewModel {
     var inputText = ""
     var chatHistory: [LocalChatThread] = []
     var showHistory = false
+    var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     
     // Current session/thread
     var currentSessionId: String = ""
@@ -178,6 +179,9 @@ class ChatViewModel {
                 messages[index].confidence = response.confidenceLabel
                 dataManager.saveMessage(messages[index])
             }
+            
+            // Store follow-up suggestions for display
+            suggestedQuestions = response.followUpSuggestions
             
             isLoading = false
             streamingMessageId = nil

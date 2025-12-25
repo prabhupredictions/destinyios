@@ -35,6 +35,11 @@ struct ChatView: View {
                 errorBanner(error)
             }
             
+            // Suggested follow-up questions (after last response)
+            if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading {
+                suggestedQuestionsView
+            }
+            
             // Input bar
             ChatInputBar(
                 text: $viewModel.inputText,
@@ -181,6 +186,52 @@ struct ChatView: View {
         )
         .padding(.horizontal, 16)
         .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+    
+    // MARK: - Suggested Questions
+    private var suggestedQuestionsView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Suggested questions")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(Color("TextDark").opacity(0.5))
+                .padding(.horizontal, 16)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(viewModel.suggestedQuestions, id: \.self) { question in
+                        Button(action: {
+                            // Clear suggestions and send as new message
+                            viewModel.inputText = question
+                            viewModel.suggestedQuestions = []
+                            if viewModel.canAskQuestion {
+                                Task { await viewModel.sendMessage() }
+                            } else {
+                                showQuotaExhausted = true
+                            }
+                        }) {
+                            Text(question)
+                                .font(.system(size: 13))
+                                .foregroundColor(Color("NavyPrimary"))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .fill(Color.white)
+                                        .shadow(color: Color.black.opacity(0.05), radius: 4, y: 2)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .stroke(Color("GoldAccent").opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+        .padding(.vertical, 8)
+        .background(Color(red: 0.96, green: 0.95, blue: 0.98))
     }
 }
 
