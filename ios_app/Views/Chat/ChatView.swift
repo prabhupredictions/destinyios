@@ -18,45 +18,50 @@ struct ChatView: View {
     @AppStorage("isGuest") private var isGuest = false
     
     var body: some View {
-        ZStack {
-            // Animated orbital background with rotating planets
-            MinimalOrbitalBackground()
+        VStack(spacing: 0) {
+            // Header
+            ChatHeader(
+                onBackTap: { onBack?() },
+                onHistoryTap: { showHistory.toggle() },
+                onNewChatTap: { viewModel.startNewChat() },
+                onChartTap: { showChart.toggle() }
+            )
             
-            VStack(spacing: 0) {
-                // Header
-                ChatHeader(
-                    onBackTap: { onBack?() },
-                    onHistoryTap: { showHistory.toggle() },
-                    onNewChatTap: { viewModel.startNewChat() },
-                    onChartTap: { showChart.toggle() }
-                )
-                
-                // Messages
-                messagesView
-                
-                // Error message
-                if let error = viewModel.errorMessage {
-                    errorBanner(error)
+            // Messages
+            messagesView
+            
+            // Error message
+            if let error = viewModel.errorMessage {
+                errorBanner(error)
+            }
+            
+            // Input bar
+            ChatInputBar(
+                text: $viewModel.inputText,
+                isFocused: $isInputFocused,
+                isLoading: viewModel.isLoading,
+                isStreaming: viewModel.isStreaming
+            ) {
+                // Check quota before sending
+                if viewModel.canAskQuestion {
+                    Task { await viewModel.sendMessage() }
+                } else {
+                    showQuotaExhausted = true
                 }
-                
-                // Input bar
-                ChatInputBar(
-                    text: $viewModel.inputText,
-                    isFocused: $isInputFocused,
-                    isLoading: viewModel.isLoading,
-                    isStreaming: viewModel.isStreaming
-                ) {
-                    // Check quota before sending
-                    if viewModel.canAskQuestion {
-                        Task { await viewModel.sendMessage() }
-                    } else {
-                        showQuotaExhausted = true
-                    }
-                }
-                
-                // Note: Bottom spacer removed - tab bar is hidden on chat screen
             }
         }
+        .background(
+            // Simple static gradient - no GeometryReader = keyboard-safe
+            LinearGradient(
+                colors: [
+                    Color(red: 0.96, green: 0.95, blue: 0.98),
+                    Color(red: 0.94, green: 0.93, blue: 0.96)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        )
         .sheet(isPresented: $showHistory) {
             ChatHistorySidebar(viewModel: viewModel) {
                 showHistory = false
