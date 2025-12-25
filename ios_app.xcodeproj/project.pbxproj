@@ -27,6 +27,7 @@
 		E442EF302EF2B99700146A8B /* ios_app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios_app.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E442EF412EF2B99C00146A8B /* ios_appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E444AD8C2EFCD75F00782341 /* ios_app.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ios_app.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,6 +89,7 @@
 		E442EF272EF2B99600146A8B = {
 			isa = PBXGroup;
 			children = (
+				E444AD8C2EFCD75F00782341 /* ios_app.xctestplan */,
 				E442EF322EF2B99700146A8B /* ios_app */,
 				E442EF442EF2B99C00146A8B /* ios_appTests */,
 				E442EF4E2EF2B99C00146A8B /* ios_appUITests */,

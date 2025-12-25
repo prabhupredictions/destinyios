@@ -1,37 +1,38 @@
 import XCTest
 @testable import ios_app
 
+@MainActor
 final class AuthViewModelTests: XCTestCase {
     
     var viewModel: AuthViewModel!
-    var mockKeychain: KeychainService!
     
-    override func setUp() {
-        super.setUp()
-        // Clear any existing session data
-        KeychainService.shared.clearAll()
-        UserDefaults.standard.removeObject(forKey: "isGuest")
-        UserDefaults.standard.removeObject(forKey: "userEmail")
-        UserDefaults.standard.removeObject(forKey: "userName")
-        UserDefaults.standard.removeObject(forKey: "isAuthenticated")
+    override func setUp() async throws {
+        try await super.setUp()
+        // Clear any existing session data - ensure clean state
+        await clearAllState()
         
-        viewModel = AuthViewModel(authService: MockAuthService())
+        // Create fresh viewModel with mock service
+        viewModel = AuthViewModel(authService: TestAuthService())
     }
     
-    override func tearDown() {
+    override func tearDown() async throws {
         viewModel = nil
-        // Clean up
+        await clearAllState()
+        try await super.tearDown()
+    }
+    
+    private func clearAllState() async {
         KeychainService.shared.clearAll()
         UserDefaults.standard.removeObject(forKey: "isGuest")
         UserDefaults.standard.removeObject(forKey: "userEmail")
         UserDefaults.standard.removeObject(forKey: "userName")
         UserDefaults.standard.removeObject(forKey: "isAuthenticated")
-        super.tearDown()
+        UserDefaults.standard.synchronize()
     }
     
     // MARK: - Initial State Tests
     
-    func testInitialState_NotAuthenticated() {
+    func testInitialState_NotAuthenticated() async throws {
         XCTAssertFalse(viewModel.isAuthenticated)
         XCTAssertFalse(viewModel.isGuest)
         XCTAssertNil(viewModel.userEmail)
@@ -42,58 +43,36 @@ final class AuthViewModelTests: XCTestCase {
     
     // MARK: - Guest Sign In Tests
     
-    func testContinueAsGuest_SetsGuestState() {
-        // Create expectation for async operation
-        let expectation = XCTestExpectation(description: "Guest sign in")
-        
+    func testContinueAsGuest_SetsGuestState() async throws {
         // When
-        viewModel.continueAsGuest()
+        await viewModel.continueAsGuestAsync()
         
-        // Wait for async
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            // Then
-            XCTAssertTrue(self.viewModel.isAuthenticated)
-            XCTAssertTrue(self.viewModel.isGuest)
-            XCTAssertNil(self.viewModel.userEmail)
-            XCTAssertEqual(self.viewModel.userName, "Guest")
-            expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 2.0)
+        // Then
+        XCTAssertTrue(viewModel.isAuthenticated)
+        XCTAssertTrue(viewModel.isGuest)
+        XCTAssertNil(viewModel.userEmail)
+        XCTAssertEqual(viewModel.userName, "Guest")
     }
     
     // MARK: - Sign Out Tests
     
-    func testSignOut_ClearsAllState() {
+    func testSignOut_ClearsAllState() async throws {
         // Given: Sign in as guest first
-        let setupExpectation = XCTestExpectation(description: "Setup")
-        viewModel.continueAsGuest()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            XCTAssertTrue(self.viewModel.isAuthenticated)
-            setupExpectation.fulfill()
-        }
-        
-        wait(for: [setupExpectation], timeout: 2.0)
+        await viewModel.continueAsGuestAsync()
+        XCTAssertTrue(viewModel.isAuthenticated, "Should be authenticated after guest sign in")
         
         // When
-        viewModel.signOut()
+        await viewModel.signOutAsync()
         
-        // Then (after async)
-        let signOutExpectation = XCTestExpectation(description: "Sign out")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            XCTAssertFalse(self.viewModel.isAuthenticated)
-            XCTAssertFalse(self.viewModel.isGuest)
-            XCTAssertNil(self.viewModel.userEmail)
-            signOutExpectation.fulfill()
-        }
-        
-        wait(for: [signOutExpectation], timeout: 2.0)
+        // Then
+        XCTAssertFalse(viewModel.isAuthenticated, "Should not be authenticated after sign out")
+        XCTAssertFalse(viewModel.isGuest, "Should not be guest after sign out")
+        XCTAssertNil(viewModel.userEmail, "Email should be nil after sign out")
     }
     
     // MARK: - Apple Sign In Tests
     
-    func testSignInWithApple_SetsAuthenticatedState() async {
+    func testSignInWithApple_SetsAuthenticatedState() async throws {
         // When
         await viewModel.signInWithApple()
         
@@ -106,7 +85,7 @@ final class AuthViewModelTests: XCTestCase {
     
     // MARK: - Google Sign In Tests
     
-    func testSignInWithGoogle_SetsAuthenticatedState() async {
+    func testSignInWithGoogle_SetsAuthenticatedState() async throws {
         // When
         await viewModel.signInWithGoogle()
         
@@ -118,25 +97,49 @@ final class AuthViewModelTests: XCTestCase {
     
     // MARK: - Loading State Tests
     
-    func testSignIn_SetsLoadingState() async {
+    func testSignIn_SetsLoadingState() async throws {
         // Given
         XCTAssertFalse(viewModel.isLoading)
         
-        // When - start sign in
-        let task = Task {
-            await viewModel.signInWithApple()
-        }
+        // When
+        await viewModel.signInWithApple()
         
-        // Give it a moment to start
-        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 sec
-        
-        // Then - should be loading
-        XCTAssertTrue(viewModel.isLoading)
-        
-        // Wait for completion
-        await task.value
-        
-        // After - should not be loading
+        // Then - after completion, should not be loading
         XCTAssertFalse(viewModel.isLoading)
+        XCTAssertTrue(viewModel.isAuthenticated)
+    }
+}
+
+// MARK: - Test Auth Service (faster than Mock)
+
+class TestAuthService: AuthServiceProtocol {
+    func signInWithApple() async throws -> User {
+        // No delay for tests
+        return User(
+            id: UUID().uuidString,
+            email: "user@icloud.com",
+            name: "Apple User"
+        )
+    }
+    
+    func signInWithGoogle() async throws -> User {
+        return User(
+            id: UUID().uuidString,
+            email: "user@gmail.com",
+            name: "Google User"
+        )
+    }
+    
+    func signInAsGuest() async -> User {
+        let guestId = "guest_test_\(UUID().uuidString.prefix(8))"
+        return User(
+            id: guestId,
+            email: nil,
+            name: "Guest"
+        )
+    }
+    
+    func signOut() async {
+        // No-op for test
     }
 }

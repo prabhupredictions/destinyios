@@ -33,66 +33,106 @@ struct SplashView: View {
                 .opacity(0.3)
             
             // Main content
-            VStack(spacing: 24) {
+            VStack(spacing: 0) {
                 Spacer()
                 
-                // Logo with glow effect
+                // Logo with premium glow effect
                 ZStack {
-                    // Glow
+                    // Outer glow
                     Circle()
-                        .fill(Color("GoldAccent").opacity(0.3))
-                        .frame(width: 140, height: 140)
+                        .fill(Color("GoldAccent").opacity(0.2))
+                        .frame(width: 200, height: 200)
+                        .blur(radius: 50)
+                    
+                    // Inner glow
+                    Circle()
+                        .fill(Color("GoldAccent").opacity(0.4))
+                        .frame(width: 160, height: 160)
                         .blur(radius: 30)
                     
                     // Logo container
                     ZStack {
+                        // Golden circle background with gradient
                         Circle()
                             .fill(
                                 LinearGradient(
-                                    colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.8)],
+                                    colors: [
+                                        Color(red: 0.95, green: 0.80, blue: 0.40),
+                                        Color(red: 0.85, green: 0.68, blue: 0.30),
+                                        Color(red: 0.90, green: 0.75, blue: 0.35)
+                                    ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .frame(width: 110, height: 110)
-                            .shadow(color: Color("GoldAccent").opacity(0.5), radius: 20)
+                            .frame(width: 140, height: 140)
+                            .shadow(color: Color("GoldAccent").opacity(0.6), radius: 25, y: 5)
                         
-                        Text("D")
-                            .font(.system(size: 56, weight: .light, design: .serif))
-                            .foregroundColor(Color("NavyPrimary"))
+                        // Logo image - properly fitted (78% of circle)
+                        Image("logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 110, height: 110)
                     }
                 }
                 .scaleEffect(logoScale)
                 .opacity(logoOpacity)
                 
-                // App name
-                VStack(spacing: 8) {
-                    Text("destiny")
-                        .font(.system(size: 44, weight: .light, design: .rounded))
+                Spacer()
+                    .frame(height: 40)
+                
+                // App name - Premium typography
+                VStack(spacing: 16) {
+                    // Main title
+                    Text("DESTINY")
+                        .font(.system(size: 42, weight: .bold, design: .default))
                         .foregroundColor(.white)
-                        .tracking(4)
+                        .tracking(12)
+                        .shadow(color: .black.opacity(0.3), radius: 2, y: 2)
                     
+                    // Subtitle
                     Text("AI ASTROLOGY")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Color("GoldAccent"))
-                        .tracking(6)
+                        .tracking(8)
+                    
+                    // Tagline
+                    Text("WORLD'S MOST ADVANCED ASTROLOGER")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
+                        .tracking(2)
+                        .padding(.top, 8)
                 }
                 .opacity(titleOpacity)
                 
                 Spacer()
                 
-                // Loading indicator
-                VStack(spacing: 16) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("GoldAccent")))
-                        .scaleEffect(1.2)
+                // Loading indicator - minimal and elegant
+                VStack(spacing: 20) {
+                    // Custom loader dots
+                    HStack(spacing: 8) {
+                        ForEach(0..<3, id: \.self) { index in
+                            Circle()
+                                .fill(Color("GoldAccent"))
+                                .frame(width: 6, height: 6)
+                                .opacity(subtitleOpacity)
+                                .scaleEffect(subtitleOpacity > 0.5 ? 1.0 : 0.5)
+                                .animation(
+                                    .easeInOut(duration: 0.6)
+                                    .repeatForever(autoreverses: true)
+                                    .delay(Double(index) * 0.2),
+                                    value: subtitleOpacity
+                                )
+                        }
+                    }
                     
                     Text("Aligning the stars...")
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(.white.opacity(0.6))
+                        .font(.system(size: 13, weight: .light))
+                        .foregroundColor(.white.opacity(0.5))
+                        .italic()
                 }
                 .opacity(subtitleOpacity)
-                .padding(.bottom, 60)
+                .padding(.bottom, 70)
             }
         }
         .onAppear {

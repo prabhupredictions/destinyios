@@ -99,7 +99,7 @@ struct AuthView: View {
                 .frame(width: 130, height: 130)
                 .blur(radius: 20)
             
-            // Logo
+            // Logo background circle
             Circle()
                 .fill(
                     LinearGradient(
@@ -111,9 +111,11 @@ struct AuthView: View {
                 .frame(width: 100, height: 100)
                 .shadow(color: Color("GoldAccent").opacity(0.4), radius: 15)
             
-            Text("D")
-                .font(.system(size: 48, weight: .light, design: .serif))
-                .foregroundColor(Color("NavyPrimary"))
+            // Logo image
+            Image("logo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 60, height: 60)
         }
     }
     
@@ -133,6 +135,15 @@ struct AuthView: View {
     // MARK: - Auth Buttons
     private var authButtonsSection: some View {
         VStack(spacing: 14) {
+            // Google Sign In (first)
+            AuthButton(
+                icon: "g.circle.fill",
+                title: "Continue with Google",
+                style: .light
+            ) {
+                Task { await viewModel.signInWithGoogle() }
+            }
+            
             // Apple Sign In
             AuthButton(
                 icon: "apple.logo",
@@ -142,16 +153,7 @@ struct AuthView: View {
                 Task { await viewModel.signInWithApple() }
             }
             
-            // Google Sign In
-            AuthButton(
-                icon: "g.circle.fill",
-                title: "Continue with Google",
-                style: .light
-            ) {
-                Task { await viewModel.signInWithGoogle() }
-            }
-            
-            // Email Sign In (placeholder)
+            // Email Sign In
             AuthButton(
                 icon: "envelope.fill",
                 title: "Continue with Email",

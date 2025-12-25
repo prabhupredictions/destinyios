@@ -36,12 +36,24 @@ final class BirthDataViewModelTests: XCTestCase {
     
     // MARK: - Validation Tests
     
-    func testWithCity_IsValid() {
-        // When
+    func testWithCityAndCoords_IsValid() {
+        // When - need both city and coordinates
         viewModel.cityOfBirth = "Los Angeles"
+        viewModel.latitude = 34.0522
+        viewModel.longitude = -118.2437
         
         // Then
         XCTAssertTrue(viewModel.isValid)
+    }
+    
+    func testWithCityButNoCoords_IsInvalid() {
+        // When - city without coordinates
+        viewModel.cityOfBirth = "Los Angeles"
+        viewModel.latitude = 0
+        viewModel.longitude = 0
+        
+        // Then
+        XCTAssertFalse(viewModel.isValid)
     }
     
     func testWithEmptyCity_IsInvalid() {
@@ -60,57 +72,34 @@ final class BirthDataViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isValid)
     }
     
-    // MARK: - BirthData Formatting Tests
+    // MARK: - Formatted Date/Time Tests
     
-    func testBirthData_FormatsDateCorrectly() {
+    func testFormattedDOB_FormatsDateCorrectly() {
         // Given
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         viewModel.dateOfBirth = dateFormatter.date(from: "1996-04-20")!
-        viewModel.cityOfBirth = "Los Angeles"
-        
-        // When
-        let birthData = viewModel.birthData
         
         // Then
-        XCTAssertEqual(birthData.dob, "1996-04-20")
+        XCTAssertEqual(viewModel.formattedDOB, "1996-04-20")
     }
     
-    func testBirthData_FormatsTimeCorrectly() {
+    func testFormattedTOB_FormatsTimeCorrectly() {
         // Given
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "HH:mm"
         viewModel.timeOfBirth = timeFormatter.date(from: "04:45")!
-        viewModel.cityOfBirth = "Los Angeles"
-        
-        // When
-        let birthData = viewModel.birthData
         
         // Then
-        XCTAssertEqual(birthData.time, "04:45")
+        XCTAssertEqual(viewModel.formattedTOB, "04:45")
     }
     
-    func testBirthData_TimeUnknownUsesNoon() {
+    func testFormattedTOB_TimeUnknownUsesNoon() {
         // Given
         viewModel.timeUnknown = true
-        viewModel.cityOfBirth = "Los Angeles"
-        
-        // When
-        let birthData = viewModel.birthData
         
         // Then
-        XCTAssertEqual(birthData.time, "12:00")
-    }
-    
-    func testBirthData_TrimsCity() {
-        // Given
-        viewModel.cityOfBirth = "  Los Angeles  "
-        
-        // When
-        let birthData = viewModel.birthData
-        
-        // Then
-        XCTAssertEqual(birthData.cityOfBirth, "Los Angeles")
+        XCTAssertEqual(viewModel.formattedTOB, "12:00")
     }
     
     // MARK: - Save Tests
@@ -118,6 +107,8 @@ final class BirthDataViewModelTests: XCTestCase {
     func testSave_WithValidData_ReturnsTrue() {
         // Given
         viewModel.cityOfBirth = "Los Angeles"
+        viewModel.latitude = 34.0522
+        viewModel.longitude = -118.2437
         
         // When
         let result = viewModel.save()
@@ -128,9 +119,23 @@ final class BirthDataViewModelTests: XCTestCase {
         XCTAssertTrue(UserDefaults.standard.bool(forKey: "hasBirthData"))
     }
     
-    func testSave_WithInvalidData_ReturnsFalse() {
+    func testSave_WithoutCity_ReturnsFalse() {
         // Given - empty city
         viewModel.cityOfBirth = ""
+        
+        // When
+        let result = viewModel.save()
+        
+        // Then
+        XCTAssertFalse(result)
+        XCTAssertNotNil(viewModel.errorMessage)
+    }
+    
+    func testSave_WithoutCoords_ReturnsFalse() {
+        // Given - city without coordinates
+        viewModel.cityOfBirth = "Los Angeles"
+        viewModel.latitude = 0
+        viewModel.longitude = 0
         
         // When
         let result = viewModel.save()
@@ -166,4 +171,18 @@ final class BirthDataViewModelTests: XCTestCase {
         // Then
         XCTAssertEqual(formatted, "Unknown")
     }
+    
+    // MARK: - Location Selection Tests
+    
+    func testSetLocation_UpdatesAllFields() {
+        // When
+        viewModel.setLocation(city: "Mumbai", lat: 19.076, lng: 72.877, id: "place123")
+        
+        // Then
+        XCTAssertEqual(viewModel.cityOfBirth, "Mumbai")
+        XCTAssertEqual(viewModel.latitude, 19.076, accuracy: 0.001)
+        XCTAssertEqual(viewModel.longitude, 72.877, accuracy: 0.001)
+        XCTAssertEqual(viewModel.placeId, "place123")
+    }
 }
+

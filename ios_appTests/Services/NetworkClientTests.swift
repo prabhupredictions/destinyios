@@ -28,8 +28,8 @@ final class NetworkClientTests: XCTestCase {
         // Given
         let expectedResponse = MockDataFactory.mockPredictionResponse()
         let jsonData = try JSONEncoder().encode(expectedResponse)
-        mockURLSession.mockData = jsonData
-        mockURLSession.mockStatusCode = 200
+        await mockURLSession.setMockData(jsonData)
+        await mockURLSession.setMockStatusCode(200)
         
         // When
         let response: PredictionResponse = try await networkClient.request(
@@ -45,8 +45,8 @@ final class NetworkClientTests: XCTestCase {
     func testRequest_SetsCorrectHeaders() async throws {
         // Given
         let jsonData = try JSONEncoder().encode(MockDataFactory.mockPredictionResponse())
-        mockURLSession.mockData = jsonData
-        mockURLSession.mockStatusCode = 200
+        await mockURLSession.setMockData(jsonData)
+        await mockURLSession.setMockStatusCode(200)
         
         // When
         let _: PredictionResponse = try await networkClient.request(
@@ -56,17 +56,17 @@ final class NetworkClientTests: XCTestCase {
         )
         
         // Then
-        let request = mockURLSession.lastRequest
+        let request = await mockURLSession.lastRequest
         XCTAssertNotNil(request)
         XCTAssertEqual(request?.value(forHTTPHeaderField: "Content-Type"), "application/json")
-        XCTAssertEqual(request?.value(forHTTPHeaderField: "X-API-KEY"), "test_key")
+        XCTAssertEqual(request?.value(forHTTPHeaderField: "Authorization"), "Bearer test_key")
     }
     
     func testRequest_EncodesBodyCorrectly() async throws {
         // Given
         let jsonData = try JSONEncoder().encode(MockDataFactory.mockPredictionResponse())
-        mockURLSession.mockData = jsonData
-        mockURLSession.mockStatusCode = 200
+        await mockURLSession.setMockData(jsonData)
+        await mockURLSession.setMockStatusCode(200)
         let requestBody = MockDataFactory.validPredictionRequest()
         
         // When
@@ -77,7 +77,7 @@ final class NetworkClientTests: XCTestCase {
         )
         
         // Then
-        let sentData = mockURLSession.lastRequest?.httpBody
+        let sentData = await mockURLSession.lastRequest?.httpBody
         XCTAssertNotNil(sentData)
     }
     
@@ -85,8 +85,8 @@ final class NetworkClientTests: XCTestCase {
     
     func testRequest_Unauthorized_ThrowsUnauthorizedError() async {
         // Given
-        mockURLSession.mockStatusCode = 401
-        mockURLSession.mockData = "{}".data(using: .utf8)!
+        await mockURLSession.setMockStatusCode(401)
+        await mockURLSession.setMockData("{}".data(using: .utf8)!)
         
         // When/Then
         do {
@@ -105,8 +105,8 @@ final class NetworkClientTests: XCTestCase {
     
     func testRequest_ServerError_ThrowsServerError() async {
         // Given
-        mockURLSession.mockStatusCode = 500
-        mockURLSession.mockData = "{\"error\": \"Internal Server Error\"}".data(using: .utf8)!
+        await mockURLSession.setMockStatusCode(500)
+        await mockURLSession.setMockData("{\"error\": \"Internal Server Error\"}".data(using: .utf8)!)
         
         // When/Then
         do {
@@ -125,8 +125,8 @@ final class NetworkClientTests: XCTestCase {
     
     func testRequest_InvalidJSON_ThrowsDecodingError() async {
         // Given
-        mockURLSession.mockStatusCode = 200
-        mockURLSession.mockData = "Not valid JSON".data(using: .utf8)!
+        await mockURLSession.setMockStatusCode(200)
+        await mockURLSession.setMockData("Not valid JSON".data(using: .utf8)!)
         
         // When/Then
         do {
@@ -145,8 +145,8 @@ final class NetworkClientTests: XCTestCase {
     
     func testRequest_NoData_ThrowsNoDataError() async {
         // Given
-        mockURLSession.mockStatusCode = 200
-        mockURLSession.mockData = Data() // Empty data
+        await mockURLSession.setMockStatusCode(200)
+        await mockURLSession.setMockData(Data()) // Empty data
         
         // When/Then
         do {
@@ -165,7 +165,7 @@ final class NetworkClientTests: XCTestCase {
     
     func testRequest_NetworkFailure_ThrowsError() async {
         // Given
-        mockURLSession.mockError = URLError(.notConnectedToInternet)
+        await mockURLSession.setMockError(URLError(.notConnectedToInternet))
         
         // When/Then
         do {

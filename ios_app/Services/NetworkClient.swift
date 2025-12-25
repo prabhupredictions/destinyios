@@ -34,7 +34,7 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "X-API-KEY")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         
         // Encode body (models have CodingKeys for snake_case)
         if let body = body {

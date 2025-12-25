@@ -10,6 +10,15 @@ struct AppRootView: View {
     // MARK: - Local State
     @State private var showSplash = true
     
+    // Computed property to check if guest needs birth data
+    private var guestNeedsBirthData: Bool {
+        let isGuest = UserDefaults.standard.bool(forKey: "isGuest")
+        let hasBirthData = UserDefaults.standard.bool(forKey: "hasBirthData")
+        // Guest users: always show birth data view on fresh session
+        // (hasBirthData gets cleared on app start for guests)
+        return isGuest && !hasBirthData
+    }
+    
     var body: some View {
         ZStack {
             // Main content
@@ -27,14 +36,15 @@ struct AppRootView: View {
                             insertion: .move(edge: .trailing),
                             removal: .move(edge: .leading)
                         ))
-                } else if !hasBirthData {
+                } else if !hasBirthData || guestNeedsBirthData {
+                    // Both new users AND guest users (each session) must enter birth data
                     BirthDataView()
                         .transition(.asymmetric(
                             insertion: .move(edge: .trailing),
                             removal: .move(edge: .leading)
                         ))
                 } else {
-                    HomeView()
+                    MainTabView()
                         .transition(.opacity)
                 }
             }

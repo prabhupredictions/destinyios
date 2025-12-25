@@ -10,6 +10,7 @@ struct BirthDataView: View {
     @State private var contentOpacity: Double = 0
     @State private var showDatePicker = false
     @State private var showTimePicker = false
+    @State private var showLocationSearch = false
     
     var body: some View {
         NavigationStack {
@@ -63,6 +64,14 @@ struct BirthDataView: View {
                 title: "Time of Birth",
                 selection: $viewModel.timeOfBirth,
                 components: .hourAndMinute
+            )
+        }
+        .sheet(isPresented: $showLocationSearch) {
+            LocationSearchView(
+                selectedCity: $viewModel.cityOfBirth,
+                latitude: $viewModel.latitude,
+                longitude: $viewModel.longitude,
+                placeId: $viewModel.placeId
             )
         }
     }
@@ -168,13 +177,14 @@ struct BirthDataView: View {
                 .padding(.leading, 4)
             }
             
-            // City of Birth
-            FormFieldInput(
+            // City of Birth (with location search)
+            FormFieldButton(
                 icon: "location",
                 title: "City of Birth",
-                placeholder: "Enter your birth city",
-                text: $viewModel.cityOfBirth
-            )
+                value: viewModel.cityOfBirth.isEmpty ? "Select your birth city" : viewModel.cityOfBirth
+            ) {
+                showLocationSearch = true
+            }
             
             // Gender (optional)
             FormFieldPicker(
@@ -195,6 +205,10 @@ struct BirthDataView: View {
     private var submitButton: some View {
         Button(action: {
             if viewModel.save() {
+                // Register with backend subscription service
+                Task {
+                    await registerWithBackend()
+                }
                 withAnimation(.easeInOut(duration: 0.3)) {
                     hasBirthData = true
                 }
@@ -226,6 +240,29 @@ struct BirthDataView: View {
             )
         }
         .disabled(!viewModel.isValid)
+    }
+    
+    // MARK: - Backend Registration
+    private func registerWithBackend() async {
+        guard let userEmail = UserDefaults.standard.string(forKey: "userEmail"),
+              !userEmail.isEmpty else {
+            return
+        }
+        
+        let isGuest = UserDefaults.standard.bool(forKey: "isGuest")
+        
+        do {
+            // Register user with subscription service (creates if doesn't exist)
+            try await QuotaManager.shared.registerWithServer(
+                email: userEmail,
+                userType: isGuest ? .guest : .registered,
+                isGeneratedEmail: isGuest
+            )
+            print("Registered user with backend: \(userEmail), isGuest: \(isGuest)")
+        } catch {
+            print("Failed to register with backend: \(error)")
+            // Continue anyway - local data is saved
+        }
     }
 }
 

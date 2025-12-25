@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 /// ViewModel for authentication state and actions
+@MainActor
 @Observable
 class AuthViewModel {
     // MARK: - Published State
@@ -54,41 +55,47 @@ class AuthViewModel {
     /// Continue as guest user
     func continueAsGuest() {
         Task {
-            await MainActor.run { isLoading = true }
-            
-            let guestUser = await authService.signInAsGuest()
-            
-            await MainActor.run {
-                handleAuthSuccess(user: guestUser, isGuest: true)
-                isLoading = false
-            }
+            await continueAsGuestAsync()
         }
+    }
+    
+    /// Async version for testing
+    func continueAsGuestAsync() async {
+        self.isLoading = true
+        
+        let guestUser = await authService.signInAsGuest()
+        
+        handleAuthSuccess(user: guestUser, isGuest: true)
+        self.isLoading = false
     }
     
     /// Sign out current user
     func signOut() {
         Task {
-            await authService.signOut()
-            
-            await MainActor.run {
-                // Clear state
-                isAuthenticated = false
-                isGuest = false
-                userEmail = nil
-                userName = nil
-                errorMessage = nil
-                
-                // Clear secure storage
-                keychain.delete(forKey: KeychainService.Keys.userId)
-                keychain.delete(forKey: KeychainService.Keys.authToken)
-                
-                // Clear user defaults
-                UserDefaults.standard.removeObject(forKey: "isGuest")
-                UserDefaults.standard.removeObject(forKey: "userEmail")
-                UserDefaults.standard.removeObject(forKey: "userName")
-                UserDefaults.standard.set(false, forKey: "isAuthenticated")
-            }
+            await signOutAsync()
         }
+    }
+    
+    /// Async version for testing
+    func signOutAsync() async {
+        await authService.signOut()
+        
+        // Clear state
+        isAuthenticated = false
+        isGuest = false
+        userEmail = nil
+        userName = nil
+        errorMessage = nil
+        
+        // Clear secure storage
+        keychain.delete(forKey: KeychainService.Keys.userId)
+        keychain.delete(forKey: KeychainService.Keys.authToken)
+        
+        // Clear user defaults
+        UserDefaults.standard.removeObject(forKey: "isGuest")
+        UserDefaults.standard.removeObject(forKey: "userEmail")
+        UserDefaults.standard.removeObject(forKey: "userName")
+        UserDefaults.standard.set(false, forKey: "isAuthenticated")
     }
     
     // MARK: - Private Helpers

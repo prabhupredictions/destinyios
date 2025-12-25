@@ -11,7 +11,7 @@ struct APIConfig {
     static let apiKey = "" // Set via environment or keychain
     #endif
     
-    // Endpoints
+    // Astrology Endpoints
     static let predict = "/vedic/api/predict/"
     static let predictStream = "/vedic/api/predict/stream"
     static let compatibility = "/vedic/api/compatibility/analyze"
@@ -19,4 +19,12 @@ struct APIConfig {
     static let compatibilityFollowUp = "/vedic/api/compatibility/follow-up"
     static let chatHistory = "/chat-history"
     static let feedback = "/feedback/submit"
+    
+    // Subscription Endpoints
+    static let subscriptionRegister = "/subscription/register"
+    static let subscriptionStatus = "/subscription/status"
+    static let subscriptionRecord = "/subscription/record"
+    static let subscriptionUpgrade = "/subscription/upgrade"
+    static let subscriptionVerify = "/subscription/verify"
 }
+

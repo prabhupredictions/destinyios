@@ -1,13 +1,28 @@
 import Foundation
 @testable import ios_app
 
-final class MockURLSession: URLSessionProtocol {
+actor MockURLSession: URLSessionProtocol {
     
     // MARK: - Mock Data
-    var mockData: Data?
-    var mockStatusCode: Int = 200
-    var mockError: Error?
-    var lastRequest: URLRequest?
+    private var mockData: Data?
+    private var mockStatusCode: Int = 200
+    private var mockError: Error?
+    private(set) var lastRequest: URLRequest?
+    
+    init() {}
+    
+    // MARK: - Setters for Tests
+    func setMockData(_ data: Data?) {
+        mockData = data
+    }
+    
+    func setMockStatusCode(_ code: Int) {
+        mockStatusCode = code
+    }
+    
+    func setMockError(_ error: Error?) {
+        mockError = error
+    }
     
     // MARK: - URLSessionProtocol
     func data(for request: URLRequest) async throws -> (Data, URLResponse) {
