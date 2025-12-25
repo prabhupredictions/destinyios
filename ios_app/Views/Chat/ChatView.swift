@@ -98,8 +98,8 @@ struct ChatView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    // Simple ForEach using direct id (no Array enumeration)
-                    ForEach(viewModel.messages) { message in
+                    // Filter out empty streaming placeholders
+                    ForEach(viewModel.messages.filter { !$0.content.isEmpty || !$0.isStreaming }) { message in
                         MessageBubble(
                             message: message,
                             userQuery: getUserQuery(for: message)

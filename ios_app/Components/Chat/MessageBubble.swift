@@ -15,6 +15,11 @@ struct MessageBubble: View {
         streamingContent ?? message.content
     }
     
+    /// Check if this is the welcome/greeting message (shouldn't show rating)
+    private var isWelcomeMessage: Bool {
+        message.content.hasPrefix("Hello! I'm Destiny")
+    }
+    
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             if isUser {
@@ -31,8 +36,8 @@ struct MessageBubble: View {
                     metadataRow
                 }
                 
-                // Star rating for completed AI messages
-                if !isUser && !message.isStreaming && message.content.count > 50 {
+                // Star rating for completed AI messages (exclude welcome message)
+                if !isUser && !message.isStreaming && !isWelcomeMessage && message.content.count > 50 {
                     MessageRating(
                         messageId: message.id,
                         query: userQuery.isEmpty ? "General question" : userQuery,
