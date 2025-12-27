@@ -343,20 +343,51 @@ struct CompatibilityView: View {
         return formatter.string(from: viewModel.boyBirthTime)
     }
     
-    // MARK: - Girl Form Card
+    // MARK: - Girl Form Card (Partner)
     private var girlFormCard: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Name field
+            // Name field (optional)
             VStack(alignment: .leading, spacing: 8) {
-                Text("girls_name".localized)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
+                HStack {
+                    Text("boys_name".localized)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.5))
+                    Text("(Optional)")
+                        .font(.system(size: 10))
+                        .foregroundColor(Color("TextDark").opacity(0.3))
+                }
                 
                 MatchTextField(
                     placeholder: "Enter name",
                     text: $viewModel.girlName,
                     icon: "person"
                 )
+            }
+            
+            // Gender Identity
+            VStack(alignment: .leading, spacing: 8) {
+                Text("gender".localized.uppercased())
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(Color("TextDark").opacity(0.5))
+                
+                HStack(spacing: 12) {
+                    ForEach(["male", "female", "other"], id: \.self) { gender in
+                        Button(action: {
+                            viewModel.partnerGender = gender
+                        }) {
+                            Text(gender.localized.capitalized)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(viewModel.partnerGender == gender ? .white : Color("NavyPrimary"))
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(viewModel.partnerGender == gender ? Color("NavyPrimary") : Color(red: 0.97, green: 0.97, blue: 0.98))
+                                )
+                        }
+                    }
+                    Spacer()
+                }
             }
             
             // Date and Time row
@@ -375,7 +406,43 @@ struct CompatibilityView: View {
                         .foregroundColor(Color("TextDark").opacity(0.5))
                     
                     MatchTimeButton(time: $viewModel.girlBirthTime)
+                        .disabled(viewModel.partnerTimeUnknown)
+                        .opacity(viewModel.partnerTimeUnknown ? 0.5 : 1)
                 }
+            }
+            
+            // I don't know birth time checkbox
+            Button(action: {
+                viewModel.partnerTimeUnknown.toggle()
+            }) {
+                HStack(spacing: 10) {
+                    Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 18))
+                        .foregroundColor(viewModel.partnerTimeUnknown ? Color("NavyPrimary") : Color("TextDark").opacity(0.4))
+                    
+                    Text("partner_birth_time_unknown".localized)
+                        .font(.system(size: 14))
+                        .foregroundColor(Color("TextDark").opacity(0.7))
+                }
+            }
+            
+            // Warning if time unknown
+            if viewModel.partnerTimeUnknown {
+                HStack(spacing: 8) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.orange)
+                    
+                    Text("birth_time_warning".localized)
+                        .font(.system(size: 12))
+                        .foregroundColor(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.orange.opacity(0.1))
+                )
             }
             
             // Place of Birth

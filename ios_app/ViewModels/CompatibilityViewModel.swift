@@ -24,6 +24,7 @@ class CompatibilityViewModel {
     var girlLatitude: Double = 0
     var girlLongitude: Double = 0
     var partnerTimeUnknown: Bool = false
+    var partnerGender: String = "" // male, female, other
     
     // Analysis state
     var isAnalyzing = false
@@ -84,14 +85,22 @@ class CompatibilityViewModel {
     
     // MARK: - Validation
     var isFormValid: Bool {
-        !boyName.isEmpty &&
-        !girlName.isEmpty &&
+        // Only require location data - names are optional
         !boyCity.isEmpty &&
         !girlCity.isEmpty &&
         boyLatitude != 0 &&
         boyLongitude != 0 &&
         girlLatitude != 0 &&
         girlLongitude != 0
+    }
+    
+    // Effective names with fallback
+    var effectiveBoyName: String {
+        boyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not Provided" : boyName
+    }
+    
+    var effectiveGirlName: String {
+        girlName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not Provided" : girlName
     }
     
     // MARK: - Actions
