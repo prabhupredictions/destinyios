@@ -51,12 +51,12 @@ struct CompatibilityView: View {
                     HStack(spacing: 6) {
                         Text("💕")
                             .font(.system(size: 24))
-                        Text("Kundali Match")
+                        Text("kundali_match".localized)
                             .font(.system(size: 24, weight: .bold))
                             .foregroundColor(Color("NavyPrimary"))
                     }
                     
-                    Text("Ashtakoot Compatibility Analysis")
+                    Text("ashtakoot_analysis".localized)
                         .font(.system(size: 14))
                         .foregroundColor(Color("TextDark").opacity(0.6))
                 }
@@ -108,7 +108,7 @@ struct CompatibilityView: View {
                     selectedTab = 0
                 }
             }) {
-                Text("Boy's Details")
+                Text("boys_details".localized)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(selectedTab == 0 ? .white : Color("NavyPrimary"))
                     .frame(maxWidth: .infinity)
@@ -133,7 +133,7 @@ struct CompatibilityView: View {
                     selectedTab = 1
                 }
             }) {
-                Text("Girl's Details")
+                Text("girls_details".localized)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(selectedTab == 1 ? .white : Color("NavyPrimary"))
                     .frame(maxWidth: .infinity)
@@ -163,71 +163,160 @@ struct CompatibilityView: View {
         )
     }
     
-    // MARK: - Boy Form Card
+    // MARK: - Boy Form Card (You - from profile)
     private var boyFormCard: some View {
         VStack(alignment: .leading, spacing: 20) {
+            // Profile indicator if data loaded
+            if viewModel.userDataLoaded {
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                    Text("From your profile")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color("TextDark").opacity(0.6))
+                    Spacer()
+                }
+                .padding(.bottom, 4)
+            }
+            
             // Name field
             VStack(alignment: .leading, spacing: 8) {
-                Text("BOY'S NAME")
+                Text("boys_name".localized)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(Color("TextDark").opacity(0.5))
                 
-                MatchTextField(
-                    placeholder: "Enter name",
-                    text: $viewModel.boyName,
-                    icon: "person"
-                )
-            }
-            
-            // Date and Time row
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("DATE OF BIRTH")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
-                    
-                    MatchDateButton(date: $viewModel.boyBirthDate)
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("TIME")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
-                    
-                    MatchTimeButton(time: $viewModel.boyBirthTime)
-                }
-            }
-            
-            // Place of Birth
-            VStack(alignment: .leading, spacing: 8) {
-                Text("PLACE OF BIRTH")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
-                
-                Button(action: {
-                    showBoyLocationSearch = true
-                }) {
+                if viewModel.userDataLoaded {
+                    // Read-only display
                     HStack(spacing: 10) {
-                        Image(systemName: "mappin")
+                        Image(systemName: "person")
                             .font(.system(size: 14))
                             .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                        
-                        Text(viewModel.boyCity.isEmpty ? "Select city" : viewModel.boyCity)
+                        Text(viewModel.boyName.isEmpty ? "Not set" : viewModel.boyName)
                             .font(.system(size: 15))
-                            .foregroundColor(viewModel.boyCity.isEmpty ? Color("TextDark").opacity(0.4) : Color("TextDark"))
-                        
+                            .foregroundColor(Color("TextDark"))
                         Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.4))
                     }
                     .padding(.horizontal, 14)
                     .frame(height: 48)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(red: 0.97, green: 0.97, blue: 0.98))
+                            .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
                     )
+                } else {
+                    MatchTextField(
+                        placeholder: "Enter name",
+                        text: $viewModel.boyName,
+                        icon: "person"
+                    )
+                }
+            }
+            
+            // Date and Time row
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("date_of_birth_caps".localized)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.5))
+                    
+                    if viewModel.userDataLoaded {
+                        // Read-only date display
+                        HStack {
+                            Text(formattedBoyDate)
+                                .font(.system(size: 15))
+                                .foregroundColor(Color("TextDark"))
+                            Spacer()
+                            Image(systemName: "calendar")
+                                .foregroundColor(Color("NavyPrimary").opacity(0.4))
+                        }
+                        .padding(.horizontal, 14)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
+                        )
+                    } else {
+                        MatchDateButton(date: $viewModel.boyBirthDate)
+                    }
+                }
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("time_caps".localized)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.5))
+                    
+                    if viewModel.userDataLoaded {
+                        // Read-only time display
+                        HStack {
+                            Text(viewModel.boyTimeUnknown ? "Unknown" : formattedBoyTime)
+                                .font(.system(size: 15))
+                                .foregroundColor(Color("TextDark"))
+                            Spacer()
+                            Image(systemName: "clock")
+                                .foregroundColor(Color("NavyPrimary").opacity(0.4))
+                        }
+                        .padding(.horizontal, 14)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
+                        )
+                    } else {
+                        MatchTimeButton(time: $viewModel.boyBirthTime)
+                    }
+                }
+            }
+            
+            // Place of Birth
+            VStack(alignment: .leading, spacing: 8) {
+                Text("place_of_birth_caps".localized)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(Color("TextDark").opacity(0.5))
+                
+                if viewModel.userDataLoaded {
+                    // Read-only city display
+                    HStack(spacing: 10) {
+                        Image(systemName: "mappin")
+                            .font(.system(size: 14))
+                            .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                        
+                        Text(viewModel.boyCity.isEmpty ? "Not set" : viewModel.boyCity)
+                            .font(.system(size: 15))
+                            .foregroundColor(Color("TextDark"))
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14)
+                    .frame(height: 48)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
+                    )
+                } else {
+                    Button(action: {
+                        showBoyLocationSearch = true
+                    }) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "mappin")
+                                .font(.system(size: 14))
+                                .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                            
+                            Text(viewModel.boyCity.isEmpty ? "select_city".localized : viewModel.boyCity)
+                                .font(.system(size: 15))
+                                .foregroundColor(viewModel.boyCity.isEmpty ? Color("TextDark").opacity(0.4) : Color("TextDark"))
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(Color("NavyPrimary").opacity(0.4))
+                        }
+                        .padding(.horizontal, 14)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(red: 0.97, green: 0.97, blue: 0.98))
+                        )
+                    }
                 }
             }
         }
@@ -240,12 +329,26 @@ struct CompatibilityView: View {
         .padding(.horizontal, 20)
     }
     
+    // Formatted date for display
+    private var formattedBoyDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        return formatter.string(from: viewModel.boyBirthDate)
+    }
+    
+    // Formatted time for display
+    private var formattedBoyTime: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mma"
+        return formatter.string(from: viewModel.boyBirthTime)
+    }
+    
     // MARK: - Girl Form Card
     private var girlFormCard: some View {
         VStack(alignment: .leading, spacing: 20) {
             // Name field
             VStack(alignment: .leading, spacing: 8) {
-                Text("GIRL'S NAME")
+                Text("girls_name".localized)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(Color("TextDark").opacity(0.5))
                 
@@ -259,7 +362,7 @@ struct CompatibilityView: View {
             // Date and Time row
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("DATE OF BIRTH")
+                    Text("date_of_birth_caps".localized)
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.5))
                     
@@ -267,7 +370,7 @@ struct CompatibilityView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("TIME")
+                    Text("time_caps".localized)
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.5))
                     
@@ -277,7 +380,7 @@ struct CompatibilityView: View {
             
             // Place of Birth
             VStack(alignment: .leading, spacing: 8) {
-                Text("PLACE OF BIRTH")
+                Text("place_of_birth_caps".localized)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(Color("TextDark").opacity(0.5))
                 
@@ -289,7 +392,7 @@ struct CompatibilityView: View {
                             .font(.system(size: 14))
                             .foregroundColor(Color("NavyPrimary").opacity(0.5))
                         
-                        Text(viewModel.girlCity.isEmpty ? "Select city" : viewModel.girlCity)
+                        Text(viewModel.girlCity.isEmpty ? "select_city".localized : viewModel.girlCity)
                             .font(.system(size: 15))
                             .foregroundColor(viewModel.girlCity.isEmpty ? Color("TextDark").opacity(0.4) : Color("TextDark"))
                         
@@ -328,7 +431,7 @@ struct CompatibilityView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .scaleEffect(0.9)
                 } else {
-                    Text("Analyze Match")
+                    Text("analyze_match".localized)
                         .font(.system(size: 17, weight: .semibold))
                     Image(systemName: "sparkles")
                         .font(.system(size: 14))

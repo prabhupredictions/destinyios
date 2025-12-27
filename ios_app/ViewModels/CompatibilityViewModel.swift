@@ -8,19 +8,22 @@ class CompatibilityViewModel {
     var boyName: String = ""
     var girlName: String = ""
     
-    // Birth data for boy
+    // Birth data for "You" (user)
     var boyBirthDate: Date = Date()
     var boyBirthTime: Date = Date()
     var boyCity: String = ""
     var boyLatitude: Double = 0
     var boyLongitude: Double = 0
+    var boyTimeUnknown: Bool = false
+    var userDataLoaded: Bool = false // Track if user data was loaded from profile
     
-    // Birth data for girl
+    // Birth data for "Partner"
     var girlBirthDate: Date = Date()
     var girlBirthTime: Date = Date()
     var girlCity: String = ""
     var girlLatitude: Double = 0
     var girlLongitude: Double = 0
+    var partnerTimeUnknown: Bool = false
     
     // Analysis state
     var isAnalyzing = false
@@ -34,6 +37,49 @@ class CompatibilityViewModel {
     // MARK: - Init
     init(compatibilityService: CompatibilityServiceProtocol = CompatibilityService()) {
         self.compatibilityService = compatibilityService
+        loadUserDataFromProfile()
+    }
+    
+    // MARK: - Load User Data
+    /// Load user's birth data from profile (UserDefaults)
+    private func loadUserDataFromProfile() {
+        // Load name
+        if let savedName = UserDefaults.standard.string(forKey: "userName"), !savedName.isEmpty {
+            boyName = savedName
+        }
+        
+        // Load birth data
+        if let data = UserDefaults.standard.data(forKey: "userBirthData") {
+            do {
+                let birthData = try JSONDecoder().decode(BirthData.self, from: data)
+                
+                // Parse date
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                if let date = dateFormatter.date(from: birthData.dob) {
+                    boyBirthDate = date
+                }
+                
+                // Parse time
+                let timeFormatter = DateFormatter()
+                timeFormatter.dateFormat = "HH:mm"
+                if let time = timeFormatter.date(from: birthData.time) {
+                    boyBirthTime = time
+                }
+                
+                // Set location
+                boyCity = birthData.cityOfBirth ?? ""
+                boyLatitude = birthData.latitude
+                boyLongitude = birthData.longitude
+                
+                // Load time unknown flag
+                boyTimeUnknown = UserDefaults.standard.bool(forKey: "birthTimeUnknown")
+                
+                userDataLoaded = true
+            } catch {
+                print("Failed to decode user birth data: \(error)")
+            }
+        }
     }
     
     // MARK: - Validation
@@ -72,21 +118,20 @@ class CompatibilityViewModel {
     }
     
     func reset() {
-        boyName = ""
+        // Only reset partner data, keep user data from profile
         girlName = ""
-        boyBirthDate = Date()
-        boyBirthTime = Date()
-        boyCity = ""
-        boyLatitude = 0
-        boyLongitude = 0
         girlBirthDate = Date()
         girlBirthTime = Date()
         girlCity = ""
         girlLatitude = 0
         girlLongitude = 0
+        partnerTimeUnknown = false
         result = nil
         showResult = false
         errorMessage = nil
+        
+        // Reload user data from profile
+        loadUserDataFromProfile()
     }
     
     // MARK: - Mock Result
