@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "Совместимость натальных карт";
 "boys_details" = "Ты";
 "girls_details" = "Партнёр";
-"analyze_match" = "Анализировать";
+"analyze_match" = "Проверить совместимость";
 "new_analysis" = "Новый анализ";
 "summary" = "Итог";
 "ashtakoot_details" = "Подробности";
@@ -161,6 +161,8 @@
 "birth_city" = "Город рождения";
 "select_date" = "Выбрать дату";
 "select_time" = "Выбрать время";
+"partner_birth_time_unknown" = "Я не знаю время рождения";
+"birth_time_warning" = "Внимание: Результаты могут быть менее точными без точного времени";
 
 // MARK: - Auth & Legal
 "or" = "или";

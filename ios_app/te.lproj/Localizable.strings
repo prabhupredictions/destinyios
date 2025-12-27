@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "బర్త్ చార్ట్ కంపాటిబిలిటీ";
 "boys_details" = "మీరు";
 "girls_details" = "పార్ట్‌నర్";
-"analyze_match" = "విశ్లేషించు";
+"analyze_match" = "కంపాటిబిలిటీ చూడండి";
 "new_analysis" = "కొత్త విశ్లేషణ";
 "summary" = "సారాంశం";
 "ashtakoot_details" = "అష్టకూట వివరాలు";
@@ -161,6 +161,8 @@
 "birth_city" = "పుట్టిన ఊరు";
 "select_date" = "తేదీ ఎంచుకోండి";
 "select_time" = "సమయం ఎంచుకోండి";
+"partner_birth_time_unknown" = "పార్ట్‌నర్ పుట్టిన సమయం తెలియదు";
+"birth_time_warning" = "గమనిక: సరిఅయిన సమయం లేకుంటే ఫలితాలు తక్కువ కరెక్ట్ కాకపోవచ్చు";
 
 // MARK: - Auth & Legal
 "or" = "లేదా";

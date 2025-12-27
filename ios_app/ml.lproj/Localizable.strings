@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "ജനന ചാര്ട്ട് കംപാറ്റിബിലിറ്റി";
 "boys_details" = "നിങ്ങൾ";
 "girls_details" = "പങ്കാളി";
-"analyze_match" = "വിശകലനം ചെയ്യുക";
+"analyze_match" = "കംപാറ്റിബിലിറ്റി ചെക്ക് ചെയ്യുക";
 "new_analysis" = "പുതിയ വിശകലനം";
 "summary" = "സംഗ്രഹം";
 "ashtakoot_details" = "അഷ്ടകൂട വിവരങ്ങൾ";
@@ -161,6 +161,8 @@
 "birth_city" = "ജനിച്ച നഗരം";
 "select_date" = "തീയതി തിരഞ്ഞെടുക്കുക";
 "select_time" = "സമയം തിരഞ്ഞെടുക്കുക";
+"partner_birth_time_unknown" = "പങ്കാളിയുടെ ജനന സമയം അറിയില്ല";
+"birth_time_warning" = "കുറിപ്പ്: സഹി സമയം ഇല്ലാതെ ഫലം പൂർണ്ണമായി ശരിയാകില്ല";
 
 // MARK: - Auth & Legal
 "or" = "അല്ലെങ്കിൽ";

@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "பிறப்பு சார்ட் பொருத்தம்";
 "boys_details" = "நீங்கள்";
 "girls_details" = "பார்ட்னர்";
-"analyze_match" = "பொருத்தம் பார்";
+"analyze_match" = "பொருத்தம் பாருங்கள்";
 "new_analysis" = "புதிய பகுப்பாய்வு";
 "summary" = "சுருக்கம்";
 "ashtakoot_details" = "அஷ்டகூட விவரம்";
@@ -161,6 +161,8 @@
 "birth_city" = "பிறந்த ஊர்";
 "select_date" = "தேதி தேர்வு செய்";
 "select_time" = "நேரம் தேர்வு செய்";
+"partner_birth_time_unknown" = "பார்ட்னர் பிறந்த நேரம் தெரியாது";
+"birth_time_warning" = "குறிப்பு: சரியான நேரம் இல்லாமல் முடிவுகள் சரியாக இல்லாமல் போகலாம்";
 
 // MARK: - Auth & Legal
 "or" = "அல்லது";

@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "बर्थ चार्ट कम्पैटिबिलिटी";
 "boys_details" = "आप";
 "girls_details" = "पार्टनर";
-"analyze_match" = "मिलान जांचें";
+"analyze_match" = "कम्पैटिबिलिटी चेक करें";
 "new_analysis" = "नया मिलान";
 "summary" = "सारांश";
 "ashtakoot_details" = "अष्टकूट विवरण";
@@ -160,6 +160,8 @@
 "birth_city" = "जन्म का शहर";
 "select_date" = "तारीख चुनें";
 "select_time" = "समय चुनें";
+"partner_birth_time_unknown" = "मुझे पार्टनर का जन्म समय नहीं पता";
+"birth_time_warning" = "नोट: बिना सही जन्म समय के रिजल्ट पूरी तरह एक्युरेट नहीं हो सकते";
 
 // MARK: - Auth & Legal
 "or" = "या";

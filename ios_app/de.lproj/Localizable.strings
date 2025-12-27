@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "Geburtshoroskop-Kompatibilität";
 "boys_details" = "Du";
 "girls_details" = "Partner";
-"analyze_match" = "Match prüfen";
+"analyze_match" = "Kompatibilität prüfen";
 "new_analysis" = "Neue Analyse";
 "summary" = "Zusammenfassung";
 "ashtakoot_details" = "Ashtakoot-Details";
@@ -160,7 +160,9 @@
 "full_name" = "Vollständiger Name";
 "birth_city" = "Geburtsstadt";
 "select_date" = "Datum wählen";
-"select_time" = "Uhrzeit wählen";
+"select_time" = "Zeit wählen";
+"partner_birth_time_unknown" = "Ich kenne die Geburtszeit nicht";
+"birth_time_warning" = "Hinweis: Ohne genaue Geburtszeit sind Ergebnisse weniger genau";
 
 // MARK: - Auth & Legal
 "or" = "oder";

@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "ಬರ್ತ್ ಚಾರ್ಟ್ ಕಂಪಾಟಿಬಿಲಿಟಿ";
 "boys_details" = "ನಿಮ್ಮ";
 "girls_details" = "ಪಾರ್ಟ್‌ನರ್";
-"analyze_match" = "ವಿಶ್ಲೇಷಿಸಿ";
+"analyze_match" = "ಕಂಪಾಟಿಬಿಲಿಟಿ ನೋಡಿ";
 "new_analysis" = "ಹೊಸ ವಿಶ್ಲೇಷಣೆ";
 "summary" = "ಸಾರಾಂಶ";
 "ashtakoot_details" = "ಅಷ್ಟಕೂಟ ವಿವರ";
@@ -161,6 +161,8 @@
 "birth_city" = "ಹುಟ್ಟಿದ ಊರು";
 "select_date" = "ದಿನಾಂಕ ಆಯ್ಕೆ ಮಾಡಿ";
 "select_time" = "ಸಮಯ ಆಯ್ಕೆ ಮಾಡಿ";
+"partner_birth_time_unknown" = "ಪಾರ್ಟ್‌ನರ್ ಹುಟ್ಟಿದ ಸಮಯ ಗೊತ್ತಿಲ್ಲ";
+"birth_time_warning" = "ಗಮನಿಸಿ: ಸರಿಯಾದ ಸಮಯ ಇಲ್ಲದೆ ಫಲಿತಾಂಶಗಳು ನಿಖರವಾಗಿರದೆ ಇರಬಹುದು";
 
 // MARK: - Auth & Legal
 "or" = "ಅಥವಾ";

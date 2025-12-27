@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "Compatibilité de Thème Astral";
 "boys_details" = "Toi";
 "girls_details" = "Partenaire";
-"analyze_match" = "Analyser";
+"analyze_match" = "Vérifier la compatibilité";
 "new_analysis" = "Nouvelle analyse";
 "summary" = "Résumé";
 "ashtakoot_details" = "Détails Ashtakoot";
@@ -161,6 +161,8 @@
 "birth_city" = "Ville de naissance";
 "select_date" = "Choisir la date";
 "select_time" = "Choisir l'heure";
+"partner_birth_time_unknown" = "Je ne connais pas l'heure de naissance";
+"birth_time_warning" = "Note: Les résultats peuvent être moins précis sans l'heure exacte";
 
 // MARK: - Auth & Legal
 "or" = "ou";

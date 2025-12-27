@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "Compatibilidad de Carta Natal";
 "boys_details" = "Tú";
 "girls_details" = "Pareja";
-"analyze_match" = "Analizar compatibilidad";
+"analyze_match" = "Ver compatibilidad";
 "new_analysis" = "Nueva consulta";
 "summary" = "Resumen";
 "ashtakoot_details" = "Detalles Ashtakoot";
@@ -161,6 +161,8 @@
 "birth_city" = "Ciudad de nacimiento";
 "select_date" = "Elegir fecha";
 "select_time" = "Elegir hora";
+"partner_birth_time_unknown" = "No sé la hora de nacimiento de mi pareja";
+"birth_time_warning" = "Nota: Los resultados pueden ser menos precisos sin la hora exacta";
 
 // MARK: - Auth & Legal
 "or" = "o";

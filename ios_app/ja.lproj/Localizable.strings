@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "出生チャートの相性";
 "boys_details" = "あなた";
 "girls_details" = "パートナー";
-"analyze_match" = "診断する";
+"analyze_match" = "相性をチェック";
 "new_analysis" = "新しい診断";
 "summary" = "まとめ";
 "ashtakoot_details" = "詳細";
@@ -161,6 +161,8 @@
 "birth_city" = "生まれた街";
 "select_date" = "日付を選ぶ";
 "select_time" = "時間を選ぶ";
+"partner_birth_time_unknown" = "パートナーの生まれた時間がわからない";
+"birth_time_warning" = "注意: 正確な時間がないと結果の精度が下がることがあります";
 
 // MARK: - Auth & Legal
 "or" = "または";

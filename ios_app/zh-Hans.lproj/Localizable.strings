@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "出生星盘兼容性";
 "boys_details" = "你";
 "girls_details" = "伴侣";
-"analyze_match" = "开始分析";
+"analyze_match" = "查看匹配结果";
 "new_analysis" = "新的分析";
 "summary" = "总结";
 "ashtakoot_details" = "八字详情";
@@ -161,6 +161,8 @@
 "birth_city" = "出生城市";
 "select_date" = "选择日期";
 "select_time" = "选择时间";
+"partner_birth_time_unknown" = "我不知道伴侣的出生时间";
+"birth_time_warning" = "注意: 没有准确时间，结果可能不够准确";
 
 // MARK: - Auth & Legal
 "or" = "或";

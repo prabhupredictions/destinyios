@@ -106,7 +106,7 @@
 "ashtakoot_analysis" = "Birth Chart Compatibility";
 "boys_details" = "You";
 "girls_details" = "Partner";
-"analyze_match" = "Analyze Match";
+"analyze_match" = "Check Compatibility";
 "new_analysis" = "New Analysis";
 "summary" = "Summary";
 "ashtakoot_details" = "Ashtakoot Details";
@@ -160,6 +160,8 @@
 "birth_city" = "Birth City";
 "select_date" = "Select Date";
 "select_time" = "Select Time";
+"partner_birth_time_unknown" = "I don't know partner's birth time";
+"birth_time_warning" = "Note: Results may be less accurate without exact birth time";
 
 // MARK: - Auth & Legal
 "or" = "or";
