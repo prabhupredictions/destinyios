@@ -102,10 +102,10 @@
 "partner_details" = "Infos partenaire";
 "calculate_match" = "Calculer";
 "match_score" = "Score";
-"kundali_match" = "Compatibilité Kundali";
-"ashtakoot_analysis" = "Analyse Ashtakoot";
-"boys_details" = "Ses infos (Lui)";
-"girls_details" = "Ses infos (Elle)";
+"kundali_match" = "Compatibilité des Thèmes";
+"ashtakoot_analysis" = "Compatibilité de Thème Astral";
+"boys_details" = "Toi";
+"girls_details" = "Partenaire";
 "analyze_match" = "Analyser";
 "new_analysis" = "Nouvelle analyse";
 "summary" = "Résumé";
@@ -150,8 +150,8 @@
 "edit" = "Modifier";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "SON PRÉNOM";
-"girls_name" = "SON PRÉNOM";
+"boys_name" = "NOM";
+"girls_name" = "NOM";
 "date_of_birth_caps" = "DATE DE NAISSANCE";
 "time_caps" = "HEURE";
 "place_of_birth_caps" = "LIEU DE NAISSANCE";

@@ -102,10 +102,10 @@
 "partner_details" = "പങ്കാളിയുടെ വിവരം";
 "calculate_match" = "പൊരുത്തം നോക്കുക";
 "match_score" = "പൊരുത്ത സ്കോർ";
-"kundali_match" = "ജാതക പൊരുത്തം";
-"ashtakoot_analysis" = "അഷ്ടകൂട വിശകലനം";
-"boys_details" = "ചെറുക്കന്റെ വിവരം";
-"girls_details" = "പെണ്ണിന്റെ വിവരം";
+"kundali_match" = "ചാര്ട്ട് മാച്ച്";
+"ashtakoot_analysis" = "ജനന ചാര്ട്ട് കംപാറ്റിബിലിറ്റി";
+"boys_details" = "നിങ്ങൾ";
+"girls_details" = "പങ്കാളി";
 "analyze_match" = "വിശകലനം ചെയ്യുക";
 "new_analysis" = "പുതിയ വിശകലനം";
 "summary" = "സംഗ്രഹം";
@@ -150,8 +150,8 @@
 "edit" = "എഡിറ്റ് ചെയ്യുക";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "ചെറുക്കന്റെ പേര്";
-"girls_name" = "പെണ്ണിന്റെ പേര്";
+"boys_name" = "പേര്";
+"girls_name" = "പേര്";
 "date_of_birth_caps" = "ജനന തീയതി";
 "time_caps" = "സമയം";
 "place_of_birth_caps" = "ജനിച്ച സ്ഥലം";

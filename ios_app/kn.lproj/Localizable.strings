@@ -102,10 +102,10 @@
 "partner_details" = "ಪಾರ್ಟ್ನರ್ ಮಾಹಿತಿ";
 "calculate_match" = "ಹೊಂದಾಣಿಕೆ ನೋಡಿ";
 "match_score" = "ಹೊಂದಾಣಿಕೆ ಸ್ಕೋರ್";
-"kundali_match" = "ಕುಂಡಲಿ ಹೊಂದಾಣಿಕೆ";
-"ashtakoot_analysis" = "ಅಷ್ಟಕೂಟ ವಿಶ್ಲೇಷಣೆ";
-"boys_details" = "ಹುಡುಗನ ಮಾಹಿತಿ";
-"girls_details" = "ಹುಡುಗಿಯ ಮಾಹಿತಿ";
+"kundali_match" = "ಚಾರ್ಟ್ ಮ್ಯಾಚ್";
+"ashtakoot_analysis" = "ಬರ್ತ್ ಚಾರ್ಟ್ ಕಂಪಾಟಿಬಿಲಿಟಿ";
+"boys_details" = "ನಿಮ್ಮ";
+"girls_details" = "ಪಾರ್ಟ್‌ನರ್";
 "analyze_match" = "ವಿಶ್ಲೇಷಿಸಿ";
 "new_analysis" = "ಹೊಸ ವಿಶ್ಲೇಷಣೆ";
 "summary" = "ಸಾರಾಂಶ";
@@ -150,8 +150,8 @@
 "edit" = "ಎಡಿಟ್ ಮಾಡಿ";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "ಹುಡುಗನ ಹೆಸರು";
-"girls_name" = "ಹುಡುಗಿಯ ಹೆಸರು";
+"boys_name" = "ಹೆಸರು";
+"girls_name" = "ಹೆಸರು";
 "date_of_birth_caps" = "ಹುಟ್ಟಿದ ದಿನಾಂಕ";
 "time_caps" = "ಸಮಯ";
 "place_of_birth_caps" = "ಹುಟ್ಟಿದ ಊರು";

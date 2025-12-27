@@ -102,10 +102,10 @@
 "partner_details" = "पार्टनर की जानकारी";
 "calculate_match" = "मिलान देखें";
 "match_score" = "मिलान स्कोर";
-"kundali_match" = "कुंडली मिलान";
-"ashtakoot_analysis" = "अष्टकूट मिलान विश्लेषण";
-"boys_details" = "वर की जानकारी";
-"girls_details" = "वधू की जानकारी";
+"kundali_match" = "चार्ट मैच";
+"ashtakoot_analysis" = "बर्थ चार्ट कम्पैटिबिलिटी";
+"boys_details" = "आप";
+"girls_details" = "पार्टनर";
 "analyze_match" = "मिलान जांचें";
 "new_analysis" = "नया मिलान";
 "summary" = "सारांश";
@@ -149,8 +149,8 @@
 "edit" = "बदलें";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "वर का नाम";
-"girls_name" = "वधू का नाम";
+"boys_name" = "नाम";
+"girls_name" = "नाम";
 "date_of_birth_caps" = "जन्म तिथि";
 "time_caps" = "समय";
 "place_of_birth_caps" = "जन्म स्थान";

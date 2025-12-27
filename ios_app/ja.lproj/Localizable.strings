@@ -102,10 +102,10 @@
 "partner_details" = "相手の情報";
 "calculate_match" = "相性を見る";
 "match_score" = "相性スコア";
-"kundali_match" = "クンダリ相性";
-"ashtakoot_analysis" = "アシュタクート分析";
-"boys_details" = "彼の情報";
-"girls_details" = "彼女の情報";
+"kundali_match" = "チャートマッチ";
+"ashtakoot_analysis" = "出生チャートの相性";
+"boys_details" = "あなた";
+"girls_details" = "パートナー";
 "analyze_match" = "診断する";
 "new_analysis" = "新しい診断";
 "summary" = "まとめ";
@@ -150,8 +150,8 @@
 "edit" = "編集";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "彼の名前";
-"girls_name" = "彼女の名前";
+"boys_name" = "名前";
+"girls_name" = "名前";
 "date_of_birth_caps" = "生年月日";
 "time_caps" = "時間";
 "place_of_birth_caps" = "出生地";

@@ -102,10 +102,10 @@
 "partner_details" = "Данные партнёра";
 "calculate_match" = "Проверить совместимость";
 "match_score" = "Результат";
-"kundali_match" = "Совместимость по натальным картам";
-"ashtakoot_analysis" = "Анализ Аштакут";
-"boys_details" = "Данные парня";
-"girls_details" = "Данные девушки";
+"kundali_match" = "Совместимость карт";
+"ashtakoot_analysis" = "Совместимость натальных карт";
+"boys_details" = "Ты";
+"girls_details" = "Партнёр";
 "analyze_match" = "Анализировать";
 "new_analysis" = "Новый анализ";
 "summary" = "Итог";
@@ -150,8 +150,8 @@
 "edit" = "Изменить";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "ИМЯ ПАРНЯ";
-"girls_name" = "ИМЯ ДЕВУШКИ";
+"boys_name" = "ИМЯ";
+"girls_name" = "ИМЯ";
 "date_of_birth_caps" = "ДАТА РОЖДЕНИЯ";
 "time_caps" = "ВРЕМЯ";
 "place_of_birth_caps" = "МЕСТО РОЖДЕНИЯ";

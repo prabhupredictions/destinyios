@@ -102,10 +102,10 @@
 "partner_details" = "பார்ட்னர் தகவல்";
 "calculate_match" = "பொருத்தம் பார்";
 "match_score" = "பொருத்த மதிப்பெண்";
-"kundali_match" = "ஜாதக பொருத்தம்";
-"ashtakoot_analysis" = "அஷ்டகூட பொருத்த பகுப்பாய்வு";
-"boys_details" = "மாப்பிள்ளை தகவல்";
-"girls_details" = "பெண் தகவல்";
+"kundali_match" = "சார்ட் பொருத்தம்";
+"ashtakoot_analysis" = "பிறப்பு சார்ட் பொருத்தம்";
+"boys_details" = "நீங்கள்";
+"girls_details" = "பார்ட்னர்";
 "analyze_match" = "பொருத்தம் பார்";
 "new_analysis" = "புதிய பகுப்பாய்வு";
 "summary" = "சுருக்கம்";
@@ -150,8 +150,8 @@
 "edit" = "திருத்து";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "மாப்பிள்ளை பெயர்";
-"girls_name" = "பெண் பெயர்";
+"boys_name" = "பெயர்";
+"girls_name" = "பெயர்";
 "date_of_birth_caps" = "பிறந்த தேதி";
 "time_caps" = "நேரம்";
 "place_of_birth_caps" = "பிறந்த ஊர்";

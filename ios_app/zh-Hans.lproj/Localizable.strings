@@ -102,10 +102,10 @@
 "partner_details" = "对方信息";
 "calculate_match" = "查看配对结果";
 "match_score" = "契合度";
-"kundali_match" = "星盘配对";
-"ashtakoot_analysis" = "八字合婚分析";
-"boys_details" = "他的信息";
-"girls_details" = "她的信息";
+"kundali_match" = "星盘匹配";
+"ashtakoot_analysis" = "出生星盘兼容性";
+"boys_details" = "你";
+"girls_details" = "伴侣";
 "analyze_match" = "开始分析";
 "new_analysis" = "新的分析";
 "summary" = "总结";
@@ -150,8 +150,8 @@
 "edit" = "编辑";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "他的名字";
-"girls_name" = "她的名字";
+"boys_name" = "名字";
+"girls_name" = "名字";
 "date_of_birth_caps" = "出生日期";
 "time_caps" = "时间";
 "place_of_birth_caps" = "出生地点";

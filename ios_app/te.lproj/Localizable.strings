@@ -102,10 +102,10 @@
 "partner_details" = "పార్ట్‌నర్ సమాచారం";
 "calculate_match" = "పొందిక చూడండి";
 "match_score" = "పొందిక స్కోర్";
-"kundali_match" = "జాతక పొందిక";
-"ashtakoot_analysis" = "అష్టకూట విశ్లేషణ";
-"boys_details" = "వరుడి సమాచారం";
-"girls_details" = "వధువు సమాచారం";
+"kundali_match" = "చార్ట్ మ్యాచ్";
+"ashtakoot_analysis" = "బర్త్ చార్ట్ కంపాటిబిలిటీ";
+"boys_details" = "మీరు";
+"girls_details" = "పార్ట్‌నర్";
 "analyze_match" = "విశ్లేషించు";
 "new_analysis" = "కొత్త విశ్లేషణ";
 "summary" = "సారాంశం";
@@ -150,8 +150,8 @@
 "edit" = "మార్చు";
 
 // MARK: - Compatibility Form Labels
-"boys_name" = "వరుడి పేరు";
-"girls_name" = "వధువు పేరు";
+"boys_name" = "పేరు";
+"girls_name" = "పేరు";
 "date_of_birth_caps" = "పుట్టిన తేదీ";
 "time_caps" = "సమయం";
 "place_of_birth_caps" = "పుట్టిన ఊరు";
