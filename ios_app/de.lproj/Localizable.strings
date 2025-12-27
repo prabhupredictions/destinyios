@@ -1,0 +1,174 @@
+/* 
+  Localizable.strings (German)
+  Destiny AI Astrology - Deutsch
+*/
+
+// MARK: - Common
+"app_name" = "Destiny";
+"done" = "Fertig";
+"cancel" = "Abbrechen";
+"save" = "Speichern";
+"close" = "Schließen";
+"loading" = "Lädt...";
+"error" = "Fehler";
+"retry" = "Nochmal versuchen";
+"ok" = "OK";
+
+// MARK: - Home Screen
+"greeting" = "Hallo!";
+"todays_insight" = "TAGESHOROSKOP";
+"ask_destiny" = "Frag Destiny";
+
+// MARK: - Suggested Questions
+"what_mindful_today" = "Worauf sollte ich heute achten?";
+"how_improve_focus" = "Wie kann ich meinen Fokus verbessern?";
+"good_time_decisions" = "Ist jetzt ein guter Zeitpunkt für wichtige Entscheidungen?";
+"chart_relationships" = "Was sagt mein Horoskop über Beziehungen?";
+
+// MARK: - Chat
+"type_question" = "Deine Frage eingeben...";
+"rate" = "Bewerten";
+"rated" = "Bewertet";
+"welcome_message" = "Hallo! Ich bin Destiny, dein persönlicher Astrologie-Guide. Frag mich alles über dein Leben, Beziehungen, Karriere oder andere Themen.";
+
+// MARK: - Profile
+"profile" = "Profil";
+"guest_user" = "Gast";
+"upgrade_premium" = "Premium holen";
+"get_unlimited" = "Unbegrenzte Fragen & Matches";
+"birth_details" = "Geburtsdaten";
+"view_birth_details" = "Geburtsdaten anzeigen";
+"not_set" = "Nicht angegeben";
+"preferences" = "Einstellungen";
+"astrology_settings" = "Astrologie-Einstellungen";
+"language" = "Sprache";
+"support" = "Hilfe";
+"help_faq" = "Hilfe & FAQ";
+"sign_out" = "Abmelden";
+
+// MARK: - Astrology Settings
+"ayanamsa" = "Ayanamsa";
+"ayanamsa_desc" = "Methode zur Tierkreisberechnung";
+"house_system" = "Häusersystem";
+"house_system_desc" = "Methode zur Häuseraufteilung";
+"lahiri" = "Lahiri (Standard)";
+"raman" = "Raman";
+"krishnamurti" = "Krishnamurti (KP)";
+"fagan_bradley" = "Fagan-Bradley";
+"equal_houses" = "Gleiche Häuser";
+"whole_sign" = "Ganzes Zeichen";
+"placidus" = "Placidus";
+"koch" = "Koch";
+"regiomontanus" = "Regiomontanus";
+"campanus" = "Campanus";
+"morinus" = "Morinus";
+"alcabitus" = "Alcabitus";
+"porphyrius" = "Porphyrius";
+
+// MARK: - Language Selection
+"select_language" = "Sprache wählen";
+"english" = "English";
+"hindi" = "Hindi";
+"language_note" = "Die App startet in der gewählten Sprache neu";
+
+// MARK: - Tab Bar
+"home" = "Start";
+"ask" = "Fragen";
+"match" = "Match";
+
+// MARK: - Birth Data
+"enter_birth_details" = "Geburtsdaten eingeben";
+"your_name" = "Dein Name";
+"date_of_birth" = "Geburtsdatum";
+"time_of_birth" = "Geburtszeit";
+"birth_time_unknown" = "Geburtszeit unbekannt";
+"place_of_birth" = "Geburtsort";
+"search_city" = "Stadt suchen...";
+"gender" = "Geschlecht";
+"male" = "Männlich";
+"female" = "Weiblich";
+"other" = "Divers";
+"continue" = "Weiter";
+
+// MARK: - Subscription
+"subscription" = "Abo";
+"free_plan" = "Gratis";
+"premium_plan" = "Premium";
+"questions_remaining" = "Fragen übrig";
+"unlimited" = "Unbegrenzt";
+
+// MARK: - Compatibility/Match
+"compatibility" = "Partnercheck";
+"partner_details" = "Partner-Daten";
+"calculate_match" = "Match berechnen";
+"match_score" = "Match-Score";
+"kundali_match" = "Kundali-Match";
+"ashtakoot_analysis" = "Ashtakoot-Analyse";
+"boys_details" = "Seine Daten";
+"girls_details" = "Ihre Daten";
+"analyze_match" = "Match prüfen";
+"new_analysis" = "Neue Analyse";
+"summary" = "Zusammenfassung";
+"ashtakoot_details" = "Ashtakoot-Details";
+"recommendation" = "Empfehlung";
+
+// MARK: - Auth
+"welcome_to_destiny" = "Willkommen bei Destiny";
+"sign_in_save" = "Melde dich an, um dein Horoskop zu speichern";
+"continue_as_guest" = "Als Gast fortfahren";
+"by_continuing" = "Mit Weiter akzeptierst du unsere";
+"signing_in" = "Anmeldung läuft...";
+"skip" = "Überspringen";
+"get_started" = "Los geht's";
+
+// MARK: - Birth Data Entry
+"create_birth_chart" = "Erstelle dein Geburtshoroskop";
+"enter_details_desc" = "Gib deine Geburtsdaten ein,\num persönliche Einblicke zu erhalten";
+
+// MARK: - Subscription
+"unlock_premium" = "Destiny Premium freischalten";
+"get_cosmic_guidance" = "Unbegrenzte astrologische Beratung";
+"cancel_anytime" = "Jederzeit kündbar";
+"restore_purchases" = "Käufe wiederherstellen";
+"subscription_terms" = "Das Abo verlängert sich automatisch, wenn du nicht 24 Stunden vorher kündigst.";
+
+// MARK: - Splash
+"aligning_stars" = "Die Sterne richten sich aus...";
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "KI-ASTROLOGIE";
+"worlds_advanced_ai" = "DER FORTSCHRITTLICHSTE KI-ASTROLOGE DER WELT";
+
+// MARK: - Chat & History
+"suggested_questions" = "Vorgeschlagene Fragen";
+"no_chat_history" = "Noch keine Chats";
+"no_conversations" = "Noch keine Gespräche";
+"start_asking" = "Stell deine erste Frage und\ndein Verlauf erscheint hier.";
+
+// MARK: - Charts
+"ascendant" = "Aszendent";
+"planetary_positions" = "Planetenpositionen";
+"edit" = "Bearbeiten";
+
+// MARK: - Compatibility Form Labels
+"boys_name" = "SEIN NAME";
+"girls_name" = "IHR NAME";
+"date_of_birth_caps" = "GEBURTSDATUM";
+"time_caps" = "UHRZEIT";
+"place_of_birth_caps" = "GEBURTSORT";
+"select_city" = "Stadt wählen";
+"enter_name" = "Name eingeben";
+"full_name" = "Vollständiger Name";
+"birth_city" = "Geburtsstadt";
+"select_date" = "Datum wählen";
+"select_time" = "Uhrzeit wählen";
+
+// MARK: - Auth & Legal
+"or" = "oder";
+"and" = "und";
+"privacy_policy" = "Datenschutz";
+"terms_of_service" = "AGB";
+"continue_with_apple" = "Mit Apple fortfahren";
+"continue_with_google" = "Mit Google fortfahren";
+"continue_with_email" = "Mit E-Mail fortfahren";
+"i_dont_know_birth_time" = "Ich kenne meine Geburtszeit nicht";
+"questions_asked" = "gestellte Fragen";

@@ -1,0 +1,180 @@
+/* 
+  Localizable.strings (Hindi)
+  Destiny AI Astrology - हिंदी
+*/
+
+// MARK: - Common
+"app_name" = "डेस्टिनी";
+"done" = "हो गया";
+"cancel" = "रद्द करें";
+"save" = "सेव करें";
+"close" = "बंद करें";
+"loading" = "लोड हो रहा है...";
+"error" = "गड़बड़ी";
+"retry" = "फिर से कोशिश करें";
+"ok" = "ठीक है";
+
+// MARK: - Home Screen
+"greeting" = "नमस्ते!";
+"todays_insight" = "आज का राशिफल";
+"ask_destiny" = "डेस्टिनी से पूछें";
+
+// MARK: - Suggested Questions
+"what_mindful_today" = "आज मुझे किस बात का ध्यान रखना चाहिए?";
+"how_improve_focus" = "मैं अपना फोकस कैसे बढ़ा सकता हूं?";
+"good_time_decisions" = "बड़े फैसलों के लिए सही समय क्या है?";
+"chart_relationships" = "मेरी कुंडली रिश्तों के बारे में क्या कहती है?";
+
+// MARK: - Chat
+"type_question" = "अपना सवाल लिखें...";
+"rate" = "रेटिंग दें";
+"rated" = "रेटिंग दी गई";
+"welcome_message" = "नमस्ते! मैं डेस्टिनी हूं, आपका अपना ज्योतिष गाइड। अपनी जिंदगी, रिश्ते, करियर या किसी भी चीज़ के बारे में मुझसे पूछें।";
+
+// MARK: - Profile
+"profile" = "प्रोफाइल";
+"guest_user" = "गेस्ट यूज़र";
+"upgrade_premium" = "प्रीमियम लें";
+"get_unlimited" = "अनलिमिटेड सवाल और मिलान पाएं";
+"birth_details" = "जन्म की जानकारी";
+"view_birth_details" = "जन्म विवरण देखें";
+"not_set" = "भरा नहीं है";
+"preferences" = "सेटिंग्स";
+"astrology_settings" = "ज्योतिष सेटिंग्स";
+"language" = "भाषा";
+"support" = "मदद";
+"help_faq" = "मदद और FAQ";
+"sign_out" = "साइन आउट";
+
+// MARK: - Astrology Settings
+"ayanamsa" = "अयनांश";
+"ayanamsa_desc" = "राशि चक्र की गणना पद्धति";
+"house_system" = "भाव पद्धति";
+"house_system_desc" = "भावों के विभाजन की विधि";
+"lahiri" = "लाहिड़ी (सबसे आम)";
+"raman" = "रामन";
+"krishnamurti" = "कृष्णमूर्ति (KP)";
+"fagan_bradley" = "फगन-ब्रैडली";
+"equal_houses" = "समान भाव";
+"whole_sign" = "पूर्ण राशि";
+"placidus" = "प्लेसिडस";
+"koch" = "कोक";
+"regiomontanus" = "रेजियोमोंटानस";
+"campanus" = "कैंपनस";
+"morinus" = "मोरिनस";
+"alcabitus" = "अल्काबिटस";
+"porphyrius" = "पोर्फिरियस";
+
+// MARK: - Language Selection
+"select_language" = "भाषा चुनें";
+"english" = "English";
+"hindi" = "हिंदी";
+"language_note" = "ऐप चुनी हुई भाषा में रीस्टार्ट होगा";
+
+// MARK: - Tab Bar
+"home" = "होम";
+"ask" = "पूछें";
+"match" = "मिलान";
+
+// MARK: - Birth Data
+"enter_birth_details" = "जन्म की जानकारी भरें";
+"your_name" = "आपका नाम";
+"date_of_birth" = "जन्म तिथि";
+"time_of_birth" = "जन्म का समय";
+"birth_time_unknown" = "जन्म का समय पता नहीं";
+"place_of_birth" = "जन्म स्थान";
+"search_city" = "शहर खोजें...";
+"gender" = "लिंग";
+"male" = "पुरुष";
+"female" = "महिला";
+"other" = "अन्य";
+"continue" = "आगे बढ़ें";
+
+// MARK: - Subscription
+"subscription" = "सब्सक्रिप्शन";
+"free_plan" = "फ्री प्लान";
+"premium_plan" = "प्रीमियम प्लान";
+"questions_remaining" = "बचे हुए सवाल";
+"unlimited" = "अनलिमिटेड";
+
+// MARK: - Compatibility/Match
+"compatibility" = "कुंडली मिलान";
+"partner_details" = "पार्टनर की जानकारी";
+"calculate_match" = "मिलान देखें";
+"match_score" = "मिलान स्कोर";
+"kundali_match" = "कुंडली मिलान";
+"ashtakoot_analysis" = "अष्टकूट मिलान विश्लेषण";
+"boys_details" = "वर की जानकारी";
+"girls_details" = "वधू की जानकारी";
+"analyze_match" = "मिलान जांचें";
+"new_analysis" = "नया मिलान";
+"summary" = "सारांश";
+"ashtakoot_details" = "अष्टकूट विवरण";
+"recommendation" = "सलाह";
+
+// MARK: - Auth
+"welcome_to_destiny" = "डेस्टिनी में आपका स्वागत है";
+"sign_in_save" = "अपनी कुंडली और चैट सेव करने के लिए साइन इन करें";
+"continue_as_guest" = "गेस्ट के रूप में जारी रखें";
+"by_continuing" = "आगे बढ़ने पर, आप हमारी शर्तों से सहमत हैं";
+"signing_in" = "साइन इन हो रहा है...";
+"skip" = "छोड़ें";
+"get_started" = "शुरू करें";
+
+// MARK: - Birth Data Entry
+"create_birth_chart" = "अपनी जन्म कुंडली बनाएं";
+"enter_details_desc" = "अपनी कुंडली बनाने और व्यक्तिगत राशिफल\nपाने के लिए जन्म की जानकारी भरें";
+
+// MARK: - Subscription
+"unlock_premium" = "डेस्टिनी प्रीमियम पाएं";
+"get_cosmic_guidance" = "अनलिमिटेड ज्योतिष सलाह पाएं";
+"cancel_anytime" = "कभी भी रद्द करें";
+"restore_purchases" = "पुरानी खरीदारी वापस लाएं";
+"subscription_terms" = "सब्सक्रिप्शन अपने आप रिन्यू होगी जब तक आप खत्म होने से 24 घंटे पहले रद्द नहीं करते।";
+
+// MARK: - Splash
+"aligning_stars" = "तारों को मिला रहे हैं...";
+
+// MARK: - Chat
+"suggested_questions" = "सुझाए गए सवाल";
+"no_chat_history" = "अभी तक कोई चैट नहीं";
+
+// MARK: - History
+"no_conversations" = "अभी तक कोई बातचीत नहीं";
+"start_asking" = "सवाल पूछना शुरू करें,\nआपकी हिस्ट्री यहां दिखेगी।";
+
+// MARK: - Charts
+"ascendant" = "लग्न";
+"planetary_positions" = "ग्रहों की स्थिति";
+"edit" = "बदलें";
+
+// MARK: - Compatibility Form Labels
+"boys_name" = "वर का नाम";
+"girls_name" = "वधू का नाम";
+"date_of_birth_caps" = "जन्म तिथि";
+"time_caps" = "समय";
+"place_of_birth_caps" = "जन्म स्थान";
+"select_city" = "शहर चुनें";
+"enter_name" = "नाम लिखें";
+"full_name" = "पूरा नाम";
+"birth_city" = "जन्म का शहर";
+"select_date" = "तारीख चुनें";
+"select_time" = "समय चुनें";
+
+// MARK: - Auth & Legal
+"or" = "या";
+"and" = "और";
+"privacy_policy" = "प्राइवेसी पॉलिसी";
+"terms_of_service" = "सेवा की शर्तें";
+"continue_with_apple" = "Apple से जारी रखें";
+"continue_with_google" = "Google से जारी रखें";
+"continue_with_email" = "Email से जारी रखें";
+"i_dont_know_birth_time" = "मुझे जन्म का समय नहीं पता";
+
+// MARK: - Splash
+"destiny_app_title" = "डेस्टिनी";
+"ai_astrology_subtitle" = "AI ज्योतिष";
+"worlds_advanced_ai" = "दुनिया का सबसे एडवांस AI ज्योतिषी";
+
+// MARK: - Onboarding
+"questions_asked" = "सवाल पूछे गए";

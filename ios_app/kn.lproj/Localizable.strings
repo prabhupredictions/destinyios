@@ -1,0 +1,174 @@
+/* 
+  Localizable.strings (Kannada)
+  Destiny AI Astrology - ಕನ್ನಡ
+*/
+
+// MARK: - Common
+"app_name" = "Destiny";
+"done" = "ಆಯ್ತು";
+"cancel" = "ರದ್ದು";
+"save" = "ಸೇವ್ ಮಾಡಿ";
+"close" = "ಮುಚ್ಚಿ";
+"loading" = "ಲೋಡ್ ಆಗ್ತಿದೆ...";
+"error" = "ತಪ್ಪಾಯ್ತು";
+"retry" = "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ";
+"ok" = "ಸರಿ";
+
+// MARK: - Home Screen
+"greeting" = "ನಮಸ್ಕಾರ!";
+"todays_insight" = "ಇಂದಿನ ರಾಶಿಫಲ";
+"ask_destiny" = "Destiny ಹತ್ರ ಕೇಳಿ";
+
+// MARK: - Suggested Questions
+"what_mindful_today" = "ಇಂದು ನಾನು ಏನು ಗಮನಿಸಬೇಕು?";
+"how_improve_focus" = "ನನ್ನ ಏಕಾಗ್ರತೆ ಹೇಗೆ ಹೆಚ್ಚಿಸಬಹುದು?";
+"good_time_decisions" = "ಮುಖ್ಯ ನಿರ್ಧಾರಗಳಿಗೆ ಈಗ ಒಳ್ಳೆಯ ಸಮಯನಾ?";
+"chart_relationships" = "ನನ್ನ ಪ್ರೇಮ ಜೀವನ ಹೇಗಿರುತ್ತೆ?";
+
+// MARK: - Chat
+"type_question" = "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಬರೆಯಿರಿ...";
+"rate" = "ರೇಟಿಂಗ್ ಕೊಡಿ";
+"rated" = "ರೇಟಿಂಗ್ ಕೊಟ್ಟಿದ್ದೀರಿ";
+"welcome_message" = "ನಮಸ್ಕಾರ! ನಾನು Destiny, ನಿಮ್ಮ ಸ್ವಂತ ಜ್ಯೋತಿಷಿ. ನಿಮ್ಮ ಜೀವನ, ಪ್ರೇಮ, ಉದ್ಯೋಗ ಬಗ್ಗೆ ಏನು ಬೇಕಾದ್ರೂ ಕೇಳಿ.";
+
+// MARK: - Profile
+"profile" = "ಪ್ರೊಫೈಲ್";
+"guest_user" = "ಅತಿಥಿ";
+"upgrade_premium" = "ಪ್ರೀಮಿಯಂ ತಗೊಳ್ಳಿ";
+"get_unlimited" = "ಅನ್‌ಲಿಮಿಟೆಡ್ ಪ್ರಶ್ನೆ ಮತ್ತು ಹೊಂದಾಣಿಕೆ";
+"birth_details" = "ಹುಟ್ಟಿದ ಮಾಹಿತಿ";
+"view_birth_details" = "ಹುಟ್ಟಿದ ಮಾಹಿತಿ ನೋಡಿ";
+"not_set" = "ಇನ್ನೂ ಹಾಕಿಲ್ಲ";
+"preferences" = "ಸೆಟ್ಟಿಂಗ್ಸ್";
+"astrology_settings" = "ಜ್ಯೋತಿಷ್ಯ ಸೆಟ್ಟಿಂಗ್ಸ್";
+"language" = "ಭಾಷೆ";
+"support" = "ಸಹಾಯ";
+"help_faq" = "ಸಹಾಯ & FAQ";
+"sign_out" = "ಲಾಗ್ ಔಟ್";
+
+// MARK: - Astrology Settings
+"ayanamsa" = "ಅಯನಾಂಶ";
+"ayanamsa_desc" = "ರಾಶಿ ಲೆಕ್ಕಾಚಾರದ ವಿಧಾನ";
+"house_system" = "ಭಾವ ಪದ್ಧತಿ";
+"house_system_desc" = "ಭಾವಗಳು ಹೇಗೆ ವಿಭಾಗಿಸಲಾಗುತ್ತೆ";
+"lahiri" = "ಲಾಹಿರಿ (ಸಾಮಾನ್ಯ)";
+"raman" = "ರಾಮನ್";
+"krishnamurti" = "ಕೃಷ್ಣಮೂರ್ತಿ (KP)";
+"fagan_bradley" = "ಫಾಗನ್-ಬ್ರಾಡ್ಲಿ";
+"equal_houses" = "ಸಮಾನ ಭಾವಗಳು";
+"whole_sign" = "ಪೂರ್ಣ ರಾಶಿ";
+"placidus" = "ಪ್ಲಾಸಿಡಸ್";
+"koch" = "ಕೋಚ್";
+"regiomontanus" = "ರೆಜಿಯೊಮಾಂಟನಸ್";
+"campanus" = "ಕ್ಯಾಂಪನಸ್";
+"morinus" = "ಮೊರಿನಸ್";
+"alcabitus" = "ಅಲ್ಕಾಬಿಟಸ್";
+"porphyrius" = "ಪೋರ್ಫಿರಿಯಸ್";
+
+// MARK: - Language Selection
+"select_language" = "ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ";
+"english" = "English";
+"hindi" = "ಹಿಂದಿ";
+"language_note" = "ಆಪ್ ನೀವು ಆಯ್ಕೆ ಮಾಡಿದ ಭಾಷೆಯಲ್ಲಿ ರೀಸ್ಟಾರ್ಟ್ ಆಗುತ್ತೆ";
+
+// MARK: - Tab Bar
+"home" = "ಹೋಮ್";
+"ask" = "ಕೇಳಿ";
+"match" = "ಹೊಂದಾಣಿಕೆ";
+
+// MARK: - Birth Data
+"enter_birth_details" = "ಹುಟ್ಟಿದ ಮಾಹಿತಿ ಹಾಕಿ";
+"your_name" = "ನಿಮ್ಮ ಹೆಸರು";
+"date_of_birth" = "ಹುಟ್ಟಿದ ದಿನಾಂಕ";
+"time_of_birth" = "ಹುಟ್ಟಿದ ಸಮಯ";
+"birth_time_unknown" = "ಸಮಯ ಗೊತ್ತಿಲ್ಲ";
+"place_of_birth" = "ಹುಟ್ಟಿದ ಊರು";
+"search_city" = "ಊರು ಹುಡುಕಿ...";
+"gender" = "ಲಿಂಗ";
+"male" = "ಗಂಡು";
+"female" = "ಹೆಣ್ಣು";
+"other" = "ಇತರೆ";
+"continue" = "ಮುಂದುವರಿಸಿ";
+
+// MARK: - Subscription
+"subscription" = "ಸಬ್‌ಸ್ಕ್ರಿಪ್ಶನ್";
+"free_plan" = "ಉಚಿತ";
+"premium_plan" = "ಪ್ರೀಮಿಯಂ";
+"questions_remaining" = "ಉಳಿದಿರುವ ಪ್ರಶ್ನೆಗಳು";
+"unlimited" = "ಅನ್‌ಲಿಮಿಟೆಡ್";
+
+// MARK: - Compatibility/Match
+"compatibility" = "ಜಾತಕ ಹೊಂದಾಣಿಕೆ";
+"partner_details" = "ಪಾರ್ಟ್ನರ್ ಮಾಹಿತಿ";
+"calculate_match" = "ಹೊಂದಾಣಿಕೆ ನೋಡಿ";
+"match_score" = "ಹೊಂದಾಣಿಕೆ ಸ್ಕೋರ್";
+"kundali_match" = "ಕುಂಡಲಿ ಹೊಂದಾಣಿಕೆ";
+"ashtakoot_analysis" = "ಅಷ್ಟಕೂಟ ವಿಶ್ಲೇಷಣೆ";
+"boys_details" = "ಹುಡುಗನ ಮಾಹಿತಿ";
+"girls_details" = "ಹುಡುಗಿಯ ಮಾಹಿತಿ";
+"analyze_match" = "ವಿಶ್ಲೇಷಿಸಿ";
+"new_analysis" = "ಹೊಸ ವಿಶ್ಲೇಷಣೆ";
+"summary" = "ಸಾರಾಂಶ";
+"ashtakoot_details" = "ಅಷ್ಟಕೂಟ ವಿವರ";
+"recommendation" = "ಸಲಹೆ";
+
+// MARK: - Auth
+"welcome_to_destiny" = "Destiny ಗೆ ಸ್ವಾಗತ";
+"sign_in_save" = "ನಿಮ್ಮ ಜಾತಕ ಸೇವ್ ಮಾಡಲು ಲಾಗಿನ್ ಆಗಿ";
+"continue_as_guest" = "ಅತಿಥಿಯಾಗಿ ಮುಂದುವರಿಸಿ";
+"by_continuing" = "ಮುಂದುವರಿಸಿದರೆ, ನೀವು ಒಪ್ಪುತ್ತೀರಿ";
+"signing_in" = "ಲಾಗಿನ್ ಆಗ್ತಿದೆ...";
+"skip" = "ಸ್ಕಿಪ್ ಮಾಡಿ";
+"get_started" = "ಶುರು ಮಾಡಿ";
+
+// MARK: - Birth Data Entry
+"create_birth_chart" = "ನಿಮ್ಮ ಜನ್ಮ ಜಾತಕ ತಯಾರಿಸಿ";
+"enter_details_desc" = "ನಿಮ್ಮ ಜಾತಕ ಮತ್ತು ವೈಯಕ್ತಿಕ ಫಲಿತಾಂಶಗಳಿಗೆ\nಮಾಹಿತಿ ಹಾಕಿ";
+
+// MARK: - Subscription
+"unlock_premium" = "Destiny Premium ಪಡೆಯಿರಿ";
+"get_cosmic_guidance" = "ಅನ್‌ಲಿಮಿಟೆಡ್ ಜ್ಯೋತಿಷ್ಯ ಸಲಹೆ";
+"cancel_anytime" = "ಯಾವಾಗ ಬೇಕಾದ್ರೂ ರದ್ದು ಮಾಡಬಹುದು";
+"restore_purchases" = "ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಿ";
+"subscription_terms" = "ಸಬ್‌ಸ್ಕ್ರಿಪ್ಶನ್ ಆಟೋಮ್ಯಾಟಿಕ್ ಆಗಿ ರಿನ್ಯೂ ಆಗುತ್ತೆ. 24 ಗಂಟೆ ಮೊದಲು ರದ್ದು ಮಾಡಿ.";
+
+// MARK: - Splash
+"aligning_stars" = "ನಕ್ಷತ್ರಗಳನ್ನು ಓದ್ತಿದ್ದೇವೆ...";
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "AI ಜ್ಯೋತಿಷ್ಯ";
+"worlds_advanced_ai" = "ಜಗತ್ತಿನ ಅತ್ಯಾಧುನಿಕ AI ಜ್ಯೋತಿಷಿ";
+
+// MARK: - Chat & History
+"suggested_questions" = "ಸೂಚಿಸಿದ ಪ್ರಶ್ನೆಗಳು";
+"no_chat_history" = "ಇನ್ನೂ ಚಾಟ್ ಇಲ್ಲ";
+"no_conversations" = "ಇನ್ನೂ ಸಂಭಾಷಣೆ ಇಲ್ಲ";
+"start_asking" = "ಪ್ರಶ್ನೆ ಕೇಳಿ,\nನಿಮ್ಮ ಇತಿಹಾಸ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತೆ.";
+
+// MARK: - Charts
+"ascendant" = "ಲಗ್ನ";
+"planetary_positions" = "ಗ್ರಹಗಳ ಸ್ಥಾನ";
+"edit" = "ಎಡಿಟ್ ಮಾಡಿ";
+
+// MARK: - Compatibility Form Labels
+"boys_name" = "ಹುಡುಗನ ಹೆಸರು";
+"girls_name" = "ಹುಡುಗಿಯ ಹೆಸರು";
+"date_of_birth_caps" = "ಹುಟ್ಟಿದ ದಿನಾಂಕ";
+"time_caps" = "ಸಮಯ";
+"place_of_birth_caps" = "ಹುಟ್ಟಿದ ಊರು";
+"select_city" = "ಊರು ಆಯ್ಕೆ ಮಾಡಿ";
+"enter_name" = "ಹೆಸರು ಹಾಕಿ";
+"full_name" = "ಪೂರ್ಣ ಹೆಸರು";
+"birth_city" = "ಹುಟ್ಟಿದ ಊರು";
+"select_date" = "ದಿನಾಂಕ ಆಯ್ಕೆ ಮಾಡಿ";
+"select_time" = "ಸಮಯ ಆಯ್ಕೆ ಮಾಡಿ";
+
+// MARK: - Auth & Legal
+"or" = "ಅಥವಾ";
+"and" = "ಮತ್ತು";
+"privacy_policy" = "ಪ್ರೈವಸಿ ಪಾಲಿಸಿ";
+"terms_of_service" = "ಸೇವಾ ನಿಯಮಗಳು";
+"continue_with_apple" = "Apple ಜೊತೆ ಮುಂದುವರಿಸಿ";
+"continue_with_google" = "Google ಜೊತೆ ಮುಂದುವರಿಸಿ";
+"continue_with_email" = "Email ಜೊತೆ ಮುಂದುವರಿಸಿ";
+"i_dont_know_birth_time" = "ನನಗೆ ಹುಟ್ಟಿದ ಸಮಯ ಗೊತ್ತಿಲ್ಲ";
+"questions_asked" = "ಪ್ರಶ್ನೆಗಳು ಕೇಳಲಾಗಿದೆ";

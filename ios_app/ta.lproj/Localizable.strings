@@ -1,0 +1,174 @@
+/* 
+  Localizable.strings (Tamil)
+  Destiny AI Astrology - தமிழ்
+*/
+
+// MARK: - Common
+"app_name" = "Destiny";
+"done" = "சரி";
+"cancel" = "ரத்து";
+"save" = "சேமி";
+"close" = "மூடு";
+"loading" = "ஏற்றுகிறது...";
+"error" = "ஏதோ தவறு";
+"retry" = "மீண்டும் முயற்சி செய்";
+"ok" = "சரி";
+
+// MARK: - Home Screen
+"greeting" = "வணக்கம்!";
+"todays_insight" = "இன்றைய ராசி பலன்";
+"ask_destiny" = "Destiny-யிடம் கேளுங்கள்";
+
+// MARK: - Suggested Questions
+"what_mindful_today" = "இன்று நான் எதை கவனிக்க வேண்டும்?";
+"how_improve_focus" = "என் கவனத்தை எப்படி கூட்டுவது?";
+"good_time_decisions" = "முக்கிய முடிவுகளுக்கு இது நல்ல நேரமா?";
+"chart_relationships" = "என் காதல் வாழ்க்கை எப்படி இருக்கும்?";
+
+// MARK: - Chat
+"type_question" = "உங்கள் கேள்வியை எழுதுங்கள்...";
+"rate" = "மதிப்பிடு";
+"rated" = "மதிப்பிட்டாயிற்று";
+"welcome_message" = "வணக்கம்! நான் Destiny, உங்கள் சொந்த ஜோதிடர். வாழ்க்கை, காதல், வேலை - எதைப் பற்றியும் என்னிடம் கேளுங்கள்.";
+
+// MARK: - Profile
+"profile" = "சுயவிவரம்";
+"guest_user" = "விருந்தினர்";
+"upgrade_premium" = "Premium எடுங்கள்";
+"get_unlimited" = "வரையறை இல்லாத கேள்விகள் & பொருத்தங்கள்";
+"birth_details" = "பிறப்பு தகவல்";
+"view_birth_details" = "பிறப்பு தகவலைப் பார்";
+"not_set" = "இன்னும் நிரப்பவில்லை";
+"preferences" = "செட்டிங்ஸ்";
+"astrology_settings" = "ஜோதிட செட்டிங்ஸ்";
+"language" = "மொழி";
+"support" = "உதவி";
+"help_faq" = "உதவி & FAQ";
+"sign_out" = "வெளியேறு";
+
+// MARK: - Astrology Settings
+"ayanamsa" = "அயனாம்சம்";
+"ayanamsa_desc" = "ராசி கணக்கீட்டு முறை";
+"house_system" = "பாவ முறை";
+"house_system_desc" = "பாவங்கள் எப்படி பிரிக்கப்படும்";
+"lahiri" = "லகிரி (பொதுவானது)";
+"raman" = "ராமன்";
+"krishnamurti" = "கிருஷ்ணமூர்த்தி (KP)";
+"fagan_bradley" = "ஃபேகன்-பிராட்லி";
+"equal_houses" = "சம பாவங்கள்";
+"whole_sign" = "முழு ராசி";
+"placidus" = "பிளாசிடஸ்";
+"koch" = "கோச்";
+"regiomontanus" = "ரெஜியோமோண்டனஸ்";
+"campanus" = "காம்பனஸ்";
+"morinus" = "மோரினஸ்";
+"alcabitus" = "அல்காபிடஸ்";
+"porphyrius" = "போர்பிரியஸ்";
+
+// MARK: - Language Selection
+"select_language" = "மொழி தேர்வு செய்யுங்கள்";
+"english" = "English";
+"hindi" = "இந்தி";
+"language_note" = "தேர்வு செய்த மொழியில் ஆப் ரீஸ்டார்ட் ஆகும்";
+
+// MARK: - Tab Bar
+"home" = "முகப்பு";
+"ask" = "கேளு";
+"match" = "பொருத்தம்";
+
+// MARK: - Birth Data
+"enter_birth_details" = "பிறப்பு தகவல் நிரப்புங்கள்";
+"your_name" = "உங்கள் பெயர்";
+"date_of_birth" = "பிறந்த தேதி";
+"time_of_birth" = "பிறந்த நேரம்";
+"birth_time_unknown" = "நேரம் தெரியாது";
+"place_of_birth" = "பிறந்த ஊர்";
+"search_city" = "ஊரைத் தேடுங்கள்...";
+"gender" = "பாலினம்";
+"male" = "ஆண்";
+"female" = "பெண்";
+"other" = "மற்றவை";
+"continue" = "தொடர்";
+
+// MARK: - Subscription
+"subscription" = "சப்ஸ்கிரிப்ஷன்";
+"free_plan" = "இலவசம்";
+"premium_plan" = "பிரீமியம்";
+"questions_remaining" = "மீதம் கேள்விகள்";
+"unlimited" = "வரையறை இல்லை";
+
+// MARK: - Compatibility/Match
+"compatibility" = "ஜாதக பொருத்தம்";
+"partner_details" = "பார்ட்னர் தகவல்";
+"calculate_match" = "பொருத்தம் பார்";
+"match_score" = "பொருத்த மதிப்பெண்";
+"kundali_match" = "ஜாதக பொருத்தம்";
+"ashtakoot_analysis" = "அஷ்டகூட பொருத்த பகுப்பாய்வு";
+"boys_details" = "மாப்பிள்ளை தகவல்";
+"girls_details" = "பெண் தகவல்";
+"analyze_match" = "பொருத்தம் பார்";
+"new_analysis" = "புதிய பகுப்பாய்வு";
+"summary" = "சுருக்கம்";
+"ashtakoot_details" = "அஷ்டகூட விவரம்";
+"recommendation" = "ஆலோசனை";
+
+// MARK: - Auth
+"welcome_to_destiny" = "Destiny-க்கு வரவேற்கிறோம்";
+"sign_in_save" = "உங்கள் ஜாதகத்தை சேமிக்க லாகின் செய்யுங்கள்";
+"continue_as_guest" = "விருந்தினராக தொடர்";
+"by_continuing" = "தொடர்வதன் மூலம் நீங்கள் ஒப்புக்கொள்கிறீர்கள்";
+"signing_in" = "லாகின் ஆகிறது...";
+"skip" = "தவிர்";
+"get_started" = "தொடங்குவோம்!";
+
+// MARK: - Birth Data Entry
+"create_birth_chart" = "உங்கள் ஜாதகத்தை உருவாக்குங்கள்";
+"enter_details_desc" = "உங்கள் ஜாதகம் மற்றும் தனிப்பட்ட\nபலன்களுக்கு தகவலை நிரப்புங்கள்";
+
+// MARK: - Subscription
+"unlock_premium" = "Destiny Premium பெறுங்கள்";
+"get_cosmic_guidance" = "வரையறை இல்லாத ஜோதிட ஆலோசனை";
+"cancel_anytime" = "எப்போது வேண்டுமானாலும் ரத்து செய்யலாம்";
+"restore_purchases" = "வாங்கியவற்றை மீட்டமை";
+"subscription_terms" = "சப்ஸ்கிரிப்ஷன் தானாக புதுப்பிக்கப்படும். 24 மணி நேரம் முன்பு ரத்து செய்யுங்கள்.";
+
+// MARK: - Splash
+"aligning_stars" = "நட்சத்திரங்களைப் படிக்கிறோம்...";
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "AI ஜோதிடம்";
+"worlds_advanced_ai" = "உலகின் மிகவும் மேம்பட்ட AI ஜோதிடர்";
+
+// MARK: - Chat & History
+"suggested_questions" = "பரிந்துரைக்கப்பட்ட கேள்விகள்";
+"no_chat_history" = "இன்னும் சாட் இல்லை";
+"no_conversations" = "இன்னும் உரையாடல் இல்லை";
+"start_asking" = "கேள்விகளைக் கேளுங்கள்,\nஉங்கள் வரலாறு இங்கே தோன்றும்.";
+
+// MARK: - Charts
+"ascendant" = "லக்னம்";
+"planetary_positions" = "கிரக நிலைகள்";
+"edit" = "திருத்து";
+
+// MARK: - Compatibility Form Labels
+"boys_name" = "மாப்பிள்ளை பெயர்";
+"girls_name" = "பெண் பெயர்";
+"date_of_birth_caps" = "பிறந்த தேதி";
+"time_caps" = "நேரம்";
+"place_of_birth_caps" = "பிறந்த ஊர்";
+"select_city" = "ஊரைத் தேர்வு செய்";
+"enter_name" = "பெயர் எழுதுங்கள்";
+"full_name" = "முழு பெயர்";
+"birth_city" = "பிறந்த ஊர்";
+"select_date" = "தேதி தேர்வு செய்";
+"select_time" = "நேரம் தேர்வு செய்";
+
+// MARK: - Auth & Legal
+"or" = "அல்லது";
+"and" = "மற்றும்";
+"privacy_policy" = "தனியுரிமை கொள்கை";
+"terms_of_service" = "சேவை விதிமுறைகள்";
+"continue_with_apple" = "Apple மூலம் தொடரவும்";
+"continue_with_google" = "Google மூலம் தொடரவும்";
+"continue_with_email" = "Email மூலம் தொடரவும்";
+"i_dont_know_birth_time" = "எனக்கு பிறந்த நேரம் தெரியாது";
+"questions_asked" = "கேள்விகள் கேட்கப்பட்டன";

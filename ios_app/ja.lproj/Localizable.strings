@@ -1,0 +1,174 @@
+/* 
+  Localizable.strings (Japanese)
+  Destiny AI Astrology - 日本語
+*/
+
+// MARK: - Common
+"app_name" = "Destiny";
+"done" = "完了";
+"cancel" = "キャンセル";
+"save" = "保存";
+"close" = "閉じる";
+"loading" = "読み込み中...";
+"error" = "エラー";
+"retry" = "もう一度試す";
+"ok" = "OK";
+
+// MARK: - Home Screen
+"greeting" = "こんにちは！";
+"todays_insight" = "今日の運勢";
+"ask_destiny" = "Destinyに相談";
+
+// MARK: - Suggested Questions
+"what_mindful_today" = "今日気をつけることは？";
+"how_improve_focus" = "集中力を上げるには？";
+"good_time_decisions" = "今は大事な決断に良い時期？";
+"chart_relationships" = "私の恋愛運はどう？";
+
+// MARK: - Chat
+"type_question" = "質問を入力してね...";
+"rate" = "評価する";
+"rated" = "評価済み";
+"welcome_message" = "こんにちは！私はDestiny、あなたの星占いガイドです。恋愛、仕事、人生のこと、なんでも聞いてね。";
+
+// MARK: - Profile
+"profile" = "プロフィール";
+"guest_user" = "ゲスト";
+"upgrade_premium" = "プレミアムにする";
+"get_unlimited" = "質問し放題＆相性診断し放題";
+"birth_details" = "生年月日情報";
+"view_birth_details" = "詳細を見る";
+"not_set" = "未設定";
+"preferences" = "設定";
+"astrology_settings" = "占いの設定";
+"language" = "言語";
+"support" = "ヘルプ";
+"help_faq" = "ヘルプ・よくある質問";
+"sign_out" = "ログアウト";
+
+// MARK: - Astrology Settings
+"ayanamsa" = "アヤナムサ";
+"ayanamsa_desc" = "黄道帯の計算方式";
+"house_system" = "ハウスシステム";
+"house_system_desc" = "ハウスの分割方式";
+"lahiri" = "ラヒリ（一般的）";
+"raman" = "ラーマン";
+"krishnamurti" = "クリシュナムルティ（KP）";
+"fagan_bradley" = "フェイガン・ブラッドリー";
+"equal_houses" = "イコールハウス";
+"whole_sign" = "ホールサイン";
+"placidus" = "プラシーダス";
+"koch" = "コッホ";
+"regiomontanus" = "レジオモンタナス";
+"campanus" = "カンパヌス";
+"morinus" = "モリナス";
+"alcabitus" = "アルカビティウス";
+"porphyrius" = "ポルフィリウス";
+
+// MARK: - Language Selection
+"select_language" = "言語を選ぶ";
+"english" = "English";
+"hindi" = "Hindi";
+"language_note" = "選んだ言語でアプリが再起動します";
+
+// MARK: - Tab Bar
+"home" = "ホーム";
+"ask" = "相談";
+"match" = "相性";
+
+// MARK: - Birth Data
+"enter_birth_details" = "生年月日を入力";
+"your_name" = "あなたの名前";
+"date_of_birth" = "生年月日";
+"time_of_birth" = "生まれた時間";
+"birth_time_unknown" = "時間がわからない";
+"place_of_birth" = "生まれた場所";
+"search_city" = "都市を検索...";
+"gender" = "性別";
+"male" = "男性";
+"female" = "女性";
+"other" = "その他";
+"continue" = "次へ";
+
+// MARK: - Subscription
+"subscription" = "サブスク";
+"free_plan" = "無料プラン";
+"premium_plan" = "プレミアム";
+"questions_remaining" = "残り質問数";
+"unlimited" = "無制限";
+
+// MARK: - Compatibility/Match
+"compatibility" = "相性診断";
+"partner_details" = "相手の情報";
+"calculate_match" = "相性を見る";
+"match_score" = "相性スコア";
+"kundali_match" = "クンダリ相性";
+"ashtakoot_analysis" = "アシュタクート分析";
+"boys_details" = "彼の情報";
+"girls_details" = "彼女の情報";
+"analyze_match" = "診断する";
+"new_analysis" = "新しい診断";
+"summary" = "まとめ";
+"ashtakoot_details" = "詳細";
+"recommendation" = "アドバイス";
+
+// MARK: - Auth
+"welcome_to_destiny" = "Destinyへようこそ";
+"sign_in_save" = "ログインしてデータを保存";
+"continue_as_guest" = "ゲストで続ける";
+"by_continuing" = "続けると利用規約に同意したことになります";
+"signing_in" = "ログイン中...";
+"skip" = "スキップ";
+"get_started" = "はじめる";
+
+// MARK: - Birth Data Entry
+"create_birth_chart" = "あなたの星図を作成";
+"enter_details_desc" = "生年月日を入力して\nあなただけの占い結果を見よう";
+
+// MARK: - Subscription
+"unlock_premium" = "Destiny プレミアムを解除";
+"get_cosmic_guidance" = "占い相談し放題";
+"cancel_anytime" = "いつでも解約OK";
+"restore_purchases" = "購入を復元";
+"subscription_terms" = "サブスクは自動更新されます。期限の24時間前までに解約してください。";
+
+// MARK: - Splash
+"aligning_stars" = "星を読み込み中...";
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "AI星占い";
+"worlds_advanced_ai" = "世界最先端のAI占い師";
+
+// MARK: - Chat & History
+"suggested_questions" = "おすすめの質問";
+"no_chat_history" = "まだ履歴がありません";
+"no_conversations" = "まだ会話がありません";
+"start_asking" = "質問してみよう！\n履歴がここに表示されます。";
+
+// MARK: - Charts
+"ascendant" = "アセンダント";
+"planetary_positions" = "惑星の位置";
+"edit" = "編集";
+
+// MARK: - Compatibility Form Labels
+"boys_name" = "彼の名前";
+"girls_name" = "彼女の名前";
+"date_of_birth_caps" = "生年月日";
+"time_caps" = "時間";
+"place_of_birth_caps" = "出生地";
+"select_city" = "都市を選ぶ";
+"enter_name" = "名前を入力";
+"full_name" = "フルネーム";
+"birth_city" = "生まれた街";
+"select_date" = "日付を選ぶ";
+"select_time" = "時間を選ぶ";
+
+// MARK: - Auth & Legal
+"or" = "または";
+"and" = "と";
+"privacy_policy" = "プライバシーポリシー";
+"terms_of_service" = "利用規約";
+"continue_with_apple" = "Appleで続ける";
+"continue_with_google" = "Googleで続ける";
+"continue_with_email" = "メールで続ける";
+"i_dont_know_birth_time" = "生まれた時間がわからない";
+"questions_asked" = "件の質問";

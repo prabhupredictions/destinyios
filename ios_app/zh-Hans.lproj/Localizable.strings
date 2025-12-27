@@ -1,0 +1,174 @@
+/* 
+  Localizable.strings (Chinese - Simplified)
+  Destiny AI Astrology - 简体中文
+*/
+
+// MARK: - Common
+"app_name" = "Destiny";
+"done" = "完成";
+"cancel" = "取消";
+"save" = "保存";
+"close" = "关闭";
+"loading" = "加载中...";
+"error" = "出错了";
+"retry" = "重试";
+"ok" = "好的";
+
+// MARK: - Home Screen
+"greeting" = "你好！";
+"todays_insight" = "今日运势";
+"ask_destiny" = "问问 Destiny";
+
+// MARK: - Suggested Questions
+"what_mindful_today" = "今天我需要注意什么？";
+"how_improve_focus" = "如何提高专注力？";
+"good_time_decisions" = "现在是做重要决定的好时机吗？";
+"chart_relationships" = "我的爱情运势怎么样？";
+
+// MARK: - Chat
+"type_question" = "输入你的问题...";
+"rate" = "评分";
+"rated" = "已评分";
+"welcome_message" = "你好！我是 Destiny，你的私人占星顾问。无论是生活、感情还是事业，都可以问我哦～";
+
+// MARK: - Profile
+"profile" = "我的";
+"guest_user" = "游客";
+"upgrade_premium" = "升级高级版";
+"get_unlimited" = "无限提问 & 配对分析";
+"birth_details" = "出生信息";
+"view_birth_details" = "查看出生信息";
+"not_set" = "未填写";
+"preferences" = "设置";
+"astrology_settings" = "占星设置";
+"language" = "语言";
+"support" = "帮助";
+"help_faq" = "帮助与常见问题";
+"sign_out" = "退出登录";
+
+// MARK: - Astrology Settings
+"ayanamsa" = "岁差制";
+"ayanamsa_desc" = "黄道计算方法";
+"house_system" = "宫位制";
+"house_system_desc" = "宫位划分方式";
+"lahiri" = "Lahiri（常用）";
+"raman" = "Raman";
+"krishnamurti" = "Krishnamurti (KP)";
+"fagan_bradley" = "Fagan-Bradley";
+"equal_houses" = "等宫制";
+"whole_sign" = "整宫制";
+"placidus" = "Placidus";
+"koch" = "Koch";
+"regiomontanus" = "Regiomontanus";
+"campanus" = "Campanus";
+"morinus" = "Morinus";
+"alcabitus" = "Alcabitus";
+"porphyrius" = "Porphyrius";
+
+// MARK: - Language Selection
+"select_language" = "选择语言";
+"english" = "English";
+"hindi" = "Hindi";
+"language_note" = "App 将以所选语言重启";
+
+// MARK: - Tab Bar
+"home" = "首页";
+"ask" = "提问";
+"match" = "配对";
+
+// MARK: - Birth Data
+"enter_birth_details" = "填写出生信息";
+"your_name" = "你的名字";
+"date_of_birth" = "出生日期";
+"time_of_birth" = "出生时间";
+"birth_time_unknown" = "不知道具体时间";
+"place_of_birth" = "出生地点";
+"search_city" = "搜索城市...";
+"gender" = "性别";
+"male" = "男";
+"female" = "女";
+"other" = "其他";
+"continue" = "继续";
+
+// MARK: - Subscription
+"subscription" = "订阅";
+"free_plan" = "免费版";
+"premium_plan" = "高级版";
+"questions_remaining" = "剩余提问次数";
+"unlimited" = "无限";
+
+// MARK: - Compatibility/Match
+"compatibility" = "星座配对";
+"partner_details" = "对方信息";
+"calculate_match" = "查看配对结果";
+"match_score" = "契合度";
+"kundali_match" = "星盘配对";
+"ashtakoot_analysis" = "八字合婚分析";
+"boys_details" = "他的信息";
+"girls_details" = "她的信息";
+"analyze_match" = "开始分析";
+"new_analysis" = "新的分析";
+"summary" = "总结";
+"ashtakoot_details" = "八字详情";
+"recommendation" = "建议";
+
+// MARK: - Auth
+"welcome_to_destiny" = "欢迎来到 Destiny";
+"sign_in_save" = "登录以保存你的星盘和聊天";
+"continue_as_guest" = "游客模式继续";
+"by_continuing" = "继续即表示你同意我们的";
+"signing_in" = "登录中...";
+"skip" = "跳过";
+"get_started" = "开始吧！";
+
+// MARK: - Birth Data Entry
+"create_birth_chart" = "创建你的星盘";
+"enter_details_desc" = "填写出生信息\n获取专属运势分析";
+
+// MARK: - Subscription
+"unlock_premium" = "解锁 Destiny 高级版";
+"get_cosmic_guidance" = "无限占星咨询";
+"cancel_anytime" = "随时取消";
+"restore_purchases" = "恢复购买";
+"subscription_terms" = "订阅会自动续期，可在到期前 24 小时取消。";
+
+// MARK: - Splash
+"aligning_stars" = "星辰解读中...";
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "AI 星座";
+"worlds_advanced_ai" = "全球最先进的 AI 占星师";
+
+// MARK: - Chat & History
+"suggested_questions" = "推荐问题";
+"no_chat_history" = "还没有聊天记录";
+"no_conversations" = "还没有对话";
+"start_asking" = "开始提问吧，\n你的历史记录会显示在这里。";
+
+// MARK: - Charts
+"ascendant" = "上升星座";
+"planetary_positions" = "行星位置";
+"edit" = "编辑";
+
+// MARK: - Compatibility Form Labels
+"boys_name" = "他的名字";
+"girls_name" = "她的名字";
+"date_of_birth_caps" = "出生日期";
+"time_caps" = "时间";
+"place_of_birth_caps" = "出生地点";
+"select_city" = "选择城市";
+"enter_name" = "输入名字";
+"full_name" = "全名";
+"birth_city" = "出生城市";
+"select_date" = "选择日期";
+"select_time" = "选择时间";
+
+// MARK: - Auth & Legal
+"or" = "或";
+"and" = "和";
+"privacy_policy" = "隐私政策";
+"terms_of_service" = "服务条款";
+"continue_with_apple" = "通过 Apple 继续";
+"continue_with_google" = "通过 Google 继续";
+"continue_with_email" = "通过邮箱继续";
+"i_dont_know_birth_time" = "我不知道出生时间";
+"questions_asked" = "个问题";
