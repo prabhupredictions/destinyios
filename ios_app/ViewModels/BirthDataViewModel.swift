@@ -85,6 +85,16 @@ class BirthDataViewModel {
     private func loadUserInfo() {
         userEmail = UserDefaults.standard.string(forKey: "userEmail")
         isGuest = UserDefaults.standard.bool(forKey: "isGuest")
+        
+        // Auto-populate name from Apple/Google sign-in (not for guests)
+        // For guests or email users, they need to enter name manually
+        if !isGuest {
+            if let signInName = UserDefaults.standard.string(forKey: "userName"),
+               !signInName.isEmpty,
+               signInName != "Guest" {
+                userName = signInName
+            }
+        }
     }
     
     // MARK: - Load Saved Data
