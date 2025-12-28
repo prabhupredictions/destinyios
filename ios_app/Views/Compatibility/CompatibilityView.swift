@@ -163,170 +163,133 @@ struct CompatibilityView: View {
         )
     }
     
-    // MARK: - Boy Form Card (You - from profile)
+    // MARK: - Boy Form Card (You) - Compact Premium Design
     private var boyFormCard: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Profile indicator if data loaded
-            if viewModel.userDataLoaded {
-                HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                    Text("From your profile")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
-                    Spacer()
-                }
-                .padding(.bottom, 4)
-            }
-            
-            // Name field
-            VStack(alignment: .leading, spacing: 8) {
-                Text("boys_name".localized)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
-                
-                if viewModel.userDataLoaded {
-                    // Read-only display
-                    HStack(spacing: 10) {
-                        Image(systemName: "person")
-                            .font(.system(size: 14))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.5))
+        VStack(alignment: .leading, spacing: 14) {
+            // Row 1: Name and Gender inline
+            HStack(spacing: 12) {
+                // Name
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("NAME")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
+                    
+                    HStack {
                         Text(viewModel.boyName.isEmpty ? "Not set" : viewModel.boyName)
                             .font(.system(size: 15))
                             .foregroundColor(Color("TextDark"))
                         Spacer()
                     }
-                    .padding(.horizontal, 14)
-                    .frame(height: 48)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
-                    )
-                } else {
-                    MatchTextField(
-                        placeholder: "Enter name",
-                        text: $viewModel.boyName,
-                        icon: "person"
-                    )
+                    .padding(.horizontal, 12)
+                    .frame(height: 44)
+                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
+                    .cornerRadius(10)
                 }
-            }
-            
-            // Date and Time row
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("date_of_birth_caps".localized)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
-                    
-                    if viewModel.userDataLoaded {
-                        // Read-only date display
-                        HStack {
-                            Text(formattedBoyDate)
-                                .font(.system(size: 15))
-                                .foregroundColor(Color("TextDark"))
-                            Spacer()
-                            Image(systemName: "calendar")
-                                .foregroundColor(Color("NavyPrimary").opacity(0.4))
-                        }
-                        .padding(.horizontal, 14)
-                        .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
-                        )
-                    } else {
-                        MatchDateButton(date: $viewModel.boyBirthDate)
-                    }
-                }
+                .frame(maxWidth: .infinity)
                 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("time_caps".localized)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
+                // Gender (read-only from profile)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("GENDER")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
                     
-                    if viewModel.userDataLoaded {
-                        // Read-only time display
-                        HStack {
-                            Text(viewModel.boyTimeUnknown ? "Unknown" : formattedBoyTime)
-                                .font(.system(size: 15))
-                                .foregroundColor(Color("TextDark"))
-                            Spacer()
-                            Image(systemName: "clock")
-                                .foregroundColor(Color("NavyPrimary").opacity(0.4))
-                        }
-                        .padding(.horizontal, 14)
-                        .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
-                        )
-                    } else {
-                        MatchTimeButton(time: $viewModel.boyBirthTime)
-                    }
-                }
-            }
-            
-            // Place of Birth
-            VStack(alignment: .leading, spacing: 8) {
-                Text("place_of_birth_caps".localized)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
-                
-                if viewModel.userDataLoaded {
-                    // Read-only city display
-                    HStack(spacing: 10) {
-                        Image(systemName: "mappin")
+                    HStack(spacing: 4) {
+                        Text(userGenderDisplayText)
                             .font(.system(size: 14))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                        
-                        Text(viewModel.boyCity.isEmpty ? "Not set" : viewModel.boyCity)
+                            .foregroundColor(Color("TextDark"))
+                            .lineLimit(1)
+                    }
+                    .padding(.horizontal, 10)
+                    .frame(height: 44)
+                    .frame(minWidth: 100)
+                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
+                    .cornerRadius(10)
+                }
+            }
+            
+            // Row 2: Date and Time inline
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("DATE OF BIRTH")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
+                    
+                    HStack {
+                        Text(formattedBoyDate)
                             .font(.system(size: 15))
                             .foregroundColor(Color("TextDark"))
-                        
                         Spacer()
+                        Image(systemName: "calendar")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color("NavyPrimary").opacity(0.3))
                     }
-                    .padding(.horizontal, 14)
-                    .frame(height: 48)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
-                    )
-                } else {
-                    Button(action: {
-                        showBoyLocationSearch = true
-                    }) {
-                        HStack(spacing: 10) {
-                            Image(systemName: "mappin")
-                                .font(.system(size: 14))
-                                .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                            
-                            Text(viewModel.boyCity.isEmpty ? "select_city".localized : viewModel.boyCity)
-                                .font(.system(size: 15))
-                                .foregroundColor(viewModel.boyCity.isEmpty ? Color("TextDark").opacity(0.4) : Color("TextDark"))
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(Color("NavyPrimary").opacity(0.4))
-                        }
-                        .padding(.horizontal, 14)
-                        .frame(height: 48)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(red: 0.97, green: 0.97, blue: 0.98))
-                        )
+                    .padding(.horizontal, 12)
+                    .frame(height: 44)
+                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
+                    .cornerRadius(10)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("TIME")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
+                    
+                    HStack {
+                        Text(viewModel.boyTimeUnknown ? "Unknown" : formattedBoyTime)
+                            .font(.system(size: 15))
+                            .foregroundColor(Color("TextDark"))
+                        Spacer()
+                        Image(systemName: "clock")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color("NavyPrimary").opacity(0.3))
                     }
+                    .padding(.horizontal, 12)
+                    .frame(height: 44)
+                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
+                    .cornerRadius(10)
                 }
             }
+            
+            // Row 3: Place of Birth
+            VStack(alignment: .leading, spacing: 4) {
+                Text("PLACE OF BIRTH")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(Color("TextDark").opacity(0.4))
+                
+                HStack {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                    
+                    Text(viewModel.boyCity.isEmpty ? "Not set" : viewModel.boyCity)
+                        .font(.system(size: 15))
+                        .foregroundColor(Color("TextDark"))
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .frame(height: 44)
+                .background(Color(red: 0.95, green: 0.95, blue: 0.96))
+                .cornerRadius(10)
+            }
         }
-        .padding(24)
+        .padding(18)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.06), radius: 15, y: 5)
+                .shadow(color: Color.black.opacity(0.05), radius: 12, y: 4)
         )
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
+    }
+    
+    // User gender display text
+    private var userGenderDisplayText: String {
+        switch viewModel.boyGender {
+        case "male": return "Male"
+        case "female": return "Female"
+        case "non-binary": return "Non-binary"
+        default: return "Not set"
+        }
     }
     
     // Formatted date for display

@@ -15,6 +15,7 @@ class CompatibilityViewModel {
     var boyLatitude: Double = 0
     var boyLongitude: Double = 0
     var boyTimeUnknown: Bool = false
+    var boyGender: String = "" // male, female, non-binary
     var userDataLoaded: Bool = false // Track if user data was loaded from profile
     
     // Birth data for "Partner"
@@ -75,6 +76,9 @@ class CompatibilityViewModel {
                 
                 // Load time unknown flag
                 boyTimeUnknown = UserDefaults.standard.bool(forKey: "birthTimeUnknown")
+                
+                // Load gender
+                boyGender = UserDefaults.standard.string(forKey: "userGender") ?? ""
                 
                 userDataLoaded = true
             } catch {
