@@ -349,93 +349,75 @@ struct CompatibilityView: View {
         case "male": return "Male"
         case "female": return "Female"
         case "non-binary": return "Non-binary"
-        default: return "Prefer not to say"
+        default: return "Select"
         }
     }
 
-    // MARK: - Girl Form Card (Partner)
+    // MARK: - Girl Form Card (Partner) - Compact Premium Design
     private var girlFormCard: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Name field (optional)
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("boys_name".localized)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
-                    Text("(Optional)")
-                        .font(.system(size: 10))
-                        .foregroundColor(Color("TextDark").opacity(0.3))
+        VStack(alignment: .leading, spacing: 14) {
+            // Row 1: Name and Gender inline
+            HStack(spacing: 12) {
+                // Name (takes more space)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("NAME")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
+                    
+                    TextField("Optional", text: $viewModel.girlName)
+                        .font(.system(size: 15))
+                        .foregroundColor(Color("TextDark"))
+                        .padding(.horizontal, 12)
+                        .frame(height: 44)
+                        .background(Color(red: 0.97, green: 0.97, blue: 0.98))
+                        .cornerRadius(10)
                 }
+                .frame(maxWidth: .infinity)
                 
-                MatchTextField(
-                    placeholder: "Enter name",
-                    text: $viewModel.girlName,
-                    icon: "person"
-                )
-            }
-            
-            // Gender Identity (Dropdown style)
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 6) {
-                    Image(systemName: "person")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color("NavyPrimary").opacity(0.6))
-                    Text("Gender Identity")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
-                }
-                
-                Menu {
-                    Button("Prefer not to say") {
-                        viewModel.partnerGender = ""
+                // Gender dropdown (compact)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("GENDER")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
+                    
+                    Menu {
+                        Button("Not specified") { viewModel.partnerGender = "" }
+                        Button("Male") { viewModel.partnerGender = "male" }
+                        Button("Female") { viewModel.partnerGender = "female" }
+                        Button("Non-binary") { viewModel.partnerGender = "non-binary" }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(genderDisplayText)
+                                .font(.system(size: 14))
+                                .foregroundColor(Color("TextDark"))
+                                .lineLimit(1)
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 10))
+                                .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                        }
+                        .padding(.horizontal, 10)
+                        .frame(height: 44)
+                        .frame(minWidth: 100)
+                        .background(Color(red: 0.97, green: 0.97, blue: 0.98))
+                        .cornerRadius(10)
                     }
-                    Button("Male") {
-                        viewModel.partnerGender = "male"
-                    }
-                    Button("Female") {
-                        viewModel.partnerGender = "female"
-                    }
-                    Button("Non-binary") {
-                        viewModel.partnerGender = "non-binary"
-                    }
-                } label: {
-                    HStack {
-                        Text(genderDisplayText)
-                            .font(.system(size: 16))
-                            .foregroundColor(Color("TextDark"))
-                        Spacer()
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 14))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                    }
-                    .padding(.horizontal, 16)
-                    .frame(height: 52)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.white)
-                            .shadow(color: Color.black.opacity(0.04), radius: 8, y: 2)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color("NavyPrimary").opacity(0.1), lineWidth: 1)
-                    )
                 }
             }
             
-            // Date and Time row
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("date_of_birth_caps".localized)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
+            // Row 2: Date and Time inline
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("DATE OF BIRTH")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
                     
                     MatchDateButton(date: $viewModel.girlBirthDate)
                 }
                 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("time_caps".localized)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("TIME")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(Color("TextDark").opacity(0.4))
                     
                     MatchTimeButton(time: $viewModel.girlBirthTime)
                         .disabled(viewModel.partnerTimeUnknown)
@@ -443,80 +425,68 @@ struct CompatibilityView: View {
                 }
             }
             
-            // I don't know birth time checkbox
-            Button(action: {
-                viewModel.partnerTimeUnknown.toggle()
-            }) {
-                HStack(spacing: 10) {
+            // Time unknown toggle (compact inline)
+            HStack(spacing: 8) {
+                Button(action: { viewModel.partnerTimeUnknown.toggle() }) {
                     Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
-                        .font(.system(size: 18))
-                        .foregroundColor(viewModel.partnerTimeUnknown ? Color("NavyPrimary") : Color("TextDark").opacity(0.4))
-                    
-                    Text("partner_birth_time_unknown".localized)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color("TextDark").opacity(0.7))
+                        .font(.system(size: 16))
+                        .foregroundColor(viewModel.partnerTimeUnknown ? Color("NavyPrimary") : Color("TextDark").opacity(0.3))
                 }
-            }
-            
-            // Warning if time unknown
-            if viewModel.partnerTimeUnknown {
-                HStack(spacing: 8) {
-                    Image(systemName: "info.circle.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(.orange)
-                    
-                    Text("birth_time_warning".localized)
-                        .font(.system(size: 12))
-                        .foregroundColor(.orange)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(12)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.orange.opacity(0.1))
-                )
-            }
-            
-            // Place of Birth
-            VStack(alignment: .leading, spacing: 8) {
-                Text("place_of_birth_caps".localized)
-                    .font(.system(size: 11, weight: .semibold))
+                
+                Text("partner_birth_time_unknown".localized)
+                    .font(.system(size: 12))
                     .foregroundColor(Color("TextDark").opacity(0.5))
                 
-                Button(action: {
-                    showGirlLocationSearch = true
-                }) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "mappin")
-                            .font(.system(size: 14))
+                Spacer()
+                
+                // Inline warning indicator
+                if viewModel.partnerTimeUnknown {
+                    HStack(spacing: 4) {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 11))
+                        Text("Less accurate")
+                            .font(.system(size: 11))
+                    }
+                    .foregroundColor(.orange)
+                }
+            }
+            
+            // Row 3: Place of Birth
+            VStack(alignment: .leading, spacing: 4) {
+                Text("PLACE OF BIRTH")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(Color("TextDark").opacity(0.4))
+                
+                Button(action: { showGirlLocationSearch = true }) {
+                    HStack {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 12))
                             .foregroundColor(Color("NavyPrimary").opacity(0.5))
                         
-                        Text(viewModel.girlCity.isEmpty ? "select_city".localized : viewModel.girlCity)
+                        Text(viewModel.girlCity.isEmpty ? "Select city" : viewModel.girlCity)
                             .font(.system(size: 15))
                             .foregroundColor(viewModel.girlCity.isEmpty ? Color("TextDark").opacity(0.4) : Color("TextDark"))
                         
                         Spacer()
                         
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.4))
+                            .font(.system(size: 12))
+                            .foregroundColor(Color("NavyPrimary").opacity(0.3))
                     }
-                    .padding(.horizontal, 14)
-                    .frame(height: 48)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(red: 0.97, green: 0.97, blue: 0.98))
-                    )
+                    .padding(.horizontal, 12)
+                    .frame(height: 44)
+                    .background(Color(red: 0.97, green: 0.97, blue: 0.98))
+                    .cornerRadius(10)
                 }
             }
         }
-        .padding(24)
+        .padding(18)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.06), radius: 15, y: 5)
+                .shadow(color: Color.black.opacity(0.05), radius: 12, y: 4)
         )
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
     }
     
     // MARK: - Analyze Button
