@@ -174,3 +174,14 @@
 "continue_with_email" = "Email ಜೊತೆ ಮುಂದುವರಿಸಿ";
 "i_dont_know_birth_time" = "ನನಗೆ ಹುಟ್ಟಿದ ಸಮಯ ಗೊತ್ತಿಲ್ಲ";
 "questions_asked" = "ಪ್ರಶ್ನೆಗಳು ಕೇಳಲಾಗಿದೆ";
+
+// MARK: - Birth Details View
+"your_birth_info" = "ನಿಮ್ಮ ಜನ್ಮ ಮಾಹಿತಿ";
+"editable" = "ಸಂಪಾದಿಸಬಹುದಾದ";
+"birth_data" = "ಜನ್ಮ ಡೇಟಾ";
+"prefer_not_to_say" = "ಹೇಳಲು ಇಷ್ಟಪಡುವುದಿಲ್ಲ";
+"non_binary" = "ನಾನ್-ಬೈನರಿ";
+"changes_saved" = "ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ";
+"name_gender_updated" = "ನಿಮ್ಮ ಹೆಸರು ಮತ್ತು ಲಿಂಗವನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ.";
+"need_update_birth_data" = "ಜನ್ಮ ಡೇಟಾವನ್ನು ನವೀಕರಿಸಬೇಕೇ?";
+"contact_support_birth_data" = "ಜನ್ಮ ದಿನಾಂಕ, ಸಮಯ ಅಥವಾ ಸ್ಥಳವನ್ನು ಬದಲಾಯಿಸಲು, ಬೆಂಬಲ ತಂಡವನ್ನು ಸಂಪರ್ಕಿಸಿ.";

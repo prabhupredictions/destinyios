@@ -58,10 +58,10 @@ struct BirthDetailsView: View {
             }
         }
         .onAppear { loadData() }
-        .alert("Changes Saved", isPresented: $showSaveConfirmation) {
-            Button("OK") { dismiss() }
+        .alert("changes_saved".localized, isPresented: $showSaveConfirmation) {
+            Button("ok".localized) { dismiss() }
         } message: {
-            Text("Your name and gender have been updated.")
+            Text("name_gender_updated".localized)
         }
     }
     
@@ -77,7 +77,7 @@ struct BirthDetailsView: View {
                     .foregroundColor(Color("NavyPrimary"))
             }
             
-            Text("Your Birth Information")
+            Text("your_birth_info".localized)
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(Color("NavyPrimary"))
         }
@@ -87,18 +87,18 @@ struct BirthDetailsView: View {
     // MARK: - Editable Section
     private var editableSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("EDITABLE")
+            Text("editable".localized.uppercased())
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(Color("TextDark").opacity(0.4))
             
             VStack(spacing: 12) {
                 // Name Field
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Name")
+                    Text("your_name".localized)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(Color("TextDark").opacity(0.6))
                     
-                    TextField("Enter your name", text: $userName)
+                    TextField("enter_name".localized, text: $userName)
                         .font(.system(size: 16))
                         .foregroundColor(Color("TextDark"))
                         .padding(.horizontal, 14)
@@ -114,15 +114,15 @@ struct BirthDetailsView: View {
                 
                 // Gender Picker
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Gender")
+                    Text("gender".localized)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(Color("TextDark").opacity(0.6))
                     
                     Menu {
-                        Button("Not specified") { gender = ""; hasChanges = true }
-                        Button("Male") { gender = "male"; hasChanges = true }
-                        Button("Female") { gender = "female"; hasChanges = true }
-                        Button("Non-binary") { gender = "non-binary"; hasChanges = true }
+                        Button("prefer_not_to_say".localized) { gender = ""; hasChanges = true }
+                        Button("male".localized) { gender = "male"; hasChanges = true }
+                        Button("female".localized) { gender = "female"; hasChanges = true }
+                        Button("non_binary".localized) { gender = "non-binary"; hasChanges = true }
                     } label: {
                         HStack {
                             Text(genderDisplayText)
@@ -156,16 +156,16 @@ struct BirthDetailsView: View {
     // MARK: - Read-only Section
     private var readOnlySection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("BIRTH DATA")
+            Text("birth_data".localized.uppercased())
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundColor(Color("TextDark").opacity(0.4))
             
             VStack(spacing: 0) {
-                readOnlyRow(label: "Date of Birth", value: dateOfBirth, icon: "calendar")
+                readOnlyRow(label: "date_of_birth".localized, value: dateOfBirth, icon: "calendar")
                 Divider().padding(.leading, 44)
-                readOnlyRow(label: "Time of Birth", value: timeOfBirth, icon: "clock")
+                readOnlyRow(label: "time_of_birth".localized, value: timeOfBirth, icon: "clock")
                 Divider().padding(.leading, 44)
-                readOnlyRow(label: "Place of Birth", value: placeOfBirth, icon: "location.fill")
+                readOnlyRow(label: "place_of_birth".localized, value: placeOfBirth, icon: "location.fill")
             }
             .background(
                 RoundedRectangle(cornerRadius: 16)
@@ -185,7 +185,7 @@ struct BirthDetailsView: View {
                 Text(label)
                     .font(.system(size: 12))
                     .foregroundColor(Color("TextDark").opacity(0.5))
-                Text(value.isEmpty ? "Not set" : value)
+                Text(value.isEmpty ? "not_set".localized : value)
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("TextDark"))
             }
@@ -208,12 +208,12 @@ struct BirthDetailsView: View {
                     .font(.system(size: 14))
                     .foregroundColor(Color("NavyPrimary"))
                 
-                Text("Need to update birth data?")
+                Text("need_update_birth_data".localized)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(Color("NavyPrimary"))
             }
             
-            Text("For changes to your date, time, or place of birth, please contact our support team. This ensures accuracy in your astrological readings.")
+            Text("contact_support_birth_data".localized)
                 .font(.system(size: 13))
                 .foregroundColor(Color("TextDark").opacity(0.7))
                 .multilineTextAlignment(.center)
@@ -247,10 +247,10 @@ struct BirthDetailsView: View {
     // MARK: - Helpers
     private var genderDisplayText: String {
         switch gender {
-        case "male": return "Male"
-        case "female": return "Female"
-        case "non-binary": return "Non-binary"
-        default: return "Not specified"
+        case "male": return "male".localized
+        case "female": return "female".localized
+        case "non-binary": return "non_binary".localized
+        default: return "prefer_not_to_say".localized
         }
     }
     
@@ -278,7 +278,7 @@ struct BirthDetailsView: View {
                 
                 // Format time
                 if UserDefaults.standard.bool(forKey: "birthTimeUnknown") {
-                    timeOfBirth = "Unknown"
+                    timeOfBirth = "birth_time_unknown".localized
                 } else {
                     let timeFormatter = DateFormatter()
                     timeFormatter.dateFormat = "HH:mm"

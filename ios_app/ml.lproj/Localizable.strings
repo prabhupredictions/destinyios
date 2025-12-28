@@ -174,3 +174,14 @@
 "continue_with_email" = "ഇമെയിൽ ഉപയോഗിച്ച് തുടരുക";
 "i_dont_know_birth_time" = "എനിക്ക് ജനന സമയം അറിയില്ല";
 "questions_asked" = "ചോദ്യങ്ങൾ ചോദിച്ചു";
+
+// MARK: - Birth Details View
+"your_birth_info" = "നിങ്ങളുടെ ജനന വിവരങ്ങൾ";
+"editable" = "എഡിറ്റ് ചെയ്യാവുന്ന";
+"birth_data" = "ജനന ഡാറ്റ";
+"prefer_not_to_say" = "പറയാൻ ആഗ്രഹിക്കുന്നില്ല";
+"non_binary" = "നോൺ-ബൈനറി";
+"changes_saved" = "മാറ്റങ്ങൾ സേവ് ചെയ്തു";
+"name_gender_updated" = "നിങ്ങളുടെ പേരും ലിംഗവും അപ്ഡേറ്റ് ചെയ്തു.";
+"need_update_birth_data" = "ജനന ഡാറ്റ അപ്ഡേറ്റ് ചെയ്യണോ?";
+"contact_support_birth_data" = "ജനന തീയതി, സമയം അല്ലെങ്കിൽ സ്ഥലം മാറ്റാൻ, സപ്പോർട്ട് ടീമിനെ ബന്ധപ്പെടുക.";

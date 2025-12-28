@@ -174,3 +174,14 @@
 "continue_with_email" = "メールで続ける";
 "i_dont_know_birth_time" = "生まれた時間がわからない";
 "questions_asked" = "件の質問";
+
+// MARK: - Birth Details View
+"your_birth_info" = "あなたの出生情報";
+"editable" = "編集可能";
+"birth_data" = "出生データ";
+"prefer_not_to_say" = "回答しない";
+"non_binary" = "ノンバイナリー";
+"changes_saved" = "変更を保存しました";
+"name_gender_updated" = "名前と性別が更新されました。";
+"need_update_birth_data" = "出生データの更新が必要ですか？";
+"contact_support_birth_data" = "生年月日、時刻、場所の変更については、サポートチームにお問い合わせください。";

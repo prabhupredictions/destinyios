@@ -180,3 +180,14 @@
 
 // MARK: - Onboarding
 "questions_asked" = "questions asked";
+
+// MARK: - Birth Details View
+"your_birth_info" = "Your Birth Information";
+"editable" = "Editable";
+"birth_data" = "Birth Data";
+"prefer_not_to_say" = "Prefer not to say";
+"non_binary" = "Non-binary";
+"changes_saved" = "Changes Saved";
+"name_gender_updated" = "Your name and gender have been updated.";
+"need_update_birth_data" = "Need to update birth data?";
+"contact_support_birth_data" = "For changes to your date, time, or place of birth, please contact our support team. This ensures accuracy in your astrological readings.";

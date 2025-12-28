@@ -174,3 +174,14 @@
 "continue_with_email" = "Continuar con correo";
 "i_dont_know_birth_time" = "No sé mi hora de nacimiento";
 "questions_asked" = "preguntas realizadas";
+
+// MARK: - Birth Details View
+"your_birth_info" = "Tu información de nacimiento";
+"editable" = "Editable";
+"birth_data" = "Datos de nacimiento";
+"prefer_not_to_say" = "Prefiero no decir";
+"non_binary" = "No binario";
+"changes_saved" = "Cambios guardados";
+"name_gender_updated" = "Tu nombre y género han sido actualizados.";
+"need_update_birth_data" = "¿Necesitas actualizar datos de nacimiento?";
+"contact_support_birth_data" = "Para cambios en tu fecha, hora o lugar de nacimiento, contacta a nuestro equipo de soporte.";

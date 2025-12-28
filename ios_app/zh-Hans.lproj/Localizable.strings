@@ -174,3 +174,14 @@
 "continue_with_email" = "通过邮箱继续";
 "i_dont_know_birth_time" = "我不知道出生时间";
 "questions_asked" = "个问题";
+
+// MARK: - Birth Details View
+"your_birth_info" = "您的出生信息";
+"editable" = "可编辑";
+"birth_data" = "出生资料";
+"prefer_not_to_say" = "不愿透露";
+"non_binary" = "非二元性别";
+"changes_saved" = "更改已保存";
+"name_gender_updated" = "您的姓名和性别已更新。";
+"need_update_birth_data" = "需要更新出生资料？";
+"contact_support_birth_data" = "如需更改出生日期、时间或地点，请联系我们的支持团队。";

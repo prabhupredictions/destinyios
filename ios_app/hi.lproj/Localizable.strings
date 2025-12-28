@@ -180,3 +180,14 @@
 
 // MARK: - Onboarding
 "questions_asked" = "सवाल पूछे गए";
+
+// MARK: - Birth Details View
+"your_birth_info" = "आपकी जन्म जानकारी";
+"editable" = "संपादन योग्य";
+"birth_data" = "जन्म डेटा";
+"prefer_not_to_say" = "नहीं बताना चाहते";
+"non_binary" = "नॉन-बाइनरी";
+"changes_saved" = "परिवर्तन सहेजे गए";
+"name_gender_updated" = "आपका नाम और लिंग अपडेट किया गया।";
+"need_update_birth_data" = "जन्म डेटा अपडेट करना है?";
+"contact_support_birth_data" = "जन्म तिथि, समय या स्थान में बदलाव के लिए कृपया सहायता टीम से संपर्क करें।";

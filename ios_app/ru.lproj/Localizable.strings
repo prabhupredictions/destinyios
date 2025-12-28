@@ -174,3 +174,14 @@
 "continue_with_email" = "Войти через Email";
 "i_dont_know_birth_time" = "Не знаю время рождения";
 "questions_asked" = "вопросов задано";
+
+// MARK: - Birth Details View
+"your_birth_info" = "Ваша информация о рождении";
+"editable" = "Редактируемое";
+"birth_data" = "Данные о рождении";
+"prefer_not_to_say" = "Не указывать";
+"non_binary" = "Небинарный";
+"changes_saved" = "Изменения сохранены";
+"name_gender_updated" = "Ваше имя и пол обновлены.";
+"need_update_birth_data" = "Нужно обновить данные о рождении?";
+"contact_support_birth_data" = "Для изменения даты, времени или места рождения обратитесь в службу поддержки.";

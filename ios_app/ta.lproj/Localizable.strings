@@ -174,3 +174,14 @@
 "continue_with_email" = "Email மூலம் தொடரவும்";
 "i_dont_know_birth_time" = "எனக்கு பிறந்த நேரம் தெரியாது";
 "questions_asked" = "கேள்விகள் கேட்கப்பட்டன";
+
+// MARK: - Birth Details View
+"your_birth_info" = "உங்கள் பிறப்பு தகவல்";
+"editable" = "திருத்தக்கூடிய";
+"birth_data" = "பிறப்பு தரவு";
+"prefer_not_to_say" = "கூற விரும்பவில்லை";
+"non_binary" = "நான்-பைனரி";
+"changes_saved" = "மாற்றங்கள் சேமிக்கப்பட்டன";
+"name_gender_updated" = "உங்கள் பெயர் மற்றும் பாலினம் புதுப்பிக்கப்பட்டது.";
+"need_update_birth_data" = "பிறப்பு தரவை புதுப்பிக்க வேண்டுமா?";
+"contact_support_birth_data" = "பிறந்த தேதி, நேரம் அல்லது இடத்தை மாற்ற, ஆதரவு குழுவைத் தொடர்பு கொள்ளவும்.";

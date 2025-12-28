@@ -174,3 +174,14 @@
 "continue_with_email" = "Email తో కొనసాగండి";
 "i_dont_know_birth_time" = "నాకు పుట్టిన సమయం తెలియదు";
 "questions_asked" = "అడిగిన ప్రశ్నలు";
+
+// MARK: - Birth Details View
+"your_birth_info" = "మీ పుట్టిన సమాచారం";
+"editable" = "సవరించదగిన";
+"birth_data" = "పుట్టిన డేటా";
+"prefer_not_to_say" = "చెప్పడానికి ఇష్టపడను";
+"non_binary" = "నాన్-బైనరీ";
+"changes_saved" = "మార్పులు సేవ్ చేయబడ్డాయి";
+"name_gender_updated" = "మీ పేరు మరియు లింగం నవీకరించబడ్డాయి.";
+"need_update_birth_data" = "పుట్టిన డేటాను అప్‌డేట్ చేయాలా?";
+"contact_support_birth_data" = "పుట్టిన తేదీ, సమయం లేదా స్థలాన్ని మార్చడానికి, సపోర్ట్ టీమ్‌ను సంప్రదించండి.";
