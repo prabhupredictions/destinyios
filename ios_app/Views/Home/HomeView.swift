@@ -2,6 +2,9 @@ import SwiftUI
 
 /// Home screen showing greeting, quota, daily insight, and suggested questions
 struct HomeView: View {
+    // MARK: - Callback for question selection
+    var onQuestionSelected: ((String) -> Void)? = nil
+    
     // MARK: - State
     @State private var viewModel = HomeViewModel()
     @State private var showMenu = false
@@ -51,8 +54,8 @@ struct HomeView: View {
                         SuggestedQuestions(
                             questions: viewModel.suggestedQuestions
                         ) { question in
-                            selectedQuestion = question
-                            // TODO: Navigate to chat with this question
+                            // Navigate to chat with this question
+                            onQuestionSelected?(question)
                         }
                         .padding(.horizontal, 20)
                     }
@@ -104,10 +107,6 @@ struct HomeView: View {
             Text("\(viewModel.greetingMessage), \(viewModel.displayName)!")
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(Color("NavyPrimary"))
-            
-            Text("Let's explore what the stars have for you.")
-                .font(.system(size: 16))
-                .foregroundColor(Color("TextDark").opacity(0.6))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -122,9 +121,13 @@ struct ProfileSheet: View {
     @AppStorage("isPremium") private var isPremium = false
     @AppStorage("astrologySystem") private var astrologySystem = "Vedic"
     @AppStorage("appLanguage") private var appLanguage = "English"
+    @AppStorage("ayanamsa") private var ayanamsa = "lahiri"
+    @AppStorage("houseSystem") private var houseSystem = "equal"
     @State private var authViewModel = AuthViewModel()
     @State private var showSubscription = false
     @State private var showBirthDataEdit = false
+    @State private var showAstrologySettings = false
+    @State private var showLanguageSettings = false
     @State private var birthDataDisplay: String = ""
     
     var body: some View {
@@ -177,6 +180,15 @@ struct ProfileSheet: View {
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView()
             }
+            .sheet(isPresented: $showAstrologySettings) {
+                AstrologySettingsSheet()
+            }
+            .sheet(isPresented: $showLanguageSettings) {
+                LanguageSettingsSheet()
+            }
+            .sheet(isPresented: $showBirthDataEdit) {
+                BirthDetailsView()
+            }
             .onAppear {
                 loadBirthDataDisplay()
             }
@@ -203,7 +215,7 @@ struct ProfileSheet: View {
             }
             
             VStack(spacing: 4) {
-                Text(isGuest ? "Guest User" : (userName.isEmpty ? "User" : userName))
+                Text(isGuest ? "guest_user".localized : (userName.isEmpty ? "User" : userName))
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(Color("NavyPrimary"))
                 
@@ -214,7 +226,7 @@ struct ProfileSheet: View {
                 }
                 
                 if isPremium {
-                    Text("Premium Member")
+                    Text("premium_plan".localized)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(Color("GoldAccent"))
                         .padding(.horizontal, 12)
@@ -238,11 +250,11 @@ struct ProfileSheet: View {
                     .foregroundColor(Color("GoldAccent"))
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Upgrade to Premium")
+                    Text("upgrade_premium".localized)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(Color("NavyPrimary"))
                     
-                    Text("Get unlimited questions & matches")
+                    Text("get_unlimited".localized)
                         .font(.system(size: 12))
                         .foregroundColor(Color("TextDark").opacity(0.6))
                 }
@@ -266,15 +278,15 @@ struct ProfileSheet: View {
     // MARK: - Birth Details Section
     private var birthDetailsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Birth Details")
+            Text("birth_details".localized)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color("TextDark").opacity(0.5))
                 .padding(.horizontal, 20)
             
             ProfileMenuItem(
                 icon: "calendar.badge.clock",
-                title: "View Birth Details",
-                subtitle: birthDataDisplay.isEmpty ? "Not set" : birthDataDisplay,
+                title: "view_birth_details".localized,
+                subtitle: birthDataDisplay.isEmpty ? "not_set".localized : birthDataDisplay,
                 action: { showBirthDataEdit = true }
             )
         }
@@ -283,23 +295,23 @@ struct ProfileSheet: View {
     // MARK: - Preferences Section
     private var preferencesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Preferences")
+            Text("preferences".localized)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color("TextDark").opacity(0.5))
                 .padding(.horizontal, 20)
             
             ProfileMenuItem(
                 icon: "globe",
-                title: "Astrology System",
-                subtitle: astrologySystem,
-                action: { /* TODO: Show picker */ }
+                title: "astrology_settings".localized,
+                subtitle: "\(ayanamsa.ayanamsaDisplayName) • \(houseSystem.houseSystemDisplayName)",
+                action: { showAstrologySettings = true }
             )
             
             ProfileMenuItem(
                 icon: "textformat",
-                title: "Language",
+                title: "language".localized,
                 subtitle: appLanguage,
-                action: { /* TODO: Show picker */ }
+                action: { showLanguageSettings = true }
             )
         }
     }
@@ -307,14 +319,14 @@ struct ProfileSheet: View {
     // MARK: - Support Section
     private var supportSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Support")
+            Text("support".localized)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(Color("TextDark").opacity(0.5))
                 .padding(.horizontal, 20)
             
             ProfileMenuItem(
                 icon: "questionmark.circle",
-                title: "Help & FAQ",
+                title: "help_faq".localized,
                 action: { /* TODO: Open help */ }
             )
         }
@@ -330,7 +342,7 @@ struct ProfileSheet: View {
         }) {
             HStack(spacing: 8) {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
-                Text("Sign Out")
+                Text("sign_out".localized)
             }
             .font(.system(size: 16, weight: .medium))
             .foregroundColor(.red.opacity(0.8))
@@ -347,7 +359,11 @@ struct ProfileSheet: View {
     
     // MARK: - Load Birth Data Display
     private func loadBirthDataDisplay() {
-        if let data = UserDefaults.standard.data(forKey: "birthData"),
+        // Try userBirthData key (new) first, then fallback to birthData (legacy)
+        let data = UserDefaults.standard.data(forKey: "userBirthData") 
+            ?? UserDefaults.standard.data(forKey: "birthData")
+        
+        if let data = data,
            let decoded = try? JSONDecoder().decode(BirthData.self, from: data) {
             birthDataDisplay = "\(decoded.dob), \(decoded.time)"
             if let city = decoded.cityOfBirth {
