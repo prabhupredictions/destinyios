@@ -343,6 +343,16 @@ struct CompatibilityView: View {
         return formatter.string(from: viewModel.boyBirthTime)
     }
     
+    // Gender display text for dropdown
+    private var genderDisplayText: String {
+        switch viewModel.partnerGender {
+        case "male": return "Male"
+        case "female": return "Female"
+        case "non-binary": return "Non-binary"
+        default: return "Prefer not to say"
+        }
+    }
+
     // MARK: - Girl Form Card (Partner)
     private var girlFormCard: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -364,29 +374,51 @@ struct CompatibilityView: View {
                 )
             }
             
-            // Gender Identity
+            // Gender Identity (Dropdown style)
             VStack(alignment: .leading, spacing: 8) {
-                Text("gender".localized.uppercased())
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
+                HStack(spacing: 6) {
+                    Image(systemName: "person")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color("NavyPrimary").opacity(0.6))
+                    Text("Gender Identity")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color("TextDark").opacity(0.6))
+                }
                 
-                HStack(spacing: 12) {
-                    ForEach(["male", "female", "other"], id: \.self) { gender in
-                        Button(action: {
-                            viewModel.partnerGender = gender
-                        }) {
-                            Text(gender.localized.capitalized)
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(viewModel.partnerGender == gender ? .white : Color("NavyPrimary"))
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(viewModel.partnerGender == gender ? Color("NavyPrimary") : Color(red: 0.97, green: 0.97, blue: 0.98))
-                                )
-                        }
+                Menu {
+                    Button("Prefer not to say") {
+                        viewModel.partnerGender = ""
                     }
-                    Spacer()
+                    Button("Male") {
+                        viewModel.partnerGender = "male"
+                    }
+                    Button("Female") {
+                        viewModel.partnerGender = "female"
+                    }
+                    Button("Non-binary") {
+                        viewModel.partnerGender = "non-binary"
+                    }
+                } label: {
+                    HStack {
+                        Text(genderDisplayText)
+                            .font(.system(size: 16))
+                            .foregroundColor(Color("TextDark"))
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 14))
+                            .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                    }
+                    .padding(.horizontal, 16)
+                    .frame(height: 52)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color.white)
+                            .shadow(color: Color.black.opacity(0.04), radius: 8, y: 2)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color("NavyPrimary").opacity(0.1), lineWidth: 1)
+                    )
                 }
             }
             
