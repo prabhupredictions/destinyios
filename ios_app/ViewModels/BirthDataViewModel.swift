@@ -5,6 +5,7 @@ import SwiftUI
 @Observable
 class BirthDataViewModel {
     // MARK: - Form State
+    var userName = ""  // User's display name
     var dateOfBirth = Calendar.current.date(byAdding: .year, value: -25, to: Date()) ?? Date()
     var timeOfBirth = Date()
     var cityOfBirth = ""
@@ -33,6 +34,7 @@ class BirthDataViewModel {
     // MARK: - Computed Properties
     
     var isValid: Bool {
+        !userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !cityOfBirth.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         latitude != 0 && longitude != 0
     }
@@ -190,15 +192,68 @@ class BirthDataViewModel {
             UserDefaults.standard.set(gender, forKey: "userGender")
             UserDefaults.standard.set(timeUnknown, forKey: "birthTimeUnknown")
             
+            // Store user name
+            if !userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                UserDefaults.standard.set(userName, forKey: "userName")
+            }
+            
             // Store generated email for guests
             if isGuest {
                 UserDefaults.standard.set(email, forKey: "userEmail")
+            }
+            
+            // Sync to server profile (fire and forget)
+            syncToServerProfile(email: email)
+            
+            // Sync chat history from server (restore any past conversations)
+            Task {
+                await ChatHistorySyncService.shared.syncFromServer(userEmail: email, dataManager: dataManager)
             }
             
             return true
         } catch {
             errorMessage = "Failed to save birth data"
             return false
+        }
+    }
+    
+    /// Sync birth data to server profile for cross-device support
+    private func syncToServerProfile(email: String) {
+        Task {
+            do {
+                // Get user name from UserDefaults (set during Google/Apple sign-in)
+                let storedUserName = UserDefaults.standard.string(forKey: "userName") ?? ""
+                
+                let profileRequest: [String: Any] = [
+                    "email": email,
+                    "user_name": storedUserName,  // From sign-in, backend defaults to "Destiny User" if empty
+                    "user_type": isGuest ? "guest" : "registered",
+                    "is_generated_email": isGuest,
+                    "birth_profile": [
+                        "date_of_birth": formattedDOB,
+                        "time_of_birth": formattedTOB,
+                        "city_of_birth": cityOfBirth,
+                        "latitude": latitude,
+                        "longitude": longitude,
+                        "gender": gender.isEmpty ? nil : gender,
+                        "birth_time_unknown": timeUnknown
+                    ] as [String: Any?]
+                ]
+                
+                let url = URL(string: "\(APIConfig.baseURL)/subscription/profile")!
+                var request = URLRequest(url: url)
+                request.httpMethod = "POST"
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+                request.httpBody = try JSONSerialization.data(withJSONObject: profileRequest)
+                
+                let (_, response) = try await URLSession.shared.data(for: request)
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("[ProfileSync] Saved to server: \(httpResponse.statusCode)")
+                }
+            } catch {
+                print("[ProfileSync] Failed to sync: \(error)")
+            }
         }
     }
     

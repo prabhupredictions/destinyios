@@ -327,7 +327,7 @@ struct CompatibilityView: View {
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
-                    TextField("Optional", text: $viewModel.girlName)
+                    TextField("Required", text: $viewModel.girlName)
                         .font(.system(size: 15))
                         .foregroundColor(Color("TextDark"))
                         .padding(.horizontal, 12)

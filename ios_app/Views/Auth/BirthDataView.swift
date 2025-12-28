@@ -117,11 +117,11 @@ struct BirthDataView: View {
                     .foregroundColor(Color("NavyPrimary"))
             }
             
-            Text("Tell us about yourself")
+            Text("create_birth_chart".localized)
                 .font(.system(size: 26, weight: .bold))
                 .foregroundColor(Color("NavyPrimary"))
             
-            Text("Enter your birth details so we can\ncreate your personalized profile")
+            Text("enter_details_desc".localized)
                 .font(.system(size: 15))
                 .foregroundColor(Color("TextDark").opacity(0.6))
                 .multilineTextAlignment(.center)
@@ -132,6 +132,14 @@ struct BirthDataView: View {
     // MARK: - Form Section
     private var formSection: some View {
         VStack(spacing: 16) {
+            // Name (mandatory)
+            FormFieldInput(
+                icon: "person.circle",
+                title: "Your Name",
+                placeholder: "Enter your name",
+                text: $viewModel.userName
+            )
+            
             // Date of Birth
             FormFieldButton(
                 icon: "calendar",
@@ -167,7 +175,7 @@ struct BirthDataView: View {
                                 .font(.system(size: 18))
                                 .foregroundColor(viewModel.timeUnknown ? Color("NavyPrimary") : Color("TextDark").opacity(0.4))
                             
-                            Text("I don't know my birth time")
+                            Text("i_dont_know_birth_time".localized)
                                 .font(.system(size: 13))
                                 .foregroundColor(Color("TextDark").opacity(0.6))
                         }
@@ -177,25 +185,25 @@ struct BirthDataView: View {
                 .padding(.leading, 4)
             }
             
-            // City of Birth (with location search)
+            // Place of Birth (with location search)
             FormFieldButton(
                 icon: "location",
-                title: "City of Birth",
+                title: "Place of Birth",
                 value: viewModel.cityOfBirth.isEmpty ? "Select your birth city" : viewModel.cityOfBirth
             ) {
                 showLocationSearch = true
             }
             
-            // Gender (optional)
+            // Gender Identity
             FormFieldPicker(
                 icon: "person",
-                title: "Gender (optional)",
+                title: "Gender Identity",
                 selection: $viewModel.gender,
                 options: [
                     ("", "Prefer not to say"),
                     ("male", "Male"),
                     ("female", "Female"),
-                    ("other", "Other")
+                    ("non-binary", "Non-binary")
                 ]
             )
         }
@@ -215,7 +223,7 @@ struct BirthDataView: View {
             }
         }) {
             HStack(spacing: 10) {
-                Text("Continue")
+                Text("continue".localized)
                     .font(.system(size: 17, weight: .semibold))
                 Image(systemName: "arrow.right")
                     .font(.system(size: 14, weight: .semibold))

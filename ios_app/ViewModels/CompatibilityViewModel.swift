@@ -89,7 +89,9 @@ class CompatibilityViewModel {
     
     // MARK: - Validation
     var isFormValid: Bool {
-        // Only require location data - names are optional
+        // Names and locations are now required
+        !boyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !girlName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !boyCity.isEmpty &&
         !girlCity.isEmpty &&
         boyLatitude != 0 &&
