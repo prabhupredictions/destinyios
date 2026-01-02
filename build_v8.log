@@ -1,0 +1,1041 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project ios_app.xcodeproj -scheme ios_app -destination "platform=iOS Simulator,name=iPhone 17 Pro" clean build
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+** CLEAN SUCCEEDED **
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'ios_app' in project 'ios_app' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 6091fde96259b113e84c7d54ba5615e3
+Build description path: /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/XCBuildData/6091fde96259b113e84c7d54ba5615e3.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /Users/i074917/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /Users/i074917/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
+
+CreateBuildDirectory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    builtin-create-build-directory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products
+
+CreateBuildDirectory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    builtin-create-build-directory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex
+
+CreateBuildDirectory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    builtin-create-build-directory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator
+
+CreateBuildDirectory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    builtin-create-build-directory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    builtin-create-build-directory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    builtin-create-build-directory /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app-30ccdd5bd347f7b09fb8533d67df7600-VFS-iphonesimulator/all-product-headers.yaml
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app.xcodeproj
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app-30ccdd5bd347f7b09fb8533d67df7600-VFS-iphonesimulator/all-product-headers.yaml
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.hmap (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.hmap
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-own-target-headers.hmap (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.DependencyMetadataFileList (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-project-headers.hmap (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-project-headers.hmap
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.DependencyStaticMetadataFileList (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-all-target-headers.hmap (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-all-non-framework-target-headers.hmap (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-generated-files.hmap (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-generated-files.hmap
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-DebugDylibPath-normal-arm64.txt (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-DebugDylibPath-normal-arm64.txt
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-DebugDylibInstallName-normal-arm64.txt (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-DebugDylibInstallName-normal-arm64.txt
+
+MkDir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /bin/mkdir -p /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/Entitlements-Simulated.plist (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/Entitlements-Simulated.plist
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftFileList (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftFileList
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftConstValuesFileList (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_const_extract_protocols.json (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.LinkFileList (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.LinkFileList
+
+WriteAuxiliaryFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-OutputFileMap.json (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    write-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-OutputFileMap.json
+
+ProcessProductPackaging /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ios_app.entitlements /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app.xcent (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+    Entitlements:
+    
+    {
+}
+    
+    builtin-productPackagingUtility /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ios_app.entitlements -entitlements -format xml -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app.xcent
+
+ProcessProductPackaging /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ios_app.entitlements /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "GTP5DH5548.com.destinyai.astrology";
+    "aps-environment" = development;
+    "com.apple.developer.applesignin" =     (
+        Default
+    );
+    "com.apple.developer.aps-environment" = development;
+    "com.apple.developer.icloud-container-identifiers" =     (
+    );
+    "com.apple.developer.icloud-services" =     (
+        CloudKit
+    );
+}
+    
+    builtin-productPackagingUtility /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ios_app.entitlements -entitlements -format xml -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent
+
+ProcessProductPackagingDER /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent.der (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /usr/bin/derq query -f xml -i /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent.der --raw
+
+ProcessProductPackagingDER /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app.xcent /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app.xcent.der (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /usr/bin/derq query -f xml -i /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app.xcent -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app.xcent.der --raw
+
+Ld /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/__preview.dylib normal (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -F/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -install_name @rpath/ios_app.debug.dylib -dead_strip -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_dependency_info.dat -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/__preview.dylib
+
+GenerateAssetSymbols /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets --compile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app --output-format human-readable-text --notices --warnings --export-dependency-info /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_dependencies --output-partial-info-plist /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_generated_info.plist --app-icon AppIcon --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 17.0 --platform iphonesimulator --bundle-identifier com.destinyai.astrology --generate-swift-asset-symbols /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols.swift --generate-objc-asset-symbols /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols.h --generate-asset-symbol-index /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/* com.apple.actool.document.warnings */
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets:./logo.imageset/(null)[2d][chat_gpt_logo.png]: warning: The image set "logo" has an unassigned child.
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets:./logo.imageset/(null)[2d][chat_gpt_logo.png]: warning: The image set "logo" has an unassigned child.
+/* com.apple.actool.compilation-results */
+/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols.h
+/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols.swift
+
+
+MkDir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/unthinned (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /bin/mkdir -p /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/unthinned
+
+MkDir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/thinned (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /bin/mkdir -p /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/thinned
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/te.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/te.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/te.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/te.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/te.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ta.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ta.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ta.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ta.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ta.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/zh-Hans.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/zh-Hans.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/zh-Hans.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/zh-Hans.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/zh-Hans.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ru.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ru.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ru.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ru.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ru.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/pt.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/pt.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/pt.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/pt.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/pt.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ml.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ml.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ml.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ml.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ml.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/kn.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/kn.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/kn.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/kn.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/kn.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ja.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ja.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ja.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ja.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ja.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/fr.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/fr.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/fr.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/fr.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/fr.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/es.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/es.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/es.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/es.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/es.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/hi.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/hi.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/hi.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/hi.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/hi.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/de.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/de.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/de.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/de.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/de.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CopyStringsFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/en.lproj/Localizable.strings /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/en.lproj/Localizable.strings (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copyStrings --validate --outputencoding binary --outfilename Localizable.strings --outdir /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/en.lproj -- /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/en.lproj/Localizable.strings
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/en.lproj/Localizable.strings:1:1: note: detected encoding of input file as Unicode (UTF-8) (in target 'ios_app' from project 'ios_app')
+
+CompileAssetCatalogVariant thinned /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets --compile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --filter-for-thinning-device-configuration iPhone18,1 --filter-for-device-os-version 26.2 --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 17.0 --platform iphonesimulator
+/* com.apple.actool.document.warnings */
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets:./logo.imageset/(null)[2d][chat_gpt_logo.png]: warning: The image set "logo" has an unassigned child.
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets:./logo.imageset/(null)[2d][chat_gpt_logo.png]: warning: The image set "logo" has an unassigned child.
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets:./logo.imageset/(null)[2d][chat_gpt_logo.png]: warning: The image set "logo" has an unassigned child.
+/* com.apple.actool.compilation-results */
+/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_generated_info.plist_thinned
+/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/thinned/Assets.car
+
+
+SwiftDriver ios_app normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ios_app -Onone -enforce-exclusivity\=checked @/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -F /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_const_extract_protocols.json -Xcc -iquote -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-generated-files.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-own-target-headers.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-all-target-headers.hmap -Xcc -iquote -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-project-headers.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources-normal/arm64 -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/arm64 -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-Swift.h -working-directory /Users/i074917/Documents/destiny_ai_astrology/ios_app -experimental-emit-module-separately -disable-cmo
+
+SwiftCompile normal arm64 Compiling\ ChatInputBar.swift,\ MarkdownTextView.swift,\ MessageBubble.swift,\ MessageRating.swift,\ ThinkingProgressView.swift,\ TypingIndicator.swift,\ ScoreCircle.swift,\ InsightCard.swift,\ QuotaWidget.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/ChatInputBar.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/MarkdownTextView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/MessageBubble.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/MessageRating.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/ThinkingProgressView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/TypingIndicator.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Compatibility/ScoreCircle.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Home/InsightCard.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Home/QuotaWidget.swift (in target 'ios_app' from project 'ios_app')
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/ChatInputBar.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/MarkdownTextView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/MarkdownTextView.swift:25:10: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
+        .onChange(of: content) { newValue in
+         ^
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/MessageBubble.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/MessageRating.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/ThinkingProgressView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Chat/TypingIndicator.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Compatibility/ScoreCircle.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Home/InsightCard.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Home/QuotaWidget.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 Compiling\ FeedbackService.swift,\ KeychainService.swift,\ LocationSearchService.swift,\ NetworkClient.swift,\ PredictionService.swift,\ ProfileService.swift,\ Protocols.swift,\ QuotaManager.swift,\ StreamingPredictionService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/FeedbackService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/KeychainService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/LocationSearchService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/NetworkClient.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/Protocols.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/QuotaManager.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/StreamingPredictionService.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/FeedbackService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/FeedbackService.swift:57:43: warning: main actor-isolated conformance of 'UnifiedFeedbackPayload' to 'Encodable' cannot be used in actor-isolated context; this is an error in the Swift 6 language mode
+        urlRequest.httpBody = try encoder.encode(request)
+                                          ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/FeedbackService.swift:44:38: warning: main actor-isolated static property 'baseURL' cannot be accessed from outside of the actor; this is an error in the Swift 6 language mode
+        let urlString = "\(APIConfig.baseURL)\(APIConfig.feedback)"
+                           ~~~~~~~~~~^~~~~~~
+                           await 
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/FeedbackService.swift:44:58: warning: main actor-isolated static property 'feedback' cannot be accessed from outside of the actor; this is an error in the Swift 6 language mode
+        let urlString = "\(APIConfig.baseURL)\(APIConfig.feedback)"
+                                               ~~~~~~~~~~^~~~~~~~
+                                               await 
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/FeedbackService.swift:53:39: warning: main actor-isolated static property 'apiKey' cannot be accessed from outside of the actor; this is an error in the Swift 6 language mode
+        urlRequest.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        await 
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/KeychainService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/LocationSearchService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/NetworkClient.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:147:88: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    func restoreProfileLocally(_ profile: ProfileResponse, dataManager: DataManager = .shared) {
+                                                                                       ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:122:51: warning: left side of nil coalescing operator '??' has non-optional type 'Any', so the right side is never used
+                "latitude": birthProfile.latitude ?? 0,
+                            ~~~~~~~~~~~~~~~~~~~~~~^~~~
+                                                 
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:123:53: warning: left side of nil coalescing operator '??' has non-optional type 'Any', so the right side is never used
+                "longitude": birthProfile.longitude ?? 0,
+                             ~~~~~~~~~~~~~~~~~~~~~~~^~~~
+                                                   
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:120:34: warning: expression implicitly coerced from 'String?' to 'Any'
+                "time_of_birth": birthProfile.timeOfBirth ?? "12:00",
+                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:120:59: note: provide a default value to avoid this warning
+                "time_of_birth": birthProfile.timeOfBirth ?? "12:00",
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+                                                                     ?? <#default value#>
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:120:59: note: force-unwrap the value to avoid this warning
+                "time_of_birth": birthProfile.timeOfBirth ?? "12:00",
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+                                                                    !
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:120:59: note: explicitly cast to 'Any' with 'as Any' to silence this warning
+                "time_of_birth": birthProfile.timeOfBirth ?? "12:00",
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+                                                                     as Any
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:122:29: warning: expression implicitly coerced from 'Double?' to 'Any'
+                "latitude": birthProfile.latitude ?? 0,
+                            ^~~~~~~~~~~~~~~~~~~~~
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:122:42: note: provide a default value to avoid this warning
+                "latitude": birthProfile.latitude ?? 0,
+                            ~~~~~~~~~~~~~^~~~~~~~
+                                                  ?? <#default value#>
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:122:42: note: force-unwrap the value to avoid this warning
+                "latitude": birthProfile.latitude ?? 0,
+                            ~~~~~~~~~~~~~^~~~~~~~
+                                                 !
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:122:42: note: explicitly cast to 'Any' with 'as Any' to silence this warning
+                "latitude": birthProfile.latitude ?? 0,
+                            ~~~~~~~~~~~~~^~~~~~~~
+                                                  as Any
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:123:30: warning: expression implicitly coerced from 'Double?' to 'Any'
+                "longitude": birthProfile.longitude ?? 0,
+                             ^~~~~~~~~~~~~~~~~~~~~~
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:123:43: note: provide a default value to avoid this warning
+                "longitude": birthProfile.longitude ?? 0,
+                             ~~~~~~~~~~~~~^~~~~~~~~
+                                                    ?? <#default value#>
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:123:43: note: force-unwrap the value to avoid this warning
+                "longitude": birthProfile.longitude ?? 0,
+                             ~~~~~~~~~~~~~^~~~~~~~~
+                                                   !
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:123:43: note: explicitly cast to 'Any' with 'as Any' to silence this warning
+                "longitude": birthProfile.longitude ?? 0,
+                             ~~~~~~~~~~~~~^~~~~~~~~
+                                                    as Any
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/Protocols.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/QuotaManager.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/QuotaManager.swift:102:49: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = DataManager.shared) {
+                                                ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/QuotaManager.swift:257:14: warning: immutable value 'data' was never used; consider replacing with '_' or removing it
+        let (data, response) = try await URLSession.shared.data(for: request)
+             ^~~~
+             _
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/StreamingPredictionService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 Compiling\ BirthDataView.swift,\ ChartComparisonSheet.swift,\ DashaView.swift,\ NorthIndianChartView.swift,\ PlanetaryPositionsSheet.swift,\ PlanetDetailCard.swift,\ SouthIndianChartView.swift,\ TransitsView.swift,\ ChatView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Auth/BirthDataView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/ChartComparisonSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/DashaView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/NorthIndianChartView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/PlanetaryPositionsSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/PlanetDetailCard.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/SouthIndianChartView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/TransitsView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Chat/ChatView.swift (in target 'ios_app' from project 'ios_app')
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Auth/BirthDataView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/BirthDataViewModel.swift:29:49: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = DataManager.shared) {
+                                                ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/ChartComparisonSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/DashaView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/NorthIndianChartView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/NorthIndianChartView.swift:268:17: warning: initialization of immutable value 'goldColor' was never used; consider replacing with assignment to '_' or removing it
+            let goldColor = Color(red: 0.9, green: 0.75, blue: 0.3)
+            ~~~~^~~~~~~~~
+            _
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/PlanetaryPositionsSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/PlanetDetailCard.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/SouthIndianChartView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Charts/TransitsView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Chat/ChatView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift:34:56: warning: call to main actor-isolated initializer 'init(networkClient:)' in a synchronous nonisolated context
+        predictionService: PredictionServiceProtocol = PredictionService(),
+                                                       ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift:9:5: note: calls to initializer 'init(networkClient:)' from outside of its actor context are implicitly asynchronous
+    init(networkClient: NetworkClientProtocol = NetworkClient()) {
+    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift:9:5: note: main actor isolation inferred from conformance to protocol 'PredictionServiceProtocol'
+    init(networkClient: NetworkClientProtocol = NetworkClient()) {
+    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift:35:37: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+        dataManager: DataManager = .shared
+                                    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 Compiling\ DoshaDescriptions.swift,\ APIConfig.swift,\ AppleAuthService.swift,\ ChatHistoryService.swift,\ ChatHistorySyncService.swift,\ CompatibilityHistoryService.swift,\ CompatibilityService.swift,\ DataManager.swift,\ EmailGenerator.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Resources/DoshaDescriptions.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/APIConfig.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/AppleAuthService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ChatHistoryService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ChatHistorySyncService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/CompatibilityHistoryService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/CompatibilityService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/EmailGenerator.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Resources/DoshaDescriptions.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/APIConfig.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/AppleAuthService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ChatHistoryService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ChatHistorySyncService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/CompatibilityHistoryService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/CompatibilityService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/EmailGenerator.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 Compiling\ ChatModels.swift,\ CompatibilityHistoryItem.swift,\ DoshaModels.swift,\ OnboardingSlide.swift,\ PredictionModels.swift,\ SupportModels.swift,\ ThinkingStep.swift,\ UserAstroDataModels.swift,\ UserBirthProfile.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/ChatModels.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/CompatibilityHistoryItem.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/DoshaModels.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/OnboardingSlide.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/PredictionModels.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/SupportModels.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/ThinkingStep.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/UserAstroDataModels.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/UserBirthProfile.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/ChatModels.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/CompatibilityHistoryItem.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/DoshaModels.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/OnboardingSlide.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/PredictionModels.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/SupportModels.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/ThinkingStep.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/UserAstroDataModels.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/UserBirthProfile.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 Compiling\ HomeView.swift,\ LanguageSelectionView.swift,\ OnboardingSlideView.swift,\ OnboardingView.swift,\ BirthDetailsView.swift,\ AstrologySettingsSheet.swift,\ ChartStylePickerSheet.swift,\ LanguageSettingsSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Home/HomeView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Onboarding/LanguageSelectionView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Onboarding/OnboardingSlideView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Onboarding/OnboardingView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Profile/BirthDetailsView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Settings/AstrologySettingsSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Settings/ChartStylePickerSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Settings/LanguageSettingsSheet.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Home/HomeView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Onboarding/LanguageSelectionView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Onboarding/OnboardingSlideView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Onboarding/OnboardingView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Profile/BirthDetailsView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Settings/AstrologySettingsSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Settings/ChartStylePickerSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Settings/LanguageSettingsSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 Compiling\ CompatibilityStreamingView.swift,\ AdditionalYogasSheet.swift,\ KalsarpaDoshaSheet.swift,\ MangalDoshaSheet.swift,\ CompatibilityHistorySheet.swift,\ CompatibilityResultView.swift,\ CompatibilityView.swift,\ HistoryView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Components/CompatibilityStreamingView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/AdditionalYogasSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/KalsarpaDoshaSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/MangalDoshaSheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityHistorySheet.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityResultView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/History/HistoryView.swift (in target 'ios_app' from project 'ios_app')
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Components/CompatibilityStreamingView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/AdditionalYogasSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/KalsarpaDoshaSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/MangalDoshaSheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/MangalDoshaSheet.swift:182:10: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
+        .onChange(of: selectedPartner) { _ in
+         ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/Sheets/MangalDoshaSheet.swift:437:29: warning: initialization of immutable value 'desc' was never used; consider replacing with assignment to '_' or removing it
+                        let desc = aspect["description"] as? String ?? ""
+                        ~~~~^~~~
+                        _
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityHistorySheet.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityResultView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityResultView.swift:751:22: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
+                    .onChange(of: messages.count) { _ in
+                     ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityResultView.swift:771:10: warning: 'onChange(of:perform:)' was deprecated in iOS 17.0: Use `onChange` with a two or zero parameter action closure instead.
+        .onChange(of: messages.count) { _ in
+         ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityResultView.swift:1271:9: warning: variable 'result' was never mutated; consider changing to 'let' constant
+    var result = text
+    ~~~ ^
+    let
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Compatibility/CompatibilityView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/History/HistoryView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/HistoryViewModel.swift:38:38: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = .shared) {
+                                     ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 Compiling\ SplashView.swift,\ SubscriptionView.swift,\ AppRootView.swift,\ MainTabView.swift,\ ContentView.swift,\ ios_appApp.swift,\ Item.swift,\ GeneratedAssetSymbols.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Splash/SplashView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Subscription/SubscriptionView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/AppRootView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/MainTabView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ContentView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ios_appApp.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Item.swift /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Splash/SplashView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Subscription/SubscriptionView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/AppRootView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/MainTabView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ContentView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ios_appApp.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Item.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ios_app (in target 'ios_app' from project 'ios_app')
+
+EmitSwiftModule normal arm64 (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:147:88: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    func restoreProfileLocally(_ profile: ProfileResponse, dataManager: DataManager = .shared) {
+                                                                                       ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/QuotaManager.swift:102:49: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = DataManager.shared) {
+                                                ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/AuthViewModel.swift:22:45: warning: call to main actor-isolated initializer 'init()' in a synchronous nonisolated context
+    init(authService: AuthServiceProtocol = AppleAuthService(), keychain: KeychainService = .shared) {
+                                            ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/AppleAuthService.swift:5:55: note: calls to initializer 'init()' from outside of its actor context are implicitly asynchronous
+class AppleAuthService: NSObject, AuthServiceProtocol {
+                                                      ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/AppleAuthService.swift:5:55: note: main actor isolation inferred from conformance to protocol 'AuthServiceProtocol'
+class AppleAuthService: NSObject, AuthServiceProtocol {
+                                                      ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/AuthViewModel.swift:22:94: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context
+    init(authService: AuthServiceProtocol = AppleAuthService(), keychain: KeychainService = .shared) {
+                                                                                             ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/KeychainService.swift:6:16: note: static property declared here
+    static let shared = KeychainService()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/BirthDataViewModel.swift:29:49: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = DataManager.shared) {
+                                                ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift:34:56: warning: call to main actor-isolated initializer 'init(networkClient:)' in a synchronous nonisolated context
+        predictionService: PredictionServiceProtocol = PredictionService(),
+                                                       ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift:9:5: note: calls to initializer 'init(networkClient:)' from outside of its actor context are implicitly asynchronous
+    init(networkClient: NetworkClientProtocol = NetworkClient()) {
+    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift:9:5: note: main actor isolation inferred from conformance to protocol 'PredictionServiceProtocol'
+    init(networkClient: NetworkClientProtocol = NetworkClient()) {
+    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift:35:37: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+        dataManager: DataManager = .shared
+                                    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/HistoryViewModel.swift:38:38: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = .shared) {
+                                     ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 Compiling\ SuggestedQuestions.swift,\ AppHeader.swift,\ CosmicBackground.swift,\ LocationSearchView.swift,\ QuotaExhaustedView.swift,\ PremiumCard.swift,\ AppTheme.swift,\ BirthData.swift,\ ChartData.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Home/SuggestedQuestions.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/AppHeader.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/CosmicBackground.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/LocationSearchView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/QuotaExhaustedView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Design/Components/PremiumCard.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Design/AppTheme.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/BirthData.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/ChartData.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/Home/SuggestedQuestions.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/AppHeader.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/CosmicBackground.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/LocationSearchView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Components/QuotaExhaustedView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Design/Components/PremiumCard.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Design/AppTheme.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/BirthData.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Models/ChartData.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+LinkAssetCatalog /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Assets.xcassets (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-linkAssetCatalog --thinned /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/thinned --thinned-dependencies /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_generated_info.plist_unthinned --output /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app --plist-output /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_generated_info.plist
+note: Emplaced /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Assets.car (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ios_app (in target 'ios_app' from project 'ios_app')
+
+SwiftDriver\ Compilation\ Requirements ios_app normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ios_app -Onone -enforce-exclusivity\=checked @/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -F /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_const_extract_protocols.json -Xcc -iquote -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-generated-files.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-own-target-headers.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-all-target-headers.hmap -Xcc -iquote -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-project-headers.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources-normal/arm64 -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/arm64 -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-Swift.h -working-directory /Users/i074917/Documents/destiny_ai_astrology/ios_app -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Info.plist /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Info.plist (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-infoPlistUtility /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/assetcatalog_generated_info.plist -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Info.plist
+
+SwiftMergeGeneratedHeaders /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/ios_app-Swift.h /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-Swift.h (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-swiftHeaderTool -arch arm64 /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-Swift.h -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/ios_app-Swift.h
+
+SwiftDriverJobDiscovery normal arm64 Compiling FeedbackService.swift, KeychainService.swift, LocationSearchService.swift, NetworkClient.swift, PredictionService.swift, ProfileService.swift, Protocols.swift, QuotaManager.swift, StreamingPredictionService.swift (in target 'ios_app' from project 'ios_app')
+
+Copy /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftdoc (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftdoc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftmodule (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftmodule /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+Copy /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.abi.json (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.abi.json /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftsourceinfo (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftsourceinfo /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+SwiftCompile normal arm64 Compiling\ SubscriptionManager.swift,\ UserChartService.swift,\ AuthViewModel.swift,\ BirthDataViewModel.swift,\ ChatViewModel.swift,\ CompatibilityViewModel.swift,\ HistoryViewModel.swift,\ HomeViewModel.swift,\ AuthView.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/SubscriptionManager.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/UserChartService.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/AuthViewModel.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/BirthDataViewModel.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/HistoryViewModel.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/HomeViewModel.swift /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Auth/AuthView.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/SubscriptionManager.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/UserChartService.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/AuthViewModel.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/AuthViewModel.swift:22:45: warning: call to main actor-isolated initializer 'init()' in a synchronous nonisolated context
+    init(authService: AuthServiceProtocol = AppleAuthService(), keychain: KeychainService = .shared) {
+                                            ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/AppleAuthService.swift:5:55: note: calls to initializer 'init()' from outside of its actor context are implicitly asynchronous
+class AppleAuthService: NSObject, AuthServiceProtocol {
+                                                      ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/AppleAuthService.swift:5:55: note: main actor isolation inferred from conformance to protocol 'AuthServiceProtocol'
+class AppleAuthService: NSObject, AuthServiceProtocol {
+                                                      ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/AuthViewModel.swift:22:94: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context
+    init(authService: AuthServiceProtocol = AppleAuthService(), keychain: KeychainService = .shared) {
+                                                                                             ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/KeychainService.swift:6:16: note: static property declared here
+    static let shared = KeychainService()
+               ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/ProfileService.swift:147:88: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    func restoreProfileLocally(_ profile: ProfileResponse, dataManager: DataManager = .shared) {
+                                                                                       ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/BirthDataViewModel.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/BirthDataViewModel.swift:29:49: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = DataManager.shared) {
+                                                ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift:34:56: warning: call to main actor-isolated initializer 'init(networkClient:)' in a synchronous nonisolated context
+        predictionService: PredictionServiceProtocol = PredictionService(),
+                                                       ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift:9:5: note: calls to initializer 'init(networkClient:)' from outside of its actor context are implicitly asynchronous
+    init(networkClient: NetworkClientProtocol = NetworkClient()) {
+    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/PredictionService.swift:9:5: note: main actor isolation inferred from conformance to protocol 'PredictionServiceProtocol'
+    init(networkClient: NetworkClientProtocol = NetworkClient()) {
+    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/ChatViewModel.swift:35:37: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+        dataManager: DataManager = .shared
+                                    ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift:352:13: warning: immutable value 'summary' was never used; consider removing it
+        let summary: String
+            ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift:429:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
+    let id = UUID()
+        ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift:429:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
+    let id = UUID()
+        ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift:429:9: note: make the property mutable instead
+    let id = UUID()
+    ~~~ ^
+    var
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift:463:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten
+    let id = UUID()
+        ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift:463:9: note: set the initial value via the initializer or explicitly define a CodingKeys enum including a 'id' case to silence this warning
+    let id = UUID()
+        ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/CompatibilityViewModel.swift:463:9: note: make the property mutable instead
+    let id = UUID()
+    ~~~ ^
+    var
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/HistoryViewModel.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/HistoryViewModel.swift:38:38: warning: main actor-isolated static property 'shared' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    init(dataManager: DataManager = .shared) {
+                                     ^
+/Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/DataManager.swift:8:16: note: static property declared here
+    static let shared = DataManager()
+               ^
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/ViewModels/HomeViewModel.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftCompile normal arm64 /Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Auth/AuthView.swift (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+
+SwiftDriverJobDiscovery normal arm64 Compiling DoshaDescriptions.swift, APIConfig.swift, AppleAuthService.swift, ChatHistoryService.swift, ChatHistorySyncService.swift, CompatibilityHistoryService.swift, CompatibilityService.swift, DataManager.swift, EmailGenerator.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SplashView.swift, SubscriptionView.swift, AppRootView.swift, MainTabView.swift, ContentView.swift, ios_appApp.swift, Item.swift, GeneratedAssetSymbols.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling HomeView.swift, LanguageSelectionView.swift, OnboardingSlideView.swift, OnboardingView.swift, BirthDetailsView.swift, AstrologySettingsSheet.swift, ChartStylePickerSheet.swift, LanguageSettingsSheet.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ChatModels.swift, CompatibilityHistoryItem.swift, DoshaModels.swift, OnboardingSlide.swift, PredictionModels.swift, SupportModels.swift, ThinkingStep.swift, UserAstroDataModels.swift, UserBirthProfile.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SuggestedQuestions.swift, AppHeader.swift, CosmicBackground.swift, LocationSearchView.swift, QuotaExhaustedView.swift, PremiumCard.swift, AppTheme.swift, BirthData.swift, ChartData.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ChatInputBar.swift, MarkdownTextView.swift, MessageBubble.swift, MessageRating.swift, ThinkingProgressView.swift, TypingIndicator.swift, ScoreCircle.swift, InsightCard.swift, QuotaWidget.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling BirthDataView.swift, ChartComparisonSheet.swift, DashaView.swift, NorthIndianChartView.swift, PlanetaryPositionsSheet.swift, PlanetDetailCard.swift, SouthIndianChartView.swift, TransitsView.swift, ChatView.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SubscriptionManager.swift, UserChartService.swift, AuthViewModel.swift, BirthDataViewModel.swift, ChatViewModel.swift, CompatibilityViewModel.swift, HistoryViewModel.swift, HomeViewModel.swift, AuthView.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriverJobDiscovery normal arm64 Compiling CompatibilityStreamingView.swift, AdditionalYogasSheet.swift, KalsarpaDoshaSheet.swift, MangalDoshaSheet.swift, CompatibilityHistorySheet.swift, CompatibilityResultView.swift, CompatibilityView.swift, HistoryView.swift (in target 'ios_app' from project 'ios_app')
+
+SwiftDriver\ Compilation ios_app normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ios_app -Onone -enforce-exclusivity\=checked @/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -F /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/i074917/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_const_extract_protocols.json -Xcc -iquote -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-generated-files.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-own-target-headers.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-all-target-headers.hmap -Xcc -iquote -Xcc /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-project-headers.hmap -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources-normal/arm64 -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources/arm64 -Xcc -I/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-Swift.h -working-directory /Users/i074917/Documents/destiny_ai_astrology/ios_app -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app.debug.dylib normal (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -F/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -filelist /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.LinkFileList -install_name @rpath/ios_app.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_dependency_info.dat -fobjc-link-runtime -fprofile-instr-generate -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.swiftmodule @/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app-linker-args.resp -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -Xlinker -no_adhoc_codesign -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app.debug.dylib
+
+ConstructStubExecutorLinkFileList /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-ExecutorLinkFileList-normal-arm64.txt (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    construct-stub-executor-link-file-list /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-ExecutorLinkFileList-normal-arm64.txt
+note: Using stub executor library with Swift entry point. (in target 'ios_app' from project 'ios_app')
+
+Ld /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app normal (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -F/Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker @executable_path/Frameworks -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -debug_variant -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app-ExecutorLinkFileList-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app-Simulated.xcent.der /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app
+
+CopySwiftLibs /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app.debug.dylib --scan-folder /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Frameworks --scan-folder /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/PlugIns --scan-folder /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/SystemExtensions --scan-folder /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Extensions --platform iphonesimulator --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ExtractAppIntentsMetadata (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ios_app --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C52 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.destinyai.astrology --output /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app --target-triple arm64-apple-ios17.0-simulator --binary-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app --dependency-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app_dependency_info.dat --stringsdata-file /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftFileList --metadata-file-list /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.DependencyMetadataFileList --static-metadata-file-list /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.DependencyStaticMetadataFileList --swift-const-vals-list /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/Objects-normal/arm64/ios_app.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-01-01 11:55:40.222 appintentsmetadataprocessor[77147:3993089] Starting appintentsmetadataprocessor export
+2026-01-01 11:55:40.227 appintentsmetadataprocessor[77147:3993089] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+AppIntentsSSUTraining (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Info.plist --temp-dir-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ssu --bundle-id com.destinyai.astrology --product-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app --extracted-metadata-path /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/Metadata.appintents --metadata-file-list /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.DependencyMetadataFileList --archive-ssu-assets
+2026-01-01 11:55:40.293 appintentsnltrainingprocessor[77150:3993096] Parsing options for appintentsnltrainingprocessor
+2026-01-01 11:55:40.294 appintentsnltrainingprocessor[77150:3993096] No AppShortcuts found - Skipping.
+
+CodeSign /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app.debug.dylib (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/ios_app.debug.dylib
+
+CodeSign /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/__preview.dylib (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app/__preview.dylib
+
+CodeSign /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --entitlements /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Intermediates.noindex/ios_app.build/Debug-iphonesimulator/ios_app.build/ios_app.app.xcent --timestamp\=none --generate-entitlement-der /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app
+
+RegisterExecutionPolicyException /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-RegisterExecutionPolicyException /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app
+
+Validate /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    builtin-validationUtility /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app -shallow-bundle -infoplist-subpath Info.plist
+
+Touch /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app (in target 'ios_app' from project 'ios_app')
+    cd /Users/i074917/Documents/destiny_ai_astrology/ios_app
+    /usr/bin/touch -c /Users/i074917/Library/Developer/Xcode/DerivedData/ios_app-eblrdridxrnuqgbigorjjuuiasez/Build/Products/Debug-iphonesimulator/ios_app.app
+
+note: Disabling hardened runtime with ad-hoc codesigning. (in target 'ios_app' from project 'ios_app')
+** BUILD SUCCEEDED **
+

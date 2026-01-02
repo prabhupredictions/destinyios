@@ -18,4 +18,12 @@ final class PredictionService: PredictionServiceProtocol {
             body: request
         )
     }
+    
+    func getTodaysPrediction(request: UserAstroDataRequest) async throws -> TodaysPredictionResponse {
+        try await networkClient.request(
+            endpoint: APIConfig.todaysPrediction,
+            method: "POST",
+            body: request
+        )
+    }
 }

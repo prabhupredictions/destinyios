@@ -54,14 +54,14 @@ struct BirthDataView: View {
         }
         .sheet(isPresented: $showDatePicker) {
             DatePickerSheet(
-                title: "Date of Birth",
+                title: "date_of_birth".localized,
                 selection: $viewModel.dateOfBirth,
                 components: .date
             )
         }
         .sheet(isPresented: $showTimePicker) {
             DatePickerSheet(
-                title: "Time of Birth",
+                title: "time_of_birth".localized,
                 selection: $viewModel.timeOfBirth,
                 components: .hourAndMinute
             )
@@ -135,15 +135,15 @@ struct BirthDataView: View {
             // Name (mandatory)
             FormFieldInput(
                 icon: "person.circle",
-                title: "Your Name",
-                placeholder: "Enter your name",
+                title: "your_name".localized,
+                placeholder: "enter_your_name".localized,
                 text: $viewModel.userName
             )
             
             // Date of Birth
             FormFieldButton(
                 icon: "calendar",
-                title: "Date of Birth",
+                title: "date_of_birth".localized,
                 value: viewModel.formattedDate
             ) {
                 showDatePicker = true
@@ -153,7 +153,7 @@ struct BirthDataView: View {
             VStack(spacing: 8) {
                 FormFieldButton(
                     icon: "clock",
-                    title: "Time of Birth",
+                    title: "time_of_birth".localized,
                     value: viewModel.formattedTime
                 ) {
                     if !viewModel.timeUnknown {
@@ -188,8 +188,8 @@ struct BirthDataView: View {
             // Place of Birth (with location search)
             FormFieldButton(
                 icon: "location",
-                title: "Place of Birth",
-                value: viewModel.cityOfBirth.isEmpty ? "Select your birth city" : viewModel.cityOfBirth
+                title: "place_of_birth".localized,
+                value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth
             ) {
                 showLocationSearch = true
             }
@@ -197,13 +197,13 @@ struct BirthDataView: View {
             // Gender Identity
             FormFieldPicker(
                 icon: "person",
-                title: "Gender Identity",
+                title: "gender_identity".localized,
                 selection: $viewModel.gender,
                 options: [
-                    ("", "Prefer not to say"),
-                    ("male", "Male"),
-                    ("female", "Female"),
-                    ("non-binary", "Non-binary")
+                    ("", "prefer_not_to_say".localized),
+                    ("male", "male".localized),
+                    ("female", "female".localized),
+                    ("non-binary", "non_binary".localized)
                 ]
             )
         }
@@ -412,6 +412,8 @@ struct DatePickerSheet: View {
                 .datePickerStyle(.graphical)
                 #endif
                 .labelsHidden()
+                // Use English locale for time picker to show AM/PM
+                .environment(\.locale, components == .hourAndMinute ? Locale(identifier: "en_US") : .current)
                 .padding()
                 
                 Spacer()
@@ -422,7 +424,7 @@ struct DatePickerSheet: View {
             #endif
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
+                    Button("done".localized) {
                         dismiss()
                     }
                     .foregroundColor(Color("NavyPrimary"))

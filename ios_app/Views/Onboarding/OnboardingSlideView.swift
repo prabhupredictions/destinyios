@@ -56,7 +56,7 @@ struct OnboardingSlideView: View {
                     // Get Started button on features slide
                     Button(action: onGetStarted) {
                         HStack(spacing: 10) {
-                            Text("Get Started")
+                            Text("get_started".localized)
                                 .font(.system(size: 17, weight: .semibold))
                             Image(systemName: "sparkles")
                                 .font(.system(size: 14, weight: .semibold))
@@ -84,30 +84,33 @@ struct OnboardingSlideView: View {
     }
     
     // MARK: - Icon View
+    // iOS HIG standard: Onboarding icons 80-120pt with consistent visual weight
+    private let iconContainerSize: CGFloat = 120
+    private let iconSize: CGFloat = 88
+    
     @ViewBuilder
     private var iconView: some View {
         if slide.icon == "logo" {
-            // App logo
-            ZStack {
-                Circle()
-                    .fill(Color("GoldAccent").opacity(0.15))
-                    .frame(width: 100, height: 100)
-                
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.85)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 80, height: 80)
-                    .shadow(color: Color("GoldAccent").opacity(0.3), radius: 10)
-                
-                Text("D")
-                    .font(.system(size: 36, weight: .light, design: .serif))
-                    .foregroundColor(Color("NavyPrimary"))
-            }
+            // Destiny logo - larger for better visibility
+            Image("logo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 110, height: 110)
+                .frame(width: iconContainerSize, height: iconContainerSize)
+        } else if slide.icon == "chatgpt" {
+            // ChatGPT logo - centered in container
+            Image("chatgpt_logo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: iconSize, height: iconSize)
+                .frame(width: iconContainerSize, height: iconContainerSize)
+        } else if slide.icon == "telescope_icon" {
+            // Telescope icon - centered in container
+            Image("telescope_icon")
+                .resizable()
+                .scaledToFit()
+                .frame(width: iconSize, height: iconSize)
+                .frame(width: iconContainerSize, height: iconContainerSize)
         } else {
             // SF Symbol icon with background
             ZStack {
@@ -133,17 +136,24 @@ struct OnboardingSlideView: View {
 struct StatsCard: View {
     var body: some View {
         HStack(spacing: 0) {
-            // Conversations stat
+            // Questions stat
             VStack(spacing: 6) {
                 HStack(spacing: 4) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(Color("GoldAccent"))
-                    Text("300K+")
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(red: 1.0, green: 0.85, blue: 0.3), Color(red: 0.9, green: 0.7, blue: 0.2)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .shadow(color: Color(red: 1.0, green: 0.85, blue: 0.3).opacity(0.5), radius: 2, y: 1)
+                    Text("2.2M+")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(Color("NavyPrimary"))
                 }
-                Text("conversations")
+                Text("questions_asked".localized)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(Color("TextDark").opacity(0.5))
             }
@@ -160,13 +170,17 @@ struct StatsCard: View {
                     ForEach(0..<4, id: \.self) { _ in
                         Image(systemName: "star.fill")
                             .font(.system(size: 14))
-                            .foregroundColor(Color("GoldAccent"))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color(red: 1.0, green: 0.85, blue: 0.3), Color(red: 0.9, green: 0.7, blue: 0.2)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .shadow(color: Color(red: 1.0, green: 0.85, blue: 0.3).opacity(0.5), radius: 2, y: 1)
                     }
-                    Image(systemName: "star.leadinghalf.filled")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color("GoldAccent"))
                 }
-                Text("4.5 rating")
+                Text("4.0 rating")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(Color("TextDark").opacity(0.5))
             }

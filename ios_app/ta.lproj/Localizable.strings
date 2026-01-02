@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "வணக்கம்!";
 "todays_insight" = "இன்றைய ராசி பலன்";
-"ask_destiny" = "Destiny-யிடம் கேளுங்கள்";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "இன்று நான் எதை கவனிக்க வேண்டும்?";
@@ -102,8 +101,6 @@
 "partner_details" = "பார்ட்னர் தகவல்";
 "calculate_match" = "பொருத்தம் பார்";
 "match_score" = "பொருத்த மதிப்பெண்";
-"kundali_match" = "சார்ட் பொருத்தம்";
-"ashtakoot_analysis" = "பிறப்பு சார்ட் பொருத்தம்";
 "boys_details" = "நீங்கள்";
 "girls_details" = "பார்ட்னர்";
 "analyze_match" = "பொருத்தம் பாருங்கள்";
@@ -185,3 +182,232 @@
 "name_gender_updated" = "உங்கள் பெயர் மற்றும் பாலினம் புதுப்பிக்கப்பட்டது.";
 "need_update_birth_data" = "பிறப்பு தரவை புதுப்பிக்க வேண்டுமா?";
 "contact_support_birth_data" = "பிறந்த தேதி, நேரம் அல்லது இடத்தை மாற்ற, ஆதரவு குழுவைத் தொடர்பு கொள்ளவும்.";
+"gender_identity" = "பாலின அடையாளம்";
+"select_birth_city" = "உங்கள் பிறந்த நகரத்தை தேர்வு செய்யவும்";
+"enter_your_name" = "உங்கள் பெயரை உள்ளிடவும்";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "இல்";
+"compatible" = "பொருத்தம்";
+"excellent_match" = "சிறந்த பொருத்தம்";
+"good_match" = "நல்ல பொருத்தம்";
+"moderate_match" = "மிதமான பொருத்தம்";
+"vs" = "எதிர்";
+"ashtakoot_grid" = "அஷ்டகூட விவரங்கள்";
+"varna" = "வர்ணம்";
+"vashya" = "வஷ்யம்";
+"tara" = "தாரா";
+"yoni" = "யோனி";
+"graha_maitri" = "மைத்ரி";
+"gana" = "கணம்";
+"bhakoot" = "பகூட்";
+"nadi" = "நாடி";
+"view_full_report" = "முழு அறிக்கை பார்க்க";
+"full_compatibility_report" = "முழு பொருத்த அறிக்கை";
+"points" = "புள்ளிகள்";
+"score" = "மதிப்பெண்";
+"boy" = "மணமகன்";
+"girl" = "மணமகள்";
+"impact" = "தாக்கம்";
+"excellent" = "சிறந்த";
+"good" = "நல்ல";
+"moderate" = "மிதமான";
+"needs_care" = "கவனம் தேவை";
+"mangal_dosha_status" = "செவ்வாய் தோஷம் நிலை";
+"no_dosha" = "தோஷம் இல்லை";
+"has_dosha" = "தோஷம் உள்ளது";
+"recommended_remedies" = "பரிந்துரைக்கப்பட்ட பரிகாரங்கள்";
+"ask_destiny" = "Destiny-யிடம் கேளுங்கள்";
+"ask_destiny_about_match" = "இந்த பொருத்தம் பற்றி கேளுங்கள்";
+"ai_powered" = "AI மூலம்";
+"tap_to_ask" = "கேட்க தட்டவும்...";
+"ask_anything_match" = "இந்த பொருத்தம் பற்றி எதையும் கேளுங்கள்...";
+"quick_topics" = "விரைவு தலைப்புகள்";
+"ask_score" = "மதிப்பெண்";
+"ask_dosha" = "தோஷம்";
+"ask_weak" = "பலவீனம்";
+"ask_remedies" = "பரிகாரம்";
+"new_match" = "புதிய பொருத்தம்";
+
+
+
+// Match Result Additions
+"ask_more_match" = "இந்த பொருத்தம் பற்றி மேலும் கேட்க...";
+"mangal_dosha" = "செவ்வாய் தோஷம்";
+"mangal_dosha_desc" = "செவ்வாய் நிலை பகுப்பாய்வு";
+"kalsarpa_dosha" = "கால சர்ப்ப தோஷம்";
+"kalsarpa_dosha_desc" = "ராகு-கேது அச்சு பகுப்பாய்வு";
+"additional_yoga" = "கூடுதல் யோகம் & தோஷம்";
+"additional_yoga_desc" = "பிற மங்களகரமான சேர்க்கைகள்";
+"charts" = "ஜாதகம்";
+"history" = "வரலாறு";
+"report" = "அறிக்கை";
+
+// MARK: - Mangal Dosha Exceptions (Tamil)
+"exception_mars_in_own_sign" = "செவ்வாய் சொந்த ராசியில் (மேஷம் அல்லது விருச்சிகம்)";
+"exception_mars_exalted" = "செவ்வாய் மகரத்தில் உச்சம்";
+"exception_mars_in_upachaya" = "செவ்வாய் உபசய வீடுகளில் (3, 6, 10, 11)";
+"exception_mars_in_fixed_sign" = "செவ்வாய் ஸ்திர ராசியில்";
+"exception_mars_in_own_navamsa" = "செவ்வாய் சொந்த நவாம்சத்தில்";
+"exception_mars_conjunct_benefics" = "செவ்வாய் சுப கிரகங்களுடன்";
+"exception_mars_benefic_nakshatra_lord" = "செவ்வாய் சுப நட்சத்திரத்தில்";
+"exception_mars_in_benefic_nakshatra" = "செவ்வாய் நற்பலன் நட்சத்திரத்தில்";
+"exception_mars_moon_friendly_nakshatras" = "செவ்வாய், சந்திரன் நட்பு நட்சத்திரங்களில்";
+"exception_mars_in_asc_lord_nakshatra" = "செவ்வாய் லக்னாதிபதி நட்சத்திரத்தில்";
+"exception_mars_moon_same_nakshatra_pada" = "செவ்வாய், சந்திரன் ஒரே நட்சத்திர பாதத்தில்";
+"exception_mars_jupiter_conjunction" = "செவ்வாய்-குரு சேர்க்கை";
+"exception_mars_aspected_by_jupiter" = "குருவின் பார்வை செவ்வாயை சாந்தப்படுத்துகிறது";
+"exception_mars_in_jupiter_sign" = "செவ்வாய் குரு ராசியில் (தனுசு/மீனம்)";
+"exception_mars_moon_conjunction_benefic" = "செவ்வாய்-சந்திரன் சுப வீட்டில் சேர்க்கை";
+"exception_mars_moon_mutual_kendra" = "செவ்வாய், சந்திரன் கேந்திர உறவில்";
+"exception_mars_aspected_by_benefics" = "செவ்வாய் சுப கிரகங்களின் பார்வை பெறுகிறது";
+"exception_mars_jupiter_mutual_aspects" = "செவ்வாய், குரு பரஸ்பர பார்வை";
+"exception_mars_jupiter_in_trine" = "செவ்வாய், குரு திரிகோண வீடுகளில்";
+"exception_mars_strong_ashtakavarga" = "செவ்வாய் அஷ்டகவர்க்கம் வலிமை";
+"exception_mars_strong_shadbala" = "செவ்வாய் ஷட்பலம் வலிமை";
+"exception_moon_strong" = "ஜாதகத்தில் சந்திரன் வலிமை";
+
+// MARK: - Intensity Factors (Tamil)
+"intensity_mars_debilitated" = "செவ்வாய் கடகத்தில் நீசம்";
+"intensity_mars_conjunct_malefics" = "செவ்வாய் பாப கிரகங்களுடன்";
+"intensity_mars_critical_degrees" = "செவ்வாய் காண்டாந்த பாகையில்";
+"intensity_mars_papa_kartari" = "செவ்வாய் பாபகர்தரி யோகத்தில்";
+"intensity_seventh_lord_afflicted" = "7ம் அதிபதி பாதிக்கப்பட்டுள்ளார்";
+"intensity_mars_dusthana_from_moon" = "செவ்வாய் சந்திரனிலிருந்து 6/8/12";
+"intensity_mars_retrograde" = "செவ்வாய் வக்கிரம்";
+"intensity_mars_combust" = "செவ்வாய் அஸ்தமனம்";
+"intensity_mars_low_ashtakavarga" = "செவ்வாய் அஷ்டகவர்க்கம் குறைவு";
+
+// MARK: - Zodiac Signs (Tamil)
+"sign_ar" = "மேஷம்";
+"sign_ta" = "ரிஷபம்";
+"sign_ge" = "மிதுனம்";
+"sign_ca" = "கடகம்";
+"sign_le" = "சிம்மம்";
+"sign_vi" = "கன்னி";
+"sign_li" = "துலாம்";
+"sign_sc" = "விருச்சிகம்";
+"sign_sg" = "தனுசு";
+"sign_cp" = "மகரம்";
+"sign_aq" = "கும்பம்";
+"sign_pi" = "மீனம்";
+
+// MARK: - Planets (Tamil)
+"planet_sun" = "சூரியன்";
+"planet_moon" = "சந்திரன்";
+"planet_mars" = "செவ்வாய்";
+"planet_mercury" = "புதன்";
+"planet_jupiter" = "குரு";
+"planet_venus" = "சுக்கிரன்";
+"planet_saturn" = "சனி";
+"planet_rahu" = "ராகு";
+"planet_ketu" = "கேது";
+
+// MARK: - Severity/Status (Tamil)
+"severity_none" = "இல்லை";
+"severity_mild" = "லேசான";
+"severity_moderate" = "நடுத்தரம்";
+"severity_high" = "கடுமை";
+"severity_severe" = "மிகக்கடுமை";
+"status_active" = "செயலில்";
+"status_reduced" = "குறைந்தது";
+"status_cancelled" = "ரத்து";
+"active" = "செயலில்";
+"reduced" = "குறைந்தது";
+"cancelled" = "ரத்து";
+
+// MARK: - Dosha UI Labels (Tamil)
+"mangal_dosha_analysis" = "செவ்வாய் தோஷ பகுப்பாய்வு";
+"kalsarpa_analysis" = "கால சர்ப்ப தோஷ பகுப்பாய்வு";
+"yogas_analysis" = "யோகங்கள் & தோஷங்கள்";
+"cancellation_active" = "தோஷம் ரத்து";
+"no_dosha_present" = "தோஷம் இல்லை";
+"mitigating_factors" = "குறைக்கும் காரணிகள்";
+"intensifying_factors" = "அதிகரிக்கும் காரணிகள்";
+"planets_involved" = "சம்பந்தப்பட்ட கிரகங்கள்";
+"affected_areas" = "பாதிக்கப்பட்ட பகுதிகள்";
+"peak_period" = "உச்ச காலம்";
+"planetary_configuration" = "கிரக அமைப்பு";
+"complete_formation" = "முழுமையான அமைப்பு";
+"partial_formation" = "பகுதி அமைப்பு";
+"no_kalsarpa" = "கால சர்ப்பம் இல்லை";
+"planets_balanced" = "கிரகங்கள் சமநிலை";
+"formation_details" = "அமைப்பு விவரங்கள்";
+"strength" = "வலிமை";
+
+// MARK: - Nakshatra Names (27) - Tamil
+"nakshatra_ashwini" = "அஸ்வினி";
+"nakshatra_bharani" = "பரணி";
+"nakshatra_krittika" = "கிருத்திகை";
+"nakshatra_rohini" = "ரோகிணி";
+"nakshatra_mrigashira" = "மிருகசீரிஷம்";
+"nakshatra_ardra" = "திருவாதிரை";
+"nakshatra_punarvasu" = "புனர்பூசம்";
+"nakshatra_pushya" = "பூசம்";
+"nakshatra_ashlesha" = "ஆயில்யம்";
+"nakshatra_magha" = "மகம்";
+"nakshatra_purva_phalguni" = "பூரம்";
+"nakshatra_uttara_phalguni" = "உத்திரம்";
+"nakshatra_hasta" = "ஹஸ்தம்";
+"nakshatra_chitra" = "சித்திரை";
+"nakshatra_swati" = "சுவாதி";
+"nakshatra_vishakha" = "விசாகம்";
+"nakshatra_anuradha" = "அனுஷம்";
+"nakshatra_jyeshtha" = "கேட்டை";
+"nakshatra_moola" = "மூலம்";
+"nakshatra_purva_ashadha" = "பூராடம்";
+"nakshatra_uttara_ashadha" = "உத்திராடம்";
+"nakshatra_shravana" = "திருவோணம்";
+"nakshatra_dhanishtha" = "அவிட்டம்";
+"nakshatra_shatabhisha" = "சதயம்";
+"nakshatra_purva_bhadrapada" = "பூரட்டாதி";
+"nakshatra_uttara_bhadrapada" = "உத்திரட்டாதி";
+"nakshatra_revati" = "ரேவதி";
+
+// MARK: - New Exception Keys (8) - Tamil
+"exception_mars_yoga_karaka" = "செவ்வாய் இந்த லக்னத்திற்கு யோககாரகர்";
+"exception_mars_jupiter_yoga" = "செவ்வாய்-குரு நல்ல யோகம் உள்ளது";
+"exception_mars_venus_yoga" = "செவ்வாய்-சுக்கிர நல்ல யோகம் உள்ளது";
+"exception_mars_good_d7" = "D7 (சப்தாம்சம்) சார்ட்டில் செவ்வாய் நல்ல நிலையில்";
+"exception_mars_good_d9" = "D9 (நவாம்சம்) சார்ட்டில் செவ்வாய் நல்ல நிலையில்";
+"exception_mars_good_d10" = "D10 (தசாம்சம்) சார்ட்டில் செவ்வாய் நல்ல நிலையில்";
+"exception_mars_good_d60" = "D60 (ஷஷ்டியாம்சம்) சார்ட்டில் செவ்வாய் நல்ல நிலையில்";
+"exception_ruchaka_yoga" = "ருசக மகாபுருஷ யோகம் உள்ளது";
+"exception_mars_has_digbala" = "செவ்வாய்க்கு திக்பலம் (திசை பலம்) உள்ளது";
+"exception_moon_strong" = "சந்திரன் ஜாதகத்தில் பலமாக உள்ளது";
+
+// MARK: - Mars Position UI Labels (10) - Tamil
+"mars_position" = "செவ்வாய் நிலை";
+"house_label" = "பாவம்";
+"sign_lord" = "ராசி அதிபதி";
+"nakshatra_lord" = "நட்சத்திர அதிபதி";
+"dosha_calculation" = "தோஷ கணக்கீடு";
+"base_strength" = "அடிப்படை வலிமை";
+"mitigation" = "குறைப்பு";
+"intensification" = "தீவிரம்";
+"final_score" = "இறுதி மதிப்பெண்";
+"explanation_label" = "கணக்கீடு விவரங்கள்";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

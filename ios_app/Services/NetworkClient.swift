@@ -57,8 +57,23 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
         case 401:
             throw NetworkError.unauthorized
         case 400...499:
+            // Try to parse error message from response body
+            if let errorJson = try? JSONDecoder().decode([String: String].self, from: data),
+               let message = errorJson["message"] {
+                throw NetworkError.serverError(message)
+            }
+            // Try nested detail format (FastAPI style)
+            if let errorData = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = errorData["detail"] as? [String: Any],
+               let message = detail["message"] as? String {
+                throw NetworkError.serverError(message)
+            }
             throw NetworkError.serverError("Client Error: \(httpResponse.statusCode)")
         case 500...599:
+            // Try to parse error message from response body
+            if let errorStr = String(data: data, encoding: .utf8), !errorStr.isEmpty {
+                throw NetworkError.serverError(errorStr)
+            }
             throw NetworkError.serverError("Server Error: \(httpResponse.statusCode)")
         default:
             throw NetworkError.serverError("Unknown Error: \(httpResponse.statusCode)")

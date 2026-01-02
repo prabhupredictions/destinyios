@@ -84,20 +84,20 @@ struct SplashView: View {
                 // App name - Premium typography
                 VStack(spacing: 16) {
                     // Main title
-                    Text("DESTINY")
+                    Text("destiny_app_title".localized)
                         .font(.system(size: 42, weight: .bold, design: .default))
                         .foregroundColor(.white)
                         .tracking(12)
                         .shadow(color: .black.opacity(0.3), radius: 2, y: 2)
                     
                     // Subtitle
-                    Text("AI ASTROLOGY")
+                    Text("ai_astrology_subtitle".localized)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Color("GoldAccent"))
                         .tracking(8)
                     
                     // Tagline
-                    Text("WORLD'S MOST ADVANCED ASTROLOGER")
+                    Text("worlds_advanced_ai".localized)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
                         .tracking(2)
@@ -126,7 +126,7 @@ struct SplashView: View {
                         }
                     }
                     
-                    Text("Aligning the stars...")
+                    Text("aligning_stars".localized)
                         .font(.system(size: 13, weight: .light))
                         .foregroundColor(.white.opacity(0.5))
                         .italic()

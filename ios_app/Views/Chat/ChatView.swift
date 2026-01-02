@@ -5,12 +5,20 @@ struct ChatView: View {
     // Navigation callback for back button
     var onBack: (() -> Void)? = nil
     
+    // Initial question passed from HomeView
+    var initialQuestion: String? = nil
+    
+    // Initial thread ID passed from History
+    var initialThreadId: String? = nil
+    
     @State private var viewModel = ChatViewModel()
     @FocusState private var isInputFocused: Bool
     @State private var showHistory = false
     @State private var showChart = false
     @State private var showQuotaExhausted = false
     @State private var showSubscription = false
+    @State private var hasHandledInitialQuestion = false
+    @State private var hasHandledInitialThread = false
     
     // For sign out flow
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -79,7 +87,14 @@ struct ChatView: View {
             QuotaExhaustedView(
                 isGuest: isGuest,
                 onSignIn: { signOutAndReauth() },
-                onUpgrade: { showSubscription = true }
+                onUpgrade: { 
+                    // For guests: require sign-in first, then they can upgrade
+                    if isGuest {
+                        signOutAndReauth()
+                    } else {
+                        showSubscription = true 
+                    }
+                }
             )
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.hidden)
@@ -87,15 +102,73 @@ struct ChatView: View {
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
         }
+        .onChange(of: initialQuestion) { oldValue, newValue in
+            // When we receive an initial question, send it immediately
+            if let question = newValue, !question.isEmpty, !hasHandledInitialQuestion {
+                hasHandledInitialQuestion = true
+                viewModel.inputText = question
+                Task {
+                    await viewModel.sendMessage()
+                }
+            }
+        }
+        // Handle initial thread ID change
+        .onChange(of: initialThreadId) { oldValue, newValue in
+            if let threadId = newValue, !threadId.isEmpty {
+                // Find thread in history - need to load history first if not ready
+                if let thread = viewModel.chatHistory.first(where: { $0.id == threadId }) {
+                    viewModel.loadThread(thread)
+                } else {
+                    // Try to fetch specific thread
+                    if let thread = viewModel.dataManager.fetchThread(id: threadId) {
+                        viewModel.loadThread(thread)
+                    }
+                }
+            }
+        }
+        .onAppear {
+            // Handle initial question on first appear
+            if let question = initialQuestion, !question.isEmpty, !hasHandledInitialQuestion {
+                hasHandledInitialQuestion = true
+                viewModel.inputText = question
+                Task {
+                    await viewModel.sendMessage()
+                }
+            }
+            
+            // Handle initial thread ID
+            if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {
+                hasHandledInitialThread = true
+                if let thread = viewModel.dataManager.fetchThread(id: threadId) {
+                    viewModel.loadThread(thread)
+                }
+            }
+        }
     }
     
     // MARK: - Sign Out and Re-auth (for guest → sign in flow)
     private func signOutAndReauth() {
+        // Clear all guest data so user starts fresh with Apple Sign-In
+        
+        // 1. Clear auth state
         isGuest = false
         isAuthenticated = false
         hasBirthData = false
-        UserDefaults.standard.removeObject(forKey: "userEmail")
-        UserDefaults.standard.removeObject(forKey: "quotaUsed")
+        
+        // 2. Clear UserDefaults
+        let keysToRemove = [
+            "userEmail", "userName", "quotaUsed", "userBirthData",
+            "hasBirthData", "userGender", "birthTimeUnknown", "isGuest"
+        ]
+        keysToRemove.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        UserDefaults.standard.set(false, forKey: "isAuthenticated")
+        
+        // 3. Clear keychain
+        let keychain = KeychainService.shared
+        keychain.delete(forKey: KeychainService.Keys.userId)
+        keychain.delete(forKey: KeychainService.Keys.authToken)
+        
+        print("[SignOut] Guest data cleared for fresh sign-in")
     }
     
     // MARK: - Messages View (Optimized for smooth scrolling)
@@ -103,20 +176,18 @@ struct ChatView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    // Filter out empty streaming placeholders
-                    ForEach(viewModel.messages.filter { !$0.content.isEmpty || !$0.isStreaming }) { message in
+                    // Show all messages including streaming ones
+                    ForEach(viewModel.messages.filter { 
+                        !$0.content.isEmpty || 
+                        $0.isStreaming  // Show streaming placeholder for loading state
+                    }) { message in
                         MessageBubble(
                             message: message,
-                            userQuery: getUserQuery(for: message)
+                            userQuery: getUserQuery(for: message),
+                            streamingContent: message.isStreaming ? viewModel.streamingContent : nil,
+                            thinkingSteps: message.isStreaming ? viewModel.thinkingSteps : []
                         )
                         .id(message.id)
-                    }
-                    
-                    // Typing indicator while waiting for API response
-                    if viewModel.isLoading {
-                        PremiumTypingIndicator()
-                            .id("typing")
-                            .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
                     
                     // Bottom anchor for reliable scrolling
@@ -151,10 +222,17 @@ struct ChatView: View {
     }
     
     private func scrollToBottom(_ proxy: ScrollViewProxy) {
-        // Use spring animation for smooth, natural feel
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+        // Scroll to last visible content, not invisible anchor
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                // If loading, scroll to typing indicator
+                if viewModel.isLoading {
+                    proxy.scrollTo("typing", anchor: .bottom)
+                } 
+                // Otherwise scroll to last message
+                else if let lastMessage = viewModel.messages.last(where: { !$0.content.isEmpty }) {
+                    proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                }
             }
         }
     }
@@ -191,7 +269,7 @@ struct ChatView: View {
     // MARK: - Suggested Questions
     private var suggestedQuestionsView: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Suggested questions")
+            Text("suggested_questions".localized)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(Color("TextDark").opacity(0.5))
                 .padding(.horizontal, 16)
@@ -282,7 +360,7 @@ struct ChatHistorySidebar: View {
                                 .font(.system(size: 48))
                                 .foregroundColor(Color("NavyPrimary").opacity(0.2))
                             
-                            Text("No chat history yet")
+                            Text("no_chat_history".localized)
                                 .font(.system(size: 16))
                                 .foregroundColor(Color("TextDark").opacity(0.5))
                         }

@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "Oi!";
 "todays_insight" = "HORÓSCOPO DE HOJE";
-"ask_destiny" = "Pergunte ao Destiny";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "O que devo prestar atenção hoje?";
@@ -79,6 +78,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "Preencha seus dados";
 "your_name" = "Seu nome";
+"enter_your_name" = "Digite seu nome";
 "date_of_birth" = "Data de nascimento";
 "time_of_birth" = "Hora de nascimento";
 "birth_time_unknown" = "Não sei a hora exata";
@@ -102,8 +102,6 @@
 "partner_details" = "Dados do parceiro(a)";
 "calculate_match" = "Ver compatibilidade";
 "match_score" = "Pontuação";
-"kundali_match" = "Compatibilidade de Mapas";
-"ashtakoot_analysis" = "Compatibilidade de Mapa Astral";
 "boys_details" = "Você";
 "girls_details" = "Parceiro(a)";
 "analyze_match" = "Ver compatibilidade";
@@ -185,3 +183,231 @@
 "name_gender_updated" = "Seu nome e gênero foram atualizados.";
 "need_update_birth_data" = "Precisa atualizar dados de nascimento?";
 "contact_support_birth_data" = "Para alterações na data, hora ou local de nascimento, entre em contato com nossa equipe de suporte.";
+"gender_identity" = "Identidade de gênero";
+"select_birth_city" = "Selecione sua cidade de nascimento";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "de";
+"compatible" = "compatível";
+"excellent_match" = "Excelente Compatibilidade";
+"good_match" = "Boa Compatibilidade";
+"moderate_match" = "Compatibilidade Moderada";
+"vs" = "VS";
+"ashtakoot_grid" = "Detalhes Ashtakoot";
+"varna" = "Varna";
+"vashya" = "Vashya";
+"tara" = "Tara";
+"yoni" = "Yoni";
+"graha_maitri" = "Maitri";
+"gana" = "Gana";
+"bhakoot" = "Bhakoot";
+"nadi" = "Nadi";
+"view_full_report" = "Ver Relatório Completo";
+"full_compatibility_report" = "Relatório Completo de Compatibilidade";
+"points" = "Pontos";
+"score" = "Pontuação";
+"boy" = "Ele";
+"girl" = "Ela";
+"impact" = "Impacto";
+"excellent" = "Excelente";
+"good" = "Bom";
+"moderate" = "Moderado";
+"needs_care" = "Precisa de Atenção";
+"mangal_dosha_status" = "Status de Mangal Dosha";
+"no_dosha" = "Sem Dosha";
+"has_dosha" = "Tem Dosha";
+"recommended_remedies" = "Remédios Recomendados";
+"ask_destiny" = "Perguntar ao Destiny";
+"ask_destiny_about_match" = "Pergunte ao Destiny sobre esta compatibilidade";
+"ai_powered" = "Alimentado por IA";
+"tap_to_ask" = "Toque para perguntar...";
+"ask_anything_match" = "Pergunte qualquer coisa sobre esta compatibilidade...";
+"quick_topics" = "Tópicos Rápidos";
+"ask_score" = "Pontuação";
+"ask_dosha" = "Dosha";
+"ask_weak" = "Fraquezas";
+"ask_remedies" = "Remédios";
+"new_match" = "Nova Compatibilidade";
+
+
+
+// Match Result Additions
+"ask_more_match" = "Perguntar mais sobre este par...";
+"mangal_dosha" = "Mangal Dosha";
+"mangal_dosha_desc" = "Análise da posição de Marte";
+"kalsarpa_dosha" = "Kalsarpa Dosha";
+"kalsarpa_dosha_desc" = "Análise do eixo Rahu-Ketu";
+"additional_yoga" = "Yoga e Dosha Adicional";
+"additional_yoga_desc" = "Outras combinações auspiciosas";
+"charts" = "Mapas";
+"history" = "Histórico";
+"report" = "Relatório";
+
+// MARK: - Mangal Dosha Exceptions (Portuguese)
+"exception_mars_in_own_sign" = "Marte está no próprio signo (Áries ou Escorpião)";
+"exception_mars_exalted" = "Marte está exaltado em Capricórnio";
+"exception_mars_in_upachaya" = "Marte nas casas de crescimento (3, 6, 10, 11)";
+"exception_mars_in_fixed_sign" = "Marte está em signo fixo";
+"exception_mars_in_own_navamsa" = "Marte está no próprio Navamsa";
+"exception_mars_conjunct_benefics" = "Marte em conjunção com benéficos";
+"exception_mars_benefic_nakshatra_lord" = "Marte em nakshatra benéfico";
+"exception_mars_in_benefic_nakshatra" = "Marte em constelação auspiciosa";
+"exception_mars_moon_friendly_nakshatras" = "Marte e Lua em nakshatras amigos";
+"exception_mars_in_asc_lord_nakshatra" = "Marte no nakshatra do senhor ascendente";
+"exception_mars_moon_same_nakshatra_pada" = "Marte e Lua compartilham o mesmo pada";
+"exception_mars_jupiter_conjunction" = "Conjunção Marte-Júpiter";
+"exception_mars_aspected_by_jupiter" = "O aspecto de Júpiter mitiga Marte";
+"exception_mars_in_jupiter_sign" = "Marte em signo de Júpiter (Sagitário/Peixes)";
+"exception_mars_moon_conjunction_benefic" = "Conjunção Marte-Lua em casa benéfica";
+"exception_mars_moon_mutual_kendra" = "Marte e Lua em relação Kendra mútua";
+"exception_mars_aspected_by_benefics" = "Marte recebe aspectos benéficos";
+"exception_mars_jupiter_mutual_aspects" = "Marte e Júpiter em aspectos mútuos";
+"exception_mars_jupiter_in_trine" = "Marte e Júpiter em casas de trígono";
+"exception_mars_strong_ashtakavarga" = "Marte tem Ashtakavarga forte";
+"exception_mars_strong_shadbala" = "Marte tem Shadbala forte";
+"exception_moon_strong" = "Lua forte no mapa";
+
+// MARK: - Intensity Factors (Portuguese)
+"intensity_mars_debilitated" = "Marte debilitado em Câncer";
+"intensity_mars_conjunct_malefics" = "Marte em conjunção com maléficos";
+"intensity_mars_critical_degrees" = "Marte em graus Gandanta críticos";
+"intensity_mars_papa_kartari" = "Marte cercado por maléficos";
+"intensity_seventh_lord_afflicted" = "Senhor da casa 7 afligido";
+"intensity_mars_dusthana_from_moon" = "Marte em 6/8/12 da Lua";
+"intensity_mars_retrograde" = "Marte está retrógrado";
+"intensity_mars_combust" = "Marte está combusto (muito perto do Sol)";
+"intensity_mars_low_ashtakavarga" = "Marte com Ashtakavarga baixo";
+
+// MARK: - Zodiac Signs (Portuguese)
+"sign_ar" = "Áries";
+"sign_ta" = "Touro";
+"sign_ge" = "Gêmeos";
+"sign_ca" = "Câncer";
+"sign_le" = "Leão";
+"sign_vi" = "Virgem";
+"sign_li" = "Libra";
+"sign_sc" = "Escorpião";
+"sign_sg" = "Sagitário";
+"sign_cp" = "Capricórnio";
+"sign_aq" = "Aquário";
+"sign_pi" = "Peixes";
+
+// MARK: - Planets (Portuguese)
+"planet_sun" = "Sol";
+"planet_moon" = "Lua";
+"planet_mars" = "Marte";
+"planet_mercury" = "Mercúrio";
+"planet_jupiter" = "Júpiter";
+"planet_venus" = "Vênus";
+"planet_saturn" = "Saturno";
+"planet_rahu" = "Rahu";
+"planet_ketu" = "Ketu";
+
+// MARK: - Severity/Status (Portuguese)
+"severity_none" = "Nenhum";
+"severity_mild" = "Leve";
+"severity_moderate" = "Moderado";
+"severity_high" = "Alto";
+"severity_severe" = "Severo";
+"status_active" = "Ativo";
+"status_reduced" = "Reduzido";
+"status_cancelled" = "Cancelado";
+"active" = "Ativo";
+"reduced" = "Reduzido";
+"cancelled" = "Cancelado";
+
+// MARK: - Dosha UI Labels (Portuguese)
+"mangal_dosha_analysis" = "Análise Mangal Dosha";
+"kalsarpa_analysis" = "Análise Kalsarpa Dosha";
+"yogas_analysis" = "Yogas e Doshas";
+"cancellation_active" = "Dosha Cancelado";
+"no_dosha_present" = "Sem Dosha";
+"mitigating_factors" = "Fatores Mitigantes";
+"intensifying_factors" = "Fatores Intensificantes";
+"planets_involved" = "Planetas Envolvidos";
+"affected_areas" = "Áreas Afetadas";
+"peak_period" = "Período de Pico";
+"planetary_configuration" = "Configuração Planetária";
+"complete_formation" = "Formação Completa";
+"partial_formation" = "Formação Parcial";
+"no_kalsarpa" = "Sem Kalsarpa";
+"planets_balanced" = "Planetas Equilibrados";
+"formation_details" = "Detalhes da Formação";
+"strength" = "Força";
+
+// MARK: - Nakshatra Names (27) - Portuguese (Sanskrit names kept)
+"nakshatra_ashwini" = "Ashwini";
+"nakshatra_bharani" = "Bharani";
+"nakshatra_krittika" = "Krittika";
+"nakshatra_rohini" = "Rohini";
+"nakshatra_mrigashira" = "Mrigashira";
+"nakshatra_ardra" = "Ardra";
+"nakshatra_punarvasu" = "Punarvasu";
+"nakshatra_pushya" = "Pushya";
+"nakshatra_ashlesha" = "Ashlesha";
+"nakshatra_magha" = "Magha";
+"nakshatra_purva_phalguni" = "Purva Phalguni";
+"nakshatra_uttara_phalguni" = "Uttara Phalguni";
+"nakshatra_hasta" = "Hasta";
+"nakshatra_chitra" = "Chitra";
+"nakshatra_swati" = "Swati";
+"nakshatra_vishakha" = "Vishakha";
+"nakshatra_anuradha" = "Anuradha";
+"nakshatra_jyeshtha" = "Jyeshtha";
+"nakshatra_moola" = "Moola";
+"nakshatra_purva_ashadha" = "Purva Ashadha";
+"nakshatra_uttara_ashadha" = "Uttara Ashadha";
+"nakshatra_shravana" = "Shravana";
+"nakshatra_dhanishtha" = "Dhanishtha";
+"nakshatra_shatabhisha" = "Shatabhisha";
+"nakshatra_purva_bhadrapada" = "Purva Bhadrapada";
+"nakshatra_uttara_bhadrapada" = "Uttara Bhadrapada";
+"nakshatra_revati" = "Revati";
+
+// MARK: - New Exception Keys (8) - Portuguese
+"exception_mars_yoga_karaka" = "Marte é Yoga Karaka para este Ascendente";
+"exception_mars_jupiter_yoga" = "Yoga benéfico Marte-Júpiter presente";
+"exception_mars_venus_yoga" = "Yoga benéfico Marte-Vênus presente";
+"exception_mars_good_d7" = "Marte bem posicionado no mapa D7 (Saptamsa)";
+"exception_mars_good_d9" = "Marte bem posicionado no mapa D9 (Navamsa)";
+"exception_mars_good_d10" = "Marte bem posicionado no mapa D10 (Dasamsa)";
+"exception_mars_good_d60" = "Marte bem posicionado no mapa D60 (Shashtiamsa)";
+"exception_ruchaka_yoga" = "Yoga Ruchaka Mahapurusha presente";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - Portuguese
+"mars_position" = "Posição de Marte";
+"house_label" = "Casa";
+"sign_lord" = "Regente do Signo";
+"nakshatra_lord" = "Regente do Nakshatra";
+"dosha_calculation" = "Cálculo do Dosha";
+"base_strength" = "Força Base";
+"mitigation" = "Mitigação";
+"intensification" = "Intensificação";
+"final_score" = "Pontuação Final";
+"explanation_label" = "Detalhes do Cálculo";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

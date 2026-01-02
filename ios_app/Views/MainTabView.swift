@@ -4,6 +4,12 @@ import SwiftUI
 struct MainTabView: View {
     @State private var selectedTab = 0
     @State private var showHistory = false
+    @State private var showAskSheet = false  // New: Show Ask Destiny Sheet
+    @State private var pendingQuestion: String? = nil
+    @State private var pendingThreadId: String? = nil
+    @State private var pendingMatchItem: CompatibilityHistoryItem? = nil
+    @State private var showMatchResult = false  // Track if match result is showing
+    @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -11,70 +17,148 @@ struct MainTabView: View {
             Group {
                 switch selectedTab {
                 case 0:
-                    HomeView()
+                    HomeView(
+                        onQuestionSelected: { question in
+                            pendingQuestion = question
+                            selectedTab = 1  // Navigate to chat
+                        },
+                        onChatHistorySelected: { threadId in
+                            pendingThreadId = threadId
+                            selectedTab = 1 // Navigate to chat
+                        },
+                        onMatchHistorySelected: { matchItem in
+                            pendingMatchItem = matchItem
+                            selectedTab = 2 // Navigate to match
+                        }
+                    )
                 case 1:
-                    ChatView(onBack: { selectedTab = 0 })  // Pass back handler
+                    ChatView(
+                        onBack: { 
+                            selectedTab = 0 
+                            pendingQuestion = nil  // Clear pending question
+                            pendingThreadId = nil
+                        },
+                        initialQuestion: pendingQuestion,
+                        initialThreadId: pendingThreadId
+                    )
                 case 2:
-                    CompatibilityView()
+                    CompatibilityView(
+                        initialMatchItem: pendingMatchItem,
+                        onShowResultChange: { isShowing in
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                showMatchResult = isShowing
+                            }
+                        }
+                    )
                 default:
-                    HomeView()
+                    HomeView(onQuestionSelected: { _ in })
                 }
             }
             
-            // Custom Tab Bar - Hidden on Chat screen (Option 1: iMessage style)
-            if selectedTab != 1 {
-                CustomTabBar(selectedTab: $selectedTab)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 8)
+            // Custom Tab Bar - Hidden on Chat screen and Match Result screen
+            if selectedTab != 1 && !showMatchResult {
+                CustomTabBar(selectedTab: $selectedTab, showAskSheet: $showAskSheet)
+                    // No horizontal padding for full width
+                    .padding(.bottom, 0) // Docked to bottom
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .ignoresSafeArea(.keyboard)
         .animation(.easeInOut(duration: 0.25), value: selectedTab)
+        .animation(.easeInOut(duration: 0.25), value: showMatchResult)
+        .sheet(isPresented: $showAskSheet) {
+            AskDestinyQuestionsSheet(
+                suggestedQuestions: homeViewModel.suggestedQuestions,
+                onQuestionSelected: { question in
+                    pendingQuestion = question
+                    selectedTab = 1  // Navigate to chat with question
+                }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+        .task {
+            // Load home data to have life areas available for Ask sheet
+            await homeViewModel.loadHomeData()
+        }
     }
 }
 
 // MARK: - Custom Tab Bar
 struct CustomTabBar: View {
     @Binding var selectedTab: Int
+    @Binding var showAskSheet: Bool
     
     var body: some View {
         HStack(spacing: 0) {
-            // Home Tab
+            // Home Tab (Left)
             TabBarItem(
                 icon: "house.fill",
-                title: "Home",
+                title: "home".localized,
                 isSelected: selectedTab == 0
             ) {
                 withAnimation(.spring(response: 0.3)) {
                     selectedTab = 0
                 }
             }
+            .frame(width: 60) // Fixed width touch target
+            
+            Spacer()
             
             // Ask Tab (Center - FAB Style)
             AskTabButton(isSelected: selectedTab == 1) {
                 withAnimation(.spring(response: 0.3)) {
-                    selectedTab = 1
+                    // Show Ask sheet instead of navigating directly
+                    showAskSheet = true
                 }
             }
+            .frame(width: 80) // Fixed width for center
             
-            // Match Tab
+            Spacer()
+            
+            // Match Tab (Right)
             TabBarItem(
                 icon: "heart.fill",
-                title: "Match",
-                isSelected: selectedTab == 2
+                title: "match".localized,
+                isSelected: selectedTab == 2,
+                accentColor: Color(red: 0.91, green: 0.71, blue: 0.72)
             ) {
                 withAnimation(.spring(response: 0.3)) {
                     selectedTab = 2
                 }
             }
+            .frame(width: 60) // Fixed width touch target
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 40) // Position icons comfortably near edges (standard ~30-40pt)
+        .padding(.top, 6)       // Ultra lean top padding
+        .padding(.bottom, 0)    // Use Safe Area
+        .frame(maxWidth: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 28)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.08), radius: 20, y: -5)
+            ZStack {
+                // Sleek Glassy Background
+                Rectangle()
+                    .fill(Color(hex: "0A0E1A").opacity(0.85)) // Deep Navy matching theme, high opacity
+                    .background(.ultraThinMaterial) // Glass blur
+                    .ignoresSafeArea()
+                
+                // Top Border Line
+                VStack {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.clear,
+                                    Color(hex: "D4AF37").opacity(0.5), // Center Gold
+                                    Color.clear
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 1)
+                    Spacer()
+                }
+            }
         )
     }
 }
@@ -84,6 +168,7 @@ struct TabBarItem: View {
     let icon: String
     let title: String
     let isSelected: Bool
+    var accentColor: Color? = nil  // Optional custom color when selected
     let action: () -> Void
     
     var body: some View {
@@ -96,7 +181,7 @@ struct TabBarItem: View {
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
             }
-            .foregroundColor(isSelected ? Color("NavyPrimary") : Color("TextDark").opacity(0.4))
+            .foregroundColor(isSelected ? (accentColor ?? Color(hex: "D4AF37")) : Color.white.opacity(0.5)) // Gold or Dim White
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
@@ -115,17 +200,17 @@ struct AskTabButton: View {
                     // Outer glow when selected
                     if isSelected {
                         Circle()
-                            .fill(Color("GoldAccent").opacity(0.2))
+                            .fill(Color(hex: "D4AF37").opacity(0.3))
                             .frame(width: 64, height: 64)
                     }
                     
-                    // Main button
+                    // Main button - champagne gold gradient
                     Circle()
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color("GoldAccent"),
-                                    Color("GoldAccent").opacity(0.85)
+                                    Color(hex: "FFF8E1"), // Light Champagne
+                                    Color(hex: "FDD835")  // Gold
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -133,7 +218,7 @@ struct AskTabButton: View {
                         )
                         .frame(width: 56, height: 56)
                         .shadow(
-                            color: Color("GoldAccent").opacity(0.4),
+                            color: Color(hex: "FDD835").opacity(0.5),
                             radius: isSelected ? 12 : 8,
                             y: 4
                         )
@@ -141,14 +226,14 @@ struct AskTabButton: View {
                     // Icon
                     Image(systemName: "bubble.left.and.bubble.right.fill")
                         .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(Color(hex: "1A1F2E")) // Dark Navy icon for contrast
                         .symbolEffect(.bounce, value: isSelected)
                 }
                 .offset(y: -20)
                 
-                Text("Ask")
+                Text("ask".localized)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(isSelected ? Color("NavyPrimary") : Color("NavyPrimary").opacity(0.7))
+                    .foregroundColor(isSelected ? Color(hex: "D4AF37") : Color.white.opacity(0.6)) // Gold or Dim White
                     .offset(y: -16)
             }
         }

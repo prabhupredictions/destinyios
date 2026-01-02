@@ -95,11 +95,11 @@ struct SubscriptionView: View {
             }
             
             VStack(spacing: 8) {
-                Text("Unlock Destiny Premium")
+                Text("unlock_premium".localized)
                     .font(.system(size: 26, weight: .bold))
                     .foregroundColor(Color("NavyPrimary"))
                 
-                Text("Get unlimited cosmic guidance")
+                Text("get_cosmic_guidance".localized)
                     .font(.system(size: 16))
                     .foregroundColor(Color("TextDark").opacity(0.6))
             }
@@ -148,7 +148,7 @@ struct SubscriptionView: View {
                 }
             }
             
-            Text("Cancel anytime")
+            Text("cancel_anytime".localized)
                 .font(.system(size: 14))
                 .foregroundColor(Color("TextDark").opacity(0.5))
         }
@@ -199,7 +199,7 @@ struct SubscriptionView: View {
                 }
             }
         }) {
-            Text("Restore Purchases")
+            Text("restore_purchases".localized)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("NavyPrimary"))
         }
@@ -207,7 +207,7 @@ struct SubscriptionView: View {
     
     // MARK: - Disclaimer
     private var disclaimerText: some View {
-        Text("Subscription automatically renews unless canceled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period.")
+        Text("subscription_terms".localized)
             .font(.system(size: 11))
             .foregroundColor(Color("TextDark").opacity(0.4))
             .multilineTextAlignment(.center)

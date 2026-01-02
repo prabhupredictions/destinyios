@@ -1,0 +1,620 @@
+//
+//  KalsarpaDoshaSheet.swift
+//  ios_app
+//
+//  Premium Kalsarpa Dosha detail sheet with professional design
+//
+
+import SwiftUI
+
+struct KalsarpaDoshaSheet: View {
+    let boyData: KalaSarpaData?
+    let girlData: KalaSarpaData?
+    let boyName: String
+    let girlName: String
+    
+    @State private var selectedPartner: Int = 0
+    @State private var animateSnake: Bool = false
+    @State private var animateOrbit: Bool = false
+    @Environment(\.dismiss) private var dismiss
+    
+    private var currentData: KalaSarpaData? {
+        selectedPartner == 0 ? boyData : girlData
+    }
+    
+    private var currentName: String {
+        selectedPartner == 0 ? boyName : girlName
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                // Background gradient - deep cosmic theme
+                LinearGradient(
+                    colors: [
+                        Color(hex: "0a0a1a"),
+                        Color(hex: "1a1a3a"),
+                        Color(hex: "0a0a1a")
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
+                // Subtle star field effect
+                starFieldOverlay
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Partner Picker
+                        partnerPicker
+                        
+                        if let data = currentData {
+                            // Hero Section with premium animation
+                            heroSection(data)
+                            
+                            // Consolidated Dosha Details Card
+                            if data.isPresent {
+                                doshaDetailsCard(data)
+                            }
+                            
+                            // Remedies (separate card for emphasis)
+                            if let remedies = data.remedies, !remedies.isEmpty {
+                                remediesCard(remedies)
+                            }
+                        } else {
+                            noDataView
+                        }
+                    }
+                    .padding()
+                    .padding(.bottom, 50)
+                }
+            }
+            .navigationTitle("kalsarpa_analysis".localized)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                animateSnake = true
+            }
+            withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
+                animateOrbit = true
+            }
+        }
+    }
+    
+    // MARK: - Star Field Overlay
+    
+    private var starFieldOverlay: some View {
+        GeometryReader { geo in
+            ForEach(0..<30, id: \.self) { i in
+                Circle()
+                    .fill(Color.white.opacity(Double.random(in: 0.1...0.4)))
+                    .frame(width: CGFloat.random(in: 1...3))
+                    .position(
+                        x: CGFloat.random(in: 0...geo.size.width),
+                        y: CGFloat.random(in: 0...geo.size.height)
+                    )
+            }
+        }
+    }
+    
+    // MARK: - Partner Picker
+    
+    private var partnerPicker: some View {
+        HStack(spacing: 0) {
+            ForEach([boyName, girlName].indices, id: \.self) { index in
+                Button {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        selectedPartner = index
+                    }
+                } label: {
+                    Text(index == 0 ? boyName : girlName)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(selectedPartner == index ? .white : .white.opacity(0.5))
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 24)
+                        .background(
+                            selectedPartner == index
+                            ? LinearGradient(colors: [.purple.opacity(0.4), .blue.opacity(0.3)], startPoint: .leading, endPoint: .trailing)
+                            : LinearGradient(colors: [.clear, .clear], startPoint: .leading, endPoint: .trailing)
+                        )
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(4)
+        .background(Color.white.opacity(0.08))
+        .clipShape(Capsule())
+    }
+    
+    // MARK: - Hero Section
+    
+    private func heroSection(_ data: KalaSarpaData) -> some View {
+        VStack(spacing: 20) {
+            if data.isPresent {
+                // Animated snake in cosmic circle
+                ZStack {
+                    // Outer glow
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [.purple.opacity(0.2), .clear],
+                                center: .center,
+                                startRadius: 60,
+                                endRadius: 100
+                            )
+                        )
+                        .frame(width: 200, height: 200)
+                    
+                    // Orbital ring
+                    Circle()
+                        .stroke(
+                            AngularGradient(
+                                colors: [.purple.opacity(0.6), .blue.opacity(0.3), .purple.opacity(0.6)],
+                                center: .center
+                            ),
+                            lineWidth: 3
+                        )
+                        .frame(width: 160, height: 160)
+                        .rotationEffect(.degrees(animateOrbit ? 360 : 0))
+                    
+                    // Inner circle
+                    Circle()
+                        .fill(Color.black.opacity(0.3))
+                        .frame(width: 140, height: 140)
+                    
+                    // Snake emoji with animation
+                    Text("🐍")
+                        .font(.system(size: 56))
+                        .scaleEffect(animateSnake ? 1.08 : 0.95)
+                        .rotationEffect(.degrees(animateSnake ? 8 : -8))
+                }
+                
+                VStack(spacing: 12) {
+                    // Status badge
+                    Text("kalsarpa_dosha".localized.uppercased())
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.red.opacity(0.9))
+                        .tracking(3)
+                    
+                    // Main status
+                    Text("DETECTED")
+                        .font(.system(size: 24, weight: .black))
+                        .foregroundColor(.white)
+                    
+                    // Yoga Name - This is what the user wanted to see!
+                    Text(data.displayName)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.purple, .pink],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                    
+                    // Completeness & Severity badges
+                    HStack(spacing: 12) {
+                        if let completeness = data.completeness {
+                            HStack(spacing: 4) {
+                                Circle()
+                                    .fill(completeness == "complete" ? Color.orange : Color.yellow)
+                                    .frame(width: 6, height: 6)
+                                Text(completeness == "complete" ? "complete_formation".localized : "partial_formation".localized)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.white.opacity(0.08))
+                            .clipShape(Capsule())
+                        }
+                        
+                        if let severity = data.severity, severity != "none" {
+                            HStack(spacing: 4) {
+                                Circle()
+                                    .fill(severityColor(severity))
+                                    .frame(width: 6, height: 6)
+                                Text(severity.capitalized)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.white.opacity(0.08))
+                            .clipShape(Capsule())
+                        }
+                    }
+                }
+            } else {
+                // No Kalsarpa - Positive state
+                ZStack {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [.green.opacity(0.15), .clear],
+                                center: .center,
+                                startRadius: 40,
+                                endRadius: 90
+                            )
+                        )
+                        .frame(width: 180, height: 180)
+                    
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [.green.opacity(0.5), .teal.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
+                        .frame(width: 140, height: 140)
+                    
+                    Text("✨")
+                        .font(.system(size: 52))
+                        .scaleEffect(animateSnake ? 1.05 : 0.98)
+                }
+                
+                VStack(spacing: 8) {
+                    Text("no_kalsarpa".localized.uppercased())
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.green)
+                        .tracking(2)
+                    
+                    Text("planets_balanced".localized)
+                        .font(.system(size: 14))
+                        .foregroundColor(.white.opacity(0.6))
+                        .multilineTextAlignment(.center)
+                }
+            }
+        }
+        .padding(28)
+        .frame(maxWidth: .infinity)
+        .background(premiumCardBackground)
+    }
+    
+    // MARK: - Yoga Details Card (Cleaned up - no Type/Count)
+    
+    // MARK: - Consolidated Dosha Details Card
+    
+    private func doshaDetailsCard(_ data: KalaSarpaData) -> some View {
+        VStack(spacing: 20) {
+            // Header - Dosha Details
+            HStack {
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(colors: [.purple.opacity(0.3), .indigo.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "sparkle")
+                        .foregroundColor(.purple)
+                        .font(.system(size: 14))
+                }
+                Text("dosha_details".localized)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            
+            // Dosha Name and Description
+            HStack(spacing: 12) {
+                Text("🐍")
+                    .font(.system(size: 24))
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(data.displayName + " Kala Sarpa")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text(doshaDescription(data.doshaName ?? data.type ?? ""))
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.6))
+                        .lineLimit(2)
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.purple.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            
+            // Affected Life Areas Section
+            if let areas = data.lifeAreas, !areas.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "heart.text.square.fill")
+                            .foregroundColor(.orange)
+                            .font(.system(size: 14))
+                        Text("affected_areas".localized)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    
+                    FlowLayout(spacing: 8) {
+                        ForEach(areas, id: \.self) { area in
+                            HStack(spacing: 4) {
+                                Text(areaIcon(area))
+                                    .font(.system(size: 11))
+                                Text(area)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.orange.opacity(0.15))
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.orange.opacity(0.25), lineWidth: 1)
+                            )
+                        }
+                    }
+                }
+            }
+            
+            // Peak Period Section
+            if let period = data.peakPeriod, !period.isEmpty {
+                HStack(spacing: 12) {
+                    Image(systemName: "clock.fill")
+                        .foregroundColor(.cyan)
+                        .font(.system(size: 16))
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("peak_period".localized)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.white.opacity(0.5))
+                        Text(period)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    
+                    Spacer()
+                }
+                .padding(12)
+                .background(Color.cyan.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            
+            // Analysis Notes Section
+            if let notes = data.analysisNotes, !notes.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "doc.text.fill")
+                            .foregroundColor(.indigo)
+                            .font(.system(size: 14))
+                        Text("analysis_notes".localized)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(notes, id: \.self) { note in
+                            HStack(alignment: .top, spacing: 8) {
+                                Circle()
+                                    .fill(Color.indigo.opacity(0.5))
+                                    .frame(width: 5, height: 5)
+                                    .padding(.top, 5)
+                                
+                                Text(note)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.white.opacity(0.75))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(premiumCardBackground)
+    }
+    
+    // MARK: - Remedies Card
+    
+    private func remediesCard(_ remedies: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(colors: [.yellow.opacity(0.3), .orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "sparkles")
+                        .foregroundColor(.yellow)
+                        .font(.system(size: 14))
+                }
+                Text("recommended_remedies".localized)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(remedies.indices, id: \.self) { index in
+                    HStack(alignment: .top, spacing: 12) {
+                        Text("🙏")
+                            .font(.system(size: 16))
+                        
+                        Text(remedies[index])
+                            .font(.system(size: 13))
+                            .foregroundColor(.white.opacity(0.85))
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.yellow.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+        .padding(20)
+        .background(premiumCardBackground)
+    }
+    
+    // MARK: - No Data View
+    
+    private var noDataView: some View {
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 80, height: 80)
+                Image(systemName: "questionmark")
+                    .font(.system(size: 32, weight: .light))
+                    .foregroundColor(.white.opacity(0.3))
+            }
+            
+            Text("no_kalsarpa_data".localized)
+                .font(.system(size: 15))
+                .foregroundColor(.white.opacity(0.5))
+        }
+        .padding(50)
+    }
+    
+    // MARK: - Premium Card Background
+    
+    private var premiumCardBackground: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Color.white.opacity(0.04))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.white.opacity(0.1), .white.opacity(0.05), .white.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
+    }
+    
+    // MARK: - Helpers
+    
+    private func severityColor(_ severity: String) -> Color {
+        switch severity.lowercased() {
+        case "mild": return .yellow
+        case "moderate": return .orange
+        case "severe": return .red
+        default: return .gray
+        }
+    }
+    
+    private func planetEmoji(_ abbr: String) -> String {
+        switch abbr.lowercased() {
+        case "su", "sun": return "☀️"
+        case "mo", "moon": return "🌙"
+        case "ma", "mars": return "🔴"
+        case "me", "mercury": return "⚡"
+        case "ju", "jupiter": return "🟡"
+        case "ve", "venus": return "💕"
+        case "sa", "saturn": return "🪐"
+        case "ra", "rahu": return "🐍"
+        case "ke", "ketu": return "☄️"
+        default: return "⭐"
+        }
+    }
+    
+    private func planetFullName(_ abbr: String) -> String {
+        switch abbr.lowercased() {
+        case "su", "sun": return "Sun"
+        case "mo", "moon": return "Moon"
+        case "ma", "mars": return "Mars"
+        case "me", "mercury": return "Mercury"
+        case "ju", "jupiter": return "Jupiter"
+        case "ve", "venus": return "Venus"
+        case "sa", "saturn": return "Saturn"
+        default: return abbr
+        }
+    }
+    
+    private func areaIcon(_ area: String) -> String {
+        switch area.lowercased() {
+        case "mother": return "👩"
+        case "home": return "🏠"
+        case "emotions": return "💭"
+        case "career": return "💼"
+        case "health": return "❤️"
+        case "wealth": return "💰"
+        case "marriage": return "💒"
+        case "children": return "👶"
+        case "education": return "📚"
+        default: return "•"
+        }
+    }
+    
+    private func doshaDescription(_ name: String) -> String {
+        switch name.lowercased() {
+        case "shankhapal", "shankhpal": return "Affects family harmony and maternal relationships"
+        case "ananta", "anant": return "Influences spiritual growth and liberation"
+        case "kulik": return "Creates obstacles in career and professional life"
+        case "vasuki": return "Impacts wealth and financial stability"
+        case "padam", "padma": return "Affects marriage and partnerships"
+        case "mahapadam", "maha padma": return "Influences overall life direction"
+        case "takshak": return "Creates sudden changes and transformations"
+        case "karkotak": return "Impacts health and vitality"
+        case "sheshnag", "shesh": return "Affects longevity and deep subconscious"
+        case "ghatak": return "Creates hidden enemies and obstacles"
+        case "vishdhar": return "Influences communication and expression"
+        case "shankachood": return "Affects father and dharma"
+        default: return "A powerful serpent dosha affecting life path"
+        }
+    }
+}
+
+// MARK: - Flow Layout for Tags
+
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = arrange(proposal: proposal, subviews: subviews)
+        return result.size
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = arrange(proposal: proposal, subviews: subviews)
+        for (index, position) in result.positions.enumerated() {
+            subviews[index].place(at: CGPoint(x: bounds.minX + position.x, y: bounds.minY + position.y), proposal: .unspecified)
+        }
+    }
+    
+    private func arrange(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
+        var positions: [CGPoint] = []
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var maxHeight: CGFloat = 0
+        let maxWidth = proposal.width ?? .infinity
+        
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x + size.width > maxWidth && x > 0 {
+                x = 0
+                y += maxHeight + spacing
+                maxHeight = 0
+            }
+            positions.append(CGPoint(x: x, y: y))
+            x += size.width + spacing
+            maxHeight = max(maxHeight, size.height)
+        }
+        
+        return (CGSize(width: maxWidth, height: y + maxHeight), positions)
+    }
+}
+
+#Preview {
+    KalsarpaDoshaSheet(
+        boyData: nil,
+        girlData: nil,
+        boyName: "Partner A",
+        girlName: "Partner B"
+    )
+}

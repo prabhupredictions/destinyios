@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "你好！";
 "todays_insight" = "今日运势";
-"ask_destiny" = "问问 Destiny";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "今天我需要注意什么？";
@@ -79,6 +78,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "填写出生信息";
 "your_name" = "你的名字";
+"enter_your_name" = "输入你的名字";
 "date_of_birth" = "出生日期";
 "time_of_birth" = "出生时间";
 "birth_time_unknown" = "不知道具体时间";
@@ -102,8 +102,6 @@
 "partner_details" = "对方信息";
 "calculate_match" = "查看配对结果";
 "match_score" = "契合度";
-"kundali_match" = "星盘匹配";
-"ashtakoot_analysis" = "出生星盘兼容性";
 "boys_details" = "你";
 "girls_details" = "伴侣";
 "analyze_match" = "查看匹配结果";
@@ -185,3 +183,231 @@
 "name_gender_updated" = "您的姓名和性别已更新。";
 "need_update_birth_data" = "需要更新出生资料？";
 "contact_support_birth_data" = "如需更改出生日期、时间或地点，请联系我们的支持团队。";
+"gender_identity" = "性别认同";
+"select_birth_city" = "选择你的出生城市";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "共";
+"compatible" = "兼容";
+"excellent_match" = "绝佳匹配";
+"good_match" = "良好匹配";
+"moderate_match" = "中等匹配";
+"vs" = "VS";
+"ashtakoot_grid" = "八宫详情";
+"varna" = "瓦尔纳";
+"vashya" = "瓦希亚";
+"tara" = "塔拉";
+"yoni" = "约尼";
+"graha_maitri" = "玛特里";
+"gana" = "甘纳";
+"bhakoot" = "巴库特";
+"nadi" = "纳迪";
+"view_full_report" = "查看完整报告";
+"full_compatibility_report" = "完整兼容性报告";
+"points" = "分";
+"score" = "得分";
+"boy" = "他";
+"girl" = "她";
+"impact" = "影响";
+"excellent" = "优秀";
+"good" = "良好";
+"moderate" = "中等";
+"needs_care" = "需要注意";
+"mangal_dosha_status" = "曼加尔多沙状态";
+"no_dosha" = "无多沙";
+"has_dosha" = "有多沙";
+"recommended_remedies" = "推荐解决方案";
+"ask_destiny" = "询问Destiny";
+"ask_destiny_about_match" = "向Destiny询问此匹配";
+"ai_powered" = "AI驱动";
+"tap_to_ask" = "点击询问...";
+"ask_anything_match" = "关于此匹配问任何问题...";
+"quick_topics" = "快速话题";
+"ask_score" = "得分";
+"ask_dosha" = "多沙";
+"ask_weak" = "弱点";
+"ask_remedies" = "解决";
+"new_match" = "新匹配";
+
+
+
+// Match Result Additions
+"ask_more_match" = "询问更多关于此配对...";
+"mangal_dosha" = "曼格尔多沙";
+"mangal_dosha_desc" = "火星位置分析";
+"kalsarpa_dosha" = "卡尔萨帕多沙";
+"kalsarpa_dosha_desc" = "罗睺-计都轴线分析";
+"additional_yoga" = "其他瑜伽与多沙";
+"additional_yoga_desc" = "其他吉利组合";
+"charts" = "图表";
+"history" = "历史";
+"report" = "报告";
+
+// MARK: - Mangal Dosha Exceptions (Chinese Simplified)
+"exception_mars_in_own_sign" = "火星在本位（白羊座或天蝎座）";
+"exception_mars_exalted" = "火星在摩羯座入庙";
+"exception_mars_in_upachaya" = "火星在成长宫（3、6、10、11）";
+"exception_mars_in_fixed_sign" = "火星在固定星座";
+"exception_mars_in_own_navamsa" = "火星在本位纳瓦姆沙";
+"exception_mars_conjunct_benefics" = "火星与吉星合相";
+"exception_mars_benefic_nakshatra_lord" = "火星在吉祥宿";
+"exception_mars_in_benefic_nakshatra" = "火星在吉祥星座";
+"exception_mars_moon_friendly_nakshatras" = "火星和月亮在友好宿";
+"exception_mars_in_asc_lord_nakshatra" = "火星在上升主星宿";
+"exception_mars_moon_same_nakshatra_pada" = "火星和月亮在相同的帕达";
+"exception_mars_jupiter_conjunction" = "火星-木星合相";
+"exception_mars_aspected_by_jupiter" = "木星相位缓和火星";
+"exception_mars_in_jupiter_sign" = "火星在木星星座（射手座/双鱼座）";
+"exception_mars_moon_conjunction_benefic" = "火星-月亮在吉宫合相";
+"exception_mars_moon_mutual_kendra" = "火星和月亮互为角宫关系";
+"exception_mars_aspected_by_benefics" = "火星受吉星相位";
+"exception_mars_jupiter_mutual_aspects" = "火星和木星互相相位";
+"exception_mars_jupiter_in_trine" = "火星和木星在三合宫";
+"exception_mars_strong_ashtakavarga" = "火星阿什塔卡瓦尔加强";
+"exception_mars_strong_shadbala" = "火星沙德巴拉强";
+"exception_moon_strong" = "星盘中月亮强";
+
+// MARK: - Intensity Factors (Chinese Simplified)
+"intensity_mars_debilitated" = "火星在巨蟹座落陷";
+"intensity_mars_conjunct_malefics" = "火星与凶星合相";
+"intensity_mars_critical_degrees" = "火星在关键甘丹塔度数";
+"intensity_mars_papa_kartari" = "火星被凶星夹击";
+"intensity_seventh_lord_afflicted" = "第七宫主受克";
+"intensity_mars_dusthana_from_moon" = "火星在月亮的6/8/12宫";
+"intensity_mars_retrograde" = "火星逆行";
+"intensity_mars_combust" = "火星燃烧（太靠近太阳）";
+"intensity_mars_low_ashtakavarga" = "火星阿什塔卡瓦尔加弱";
+
+// MARK: - Zodiac Signs (Chinese Simplified)
+"sign_ar" = "白羊座";
+"sign_ta" = "金牛座";
+"sign_ge" = "双子座";
+"sign_ca" = "巨蟹座";
+"sign_le" = "狮子座";
+"sign_vi" = "处女座";
+"sign_li" = "天秤座";
+"sign_sc" = "天蝎座";
+"sign_sg" = "射手座";
+"sign_cp" = "摩羯座";
+"sign_aq" = "水瓶座";
+"sign_pi" = "双鱼座";
+
+// MARK: - Planets (Chinese Simplified)
+"planet_sun" = "太阳";
+"planet_moon" = "月亮";
+"planet_mars" = "火星";
+"planet_mercury" = "水星";
+"planet_jupiter" = "木星";
+"planet_venus" = "金星";
+"planet_saturn" = "土星";
+"planet_rahu" = "罗睺";
+"planet_ketu" = "计都";
+
+// MARK: - Severity/Status (Chinese Simplified)
+"severity_none" = "无";
+"severity_mild" = "轻微";
+"severity_moderate" = "中等";
+"severity_high" = "严重";
+"severity_severe" = "非常严重";
+"status_active" = "有效";
+"status_reduced" = "减弱";
+"status_cancelled" = "取消";
+"active" = "有效";
+"reduced" = "减弱";
+"cancelled" = "取消";
+
+// MARK: - Dosha UI Labels (Chinese Simplified)
+"mangal_dosha_analysis" = "曼加尔多沙分析";
+"kalsarpa_analysis" = "卡尔萨帕多沙分析";
+"yogas_analysis" = "瑜伽与多沙";
+"cancellation_active" = "多沙取消";
+"no_dosha_present" = "无多沙";
+"mitigating_factors" = "缓解因素";
+"intensifying_factors" = "加强因素";
+"planets_involved" = "涉及行星";
+"affected_areas" = "影响领域";
+"peak_period" = "高峰期";
+"planetary_configuration" = "行星配置";
+"complete_formation" = "完整形成";
+"partial_formation" = "部分形成";
+"no_kalsarpa" = "无卡尔萨帕";
+"planets_balanced" = "行星平衡";
+"formation_details" = "形成详情";
+"strength" = "强度";
+
+// MARK: - Nakshatra Names (27) - Chinese (Sanskrit transliteration)
+"nakshatra_ashwini" = "阿须毗尼";
+"nakshatra_bharani" = "婆罗尼";
+"nakshatra_krittika" = "昴宿";
+"nakshatra_rohini" = "毕宿";
+"nakshatra_mrigashira" = "参宿";
+"nakshatra_ardra" = "觜宿";
+"nakshatra_punarvasu" = "井宿";
+"nakshatra_pushya" = "鬼宿";
+"nakshatra_ashlesha" = "柳宿";
+"nakshatra_magha" = "星宿";
+"nakshatra_purva_phalguni" = "张宿";
+"nakshatra_uttara_phalguni" = "翼宿";
+"nakshatra_hasta" = "轸宿";
+"nakshatra_chitra" = "角宿";
+"nakshatra_swati" = "亢宿";
+"nakshatra_vishakha" = "氐宿";
+"nakshatra_anuradha" = "房宿";
+"nakshatra_jyeshtha" = "心宿";
+"nakshatra_moola" = "尾宿";
+"nakshatra_purva_ashadha" = "箕宿";
+"nakshatra_uttara_ashadha" = "斗宿";
+"nakshatra_shravana" = "牛宿";
+"nakshatra_dhanishtha" = "女宿";
+"nakshatra_shatabhisha" = "虚宿";
+"nakshatra_purva_bhadrapada" = "危宿";
+"nakshatra_uttara_bhadrapada" = "室宿";
+"nakshatra_revati" = "壁宿";
+
+// MARK: - New Exception Keys (8) - Chinese
+"exception_mars_yoga_karaka" = "火星是此上升点的瑜伽因子";
+"exception_mars_jupiter_yoga" = "存在火星-木星吉祥瑜伽";
+"exception_mars_venus_yoga" = "存在火星-金星吉祥瑜伽";
+"exception_mars_good_d7" = "火星在D7（七分盘）中位置良好";
+"exception_mars_good_d9" = "火星在D9（九分盘）中位置良好";
+"exception_mars_good_d10" = "火星在D10（十分盘）中位置良好";
+"exception_mars_good_d60" = "火星在D60（六十分盘）中位置良好";
+"exception_ruchaka_yoga" = "存在鲁恰卡大人物瑜伽";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - Chinese
+"mars_position" = "火星位置";
+"house_label" = "宫位";
+"sign_lord" = "星座主宰";
+"nakshatra_lord" = "星宿主宰";
+"dosha_calculation" = "灾厄计算";
+"base_strength" = "基础强度";
+"mitigation" = "缓解";
+"intensification" = "加剧";
+"final_score" = "最终得分";
+"explanation_label" = "计算详情";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

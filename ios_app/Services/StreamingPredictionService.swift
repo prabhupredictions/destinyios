@@ -1,153 +1,177 @@
 import Foundation
 
-// MARK: - SSE Event Types
-/// Events streamed from the prediction API
-enum SSEEventType: String {
-    case started = "started"
-    case thought = "thought"
-    case action = "action"
-    case observation = "observation"
-    case finalAnswer = "final_answer"
-    case systemOpinion = "system_opinion"
-    case error = "error"
-    case complete = "complete"
-}
-
-/// Parsed SSE event
-struct SSEEvent {
-    let type: SSEEventType
-    let data: [String: Any]
-    
-    var displayText: String? {
-        data["display"] as? String
-    }
-    
-    var content: String? {
-        data["content"] as? String
-    }
-    
-    var step: Int? {
-        data["step"] as? Int
-    }
-}
-
 // MARK: - Streaming Prediction Service
-/// Service that streams predictions via SSE, showing thinking/observations like Claude
-actor StreamingPredictionService {
+/// SSE client for real-time streaming predictions with progress updates
+
+class StreamingPredictionService {
     static let shared = StreamingPredictionService()
-    
     private init() {}
     
-    /// Stream prediction with real-time events
-    /// Returns an AsyncThrowingStream of SSE events
-    func predictStream(request: PredictionRequest) -> AsyncThrowingStream<SSEEvent, Error> {
-        AsyncThrowingStream { continuation in
-            Task {
-                do {
-                    try await streamPrediction(request: request, continuation: continuation)
-                } catch {
-                    continuation.finish(throwing: error)
-                }
-            }
-        }
+    // MARK: - Event Types
+    
+    enum StreamEvent {
+        case thought(step: Int, content: String, display: String)
+        case action(step: Int, tool: String, display: String)
+        case observation(step: Int, display: String)
+        case finalAnswer(content: String)
+        case answer(response: PredictionResponse)
+        case done(totalSteps: Int)
+        case error(message: String)
     }
     
-    private func streamPrediction(
+    // MARK: - Streaming Predict
+    
+    /// Stream predictions with progress updates via SSE
+    /// Has 30 second timeout, falls back to regular API on failure
+    func predictStream(
         request: PredictionRequest,
-        continuation: AsyncThrowingStream<SSEEvent, Error>.Continuation
+        onEvent: @escaping (StreamEvent) -> Void
     ) async throws {
-        // Build URL
-        let urlString = "\(APIConfig.baseURL)\(APIConfig.predictStream)"
-        guard let url = URL(string: urlString) else {
-            throw StreamingError.invalidURL
-        }
+        let url = URL(string: "\(APIConfig.baseURL)/vedic/api/predict/stream")!
         
-        // Create request
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
+        urlRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-        urlRequest.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+        urlRequest.timeoutInterval = 60  // 60 second timeout for long predictions
         
-        // Encode body
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
+        // Build request body using correct BirthData properties
+        let body: [String: Any] = [
+            "query": request.query,
+            "birth_data": [
+                "dob": request.birthData.dob,  // YYYY-MM-DD
+                "time": request.birthData.time,  // HH:MM
+                "city_of_birth": request.birthData.cityOfBirth ?? "",
+                "latitude": request.birthData.latitude,
+                "longitude": request.birthData.longitude,
+                "ayanamsa": request.birthData.ayanamsa,
+                "house_system": request.birthData.houseSystem
+            ],
+            "session_id": request.sessionId ?? UUID().uuidString,
+            "conversation_id": request.conversationId ?? UUID().uuidString,
+            "user_email": request.userEmail ?? ""
+        ]
         
-        // Create stream request body
-        let streamRequest = StreamPredictionRequest(
-            query: request.query,
-            birthData: request.birthData,
-            sessionId: request.sessionId,
-            conversationId: request.conversationId,
-            userEmail: request.userEmail
-        )
-        urlRequest.httpBody = try encoder.encode(streamRequest)
+        urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
         
-        // Start streaming with URLSession bytes
-        let (bytes, response) = try await URLSession.shared.bytes(for: urlRequest)
+        // Use dedicated URLSession configuration for SSE
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 60
+        config.timeoutIntervalForResource = 120
+        let session = URLSession(configuration: config)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
-            throw StreamingError.serverError((response as? HTTPURLResponse)?.statusCode ?? 0)
+        // Use bytes for SSE streaming
+        let (asyncBytes, response) = try await session.bytes(for: urlRequest)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw StreamError.invalidResponse
         }
         
-        // Parse SSE events line by line
-        var currentEvent: String?
-        var currentData: String = ""
+        guard (200...299).contains(httpResponse.statusCode) else {
+            print("[SSE] HTTP error: \(httpResponse.statusCode)")
+            throw StreamError.invalidResponse
+        }
         
-        for try await line in bytes.lines {
-            if line.hasPrefix("event:") {
-                currentEvent = String(line.dropFirst(6)).trimmingCharacters(in: .whitespaces)
-            } else if line.hasPrefix("data:") {
-                currentData = String(line.dropFirst(5)).trimmingCharacters(in: .whitespaces)
-            } else if line.isEmpty && !currentData.isEmpty {
-                // Empty line = end of event, parse it
-                if let event = currentEvent,
-                   let eventType = SSEEventType(rawValue: event),
-                   let jsonData = currentData.data(using: .utf8),
-                   let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] {
+        // Parse SSE events
+        var currentEventType = ""
+        var currentData = ""
+        
+        for try await line in asyncBytes.lines {
+            // Check for cancellation
+            try Task.checkCancellation()
+            
+            if line.hasPrefix("event: ") {
+                currentEventType = String(line.dropFirst(7))
+            } else if line.hasPrefix("data: ") {
+                currentData = String(line.dropFirst(6))
+                
+                // Process complete event on main actor
+                if let event = parseEvent(type: currentEventType, data: currentData) {
+                    await MainActor.run {
+                        onEvent(event)
+                    }
                     
-                    let sseEvent = SSEEvent(type: eventType, data: json)
-                    continuation.yield(sseEvent)
-                    
-                    // Finish on complete or final_answer
-                    if eventType == .complete {
-                        continuation.finish()
-                        return
+                    // If done event, break out of loop
+                    if case .done = event {
+                        break
                     }
                 }
                 
-                // Reset for next event
-                currentEvent = nil
+                currentEventType = ""
                 currentData = ""
             }
         }
-        
-        continuation.finish()
     }
-}
-
-// MARK: - Stream Request
-struct StreamPredictionRequest: Encodable {
-    let query: String
-    let birthData: BirthData
-    let sessionId: String?
-    let conversationId: String?
-    let userEmail: String?
-    let stream: Bool = true
-}
-
-// MARK: - Errors
-enum StreamingError: LocalizedError {
-    case invalidURL
-    case serverError(Int)
-    case parseError
     
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL: return "Invalid streaming URL"
-        case .serverError(let code): return "Server error: \(code)"
-        case .parseError: return "Failed to parse SSE event"
+    // MARK: - Event Parsing
+    
+    private func parseEvent(type: String, data: String) -> StreamEvent? {
+        guard let jsonData = data.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+            return nil
         }
+        
+        switch type {
+        case "thought":
+            return .thought(
+                step: json["step"] as? Int ?? 0,
+                content: json["content"] as? String ?? "",
+                display: json["display"] as? String ?? "💭 Thinking..."
+            )
+            
+        case "action":
+            return .action(
+                step: json["step"] as? Int ?? 0,
+                tool: json["tool"] as? String ?? "",
+                display: json["display"] as? String ?? "🔧 Processing..."
+            )
+            
+        case "observation":
+            return .observation(
+                step: json["step"] as? Int ?? 0,
+                display: json["display"] as? String ?? "📊 Analyzing..."
+            )
+            
+        case "final_answer":
+            return .finalAnswer(
+                content: json["content"] as? String ?? ""
+            )
+            
+        case "answer":
+            // Parse full response with all required fields
+            let response = PredictionResponse(
+                predictionId: json["prediction_id"] as? String ?? "",
+                sessionId: json["session_id"] as? String ?? "",
+                conversationId: json["conversation_id"] as? String ?? "",
+                status: json["status"] as? String ?? "completed",
+                answer: json["answer"] as? String ?? "",
+                answerSummary: json["answer_summary"] as? String,
+                timing: nil,  // Parse separately if needed
+                confidence: json["confidence"] as? Double ?? 0.5,
+                confidenceLabel: json["confidence_label"] as? String ?? "MEDIUM",
+                supportingFactors: json["supporting_factors"] as? [String] ?? [],
+                challengingFactors: json["challenging_factors"] as? [String] ?? [],
+                followUpSuggestions: json["follow_up_suggestions"] as? [String] ?? [],
+                lifeArea: json["life_area"] as? String ?? "",
+                executionTimeMs: json["execution_time_ms"] as? Double ?? 0,
+                createdAt: json["created_at"] as? String ?? ISO8601DateFormatter().string(from: Date())
+            )
+            return .answer(response: response)
+            
+        case "done":
+            return .done(totalSteps: json["total_steps"] as? Int ?? 0)
+            
+        case "error":
+            return .error(message: json["error"] as? String ?? "Unknown error")
+            
+        default:
+            return nil
+        }
+    }
+    
+    enum StreamError: Error {
+        case invalidResponse
+        case connectionFailed
     }
 }

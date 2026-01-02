@@ -17,12 +17,25 @@ class HomeViewModel {
     var isPremium = false
     var userType: UserType = .guest
     
+    // MARK: - New Premium State
+    var currentDasha: String = "Loading..."
+    var moonSign: String = ""
+    var lifeAreas: [String: LifeAreaStatus] = [:]
+    var currentTransits: [TransitDisplayData] = []
+    
+    struct TransitDisplayData: Identifiable {
+        let id = UUID()
+        let planet: String
+        let sign: String
+        let house: Int
+    }
+    
     // MARK: - Dependencies
-    private let predictionService: PredictionServiceProtocol?
+    private let predictionService: PredictionServiceProtocol
     private let quotaManager = QuotaManager.shared
     
     // MARK: - Init
-    init(predictionService: PredictionServiceProtocol? = nil) {
+    init(predictionService: PredictionServiceProtocol = PredictionService()) {
         self.predictionService = predictionService
         loadUserInfo()
     }
@@ -57,29 +70,85 @@ class HomeViewModel {
         }
     }
     
-    // MARK: - Load Home Data (with backend sync)
+    // MARK: - Load Home Data
     func loadHomeData() async {
         await MainActor.run {
             isLoading = true
             errorMessage = nil
         }
         
-        // Sync quota from backend
+        // Sync quota
         await syncQuotaFromBackend()
         
-        // Generate daily insight
-        await MainActor.run {
-            dailyInsight = generateDailyInsight()
-            
-            suggestedQuestions = [
-                "What should I be mindful of today?",
-                "How can I improve my focus and productivity?",
-                "What's a good time for important decisions?",
-                "What does my chart say about relationships?"
-            ]
-            
-            isLoading = false
+        // Fetch Prediction
+        guard let birthData = loadBirthData() else {
+            // Guest or no data - fallback to generic
+            await MainActor.run { 
+                self.dailyInsight = "Sign in or add birth details to unlock your daily cosmic forecast."
+                self.isLoading = false 
+            }
+            return
         }
+        
+        // Check local cache first
+        if let cached = TodaysPredictionCache.shared.get() {
+            await MainActor.run {
+                self.applyPredictionResponse(cached)
+                self.isLoading = false
+            }
+            return
+        }
+        
+        do {
+            // Pass user email for backend caching
+            let userEmail = UserDefaults.standard.string(forKey: "userEmail")
+            let request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail)
+            let response = try await predictionService.getTodaysPrediction(request: request)
+            
+            // Cache locally
+            TodaysPredictionCache.shared.set(response)
+            
+            await MainActor.run {
+                self.applyPredictionResponse(response)
+                self.isLoading = false
+            }
+        } catch {
+            print("Error fetching prediction: \(error)")
+            await MainActor.run {
+                self.errorMessage = "Failed to load cosmic data."
+                self.isLoading = false
+            }
+        }
+    }
+    
+    /// Apply prediction response to view state
+    private func applyPredictionResponse(_ response: TodaysPredictionResponse) {
+        self.dailyInsight = response.todaysInsight
+        self.currentDasha = response.currentDasha
+        self.suggestedQuestions = response.mindQuestions
+        self.lifeAreas = response.lifeAreas
+        
+        // Parse Transits
+        if let transits = response.currentTransits {
+            self.currentTransits = transits.map { key, value in
+                TransitDisplayData(planet: key, sign: value.sign, house: value.houseFromLagna)
+            }.sorted { $0.house < $1.house }
+            
+            // Set Moon Sign
+            if let moon = transits["Moon"] {
+                self.moonSign = moon.sign
+            }
+        }
+    }
+    
+    private func loadBirthData() -> UserBirthData? {
+        // Try userBirthData (new) then birthData (legacy)
+        let key = UserDefaults.standard.object(forKey: "userBirthData") != nil ? "userBirthData" : "birthData"
+        guard let data = UserDefaults.standard.data(forKey: key),
+              let birthData = try? JSONDecoder().decode(UserBirthData.self, from: data) else {
+            return nil
+        }
+        return birthData
     }
     
     // MARK: - Backend Sync
@@ -140,18 +209,12 @@ class HomeViewModel {
     }
     
     var greetingMessage: String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        switch hour {
-        case 0..<5: return "Good night"
-        case 5..<12: return "Good morning"
-        case 12..<17: return "Good afternoon"
-        default: return "Good evening"
-        }
+        return "Hey"
     }
     
     var displayName: String {
         if isGuest {
-            return "Guest"
+            return "there"
         }
         return userName.isEmpty ? "there" : userName.components(separatedBy: " ").first ?? userName
     }

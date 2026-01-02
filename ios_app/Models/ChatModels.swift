@@ -22,6 +22,7 @@ final class LocalChatMessage {
     var sources: [String]  // References (non-optional)
     var createdAt: Date
     var isStreaming: Bool
+    var executionTimeMs: Double = 0  // Prediction execution time in milliseconds
     
     init(
         id: String = UUID().uuidString,
@@ -34,7 +35,8 @@ final class LocalChatMessage {
         toolCalls: [String] = [],
         sources: [String] = [],
         createdAt: Date = Date(),
-        isStreaming: Bool = false
+        isStreaming: Bool = false,
+        executionTimeMs: Double = 0
     ) {
         self.id = id
         self.threadId = threadId
@@ -47,6 +49,7 @@ final class LocalChatMessage {
         self.sources = sources
         self.createdAt = createdAt
         self.isStreaming = isStreaming
+        self.executionTimeMs = executionTimeMs
     }
     
     var messageRole: MessageRole {

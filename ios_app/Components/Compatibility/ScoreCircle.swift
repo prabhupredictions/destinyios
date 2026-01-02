@@ -123,6 +123,78 @@ struct KutaRow: View {
     }
 }
 
+// MARK: - Kuta Grid Item (Compact box for grid display)
+struct KutaGridItem: View {
+    let kuta: KutaDetail
+    
+    private var backgroundColor: Color {
+        let percentage = kuta.percentage
+        if percentage >= 0.75 {
+            return Color.green.opacity(0.15)
+        } else if percentage >= 0.50 {
+            return Color("GoldAccent").opacity(0.15)
+        } else if percentage >= 0.25 {
+            return Color.orange.opacity(0.15)
+        } else {
+            return Color.red.opacity(0.15)
+        }
+    }
+    
+    private var textColor: Color {
+        let percentage = kuta.percentage
+        if percentage >= 0.75 {
+            return Color.green
+        } else if percentage >= 0.50 {
+            return Color("GoldAccent")
+        } else if percentage >= 0.25 {
+            return Color.orange
+        } else {
+            return Color.red
+        }
+    }
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            // Score
+            Text("\(kuta.points)/\(kuta.maxPoints)")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(textColor)
+            
+            // Name
+            Text(kuta.name.uppercased())
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(Color("TextDark").opacity(0.6))
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(backgroundColor)
+        )
+    }
+}
+
+// MARK: - Kuta Grid (4x2 layout)
+struct KutaGrid: View {
+    let kutas: [KutaDetail]
+    
+    private let columns = [
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8)
+    ]
+    
+    var body: some View {
+        LazyVGrid(columns: columns, spacing: 8) {
+            ForEach(kutas) { kuta in
+                KutaGridItem(kuta: kuta)
+            }
+        }
+    }
+}
+
 // MARK: - Previews
 #Preview("Score Circle") {
     VStack(spacing: 40) {
@@ -139,5 +211,19 @@ struct KutaRow: View {
         KutaRow(kuta: KutaDetail(name: "Bhakoot", maxPoints: 7, points: 5))
         KutaRow(kuta: KutaDetail(name: "Gana", maxPoints: 6, points: 2))
     }
+    .padding()
+}
+
+#Preview("Kuta Grid") {
+    KutaGrid(kutas: [
+        KutaDetail(name: "Varna", maxPoints: 1, points: 1),
+        KutaDetail(name: "Vashya", maxPoints: 2, points: 1),
+        KutaDetail(name: "Tara", maxPoints: 3, points: 0),
+        KutaDetail(name: "Yoni", maxPoints: 4, points: 4),
+        KutaDetail(name: "Maitri", maxPoints: 5, points: 2),
+        KutaDetail(name: "Gana", maxPoints: 6, points: 6),
+        KutaDetail(name: "Bhakoot", maxPoints: 7, points: 4),
+        KutaDetail(name: "Nadi", maxPoints: 8, points: 4)
+    ])
     .padding()
 }

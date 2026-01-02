@@ -8,45 +8,61 @@ struct InsightCard: View {
     var isLoading: Bool = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color("GoldAccent"))
+        VStack(alignment: .leading, spacing: 16) {
+            // Header with icon glow
+            HStack(spacing: 10) {
+                // Icon with subtle glow
+                ZStack {
+                    // Glow effect
+                    Circle()
+                        .fill(Color("GoldAccent").opacity(0.3))
+                        .frame(width: 28, height: 28)
+                        .blur(radius: 6)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(Color("GoldAccent"))
+                }
                 
-                Text(title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color("TextDark").opacity(0.6))
+                Text(title.uppercased())
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(Color("TextDark").opacity(0.5))
+                    .tracking(1.2)
                 
                 Spacer()
+                
+                // Decorative dots
+                HStack(spacing: 4) {
+                    Circle().fill(Color("GoldAccent").opacity(0.6)).frame(width: 4, height: 4)
+                    Circle().fill(Color("GoldAccent").opacity(0.3)).frame(width: 4, height: 4)
+                }
             }
             
             // Content
             if isLoading {
                 // Skeleton loading
-                VStack(alignment: .leading, spacing: 8) {
-                    SkeletonLine(width: 0.9)
-                    SkeletonLine(width: 0.75)
-                    SkeletonLine(width: 0.5)
+                VStack(alignment: .leading, spacing: 10) {
+                    SkeletonLine(width: 0.95)
+                    SkeletonLine(width: 0.8)
+                    SkeletonLine(width: 0.55)
                 }
             } else {
                 Text(insight)
-                    .font(.system(size: 16, weight: .regular))
+                    .font(.system(size: 17, weight: .regular))
                     .foregroundColor(Color("NavyPrimary"))
-                    .lineSpacing(6)
+                    .lineSpacing(7)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
+        .padding(22)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color("NavyPrimary").opacity(0.03),
-                            Color("GoldAccent").opacity(0.05)
+                            Color(red: 0.99, green: 0.97, blue: 0.94),  // #FDF8F0 warm ivory
+                            Color(red: 0.98, green: 0.95, blue: 0.90)   // #FAF2E6 soft cream
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -54,9 +70,20 @@ struct InsightCard: View {
                 )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color("NavyPrimary").opacity(0.08), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.35),  // #D4AF37 gold
+                            Color(red: 0.91, green: 0.84, blue: 0.72).opacity(0.2)    // #E8D5B7 champagne
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
         )
+        .shadow(color: Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.12), radius: 16, x: 0, y: 6)
     }
 }
 

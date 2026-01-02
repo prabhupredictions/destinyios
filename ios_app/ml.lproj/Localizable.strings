@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "നമസ്കാരം!";
 "todays_insight" = "ഇന്നത്തെ രാശിഫലം";
-"ask_destiny" = "Destiny-യോട് ചോദിക്കൂ";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "ഇന്ന് ഞാൻ എന്ത് ശ്രദ്ധിക്കണം?";
@@ -102,8 +101,6 @@
 "partner_details" = "പങ്കാളിയുടെ വിവരം";
 "calculate_match" = "പൊരുത്തം നോക്കുക";
 "match_score" = "പൊരുത്ത സ്കോർ";
-"kundali_match" = "ചാര്ട്ട് മാച്ച്";
-"ashtakoot_analysis" = "ജനന ചാര്ട്ട് കംപാറ്റിബിലിറ്റി";
 "boys_details" = "നിങ്ങൾ";
 "girls_details" = "പങ്കാളി";
 "analyze_match" = "കംപാറ്റിബിലിറ്റി ചെക്ക് ചെയ്യുക";
@@ -185,3 +182,232 @@
 "name_gender_updated" = "നിങ്ങളുടെ പേരും ലിംഗവും അപ്ഡേറ്റ് ചെയ്തു.";
 "need_update_birth_data" = "ജനന ഡാറ്റ അപ്ഡേറ്റ് ചെയ്യണോ?";
 "contact_support_birth_data" = "ജനന തീയതി, സമയം അല്ലെങ്കിൽ സ്ഥലം മാറ്റാൻ, സപ്പോർട്ട് ടീമിനെ ബന്ധപ്പെടുക.";
+"gender_identity" = "ലിംഗ സ്വത്വം";
+"select_birth_city" = "നിങ്ങളുടെ ജന്മ നഗരം തിരഞ്ഞെടുക്കുക";
+"enter_your_name" = "നിങ്ങളുടെ പേര് നൽകുക";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "ൽ";
+"compatible" = "പൊരുത്തം";
+"excellent_match" = "മികച്ച പൊരുത്തം";
+"good_match" = "നല്ല പൊരുത്തം";
+"moderate_match" = "മിതമായ പൊരുത്തം";
+"vs" = "VS";
+"ashtakoot_grid" = "അഷ്ടകൂട വിശദാംശങ്ങൾ";
+"varna" = "വർണ്ണം";
+"vashya" = "വശ്യം";
+"tara" = "താര";
+"yoni" = "യോനി";
+"graha_maitri" = "മൈത്രി";
+"gana" = "ഗണം";
+"bhakoot" = "ഭകൂട്";
+"nadi" = "നാഡി";
+"view_full_report" = "പൂർണ്ണ റിപ്പോർട്ട് കാണുക";
+"full_compatibility_report" = "പൂർണ്ണ പൊരുത്ത റിപ്പോർട്ട്";
+"points" = "പോയിന്റുകൾ";
+"score" = "സ്കോർ";
+"boy" = "വരൻ";
+"girl" = "വധു";
+"impact" = "സ്വാധീനം";
+"excellent" = "മികച്ചത്";
+"good" = "നല്ലത്";
+"moderate" = "മിതമായ";
+"needs_care" = "ശ്രദ്ധ ആവശ്യമാണ്";
+"mangal_dosha_status" = "ചൊവ്വ ദോഷം നില";
+"no_dosha" = "ദോഷമില്ല";
+"has_dosha" = "ദോഷമുണ്ട്";
+"recommended_remedies" = "ശുപാർശ ചെയ്ത പരിഹാരങ്ങൾ";
+"ask_destiny" = "Destiny-യോട് ചോദിക്കുക";
+"ask_destiny_about_match" = "ഈ പൊരുത്തത്തെ കുറിച്ച് ചോദിക്കുക";
+"ai_powered" = "AI പവർഡ്";
+"tap_to_ask" = "ചോദിക്കാൻ ടാപ്പ് ചെയ്യുക...";
+"ask_anything_match" = "ഈ പൊരുത്തത്തെ കുറിച്ച് എന്തും ചോദിക്കുക...";
+"quick_topics" = "ദ്രുത വിഷയങ്ങൾ";
+"ask_score" = "സ്കോർ";
+"ask_dosha" = "ദോഷം";
+"ask_weak" = "ബലഹീനത";
+"ask_remedies" = "പരിഹാരം";
+"new_match" = "പുതിയ പൊരുത്തം";
+
+
+
+// Match Result Additions
+"ask_more_match" = "ഈ പൊരുത്തത്തെക്കുറിച്ച് കൂടുതൽ ചോദിക്കുക...";
+"mangal_dosha" = "ചൊവ്വ ദോഷം";
+"mangal_dosha_desc" = "ചൊവ്വ സ്ഥാനം വിശകലനം";
+"kalsarpa_dosha" = "കാളസര്പ്പ ദോഷം";
+"kalsarpa_dosha_desc" = "രാഹു-കേതു വിശകലനം";
+"additional_yoga" = "അധിക യോഗവും ദോഷവും";
+"additional_yoga_desc" = "മറ്റ് ശുഭകരമായ യോഗങ്ങൾ";
+"charts" = "ചാർട്ട്";
+"history" = "ചരിത്രം";
+"report" = "റിപ്പോർട്ട്";
+
+// MARK: - Mangal Dosha Exceptions (Malayalam)
+"exception_mars_in_own_sign" = "ചൊവ്വ സ്വന്തം രാശിയിൽ (മേടം അല്ലെങ്കിൽ വൃശ്ചികം)";
+"exception_mars_exalted" = "ചൊവ്വ മകരത്തിൽ ഉച്ചത്തിൽ";
+"exception_mars_in_upachaya" = "ചൊവ്വ ഉപചയ ഭാവങ്ങളിൽ (3, 6, 10, 11)";
+"exception_mars_in_fixed_sign" = "ചൊവ്വ സ്ഥിര രാശിയിൽ";
+"exception_mars_in_own_navamsa" = "ചൊവ്വ സ്വന്തം നവാംശത്തിൽ";
+"exception_mars_conjunct_benefics" = "ചൊവ്വ ശുഭഗ്രഹങ്ങളോടൊപ്പം";
+"exception_mars_benefic_nakshatra_lord" = "ചൊവ്വ ശുഭ നക്ഷത്രത്തിൽ";
+"exception_mars_in_benefic_nakshatra" = "ചൊവ്വ നല്ല നക്ഷത്രത്തിൽ";
+"exception_mars_moon_friendly_nakshatras" = "ചൊവ്വ-ചന്ദ്രൻ സൗഹൃദ നക്ഷത്രങ്ങളിൽ";
+"exception_mars_in_asc_lord_nakshatra" = "ചൊവ്വ ലഗ്നാധിപതി നക്ഷത്രത്തിൽ";
+"exception_mars_moon_same_nakshatra_pada" = "ചൊവ്വ-ചന്ദ്രൻ ഒരേ നക്ഷത്ര പാദത്തിൽ";
+"exception_mars_jupiter_conjunction" = "ചൊവ്വ-വ്യാഴം യോഗം";
+"exception_mars_aspected_by_jupiter" = "വ്യാഴത്തിന്റെ ദൃഷ്ടി ചൊവ്വയെ ശാന്തമാക്കുന്നു";
+"exception_mars_in_jupiter_sign" = "ചൊവ്വ വ്യാഴ രാശിയിൽ (ധനു/മീനം)";
+"exception_mars_moon_conjunction_benefic" = "ചൊവ്വ-ചന്ദ്രൻ ശുഭ ഭാവത്തിൽ യോഗം";
+"exception_mars_moon_mutual_kendra" = "ചൊവ്വ-ചന്ദ്രൻ കേന്ദ്ര ബന്ധത്തിൽ";
+"exception_mars_aspected_by_benefics" = "ചൊവ്വയ്ക്ക് ശുഭഗ്രഹ ദൃഷ്ടി";
+"exception_mars_jupiter_mutual_aspects" = "ചൊവ്വ-വ്യാഴം പരസ്പര ദൃഷ്ടി";
+"exception_mars_jupiter_in_trine" = "ചൊവ്വ-വ്യാഴം ത്രികോണ ഭാവങ്ങളിൽ";
+"exception_mars_strong_ashtakavarga" = "ചൊവ്വയ്ക്ക് ശക്തമായ അഷ്ടകവർഗ്ഗം";
+"exception_mars_strong_shadbala" = "ചൊവ്വയ്ക്ക് ശക്തമായ ഷഡ്ബലം";
+"exception_moon_strong" = "ജാതകത്തിൽ ചന്ദ്രൻ ശക്തം";
+
+// MARK: - Intensity Factors (Malayalam)
+"intensity_mars_debilitated" = "ചൊവ്വ കർക്കടകത്തിൽ നീചം";
+"intensity_mars_conjunct_malefics" = "ചൊവ്വ പാപഗ്രഹങ്ങളോടൊപ്പം";
+"intensity_mars_critical_degrees" = "ചൊവ്വ ഗണ്ഡാന്ത അംശത്തിൽ";
+"intensity_mars_papa_kartari" = "ചൊവ്വ പാപകർത്തരി യോഗത്തിൽ";
+"intensity_seventh_lord_afflicted" = "സപ്തമാധിപതി പീഡിതൻ";
+"intensity_mars_dusthana_from_moon" = "ചൊവ്വ ചന്ദ്രനിൽ നിന്ന് 6/8/12";
+"intensity_mars_retrograde" = "ചൊവ്വ വക്രഗതിയിൽ";
+"intensity_mars_combust" = "ചൊവ്വ അസ്തം";
+"intensity_mars_low_ashtakavarga" = "ചൊവ്വയ്ക്ക് കുറഞ്ഞ അഷ്ടകവർഗ്ഗം";
+
+// MARK: - Zodiac Signs (Malayalam)
+"sign_ar" = "മേടം";
+"sign_ta" = "ഇടവം";
+"sign_ge" = "മിഥുനം";
+"sign_ca" = "കർക്കടകം";
+"sign_le" = "ചിങ്ങം";
+"sign_vi" = "കന്നി";
+"sign_li" = "തുലാം";
+"sign_sc" = "വൃശ്ചികം";
+"sign_sg" = "ധനു";
+"sign_cp" = "മകരം";
+"sign_aq" = "കുംഭം";
+"sign_pi" = "മീനം";
+
+// MARK: - Planets (Malayalam)
+"planet_sun" = "സൂര്യൻ";
+"planet_moon" = "ചന്ദ്രൻ";
+"planet_mars" = "ചൊവ്വ";
+"planet_mercury" = "ബുധൻ";
+"planet_jupiter" = "വ്യാഴം";
+"planet_venus" = "ശുക്രൻ";
+"planet_saturn" = "ശനി";
+"planet_rahu" = "രാഹു";
+"planet_ketu" = "കേതു";
+
+// MARK: - Severity/Status (Malayalam)
+"severity_none" = "ഇല്ല";
+"severity_mild" = "നേരിയ";
+"severity_moderate" = "മിതമായ";
+"severity_high" = "തീവ്രം";
+"severity_severe" = "അതിതീവ്രം";
+"status_active" = "സജീവം";
+"status_reduced" = "കുറഞ്ഞു";
+"status_cancelled" = "റദ്ദാക്കി";
+"active" = "സജീവം";
+"reduced" = "കുറഞ്ഞു";
+"cancelled" = "റദ്ദാക്കി";
+
+// MARK: - Dosha UI Labels (Malayalam)
+"mangal_dosha_analysis" = "ചൊവ്വ ദോഷ വിശകലനം";
+"kalsarpa_analysis" = "കാളസർപ്പ ദോഷ വിശകലനം";
+"yogas_analysis" = "യോഗങ്ങളും ദോഷങ്ങളും";
+"cancellation_active" = "ദോഷം റദ്ദാക്കി";
+"no_dosha_present" = "ദോഷം ഇല്ല";
+"mitigating_factors" = "കുറയ്ക്കുന്ന ഘടകങ്ങൾ";
+"intensifying_factors" = "തീവ്രമാക്കുന്ന ഘടകങ്ങൾ";
+"planets_involved" = "ബന്ധപ്പെട്ട ഗ്രഹങ്ങൾ";
+"affected_areas" = "ബാധിത മേഖലകൾ";
+"peak_period" = "ഉച്ച കാലഘട്ടം";
+"planetary_configuration" = "ഗ്രഹ വിന്യാസം";
+"complete_formation" = "പൂർണ രൂപീകരണം";
+"partial_formation" = "ഭാഗിക രൂപീകരണം";
+"no_kalsarpa" = "കാളസർപ്പം ഇല്ല";
+"planets_balanced" = "ഗ്രഹങ്ങൾ സമതുലിതം";
+"formation_details" = "രൂപീകരണ വിശദാംശങ്ങൾ";
+"strength" = "ശക്തി";
+
+// MARK: - Nakshatra Names (27) - Malayalam
+"nakshatra_ashwini" = "അശ്വതി";
+"nakshatra_bharani" = "ഭരണി";
+"nakshatra_krittika" = "കാർത്തിക";
+"nakshatra_rohini" = "രോഹിണി";
+"nakshatra_mrigashira" = "മകയിരം";
+"nakshatra_ardra" = "തിരുവാതിര";
+"nakshatra_punarvasu" = "പുണർതം";
+"nakshatra_pushya" = "പൂയം";
+"nakshatra_ashlesha" = "ആയില്യം";
+"nakshatra_magha" = "മകം";
+"nakshatra_purva_phalguni" = "പൂരം";
+"nakshatra_uttara_phalguni" = "ഉത്രം";
+"nakshatra_hasta" = "അത്തം";
+"nakshatra_chitra" = "ചിത്തിര";
+"nakshatra_swati" = "ചോതി";
+"nakshatra_vishakha" = "വിശാഖം";
+"nakshatra_anuradha" = "അനിഴം";
+"nakshatra_jyeshtha" = "തൃക്കേട്ട";
+"nakshatra_moola" = "മൂലം";
+"nakshatra_purva_ashadha" = "പൂരാടം";
+"nakshatra_uttara_ashadha" = "ഉത്രാടം";
+"nakshatra_shravana" = "തിരുവോണം";
+"nakshatra_dhanishtha" = "അവിട്ടം";
+"nakshatra_shatabhisha" = "ചതയം";
+"nakshatra_purva_bhadrapada" = "പൂരുരുട്ടാതി";
+"nakshatra_uttara_bhadrapada" = "ഉത്രട്ടാതി";
+"nakshatra_revati" = "രേവതി";
+
+// MARK: - New Exception Keys (8) - Malayalam
+"exception_mars_yoga_karaka" = "ചൊവ്വ ഈ ലഗ്നത്തിന് യോഗകാരകൻ";
+"exception_mars_jupiter_yoga" = "ചൊവ്വ-ഗുരു ശുഭ യോഗം ഉണ്ട്";
+"exception_mars_venus_yoga" = "ചൊവ്വ-ശുക്രൻ ശുഭ യോഗം ഉണ്ട്";
+"exception_mars_good_d7" = "D7 (സപ്താംശ) ചാർട്ടിൽ ചൊവ്വ നല്ല സ്ഥാനത്ത്";
+"exception_mars_good_d9" = "D9 (നവാംശ) ചാർട്ടിൽ ചൊവ്വ നല്ല സ്ഥാനത്ത്";
+"exception_mars_good_d10" = "D10 (ദശാംശ) ചാർട്ടിൽ ചൊവ്വ നല്ല സ്ഥാനത്ത്";
+"exception_mars_good_d60" = "D60 (ഷഷ്ട്യാംശ) ചാർട്ടിൽ ചൊവ്വ നല്ല സ്ഥാനത്ത്";
+"exception_ruchaka_yoga" = "രുചക മഹാപുരുഷ യോഗം ഉണ്ട്";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - Malayalam
+"mars_position" = "ചൊവ്വയുടെ സ്ഥാനം";
+"house_label" = "ഭാവം";
+"sign_lord" = "രാശി അധിപൻ";
+"nakshatra_lord" = "നക്ഷത്ര അധിപൻ";
+"dosha_calculation" = "ദോഷ കണക്കുകൂട്ടൽ";
+"base_strength" = "അടിസ്ഥാന ശക്തി";
+"mitigation" = "ലഘൂകരണം";
+"intensification" = "തീവ്രത";
+"final_score" = "അന്തിമ സ്കോർ";
+"explanation_label" = "കണക്കുകൂട്ടൽ വിശദാംശങ്ങൾ";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

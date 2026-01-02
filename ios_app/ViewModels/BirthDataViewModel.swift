@@ -41,14 +41,15 @@ class BirthDataViewModel {
     
     var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .long
+        formatter.dateFormat = "dd/MM/yyyy"
         return formatter.string(from: dateOfBirth)
     }
     
     var formattedTime: String {
-        if timeUnknown { return "Unknown" }
+        if timeUnknown { return "birth_time_unknown".localized }
         let formatter = DateFormatter()
-        formatter.timeStyle = .short
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "h:mm a"
         return formatter.string(from: timeOfBirth)
     }
     

@@ -8,6 +8,17 @@ struct AppHeader: View {
     var onMenuTap: (() -> Void)? = nil
     var onProfileTap: (() -> Void)? = nil
     
+    // User info for profile button
+    @AppStorage("userName") private var userName = ""
+    @AppStorage("isGuest") private var isGuest = false
+    
+    // First letter of user name
+    private var userInitial: String? {
+        let trimmedName = userName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return nil }
+        return String(trimmedName.prefix(1)).uppercased()
+    }
+    
     var body: some View {
         HStack(spacing: 16) {
             // Menu button
@@ -39,10 +50,25 @@ struct AppHeader: View {
             // Profile button
             if showProfileButton {
                 Button(action: { onProfileTap?() }) {
-                    Image(systemName: "person.circle.fill")
-                        .font(.system(size: 26))
-                        .foregroundColor(Color("NavyPrimary").opacity(0.7))
+                    if let initial = userInitial {
+                        // Show user's first letter in a circle
+                        ZStack {
+                            Circle()
+                                .fill(Color("NavyPrimary"))
+                                .frame(width: 32, height: 32)
+                            
+                            Text(initial)
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
+                        }
                         .frame(width: 44, height: 44)
+                    } else {
+                        // Guest user - show person icon
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 26))
+                            .foregroundColor(Color("NavyPrimary").opacity(0.7))
+                            .frame(width: 44, height: 44)
+                    }
                 }
             } else {
                 Spacer()
@@ -57,30 +83,11 @@ struct AppHeader: View {
 // MARK: - Logo View
 struct LogoView: View {
     var body: some View {
-        HStack(spacing: 8) {
-            // Logo circle with D
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.85)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 32, height: 32)
-                    .shadow(color: Color("GoldAccent").opacity(0.3), radius: 4, y: 2)
-                
-                Text("D")
-                    .font(.system(size: 16, weight: .medium, design: .serif))
-                    .foregroundColor(Color("NavyPrimary"))
-            }
-            
-            // App name
-            Text("destiny")
-                .font(.system(size: 22, weight: .light))
-                .foregroundColor(Color("NavyPrimary"))
-        }
+        // Destiny wordmark logo
+        Image("destiny_home")
+            .resizable()
+            .scaledToFit()
+            .frame(height: 28)  // Height controls size, width auto-scales
     }
 }
 
@@ -138,6 +145,65 @@ struct ChatHeader: View {
     }
 }
 
+// MARK: - Match Result Header (with back, history, charts, new match buttons)
+struct MatchResultHeader: View {
+    var onBackTap: (() -> Void)? = nil
+    var onHistoryTap: (() -> Void)? = nil
+    var onChartTap: (() -> Void)? = nil
+    var onNewMatchTap: (() -> Void)? = nil
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Back button
+            Button(action: { onBackTap?() }) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(Color("NavyPrimary"))
+                    .frame(width: 44, height: 44)
+            }
+            
+            // History button
+            Button(action: { onHistoryTap?() }) {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(Color("NavyPrimary"))
+                    .frame(width: 40, height: 40)
+            }
+            
+            Spacer()
+            
+            // Title with heart icon
+            HStack(spacing: 4) {
+                Text("💕")
+                    .font(.system(size: 16))
+                Text("kundali_match".localized)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(Color("NavyPrimary"))
+            }
+            
+            Spacer()
+            
+            // Chart button
+            Button(action: { onChartTap?() }) {
+                Image(systemName: "globe.asia.australia")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(Color("NavyPrimary"))
+                    .frame(width: 40, height: 40)
+            }
+            
+            // New match button
+            Button(action: { onNewMatchTap?() }) {
+                Image(systemName: "square.and.pencil")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(Color("NavyPrimary"))
+                    .frame(width: 40, height: 40)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+}
+
 // MARK: - Previews
 #Preview("App Header") {
     VStack {
@@ -155,7 +221,16 @@ struct ChatHeader: View {
     .background(Color(red: 0.96, green: 0.95, blue: 0.98))
 }
 
+#Preview("Match Result Header") {
+    VStack {
+        MatchResultHeader()
+        Spacer()
+    }
+    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+}
+
 #Preview("Logo") {
     LogoView()
         .padding()
 }
+

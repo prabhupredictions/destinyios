@@ -18,7 +18,8 @@ class AuthViewModel {
     private let keychain: KeychainService
     
     // MARK: - Init
-    init(authService: AuthServiceProtocol = MockAuthService(), keychain: KeychainService = .shared) {
+    /// Use AppleAuthService for real Apple Sign-In (Google still needs SDK setup)
+    init(authService: AuthServiceProtocol = AppleAuthService(), keychain: KeychainService = .shared) {
         self.authService = authService
         self.keychain = keychain
         checkExistingSession()
@@ -78,6 +79,8 @@ class AuthViewModel {
     
     /// Async version for testing
     func signOutAsync() async {
+        let wasGuest = UserDefaults.standard.bool(forKey: "isGuest")
+        
         await authService.signOut()
         
         // Clear state
@@ -91,11 +94,22 @@ class AuthViewModel {
         keychain.delete(forKey: KeychainService.Keys.userId)
         keychain.delete(forKey: KeychainService.Keys.authToken)
         
-        // Clear user defaults
+        // Clear user session defaults
         UserDefaults.standard.removeObject(forKey: "isGuest")
         UserDefaults.standard.removeObject(forKey: "userEmail")
         UserDefaults.standard.removeObject(forKey: "userName")
         UserDefaults.standard.set(false, forKey: "isAuthenticated")
+        
+        // For GUEST users: clear birth data and quota (they get fresh start)
+        // For REGISTERED users: keep birth data locally cached by email
+        if wasGuest {
+            UserDefaults.standard.removeObject(forKey: "quotaUsed")
+            UserDefaults.standard.removeObject(forKey: "userBirthData")
+            UserDefaults.standard.removeObject(forKey: "hasBirthData")
+            UserDefaults.standard.removeObject(forKey: "userGender")
+            UserDefaults.standard.removeObject(forKey: "birthTimeUnknown")
+        }
+        // Note: Registered users' birth data is preserved in SwiftData by email key
     }
     
     // MARK: - Private Helpers
@@ -140,6 +154,40 @@ class AuthViewModel {
         }
         if let name = user.name {
             UserDefaults.standard.set(name, forKey: "userName")
+        }
+        
+        // For registered users, try to fetch existing profile from server
+        if !isGuest, let email = user.email {
+            Task {
+                await fetchAndRestoreProfile(email: email)
+            }
+        }
+    }
+    
+    /// Fetch user profile from server and restore locally
+    private func fetchAndRestoreProfile(email: String) async {
+        do {
+            if let profile = try await ProfileService.shared.fetchProfile(email: email) {
+                // Restore profile data locally
+                ProfileService.shared.restoreProfileLocally(profile)
+                
+                // Update hasBirthData flag if profile has birth data
+                if profile.birthProfile != nil {
+                    UserDefaults.standard.set(true, forKey: "hasBirthData")
+                    print("[AuthViewModel] Restored profile from server: \(email)")
+                }
+                
+                // Update quota from server
+                UserDefaults.standard.set(profile.questionsAsked, forKey: "quotaUsed")
+            } else {
+                print("[AuthViewModel] No existing profile found on server for: \(email)")
+            }
+            
+            // Sync chat history from server
+            await ChatHistorySyncService.shared.syncFromServer(userEmail: email, dataManager: DataManager.shared)
+            
+        } catch {
+            print("[AuthViewModel] Failed to fetch profile: \(error)")
         }
     }
 }

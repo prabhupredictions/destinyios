@@ -21,7 +21,7 @@ struct BirthDetailsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 16) {
                     // Header
                     headerSection
                     
@@ -33,24 +33,23 @@ struct BirthDetailsView: View {
                     
                     // Support Contact Info
                     supportInfoSection
-                    
-                    Spacer(minLength: 40)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 20)
             }
             .background(Color(red: 0.96, green: 0.95, blue: 0.98))
-            .navigationTitle("Birth Details")
+            .navigationTitle("birth_details".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("cancel".localized) { dismiss() }
                         .foregroundColor(Color("NavyPrimary"))
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { saveChanges() }
+                    Button("save".localized) { saveChanges() }
                         .foregroundColor(Color("NavyPrimary"))
                         .fontWeight(.semibold)
                         .disabled(!hasChanges)
@@ -67,55 +66,54 @@ struct BirthDetailsView: View {
     
     // MARK: - Header Section
     private var headerSection: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             ZStack {
                 Circle()
                     .fill(Color("NavyPrimary").opacity(0.1))
-                    .frame(width: 70, height: 70)
+                    .frame(width: 56, height: 56)
                 Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 40))
+                    .font(.system(size: 32))
                     .foregroundColor(Color("NavyPrimary"))
             }
             
             Text("your_birth_info".localized)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(Color("NavyPrimary"))
         }
-        .padding(.bottom, 8)
     }
     
     // MARK: - Editable Section
     private var editableSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("editable".localized.uppercased())
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(Color("TextDark").opacity(0.4))
             
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 // Name Field
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("your_name".localized)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(Color("TextDark").opacity(0.6))
                     
-                    TextField("enter_name".localized, text: $userName)
-                        .font(.system(size: 16))
+                    TextField("enter_your_name".localized, text: $userName)
+                        .font(.system(size: 15))
                         .foregroundColor(Color("TextDark"))
-                        .padding(.horizontal, 14)
-                        .frame(height: 48)
+                        .padding(.horizontal, 12)
+                        .frame(height: 44)
                         .background(Color.white)
-                        .cornerRadius(12)
+                        .cornerRadius(10)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
+                            RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
                         )
                         .onChange(of: userName) { _, _ in hasChanges = true }
                 }
                 
                 // Gender Picker
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("gender".localized)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(Color("TextDark").opacity(0.6))
                     
                     Menu {
@@ -126,119 +124,120 @@ struct BirthDetailsView: View {
                     } label: {
                         HStack {
                             Text(genderDisplayText)
-                                .font(.system(size: 16))
+                                .font(.system(size: 15))
                                 .foregroundColor(Color("TextDark"))
                             Spacer()
                             Image(systemName: "chevron.down")
-                                .font(.system(size: 12))
+                                .font(.system(size: 11))
                                 .foregroundColor(Color("NavyPrimary").opacity(0.5))
                         }
-                        .padding(.horizontal, 14)
-                        .frame(height: 48)
+                        .padding(.horizontal, 12)
+                        .frame(height: 44)
                         .background(Color.white)
-                        .cornerRadius(12)
+                        .cornerRadius(10)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
+                            RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
                         )
                     }
                 }
             }
-            .padding(16)
+            .padding(12)
             .background(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 12)
                     .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.04), radius: 8, y: 2)
+                    .shadow(color: Color.black.opacity(0.04), radius: 6, y: 2)
             )
         }
     }
     
     // MARK: - Read-only Section
     private var readOnlySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("birth_data".localized.uppercased())
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(Color("TextDark").opacity(0.4))
             
             VStack(spacing: 0) {
                 readOnlyRow(label: "date_of_birth".localized, value: dateOfBirth, icon: "calendar")
-                Divider().padding(.leading, 44)
+                Divider().padding(.leading, 40)
                 readOnlyRow(label: "time_of_birth".localized, value: timeOfBirth, icon: "clock")
-                Divider().padding(.leading, 44)
+                Divider().padding(.leading, 40)
                 readOnlyRow(label: "place_of_birth".localized, value: placeOfBirth, icon: "location.fill")
             }
             .background(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 12)
                     .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
             )
         }
     }
     
     private func readOnlyRow(label: String, value: String, icon: String) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .font(.system(size: 14))
                 .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                .frame(width: 24)
+                .frame(width: 22)
             
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(label)
-                    .font(.system(size: 12))
+                    .font(.system(size: 11))
                     .foregroundColor(Color("TextDark").opacity(0.5))
                 Text(value.isEmpty ? "not_set".localized : value)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 14, weight: .medium))
                     .foregroundColor(Color("TextDark"))
+                    .lineLimit(1)
             }
             
             Spacer()
             
             Image(systemName: "lock.fill")
-                .font(.system(size: 12))
+                .font(.system(size: 10))
                 .foregroundColor(Color("TextDark").opacity(0.3))
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
     }
     
     // MARK: - Support Info Section
     private var supportInfoSection: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 8) {
+        VStack(spacing: 8) {
+            HStack(spacing: 6) {
                 Image(systemName: "info.circle.fill")
-                    .font(.system(size: 14))
+                    .font(.system(size: 12))
                     .foregroundColor(Color("NavyPrimary"))
                 
                 Text("need_update_birth_data".localized)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundColor(Color("NavyPrimary"))
             }
             
             Text("contact_support_birth_data".localized)
-                .font(.system(size: 13))
+                .font(.system(size: 12))
                 .foregroundColor(Color("TextDark").opacity(0.7))
                 .multilineTextAlignment(.center)
-                .lineSpacing(4)
+                .lineSpacing(2)
             
             Button(action: { openEmail() }) {
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     Image(systemName: "envelope.fill")
-                        .font(.system(size: 14))
+                        .font(.system(size: 12))
                     Text("support@destinyaiastrology.com")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 12, weight: .medium))
                 }
                 .foregroundColor(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
                 .background(Color("NavyPrimary"))
-                .cornerRadius(10)
+                .cornerRadius(8)
             }
         }
-        .padding(20)
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(Color("NavyPrimary").opacity(0.05))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 12)
                         .stroke(Color("NavyPrimary").opacity(0.1), lineWidth: 1)
                 )
         )
@@ -266,24 +265,25 @@ struct BirthDetailsView: View {
             do {
                 let birthData = try JSONDecoder().decode(BirthData.self, from: data)
                 
-                // Format date
+                // Format date - use dd/MM/yyyy format with 4-digit year
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 if let date = dateFormatter.date(from: birthData.dob) {
-                    dateFormatter.dateStyle = .long
+                    dateFormatter.dateFormat = "dd/MM/yyyy"
                     dateOfBirth = dateFormatter.string(from: date)
                 } else {
                     dateOfBirth = birthData.dob
                 }
                 
-                // Format time
+                // Format time - always use English AM/PM format
                 if UserDefaults.standard.bool(forKey: "birthTimeUnknown") {
                     timeOfBirth = "birth_time_unknown".localized
                 } else {
                     let timeFormatter = DateFormatter()
                     timeFormatter.dateFormat = "HH:mm"
                     if let time = timeFormatter.date(from: birthData.time) {
-                        timeFormatter.timeStyle = .short
+                        timeFormatter.locale = Locale(identifier: "en_US")
+                        timeFormatter.dateFormat = "h:mm a"
                         timeOfBirth = timeFormatter.string(from: time)
                     } else {
                         timeOfBirth = birthData.time

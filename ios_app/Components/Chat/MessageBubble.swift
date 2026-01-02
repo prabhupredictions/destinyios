@@ -1,29 +1,32 @@
 import SwiftUI
 
-/// Message bubble for chat conversations (WhatsApp/iMessage style)
+/// Message bubble for chat conversations - ChatGPT-style streaming support
 struct MessageBubble: View {
     let message: LocalChatMessage
-    var userQuery: String = ""  // The user's question (for feedback)
-    var streamingContent: String? = nil  // Live streaming text from ViewModel
+    var userQuery: String = ""
+    var streamingContent: String? = nil
+    var thinkingSteps: [ThinkingStep] = []  // For streaming progress
     
     private var isUser: Bool {
         message.messageRole == .user
     }
     
-    /// Content to display - streaming content if available, otherwise message content
     private var displayContent: String {
         streamingContent ?? message.content
     }
     
-    /// Check if this is the welcome/greeting message (shouldn't show rating)
     private var isWelcomeMessage: Bool {
-        message.content.hasPrefix("Hello! I'm Destiny")
+        message.content.contains("I'm Destiny, your personal astrology guide")
+    }
+    
+    // Check if we're in loading/streaming state
+    private var isLoadingState: Bool {
+        message.isStreaming && displayContent.isEmpty
     }
     
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             if isUser {
-                // Push user message to the right
                 Spacer(minLength: 60)
             }
             
@@ -31,25 +34,13 @@ struct MessageBubble: View {
                 // Message content
                 messageContent
                 
-                // Metadata row (confidence, area, time)
+                // Metadata row with inline rating (timestamp + time + rating stars)
                 if !isUser && !message.isStreaming {
-                    metadataRow
-                }
-                
-                // Star rating for completed AI messages (exclude welcome message)
-                if !isUser && !message.isStreaming && !isWelcomeMessage && message.content.count > 50 {
-                    MessageRating(
-                        messageId: message.id,
-                        query: userQuery.isEmpty ? "General question" : userQuery,
-                        responseText: String(message.content.prefix(500)), // Limit for API
-                        predictionId: message.traceId
-                    )
-                    .padding(.top, 4)
+                    metadataRowWithRating
                 }
             }
             
             if !isUser {
-                // Push AI message content with spacer on right
                 Spacer(minLength: 60)
             }
         }
@@ -60,20 +51,21 @@ struct MessageBubble: View {
     @ViewBuilder
     private var messageContent: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Text content with styled markdown support
-            HStack(alignment: .top, spacing: 0) {
-                // Render styled markdown for AI messages, plain text for user
-                if isUser {
-                    Text(message.content)
-                        .font(.system(size: 15))
-                        .foregroundColor(.white)
-                } else {
-                    // Premium glassmorphism cards for AI responses
-                    PremiumMarkdownView(
-                        content: message.content,
-                        textColor: Color("NavyPrimary")
-                    )
-                }
+            if isUser {
+                // User message - plain text
+                Text(message.content)
+                    .font(.system(size: 15))
+                    .foregroundColor(.white)
+            } else if isLoadingState {
+                // AI loading state - show progress inside bubble
+                streamingProgressView
+            } else if !displayContent.isEmpty {
+                // AI message with content
+                MarkdownTextView(
+                    content: displayContent,
+                    textColor: Color("NavyPrimary"),
+                    fontSize: 15
+                )
             }
             
             // Tool calls chips (if any)
@@ -93,6 +85,12 @@ struct MessageBubble: View {
                 .fill(isUser ? Color("NavyPrimary") : Color.white)
                 .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
         )
+    }
+    
+    // MARK: - Streaming Progress View (Claude-style collapsible)
+    @ViewBuilder
+    private var streamingProgressView: some View {
+        CollapsibleProgressView(thinkingSteps: thinkingSteps)
     }
     
     // Fallback parser for **bold** syntax
@@ -155,32 +153,37 @@ struct MessageBubble: View {
         }
     }
     
-    // MARK: - Metadata Row
+    // MARK: - Metadata Row with Inline Rating
     @ViewBuilder
-    private var metadataRow: some View {
-        HStack(spacing: 12) {
-            // Confidence badge
-            if let confidence = message.confidence {
-                HStack(spacing: 4) {
-                    Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 10))
-                    Text(confidence)
-                        .font(.system(size: 11))
-                }
-                .foregroundColor(Color("GoldAccent"))
-            }
-            
-            // Life area
-            if let area = message.area {
-                Text(area.capitalized)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
-            }
-            
+    private var metadataRowWithRating: some View {
+        HStack(spacing: 6) {
             // Timestamp
             Text(formatTime(message.createdAt))
                 .font(.system(size: 11))
                 .foregroundColor(Color("TextDark").opacity(0.4))
+            
+            // Execution time (if available from API response)
+            if message.executionTimeMs > 0 {
+                Text("•")
+                    .font(.system(size: 11))
+                    .foregroundColor(Color("TextDark").opacity(0.3))
+                
+                Text(formatExecutionTime(message.executionTimeMs))
+                    .font(.system(size: 11))
+                    .foregroundColor(Color("TextDark").opacity(0.4))
+            }
+            
+            Spacer()
+            
+            // Inline rating (only for substantial AI messages)
+            if !isWelcomeMessage && message.content.count > 50 {
+                InlineMessageRating(
+                    messageId: message.id,
+                    query: userQuery.isEmpty ? "General question" : userQuery,
+                    responseText: String(message.content.prefix(500)),
+                    predictionId: message.traceId
+                )
+            }
         }
     }
     
@@ -189,6 +192,19 @@ struct MessageBubble: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+    
+    private func formatExecutionTime(_ ms: Double) -> String {
+        let seconds = ms / 1000
+        if seconds < 1 {
+            return String(format: "%.0fms", ms)
+        } else if seconds < 60 {
+            return String(format: "%.1fs", seconds)
+        } else {
+            let mins = Int(seconds) / 60
+            let secs = Int(seconds) % 60
+            return "\(mins)m \(secs)s"
+        }
     }
 }
 
@@ -270,6 +286,144 @@ struct BlinkingCursor: View {
             content: "Based on your chart, Saturn's",
             isStreaming: true
         )
+    )
+    .padding()
+    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+}
+
+// MARK: - Animated Dots Component
+struct AnimatedDots: View {
+    @State private var animateFirst = false
+    @State private var animateSecond = false
+    @State private var animateThird = false
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(Color("GoldAccent"))
+                .frame(width: 6, height: 6)
+                .offset(y: animateFirst ? -4 : 0)
+            Circle()
+                .fill(Color("GoldAccent"))
+                .frame(width: 6, height: 6)
+                .offset(y: animateSecond ? -4 : 0)
+            Circle()
+                .fill(Color("GoldAccent"))
+                .frame(width: 6, height: 6)
+                .offset(y: animateThird ? -4 : 0)
+        }
+        .onAppear {
+            startAnimation()
+        }
+    }
+    
+    private func startAnimation() {
+        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) {
+            animateFirst = true
+        }
+        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.15)) {
+            animateSecond = true
+        }
+        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.3)) {
+            animateThird = true
+        }
+    }
+}
+
+// MARK: - Collapsible Progress View (Claude-style)
+struct CollapsibleProgressView: View {
+    let thinkingSteps: [ThinkingStep]
+    @State private var isExpanded = false
+    @State private var elapsedSeconds: Int = 0
+    @State private var timer: Timer?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header - always visible, tappable
+            Button(action: {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    isExpanded.toggle()
+                }
+            }) {
+                HStack(spacing: 10) {
+                    // Animated spinner
+                    AnimatedDots()
+                    
+                    // Status text
+                    Text("Analyzing your chart")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(Color("NavyPrimary"))
+                    
+                    Spacer()
+                    
+                    // Elapsed time
+                    Text(formatTime(elapsedSeconds))
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color("GoldAccent"))
+                    
+                    // Expand/collapse chevron
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            // Expandable details
+            if isExpanded && !thinkingSteps.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    Divider()
+                        .padding(.vertical, 8)
+                    
+                    ForEach(thinkingSteps.suffix(8)) { step in
+                        HStack(alignment: .top, spacing: 8) {
+                            Text(step.type.icon)
+                                .font(.system(size: 12))
+                            
+                            Text(step.content ?? step.display)
+                                .font(.system(size: 13))
+                                .foregroundColor(Color("NavyPrimary").opacity(0.8))
+                                .lineLimit(2)
+                        }
+                    }
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .frame(minWidth: 220, alignment: .leading)
+        .onAppear {
+            startTimer()
+        }
+        .onDisappear {
+            timer?.invalidate()
+        }
+    }
+    
+    private func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            elapsedSeconds += 1
+        }
+    }
+    
+    private func formatTime(_ seconds: Int) -> String {
+        let mins = seconds / 60
+        let secs = seconds % 60
+        return String(format: "%d:%02d", mins, secs)
+    }
+}
+
+#Preview("Loading State") {
+    MessageBubble(
+        message: LocalChatMessage(
+            threadId: "1",
+            role: .assistant,
+            content: "",
+            isStreaming: true
+        ),
+        thinkingSteps: [
+            ThinkingStep(step: 1, type: .thought, display: "Examining birth chart...", content: "Analyzing Saturn's position in the 10th house..."),
+            ThinkingStep(step: 2, type: .action, display: "Running Dasha", content: "Calculating Moon-Saturn-Rahu dasha period...")
+        ]
     )
     .padding()
     .background(Color(red: 0.96, green: 0.95, blue: 0.98))

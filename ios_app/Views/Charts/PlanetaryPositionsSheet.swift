@@ -4,225 +4,498 @@ import SwiftUI
 /// Accessible from Chat screen as floating button
 struct PlanetaryPositionsSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("chartStyle") private var chartStyle: String = "north" // north | south
     
-    // Birth data from UserDefaults
-    @State private var birthData: BirthData?
+    // User Birth Data
+    @State private var birthData: UserBirthData?
+    @State private var chartData: UserAstroDataResponse?
+    @State private var cityOfBirth: String = ""
+    
     @State private var isLoading = true
-    
-    // Mock planetary positions (in production, fetch from API)
-    private let planets: [(symbol: String, name: String, sign: String, degree: String)] = [
-        ("☉", "Sun", "Gemini", "15°23'"),
-        ("☽", "Moon", "Aquarius", "8°47'"),
-        ("☿", "Mercury", "Gemini", "22°11'"),
-        ("♀", "Venus", "Cancer", "3°56'"),
-        ("♂", "Mars", "Taurus", "18°32'"),
-        ("♃", "Jupiter", "Libra", "11°08'"),
-        ("♄", "Saturn", "Pisces", "27°44'"),
-        ("☊", "Rahu", "Libra", "5°22'"),
-        ("☋", "Ketu", "Aries", "5°22'")
-    ]
+    @State private var errorMessage: String?
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 0.95, green: 0.94, blue: 0.96)
-                    .ignoresSafeArea()
-                
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        // Ascendant header
-                        ascendantSection
+                // Premium Deep Space Nebula Background
+                GeometryReader { geo in
+                    ZStack {
+                        // Deep Base
+                        Color(red: 0.05, green: 0.07, blue: 0.15).ignoresSafeArea()
                         
-                        // Planetary grid
-                        planetaryGrid
+                        // Central Blue Glow
+                        RadialGradient(
+                            colors: [
+                                Color(red: 0.12, green: 0.16, blue: 0.28).opacity(0.8),
+                                .clear
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: max(geo.size.width, geo.size.height) * 0.8
+                        )
                         
-                        // Birth info footer
-                        if let data = birthData {
-                            birthInfoFooter(data)
-                        }
+                        // Top-Left Gold Nebula/Star Glow
+                        RadialGradient(
+                            colors: [
+                                Color(red: 0.85, green: 0.65, blue: 0.2).opacity(0.08),
+                                .clear
+                            ],
+                            center: .topLeading,
+                            startRadius: 0,
+                            endRadius: 300
+                        )
+                        
+                        // Bottom-Right Purple/Deep Nebula
+                        RadialGradient(
+                            colors: [
+                                Color(red: 0.3, green: 0.1, blue: 0.4).opacity(0.15),
+                                .clear
+                            ],
+                            center: .bottomTrailing,
+                            startRadius: 0,
+                            endRadius: 400
+                        )
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-                    .padding(.bottom, 40)
+                }
+                .ignoresSafeArea()
+                
+                if isLoading {
+                    VStack(spacing: 16) {
+                        ProgressView()
+                            .tint(Color("GoldAccent"))
+                            .scaleEffect(1.5)
+                        Text("Calculating Chart...")
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                } else if let error = errorMessage {
+                     VStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 40))
+                            .foregroundColor(.red.opacity(0.8))
+                        Text("Failed to load chart")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Text(error)
+                            .font(.caption)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.white.opacity(0.7))
+                        Button("Retry") { loadData() }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color("GoldAccent"))
+                    }
+                    .padding()
+                } else if let chart = chartData {
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 20) {
+                            // Calculate Ascendant for display
+                            let signNum = chart.houses["1"]?.signNum ?? 1
+                            let ascIndex = max(0, min(11, signNum - 1))
+                            let ascSignCode = ChartConstants.orderedSigns[ascIndex]
+                            let ascName = ChartConstants.signFullNames[ascSignCode] ?? ascSignCode
+                            
+                            // Minimal Birth Info Line + Ascendant
+                            minimalBirthInfo(chart.birthDetails, city: cityOfBirth, ascendant: ascName)
+                            
+                            // Chart Visualization (North/South)
+                            chartVisualSection(chart: chart)
+                            
+                            // Premium Planetary Grid
+                            planetaryGrid(chart: chart)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+                        .padding(.bottom, 40)
+                    }
                 }
             }
             .navigationTitle("Birth Chart")
-            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            // .toolbarBackground(.visible, for: .navigationBar) // was solid NavyPrimary
             .toolbar {
-                #if os(iOS)
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                    // Chart Style Toggles
+                    Menu {
+                        Button(action: { chartStyle = "north" }) {
+                            Label("North Indian", systemImage: chartStyle == "north" ? "checkmark" : "")
+                        }
+                        Button(action: { chartStyle = "south" }) {
+                            Label("South Indian", systemImage: chartStyle == "south" ? "checkmark" : "")
+                        }
+                    } label: {
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundColor(Color("GoldAccent"))
+                    }
                 }
-                #else
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Close") { dismiss() }
+                        .foregroundColor(.white)
                 }
-                #endif
             }
             .onAppear {
-                loadBirthData()
+                loadData()
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
     
-    // MARK: - Ascendant Section
-    private var ascendantSection: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: "sparkle")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color("GoldAccent"))
-                
-                Text("Ascendant")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color("TextDark").opacity(0.6))
-            }
+    // MARK: - Chart Visualization Section
+    private func chartVisualSection(chart: UserAstroDataResponse) -> some View {
+        VStack(spacing: 12) {
+            // Header Removed as requested - Clean Look
             
-            Text("♋ Cancer")
-                .font(.system(size: 28, weight: .bold))
-                .foregroundColor(Color("NavyPrimary"))
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
-        )
-    }
-    
-    // MARK: - Planetary Grid
-    private var planetaryGrid: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: "globe")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color("GoldAccent"))
-                
-                Text("Planetary Positions")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
-            }
+            // The Chart
+            let mappedData = mapToChartData(chart)
+            // Get Ascendant Sign (House 1)
+            let signNum = chart.houses["1"]?.signNum ?? 1
+            let ascIndex = max(0, min(11, signNum - 1))
+            let ascendantSign = ChartConstants.orderedSigns[ascIndex]
             
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
-                ForEach(planets, id: \.name) { planet in
-                    PlanetCard(
-                        symbol: planet.symbol,
-                        name: planet.name,
-                        sign: planet.sign,
-                        degree: planet.degree
+            Group {
+                if chartStyle == "north" {
+                    NorthIndianChartView(
+                        chartData: mappedData,
+                        chartType: .d1,
+                        personName: "", // Hidden in view
+                        ascendantSign: nil // Hidden in view
+                    )
+                } else {
+                    SouthIndianChartView(
+                        chartData: mappedData,
+                        chartType: .d1,
+                        personName: "Rashi (D1)",
+                        ascendantSign: ascendantSign
                     )
                 }
             }
+            .frame(maxWidth: .infinity)
+            // Removed fixed height and background to let chart "gel" with app background
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
-        )
     }
     
-    // MARK: - Birth Info Footer
-    private func birthInfoFooter(_ data: BirthData) -> some View {
-        HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Birth Details")
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
+    // MARK: - Planetary Grid
+    private func planetaryGrid(chart: UserAstroDataResponse) -> some View {
+        // Define planet order
+        let planetOrder = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]
+        
+        return VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Planetary Positions")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            
+            VStack(spacing: 12) {
+                ForEach(planetOrder, id: \.self) { planetName in
+                    if let pData = chart.planets[planetName] {
+                        PremiumPlanetRow(
+                            name: planetName,
+                            data: pData,
+                            nakshatra: chart.nakshatra[planetName]
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Minimal Birth Info (Clean, no box)
+    private func minimalBirthInfo(_ details: AstroBirthDetails, city: String, ascendant: String) -> some View {
+        let premiumGold = Color(red: 212/255, green: 175/255, blue: 55/255)
+        
+        return HStack(spacing: 8) {
+            // Date
+            Text(formatBirthDate(details.dob))
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white)
+            
+            Text("•")
+                .foregroundColor(premiumGold.opacity(0.6))
+            
+            // Time
+            Text(formatBirthTime(details.time))
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white)
+            
+            // City (if available)
+            if !city.isEmpty {
+                Text("•")
+                    .foregroundColor(premiumGold.opacity(0.6))
                 
-                Text("\(data.dob) at \(data.time)")
+                Text(city)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(.white.opacity(0.8))
+                    .lineLimit(1)
+            }
+            
+            // Ascendant
+            Text("•")
+                .foregroundColor(premiumGold.opacity(0.6))
+            
+            Text("Asc: \(ascendant)")
+                .font(.system(size: 14, weight: .semibold)) // Slightly bolder
+                .foregroundColor(Color("GoldAccent")) // Gold color to stand out
+        }
+        .padding(.vertical, 4)
+    }
+    
+    private func formatBirthDate(_ dob: String) -> String {
+        // Convert 2013-04-22 to Apr 22, 2013
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "MMM dd, yyyy"
+        
+        if let date = inputFormatter.date(from: dob) {
+            return outputFormatter.string(from: date)
+        }
+        return dob
+    }
+    
+    private func formatBirthTime(_ time: String) -> String {
+        // Convert 20:20 to 8:20 PM
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "HH:mm"
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "h:mm a"
+        
+        if let date = inputFormatter.date(from: time) {
+            return outputFormatter.string(from: date)
+        }
+        return time
+    }
+    
+    // MARK: - Data Mapper
+    private func mapToChartData(_ response: UserAstroDataResponse) -> ChartData {
+        // Map D1
+        var d1Map: [String: D1PlanetPosition] = [:]
+        for (key, data) in response.planets {
+            d1Map[key] = D1PlanetPosition(
+                house: data.house,
+                sign: data.sign,
+                degree: data.degree,
+                retrograde: data.isRetrograde ?? false,
+                vargottama: data.vargottama ?? false,
+                combust: data.isCombust ?? false,
+                nakshatra: response.nakshatra[key]?.nakshatra,
+                pada: response.nakshatra[key]?.pada
+            )
+        }
+        
+        // Map D9 (API returns flat structure, which is D9 data directly)
+        var d9Map: [String: D9PlanetPosition] = [:]
+        for (key, divData) in response.divisionalCharts {
+            // divData.house is String in model, converting to Int
+            let houseInt = Int(divData.house)
+            d9Map[key] = D9PlanetPosition(
+                house: houseInt,
+                sign: divData.sign
+            )
+        }
+        
+        return ChartData(d1: d1Map, d9: d9Map)
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func loadData() {
+        isLoading = true
+        errorMessage = nil
+        
+        // Read from correct key: "userBirthData" (not "userBirthProfile")
+        guard let storedData = UserDefaults.standard.data(forKey: "userBirthData"),
+              let savedBirthData = try? JSONDecoder().decode(BirthData.self, from: storedData) else {
+            isLoading = false
+            errorMessage = "No birth profile found."
+            return
+        }
+        
+        // Convert BirthData (local storage) -> UserBirthData (API request)
+        let apiBirthData = UserBirthData(
+            dob: savedBirthData.dob,
+            time: savedBirthData.time,
+            latitude: savedBirthData.latitude,
+            longitude: savedBirthData.longitude,
+            ayanamsa: savedBirthData.ayanamsa,
+            houseSystem: savedBirthData.houseSystem,
+            cityOfBirth: savedBirthData.cityOfBirth
+        )
+        
+        Task {
+            do {
+                let chart = try await UserChartService.shared.fetchFullChartData(birthData: apiBirthData)
                 
-                if let city = data.cityOfBirth {
-                    Text(city)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                await MainActor.run {
+                    self.chartData = chart
+                    self.cityOfBirth = savedBirthData.cityOfBirth ?? ""
+                    self.isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
+    }
+    
+    private func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: date)
+    }
+}
+
+// MARK: - Premium Planet Row (Updated for Dark Mode Contrast)
+// MARK: - Premium Planet Row (Updated for Dark Mode Contrast)
+struct PremiumPlanetRow: View {
+    let name: String
+    let data: PlanetData
+    let nakshatra: NakshatraData?
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Icon Column - Dark Glass Circle
+            ZStack {
+                Circle()
+                    .fill(Color.black.opacity(0.3))
+                    .frame(width: 48, height: 48)
+                
+                Text(planetSymbol(for: name))
+                    .font(.system(size: 22))
+                    .foregroundColor(Color("GoldAccent"))
+            }
+            
+            // Main Info Column
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text(name.localized)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    // Badges
+                    if data.isRetrograde == true {
+                        Badge(text: "R", color: .red)
+                    }
+                    if data.isCombust == true {
+                        Badge(text: "C", color: .orange)
+                    }
+                    if data.vargottama == true {
+                        Badge(text: "V", color: .purple)
+                    }
+                }
+                
+                HStack(spacing: 6) {
+                    Text(data.sign)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(Color("GoldAccent").opacity(0.9))
+                    
+                    Text("•")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white.opacity(0.4))
+                    
+                    Text(formatDegree(data.degree))
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.7))
                 }
             }
             
             Spacer()
             
-            Button(action: {
-                // TODO: Navigate to edit birth data
-            }) {
-                Text("Edit")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
+            // Detailed Right Column (House & Nakshatra)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text("House \(data.house)")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(Color("GoldAccent"))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
                     .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color("NavyPrimary").opacity(0.3), lineWidth: 1)
+                        Capsule()
+                            .fill(Color("GoldAccent").opacity(0.15))
+                            .strokeBorder(Color("GoldAccent").opacity(0.3), lineWidth: 1)
                     )
+                
+                if let nak = nakshatra {
+                    VStack(alignment: .trailing, spacing: 1) {
+                        Text(nak.nakshatra)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.white.opacity(0.9))
+                        Text("Pada \(nak.pada)")
+                            .font(.system(size: 10))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
+                }
             }
         }
         .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color("NavyPrimary").opacity(0.05))
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(red: 0.1, green: 0.1, blue: 0.2).opacity(0.6)) // Dark bluish glass
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.15), .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        // Add subtle shadow for depth
+        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
     
-    // MARK: - Load Birth Data
-    private func loadBirthData() {
-        if let data = UserDefaults.standard.data(forKey: "birthData"),
-           let decoded = try? JSONDecoder().decode(BirthData.self, from: data) {
-            birthData = decoded
+    // Helpers within struct
+    private func planetSymbol(for name: String) -> String {
+        switch name {
+        case "Sun": return "☉"
+        case "Moon": return "☽"
+        case "Mars": return "♂"
+        case "Mercury": return "☿"
+        case "Jupiter": return "♃"
+        case "Venus": return "♀"
+        case "Saturn": return "♄"
+        case "Rahu": return "☊"
+        case "Ketu": return "☋"
+        default: return "⋆"
         }
-        isLoading = false
+    }
+    
+    private func formatDegree(_ degree: Double) -> String {
+        let d = Int(degree)
+        let m = Int((degree - Double(d)) * 60)
+        return String(format: "%d°%02d'", d, m)
     }
 }
 
-// MARK: - Planet Card
-struct PlanetCard: View {
-    let symbol: String
-    let name: String
-    let sign: String
-    let degree: String
+struct Badge: View {
+    let text: String
+    let color: Color
     
     var body: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 6) {
-                Text(symbol)
-                    .font(.system(size: 18))
-                
-                Text(name)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
-            }
-            
-            VStack(spacing: 2) {
-                Text(sign)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
-                
-                Text(degree)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.96, green: 0.95, blue: 0.98))
-        )
+        Text(text)
+            .font(.system(size: 10, weight: .bold))
+            .foregroundColor(color.opacity(0.9))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(
+                Capsule()
+                    .fill(color.opacity(0.2))
+                    .strokeBorder(color.opacity(0.4), lineWidth: 0.5)
+            )
     }
-}
-
-// MARK: - Preview
-#Preview {
-    PlanetaryPositionsSheet()
 }

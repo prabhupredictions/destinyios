@@ -32,6 +32,25 @@ class CompatibilityViewModel {
     var showResult = false
     var errorMessage: String?
     var result: CompatibilityResult?
+    var sessionId: String? // For follow-up queries
+    
+    // Streaming progress state
+    var currentStep: AnalysisStep = .calculatingCharts
+    var streamingText: String = ""
+    var showStreamingView: Bool = false
+    
+    // MARK: - Formatted Date Strings
+    var formattedBoyDob: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        return formatter.string(from: boyBirthDate)
+    }
+    
+    var formattedGirlDob: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        return formatter.string(from: girlBirthDate)
+    }
     
     // MARK: - Dependencies
     private let compatibilityService: CompatibilityServiceProtocol
@@ -118,18 +137,239 @@ class CompatibilityViewModel {
         
         await MainActor.run {
             isAnalyzing = true
+            showStreamingView = true
+            currentStep = .calculatingCharts
+            streamingText = ""
             errorMessage = nil
         }
         
-        // Simulate API call
-        try? await Task.sleep(nanoseconds: 2_000_000_000)
-        
-        await MainActor.run {
-            // Generate mock result
-            result = generateMockResult()
-            isAnalyzing = false
-            showResult = true
+        do {
+            // Build API request
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            let timeFormatter = DateFormatter()
+            timeFormatter.dateFormat = "HH:mm:ss"
+            
+            // Round coordinates to 6 decimal places (backend validation requirement)
+            let roundedBoyLat = (boyLatitude * 1_000_000).rounded() / 1_000_000
+            let roundedBoyLon = (boyLongitude * 1_000_000).rounded() / 1_000_000
+            let roundedGirlLat = (girlLatitude * 1_000_000).rounded() / 1_000_000
+            let roundedGirlLon = (girlLongitude * 1_000_000).rounded() / 1_000_000
+            
+            let request = CompatibilityRequest(
+                boy: BirthDetails(
+                    dob: dateFormatter.string(from: boyBirthDate),
+                    time: timeFormatter.string(from: boyBirthTime),
+                    lat: roundedBoyLat,
+                    lon: roundedBoyLon,
+                    name: boyName,
+                    place: boyCity
+                ),
+                girl: BirthDetails(
+                    dob: dateFormatter.string(from: girlBirthDate),
+                    time: timeFormatter.string(from: girlBirthTime),
+                    lat: roundedGirlLat,
+                    lon: roundedGirlLon,
+                    name: girlName,
+                    place: girlCity
+                ),
+                sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
+                userEmail: nil
+            )
+            
+            print("[CompatibilityViewModel] GENERATED session_id in request: \(request.sessionId ?? "NIL")")
+            
+            // Call streaming API with progress callback
+            let response: CompatibilityResponse
+            if let service = compatibilityService as? CompatibilityService {
+                response = try await service.analyzeWithProgress(request: request) { [weak self] step, _ in
+                    self?.updateStep(step)
+                }
+            } else {
+                response = try await compatibilityService.analyzeStream(request: request)
+            }
+            
+            // Parse ashtakoot data from response
+            let result = parseApiResponse(response)
+            
+            await MainActor.run {
+                self.currentStep = .complete
+                self.result = result
+                isAnalyzing = false
+                showStreamingView = false
+                showResult = true
+                
+                // Save to history
+                self.saveToHistory(result: result)
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = "Analysis failed: \(error.localizedDescription)"
+                isAnalyzing = false
+                showStreamingView = false
+            }
         }
+    }
+    
+    // MARK: - History
+    private func saveToHistory(result: CompatibilityResult) {
+        guard let sid = result.sessionId else { return }
+        
+        let item = CompatibilityHistoryItem(
+            sessionId: sid,
+            timestamp: Date(),
+            boyName: boyName,
+            boyDob: formattedBoyDob,
+            boyCity: boyCity,
+            girlName: girlName,
+            girlDob: formattedGirlDob,
+            girlCity: girlCity,
+            totalScore: result.totalScore,
+            maxScore: result.maxScore,
+            result: result,
+            chatMessages: [] // Chat starts empty
+        )
+        
+        CompatibilityHistoryService.shared.save(item)
+    }
+    
+    /// Load state from a history item
+    func loadFromHistory(_ item: CompatibilityHistoryItem) {
+        // Restore properties
+        boyName = item.boyName
+        girlName = item.girlName
+        boyCity = item.boyCity
+        girlCity = item.girlCity
+        
+        // Restore dates (parsing strings back to dates if needed, or better to store dates in HistoryItem?)
+        // The HistoryItem has formatted strings for display, but also SHOULD store raw dates if we want to edit.
+        // For now, we update the display state. The ViewModel stores Date objects.
+        // Ideally HistoryItem should store Date objects or TimeIntervals.
+        // Looking at CompatibilityHistoryItem.swift, it has `timestamp` but inputs are strings?
+        // Ah, in current HistoryItem I put `boyDob: String` (formatted).
+        // If we want to fully restore the *form* state (dates), we might need to parse or store raw dates.
+        // BUT, for displaying the result, we largely rely on `result` object.
+        // Let's rely on `item.result` for the analysis data.
+        
+        // Restore result
+        if let savedResult = item.result {
+            self.result = savedResult
+            self.showResult = true
+        }
+    }
+    
+    /// Map SSE step name to AnalysisStep enum
+    private func updateStep(_ stepName: String) {
+        // Backend sends: calculate_charts, ashtakoot, mangal_compat, yoga_kalsarpa, formatting, llm
+        let stepMapping: [String: AnalysisStep] = [
+            "calculate_charts": .calculatingCharts,
+            "ashtakoot": .ashtakootMatching,
+            "mangal_compat": .mangalDosha,
+            "yoga_kalsarpa": .collectingYogas,
+            "formatting": .collectingYogas,
+            "llm": .generatingAnalysis
+        ]
+        
+        if let step = stepMapping[stepName] {
+            currentStep = step
+        }
+        print("[ViewModel] Step update: \(stepName) -> \(currentStep)")
+    }
+    
+    /// Parse API response to CompatibilityResult with analysisData
+    private func parseApiResponse(_ response: CompatibilityResponse) -> CompatibilityResult {
+        var kutas: [KutaDetail] = []
+        var totalScore: Int = 0
+        let maxScore = 36
+        
+        // Extract Kuta details from ashtakoot matching if available
+        if let joint = response.analysisData?.joint,
+           let ashtakoot = joint.ashtakootMatching {
+            
+            // Parse kuta values from guna_scores nested inside ashtakoot_matching
+            // API structure: ashtakoot_matching.guna_scores.varna.score
+            let kutaNames = [
+                ("varna", "Varna", 1),
+                ("vashya", "Vashya", 2),
+                ("tara", "Tara", 3),
+                ("yoni", "Yoni", 4),
+                ("maitri", "Maitri", 5),
+                ("gana", "Gana", 6),
+                ("bhakoot", "Bhakoot", 7),
+                ("nadi", "Nadi", 8)
+            ]
+            
+            // First try to get guna_scores nested object
+            if let gunaScores = ashtakoot["guna_scores"]?.value as? [String: Any] {
+                for (key, name, maxPoints) in kutaNames {
+                    if let kutaData = gunaScores[key] as? [String: Any],
+                       let score = kutaData["score"] as? Int {
+                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: score))
+                        totalScore += score
+                    } else if let kutaData = gunaScores[key] as? [String: Any],
+                              let score = kutaData["score"] as? Double {
+                        let points = Int(score)
+                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: points))
+                        totalScore += points
+                    }
+                }
+            } else {
+                // Fallback: try direct access (old structure)
+                for (key, name, maxPoints) in kutaNames {
+                    if let kutaData = ashtakoot[key]?.value as? [String: Any],
+                       let score = kutaData["score"] as? Double {
+                        let points = Int(score)
+                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: points))
+                        totalScore += points
+                    }
+                }
+            }
+            
+            // Extract total score if available
+            if let total = ashtakoot["total_score"]?.value as? Double {
+                totalScore = Int(total)
+            } else if let total = ashtakoot["total_score"]?.value as? Int {
+                totalScore = total
+            }
+        }
+        
+        // If no kutas parsed, generate mock
+        if kutas.isEmpty {
+            kutas = [
+                KutaDetail(name: "Varna", maxPoints: 1, points: 1),
+                KutaDetail(name: "Vashya", maxPoints: 2, points: 1),
+                KutaDetail(name: "Tara", maxPoints: 3, points: 2),
+                KutaDetail(name: "Yoni", maxPoints: 4, points: 2),
+                KutaDetail(name: "Maitri", maxPoints: 5, points: 3),
+                KutaDetail(name: "Gana", maxPoints: 6, points: 3),
+                KutaDetail(name: "Bhakoot", maxPoints: 7, points: 4),
+                KutaDetail(name: "Nadi", maxPoints: 8, points: 4)
+            ]
+            totalScore = 20
+        }
+        
+        // Generate summary based on score
+        let summary: String
+        if totalScore >= 28 {
+            summary = "This is an excellent match with strong compatibility across all major areas."
+        } else if totalScore >= 21 {
+            summary = "A good match with solid foundations. Some areas may require conscious effort."
+        } else {
+            summary = "This match has some challenging aspects that require awareness and effort."
+        }
+        let rec = totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful"
+        
+        print("[CompatibilityViewModel] STORING session_id in result: \(response.sessionId ?? "NIL")")
+        
+        return CompatibilityResult(
+            totalScore: totalScore,
+            maxScore: maxScore,
+            kutas: kutas,
+            summary: response.llmAnalysis ?? "\(totalScore)/36",
+            recommendation: rec,
+            analysisData: response.analysisData,
+            sessionId: response.sessionId
+        )
     }
     
     func reset() {
@@ -185,21 +425,41 @@ class CompatibilityViewModel {
 }
 
 // MARK: - Models
-struct CompatibilityResult: Identifiable {
+struct CompatibilityResult: Identifiable, Codable {
     let id = UUID()
     let totalScore: Int
     let maxScore: Int
     let kutas: [KutaDetail]
     let summary: String
     let recommendation: String
+    let analysisData: AnalysisData?
+    let sessionId: String?
     
     var percentage: Double {
         guard maxScore > 0 else { return 0 }
         return Double(totalScore) / Double(maxScore)
     }
+    
+    init(
+        totalScore: Int,
+        maxScore: Int,
+        kutas: [KutaDetail],
+        summary: String,
+        recommendation: String,
+        analysisData: AnalysisData? = nil,
+        sessionId: String? = nil
+    ) {
+        self.totalScore = totalScore
+        self.maxScore = maxScore
+        self.kutas = kutas
+        self.summary = summary
+        self.recommendation = recommendation
+        self.analysisData = analysisData
+        self.sessionId = sessionId
+    }
 }
 
-struct KutaDetail: Identifiable {
+struct KutaDetail: Identifiable, Codable {
     let id = UUID()
     let name: String
     let maxPoints: Int

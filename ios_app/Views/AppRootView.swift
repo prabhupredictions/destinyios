@@ -3,6 +3,7 @@ import SwiftUI
 /// Main app container that handles routing between authentication flows
 struct AppRootView: View {
     // MARK: - Persisted State
+    @AppStorage("hasCompletedLanguageSelection") private var hasCompletedLanguageSelection = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("isAuthenticated") private var isAuthenticated = false
     @AppStorage("hasBirthData") private var hasBirthData = false
@@ -23,7 +24,10 @@ struct AppRootView: View {
         ZStack {
             // Main content
             Group {
-                if !hasSeenOnboarding {
+                if !hasCompletedLanguageSelection {
+                    LanguageSelectionView(isCompleted: $hasCompletedLanguageSelection)
+                        .transition(.opacity)
+                } else if !hasSeenOnboarding {
                     OnboardingView(onComplete: {
                         withAnimation(.easeInOut(duration: 0.5)) {
                             hasSeenOnboarding = true
@@ -48,6 +52,7 @@ struct AppRootView: View {
                         .transition(.opacity)
                 }
             }
+            .animation(.easeInOut(duration: 0.4), value: hasCompletedLanguageSelection)
             .animation(.easeInOut(duration: 0.4), value: hasSeenOnboarding)
             .animation(.easeInOut(duration: 0.4), value: isAuthenticated)
             .animation(.easeInOut(duration: 0.4), value: hasBirthData)

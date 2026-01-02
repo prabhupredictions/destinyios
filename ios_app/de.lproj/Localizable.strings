@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "Hallo!";
 "todays_insight" = "TAGESHOROSKOP";
-"ask_destiny" = "Frag Destiny";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "Worauf sollte ich heute achten?";
@@ -79,6 +78,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "Geburtsdaten eingeben";
 "your_name" = "Dein Name";
+"enter_your_name" = "Gib deinen Namen ein";
 "date_of_birth" = "Geburtsdatum";
 "time_of_birth" = "Geburtszeit";
 "birth_time_unknown" = "Geburtszeit unbekannt";
@@ -102,8 +102,6 @@
 "partner_details" = "Partner-Daten";
 "calculate_match" = "Match berechnen";
 "match_score" = "Match-Score";
-"kundali_match" = "Chart-Matching";
-"ashtakoot_analysis" = "Geburtshoroskop-Kompatibilität";
 "boys_details" = "Du";
 "girls_details" = "Partner";
 "analyze_match" = "Kompatibilität prüfen";
@@ -185,3 +183,231 @@
 "name_gender_updated" = "Ihr Name und Geschlecht wurden aktualisiert.";
 "need_update_birth_data" = "Geburtsdaten aktualisieren?";
 "contact_support_birth_data" = "Für Änderungen an Datum, Uhrzeit oder Ort Ihrer Geburt kontaktieren Sie bitte unser Support-Team.";
+"gender_identity" = "Geschlechtsidentität";
+"select_birth_city" = "Wähle deinen Geburtsort";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "von";
+"compatible" = "kompatibel";
+"excellent_match" = "Ausgezeichnete Übereinstimmung";
+"good_match" = "Gute Übereinstimmung";
+"moderate_match" = "Mäßige Übereinstimmung";
+"vs" = "VS";
+"ashtakoot_grid" = "Ashtakoot-Details";
+"varna" = "Varna";
+"vashya" = "Vashya";
+"tara" = "Tara";
+"yoni" = "Yoni";
+"graha_maitri" = "Maitri";
+"gana" = "Gana";
+"bhakoot" = "Bhakoot";
+"nadi" = "Nadi";
+"view_full_report" = "Vollständigen Bericht anzeigen";
+"full_compatibility_report" = "Vollständiger Kompatibilitätsbericht";
+"points" = "Punkte";
+"score" = "Punktzahl";
+"boy" = "Er";
+"girl" = "Sie";
+"impact" = "Auswirkung";
+"excellent" = "Ausgezeichnet";
+"good" = "Gut";
+"moderate" = "Mäßig";
+"needs_care" = "Aufmerksamkeit erforderlich";
+"mangal_dosha_status" = "Mangal-Dosha-Status";
+"no_dosha" = "Kein Dosha";
+"has_dosha" = "Hat Dosha";
+"recommended_remedies" = "Empfohlene Heilmittel";
+"ask_destiny" = "Destiny fragen";
+"ask_destiny_about_match" = "Frage Destiny über diesen Vergleich";
+"ai_powered" = "KI-gestützt";
+"tap_to_ask" = "Tippe zum Fragen...";
+"ask_anything_match" = "Frage alles über diesen Vergleich...";
+"quick_topics" = "Schnellthemen";
+"ask_score" = "Punktzahl";
+"ask_dosha" = "Dosha";
+"ask_weak" = "Schwächen";
+"ask_remedies" = "Abhilfe";
+"new_match" = "Neuer Vergleich";
+
+
+
+// Match Result Additions
+"ask_more_match" = "Mehr über dieses Match fragen...";
+"mangal_dosha" = "Mangal Dosha";
+"mangal_dosha_desc" = "Mars-Positionsanalyse";
+"kalsarpa_dosha" = "Kalsarpa Dosha";
+"kalsarpa_dosha_desc" = "Rahu-Ketu-Achsenanalyse";
+"additional_yoga" = "Zusätzliche Yoga & Dosha";
+"additional_yoga_desc" = "Andere glückverheißende Kombinationen";
+"charts" = "Charts";
+"history" = "Verlauf";
+"report" = "Bericht";
+
+// MARK: - Mangal Dosha Exceptions (German)
+"exception_mars_in_own_sign" = "Mars ist im eigenen Zeichen (Widder oder Skorpion)";
+"exception_mars_exalted" = "Mars ist im Steinbock erhöht";
+"exception_mars_in_upachaya" = "Mars in Wachstumshäusern (3, 6, 10, 11)";
+"exception_mars_in_fixed_sign" = "Mars ist in einem festen Zeichen";
+"exception_mars_in_own_navamsa" = "Mars ist im eigenen Navamsa";
+"exception_mars_conjunct_benefics" = "Mars konjugiert mit Wohltätern";
+"exception_mars_benefic_nakshatra_lord" = "Mars im günstigen Nakshatra";
+"exception_mars_in_benefic_nakshatra" = "Mars in glückverheißender Konstellation";
+"exception_mars_moon_friendly_nakshatras" = "Mars und Mond in freundlichen Nakshatras";
+"exception_mars_in_asc_lord_nakshatra" = "Mars im Nakshatra des Aszendenten-Herrschers";
+"exception_mars_moon_same_nakshatra_pada" = "Mars und Mond teilen denselben Pada";
+"exception_mars_jupiter_conjunction" = "Mars-Jupiter-Konjunktion";
+"exception_mars_aspected_by_jupiter" = "Jupiters Aspekt mildert Mars";
+"exception_mars_in_jupiter_sign" = "Mars im Jupiter-Zeichen (Schütze/Fische)";
+"exception_mars_moon_conjunction_benefic" = "Mars-Mond-Konjunktion im günstigen Haus";
+"exception_mars_moon_mutual_kendra" = "Mars und Mond in gegenseitiger Kendra-Beziehung";
+"exception_mars_aspected_by_benefics" = "Mars erhält wohltätige Aspekte";
+"exception_mars_jupiter_mutual_aspects" = "Mars und Jupiter in gegenseitigen Aspekten";
+"exception_mars_jupiter_in_trine" = "Mars und Jupiter in Trigon-Häusern";
+"exception_mars_strong_ashtakavarga" = "Mars hat starkes Ashtakavarga";
+"exception_mars_strong_shadbala" = "Mars hat starkes Shadbala";
+"exception_moon_strong" = "Starker Mond im Horoskop";
+
+// MARK: - Intensity Factors (German)
+"intensity_mars_debilitated" = "Mars geschwächt im Krebs";
+"intensity_mars_conjunct_malefics" = "Mars konjugiert mit Übeltätern";
+"intensity_mars_critical_degrees" = "Mars bei kritischen Gandanta-Graden";
+"intensity_mars_papa_kartari" = "Mars eingeschlossen von Übeltätern";
+"intensity_seventh_lord_afflicted" = "Herrscher des 7. Hauses bedrängt";
+"intensity_mars_dusthana_from_moon" = "Mars in 6/8/12 vom Mond";
+"intensity_mars_retrograde" = "Mars ist rückläufig";
+"intensity_mars_combust" = "Mars ist verbrannt (zu nah an der Sonne)";
+"intensity_mars_low_ashtakavarga" = "Mars mit niedrigem Ashtakavarga";
+
+// MARK: - Zodiac Signs (German)
+"sign_ar" = "Widder";
+"sign_ta" = "Stier";
+"sign_ge" = "Zwillinge";
+"sign_ca" = "Krebs";
+"sign_le" = "Löwe";
+"sign_vi" = "Jungfrau";
+"sign_li" = "Waage";
+"sign_sc" = "Skorpion";
+"sign_sg" = "Schütze";
+"sign_cp" = "Steinbock";
+"sign_aq" = "Wassermann";
+"sign_pi" = "Fische";
+
+// MARK: - Planets (German)
+"planet_sun" = "Sonne";
+"planet_moon" = "Mond";
+"planet_mars" = "Mars";
+"planet_mercury" = "Merkur";
+"planet_jupiter" = "Jupiter";
+"planet_venus" = "Venus";
+"planet_saturn" = "Saturn";
+"planet_rahu" = "Rahu";
+"planet_ketu" = "Ketu";
+
+// MARK: - Severity/Status (German)
+"severity_none" = "Keine";
+"severity_mild" = "Leicht";
+"severity_moderate" = "Mäßig";
+"severity_high" = "Hoch";
+"severity_severe" = "Schwer";
+"status_active" = "Aktiv";
+"status_reduced" = "Reduziert";
+"status_cancelled" = "Aufgehoben";
+"active" = "Aktiv";
+"reduced" = "Reduziert";
+"cancelled" = "Aufgehoben";
+
+// MARK: - Dosha UI Labels (German)
+"mangal_dosha_analysis" = "Mangal Dosha Analyse";
+"kalsarpa_analysis" = "Kalsarpa Dosha Analyse";
+"yogas_analysis" = "Yogas & Doshas";
+"cancellation_active" = "Dosha Aufgehoben";
+"no_dosha_present" = "Kein Dosha";
+"mitigating_factors" = "Mildernde Faktoren";
+"intensifying_factors" = "Verstärkende Faktoren";
+"planets_involved" = "Beteiligte Planeten";
+"affected_areas" = "Betroffene Bereiche";
+"peak_period" = "Höhepunktperiode";
+"planetary_configuration" = "Planetenkonfiguration";
+"complete_formation" = "Vollständige Bildung";
+"partial_formation" = "Teilweise Bildung";
+"no_kalsarpa" = "Kein Kalsarpa";
+"planets_balanced" = "Planeten Ausgeglichen";
+"formation_details" = "Bildungsdetails";
+"strength" = "Stärke";
+
+// MARK: - Nakshatra Names (27) - German (Sanskrit names kept)
+"nakshatra_ashwini" = "Ashwini";
+"nakshatra_bharani" = "Bharani";
+"nakshatra_krittika" = "Krittika";
+"nakshatra_rohini" = "Rohini";
+"nakshatra_mrigashira" = "Mrigashira";
+"nakshatra_ardra" = "Ardra";
+"nakshatra_punarvasu" = "Punarvasu";
+"nakshatra_pushya" = "Pushya";
+"nakshatra_ashlesha" = "Ashlesha";
+"nakshatra_magha" = "Magha";
+"nakshatra_purva_phalguni" = "Purva Phalguni";
+"nakshatra_uttara_phalguni" = "Uttara Phalguni";
+"nakshatra_hasta" = "Hasta";
+"nakshatra_chitra" = "Chitra";
+"nakshatra_swati" = "Swati";
+"nakshatra_vishakha" = "Vishakha";
+"nakshatra_anuradha" = "Anuradha";
+"nakshatra_jyeshtha" = "Jyeshtha";
+"nakshatra_moola" = "Moola";
+"nakshatra_purva_ashadha" = "Purva Ashadha";
+"nakshatra_uttara_ashadha" = "Uttara Ashadha";
+"nakshatra_shravana" = "Shravana";
+"nakshatra_dhanishtha" = "Dhanishtha";
+"nakshatra_shatabhisha" = "Shatabhisha";
+"nakshatra_purva_bhadrapada" = "Purva Bhadrapada";
+"nakshatra_uttara_bhadrapada" = "Uttara Bhadrapada";
+"nakshatra_revati" = "Revati";
+
+// MARK: - New Exception Keys (8) - German
+"exception_mars_yoga_karaka" = "Mars ist Yoga Karaka für diesen Aszendenten";
+"exception_mars_jupiter_yoga" = "Mars-Jupiter günstiges Yoga vorhanden";
+"exception_mars_venus_yoga" = "Mars-Venus günstiges Yoga vorhanden";
+"exception_mars_good_d7" = "Mars ist gut platziert im D7 (Saptamsa) Horoskop";
+"exception_mars_good_d9" = "Mars ist gut platziert im D9 (Navamsa) Horoskop";
+"exception_mars_good_d10" = "Mars ist gut platziert im D10 (Dasamsa) Horoskop";
+"exception_mars_good_d60" = "Mars ist gut platziert im D60 (Shashtiamsa) Horoskop";
+"exception_ruchaka_yoga" = "Ruchaka Mahapurusha Yoga vorhanden";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - German
+"mars_position" = "Mars Position";
+"house_label" = "Haus";
+"sign_lord" = "Zeichenherr";
+"nakshatra_lord" = "Nakshatra Herr";
+"dosha_calculation" = "Dosha Berechnung";
+"base_strength" = "Grundstärke";
+"mitigation" = "Milderung";
+"intensification" = "Verstärkung";
+"final_score" = "Endpunktzahl";
+"explanation_label" = "Berechnungsdetails";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

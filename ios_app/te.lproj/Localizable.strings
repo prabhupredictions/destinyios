@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "నమస్తే!";
 "todays_insight" = "ఈ రోజు రాశి ఫలం";
-"ask_destiny" = "Destiny ని అడగండి";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "ఈ రోజు నేను దేని గురించి గమనించాలి?";
@@ -102,8 +101,6 @@
 "partner_details" = "పార్ట్‌నర్ సమాచారం";
 "calculate_match" = "పొందిక చూడండి";
 "match_score" = "పొందిక స్కోర్";
-"kundali_match" = "చార్ట్ మ్యాచ్";
-"ashtakoot_analysis" = "బర్త్ చార్ట్ కంపాటిబిలిటీ";
 "boys_details" = "మీరు";
 "girls_details" = "పార్ట్‌నర్";
 "analyze_match" = "కంపాటిబిలిటీ చూడండి";
@@ -185,3 +182,232 @@
 "name_gender_updated" = "మీ పేరు మరియు లింగం నవీకరించబడ్డాయి.";
 "need_update_birth_data" = "పుట్టిన డేటాను అప్‌డేట్ చేయాలా?";
 "contact_support_birth_data" = "పుట్టిన తేదీ, సమయం లేదా స్థలాన్ని మార్చడానికి, సపోర్ట్ టీమ్‌ను సంప్రదించండి.";
+"gender_identity" = "లింగ గుర్తింపు";
+"select_birth_city" = "మీ పుట్టిన నగరాన్ని ఎంచుకోండి";
+"enter_your_name" = "మీ పేరు నమోదు చేయండి";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "లో";
+"compatible" = "అనుకూలం";
+"excellent_match" = "అద్భుతమైన మ్యాచ్";
+"good_match" = "మంచి మ్యాచ్";
+"moderate_match" = "మధ్యస్థ మ్యాచ్";
+"vs" = "VS";
+"ashtakoot_grid" = "అష్టకూట వివరాలు";
+"varna" = "వర్ణ";
+"vashya" = "వశ్య";
+"tara" = "తార";
+"yoni" = "యోని";
+"graha_maitri" = "మైత్రి";
+"gana" = "గణ";
+"bhakoot" = "భకూట్";
+"nadi" = "నాడి";
+"view_full_report" = "పూర్తి నివేదిక చూడండి";
+"full_compatibility_report" = "పూర్తి అనుకూలత నివేదిక";
+"points" = "పాయింట్లు";
+"score" = "స్కోర్";
+"boy" = "వరుడు";
+"girl" = "వధువు";
+"impact" = "ప్రభావం";
+"excellent" = "అద్భుతం";
+"good" = "మంచిది";
+"moderate" = "మధ్యస్థం";
+"needs_care" = "శ్రద్ధ అవసరం";
+"mangal_dosha_status" = "మంగళ దోష స్థితి";
+"no_dosha" = "దోషం లేదు";
+"has_dosha" = "దోషం ఉంది";
+"recommended_remedies" = "సిఫారసు చేసిన పరిష్కారాలు";
+"ask_destiny" = "Destiny ని అడగండి";
+"ask_destiny_about_match" = "ఈ మ్యాచ్ గురించి అడగండి";
+"ai_powered" = "AI ఆధారిత";
+"tap_to_ask" = "అడగడానికి నొక్కండి...";
+"ask_anything_match" = "ఈ మ్యాచ్ గురించి ఏదైనా అడగండి...";
+"quick_topics" = "త్వరిత అంశాలు";
+"ask_score" = "స్కోర్";
+"ask_dosha" = "దోషం";
+"ask_weak" = "బలహీనత";
+"ask_remedies" = "పరిష్కారం";
+"new_match" = "కొత్త మ్యాచ్";
+
+
+
+// Match Result Additions
+"ask_more_match" = "ఈ మ్యాచ్ గురించి మరింత అడగండి...";
+"mangal_dosha" = "కుజ దోషం";
+"mangal_dosha_desc" = "కుజ గ్రహ విశ్లేషణ";
+"kalsarpa_dosha" = "కాలసర్ప దోషం";
+"kalsarpa_dosha_desc" = "రాహు-కేతు అక్షం విశ్లేషణ";
+"additional_yoga" = "అదనపు యోగం & దోషం";
+"additional_yoga_desc" = "ఇతర శుభ కలయికలు";
+"charts" = "చార్ట్";
+"history" = "చరిత్ర";
+"report" = "నివేదిక";
+
+// MARK: - Mangal Dosha Exceptions (Telugu)
+"exception_mars_in_own_sign" = "కుజుడు స్వక్షేత్రంలో (మేషం లేదా వృశ్చికం)";
+"exception_mars_exalted" = "కుజుడు మకరంలో ఉచ్ఛస్థితి";
+"exception_mars_in_upachaya" = "కుజుడు ఉపచయ భావాలలో (3, 6, 10, 11)";
+"exception_mars_in_fixed_sign" = "కుజుడు స్థిర రాశిలో";
+"exception_mars_in_own_navamsa" = "కుజుడు స్వ నవాంశలో";
+"exception_mars_conjunct_benefics" = "కుజుడు శుభ గ్రహాలతో కలిసి";
+"exception_mars_benefic_nakshatra_lord" = "కుజుడు శుభ నక్షత్రంలో";
+"exception_mars_in_benefic_nakshatra" = "కుజుడు మంచి నక్షత్రంలో";
+"exception_mars_moon_friendly_nakshatras" = "కుజ-చంద్రులు స్నేహ నక్షత్రాలలో";
+"exception_mars_in_asc_lord_nakshatra" = "కుజుడు లగ్నాధిపతి నక్షత్రంలో";
+"exception_mars_moon_same_nakshatra_pada" = "కుజ-చంద్రులు ఒకే నక్షత్ర పాదంలో";
+"exception_mars_jupiter_conjunction" = "కుజ-గురు యుతి";
+"exception_mars_aspected_by_jupiter" = "గురు దృష్టి కుజుని శాంతపరుస్తుంది";
+"exception_mars_in_jupiter_sign" = "కుజుడు గురు రాశిలో (ధనుస్సు/మీనం)";
+"exception_mars_moon_conjunction_benefic" = "కుజ-చంద్ర యుతి శుభ భావంలో";
+"exception_mars_moon_mutual_kendra" = "కుజ-చంద్రులు కేంద్ర సంబంధంలో";
+"exception_mars_aspected_by_benefics" = "కుజునిపై శుభ గ్రహాల దృష్టి";
+"exception_mars_jupiter_mutual_aspects" = "కుజ-గురుల పరస్పర దృష్టి";
+"exception_mars_jupiter_in_trine" = "కుజ-గురులు త్రికోణ భావాలలో";
+"exception_mars_strong_ashtakavarga" = "కుజుడికి బలమైన అష్టకవర్గ";
+"exception_mars_strong_shadbala" = "కుజుడికి బలమైన షడ్బల";
+"exception_moon_strong" = "జాతకంలో చంద్రుడు బలంగా";
+
+// MARK: - Intensity Factors (Telugu)
+"intensity_mars_debilitated" = "కుజుడు కర్కాటకంలో నీచస్థితి";
+"intensity_mars_conjunct_malefics" = "కుజుడు పాప గ్రహాలతో కలిసి";
+"intensity_mars_critical_degrees" = "కుజుడు గండాంత అంశలో";
+"intensity_mars_papa_kartari" = "కుజుడు పాపకర్తరి యోగంలో";
+"intensity_seventh_lord_afflicted" = "సప్తమాధిపతి పీడితుడు";
+"intensity_mars_dusthana_from_moon" = "కుజుడు చంద్రుని నుండి 6/8/12లో";
+"intensity_mars_retrograde" = "కుజుడు వక్రస్థితిలో";
+"intensity_mars_combust" = "కుజుడు అస్తంగతుడు";
+"intensity_mars_low_ashtakavarga" = "కుజుడికి తక్కువ అష్టకవర్గ";
+
+// MARK: - Zodiac Signs (Telugu)
+"sign_ar" = "మేషం";
+"sign_ta" = "వృషభం";
+"sign_ge" = "మిథునం";
+"sign_ca" = "కర్కాటకం";
+"sign_le" = "సింహం";
+"sign_vi" = "కన్య";
+"sign_li" = "తులా";
+"sign_sc" = "వృశ్చికం";
+"sign_sg" = "ధనుస్సు";
+"sign_cp" = "మకరం";
+"sign_aq" = "కుంభం";
+"sign_pi" = "మీనం";
+
+// MARK: - Planets (Telugu)
+"planet_sun" = "సూర్యుడు";
+"planet_moon" = "చంద్రుడు";
+"planet_mars" = "కుజుడు";
+"planet_mercury" = "బుధుడు";
+"planet_jupiter" = "గురుడు";
+"planet_venus" = "శుక్రుడు";
+"planet_saturn" = "శని";
+"planet_rahu" = "రాహువు";
+"planet_ketu" = "కేతువు";
+
+// MARK: - Severity/Status (Telugu)
+"severity_none" = "లేదు";
+"severity_mild" = "సున్నితం";
+"severity_moderate" = "మధ్యస్థం";
+"severity_high" = "తీవ్రం";
+"severity_severe" = "అత్యధికం";
+"status_active" = "చురుకుగా";
+"status_reduced" = "తగ్గింది";
+"status_cancelled" = "రద్దు";
+"active" = "చురుకుగా";
+"reduced" = "తగ్గింది";
+"cancelled" = "రద్దు";
+
+// MARK: - Dosha UI Labels (Telugu)
+"mangal_dosha_analysis" = "కుజ దోష విశ్లేషణ";
+"kalsarpa_analysis" = "కాలసర్ప దోష విశ్లేషణ";
+"yogas_analysis" = "యోగాలు & దోషాలు";
+"cancellation_active" = "దోషం రద్దు";
+"no_dosha_present" = "దోషం లేదు";
+"mitigating_factors" = "తగ్గించే కారకాలు";
+"intensifying_factors" = "తీవ్రతరం చేసే కారకాలు";
+"planets_involved" = "సంబంధిత గ్రహాలు";
+"affected_areas" = "ప్రభావిత రంగాలు";
+"peak_period" = "గరిష్ట కాలం";
+"planetary_configuration" = "గ్రహ విన్యాసం";
+"complete_formation" = "పూర్తి నిర్మాణం";
+"partial_formation" = "పాక్షిక నిర్మాణం";
+"no_kalsarpa" = "కాలసర్పం లేదు";
+"planets_balanced" = "గ్రహాలు సమతుల్యం";
+"formation_details" = "నిర్మాణ వివరాలు";
+"strength" = "బలం";
+
+// MARK: - Nakshatra Names (27) - Telugu
+"nakshatra_ashwini" = "అశ్విని";
+"nakshatra_bharani" = "భరణి";
+"nakshatra_krittika" = "కృత్తిక";
+"nakshatra_rohini" = "రోహిణి";
+"nakshatra_mrigashira" = "మృగశిర";
+"nakshatra_ardra" = "ఆర్ద్ర";
+"nakshatra_punarvasu" = "పునర్వసు";
+"nakshatra_pushya" = "పుష్యమి";
+"nakshatra_ashlesha" = "ఆశ్లేష";
+"nakshatra_magha" = "మఘ";
+"nakshatra_purva_phalguni" = "పూర్వ ఫల్గుని";
+"nakshatra_uttara_phalguni" = "ఉత్తర ఫల్గుని";
+"nakshatra_hasta" = "హస్త";
+"nakshatra_chitra" = "చిత్త";
+"nakshatra_swati" = "స్వాతి";
+"nakshatra_vishakha" = "విశాఖ";
+"nakshatra_anuradha" = "అనురాధ";
+"nakshatra_jyeshtha" = "జ్యేష్ఠ";
+"nakshatra_moola" = "మూల";
+"nakshatra_purva_ashadha" = "పూర్వాషాఢ";
+"nakshatra_uttara_ashadha" = "ఉత్తరాషాఢ";
+"nakshatra_shravana" = "శ్రవణం";
+"nakshatra_dhanishtha" = "ధనిష్ఠ";
+"nakshatra_shatabhisha" = "శతభిషం";
+"nakshatra_purva_bhadrapada" = "పూర్వాభాద్ర";
+"nakshatra_uttara_bhadrapada" = "ఉత్తరాభాద్ర";
+"nakshatra_revati" = "రేవతి";
+
+// MARK: - New Exception Keys (8) - Telugu
+"exception_mars_yoga_karaka" = "కుజుడు ఈ లగ్నానికి యోగకారకుడు";
+"exception_mars_jupiter_yoga" = "కుజ-గురు శుభ యోగం ఉంది";
+"exception_mars_venus_yoga" = "కుజ-శుక్ర శుభ యోగం ఉంది";
+"exception_mars_good_d7" = "D7 (సప్తాంశ) చార్ట్‌లో కుజుడు మంచి స్థితిలో";
+"exception_mars_good_d9" = "D9 (నవాంశ) చార్ట్‌లో కుజుడు మంచి స్థితిలో";
+"exception_mars_good_d10" = "D10 (దశాంశ) చార్ట్‌లో కుజుడు మంచి స్థితిలో";
+"exception_mars_good_d60" = "D60 (షష్ట్యాంశ) చార్ట్‌లో కుజుడు మంచి స్థితిలో";
+"exception_ruchaka_yoga" = "రుచక మహాపురుష యోగం ఉంది";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - Telugu
+"mars_position" = "కుజుడి స్థానం";
+"house_label" = "భావం";
+"sign_lord" = "రాశి అధిపతి";
+"nakshatra_lord" = "నక్షత్ర అధిపతి";
+"dosha_calculation" = "దోష లెక్కింపు";
+"base_strength" = "ప్రాథమిక బలం";
+"mitigation" = "తగ్గింపు";
+"intensification" = "తీవ్రత";
+"final_score" = "తుది స్కోరు";
+"explanation_label" = "లెక్కింపు వివరాలు";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

@@ -6,6 +6,13 @@ struct CompatibilityView: View {
     @State private var selectedTab = 0 // 0 = Boy, 1 = Girl
     @State private var showBoyLocationSearch = false
     @State private var showGirlLocationSearch = false
+    @State private var showChartsSheet = false  // NEW: For chart display
+    
+    // External callbacks/props
+    var initialMatchItem: CompatibilityHistoryItem? = nil
+    var onShowResultChange: ((Bool) -> Void)? = nil
+    
+    @State private var hasHandledInitialMatch = false
     
     var body: some View {
         ZStack {
@@ -16,12 +23,36 @@ struct CompatibilityView: View {
                 CompatibilityResultView(
                     result: result,
                     boyName: viewModel.boyName,
-                    girlName: viewModel.girlName
-                ) {
-                    viewModel.reset()
-                }
+                    girlName: viewModel.girlName,
+                    boyDob: viewModel.formattedBoyDob,
+                    girlDob: viewModel.formattedGirlDob,
+                    boyCity: viewModel.boyCity,
+                    girlCity: viewModel.girlCity,
+                    onNewAnalysis: {
+                        viewModel.reset()
+                    },
+                    onBack: {
+                        viewModel.showResult = false
+                    },
+                    onHistory: nil, // Handled internally by CompatibilityResultView now
+                    onCharts: {
+                        showChartsSheet = true
+                    },
+                    onLoadHistory: { item in
+                        viewModel.loadFromHistory(item)
+                    }
+                )
             } else {
                 compatibilityForm
+            }
+            
+            // Premium streaming progress overlay
+            if viewModel.showStreamingView {
+                CompatibilityStreamingView(
+                    isVisible: $viewModel.showStreamingView,
+                    currentStep: $viewModel.currentStep,
+                    streamingText: $viewModel.streamingText
+                )
             }
         }
         .sheet(isPresented: $showBoyLocationSearch) {
@@ -39,6 +70,42 @@ struct CompatibilityView: View {
                 longitude: $viewModel.girlLongitude,
                 placeId: .constant(nil)
             )
+        }
+        .sheet(isPresented: $showChartsSheet) {
+            if let result = viewModel.result {
+                let boyAsc = result.analysisData?.boy?.chartData?.d1["Ascendant"]?.sign
+                let girlAsc = result.analysisData?.girl?.chartData?.d1["Ascendant"]?.sign
+                let _ = print("[ChartSheet] analysisData: \(result.analysisData != nil)")
+                let _ = print("[ChartSheet] boy: \(result.analysisData?.boy != nil)")
+                let _ = print("[ChartSheet] boyChartData: \(result.analysisData?.boy?.chartData != nil)")
+                let _ = print("[ChartSheet] girlChartData: \(result.analysisData?.girl?.chartData != nil)")
+                ChartComparisonSheet(
+                    boyName: viewModel.boyName.isEmpty ? "You" : viewModel.boyName,
+                    girlName: viewModel.girlName.isEmpty ? "Partner" : viewModel.girlName,
+                    boyChartData: result.analysisData?.boy?.chartData,
+                    girlChartData: result.analysisData?.girl?.chartData,
+                    boyAscendant: boyAsc,
+                    girlAscendant: girlAsc
+                )
+            }
+        }
+        .onChange(of: viewModel.showResult) { _, newValue in
+            onShowResultChange?(newValue)
+        }
+        // Handle initial match loading
+        .onChange(of: initialMatchItem) { oldValue, newValue in
+            if let item = newValue {
+                viewModel.loadFromHistory(item)
+            }
+        }
+        .onAppear {
+            if let item = initialMatchItem, !hasHandledInitialMatch {
+                hasHandledInitialMatch = true
+                // Slight delay to ensure view is ready
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    viewModel.loadFromHistory(item)
+                }
+            }
         }
     }
     
@@ -170,12 +237,12 @@ struct CompatibilityView: View {
             HStack(spacing: 12) {
                 // Name
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("NAME")
+                    Text("boys_name".localized)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
                     HStack {
-                        Text(viewModel.boyName.isEmpty ? "Not set" : viewModel.boyName)
+                        Text(viewModel.boyName.isEmpty ? "not_set".localized : viewModel.boyName)
                             .font(.system(size: 15))
                             .foregroundColor(Color("TextDark"))
                         Spacer()
@@ -189,7 +256,7 @@ struct CompatibilityView: View {
                 
                 // Gender (read-only from profile)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("GENDER")
+                    Text("gender".localized.uppercased())
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
@@ -210,7 +277,7 @@ struct CompatibilityView: View {
             // Row 2: Date and Time inline
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("DATE OF BIRTH")
+                    Text("date_of_birth_caps".localized)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
@@ -230,12 +297,12 @@ struct CompatibilityView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("TIME")
+                    Text("time_caps".localized)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
                     HStack {
-                        Text(viewModel.boyTimeUnknown ? "Unknown" : formattedBoyTime)
+                        Text(viewModel.boyTimeUnknown ? "birth_time_unknown".localized : formattedBoyTime)
                             .font(.system(size: 15))
                             .foregroundColor(Color("TextDark"))
                         Spacer()
@@ -252,7 +319,7 @@ struct CompatibilityView: View {
             
             // Row 3: Place of Birth
             VStack(alignment: .leading, spacing: 4) {
-                Text("PLACE OF BIRTH")
+                Text("place_of_birth_caps".localized)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundColor(Color("TextDark").opacity(0.4))
                 
@@ -261,7 +328,7 @@ struct CompatibilityView: View {
                         .font(.system(size: 12))
                         .foregroundColor(Color("NavyPrimary").opacity(0.5))
                     
-                    Text(viewModel.boyCity.isEmpty ? "Not set" : viewModel.boyCity)
+                    Text(viewModel.boyCity.isEmpty ? "not_set".localized : viewModel.boyCity)
                         .font(.system(size: 15))
                         .foregroundColor(Color("TextDark"))
                     
@@ -285,10 +352,10 @@ struct CompatibilityView: View {
     // User gender display text
     private var userGenderDisplayText: String {
         switch viewModel.boyGender {
-        case "male": return "Male"
-        case "female": return "Female"
-        case "non-binary": return "Non-binary"
-        default: return "Not set"
+        case "male": return "male".localized
+        case "female": return "female".localized
+        case "non-binary": return "non_binary".localized
+        default: return "prefer_not_to_say".localized
         }
     }
     
@@ -302,17 +369,18 @@ struct CompatibilityView: View {
     // Formatted time for display
     private var formattedBoyTime: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "h:mma"
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "h:mm a"
         return formatter.string(from: viewModel.boyBirthTime)
     }
     
     // Gender display text for dropdown
     private var genderDisplayText: String {
         switch viewModel.partnerGender {
-        case "male": return "Male"
-        case "female": return "Female"
-        case "non-binary": return "Non-binary"
-        default: return "Select"
+        case "male": return "male".localized
+        case "female": return "female".localized
+        case "non-binary": return "non_binary".localized
+        default: return "prefer_not_to_say".localized
         }
     }
 
@@ -323,11 +391,11 @@ struct CompatibilityView: View {
             HStack(spacing: 12) {
                 // Name (takes more space)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("NAME")
+                    Text("girls_name".localized)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
-                    TextField("Required", text: $viewModel.girlName)
+                    TextField("enter_name".localized, text: $viewModel.girlName)
                         .font(.system(size: 15))
                         .foregroundColor(Color("TextDark"))
                         .padding(.horizontal, 12)
@@ -339,15 +407,15 @@ struct CompatibilityView: View {
                 
                 // Gender dropdown (compact)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("GENDER")
+                    Text("gender".localized.uppercased())
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
                     Menu {
-                        Button("Not specified") { viewModel.partnerGender = "" }
-                        Button("Male") { viewModel.partnerGender = "male" }
-                        Button("Female") { viewModel.partnerGender = "female" }
-                        Button("Non-binary") { viewModel.partnerGender = "non-binary" }
+                        Button("prefer_not_to_say".localized) { viewModel.partnerGender = "" }
+                        Button("male".localized) { viewModel.partnerGender = "male" }
+                        Button("female".localized) { viewModel.partnerGender = "female" }
+                        Button("non_binary".localized) { viewModel.partnerGender = "non-binary" }
                     } label: {
                         HStack(spacing: 4) {
                             Text(genderDisplayText)
@@ -370,7 +438,7 @@ struct CompatibilityView: View {
             // Row 2: Date and Time inline
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("DATE OF BIRTH")
+                    Text("date_of_birth_caps".localized)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
@@ -378,18 +446,35 @@ struct CompatibilityView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("TIME")
+                    Text("time_caps".localized)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(Color("TextDark").opacity(0.4))
                     
-                    MatchTimeButton(time: $viewModel.girlBirthTime)
-                        .disabled(viewModel.partnerTimeUnknown)
-                        .opacity(viewModel.partnerTimeUnknown ? 0.5 : 1)
+                    if viewModel.partnerTimeUnknown {
+                        // Show "Unknown" text when time is unknown
+                        HStack {
+                            Text("birth_time_unknown".localized)
+                                .font(.system(size: 15))
+                                .foregroundColor(Color("TextDark").opacity(0.5))
+                            Spacer()
+                            Image(systemName: "clock")
+                                .font(.system(size: 14))
+                                .foregroundColor(Color("NavyPrimary").opacity(0.3))
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(red: 0.96, green: 0.95, blue: 0.98))
+                        )
+                    } else {
+                        MatchTimeButton(time: $viewModel.girlBirthTime)
+                    }
                 }
             }
             
             // Time unknown toggle (compact inline)
-            HStack(spacing: 8) {
+            HStack(alignment: .top, spacing: 8) {
                 Button(action: { viewModel.partnerTimeUnknown.toggle() }) {
                     Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
                         .font(.system(size: 16))
@@ -399,24 +484,33 @@ struct CompatibilityView: View {
                 Text("partner_birth_time_unknown".localized)
                     .font(.system(size: 12))
                     .foregroundColor(Color("TextDark").opacity(0.5))
+                    .fixedSize(horizontal: false, vertical: true)
                 
                 Spacer()
-                
-                // Inline warning indicator
-                if viewModel.partnerTimeUnknown {
-                    HStack(spacing: 4) {
-                        Image(systemName: "info.circle")
-                            .font(.system(size: 11))
-                        Text("Less accurate")
-                            .font(.system(size: 11))
-                    }
-                    .foregroundColor(.orange)
+            }
+            
+            // Warning note (shown separately for better visibility)
+            if viewModel.partnerTimeUnknown {
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(.orange)
+                    
+                    Text("birth_time_warning".localized)
+                        .font(.system(size: 11))
+                        .foregroundColor(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.orange.opacity(0.1))
+                )
             }
             
             // Row 3: Place of Birth
             VStack(alignment: .leading, spacing: 4) {
-                Text("PLACE OF BIRTH")
+                Text("place_of_birth_caps".localized)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundColor(Color("TextDark").opacity(0.4))
                 
@@ -426,7 +520,7 @@ struct CompatibilityView: View {
                             .font(.system(size: 12))
                             .foregroundColor(Color("NavyPrimary").opacity(0.5))
                         
-                        Text(viewModel.girlCity.isEmpty ? "Select city" : viewModel.girlCity)
+                        Text(viewModel.girlCity.isEmpty ? "select_city".localized : viewModel.girlCity)
                             .font(.system(size: 15))
                             .foregroundColor(viewModel.girlCity.isEmpty ? Color("TextDark").opacity(0.4) : Color("TextDark"))
                         
@@ -557,7 +651,8 @@ struct MatchTimeButton: View {
     
     private func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.timeStyle = .short
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "h:mm a"
         return formatter.string(from: date)
     }
 }
@@ -769,6 +864,7 @@ struct MatchTimePickerSheet: View {
                 .datePickerStyle(.graphical)
                 #endif
                 .labelsHidden()
+                .environment(\.locale, Locale(identifier: "en_US"))
                 .padding()
                 
                 Spacer()
@@ -780,18 +876,27 @@ struct MatchTimePickerSheet: View {
             .toolbar {
                 #if os(iOS)
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done".localized) { dismiss() }
                         .foregroundColor(Color("NavyPrimary"))
                 }
                 #else
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button("done".localized) { dismiss() }
                         .foregroundColor(Color("NavyPrimary"))
                 }
                 #endif
             }
         }
         .presentationDetents([.medium])
+    }
+    
+    // MARK: - Helper Functions
+    
+    /// Extract ascendant sign from chart data (D1)
+    private func extractAscendant(from chartData: ChartData?) -> String? {
+        guard let d1 = chartData?.d1,
+              let asc = d1["Ascendant"] else { return nil }
+        return asc.sign
     }
 }
 

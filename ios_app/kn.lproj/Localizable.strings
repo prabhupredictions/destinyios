@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "ನಮಸ್ಕಾರ!";
 "todays_insight" = "ಇಂದಿನ ರಾಶಿಫಲ";
-"ask_destiny" = "Destiny ಹತ್ರ ಕೇಳಿ";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "ಇಂದು ನಾನು ಏನು ಗಮನಿಸಬೇಕು?";
@@ -102,8 +101,6 @@
 "partner_details" = "ಪಾರ್ಟ್ನರ್ ಮಾಹಿತಿ";
 "calculate_match" = "ಹೊಂದಾಣಿಕೆ ನೋಡಿ";
 "match_score" = "ಹೊಂದಾಣಿಕೆ ಸ್ಕೋರ್";
-"kundali_match" = "ಚಾರ್ಟ್ ಮ್ಯಾಚ್";
-"ashtakoot_analysis" = "ಬರ್ತ್ ಚಾರ್ಟ್ ಕಂಪಾಟಿಬಿಲಿಟಿ";
 "boys_details" = "ನಿಮ್ಮ";
 "girls_details" = "ಪಾರ್ಟ್‌ನರ್";
 "analyze_match" = "ಕಂಪಾಟಿಬಿಲಿಟಿ ನೋಡಿ";
@@ -185,3 +182,232 @@
 "name_gender_updated" = "ನಿಮ್ಮ ಹೆಸರು ಮತ್ತು ಲಿಂಗವನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ.";
 "need_update_birth_data" = "ಜನ್ಮ ಡೇಟಾವನ್ನು ನವೀಕರಿಸಬೇಕೇ?";
 "contact_support_birth_data" = "ಜನ್ಮ ದಿನಾಂಕ, ಸಮಯ ಅಥವಾ ಸ್ಥಳವನ್ನು ಬದಲಾಯಿಸಲು, ಬೆಂಬಲ ತಂಡವನ್ನು ಸಂಪರ್ಕಿಸಿ.";
+"gender_identity" = "ಲಿಂಗ ಗುರುತು";
+"select_birth_city" = "ನಿಮ್ಮ ಹುಟ್ಟಿದ ಊರನ್ನು ಆಯ್ಕೆಮಾಡಿ";
+"enter_your_name" = "ನಿಮ್ಮ ಹೆಸರನ್ನು ನಮೂದಿಸಿ";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "ರಲ್ಲಿ";
+"compatible" = "ಹೊಂದಾಣಿಕೆ";
+"excellent_match" = "ಅತ್ಯುತ್ತಮ ಹೊಂದಾಣಿಕೆ";
+"good_match" = "ಒಳ್ಳೆಯ ಹೊಂದಾಣಿಕೆ";
+"moderate_match" = "ಮಧ್ಯಮ ಹೊಂದಾಣಿಕೆ";
+"vs" = "VS";
+"ashtakoot_grid" = "ಅಷ್ಟಕೂಟ ವಿವರಗಳು";
+"varna" = "ವರ್ಣ";
+"vashya" = "ವಶ್ಯ";
+"tara" = "ತಾರಾ";
+"yoni" = "ಯೋನಿ";
+"graha_maitri" = "ಮೈತ್ರಿ";
+"gana" = "ಗಣ";
+"bhakoot" = "ಭಕೂಟ್";
+"nadi" = "ನಾಡಿ";
+"view_full_report" = "ಪೂರ್ಣ ವರದಿ ನೋಡಿ";
+"full_compatibility_report" = "ಪೂರ್ಣ ಹೊಂದಾಣಿಕೆ ವರದಿ";
+"points" = "ಅಂಕಗಳು";
+"score" = "ಸ್ಕೋರ್";
+"boy" = "ವರ";
+"girl" = "ವಧು";
+"impact" = "ಪರಿಣಾಮ";
+"excellent" = "ಅತ್ಯುತ್ತಮ";
+"good" = "ಒಳ್ಳೆಯದು";
+"moderate" = "ಮಧ್ಯಮ";
+"needs_care" = "ಗಮನ ಅಗತ್ಯ";
+"mangal_dosha_status" = "ಮಂಗಳ ದೋಷ ಸ್ಥಿತಿ";
+"no_dosha" = "ದೋಷ ಇಲ್ಲ";
+"has_dosha" = "ದೋಷ ಇದೆ";
+"recommended_remedies" = "ಶಿಫಾರಸು ಮಾಡಿದ ಪರಿಹಾರಗಳು";
+"ask_destiny" = "Destiny ಅನ್ನು ಕೇಳಿ";
+"ask_destiny_about_match" = "ಈ ಹೊಂದಾಣಿಕೆ ಬಗ್ಗೆ ಕೇಳಿ";
+"ai_powered" = "AI ಚಾಲಿತ";
+"tap_to_ask" = "ಕೇಳಲು ಟ್ಯಾಪ್ ಮಾಡಿ...";
+"ask_anything_match" = "ಈ ಹೊಂದಾಣಿಕೆ ಬಗ್ಗೆ ಏನಾದರೂ ಕೇಳಿ...";
+"quick_topics" = "ತ್ವರಿತ ವಿಷಯಗಳು";
+"ask_score" = "ಸ್ಕೋರ್";
+"ask_dosha" = "ದೋಷ";
+"ask_weak" = "ದೌರ್ಬಲ್ಯ";
+"ask_remedies" = "ಪರಿಹಾರ";
+"new_match" = "ಹೊಸ ಹೊಂದಾಣಿಕೆ";
+
+
+
+// Match Result Additions
+"ask_more_match" = "ಈ ಹೊಂದಾಣಿಕೆಯ ಬಗ್ಗೆ ಇನ್ನಷ್ಟು ಕೇಳಿ...";
+"mangal_dosha" = "ಕುಜ ದೋಷ";
+"mangal_dosha_desc" = "ಕುಜ ಗ್ರಹ ವಿಶ್ಲೇಷಣೆ";
+"kalsarpa_dosha" = "ಕಾಲಸರ್ಪ ದೋಷ";
+"kalsarpa_dosha_desc" = "ರಾಹು-ಕೇತು ಅಕ್ಷ ವಿಶ್ಲೇಷಣೆ";
+"additional_yoga" = "ಹೆಚ್ಚುವರಿ ಯೋಗ ಮತ್ತು ದೋಷ";
+"additional_yoga_desc" = "ಇತರೆ ಶುಭ ಸಂಯೋಜನೆಗಳು";
+"charts" = "ಜಾತಕ";
+"history" = "ಇತಿಹಾಸ";
+"report" = "ವರದಿ";
+
+// MARK: - Mangal Dosha Exceptions (Kannada)
+"exception_mars_in_own_sign" = "ಕುಜ ಸ್ವಕ್ಷೇತ್ರದಲ್ಲಿ (ಮೇಷ ಅಥವಾ ವೃಶ್ಚಿಕ)";
+"exception_mars_exalted" = "ಕುಜ ಮಕರದಲ್ಲಿ ಉಚ್ಛ";
+"exception_mars_in_upachaya" = "ಕುಜ ಉಪಚಯ ಭಾವಗಳಲ್ಲಿ (3, 6, 10, 11)";
+"exception_mars_in_fixed_sign" = "ಕುಜ ಸ್ಥಿರ ರಾಶಿಯಲ್ಲಿ";
+"exception_mars_in_own_navamsa" = "ಕುಜ ಸ್ವ ನವಾಂಶದಲ್ಲಿ";
+"exception_mars_conjunct_benefics" = "ಕುಜ ಶುಭ ಗ್ರಹಗಳೊಂದಿಗೆ";
+"exception_mars_benefic_nakshatra_lord" = "ಕುಜ ಶುಭ ನಕ್ಷತ್ರದಲ್ಲಿ";
+"exception_mars_in_benefic_nakshatra" = "ಕುಜ ಒಳ್ಳೆಯ ನಕ್ಷತ್ರದಲ್ಲಿ";
+"exception_mars_moon_friendly_nakshatras" = "ಕುಜ-ಚಂದ್ರ ಸ್ನೇಹ ನಕ್ಷತ್ರಗಳಲ್ಲಿ";
+"exception_mars_in_asc_lord_nakshatra" = "ಕುಜ ಲಗ್ನಾಧಿಪತಿ ನಕ್ಷತ್ರದಲ್ಲಿ";
+"exception_mars_moon_same_nakshatra_pada" = "ಕುಜ-ಚಂದ್ರ ಒಂದೇ ನಕ್ಷತ್ರ ಪಾದದಲ್ಲಿ";
+"exception_mars_jupiter_conjunction" = "ಕುಜ-ಗುರು ಯುತಿ";
+"exception_mars_aspected_by_jupiter" = "ಗುರುವಿನ ದೃಷ್ಟಿ ಕುಜನನ್ನು ಶಾಂತಗೊಳಿಸುತ್ತದೆ";
+"exception_mars_in_jupiter_sign" = "ಕುಜ ಗುರು ರಾಶಿಯಲ್ಲಿ (ಧನು/ಮೀನ)";
+"exception_mars_moon_conjunction_benefic" = "ಕುಜ-ಚಂದ್ರ ಶುಭ ಭಾವದಲ್ಲಿ ಯುತಿ";
+"exception_mars_moon_mutual_kendra" = "ಕುಜ-ಚಂದ್ರ ಕೇಂದ್ರ ಸಂಬಂಧದಲ್ಲಿ";
+"exception_mars_aspected_by_benefics" = "ಕುಜನ ಮೇಲೆ ಶುಭ ಗ್ರಹಗಳ ದೃಷ್ಟಿ";
+"exception_mars_jupiter_mutual_aspects" = "ಕುಜ-ಗುರು ಪರಸ್ಪರ ದೃಷ್ಟಿ";
+"exception_mars_jupiter_in_trine" = "ಕುಜ-ಗುರು ತ್ರಿಕೋಣ ಭಾವಗಳಲ್ಲಿ";
+"exception_mars_strong_ashtakavarga" = "ಕುಜನಿಗೆ ಬಲವಾದ ಅಷ್ಟಕವರ್ಗ";
+"exception_mars_strong_shadbala" = "ಕುಜನಿಗೆ ಬಲವಾದ ಷಡ್ಬಲ";
+"exception_moon_strong" = "ಜಾತಕದಲ್ಲಿ ಚಂದ್ರ ಬಲವಾಗಿ";
+
+// MARK: - Intensity Factors (Kannada)
+"intensity_mars_debilitated" = "ಕುಜ ಕರ್ಕಾಟಕದಲ್ಲಿ ನೀಚ";
+"intensity_mars_conjunct_malefics" = "ಕುಜ ಪಾಪ ಗ್ರಹಗಳೊಂದಿಗೆ";
+"intensity_mars_critical_degrees" = "ಕುಜ ಗಂಡಾಂತ ಅಂಶದಲ್ಲಿ";
+"intensity_mars_papa_kartari" = "ಕುಜ ಪಾಪಕರ್ತರಿ ಯೋಗದಲ್ಲಿ";
+"intensity_seventh_lord_afflicted" = "ಸಪ್ತಮಾಧಿಪತಿ ಪೀಡಿತ";
+"intensity_mars_dusthana_from_moon" = "ಕುಜ ಚಂದ್ರನಿಂದ 6/8/12ರಲ್ಲಿ";
+"intensity_mars_retrograde" = "ಕುಜ ವಕ್ರಗತಿಯಲ್ಲಿ";
+"intensity_mars_combust" = "ಕುಜ ಅಸ್ತ";
+"intensity_mars_low_ashtakavarga" = "ಕುಜನಿಗೆ ಕಡಿಮೆ ಅಷ್ಟಕವರ್ಗ";
+
+// MARK: - Zodiac Signs (Kannada)
+"sign_ar" = "ಮೇಷ";
+"sign_ta" = "ವೃಷಭ";
+"sign_ge" = "ಮಿಥುನ";
+"sign_ca" = "ಕರ್ಕಾಟಕ";
+"sign_le" = "ಸಿಂಹ";
+"sign_vi" = "ಕನ್ಯಾ";
+"sign_li" = "ತುಲಾ";
+"sign_sc" = "ವೃಶ್ಚಿಕ";
+"sign_sg" = "ಧನು";
+"sign_cp" = "ಮಕರ";
+"sign_aq" = "ಕುಂಭ";
+"sign_pi" = "ಮೀನ";
+
+// MARK: - Planets (Kannada)
+"planet_sun" = "ಸೂರ್ಯ";
+"planet_moon" = "ಚಂದ್ರ";
+"planet_mars" = "ಕುಜ";
+"planet_mercury" = "ಬುಧ";
+"planet_jupiter" = "ಗುರು";
+"planet_venus" = "ಶುಕ್ರ";
+"planet_saturn" = "ಶನಿ";
+"planet_rahu" = "ರಾಹು";
+"planet_ketu" = "ಕೇತು";
+
+// MARK: - Severity/Status (Kannada)
+"severity_none" = "ಇಲ್ಲ";
+"severity_mild" = "ಸೌಮ್ಯ";
+"severity_moderate" = "ಮಧ್ಯಮ";
+"severity_high" = "ತೀವ್ರ";
+"severity_severe" = "ಬಹಳ ತೀವ್ರ";
+"status_active" = "ಸಕ್ರಿಯ";
+"status_reduced" = "ಕಡಿಮೆಯಾಗಿದೆ";
+"status_cancelled" = "ರದ್ದು";
+"active" = "ಸಕ್ರಿಯ";
+"reduced" = "ಕಡಿಮೆ";
+"cancelled" = "ರದ್ದು";
+
+// MARK: - Dosha UI Labels (Kannada)
+"mangal_dosha_analysis" = "ಕುಜ ದೋಷ ವಿಶ್ಲೇಷಣೆ";
+"kalsarpa_analysis" = "ಕಾಲಸರ್ಪ ದೋಷ ವಿಶ್ಲೇಷಣೆ";
+"yogas_analysis" = "ಯೋಗಗಳು & ದೋಷಗಳು";
+"cancellation_active" = "ದೋಷ ರದ್ದು";
+"no_dosha_present" = "ದೋಷ ಇಲ್ಲ";
+"mitigating_factors" = "ಕಡಿಮೆ ಮಾಡುವ ಅಂಶಗಳು";
+"intensifying_factors" = "ತೀವ್ರಗೊಳಿಸುವ ಅಂಶಗಳು";
+"planets_involved" = "ಸಂಬಂಧಿತ ಗ್ರಹಗಳು";
+"affected_areas" = "ಪ್ರಭಾವಿತ ಕ್ಷೇತ್ರಗಳು";
+"peak_period" = "ಉತ್ತುಂಗ ಅವಧಿ";
+"planetary_configuration" = "ಗ್ರಹ ವಿನ್ಯಾಸ";
+"complete_formation" = "ಪೂರ್ಣ ರಚನೆ";
+"partial_formation" = "ಭಾಗಶಃ ರಚನೆ";
+"no_kalsarpa" = "ಕಾಲಸರ್ಪ ಇಲ್ಲ";
+"planets_balanced" = "ಗ್ರಹಗಳು ಸಮತೋಲನ";
+"formation_details" = "ರಚನೆ ವಿವರ";
+"strength" = "ಬಲ";
+
+// MARK: - Nakshatra Names (27) - Kannada
+"nakshatra_ashwini" = "ಅಶ್ವಿನಿ";
+"nakshatra_bharani" = "ಭರಣಿ";
+"nakshatra_krittika" = "ಕೃತ್ತಿಕಾ";
+"nakshatra_rohini" = "ರೋಹಿಣಿ";
+"nakshatra_mrigashira" = "ಮೃಗಶಿರ";
+"nakshatra_ardra" = "ಆರ್ದ್ರ";
+"nakshatra_punarvasu" = "ಪುನರ್ವಸು";
+"nakshatra_pushya" = "ಪುಷ್ಯ";
+"nakshatra_ashlesha" = "ಆಶ್ಲೇಷ";
+"nakshatra_magha" = "ಮಘ";
+"nakshatra_purva_phalguni" = "ಪೂರ್ವ ಫಲ್ಗುಣಿ";
+"nakshatra_uttara_phalguni" = "ಉತ್ತರ ಫಲ್ಗುಣಿ";
+"nakshatra_hasta" = "ಹಸ್ತ";
+"nakshatra_chitra" = "ಚಿತ್ರ";
+"nakshatra_swati" = "ಸ್ವಾತಿ";
+"nakshatra_vishakha" = "ವಿಶಾಖ";
+"nakshatra_anuradha" = "ಅನುರಾಧ";
+"nakshatra_jyeshtha" = "ಜ್ಯೇಷ್ಠ";
+"nakshatra_moola" = "ಮೂಲ";
+"nakshatra_purva_ashadha" = "ಪೂರ್ವಾಷಾಢ";
+"nakshatra_uttara_ashadha" = "ಉತ್ತರಾಷಾಢ";
+"nakshatra_shravana" = "ಶ್ರವಣ";
+"nakshatra_dhanishtha" = "ಧನಿಷ್ಠ";
+"nakshatra_shatabhisha" = "ಶತಭಿಷ";
+"nakshatra_purva_bhadrapada" = "ಪೂರ್ವಾಭಾದ್ರ";
+"nakshatra_uttara_bhadrapada" = "ಉತ್ತರಾಭಾದ್ರ";
+"nakshatra_revati" = "ರೇವತಿ";
+
+// MARK: - New Exception Keys (8) - Kannada
+"exception_mars_yoga_karaka" = "ಕುಜ ಈ ಲಗ್ನಕ್ಕೆ ಯೋಗಕಾರಕ";
+"exception_mars_jupiter_yoga" = "ಕುಜ-ಗುರು ಶುಭ ಯೋಗ ಇದೆ";
+"exception_mars_venus_yoga" = "ಕುಜ-ಶುಕ್ರ ಶುಭ ಯೋಗ ಇದೆ";
+"exception_mars_good_d7" = "D7 (ಸಪ್ತಾಂಶ) ಚಾರ್ಟ್‌ನಲ್ಲಿ ಕುಜ ಉತ್ತಮ ಸ್ಥಾನದಲ್ಲಿ";
+"exception_mars_good_d9" = "D9 (ನವಾಂಶ) ಚಾರ್ಟ್‌ನಲ್ಲಿ ಕುಜ ಉತ್ತಮ ಸ್ಥಾನದಲ್ಲಿ";
+"exception_mars_good_d10" = "D10 (ದಶಾಂಶ) ಚಾರ್ಟ್‌ನಲ್ಲಿ ಕುಜ ಉತ್ತಮ ಸ್ಥಾನದಲ್ಲಿ";
+"exception_mars_good_d60" = "D60 (ಷಷ್ಟ್ಯಾಂಶ) ಚಾರ್ಟ್‌ನಲ್ಲಿ ಕುಜ ಉತ್ತಮ ಸ್ಥಾನದಲ್ಲಿ";
+"exception_ruchaka_yoga" = "ರುಚಕ ಮಹಾಪುರುಷ ಯೋಗ ಇದೆ";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - Kannada
+"mars_position" = "ಕುಜ ಸ್ಥಾನ";
+"house_label" = "ಭಾವ";
+"sign_lord" = "ರಾಶಿ ಅಧಿಪತಿ";
+"nakshatra_lord" = "ನಕ್ಷತ್ರ ಅಧಿಪತಿ";
+"dosha_calculation" = "ದೋಷ ಲೆಕ್ಕಾಚಾರ";
+"base_strength" = "ಮೂಲ ಬಲ";
+"mitigation" = "ತಗ್ಗಿಸುವಿಕೆ";
+"intensification" = "ತೀವ್ರತೆ";
+"final_score" = "ಅಂತಿಮ ಸ್ಕೋರ್";
+"explanation_label" = "ಲೆಕ್ಕಾಚಾರ ವಿವರ";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

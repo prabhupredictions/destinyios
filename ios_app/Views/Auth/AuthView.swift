@@ -92,41 +92,21 @@ struct AuthView: View {
     
     // MARK: - Logo Section
     private var logoSection: some View {
-        ZStack {
-            // Glow
-            Circle()
-                .fill(Color("GoldAccent").opacity(0.15))
-                .frame(width: 130, height: 130)
-                .blur(radius: 20)
-            
-            // Logo background circle
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.85)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 100, height: 100)
-                .shadow(color: Color("GoldAccent").opacity(0.4), radius: 15)
-            
-            // Logo image
-            Image("logo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 60, height: 60)
-        }
+        // Destiny logo from assets
+        Image("logo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 180, height: 180)
     }
     
     // MARK: - Welcome Section
     private var welcomeSection: some View {
         VStack(spacing: 12) {
-            Text("Welcome to Destiny")
+            Text("welcome_to_destiny".localized)
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(Color("NavyPrimary"))
             
-            Text("Your personal astrology companion")
+            Text("sign_in_save".localized)
                 .font(.system(size: 16, weight: .regular))
                 .foregroundColor(Color("TextDark").opacity(0.6))
         }
@@ -135,27 +115,30 @@ struct AuthView: View {
     // MARK: - Auth Buttons
     private var authButtonsSection: some View {
         VStack(spacing: 14) {
-            // Google Sign In (first)
-            AuthButton(
-                icon: "g.circle.fill",
-                title: "Continue with Google",
-                style: .light
-            ) {
-                Task { await viewModel.signInWithGoogle() }
-            }
-            
-            // Apple Sign In
+            // Apple Sign In (first per iOS HIG)
             AuthButton(
                 icon: "apple.logo",
+                iconImage: nil,
                 title: "Continue with Apple",
                 style: .dark
             ) {
                 Task { await viewModel.signInWithApple() }
             }
             
+            // Google Sign In
+            AuthButton(
+                icon: nil,
+                iconImage: "google_logo",
+                title: "Continue with Google",
+                style: .light
+            ) {
+                Task { await viewModel.signInWithGoogle() }
+            }
+            
             // Email Sign In
             AuthButton(
                 icon: "envelope.fill",
+                iconImage: nil,
                 title: "Continue with Email",
                 style: .light
             ) {
@@ -182,7 +165,7 @@ struct AuthView: View {
                 Rectangle()
                     .fill(Color("TextDark").opacity(0.2))
                     .frame(height: 1)
-                Text("or")
+                Text("or".localized)
                     .font(.system(size: 13))
                     .foregroundColor(Color("TextDark").opacity(0.4))
                 Rectangle()
@@ -196,7 +179,7 @@ struct AuthView: View {
             Button(action: {
                 viewModel.continueAsGuest()
             }) {
-                Text("Continue as Guest")
+                Text("continue_as_guest".localized)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(Color("NavyPrimary"))
             }
@@ -207,7 +190,7 @@ struct AuthView: View {
     // MARK: - Terms Section
     private var termsSection: some View {
         VStack(spacing: 8) {
-            Text("By continuing, you agree to our")
+            Text("by_continuing".localized)
                 .font(.system(size: 12))
                 .foregroundColor(Color("TextDark").opacity(0.5))
             
@@ -218,7 +201,7 @@ struct AuthView: View {
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(Color("NavyPrimary"))
                 
-                Text("and")
+                Text("and".localized)
                     .font(.system(size: 12))
                     .foregroundColor(Color("TextDark").opacity(0.5))
                 
@@ -243,7 +226,7 @@ struct AuthView: View {
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     .scaleEffect(1.3)
                 
-                Text("Signing in...")
+                Text("signing_in".localized)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.white)
             }
@@ -272,7 +255,8 @@ struct AuthButton: View {
         case dark, light
     }
     
-    let icon: String
+    let icon: String?          // SF Symbol name (optional)
+    let iconImage: String?     // Asset image name (optional)
     let title: String
     let style: Style
     let action: () -> Void
@@ -280,8 +264,16 @@ struct AuthButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: .medium))
+                // Show either SF Symbol or asset image
+                if let iconImage = iconImage {
+                    Image(iconImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                } else if let icon = icon {
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .medium))
+                }
                 
                 Text(title)
                     .font(.system(size: 16, weight: .semibold))

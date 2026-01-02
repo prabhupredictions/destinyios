@@ -42,7 +42,7 @@ struct OnboardingView: View {
                 HStack {
                     if currentSlide < slides.count - 1 {
                         Button(action: onComplete) {
-                            Text("Skip")
+                            Text("skip".localized)
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(Color("TextDark").opacity(0.6))
                         }
@@ -87,7 +87,7 @@ struct OnboardingView: View {
                             }
                         }) {
                             HStack(spacing: 8) {
-                                Text("Continue")
+                                Text("continue".localized)
                                     .font(.system(size: 17, weight: .semibold))
                                 Image(systemName: "arrow.right")
                                     .font(.system(size: 14, weight: .semibold))

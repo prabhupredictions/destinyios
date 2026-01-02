@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "नमस्ते!";
 "todays_insight" = "आज का राशिफल";
-"ask_destiny" = "डेस्टिनी से पूछें";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "आज मुझे किस बात का ध्यान रखना चाहिए?";
@@ -79,6 +78,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "जन्म की जानकारी भरें";
 "your_name" = "आपका नाम";
+"enter_your_name" = "अपना नाम दर्ज करें";
 "date_of_birth" = "जन्म तिथि";
 "time_of_birth" = "जन्म का समय";
 "birth_time_unknown" = "जन्म का समय पता नहीं";
@@ -102,8 +102,6 @@
 "partner_details" = "पार्टनर की जानकारी";
 "calculate_match" = "मिलान देखें";
 "match_score" = "मिलान स्कोर";
-"kundali_match" = "चार्ट मैच";
-"ashtakoot_analysis" = "बर्थ चार्ट कम्पैटिबिलिटी";
 "boys_details" = "आप";
 "girls_details" = "पार्टनर";
 "analyze_match" = "कम्पैटिबिलिटी चेक करें";
@@ -191,3 +189,246 @@
 "name_gender_updated" = "आपका नाम और लिंग अपडेट किया गया।";
 "need_update_birth_data" = "जन्म डेटा अपडेट करना है?";
 "contact_support_birth_data" = "जन्म तिथि, समय या स्थान में बदलाव के लिए कृपया सहायता टीम से संपर्क करें।";
+"gender_identity" = "लिंग पहचान";
+"select_birth_city" = "अपने जन्म का शहर चुनें";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "में से";
+"compatible" = "अनुकूल";
+"excellent_match" = "उत्कृष्ट मिलान";
+"good_match" = "अच्छा मिलान";
+"moderate_match" = "मध्यम मिलान";
+
+// Partner Cards
+"vs" = "बनाम";
+
+// Kuta Grid
+"ashtakoot_grid" = "अष्टकूट विवरण";
+"varna" = "वर्ण";
+"vashya" = "वश्य";
+"tara" = "तारा";
+"yoni" = "योनि";
+"graha_maitri" = "मैत्री";
+"gana" = "गण";
+"bhakoot" = "भकूट";
+"nadi" = "नाड़ी";
+
+// View Full Report
+"view_full_report" = "पूरी रिपोर्ट देखें";
+"full_compatibility_report" = "पूर्ण अनुकूलता रिपोर्ट";
+"points" = "अंक";
+"score" = "स्कोर";
+"boy" = "वर";
+"girl" = "वधू";
+"impact" = "प्रभाव";
+"excellent" = "उत्कृष्ट";
+"good" = "अच्छा";
+"moderate" = "मध्यम";
+"needs_care" = "ध्यान देने योग्य";
+
+// Mangal Dosha
+"mangal_dosha_status" = "मंगल दोष स्थिति";
+"no_dosha" = "दोष नहीं";
+"has_dosha" = "दोष है";
+
+// Remedies
+"recommended_remedies" = "सुझाए गए उपाय";
+
+// Ask Destiny
+"ask_destiny" = "डेस्टिनी से पूछें";
+"ask_destiny_about_match" = "इस मिलान के बारे में पूछें";
+"ai_powered" = "AI संचालित";
+"tap_to_ask" = "पूछने के लिए टैप करें...";
+"ask_anything_match" = "इस मिलान के बारे में कुछ भी पूछें...";
+"quick_topics" = "त्वरित विषय";
+"ask_score" = "स्कोर";
+"ask_dosha" = "दोष";
+"ask_weak" = "कमजोर";
+"ask_remedies" = "उपाय";
+
+// Match Result Actions
+"new_match" = "नया मिलान";
+
+
+// Match Result Additions
+"ask_more_match" = "मिलान के बारे में और पूछें...";
+"mangal_dosha" = "मंगल दोष";
+"mangal_dosha_desc" = "मंगल स्थिति विश्लेषण";
+"kalsarpa_dosha" = "कालसर्प दोष";
+"kalsarpa_dosha_desc" = "राहु-केतु अक्ष विश्लेषण";
+"additional_yoga" = "अन्य योग व दोष";
+"additional_yoga_desc" = "अन्य शुभ संयोग";
+"charts" = "कुंडली";
+"history" = "इतिहास";
+"report" = "रिपोर्ट";
+
+// MARK: - Mangal Dosha Exceptions (Hindi)
+"exception_mars_in_own_sign" = "मंगल अपनी राशि (मेष या वृश्चिक) में है";
+"exception_mars_exalted" = "मंगल मकर में उच्च का है";
+"exception_mars_in_upachaya" = "मंगल उपचय भाव (3, 6, 10, 11) में है";
+"exception_mars_in_fixed_sign" = "मंगल स्थिर राशि में है";
+"exception_mars_in_own_navamsa" = "मंगल अपने नवांश में है";
+"exception_mars_conjunct_benefics" = "मंगल शुभ ग्रहों के साथ है";
+"exception_mars_benefic_nakshatra_lord" = "मंगल शुभ नक्षत्र में है";
+"exception_mars_in_benefic_nakshatra" = "मंगल शुभ नक्षत्र में स्थित है";
+"exception_mars_moon_friendly_nakshatras" = "मंगल और चंद्र मित्र नक्षत्रों में हैं";
+"exception_mars_in_asc_lord_nakshatra" = "मंगल लग्नेश के नक्षत्र में है";
+"exception_mars_moon_same_nakshatra_pada" = "मंगल और चंद्र एक ही नक्षत्र पद में हैं";
+"exception_mars_jupiter_conjunction" = "मंगल-गुरु युति है";
+"exception_mars_aspected_by_jupiter" = "गुरु की दृष्टि मंगल को शांत करती है";
+"exception_mars_in_jupiter_sign" = "मंगल गुरु की राशि (धनु/मीन) में है";
+"exception_mars_moon_conjunction_benefic" = "मंगल-चंद्र शुभ भाव में युति";
+"exception_mars_moon_mutual_kendra" = "मंगल और चंद्र केंद्र संबंध में हैं";
+"exception_mars_aspected_by_benefics" = "मंगल पर शुभ ग्रहों की दृष्टि है";
+"exception_mars_jupiter_mutual_aspects" = "मंगल और गुरु की परस्पर दृष्टि है";
+"exception_mars_jupiter_in_trine" = "मंगल और गुरु त्रिकोण भावों में हैं";
+"exception_mars_strong_ashtakavarga" = "मंगल के अष्टकवर्ग अंक मजबूत हैं";
+"exception_mars_strong_shadbala" = "मंगल का षड्बल मजबूत है";
+"exception_moon_strong" = "कुंडली में चंद्रमा बलवान है";
+
+// MARK: - Intensity Factors (Hindi)
+"intensity_mars_debilitated" = "मंगल कर्क में नीच का है";
+"intensity_mars_conjunct_malefics" = "मंगल पाप ग्रहों के साथ है";
+"intensity_mars_critical_degrees" = "मंगल गंडांत अंशों पर है";
+"intensity_mars_papa_kartari" = "मंगल पापकर्तरी योग में है";
+"intensity_seventh_lord_afflicted" = "सप्तमेश पीड़ित है";
+"intensity_mars_dusthana_from_moon" = "मंगल चंद्र से 6/8/12 में है";
+"intensity_mars_retrograde" = "मंगल वक्री है";
+"intensity_mars_combust" = "मंगल अस्त है (सूर्य के बहुत करीब)";
+"intensity_mars_low_ashtakavarga" = "मंगल के अष्टकवर्ग अंक कम हैं";
+
+// MARK: - Zodiac Signs (Hindi)
+"sign_ar" = "मेष";
+"sign_ta" = "वृषभ";
+"sign_ge" = "मिथुन";
+"sign_ca" = "कर्क";
+"sign_le" = "सिंह";
+"sign_vi" = "कन्या";
+"sign_li" = "तुला";
+"sign_sc" = "वृश्चिक";
+"sign_sg" = "धनु";
+"sign_cp" = "मकर";
+"sign_aq" = "कुंभ";
+"sign_pi" = "मीन";
+
+// MARK: - Planets (Hindi)
+"planet_sun" = "सूर्य";
+"planet_moon" = "चंद्र";
+"planet_mars" = "मंगल";
+"planet_mercury" = "बुध";
+"planet_jupiter" = "गुरु";
+"planet_venus" = "शुक्र";
+"planet_saturn" = "शनि";
+"planet_rahu" = "राहु";
+"planet_ketu" = "केतु";
+
+// MARK: - Severity Levels (Hindi)
+"severity_none" = "कोई नहीं";
+"severity_mild" = "हल्का";
+"severity_moderate" = "मध्यम";
+"severity_high" = "तीव्र";
+"severity_severe" = "गंभीर";
+
+// MARK: - Status Labels (Hindi)
+"status_active" = "सक्रिय";
+"status_reduced" = "कम हुआ";
+"status_cancelled" = "निरस्त";
+"active" = "सक्रिय";
+"reduced" = "कम हुआ";
+"cancelled" = "निरस्त";
+
+// MARK: - Dosha UI Labels (Hindi)
+"mangal_dosha_analysis" = "मंगल दोष विश्लेषण";
+"kalsarpa_analysis" = "कालसर्प दोष विश्लेषण";
+"yogas_analysis" = "योग एवं दोष";
+"cancellation_active" = "दोष निरस्त";
+"no_dosha_present" = "कोई दोष नहीं";
+"mitigating_factors" = "दोष-शमन कारक";
+"intensifying_factors" = "दोष-वृद्धि कारक";
+"planets_involved" = "शामिल ग्रह";
+"affected_areas" = "प्रभावित क्षेत्र";
+"peak_period" = "चरम अवधि";
+"planetary_configuration" = "ग्रह विन्यास";
+"complete_formation" = "पूर्ण निर्माण";
+"partial_formation" = "आंशिक निर्माण";
+"no_kalsarpa" = "कालसर्प योग नहीं";
+"planets_balanced" = "ग्रह संतुलित हैं";
+"formation_details" = "निर्माण विवरण";
+"strength" = "शक्ति";
+
+// MARK: - Nakshatra Names (27)
+"nakshatra_ashwini" = "अश्विनी";
+"nakshatra_bharani" = "भरणी";
+"nakshatra_krittika" = "कृत्तिका";
+"nakshatra_rohini" = "रोहिणी";
+"nakshatra_mrigashira" = "मृगशिरा";
+"nakshatra_ardra" = "आर्द्रा";
+"nakshatra_punarvasu" = "पुनर्वसु";
+"nakshatra_pushya" = "पुष्य";
+"nakshatra_ashlesha" = "आश्लेषा";
+"nakshatra_magha" = "मघा";
+"nakshatra_purva_phalguni" = "पूर्वा फाल्गुनी";
+"nakshatra_uttara_phalguni" = "उत्तरा फाल्गुनी";
+"nakshatra_hasta" = "हस्त";
+"nakshatra_chitra" = "चित्रा";
+"nakshatra_swati" = "स्वाति";
+"nakshatra_vishakha" = "विशाखा";
+"nakshatra_anuradha" = "अनुराधा";
+"nakshatra_jyeshtha" = "ज्येष्ठा";
+"nakshatra_moola" = "मूल";
+"nakshatra_purva_ashadha" = "पूर्वाषाढ़ा";
+"nakshatra_uttara_ashadha" = "उत्तराषाढ़ा";
+"nakshatra_shravana" = "श्रवण";
+"nakshatra_dhanishtha" = "धनिष्ठा";
+"nakshatra_shatabhisha" = "शतभिषा";
+"nakshatra_purva_bhadrapada" = "पूर्वाभाद्रपद";
+"nakshatra_uttara_bhadrapada" = "उत्तराभाद्रपद";
+"nakshatra_revati" = "रेवती";
+
+// MARK: - New Exception Keys (8)
+"exception_mars_yoga_karaka" = "मंगल इस लग्न के लिए योगकारक है";
+"exception_mars_jupiter_yoga" = "मंगल-गुरु शुभ योग मौजूद है";
+"exception_mars_venus_yoga" = "मंगल-शुक्र शुभ योग मौजूद है";
+"exception_mars_good_d7" = "मंगल D7 (सप्तांश) चार्ट में अच्छी स्थिति में है";
+"exception_mars_good_d9" = "मंगल D9 (नवांश) चार्ट में अच्छी स्थिति में है";
+"exception_mars_good_d10" = "मंगल D10 (दशांश) चार्ट में अच्छी स्थिति में है";
+"exception_mars_good_d60" = "मंगल D60 (षष्ट्यांश) चार्ट में अच्छी स्थिति में है";
+"exception_ruchaka_yoga" = "रुचक महापुरुष योग मौजूद है";
+"exception_mars_has_digbala" = "मंगल में दिग्बल (दिशात्मक शक्ति) है";
+"exception_moon_strong" = "चंद्रमा कुंडली में बलवान है";
+
+// MARK: - Mars Position UI Labels (10)
+"mars_position" = "मंगल की स्थिति";
+"house_label" = "भाव";
+"sign_lord" = "राशि स्वामी";
+"nakshatra_lord" = "नक्षत्र स्वामी";
+"dosha_calculation" = "दोष गणना";
+"base_strength" = "मूल शक्ति";
+"mitigation" = "शमन";
+"intensification" = "तीव्रता";
+"final_score" = "अंतिम स्कोर";
+"explanation_label" = "गणना विवरण";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

@@ -90,8 +90,77 @@ final class UserBirthProfile {
     }
     
     /// Get quota status
+    // MARK: - Quota Status Helper
+    
     var quotaStatus: QuotaStatus {
         QuotaStatus(userType: userType, questionsUsed: totalQuestionsAsked)
+    }
+}
+
+// MARK: - Codable
+
+extension UserBirthProfile: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id, email, isGuestEmail
+        case dateOfBirth, timeOfBirth, cityOfBirth
+        case latitude, longitude, placeId, gender, timeUnknown
+        case totalQuestionsAsked, isPremium, createdAt, updatedAt
+    }
+    
+    convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(String.self, forKey: .id)
+        let email = try container.decode(String.self, forKey: .email)
+        let isGuestEmail = try container.decode(Bool.self, forKey: .isGuestEmail)
+        let dateOfBirth = try container.decode(String.self, forKey: .dateOfBirth)
+        let timeOfBirth = try container.decode(String.self, forKey: .timeOfBirth)
+        let cityOfBirth = try container.decode(String.self, forKey: .cityOfBirth)
+        let latitude = try container.decode(Double.self, forKey: .latitude)
+        let longitude = try container.decode(Double.self, forKey: .longitude)
+        let placeId = try container.decodeIfPresent(String.self, forKey: .placeId)
+        let gender = try container.decodeIfPresent(String.self, forKey: .gender)
+        let timeUnknown = try container.decode(Bool.self, forKey: .timeUnknown)
+        let totalQuestionsAsked = try container.decode(Int.self, forKey: .totalQuestionsAsked)
+        let isPremium = try container.decode(Bool.self, forKey: .isPremium)
+        let createdAt = try container.decode(Date.self, forKey: .createdAt)
+        let updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        
+        self.init(
+            id: id,
+            email: email,
+            isGuestEmail: isGuestEmail,
+            dateOfBirth: dateOfBirth,
+            timeOfBirth: timeOfBirth,
+            cityOfBirth: cityOfBirth,
+            latitude: latitude,
+            longitude: longitude,
+            placeId: placeId,
+            gender: gender,
+            timeUnknown: timeUnknown,
+            totalQuestionsAsked: totalQuestionsAsked,
+            isPremium: isPremium,
+            createdAt: createdAt,
+            updatedAt: updatedAt
+        )
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(email, forKey: .email)
+        try container.encode(isGuestEmail, forKey: .isGuestEmail)
+        try container.encode(dateOfBirth, forKey: .dateOfBirth)
+        try container.encode(timeOfBirth, forKey: .timeOfBirth)
+        try container.encode(cityOfBirth, forKey: .cityOfBirth)
+        try container.encode(latitude, forKey: .latitude)
+        try container.encode(longitude, forKey: .longitude)
+        try container.encode(placeId, forKey: .placeId)
+        try container.encode(gender, forKey: .gender)
+        try container.encode(timeUnknown, forKey: .timeUnknown)
+        try container.encode(totalQuestionsAsked, forKey: .totalQuestionsAsked)
+        try container.encode(isPremium, forKey: .isPremium)
+        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(updatedAt, forKey: .updatedAt)
     }
 }
 

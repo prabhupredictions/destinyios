@@ -12,11 +12,14 @@ protocol NetworkClientProtocol {
 // MARK: - Prediction Service Protocol
 protocol PredictionServiceProtocol {
     func predict(request: PredictionRequest) async throws -> PredictionResponse
+    func getTodaysPrediction(request: UserAstroDataRequest) async throws -> TodaysPredictionResponse
 }
 
 // MARK: - Compatibility Service Protocol
 protocol CompatibilityServiceProtocol {
     func analyze(request: CompatibilityRequest) async throws -> CompatibilityResponse
+    func analyzeStream(request: CompatibilityRequest) async throws -> CompatibilityResponse
+    func followUp(request: CompatibilityFollowUpRequest) async throws -> CompatibilityFollowUpResponse
 }
 
 // MARK: - Chat History Service Protocol

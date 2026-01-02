@@ -8,9 +8,9 @@ struct SuggestedQuestions: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Section header
-            Text("Ask Destiny")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(Color("TextDark").opacity(0.6))
+            Text("ask_destiny".localized)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color("TextDark").opacity(0.7))
                 .padding(.leading, 4)
             
             // Questions list
@@ -37,7 +37,7 @@ struct QuestionRow: View {
             HStack(spacing: 12) {
                 // Question text
                 Text(question)
-                    .font(.system(size: 15))
+                    .font(.system(size: 16, weight: .regular))
                     .foregroundColor(Color("NavyPrimary"))
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
@@ -46,18 +46,24 @@ struct QuestionRow: View {
                 
                 // Arrow indicator
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.4))
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Color("NavyPrimary").opacity(0.35))
             }
-            .padding(16)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 16)
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 14)
                     .fill(Color.white)
-                    .shadow(
-                        color: Color.black.opacity(isPressed ? 0.02 : 0.04),
-                        radius: isPressed ? 4 : 8,
-                        y: isPressed ? 1 : 2
-                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(Color("NavyPrimary").opacity(0.06), lineWidth: 1)
+            )
+            .shadow(
+                color: Color("NavyPrimary").opacity(isPressed ? 0.03 : 0.06),
+                radius: isPressed ? 6 : 12,
+                x: 0,
+                y: isPressed ? 2 : 4
             )
             .scaleEffect(isPressed ? 0.98 : 1.0)
         }

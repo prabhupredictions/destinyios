@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "Привет!";
 "todays_insight" = "ГОРОСКОП НА СЕГОДНЯ";
-"ask_destiny" = "Спросить Destiny";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "На что обратить внимание сегодня?";
@@ -79,6 +78,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "Введи свои данные";
 "your_name" = "Твоё имя";
+"enter_your_name" = "Введи своё имя";
 "date_of_birth" = "Дата рождения";
 "time_of_birth" = "Время рождения";
 "birth_time_unknown" = "Не знаю точное время";
@@ -102,8 +102,6 @@
 "partner_details" = "Данные партнёра";
 "calculate_match" = "Проверить совместимость";
 "match_score" = "Результат";
-"kundali_match" = "Совместимость карт";
-"ashtakoot_analysis" = "Совместимость натальных карт";
 "boys_details" = "Ты";
 "girls_details" = "Партнёр";
 "analyze_match" = "Проверить совместимость";
@@ -185,3 +183,231 @@
 "name_gender_updated" = "Ваше имя и пол обновлены.";
 "need_update_birth_data" = "Нужно обновить данные о рождении?";
 "contact_support_birth_data" = "Для изменения даты, времени или места рождения обратитесь в службу поддержки.";
+"gender_identity" = "Гендерная идентичность";
+"select_birth_city" = "Выбери свой город рождения";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "из";
+"compatible" = "совместимы";
+"excellent_match" = "Отличная Совместимость";
+"good_match" = "Хорошая Совместимость";
+"moderate_match" = "Умеренная Совместимость";
+"vs" = "VS";
+"ashtakoot_grid" = "Детали Аштакута";
+"varna" = "Варна";
+"vashya" = "Вашья";
+"tara" = "Тара";
+"yoni" = "Йони";
+"graha_maitri" = "Майтри";
+"gana" = "Гана";
+"bhakoot" = "Бхакут";
+"nadi" = "Нади";
+"view_full_report" = "Посмотреть Полный Отчет";
+"full_compatibility_report" = "Полный Отчет о Совместимости";
+"points" = "Баллы";
+"score" = "Счет";
+"boy" = "Он";
+"girl" = "Она";
+"impact" = "Влияние";
+"excellent" = "Отлично";
+"good" = "Хорошо";
+"moderate" = "Умеренно";
+"needs_care" = "Требует Внимания";
+"mangal_dosha_status" = "Статус Мангал Доши";
+"no_dosha" = "Нет Доши";
+"has_dosha" = "Есть Доша";
+"recommended_remedies" = "Рекомендуемые Средства";
+"ask_destiny" = "Спросить Destiny";
+"ask_destiny_about_match" = "Спроси Destiny об этой совместимости";
+"ai_powered" = "На базе ИИ";
+"tap_to_ask" = "Нажми, чтобы спросить...";
+"ask_anything_match" = "Спроси что угодно об этой совместимости...";
+"quick_topics" = "Быстрые Темы";
+"ask_score" = "Счет";
+"ask_dosha" = "Доша";
+"ask_weak" = "Слабости";
+"ask_remedies" = "Средства";
+"new_match" = "Новая Совместимость";
+
+
+
+// Match Result Additions
+"ask_more_match" = "Спросить больше об этом совпадении...";
+"mangal_dosha" = "Мангал Доша";
+"mangal_dosha_desc" = "Анализ положения Марса";
+"kalsarpa_dosha" = "Калсарпа Доша";
+"kalsarpa_dosha_desc" = "Анализ оси Раху-Кету";
+"additional_yoga" = "Дополнительные Йога и Доша";
+"additional_yoga_desc" = "Другие благоприятные комбинации";
+"charts" = "Карты";
+"history" = "История";
+"report" = "Отчет";
+
+// MARK: - Mangal Dosha Exceptions (Russian)
+"exception_mars_in_own_sign" = "Марс в своём знаке (Овен или Скорпион)";
+"exception_mars_exalted" = "Марс экзальтирован в Козероге";
+"exception_mars_in_upachaya" = "Марс в домах роста (3, 6, 10, 11)";
+"exception_mars_in_fixed_sign" = "Марс в фиксированном знаке";
+"exception_mars_in_own_navamsa" = "Марс в своей Навамше";
+"exception_mars_conjunct_benefics" = "Марс в соединении с благодетелями";
+"exception_mars_benefic_nakshatra_lord" = "Марс в благоприятной накшатре";
+"exception_mars_in_benefic_nakshatra" = "Марс в благоприятном созвездии";
+"exception_mars_moon_friendly_nakshatras" = "Марс и Луна в дружественных накшатрах";
+"exception_mars_in_asc_lord_nakshatra" = "Марс в накшатре управителя асцендента";
+"exception_mars_moon_same_nakshatra_pada" = "Марс и Луна в одной паде";
+"exception_mars_jupiter_conjunction" = "Соединение Марс-Юпитер";
+"exception_mars_aspected_by_jupiter" = "Аспект Юпитера смягчает Марс";
+"exception_mars_in_jupiter_sign" = "Марс в знаке Юпитера (Стрелец/Рыбы)";
+"exception_mars_moon_conjunction_benefic" = "Соединение Марс-Луна в благом доме";
+"exception_mars_moon_mutual_kendra" = "Марс и Луна во взаимной Кендре";
+"exception_mars_aspected_by_benefics" = "Марс получает благоприятные аспекты";
+"exception_mars_jupiter_mutual_aspects" = "Марс и Юпитер во взаимных аспектах";
+"exception_mars_jupiter_in_trine" = "Марс и Юпитер в тригональных домах";
+"exception_mars_strong_ashtakavarga" = "Марс имеет сильную Аштакаваргу";
+"exception_mars_strong_shadbala" = "Марс имеет сильную Шадбалу";
+"exception_moon_strong" = "Сильная Луна в карте";
+
+// MARK: - Intensity Factors (Russian)
+"intensity_mars_debilitated" = "Марс ослаблен в Раке";
+"intensity_mars_conjunct_malefics" = "Марс в соединении с вредителями";
+"intensity_mars_critical_degrees" = "Марс на критических градусах Гандханта";
+"intensity_mars_papa_kartari" = "Марс окружён вредителями";
+"intensity_seventh_lord_afflicted" = "Управитель 7 дома поражён";
+"intensity_mars_dusthana_from_moon" = "Марс в 6/8/12 от Луны";
+"intensity_mars_retrograde" = "Марс ретроградный";
+"intensity_mars_combust" = "Марс сожжён (слишком близко к Солнцу)";
+"intensity_mars_low_ashtakavarga" = "Марс со слабой Аштакаваргой";
+
+// MARK: - Zodiac Signs (Russian)
+"sign_ar" = "Овен";
+"sign_ta" = "Телец";
+"sign_ge" = "Близнецы";
+"sign_ca" = "Рак";
+"sign_le" = "Лев";
+"sign_vi" = "Дева";
+"sign_li" = "Весы";
+"sign_sc" = "Скорпион";
+"sign_sg" = "Стрелец";
+"sign_cp" = "Козерог";
+"sign_aq" = "Водолей";
+"sign_pi" = "Рыбы";
+
+// MARK: - Planets (Russian)
+"planet_sun" = "Солнце";
+"planet_moon" = "Луна";
+"planet_mars" = "Марс";
+"planet_mercury" = "Меркурий";
+"planet_jupiter" = "Юпитер";
+"planet_venus" = "Венера";
+"planet_saturn" = "Сатурн";
+"planet_rahu" = "Раху";
+"planet_ketu" = "Кету";
+
+// MARK: - Severity/Status (Russian)
+"severity_none" = "Нет";
+"severity_mild" = "Лёгкая";
+"severity_moderate" = "Умеренная";
+"severity_high" = "Высокая";
+"severity_severe" = "Тяжёлая";
+"status_active" = "Активна";
+"status_reduced" = "Ослаблена";
+"status_cancelled" = "Отменена";
+"active" = "Активна";
+"reduced" = "Ослаблена";
+"cancelled" = "Отменена";
+
+// MARK: - Dosha UI Labels (Russian)
+"mangal_dosha_analysis" = "Анализ Мангал Доша";
+"kalsarpa_analysis" = "Анализ Калсарпа Доша";
+"yogas_analysis" = "Йоги и Доши";
+"cancellation_active" = "Доша Отменена";
+"no_dosha_present" = "Доша Отсутствует";
+"mitigating_factors" = "Смягчающие Факторы";
+"intensifying_factors" = "Усиливающие Факторы";
+"planets_involved" = "Задействованные Планеты";
+"affected_areas" = "Затронутые Сферы";
+"peak_period" = "Пиковый Период";
+"planetary_configuration" = "Планетарная Конфигурация";
+"complete_formation" = "Полная Формация";
+"partial_formation" = "Частичная Формация";
+"no_kalsarpa" = "Калсарпа Отсутствует";
+"planets_balanced" = "Планеты Сбалансированы";
+"formation_details" = "Детали Формации";
+"strength" = "Сила";
+
+// MARK: - Nakshatra Names (27) - Russian (Sanskrit transliteration)
+"nakshatra_ashwini" = "Ашвини";
+"nakshatra_bharani" = "Бхарани";
+"nakshatra_krittika" = "Криттика";
+"nakshatra_rohini" = "Рохини";
+"nakshatra_mrigashira" = "Мригашира";
+"nakshatra_ardra" = "Ардра";
+"nakshatra_punarvasu" = "Пунарвасу";
+"nakshatra_pushya" = "Пушья";
+"nakshatra_ashlesha" = "Ашлеша";
+"nakshatra_magha" = "Магха";
+"nakshatra_purva_phalguni" = "Пурва Пхалгуни";
+"nakshatra_uttara_phalguni" = "Уттара Пхалгуни";
+"nakshatra_hasta" = "Хаста";
+"nakshatra_chitra" = "Читра";
+"nakshatra_swati" = "Свати";
+"nakshatra_vishakha" = "Вишакха";
+"nakshatra_anuradha" = "Анурадха";
+"nakshatra_jyeshtha" = "Джьештха";
+"nakshatra_moola" = "Мула";
+"nakshatra_purva_ashadha" = "Пурва Ашадха";
+"nakshatra_uttara_ashadha" = "Уттара Ашадха";
+"nakshatra_shravana" = "Шравана";
+"nakshatra_dhanishtha" = "Дхаништха";
+"nakshatra_shatabhisha" = "Шатабхиша";
+"nakshatra_purva_bhadrapada" = "Пурва Бхадрапада";
+"nakshatra_uttara_bhadrapada" = "Уттара Бхадрапада";
+"nakshatra_revati" = "Ревати";
+
+// MARK: - New Exception Keys (8) - Russian
+"exception_mars_yoga_karaka" = "Марс является Йога Караком для этого Асцендента";
+"exception_mars_jupiter_yoga" = "Присутствует благоприятная йога Марс-Юпитер";
+"exception_mars_venus_yoga" = "Присутствует благоприятная йога Марс-Венера";
+"exception_mars_good_d7" = "Марс хорошо расположен в карте D7 (Саптамша)";
+"exception_mars_good_d9" = "Марс хорошо расположен в карте D9 (Навамша)";
+"exception_mars_good_d10" = "Марс хорошо расположен в карте D10 (Дашамша)";
+"exception_mars_good_d60" = "Марс хорошо расположен в карте D60 (Шаштьямша)";
+"exception_ruchaka_yoga" = "Присутствует йога Ручака Махапуруша";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - Russian
+"mars_position" = "Положение Марса";
+"house_label" = "Дом";
+"sign_lord" = "Управитель Знака";
+"nakshatra_lord" = "Управитель Накшатры";
+"dosha_calculation" = "Расчёт Доши";
+"base_strength" = "Базовая Сила";
+"mitigation" = "Смягчение";
+"intensification" = "Усиление";
+"final_score" = "Итоговый Балл";
+"explanation_label" = "Детали Расчёта";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";

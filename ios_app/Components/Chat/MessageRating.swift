@@ -128,6 +128,101 @@ struct MessageRating: View {
     }
 }
 
+// MARK: - Inline Message Rating (Compact version for metadata row)
+/// Compact star rating that fits inline with timestamp/processing time
+struct InlineMessageRating: View {
+    let messageId: String
+    let query: String
+    let responseText: String
+    let predictionId: String?
+    
+    @State private var selectedRating: Int = 0
+    @State private var isSubmitting = false
+    @State private var hasSubmitted = false
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            if hasSubmitted {
+                // Compact thank you
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(.green)
+                Text("Rated")
+                    .font(.system(size: 10))
+                    .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                    .fixedSize()
+            } else {
+                // Rate label
+                Text("Rate")
+                    .font(.system(size: 10))
+                    .foregroundColor(Color("NavyPrimary").opacity(0.4))
+                    .fixedSize()
+                
+                // Compact star buttons
+                HStack(spacing: 1) {
+                    ForEach(1...5, id: \.self) { star in
+                        Button {
+                            selectRating(star)
+                        } label: {
+                            Image(systemName: star <= selectedRating ? "star.fill" : "star")
+                                .font(.system(size: 12))
+                                .foregroundColor(star <= selectedRating ? Color("GoldAccent") : Color("NavyPrimary").opacity(0.25))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isSubmitting)
+                    }
+                }
+                .opacity(isSubmitting ? 0.5 : 1)
+                
+                if isSubmitting {
+                    ProgressView()
+                        .scaleEffect(0.5)
+                }
+            }
+        }
+        .fixedSize(horizontal: true, vertical: false)
+        .animation(.spring(response: 0.3), value: selectedRating)
+        .animation(.spring(response: 0.3), value: hasSubmitted)
+    }
+    
+    private func selectRating(_ rating: Int) {
+        let impact = UIImpactFeedbackGenerator(style: .light)
+        impact.impactOccurred()
+        
+        selectedRating = rating
+        submitRating(rating)
+    }
+    
+    private func submitRating(_ rating: Int) {
+        isSubmitting = true
+        
+        Task {
+            do {
+                try await FeedbackService.shared.submitRating(
+                    predictionId: predictionId,
+                    rating: rating,
+                    query: query,
+                    predictionText: responseText,
+                    area: "general"
+                )
+                
+                await MainActor.run {
+                    isSubmitting = false
+                    hasSubmitted = true
+                    
+                    let notification = UINotificationFeedbackGenerator()
+                    notification.notificationOccurred(.success)
+                }
+            } catch {
+                print("❌ Failed to submit rating: \(error)")
+                await MainActor.run {
+                    isSubmitting = false
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Compact Rating (Thumbs only variant for future use)
 struct CompactRating: View {
     let onThumbsUp: () -> Void

@@ -122,11 +122,36 @@ final class DataManager {
         return thread
     }
     
+    /// Save thread (upsert - insert or update) - for sync from server
+    func saveThread(_ thread: LocalChatThread) {
+        // Check if thread already exists
+        if let existing = getThread(id: thread.id) {
+            // Update existing
+            existing.title = thread.title
+            existing.preview = thread.preview
+            existing.primaryArea = thread.primaryArea
+            existing.areasDiscussed = thread.areasDiscussed
+            existing.messageCount = thread.messageCount
+            existing.isPinned = thread.isPinned
+            existing.isArchived = thread.isArchived
+            existing.updatedAt = thread.updatedAt
+        } else {
+            // Insert new
+            context.insert(thread)
+        }
+        try? context.save()
+    }
+    
     /// Get thread by ID
     func getThread(id: String) -> LocalChatThread? {
         let predicate = #Predicate<LocalChatThread> { $0.id == id }
         let descriptor = FetchDescriptor<LocalChatThread>(predicate: predicate)
         return try? context.fetch(descriptor).first
+    }
+    
+    /// Public alias for getThread to match usage in ViewModels
+    func fetchThread(id: String) -> LocalChatThread? {
+        getThread(id: id)
     }
     
     /// Update thread from its messages

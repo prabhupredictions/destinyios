@@ -17,7 +17,6 @@
 // MARK: - Home Screen
 "greeting" = "こんにちは！";
 "todays_insight" = "今日の運勢";
-"ask_destiny" = "Destinyに相談";
 
 // MARK: - Suggested Questions
 "what_mindful_today" = "今日気をつけることは？";
@@ -79,6 +78,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "生年月日を入力";
 "your_name" = "あなたの名前";
+"enter_your_name" = "名前を入力してください";
 "date_of_birth" = "生年月日";
 "time_of_birth" = "生まれた時間";
 "birth_time_unknown" = "時間がわからない";
@@ -102,8 +102,6 @@
 "partner_details" = "相手の情報";
 "calculate_match" = "相性を見る";
 "match_score" = "相性スコア";
-"kundali_match" = "チャートマッチ";
-"ashtakoot_analysis" = "出生チャートの相性";
 "boys_details" = "あなた";
 "girls_details" = "パートナー";
 "analyze_match" = "相性をチェック";
@@ -185,3 +183,231 @@
 "name_gender_updated" = "名前と性別が更新されました。";
 "need_update_birth_data" = "出生データの更新が必要ですか？";
 "contact_support_birth_data" = "生年月日、時刻、場所の変更については、サポートチームにお問い合わせください。";
+"gender_identity" = "ジェンダーアイデンティティ";
+"select_birth_city" = "出生地を選択してください";
+
+// MARK: - Match Result Screen Redesign
+"kundali_match" = "Chart Match";
+"ashtakoot_analysis" = "Birth Chart Compatibility";
+"out_of" = "中";
+"compatible" = "相性";
+"excellent_match" = "素晴らしい相性";
+"good_match" = "良い相性";
+"moderate_match" = "普通の相性";
+"vs" = "VS";
+"ashtakoot_grid" = "アシュタクート詳細";
+"varna" = "ヴァルナ";
+"vashya" = "ヴァシヤ";
+"tara" = "タラ";
+"yoni" = "ヨニ";
+"graha_maitri" = "マイトリ";
+"gana" = "ガナ";
+"bhakoot" = "バクート";
+"nadi" = "ナディ";
+"view_full_report" = "完全レポートを見る";
+"full_compatibility_report" = "完全相性レポート";
+"points" = "ポイント";
+"score" = "スコア";
+"boy" = "彼";
+"girl" = "彼女";
+"impact" = "影響";
+"excellent" = "優秀";
+"good" = "良好";
+"moderate" = "中程度";
+"needs_care" = "注意が必要";
+"mangal_dosha_status" = "マンガルドーシャ状態";
+"no_dosha" = "ドーシャなし";
+"has_dosha" = "ドーシャあり";
+"recommended_remedies" = "推奨される治療法";
+"ask_destiny" = "Destinyに質問";
+"ask_destiny_about_match" = "この相性についてDestinyに質問";
+"ai_powered" = "AI搭載";
+"tap_to_ask" = "質問するにはタップ...";
+"ask_anything_match" = "この相性について何でも質問...";
+"quick_topics" = "クイックトピック";
+"ask_score" = "スコア";
+"ask_dosha" = "ドーシャ";
+"ask_weak" = "弱点";
+"ask_remedies" = "対策";
+"new_match" = "新しいマッチ";
+
+
+
+// Match Result Additions
+"ask_more_match" = "このマッチについてもっと聞く...";
+"mangal_dosha" = "マンガル・ドーシャ";
+"mangal_dosha_desc" = "火星の位置分析";
+"kalsarpa_dosha" = "カルサルパ・ドーシャ";
+"kalsarpa_dosha_desc" = "ラーフ・ケートゥ軸分析";
+"additional_yoga" = "追加のヨガとドーシャ";
+"additional_yoga_desc" = "その他の吉祥な組み合わせ";
+"charts" = "チャート";
+"history" = "履歴";
+"report" = "レポート";
+
+// MARK: - Mangal Dosha Exceptions (Japanese)
+"exception_mars_in_own_sign" = "火星が自室（牡羊座または蠍座）にある";
+"exception_mars_exalted" = "火星が山羊座で高揚";
+"exception_mars_in_upachaya" = "火星が成長ハウス（3、6、10、11）にある";
+"exception_mars_in_fixed_sign" = "火星が固定サインにある";
+"exception_mars_in_own_navamsa" = "火星が自分のナヴァムシャにある";
+"exception_mars_conjunct_benefics" = "火星が吉星と合";
+"exception_mars_benefic_nakshatra_lord" = "火星が吉祥ナクシャトラにある";
+"exception_mars_in_benefic_nakshatra" = "火星が吉祥な星座にある";
+"exception_mars_moon_friendly_nakshatras" = "火星と月が友好的なナクシャトラにある";
+"exception_mars_in_asc_lord_nakshatra" = "火星がアセンダント支配星のナクシャトラにある";
+"exception_mars_moon_same_nakshatra_pada" = "火星と月が同じパダにある";
+"exception_mars_jupiter_conjunction" = "火星-木星コンジャンクション";
+"exception_mars_aspected_by_jupiter" = "木星のアスペクトが火星を緩和";
+"exception_mars_in_jupiter_sign" = "火星が木星サイン（射手座/魚座）にある";
+"exception_mars_moon_conjunction_benefic" = "火星-月コンジャンクションが吉ハウスにある";
+"exception_mars_moon_mutual_kendra" = "火星と月が相互ケンドラ関係にある";
+"exception_mars_aspected_by_benefics" = "火星が吉星のアスペクトを受ける";
+"exception_mars_jupiter_mutual_aspects" = "火星と木星が相互アスペクト";
+"exception_mars_jupiter_in_trine" = "火星と木星がトライン・ハウスにある";
+"exception_mars_strong_ashtakavarga" = "火星のアシュタカヴァルガが強い";
+"exception_mars_strong_shadbala" = "火星のシャドバラが強い";
+"exception_moon_strong" = "チャートで月が強い";
+
+// MARK: - Intensity Factors (Japanese)
+"intensity_mars_debilitated" = "火星が蟹座で減衰";
+"intensity_mars_conjunct_malefics" = "火星が凶星と合";
+"intensity_mars_critical_degrees" = "火星がガンダンタ度数にある";
+"intensity_mars_papa_kartari" = "火星がパパカルタリ・ヨガにある";
+"intensity_seventh_lord_afflicted" = "7室の支配星が傷ついている";
+"intensity_mars_dusthana_from_moon" = "火星が月から6/8/12にある";
+"intensity_mars_retrograde" = "火星が逆行中";
+"intensity_mars_combust" = "火星がコンバスト（太陽に近すぎる）";
+"intensity_mars_low_ashtakavarga" = "火星のアシュタカヴァルガが低い";
+
+// MARK: - Zodiac Signs (Japanese)
+"sign_ar" = "牡羊座";
+"sign_ta" = "牡牛座";
+"sign_ge" = "双子座";
+"sign_ca" = "蟹座";
+"sign_le" = "獅子座";
+"sign_vi" = "乙女座";
+"sign_li" = "天秤座";
+"sign_sc" = "蠍座";
+"sign_sg" = "射手座";
+"sign_cp" = "山羊座";
+"sign_aq" = "水瓶座";
+"sign_pi" = "魚座";
+
+// MARK: - Planets (Japanese)
+"planet_sun" = "太陽";
+"planet_moon" = "月";
+"planet_mars" = "火星";
+"planet_mercury" = "水星";
+"planet_jupiter" = "木星";
+"planet_venus" = "金星";
+"planet_saturn" = "土星";
+"planet_rahu" = "ラーフ";
+"planet_ketu" = "ケートゥ";
+
+// MARK: - Severity/Status (Japanese)
+"severity_none" = "なし";
+"severity_mild" = "軽度";
+"severity_moderate" = "中度";
+"severity_high" = "重度";
+"severity_severe" = "深刻";
+"status_active" = "有効";
+"status_reduced" = "軽減";
+"status_cancelled" = "解除";
+"active" = "有効";
+"reduced" = "軽減";
+"cancelled" = "解除";
+
+// MARK: - Dosha UI Labels (Japanese)
+"mangal_dosha_analysis" = "マンガル・ドーシャ分析";
+"kalsarpa_analysis" = "カルサルパ・ドーシャ分析";
+"yogas_analysis" = "ヨガとドーシャ";
+"cancellation_active" = "ドーシャ解除";
+"no_dosha_present" = "ドーシャなし";
+"mitigating_factors" = "緩和要因";
+"intensifying_factors" = "強化要因";
+"planets_involved" = "関係する惑星";
+"affected_areas" = "影響を受ける領域";
+"peak_period" = "ピーク期間";
+"planetary_configuration" = "惑星配置";
+"complete_formation" = "完全な形成";
+"partial_formation" = "部分的な形成";
+"no_kalsarpa" = "カルサルパなし";
+"planets_balanced" = "惑星バランス";
+"formation_details" = "形成の詳細";
+"strength" = "強さ";
+
+// MARK: - Nakshatra Names (27) - Japanese (Sanskrit names)
+"nakshatra_ashwini" = "アシュヴィニー";
+"nakshatra_bharani" = "バラニー";
+"nakshatra_krittika" = "クリッティカー";
+"nakshatra_rohini" = "ローヒニー";
+"nakshatra_mrigashira" = "ムリガシーラ";
+"nakshatra_ardra" = "アールドラー";
+"nakshatra_punarvasu" = "プナルヴァス";
+"nakshatra_pushya" = "プシュヤ";
+"nakshatra_ashlesha" = "アーシュレーシャー";
+"nakshatra_magha" = "マガー";
+"nakshatra_purva_phalguni" = "プールヴァ・パルグニー";
+"nakshatra_uttara_phalguni" = "ウッタラ・パルグニー";
+"nakshatra_hasta" = "ハスタ";
+"nakshatra_chitra" = "チトラー";
+"nakshatra_swati" = "スヴァーティー";
+"nakshatra_vishakha" = "ヴィシャーカー";
+"nakshatra_anuradha" = "アヌラーダー";
+"nakshatra_jyeshtha" = "ジェーシュター";
+"nakshatra_moola" = "ムーラ";
+"nakshatra_purva_ashadha" = "プールヴァ・アシャーダー";
+"nakshatra_uttara_ashadha" = "ウッタラ・アシャーダー";
+"nakshatra_shravana" = "シュラヴァナ";
+"nakshatra_dhanishtha" = "ダニシュター";
+"nakshatra_shatabhisha" = "シャタビシャー";
+"nakshatra_purva_bhadrapada" = "プールヴァ・バードラパダー";
+"nakshatra_uttara_bhadrapada" = "ウッタラ・バードラパダー";
+"nakshatra_revati" = "レーヴァティー";
+
+// MARK: - New Exception Keys (8) - Japanese
+"exception_mars_yoga_karaka" = "火星がこのアセンダントのヨガカラカです";
+"exception_mars_jupiter_yoga" = "火星-木星の吉ヨガがあります";
+"exception_mars_venus_yoga" = "火星-金星の吉ヨガがあります";
+"exception_mars_good_d7" = "D7（サプタムシャ）チャートで火星が良好な位置にあります";
+"exception_mars_good_d9" = "D9（ナヴァムシャ）チャートで火星が良好な位置にあります";
+"exception_mars_good_d10" = "D10（ダシャムシャ）チャートで火星が良好な位置にあります";
+"exception_mars_good_d60" = "D60（シャシュティアムシャ）チャートで火星が良好な位置にあります";
+"exception_ruchaka_yoga" = "ルチャカ・マハプルシャ・ヨガがあります";
+"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
+"exception_moon_strong" = "Moon is strong in the chart";
+
+// MARK: - Mars Position UI Labels (10) - Japanese
+"mars_position" = "火星の位置";
+"house_label" = "ハウス";
+"sign_lord" = "星座支配星";
+"nakshatra_lord" = "ナクシャトラ支配星";
+"dosha_calculation" = "ドーシャ計算";
+"base_strength" = "基本強度";
+"mitigation" = "緩和";
+"intensification" = "強化";
+"final_score" = "最終スコア";
+"explanation_label" = "計算詳細";
+
+// MARK: - Combined Mangal Dosha Analysis
+"combined" = "Combined";
+"synastry_aspects" = "Synastry Aspects";
+"beneficial" = "Beneficial";
+"challenging" = "Challenging";
+"recommendations" = "Recommendations";
+"present" = "Present";
+"absent" = "Absent";
+"no_data" = "No Data";
+"dosha_cancelled" = "Dosha Cancelled";
+
+// MARK: - Kala Sarpa Premium UI
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"dosha_details" = "Yoga Details";
+"rahu_ketu_axis" = "Rahu-Ketu Axis";
+"planets" = "Planets";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+"planets_trapped" = "planets trapped";
+"head_of_serpent" = "Head of Serpent";
+"tail_of_serpent" = "Tail of Serpent";
