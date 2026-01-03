@@ -101,7 +101,7 @@ struct ChartComparisonSheet: View {
                         }
                     } label: {
                         Image(systemName: "slider.horizontal.3")
-                            .foregroundColor(Color("GoldAccent"))
+                            .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
             }
@@ -140,7 +140,7 @@ struct ChartComparisonSheet: View {
                 .padding(.vertical, 10)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(selectedTab == index ? Color("GoldAccent") : Color.clear)
+                        .fill(selectedTab == index ? AppTheme.Colors.gold : Color.clear)
                 )
         }
         .buttonStyle(.plain)

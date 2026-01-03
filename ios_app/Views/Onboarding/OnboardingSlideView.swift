@@ -17,15 +17,15 @@ struct OnboardingSlideView: View {
                 // Title section
                 VStack(spacing: 12) {
                     Text(slide.title)
-                        .font(.system(size: 26, weight: .bold))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.display(size: 26))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                         .lineSpacing(4)
                     
                     if let subtitle = slide.subtitle {
                         Text(subtitle)
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(Color("TextDark").opacity(0.7))
+                            .font(AppTheme.Fonts.title(size: 18))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                             .multilineTextAlignment(.center)
                     }
                 }
@@ -41,8 +41,8 @@ struct OnboardingSlideView: View {
                 // Description
                 if !slide.description.isEmpty {
                     Text(slide.description)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(Color("TextDark").opacity(0.7))
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                         .lineSpacing(6)
                         .padding(.horizontal, 36)
@@ -61,18 +61,12 @@ struct OnboardingSlideView: View {
                             Image(systemName: "sparkles")
                                 .font(.system(size: 14, weight: .semibold))
                         }
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "0B0F19")) // Dark text on gold
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(
-                            LinearGradient(
-                                colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.85)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .background(AppTheme.Colors.premiumGradient)
                         .cornerRadius(16)
-                        .shadow(color: Color("NavyPrimary").opacity(0.3), radius: 10, y: 5)
+                        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 5)
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
@@ -115,18 +109,12 @@ struct OnboardingSlideView: View {
             // SF Symbol icon with background
             ZStack {
                 Circle()
-                    .fill(Color("NavyPrimary").opacity(0.08))
+                    .fill(AppTheme.Colors.mainBackground.opacity(0.5)) // Adjusted for visibility
                     .frame(width: 100, height: 100)
                 
                 Image(systemName: slide.icon)
                     .font(.system(size: 44, weight: .medium))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .foregroundStyle(AppTheme.Colors.premiumGradient)
             }
         }
     }
@@ -141,27 +129,21 @@ struct StatsCard: View {
                 HStack(spacing: 4) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
                         .font(.system(size: 14))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color(red: 1.0, green: 0.85, blue: 0.3), Color(red: 0.9, green: 0.7, blue: 0.2)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .shadow(color: Color(red: 1.0, green: 0.85, blue: 0.3).opacity(0.5), radius: 2, y: 1)
+                        .foregroundStyle(AppTheme.Colors.premiumGradient)
+                        .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 2, y: 1)
                     Text("2.2M+")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.title(size: 22))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 Text("questions_asked".localized)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
             }
             .frame(maxWidth: .infinity)
             
             // Divider
             Rectangle()
-                .fill(Color("NavyPrimary").opacity(0.1))
+                .fill(AppTheme.Colors.separator)
                 .frame(width: 1, height: 50)
             
             // Rating stat
@@ -170,28 +152,24 @@ struct StatsCard: View {
                     ForEach(0..<4, id: \.self) { _ in
                         Image(systemName: "star.fill")
                             .font(.system(size: 14))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [Color(red: 1.0, green: 0.85, blue: 0.3), Color(red: 0.9, green: 0.7, blue: 0.2)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .shadow(color: Color(red: 1.0, green: 0.85, blue: 0.3).opacity(0.5), radius: 2, y: 1)
+                            .foregroundStyle(AppTheme.Colors.premiumGradient)
+                            .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 2, y: 1)
                     }
                 }
                 Text("4.0 rating")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
             }
             .frame(maxWidth: .infinity)
         }
         .padding(.vertical, 20)
-        .background(
+        .background(AppTheme.Colors.cardBackground)
+        .cornerRadius(16)
+        .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.06), radius: 15, y: 5)
+                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.2), radius: 10, y: 4)
     }
 }
 
@@ -206,23 +184,23 @@ struct FeaturesListView: View {
                     // Icon container
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color("NavyPrimary").opacity(0.08))
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
                             .frame(width: 48, height: 48)
                         
                         Image(systemName: feature.icon)
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(Color("NavyPrimary"))
+                            .foregroundColor(AppTheme.Colors.gold)
                     }
                     
                     // Text content
                     VStack(alignment: .leading, spacing: 4) {
                         Text(feature.title)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color("NavyPrimary"))
+                            .font(AppTheme.Fonts.title(size: 15))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
                         
                         Text(feature.description)
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(Color("TextDark").opacity(0.6))
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                             .lineLimit(2)
                     }
                     

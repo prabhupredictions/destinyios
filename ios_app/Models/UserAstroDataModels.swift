@@ -7,7 +7,19 @@ struct UserAstroDataRequest: Codable {
     let userEmail: String?
     
     init(birthData: UserBirthData, userEmail: String? = nil) {
-        self.birthData = birthData
+        // Round coordinates to 6 decimal places to satisfy backend validation
+        let roundedLat = (birthData.latitude * 1_000_000).rounded() / 1_000_000
+        let roundedLong = (birthData.longitude * 1_000_000).rounded() / 1_000_000
+        
+        self.birthData = UserBirthData(
+            dob: birthData.dob,
+            time: birthData.time,
+            latitude: roundedLat,
+            longitude: roundedLong,
+            ayanamsa: birthData.ayanamsa,
+            houseSystem: birthData.houseSystem,
+            cityOfBirth: birthData.cityOfBirth
+        )
         self.userEmail = userEmail
     }
     
@@ -30,6 +42,32 @@ struct UserBirthData: Codable {
         case dob, time, latitude, longitude
         case ayanamsa, houseSystem = "house_system"
         case cityOfBirth = "city_of_birth"
+    }
+    
+    /// Round a coordinate to 6 decimal places (backend validation requirement)
+    private static func roundCoordinate(_ value: Double) -> Double {
+        (value * 1_000_000).rounded() / 1_000_000
+    }
+    
+    init(dob: String, time: String, latitude: Double, longitude: Double, ayanamsa: String, houseSystem: String, cityOfBirth: String?) {
+        self.dob = dob
+        self.time = time
+        self.latitude = Self.roundCoordinate(latitude)
+        self.longitude = Self.roundCoordinate(longitude)
+        self.ayanamsa = ayanamsa
+        self.houseSystem = houseSystem
+        self.cityOfBirth = cityOfBirth
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        dob = try container.decode(String.self, forKey: .dob)
+        time = try container.decode(String.self, forKey: .time)
+        latitude = Self.roundCoordinate(try container.decode(Double.self, forKey: .latitude))
+        longitude = Self.roundCoordinate(try container.decode(Double.self, forKey: .longitude))
+        ayanamsa = try container.decode(String.self, forKey: .ayanamsa)
+        houseSystem = try container.decode(String.self, forKey: .houseSystem)
+        cityOfBirth = try container.decodeIfPresent(String.self, forKey: .cityOfBirth)
     }
 }
 

@@ -12,7 +12,7 @@ struct TransitsView: View {
                 
                 Text("Transits (\(transitResponse?.year ?? 2024))")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
             }
             
             if let transits = transitResponse?.transits {

@@ -12,6 +12,11 @@ struct AppTheme {
         static let cardBackground = Color(hex: "151A29") // Slightly lighter navy for cards
         static let secondaryBackground = Color(hex: "1C2235") // Interactive elements
         
+        // Inputs & Surfaces
+        static let inputBackground = Color(hex: "121620") // Darker navy for text inputs
+        static let surfaceBackground = Color(hex: "151A29") // Standard surface/modal color
+        static let separator = Color(hex: "2D3748").opacity(0.5) // Subtle divider
+        
         // Accents
         static let gold = Color(hex: "D4AF37") // Classic Gold
         static let goldLight = Color(hex: "F2D06B") // Highlight Gold
@@ -54,13 +59,19 @@ struct AppTheme {
         static func body(size: CGFloat) -> Font {
             return .system(size: size, weight: .regular, design: .default)
         }
+        
+        static func caption(size: CGFloat = 12) -> Font {
+            return .system(size: size, weight: .regular, design: .default)
+        }
     }
     
     // MARK: - Styles
     struct Styles {
         static let cornerRadius: CGFloat = 16
+        static let inputHeight: CGFloat = 52
         static let cardShadow = ShadowStyle(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 4)
         static let goldBorder = OverlayStyle(stroke: Colors.gold.opacity(0.3), width: 1)
+        static let inputBorder = OverlayStyle(stroke: Colors.gold.opacity(0.15), width: 1)
     }
 }
 

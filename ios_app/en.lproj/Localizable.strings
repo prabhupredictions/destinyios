@@ -44,6 +44,8 @@
 "support" = "Support";
 "help_faq" = "Help & FAQ";
 "sign_out" = "Sign Out";
+"sign_out_message" = "You will be signed out. Your data will be saved for when you sign in again.";
+"sign_out_guest_message" = "As a guest, your birth data will be deleted. Sign in with Apple or Google to save your data.";
 
 // MARK: - Astrology Settings
 "ayanamsa" = "Ayanamsa";
@@ -140,6 +142,7 @@
 // MARK: - History
 "no_conversations" = "No conversations yet";
 "start_asking" = "Start asking questions and your\nhistory will appear here.";
+"compatibility_match_subtitle" = "Compatibility Match";
 
 // MARK: - Charts
 "ascendant" = "Ascendant";
@@ -449,3 +452,10 @@
 "relationship" = "Relationship";
 "investment" = "Investment";
 "sudden_events" = "Sudden Events";
+
+// MARK: - Network Status
+"offline_mode" = "You're offline";
+
+// MARK: - Profile Setup
+"setting_up_profile" = "Setting Up Your Profile";
+"cosmic_alignment" = "Aligning the cosmos just for you...";

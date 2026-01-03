@@ -6,6 +6,8 @@
 
 The app implements a multi-layer caching strategy to optimize performance, reduce API costs, and provide offline capabilities. Caching happens at both **Backend** (Python/FastAPI) and **iOS** (Swift) levels.
 
+**All caches are user-scoped using `userEmail` to prevent data mixing between accounts.**
+
 ---
 
 ## Complete Storage Matrix
@@ -23,16 +25,23 @@ The app implements a multi-layer caching strategy to optimize performance, reduc
 
 ---
 
-## Column Definitions
+## 🔐 User Data Isolation
 
-| Column | Meaning |
-|--------|---------|
-| **Stateless** | No user context needed; same input = same output |
-| **Backend Cache** | Server-side caching (Redis/in-memory) |
-| **UI Cache** | iOS local caching (UserDefaults, SwiftData) |
-| **Backend History** | Persistent storage in backend database |
-| **iOS History** | User-visible browsable history in app |
-| **Sync on Clear** | Recoverable from backend when iOS data cleared |
+**All caches are keyed by `userEmail` to prevent data mixing:**
+
+| Cache | Key Format | Example |
+|-------|------------|---------|
+| `UserBirthData` (Storage) | `userBirthData_{email}` | `userBirthData_user@icloud.com` |
+| `TodaysPredictionCache` | `todaysPrediction_response_{email}` | `todaysPrediction_response_user@icloud.com` |
+| `AstroDataCache` (chart) | `astro_chart_{email}_{birthHash}` | `astro_chart_user@icloud.com_a1b2c3d4` |
+| `AstroDataCache` (dasha) | `astro_dasha_{email}_{birthHash}_{year}` | `astro_dasha_user@icloud.com_a1b2c3d4_2026` |
+| `AstroDataCache` (transits) | `astro_transits_{email}_{birthHash}_{year}` | `astro_transits_user@icloud.com_a1b2c3d4_2026` |
+| `CompatibilityHistoryService` | `compatibility_history_{email}` | `compatibility_history_user@icloud.com` |
+| `DataManager` (SwiftData) | Filtered by `userEmail` field | `WHERE userEmail = 'user@icloud.com'` |
+
+### Guest Users
+- Guest users are keyed as `guest` until they sign in
+- On sign-in, new cache entries are created for their email
 
 ---
 
@@ -45,6 +54,7 @@ The app implements a multi-layer caching strategy to optimize performance, reduc
 │                                                                             │
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐ │
 │  │   UI CACHE (Fast)   │  │  iOS HISTORY (View) │  │   SYNC SERVICES     │ │
+│  │   🔐 Per-User Keys  │  │   🔐 Per-User Query │  │                     │ │
 │  ├─────────────────────┤  ├─────────────────────┤  ├─────────────────────┤ │
 │  │ TodaysPrediction    │  │ LocalChatThread     │  │ ChatHistorySyncSvc  │ │
 │  │   Cache.swift       │  │ LocalChatMessage    │  │ CompatHistorySync   │ │
@@ -70,6 +80,7 @@ The app implements a multi-layer caching strategy to optimize performance, reduc
 │                                                                             │
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐ │
 │  │   BACKEND CACHE     │  │  QUERY SECURITY     │  │   CHAT HISTORY      │ │
+│  │   🔐 Per-User Keys  │  │                     │  │   🔐 Per-User DB    │ │
 │  ├─────────────────────┤  ├─────────────────────┤  ├─────────────────────┤ │
 │  │ CacheService        │  │ QuerySecuritySvc    │  │ ChatHistoryService  │ │
 │  │ (Redis/In-Memory)   │  │                     │  │                     │ │
@@ -92,15 +103,13 @@ The app implements a multi-layer caching strategy to optimize performance, reduc
 |----------|-------|
 | **Backend Cache** | ❌ None (fast ~50ms calculation) |
 | **iOS Cache** | ✅ `AstroDataCache.swift` |
-| **Cache Key** | `chart_{birthHash}`, `dasha_{birthHash}_{year}`, `transits_{birthHash}_{year}` |
+| **Cache Key** | `astro_chart_{email}_{birthHash}`, `astro_dasha_{email}_{birthHash}_{year}` |
 | **TTL** | Forever (until birth data changes) |
-| **Invalidation** | When user updates birth details |
+| **User Isolated** | ✅ Yes, by `userEmail` |
 
 ```swift
-// AstroDataCache.swift
-func getFullChart(birthHash: String) -> UserAstroDataResponse?
-func getDasha(birthHash: String, year: Int) -> DashaResponse?
-func getTransits(birthHash: String, year: Int) -> TransitResponse?
+// AstroDataCache.swift - All keys include email
+let key = "\(fullChartPrefix)\(email)_\(birthHash)"
 ```
 
 ---
@@ -111,20 +120,13 @@ func getTransits(birthHash: String, year: Int) -> TransitResponse?
 |----------|-------|
 | **Backend Cache** | ✅ `CacheService` with 24h TTL |
 | **iOS Cache** | ✅ `TodaysPredictionCache.swift` |
-| **Cache Key** | `todays_prediction:{email}:{date}` |
+| **Cache Key** | `todaysPrediction_response_{email}`, `todaysPrediction_date_{email}` |
 | **TTL** | 24 hours (expires at midnight) |
-| **Invalidation** | Automatic at midnight |
-
-```python
-# Backend (todays_prediction.py)
-cache_key = f"todays_prediction:{user_email}:{target_date.isoformat()}"
-cache.set(cache_key, response.model_dump(), ttl=86400)  # 24h
-```
+| **User Isolated** | ✅ Yes, by `userEmail` |
 
 ```swift
-// iOS (TodaysPredictionCache.swift)
-func get() -> TodaysPredictionResponse?  // Returns nil if date changed
-func set(_ response: TodaysPredictionResponse)
+// TodaysPredictionCache.swift
+let responseKey = "\(responsePrefixKey)\(email)"  // todaysPrediction_response_user@icloud.com
 ```
 
 ---
@@ -137,13 +139,13 @@ func set(_ response: TodaysPredictionResponse)
 | **iOS Cache** | ✅ `SwiftData` (LocalChatThread, LocalChatMessage) |
 | **Backend History** | ✅ `ChatHistoryService` |
 | **iOS History** | ✅ Visible in History tab |
+| **User Isolated** | ✅ Yes, filtered by `userEmail` field |
 | **Sync on Clear** | ✅ `ChatHistorySyncService.syncFromServer()` |
 
-**Flow:**
-1. User sends query → Backend validates via QuerySecurity
-2. Response stored in ChatHistory (backend DB)
-3. iOS saves to SwiftData locally
-4. On reinstall → `ChatHistorySyncService` fetches all threads
+```swift
+// DataManager.swift - SwiftData queries filter by email
+predicate = #Predicate<LocalChatThread> { $0.userEmail == userEmail }
+```
 
 ---
 
@@ -155,41 +157,56 @@ func set(_ response: TodaysPredictionResponse)
 | **iOS Cache** | ✅ `CompatibilityHistoryService` (UserDefaults) |
 | **Backend History** | ✅ `ChatHistoryService` (area="compatibility") |
 | **iOS History** | ✅ Visible in Match History |
+| **User Isolated** | ✅ Yes, by `userEmail` |
 | **Sync on Clear** | ✅ `CompatibilityHistoryService.syncFromServer()` |
 
-```python
-# Backend (compatibility.py) - stores to history
-chat_history.create_thread(
-    user_id=user_email,
-    thread_id=f"compat_{session_id}",
-    title=f"Match: {boy.name} & {girl.name}",
-    area="compatibility"
-)
+```swift
+// CompatibilityHistoryService.swift - Storage key includes email
+private var storageKey: String {
+    "\(Self.storageKeyPrefix)\(currentUserEmail)"  // compatibility_history_user@icloud.com
+}
 ```
-
----
-
-### 5. `/subscription/*` - User Profile & Quota
-
-| Property | Value |
-|----------|-------|
-| **Backend Cache** | ❌ None (real-time quota needed) |
-| **iOS Cache** | ✅ `UserDefaults` (quota, premium status) |
-| **Backend History** | ✅ Profile DB |
-| **iOS History** | ✅ `UserDefaults` |
-| **Sync on Clear** | ✅ `ProfileService.fetchProfile()` → `restoreProfileLocally()` |
 
 ---
 
 ## iOS Cache Services Summary
 
-| Service | Storage | Purpose | TTL |
-|---------|---------|---------|-----|
-| `TodaysPredictionCache` | UserDefaults | Daily AI insight | Daily (midnight) |
-| `AstroDataCache` | UserDefaults | Chart, Dasha, Transits | Forever |
-| `DataManager` | SwiftData | Chat threads/messages | Forever |
-| `CompatibilityHistoryService` | UserDefaults | Match results | Forever |
-| `QuotaManager` | UserDefaults | Quota status | Per-session |
+| Service | Storage | User Isolated | Clear Method |
+|---------|---------|---------------|--------------|
+| `TodaysPredictionCache` | UserDefaults | ✅ `{email}` in key | `clear(forUser:)` |
+| `AstroDataCache` | UserDefaults | ✅ `{email}` in key | `clearAll(forUser:)` |
+| `CompatibilityHistoryService` | UserDefaults | ✅ `{email}` in key | `clearAll(forUser:)` |
+| `DataManager` | SwiftData | ✅ Filter by `userEmail` | Intrinsic |
+
+---
+
+## Logout Behavior
+
+### Current Flow (Secure)
+
+| Data Type | Guest Logout | Registered User Logout |
+|-----------|--------------|------------------------|
+| Auth state (keychain) | ✅ Cleared | ✅ Cleared |
+| UserDefaults (isGuest, email, name) | ✅ Cleared | ✅ Cleared |
+| Birth data (Session) | ✅ Cleared | ✅ Cleared (UI resets) |
+| Birth data (Storage) | ✅ **Deleted** | 🔒 **Preserved** (isolated in `userBirthData_{email}`) |
+| TodaysPredictionCache | 🔒 Isolated (guest key) | 🔒 Isolated (user key) |
+| AstroDataCache | 🔒 Isolated (guest key) | 🔒 Isolated (user key) |
+| CompatibilityHistoryService | 🔒 Isolated (guest key) | 🔒 Isolated (user key) |
+| SwiftData (chat threads) | 🔒 Filtered by email | 🔒 Filtered by email |
+
+**Key Insight:** Data is NOT cleared on logout, but it's isolated by user. When User B logs in, they see only their data, not User A's cached data.
+
+---
+
+## Cache Invalidation Rules
+
+| Trigger | Action |
+|---------|--------|
+| Midnight (date change) | `TodaysPredictionCache` automatically returns nil |
+| Birth data updated | Caller should call `AstroDataCache.clearAll()` |
+| Logout | Data isolated by user key - no clearing needed |
+| App reinstall | Sync from backend restores history for logged-in user |
 
 ---
 
@@ -200,11 +217,12 @@ When user logs in on a new device:
 ```
 ┌──────────────────────┐
 │   User Logs In       │
+│   email: user@...    │
 └──────────┬───────────┘
            │
            ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                    PARALLEL SYNC                              │
+│                    PARALLEL SYNC (by email)                   │
 ├──────────────────┬───────────────────┬───────────────────────┤
 │ ProfileService   │ ChatHistorySync   │ CompatHistorySync     │
 │ .fetchProfile()  │ .syncFromServer() │ .syncFromServer()     │
@@ -218,18 +236,11 @@ When user logs in on a new device:
 │ • Quota          │ • All messages    │ • Names, scores       │
 │ • Premium status │                   │                       │
 └──────────────────┴───────────────────┴───────────────────────┘
+           │
+           ▼
+   All data stored with {email} key
+   → Visible only to this user
 ```
-
----
-
-## Cache Invalidation Rules
-
-| Trigger | Caches Invalidated |
-|---------|-------------------|
-| Midnight (date change) | `TodaysPredictionCache` |
-| Birth data updated | `AstroDataCache.clearAll()` |
-| Logout | All local caches |
-| App reinstall | Sync from backend restores history |
 
 ---
 
@@ -246,11 +257,11 @@ When user logs in on a new device:
 ## File References
 
 ### iOS Cache Files
-- [`TodaysPredictionCache.swift`](../ios_app/Services/TodaysPredictionCache.swift)
-- [`AstroDataCache.swift`](../ios_app/Services/AstroDataCache.swift)
-- [`CompatibilityHistoryService.swift`](../ios_app/Services/CompatibilityHistoryService.swift)
+- [`TodaysPredictionCache.swift`](../ios_app/Services/TodaysPredictionCache.swift) - 🔐 User-isolated
+- [`AstroDataCache.swift`](../ios_app/Services/AstroDataCache.swift) - 🔐 User-isolated
+- [`CompatibilityHistoryService.swift`](../ios_app/Services/CompatibilityHistoryService.swift) - 🔐 User-isolated
 - [`ChatHistorySyncService.swift`](../ios_app/Services/ChatHistorySyncService.swift)
-- [`DataManager.swift`](../ios_app/Services/DataManager.swift)
+- [`DataManager.swift`](../ios_app/Services/DataManager.swift) - 🔐 Queries filter by userEmail
 
 ### Backend Cache Files
 - [`cache/service.py`](../../astrology_api/astroapi-v2/app/core/shared_services/cache/service.py)

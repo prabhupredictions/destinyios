@@ -38,105 +38,126 @@ struct AstrologySettingsSheet: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                // Ayanamsa Section
-                Section {
-                    ForEach(ayanamsaOptions, id: \.key) { option in
-                        Button {
-                            ayanamsa = option.key
-                        } label: {
-                            HStack {
-                                Text(option.label)
-                                    .foregroundColor(Color("NavyPrimary"))
-                                
-                                Spacer()
-                                
-                                if ayanamsa == option.key {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(Color("GoldAccent"))
-                                        .font(.system(size: 14, weight: .semibold))
-                                }
-                            }
-                        }
-                    }
-                } header: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("ayanamsa".localized)
-                        Text("ayanamsa_desc".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
                 
-                // House System Section
-                Section {
-                    ForEach(houseSystemOptions, id: \.key) { option in
-                        Button {
-                            houseSystem = option.key
-                        } label: {
-                            HStack {
-                                Text(option.label)
-                                    .foregroundColor(Color("NavyPrimary"))
-                                
-                                Spacer()
-                                
-                                if houseSystem == option.key {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(Color("GoldAccent"))
-                                        .font(.system(size: 14, weight: .semibold))
+                List {
+                    // Ayanamsa Section
+                    Section {
+                        ForEach(ayanamsaOptions, id: \.key) { option in
+                            Button {
+                                ayanamsa = option.key
+                                HapticManager.shared.play(.light)
+                            } label: {
+                                HStack {
+                                    Text(option.label)
+                                        .font(AppTheme.Fonts.body(size: 16))
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                    
+                                    Spacer()
+                                    
+                                    if ayanamsa == option.key {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(AppTheme.Colors.gold)
+                                            .font(.system(size: 14, weight: .semibold))
+                                    }
                                 }
                             }
+                            .listRowBackground(AppTheme.Colors.cardBackground)
+                        }
+                    } header: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("ayanamsa".localized)
+                                .font(AppTheme.Fonts.title(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            Text("ayanamsa_desc".localized)
+                                .font(AppTheme.Fonts.caption(size: 12))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                     }
-                } header: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("house_system".localized)
-                        Text("house_system_desc".localized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                
-                // Chart Style Section
-                Section {
-                    ForEach(chartStyleOptions, id: \.key) { option in
-                        Button {
-                            chartStyle = option.key
-                        } label: {
-                            HStack {
-                                Text(option.label)
-                                    .foregroundColor(Color("NavyPrimary"))
-                                
-                                Spacer()
-                                
-                                if chartStyle == option.key {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(Color("GoldAccent"))
-                                        .font(.system(size: 14, weight: .semibold))
+                    
+                    // House System Section
+                    Section {
+                        ForEach(houseSystemOptions, id: \.key) { option in
+                            Button {
+                                houseSystem = option.key
+                                HapticManager.shared.play(.light)
+                            } label: {
+                                HStack {
+                                    Text(option.label)
+                                        .font(AppTheme.Fonts.body(size: 16))
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                    
+                                    Spacer()
+                                    
+                                    if houseSystem == option.key {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(AppTheme.Colors.gold)
+                                            .font(.system(size: 14, weight: .semibold))
+                                    }
                                 }
                             }
+                            .listRowBackground(AppTheme.Colors.cardBackground)
+                        }
+                    } header: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("house_system".localized)
+                                .font(AppTheme.Fonts.title(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            Text("house_system_desc".localized)
+                                .font(AppTheme.Fonts.caption(size: 12))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                     }
-                } header: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Chart Style")
-                        Text("Choose how birth charts are displayed")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                    
+                    // Chart Style Section
+                    Section {
+                        ForEach(chartStyleOptions, id: \.key) { option in
+                            Button {
+                                chartStyle = option.key
+                                HapticManager.shared.play(.light)
+                            } label: {
+                                HStack {
+                                    Text(option.label)
+                                        .font(AppTheme.Fonts.body(size: 16))
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                    
+                                    Spacer()
+                                    
+                                    if chartStyle == option.key {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(AppTheme.Colors.gold)
+                                            .font(.system(size: 14, weight: .semibold))
+                                    }
+                                }
+                            }
+                            .listRowBackground(AppTheme.Colors.cardBackground)
+                        }
+                    } header: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Chart Style")
+                                .font(AppTheme.Fonts.title(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            Text("Choose how birth charts are displayed")
+                                .font(AppTheme.Fonts.caption(size: 12))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                        }
                     }
                 }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
             }
-            .listStyle(.insetGrouped)
             .navigationTitle("Astrology Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
+                    PremiumCloseButton {
                         dismiss()
                     }
-                    .foregroundColor(Color("NavyPrimary"))
                 }
             }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
     }
 }

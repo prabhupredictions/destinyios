@@ -54,8 +54,8 @@ struct MessageBubble: View {
             if isUser {
                 // User message - plain text
                 Text(message.content)
-                    .font(.system(size: 15))
-                    .foregroundColor(.white)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.mainBackground) // Dark text on gold gradient
             } else if isLoadingState {
                 // AI loading state - show progress inside bubble
                 streamingProgressView
@@ -63,7 +63,7 @@ struct MessageBubble: View {
                 // AI message with content
                 MarkdownTextView(
                     content: displayContent,
-                    textColor: Color("NavyPrimary"),
+                    textColor: AppTheme.Colors.textPrimary,
                     fontSize: 15
                 )
             }
@@ -81,9 +81,19 @@ struct MessageBubble: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(isUser ? Color("NavyPrimary") : Color.white)
-                .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
+            Group {
+                if isUser {
+                    AppTheme.Colors.premiumGradient
+                } else {
+                    AppTheme.Colors.surfaceBackground
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18)
+                                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
+                        )
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .shadow(color: AppTheme.Colors.gold.opacity(isUser ? 0.3 : 0.05), radius: 5, y: 2)
         )
     }
     
@@ -126,12 +136,12 @@ struct MessageBubble: View {
         HStack(spacing: 6) {
             Image(systemName: "wand.and.stars")
                 .font(.system(size: 10))
-                .foregroundColor(Color("GoldAccent"))
+                .foregroundColor(AppTheme.Colors.gold)
             
             ForEach(tools, id: \.self) { tool in
                 Text(tool)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.7))
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
         }
         .padding(.top, 4)
@@ -143,12 +153,12 @@ struct MessageBubble: View {
         HStack(spacing: 6) {
             Image(systemName: "book.closed")
                 .font(.system(size: 10))
-                .foregroundColor(Color("GoldAccent"))
+                .foregroundColor(AppTheme.Colors.gold)
             
             ForEach(sources, id: \.self) { source in
                 Text(source)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.7))
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
         }
     }
@@ -159,18 +169,18 @@ struct MessageBubble: View {
         HStack(spacing: 6) {
             // Timestamp
             Text(formatTime(message.createdAt))
-                .font(.system(size: 11))
-                .foregroundColor(Color("TextDark").opacity(0.4))
+                .font(AppTheme.Fonts.caption())
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
             
             // Execution time (if available from API response)
             if message.executionTimeMs > 0 {
                 Text("•")
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("TextDark").opacity(0.3))
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
                 
                 Text(formatExecutionTime(message.executionTimeMs))
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("TextDark").opacity(0.4))
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
             }
             
             Spacer()
@@ -217,17 +227,17 @@ struct AvatarView: View {
             Circle()
                 .fill(
                     LinearGradient(
-                        colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.8)],
+                        colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.8)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .frame(width: size, height: size)
-                .shadow(color: Color("GoldAccent").opacity(0.3), radius: 4, y: 2)
+                .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 4, y: 2)
             
             Text("D")
                 .font(.system(size: size * 0.45, weight: .medium, design: .serif))
-                .foregroundColor(Color("NavyPrimary"))
+                .foregroundColor(AppTheme.Colors.mainBackground)
         }
     }
 }
@@ -238,7 +248,7 @@ struct BlinkingCursor: View {
     
     var body: some View {
         Rectangle()
-            .fill(Color("NavyPrimary"))
+            .fill(AppTheme.Colors.gold)
             .frame(width: 2, height: 16)
             .opacity(isVisible ? 1 : 0)
             .onAppear {
@@ -247,48 +257,6 @@ struct BlinkingCursor: View {
                 }
             }
     }
-}
-
-// MARK: - Preview
-#Preview("User Message") {
-    MessageBubble(
-        message: LocalChatMessage(
-            threadId: "1",
-            role: .user,
-            content: "What's my career outlook for 2024?"
-        )
-    )
-    .padding()
-    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
-}
-
-#Preview("AI Message") {
-    MessageBubble(
-        message: LocalChatMessage(
-            threadId: "1",
-            role: .assistant,
-            content: "Based on your chart, Saturn's transit through your 10th house suggests a period of significant professional growth. You may face some challenges, but they will ultimately lead to greater stability.",
-            area: "career",
-            confidence: "High",
-            toolCalls: ["10th house", "Saturn transit"],
-            sources: ["BPHS Ch.12"]
-        )
-    )
-    .padding()
-    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
-}
-
-#Preview("Streaming") {
-    MessageBubble(
-        message: LocalChatMessage(
-            threadId: "1",
-            role: .assistant,
-            content: "Based on your chart, Saturn's",
-            isStreaming: true
-        )
-    )
-    .padding()
-    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
 }
 
 // MARK: - Animated Dots Component
@@ -300,15 +268,15 @@ struct AnimatedDots: View {
     var body: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(Color("GoldAccent"))
+                .fill(AppTheme.Colors.gold)
                 .frame(width: 6, height: 6)
                 .offset(y: animateFirst ? -4 : 0)
             Circle()
-                .fill(Color("GoldAccent"))
+                .fill(AppTheme.Colors.gold)
                 .frame(width: 6, height: 6)
                 .offset(y: animateSecond ? -4 : 0)
             Circle()
-                .fill(Color("GoldAccent"))
+                .fill(AppTheme.Colors.gold)
                 .frame(width: 6, height: 6)
                 .offset(y: animateThird ? -4 : 0)
         }
@@ -351,20 +319,20 @@ struct CollapsibleProgressView: View {
                     
                     // Status text
                     Text("Analyzing your chart")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.body(size: 14).weight(.medium))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Spacer()
                     
                     // Elapsed time
                     Text(formatTime(elapsedSeconds))
                         .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundColor(Color("GoldAccent"))
+                        .foregroundColor(AppTheme.Colors.gold)
                     
                     // Expand/collapse chevron
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
             .buttonStyle(PlainButtonStyle())
@@ -373,16 +341,17 @@ struct CollapsibleProgressView: View {
             if isExpanded && !thinkingSteps.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
                     Divider()
+                        .background(AppTheme.Colors.separator)
                         .padding(.vertical, 8)
                     
-                    ForEach(thinkingSteps.suffix(8)) { step in
+                    ForEach(Array(thinkingSteps.suffix(8))) { step in
                         HStack(alignment: .top, spacing: 8) {
                             Text(step.type.icon)
                                 .font(.system(size: 12))
                             
                             Text(step.content ?? step.display)
-                                .font(.system(size: 13))
-                                .foregroundColor(Color("NavyPrimary").opacity(0.8))
+                                .font(AppTheme.Fonts.caption())
+                                .foregroundColor(AppTheme.Colors.textSecondary)
                                 .lineLimit(2)
                         }
                     }
@@ -410,6 +379,48 @@ struct CollapsibleProgressView: View {
         let secs = seconds % 60
         return String(format: "%d:%02d", mins, secs)
     }
+}
+
+// MARK: - Preview
+#Preview("User Message") {
+    MessageBubble(
+        message: LocalChatMessage(
+            threadId: "1",
+            role: .user,
+            content: "What's my career outlook for 2024?"
+        )
+    )
+    .padding()
+    .background(AppTheme.Colors.mainBackground)
+}
+
+#Preview("AI Message") {
+    MessageBubble(
+        message: LocalChatMessage(
+            threadId: "1",
+            role: .assistant,
+            content: "Based on your chart, Saturn's transit through your 10th house suggests a period of significant professional growth. You may face some challenges, but they will ultimately lead to greater stability.",
+            area: "career",
+            confidence: "High",
+            toolCalls: ["10th house", "Saturn transit"],
+            sources: ["BPHS Ch.12"]
+        )
+    )
+    .padding()
+    .background(AppTheme.Colors.mainBackground)
+}
+
+#Preview("Streaming") {
+    MessageBubble(
+        message: LocalChatMessage(
+            threadId: "1",
+            role: .assistant,
+            content: "Based on your chart, Saturn's",
+            isStreaming: true
+        )
+    )
+    .padding()
+    .background(AppTheme.Colors.mainBackground)
 }
 
 #Preview("Loading State") {

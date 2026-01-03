@@ -36,7 +36,7 @@ struct MessageRating: View {
                         } label: {
                             Image(systemName: star <= selectedRating ? "star.fill" : "star")
                                 .font(.system(size: 14))
-                                .foregroundColor(star <= selectedRating ? Color("GoldAccent") : Color("NavyPrimary").opacity(0.3))
+                                .foregroundColor(star <= selectedRating ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.3))
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)

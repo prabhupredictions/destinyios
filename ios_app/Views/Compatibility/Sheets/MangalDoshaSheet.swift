@@ -33,47 +33,9 @@ struct MangalDoshaSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Premium Deep Space Nebula Background
-                GeometryReader { geo in
-                    ZStack {
-                        // Deep Base
-                        Color(red: 0.05, green: 0.07, blue: 0.15).ignoresSafeArea()
-                        
-                        // Central Blue Glow
-                        RadialGradient(
-                            colors: [
-                                Color(red: 0.12, green: 0.16, blue: 0.28).opacity(0.8),
-                                .clear
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: max(geo.size.width, geo.size.height) * 0.8
-                        )
-                        
-                        // Top-Left Gold Nebula Glow
-                        RadialGradient(
-                            colors: [
-                                Color(red: 0.85, green: 0.65, blue: 0.2).opacity(0.08),
-                                .clear
-                            ],
-                            center: .topLeading,
-                            startRadius: 0,
-                            endRadius: 300
-                        )
-                        
-                        // Bottom-Right Purple/Deep Nebula
-                        RadialGradient(
-                            colors: [
-                                Color(red: 0.3, green: 0.1, blue: 0.4).opacity(0.15),
-                                .clear
-                            ],
-                            center: .bottomTrailing,
-                            startRadius: 0,
-                            endRadius: 400
-                        )
-                    }
-                }
-                .ignoresSafeArea()
+                // Premium Midnight Gold Background
+                AppTheme.Colors.mainBackground
+                    .ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -108,7 +70,7 @@ struct MangalDoshaSheet: View {
                                     title: "mitigating_factors".localized,
                                     factors: data.exceptionDescriptions,
                                     icon: "checkmark.circle.fill",
-                                    color: .green
+                                    color: AppTheme.Colors.success
                                 )
                             } else if let count = data.exceptionCount, count > 0 {
                                 // Fallback: Show count when details unavailable
@@ -116,7 +78,7 @@ struct MangalDoshaSheet: View {
                                     title: "mitigating_factors".localized,
                                     factors: ["\(count) " + "factors_reduce_severity".localized],
                                     icon: "checkmark.circle.fill",
-                                    color: .green
+                                    color: AppTheme.Colors.success
                                 )
                             }
                             
@@ -126,7 +88,7 @@ struct MangalDoshaSheet: View {
                                     title: "intensifying_factors".localized,
                                     factors: data.intensityDescriptions,
                                     icon: "exclamationmark.triangle.fill",
-                                    color: .orange
+                                    color: AppTheme.Colors.error
                                 )
                             } else if let count = data.intensityFactorCount, count > 0 {
                                 // Fallback: Show count when details unavailable
@@ -134,7 +96,7 @@ struct MangalDoshaSheet: View {
                                     title: "intensifying_factors".localized,
                                     factors: ["\(count) " + "factors_increase_severity".localized],
                                     icon: "exclamationmark.triangle.fill",
-                                    color: .orange
+                                    color: AppTheme.Colors.error
                                 )
                             }
                             
@@ -156,20 +118,16 @@ struct MangalDoshaSheet: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         dismiss()
                     } label: {
-                        Text("Close")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(
-                                Capsule()
-                                    .fill(Color.white.opacity(0.1))
-                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                            )
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                     }
                 }
             }
@@ -234,10 +192,10 @@ struct MangalDoshaSheet: View {
             pickerButton(title: "combined".localized, index: 2)
         }
         .padding(4)
-        .background(Color.black.opacity(0.3)) // Dark Glass
+        .background(AppTheme.Colors.inputBackground) // Darker Nav
         .clipShape(Capsule())
         .overlay(
-            Capsule().stroke(Color.white.opacity(0.1), lineWidth: 1)
+            Capsule().stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
         )
     }
     
@@ -248,20 +206,16 @@ struct MangalDoshaSheet: View {
             }
         } label: {
             Text(title)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(selectedPartner == index ? .white : .white.opacity(0.6))
+                .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
+                .foregroundColor(selectedPartner == index ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 16)
                 .background(
                     selectedPartner == index
-                    ? Color("GoldAccent").opacity(0.3)
+                    ? AppTheme.Colors.gold
                     : Color.clear
                 )
                 .clipShape(Capsule())
-                .overlay(
-                    selectedPartner == index ?
-                    Capsule().stroke(Color("GoldAccent").opacity(0.5), lineWidth: 1) : nil
-                )
         }
     }
     
@@ -348,7 +302,11 @@ struct MangalDoshaSheet: View {
         }
         .padding(24)
         .frame(maxWidth: .infinity)
-        .background(glassBackground)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
     }
     
     // MARK: - Side by Side Comparison
@@ -402,8 +360,12 @@ struct MangalDoshaSheet: View {
         .padding(16)
         .frame(maxWidth: .infinity)
         .background(
-            glassBackground
-                .overlay(color.opacity(0.05).cornerRadius(16))
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                        .stroke(color.opacity(0.3), lineWidth: 1)
+                )
         )
     }
     
@@ -474,7 +436,11 @@ struct MangalDoshaSheet: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(glassBackground)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
     }
     
     // MARK: - Recommendations Card
@@ -506,7 +472,11 @@ struct MangalDoshaSheet: View {
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(glassBackground)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                    .fill(AppTheme.Colors.cardBackground)
+                    .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+            )
         )
     }
     
@@ -592,7 +562,11 @@ struct MangalDoshaSheet: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(glassBackground)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
     }
     
     // MARK: - Mars Position Card (Premium)
@@ -651,14 +625,11 @@ struct MangalDoshaSheet: View {
         }
         .padding()
         .background(
-            glassBackground
-                .overlay(    
-                    LinearGradient(
-                        colors: [Color.red.opacity(0.08), Color.orange.opacity(0.04)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .cornerRadius(16)
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                        .stroke(Color.red.opacity(0.3), lineWidth: 1)
                 )
         )
     }
@@ -688,9 +659,11 @@ struct MangalDoshaSheet: View {
         }
         .padding()
         .background(
-            glassBackground
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
                 .overlay(
-                    hasExceptions ? Color.green.opacity(0.05).cornerRadius(16) : Color.white.opacity(0.02).cornerRadius(16)
+                    RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                        .stroke(hasExceptions ? AppTheme.Colors.success.opacity(0.3) : AppTheme.Colors.error.opacity(0.3), lineWidth: 1)
                 )
         )
     }
@@ -800,9 +773,11 @@ struct MangalDoshaSheet: View {
             }
         }
         .padding()
+        .padding()
         .background(
-            glassBackground
-                .overlay(Color.blue.opacity(0.05).cornerRadius(16))
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
         )
     }
     
@@ -863,7 +838,15 @@ struct MangalDoshaSheet: View {
             }
         }
         .padding()
-        .background(glassBackground)
+        .padding()
+        .background(
+             RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                 .fill(AppTheme.Colors.cardBackground)
+                 .overlay(
+                     RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                         .stroke(color.opacity(0.3), lineWidth: 1)
+                 )
+        )
     }
     
     // MARK: - Remedies Card
@@ -893,7 +876,15 @@ struct MangalDoshaSheet: View {
             }
         }
         .padding()
-        .background(glassBackground)
+        .padding()
+        .background(
+             RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                 .fill(AppTheme.Colors.cardBackground)
+                 .overlay(
+                     RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                         .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                 )
+        )
     }
     
     // MARK: - No Data View
@@ -909,27 +900,14 @@ struct MangalDoshaSheet: View {
                 .foregroundColor(.white.opacity(0.5))
         }
         .padding(40)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
     }
     
     // MARK: - Helpers
-    
-    private var glassBackground: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color.white.opacity(0.05))
-            .background(Color.black.opacity(0.2).cornerRadius(16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.white.opacity(0.2), .white.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            )
-            .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 5)
-    }
     
     private func gaugeGradient(for score: Double) -> AngularGradient {
         AngularGradient(

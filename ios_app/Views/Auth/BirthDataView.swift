@@ -12,11 +12,23 @@ struct BirthDataView: View {
     @State private var showTimePicker = false
     @State private var showLocationSearch = false
     
+    // Profile setup loading - setting this triggers fullScreenCover via item binding
+    @State private var savedBirthData: BirthData?
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 // Background
-                backgroundView
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                
+                // Cosmic background effect
+                GeometryReader { geo in
+                    Circle()
+                        .fill(AppTheme.Colors.premiumGradient.opacity(0.1))
+                        .frame(width: 500, height: 500)
+                        .blur(radius: 100)
+                        .offset(x: geo.size.width - 150, y: -200)
+                }
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 32) {
@@ -30,8 +42,8 @@ struct BirthDataView: View {
                         // Error message
                         if let error = viewModel.errorMessage {
                             Text(error)
-                                .font(.system(size: 13))
-                                .foregroundColor(.red)
+                                .font(AppTheme.Fonts.caption())
+                                .foregroundColor(AppTheme.Colors.error)
                         }
                         
                         // Submit button
@@ -74,32 +86,21 @@ struct BirthDataView: View {
                 placeId: $viewModel.placeId
             )
         }
-    }
-    
-    // MARK: - Background
-    private var backgroundView: some View {
-        ZStack {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.96, green: 0.95, blue: 0.98),
-                    Color(red: 0.94, green: 0.94, blue: 0.97)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
+        .fullScreenCover(item: $savedBirthData) { birthData in
+            ProfileSetupLoadingView(
+                onComplete: {
+                    // Set hasBirthData FIRST so AppRootView transitions to MainTabView
+                    // BEFORE the cover dismisses (avoids flash of BirthDataView)
+                    hasBirthData = true
+                    
+                    // Small delay to allow transition to start, then dismiss cover
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        savedBirthData = nil
+                    }
+                },
+                birthData: birthData,
+                userEmail: UserDefaults.standard.string(forKey: "userEmail") ?? ""
             )
-            .ignoresSafeArea()
-            
-            // Decorative elements
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Circle()
-                        .fill(Color("GoldAccent").opacity(0.08))
-                        .frame(width: 300, height: 300)
-                        .offset(x: 100, y: 100)
-                }
-            }
         }
     }
     
@@ -109,21 +110,26 @@ struct BirthDataView: View {
             // Icon
             ZStack {
                 Circle()
-                    .fill(Color("NavyPrimary").opacity(0.08))
+                    .fill(AppTheme.Colors.inputBackground)
                     .frame(width: 80, height: 80)
+                    .overlay(
+                        Circle()
+                            .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                    )
                 
                 Image(systemName: "person.crop.circle.badge.plus")
                     .font(.system(size: 36))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
             }
+            .shadow(color: AppTheme.Colors.gold.opacity(0.2), radius: 15, x: 0, y: 0)
             
             Text("create_birth_chart".localized)
-                .font(.system(size: 26, weight: .bold))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.display(size: 26))
+                .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text("enter_details_desc".localized)
-                .font(.system(size: 15))
-                .foregroundColor(Color("TextDark").opacity(0.6))
+                .font(AppTheme.Fonts.body(size: 15))
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
         }
@@ -131,123 +137,113 @@ struct BirthDataView: View {
     
     // MARK: - Form Section
     private var formSection: some View {
-        VStack(spacing: 16) {
-            // Name (mandatory)
-            FormFieldInput(
-                icon: "person.circle",
-                title: "your_name".localized,
-                placeholder: "enter_your_name".localized,
-                text: $viewModel.userName
-            )
-            
-            // Date of Birth
-            FormFieldButton(
-                icon: "calendar",
-                title: "date_of_birth".localized,
-                value: viewModel.formattedDate
-            ) {
-                showDatePicker = true
-            }
-            
-            // Time of Birth
-            VStack(spacing: 8) {
-                FormFieldButton(
-                    icon: "clock",
-                    title: "time_of_birth".localized,
-                    value: viewModel.formattedTime
-                ) {
-                    if !viewModel.timeUnknown {
-                        showTimePicker = true
-                    }
-                }
-                .disabled(viewModel.timeUnknown)
-                .opacity(viewModel.timeUnknown ? 0.6 : 1)
+        PremiumCard {
+            VStack(spacing: 20) {
+                // Name (mandatory)
+                PremiumTextField(
+                    "your_name".localized,
+                    text: $viewModel.userName,
+                    placeholder: "enter_your_name".localized,
+                    icon: "person.circle"
+                )
                 
-                // Time unknown toggle
-                HStack {
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            viewModel.timeUnknown.toggle()
-                        }
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: viewModel.timeUnknown ? "checkmark.square.fill" : "square")
-                                .font(.system(size: 18))
-                                .foregroundColor(viewModel.timeUnknown ? Color("NavyPrimary") : Color("TextDark").opacity(0.4))
-                            
-                            Text("i_dont_know_birth_time".localized)
-                                .font(.system(size: 13))
-                                .foregroundColor(Color("TextDark").opacity(0.6))
+                // Date of Birth
+                PremiumSelectionRow(
+                    icon: "calendar",
+                    title: "date_of_birth".localized,
+                    value: viewModel.formattedDate
+                ) {
+                    showDatePicker = true
+                }
+                
+                // Time of Birth
+                VStack(spacing: 12) {
+                    PremiumSelectionRow(
+                        icon: "clock",
+                        title: "time_of_birth".localized,
+                        value: viewModel.formattedTime,
+                        isDisabled: viewModel.timeUnknown
+                    ) {
+                        if !viewModel.timeUnknown {
+                            showTimePicker = true
                         }
                     }
-                    Spacer()
+                    
+                    // Time unknown toggle
+                    HStack {
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                viewModel.timeUnknown.toggle()
+                            }
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: viewModel.timeUnknown ? "checkmark.square.fill" : "square")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(viewModel.timeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                
+                                Text("i_dont_know_birth_time".localized)
+                                    .font(AppTheme.Fonts.body(size: 13))
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                            }
+                        }
+                        Spacer()
+                    }
+                    .padding(.leading, 4)
                 }
-                .padding(.leading, 4)
+                
+                // Place of Birth (with location search)
+                PremiumSelectionRow(
+                    icon: "location",
+                    title: "place_of_birth".localized,
+                    value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth
+                ) {
+                    showLocationSearch = true
+                }
+                
+                // Gender Identity
+                PremiumMenuRow(
+                    icon: "person",
+                    title: "gender_identity".localized,
+                    selection: $viewModel.gender,
+                    options: [
+                        ("", "prefer_not_to_say".localized),
+                        ("male", "male".localized),
+                        ("female", "female".localized),
+                        ("non-binary", "non_binary".localized)
+                    ]
+                )
             }
-            
-            // Place of Birth (with location search)
-            FormFieldButton(
-                icon: "location",
-                title: "place_of_birth".localized,
-                value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth
-            ) {
-                showLocationSearch = true
-            }
-            
-            // Gender Identity
-            FormFieldPicker(
-                icon: "person",
-                title: "gender_identity".localized,
-                selection: $viewModel.gender,
-                options: [
-                    ("", "prefer_not_to_say".localized),
-                    ("male", "male".localized),
-                    ("female", "female".localized),
-                    ("non-binary", "non_binary".localized)
-                ]
-            )
         }
     }
     
     // MARK: - Submit Button
     private var submitButton: some View {
-        Button(action: {
+        PremiumButton(
+            "continue".localized,
+            icon: "arrow.right"
+        ) {
             if viewModel.save() {
                 // Register with backend subscription service
                 Task {
                     await registerWithBackend()
                 }
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    hasBirthData = true
-                }
-            }
-        }) {
-            HStack(spacing: 10) {
-                Text("continue".localized)
-                    .font(.system(size: 17, weight: .semibold))
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 14, weight: .semibold))
-            }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .frame(height: 56)
-            .background(
-                LinearGradient(
-                    colors: viewModel.isValid
-                        ? [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.9)]
-                        : [Color.gray.opacity(0.5), Color.gray.opacity(0.4)],
-                    startPoint: .leading,
-                    endPoint: .trailing
+                
+                // Create birth data for prefetch
+                savedBirthData = BirthData(
+                    dob: viewModel.formattedDOB,
+                    time: viewModel.formattedTOB,
+                    latitude: viewModel.latitude,
+                    longitude: viewModel.longitude,
+                    cityOfBirth: viewModel.cityOfBirth
                 )
-            )
-            .cornerRadius(16)
-            .shadow(
-                color: viewModel.isValid ? Color("NavyPrimary").opacity(0.3) : Color.clear,
-                radius: 10,
-                y: 5
-            )
+                
+                // DEBUG: Setting savedBirthData triggers fullScreenCover automatically
+                print("[DEBUG] BirthData saved, triggering ProfileSetupLoadingView via item binding")
+            }
         }
         .disabled(!viewModel.isValid)
+        .opacity(viewModel.isValid ? 1 : 0.6)
     }
     
     // MARK: - Backend Registration
@@ -274,12 +270,13 @@ struct BirthDataView: View {
     }
 }
 
-// MARK: - Form Field Components
+// MARK: - Helper Components
 
-struct FormFieldButton: View {
+struct PremiumSelectionRow: View {
     let icon: String
     let title: String
     let value: String
+    var isDisabled: Bool = false
     let action: () -> Void
     
     var body: some View {
@@ -288,65 +285,36 @@ struct FormFieldButton: View {
                 HStack(spacing: 8) {
                     Image(systemName: icon)
                         .font(.system(size: 14))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                     Text(title)
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                        .font(AppTheme.Fonts.caption(size: 13))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
                 
                 HStack {
                     Text(value)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(isDisabled ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                 }
                 .padding()
-                .background(Color.white)
-                .cornerRadius(14)
+                .background(AppTheme.Colors.inputBackground)
+                .cornerRadius(12)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
                 )
             }
         }
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.6 : 1)
     }
 }
 
-struct FormFieldInput: View {
-    let icon: String
-    let title: String
-    let placeholder: String
-    @Binding var text: String
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color("NavyPrimary"))
-                Text(title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color("TextDark").opacity(0.6))
-            }
-            
-            TextField(placeholder, text: $text)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(Color("NavyPrimary"))
-                .padding()
-                .background(Color.white)
-                .cornerRadius(14)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
-                )
-        }
-    }
-}
-
-struct FormFieldPicker: View {
+struct PremiumMenuRow: View {
     let icon: String
     let title: String
     @Binding var selection: String
@@ -357,10 +325,10 @@ struct FormFieldPicker: View {
             HStack(spacing: 8) {
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
                 Text(title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color("TextDark").opacity(0.6))
+                    .font(AppTheme.Fonts.caption(size: 13))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
             Menu {
@@ -372,19 +340,19 @@ struct FormFieldPicker: View {
             } label: {
                 HStack {
                     Text(options.first(where: { $0.0 == selection })?.1 ?? "Select")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                 }
                 .padding()
-                .background(Color.white)
-                .cornerRadius(14)
+                .background(AppTheme.Colors.inputBackground)
+                .cornerRadius(12)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
                 )
             }
         }
@@ -400,23 +368,28 @@ struct DatePickerSheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                DatePicker(
-                    title,
-                    selection: $selection,
-                    displayedComponents: components
-                )
-                #if os(iOS)
-                .datePickerStyle(.wheel)
-                #else
-                .datePickerStyle(.graphical)
-                #endif
-                .labelsHidden()
-                // Use English locale for time picker to show AM/PM
-                .environment(\.locale, components == .hourAndMinute ? Locale(identifier: "en_US") : .current)
-                .padding()
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
                 
-                Spacer()
+                VStack {
+                    DatePicker(
+                        title,
+                        selection: $selection,
+                        displayedComponents: components
+                    )
+                    #if os(iOS)
+                    .datePickerStyle(.wheel)
+                    #else
+                    .datePickerStyle(.graphical)
+                    #endif
+                    .colorScheme(.dark)
+                    .labelsHidden()
+                    // Use English locale for time picker to show AM/PM
+                    .environment(\.locale, components == .hourAndMinute ? Locale(identifier: "en_US") : .current)
+                    .padding()
+                    
+                    Spacer()
+                }
             }
             .navigationTitle(title)
             #if os(iOS)
@@ -427,9 +400,10 @@ struct DatePickerSheet: View {
                     Button("done".localized) {
                         dismiss()
                     }
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
                 }
             }
+            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
         }
         #if os(iOS)
         .presentationDetents([.medium])

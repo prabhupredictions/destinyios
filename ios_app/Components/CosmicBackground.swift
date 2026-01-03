@@ -15,15 +15,9 @@ struct OrbitalBackground: View {
             
             ZStack {
                 // Base gradient
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.96, green: 0.95, blue: 0.98),
-                        Color(red: 0.94, green: 0.93, blue: 0.97),
-                        Color(red: 0.95, green: 0.94, blue: 0.96)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                // Base gradient (Midnight Gold)
+                AppTheme.Colors.mainBackground
+                    .ignoresSafeArea()
                 
                 // Central sun/glow
                 CentralSun(center: center)
@@ -80,7 +74,7 @@ struct OrbitalBackground: View {
                     center: center,
                     radius: maxRadius * 0.88,
                     planetSize: 14,
-                    planetColor: Color("GoldAccent"), // Gold for Saturn
+                    planetColor: AppTheme.Colors.gold, // Gold for Saturn
                     orbitDuration: 40,
                     startAngle: 330,
                     hasRing: true
@@ -164,7 +158,7 @@ struct OrbitRing: View {
     var body: some View {
         if show {
             Circle()
-                .stroke(Color("NavyPrimary").opacity(opacity), lineWidth: 1)
+                .stroke(AppTheme.Colors.gold.opacity(opacity), lineWidth: 1)
                 .frame(width: radius * 2, height: radius * 2)
                 .position(center)
         }

@@ -26,55 +26,48 @@ struct ChatView: View {
     @AppStorage("isGuest") private var isGuest = false
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            ChatHeader(
-                onBackTap: { onBack?() },
-                onHistoryTap: { showHistory.toggle() },
-                onNewChatTap: { viewModel.startNewChat() },
-                onChartTap: { showChart.toggle() }
-            )
+        ZStack {
+            // Dark Background
+            AppTheme.Colors.mainBackground.ignoresSafeArea()
             
-            // Messages
-            messagesView
-            
-            // Error message
-            if let error = viewModel.errorMessage {
-                errorBanner(error)
-            }
-            
-            // Suggested follow-up questions (after last response)
-            if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading {
-                suggestedQuestionsView
-            }
-            
-            // Input bar
-            ChatInputBar(
-                text: $viewModel.inputText,
-                isFocused: $isInputFocused,
-                isLoading: viewModel.isLoading,
-                isStreaming: viewModel.isStreaming
-            ) {
-                // Check quota before sending
-                if viewModel.canAskQuestion {
-                    Task { await viewModel.sendMessage() }
-                } else {
-                    showQuotaExhausted = true
+            VStack(spacing: 0) {
+                // Header
+                ChatHeader(
+                    onBackTap: { onBack?() },
+                    onHistoryTap: { showHistory.toggle() },
+                    onNewChatTap: { viewModel.startNewChat() },
+                    onChartTap: { showChart.toggle() }
+                )
+                
+                // Messages
+                messagesView
+                
+                // Error message
+                if let error = viewModel.errorMessage {
+                    errorBanner(error)
+                }
+                
+                // Suggested follow-up questions (after last response)
+                if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading {
+                    suggestedQuestionsView
+                }
+                
+                // Input bar
+                ChatInputBar(
+                    text: $viewModel.inputText,
+                    isFocused: $isInputFocused,
+                    isLoading: viewModel.isLoading,
+                    isStreaming: viewModel.isStreaming
+                ) {
+                    // Check quota before sending
+                    if viewModel.canAskQuestion {
+                        Task { await viewModel.sendMessage() }
+                    } else {
+                        showQuotaExhausted = true
+                    }
                 }
             }
         }
-        .background(
-            // Simple static gradient - no GeometryReader = keyboard-safe
-            LinearGradient(
-                colors: [
-                    Color(red: 0.96, green: 0.95, blue: 0.98),
-                    Color(red: 0.94, green: 0.93, blue: 0.96)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-        )
         .sheet(isPresented: $showHistory) {
             ChatHistorySidebar(viewModel: viewModel) {
                 showHistory = false
@@ -253,14 +246,14 @@ struct ChatView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 14))
             Text(message)
-                .font(.system(size: 14))
+                .font(AppTheme.Fonts.body(size: 14))
         }
-        .foregroundColor(.white)
+        .foregroundColor(AppTheme.Colors.textPrimary)
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.red.opacity(0.85))
+                .fill(AppTheme.Colors.error.opacity(0.85))
         )
         .padding(.horizontal, 16)
         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -270,8 +263,8 @@ struct ChatView: View {
     private var suggestedQuestionsView: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("suggested_questions".localized)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color("TextDark").opacity(0.5))
+                .font(AppTheme.Fonts.caption())
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .padding(.horizontal, 16)
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -288,18 +281,17 @@ struct ChatView: View {
                             }
                         }) {
                             Text(question)
-                                .font(.system(size: 13))
-                                .foregroundColor(Color("NavyPrimary"))
+                                .font(AppTheme.Fonts.body(size: 13))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 10)
                                 .background(
                                     RoundedRectangle(cornerRadius: 18)
-                                        .fill(Color.white)
-                                        .shadow(color: Color.black.opacity(0.05), radius: 4, y: 2)
+                                        .fill(AppTheme.Colors.cardBackground)
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 18)
-                                        .stroke(Color("GoldAccent").opacity(0.3), lineWidth: 1)
+                                        .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                                 )
                         }
                         .buttonStyle(.plain)
@@ -309,7 +301,7 @@ struct ChatView: View {
             }
         }
         .padding(.vertical, 8)
-        .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+        .background(AppTheme.Colors.mainBackground)
     }
 }
 
@@ -320,83 +312,90 @@ struct ChatHistorySidebar: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    // Group threads by date
-                    let grouped = viewModel.dataManager.fetchThreadsGroupedByDate(for: viewModel.currentSessionId)
-                    
-                    ForEach(grouped, id: \.0) { group in
-                        Section {
-                            ForEach(group.1, id: \.id) { thread in
-                                HistoryRow(
-                                    thread: thread,
-                                    isSelected: thread.id == viewModel.currentThreadId
-                                ) {
-                                    viewModel.loadThread(thread)
-                                    onDismiss()
-                                } onDelete: {
-                                    viewModel.deleteThread(thread)
-                                } onPin: {
-                                    viewModel.togglePinThread(thread)
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        // Group threads by date
+                        let grouped = viewModel.dataManager.fetchThreadsGroupedByDate(for: viewModel.currentSessionId)
+                        
+                        ForEach(grouped, id: \.0) { group in
+                            Section(header: 
+                                HStack {
+                                    Text(group.0)
+                                        .font(AppTheme.Fonts.caption())
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                        .textCase(.uppercase)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.top, 20)
+                                .padding(.bottom, 8)
+                            ) {
+                                ForEach(group.1, id: \.id) { thread in
+                                    HistoryRow(
+                                        thread: thread,
+                                        isSelected: thread.id == viewModel.currentThreadId,
+                                        onTap: {
+                                            viewModel.loadThread(thread)
+                                            onDismiss()
+                                        },
+                                        onDelete: {
+                                            viewModel.deleteThread(thread)
+                                        },
+                                        onPin: {
+                                            viewModel.togglePinThread(thread)
+                                        }
+                                    )
                                 }
                             }
-                        } header: {
-                            HStack {
-                                Text(group.0)
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundColor(Color("TextDark").opacity(0.5))
-                                    .textCase(.uppercase)
-                                Spacer()
+                        }
+                        
+                        if grouped.isEmpty {
+                            VStack(spacing: 16) {
+                                Image(systemName: "bubble.left.and.bubble.right")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
+                                
+                                Text("no_chat_history".localized)
+                                    .font(AppTheme.Fonts.body(size: 16))
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
                             }
-                            .padding(.horizontal, 20)
-                            .padding(.top, 20)
-                            .padding(.bottom, 8)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 80)
                         }
-                    }
-                    
-                    if grouped.isEmpty {
-                        VStack(spacing: 16) {
-                            Image(systemName: "bubble.left.and.bubble.right")
-                                .font(.system(size: 48))
-                                .foregroundColor(Color("NavyPrimary").opacity(0.2))
-                            
-                            Text("no_chat_history".localized)
-                                .font(.system(size: 16))
-                                .foregroundColor(Color("TextDark").opacity(0.5))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 80)
                     }
                 }
             }
-            .background(Color(red: 0.96, green: 0.95, blue: 0.98))
             .navigationTitle("Chat History")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
+            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
             .toolbar {
                 #if os(iOS)
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { onDismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { viewModel.startNewChat(); onDismiss() }) {
                         Image(systemName: "square.and.pencil")
-                            .foregroundColor(Color("NavyPrimary"))
+                            .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
                 #else
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { onDismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button(action: { viewModel.startNewChat(); onDismiss() }) {
                         Image(systemName: "square.and.pencil")
-                            .foregroundColor(Color("NavyPrimary"))
+                            .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
                 #endif
@@ -420,33 +419,33 @@ struct HistoryRow: View {
                 if thread.isPinned {
                     Image(systemName: "pin.fill")
                         .font(.system(size: 12))
-                        .foregroundColor(Color("GoldAccent"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(thread.title)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.body(size: 15))
+                        .fontWeight(.medium)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                         .lineLimit(1)
                     
                     Text(thread.preview)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                         .lineLimit(1)
                 }
                 
                 Spacer()
                 
-                // Message count
                 Text("\(thread.messageCount)")
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("TextDark").opacity(0.4))
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color("NavyPrimary").opacity(0.08) : Color.clear)
+                    .fill(isSelected ? AppTheme.Colors.cardBackground : Color.clear)
             )
         }
         .buttonStyle(.plain)

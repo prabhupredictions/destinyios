@@ -37,8 +37,9 @@ struct BirthDetailsView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 .padding(.bottom, 20)
+                .padding(.bottom, 20)
             }
-            .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+            .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
             .navigationTitle("birth_details".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -46,15 +47,17 @@ struct BirthDetailsView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("cancel".localized) { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("save".localized) { saveChanges() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                         .fontWeight(.semibold)
                         .disabled(!hasChanges)
                 }
             }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
         .onAppear { loadData() }
         .alert("changes_saved".localized, isPresented: $showSaveConfirmation) {
@@ -69,16 +72,16 @@ struct BirthDetailsView: View {
         VStack(spacing: 6) {
             ZStack {
                 Circle()
-                    .fill(Color("NavyPrimary").opacity(0.1))
+                    .fill(AppTheme.Colors.gold.opacity(0.1))
                     .frame(width: 56, height: 56)
                 Image(systemName: "person.crop.circle.fill")
                     .font(.system(size: 32))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
             }
             
             Text("your_birth_info".localized)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.title(size: 16))
+                .foregroundColor(AppTheme.Colors.textPrimary)
         }
     }
     
@@ -86,26 +89,26 @@ struct BirthDetailsView: View {
     private var editableSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("editable".localized.uppercased())
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(Color("TextDark").opacity(0.4))
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             
             VStack(spacing: 10) {
                 // Name Field
                 VStack(alignment: .leading, spacing: 4) {
                     Text("your_name".localized)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                        .font(AppTheme.Fonts.body(size: 11))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                     
                     TextField("enter_your_name".localized, text: $userName)
-                        .font(.system(size: 15))
-                        .foregroundColor(Color("TextDark"))
+                        .font(AppTheme.Fonts.body(size: 15))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                         .padding(.horizontal, 12)
                         .frame(height: 44)
-                        .background(Color.white)
+                        .background(AppTheme.Colors.inputBackground)
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
+                                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
                         )
                         .onChange(of: userName) { _, _ in hasChanges = true }
                 }
@@ -113,8 +116,8 @@ struct BirthDetailsView: View {
                 // Gender Picker
                 VStack(alignment: .leading, spacing: 4) {
                     Text("gender".localized)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                        .font(AppTheme.Fonts.body(size: 11))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                     
                     Menu {
                         Button("prefer_not_to_say".localized) { gender = ""; hasChanges = true }
@@ -124,29 +127,30 @@ struct BirthDetailsView: View {
                     } label: {
                         HStack {
                             Text(genderDisplayText)
-                                .font(.system(size: 15))
-                                .foregroundColor(Color("TextDark"))
+                                .font(AppTheme.Fonts.body(size: 15))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
                             Spacer()
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 11))
-                                .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                         .padding(.horizontal, 12)
                         .frame(height: 44)
-                        .background(Color.white)
+                        .background(AppTheme.Colors.inputBackground)
                         .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
+                                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
                         )
                     }
                 }
             }
             .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.04), radius: 6, y: 2)
+            .background(AppTheme.Colors.cardBackground)
+            .cornerRadius(12)
+            .overlay(
+                 RoundedRectangle(cornerRadius: 12)
+                     .stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
             )
         }
     }
@@ -155,19 +159,21 @@ struct BirthDetailsView: View {
     private var readOnlySection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("birth_data".localized.uppercased())
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(Color("TextDark").opacity(0.4))
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             
             VStack(spacing: 0) {
                 readOnlyRow(label: "date_of_birth".localized, value: dateOfBirth, icon: "calendar")
-                Divider().padding(.leading, 40)
+                Divider().overlay(AppTheme.Colors.separator).padding(.leading, 40)
                 readOnlyRow(label: "time_of_birth".localized, value: timeOfBirth, icon: "clock")
-                Divider().padding(.leading, 40)
+                Divider().overlay(AppTheme.Colors.separator).padding(.leading, 40)
                 readOnlyRow(label: "place_of_birth".localized, value: placeOfBirth, icon: "location.fill")
             }
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(red: 0.95, green: 0.95, blue: 0.96))
+            .background(AppTheme.Colors.cardBackground)
+            .cornerRadius(12)
+            .overlay(
+                 RoundedRectangle(cornerRadius: 12)
+                     .stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
             )
         }
     }
@@ -176,16 +182,16 @@ struct BirthDetailsView: View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 14))
-                .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .frame(width: 22)
             
             VStack(alignment: .leading, spacing: 1) {
                 Text(label)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
+                    .font(AppTheme.Fonts.caption(size: 11))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
                 Text(value.isEmpty ? "not_set".localized : value)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color("TextDark"))
+                    .font(AppTheme.Fonts.body(size: 14))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                     .lineLimit(1)
             }
             
@@ -193,7 +199,7 @@ struct BirthDetailsView: View {
             
             Image(systemName: "lock.fill")
                 .font(.system(size: 10))
-                .foregroundColor(Color("TextDark").opacity(0.3))
+                .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.5))
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -205,16 +211,16 @@ struct BirthDetailsView: View {
             HStack(spacing: 6) {
                 Image(systemName: "info.circle.fill")
                     .font(.system(size: 12))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                 
                 Text("need_update_birth_data".localized)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.body(size: 13))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
             Text("contact_support_birth_data".localized)
-                .font(.system(size: 12))
-                .foregroundColor(Color("TextDark").opacity(0.7))
+                .font(AppTheme.Fonts.caption(size: 12))
+                .foregroundColor(AppTheme.Colors.textTertiary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(2)
             
@@ -223,22 +229,22 @@ struct BirthDetailsView: View {
                     Image(systemName: "envelope.fill")
                         .font(.system(size: 12))
                     Text("support@destinyaiastrology.com")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(AppTheme.Fonts.body(size: 12))
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppTheme.Colors.mainBackground)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background(Color("NavyPrimary"))
+                .background(AppTheme.Colors.gold)
                 .cornerRadius(8)
             }
         }
         .padding(14)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color("NavyPrimary").opacity(0.05))
+                .fill(AppTheme.Colors.cardBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color("NavyPrimary").opacity(0.1), lineWidth: 1)
+                        .stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
                 )
         )
     }
@@ -254,14 +260,16 @@ struct BirthDetailsView: View {
     }
     
     private func loadData() {
-        // Load name
+        // Load name (remains global for current user session)
         userName = UserDefaults.standard.string(forKey: "userName") ?? ""
         
-        // Load gender
-        gender = UserDefaults.standard.string(forKey: "userGender") ?? ""
+        // Load gender (User-Scoped)
+        let genderKey = StorageKeys.userKey(for: StorageKeys.userGender)
+        gender = UserDefaults.standard.string(forKey: genderKey) ?? ""
         
-        // Load birth data
-        if let data = UserDefaults.standard.data(forKey: "userBirthData") {
+        // Load birth data (User-Scoped)
+        let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData)
+        if let data = UserDefaults.standard.data(forKey: dataKey) {
             do {
                 let birthData = try JSONDecoder().decode(BirthData.self, from: data)
                 
@@ -276,7 +284,8 @@ struct BirthDetailsView: View {
                 }
                 
                 // Format time - always use English AM/PM format
-                if UserDefaults.standard.bool(forKey: "birthTimeUnknown") {
+                let timeUnknownKey = StorageKeys.userKey(for: StorageKeys.birthTimeUnknown)
+                if UserDefaults.standard.bool(forKey: timeUnknownKey) {
                     timeOfBirth = "birth_time_unknown".localized
                 } else {
                     let timeFormatter = DateFormatter()
@@ -304,8 +313,9 @@ struct BirthDetailsView: View {
         // Save name
         UserDefaults.standard.set(userName, forKey: "userName")
         
-        // Save gender
-        UserDefaults.standard.set(gender, forKey: "userGender")
+        // Save gender (User-Scoped)
+        let genderKey = StorageKeys.userKey(for: StorageKeys.userGender)
+        UserDefaults.standard.set(gender, forKey: genderKey)
         
         showSaveConfirmation = true
     }

@@ -52,17 +52,9 @@ struct AdditionalYogasSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                LinearGradient(
-                    colors: [
-                        Color(hex: "1a1a2e").opacity(0.98),
-                        Color(hex: "2d2d4e").opacity(0.95),
-                        Color(hex: "1a1a2e").opacity(0.98)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                // Background
+                AppTheme.Colors.mainBackground
+                    .ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -92,12 +84,13 @@ struct AdditionalYogasSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                     }
                 }
             }
@@ -110,27 +103,29 @@ struct AdditionalYogasSheet: View {
         HStack(spacing: 0) {
             ForEach([boyName, girlName].indices, id: \.self) { index in
                 Button {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                    withAnimation(.spring(response: 0.3)) {
                         selectedPartner = index
                     }
                 } label: {
                     Text(index == 0 ? boyName : girlName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(selectedPartner == index ? .white : .white.opacity(0.6))
+                        .font(AppTheme.Fonts.caption(size: 14).weight(.semibold))
+                        .foregroundColor(selectedPartner == index ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
                         .padding(.vertical, 10)
-                        .padding(.horizontal, 24)
+                        .frame(maxWidth: .infinity)
                         .background(
                             selectedPartner == index
-                            ? Color.white.opacity(0.2)
+                            ? AppTheme.Colors.gold
                             : Color.clear
                         )
-                        .clipShape(Capsule())
                 }
             }
         }
-        .padding(4)
-        .background(Color.white.opacity(0.1))
+        .background(AppTheme.Colors.inputBackground)
         .clipShape(Capsule())
+        .overlay(
+            Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+        )
+        .padding(.horizontal, 4)
     }
     
     // MARK: - Filter Picker
@@ -150,20 +145,20 @@ struct AdditionalYogasSheet: View {
                             Text("⚠️")
                         }
                         Text(type.rawValue)
-                            .font(.system(size: 13, weight: .medium))
+                            .font(AppTheme.Fonts.caption(size: 13).weight(.medium))
                     }
-                    .foregroundColor(filterType == type ? .white : .white.opacity(0.5))
+                    .foregroundColor(filterType == type ? AppTheme.Colors.textPrimary : AppTheme.Colors.textSecondary)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .background(
                         filterType == type
-                        ? Color.white.opacity(0.15)
+                        ? AppTheme.Colors.inputBackground
                         : Color.clear
                     )
                     .clipShape(Capsule())
                     .overlay(
                         Capsule()
-                            .stroke(Color.white.opacity(filterType == type ? 0.3 : 0.1), lineWidth: 1)
+                            .stroke(filterType == type ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
                     )
                 }
             }
@@ -178,53 +173,37 @@ struct AdditionalYogasSheet: View {
                 count: data.activeYogaCount,
                 label: "Yogas",
                 icon: "✨",
-                gradient: [Color.purple, Color.blue]
+                color: AppTheme.Colors.success
             )
             
             summaryCard(
                 count: data.activeDoshaCount,
                 label: "Doshas",
                 icon: "⚠️",
-                gradient: [Color.orange, Color.red]
+                color: AppTheme.Colors.error
             )
         }
     }
     
-    private func summaryCard(count: Int, label: String, icon: String, gradient: [Color]) -> some View {
+    private func summaryCard(count: Int, label: String, icon: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Text(icon)
                 .font(.system(size: 24))
             
             Text("\(count)")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .font(AppTheme.Fonts.title(size: 24))
+                .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text(label)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.white.opacity(0.7))
+                .font(AppTheme.Fonts.caption())
+                .foregroundColor(AppTheme.Colors.textSecondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: gradient.map { $0.opacity(0.2) },
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(
-                            LinearGradient(
-                                colors: gradient.map { $0.opacity(0.4) },
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                )
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
         )
     }
     
@@ -241,6 +220,7 @@ struct AdditionalYogasSheet: View {
     private func yogaItemCard(_ item: YogaItem) -> some View {
         let isExpanded = expandedItems.contains(item.id)
         let isDosha = (currentData?.doshas?.contains(where: { $0.id == item.id }) ?? false)
+        let statusColor = isDosha ? (item.status == "A" ? AppTheme.Colors.error : AppTheme.Colors.gold) : AppTheme.Colors.success
         
         return VStack(spacing: 0) {
             // Header
@@ -259,26 +239,26 @@ struct AdditionalYogasSheet: View {
                     
                     VStack(alignment: .leading, spacing: 4) {
                         Text(item.displayName)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.white)
+                            .font(AppTheme.Fonts.body(size: 15).weight(.semibold))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
                         
                         // Strength bar
                         HStack(spacing: 8) {
                             GeometryReader { geometry in
                                 ZStack(alignment: .leading) {
                                     Capsule()
-                                        .fill(Color.white.opacity(0.1))
+                                        .fill(AppTheme.Colors.inputBackground)
                                     
                                     Capsule()
-                                        .fill(strengthGradient(item: item, isDosha: isDosha))
+                                        .fill(statusColor)
                                         .frame(width: geometry.size.width * (item.strength))
                                 }
                             }
                             .frame(height: 6)
                             
                             Text("\(item.strengthPercentage)%")
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.6))
+                                .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
                                 .frame(width: 35, alignment: .trailing)
                         }
                     }
@@ -290,7 +270,7 @@ struct AdditionalYogasSheet: View {
                     
                     Image(systemName: "chevron.down")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.white.opacity(0.4))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
                 .padding()
@@ -300,7 +280,7 @@ struct AdditionalYogasSheet: View {
             if isExpanded {
                 VStack(alignment: .leading, spacing: 12) {
                     Divider()
-                        .background(Color.white.opacity(0.1))
+                        .background(AppTheme.Colors.gold.opacity(0.1))
                     
                     // Houses and Planets on same row
                     HStack {
@@ -309,13 +289,13 @@ struct AdditionalYogasSheet: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "house.fill")
                                     .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.5))
+                                    .foregroundColor(AppTheme.Colors.goldDim)
                                 Text("Houses:")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.5))
+                                    .font(AppTheme.Fonts.caption())
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
                                 Text(houses)
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.8))
+                                    .font(AppTheme.Fonts.caption().weight(.medium))
+                                    .foregroundColor(AppTheme.Colors.textPrimary)
                             }
                         }
                         
@@ -326,10 +306,10 @@ struct AdditionalYogasSheet: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "sparkle")
                                     .font(.system(size: 12))
-                                    .foregroundColor(.cyan.opacity(0.7))
+                                    .foregroundColor(AppTheme.Colors.gold)
                                 Text(planets)
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(.cyan)
+                                    .font(AppTheme.Fonts.caption().weight(.medium))
+                                    .foregroundColor(AppTheme.Colors.gold)
                             }
                         }
                     }
@@ -343,14 +323,14 @@ struct AdditionalYogasSheet: View {
                             HStack {
                                 Image(systemName: "info.circle.fill")
                                     .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.5))
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
                                 Text("Formation")
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.white.opacity(0.5))
+                                    .font(AppTheme.Fonts.caption())
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
                             }
                             Text(formation)
-                                .font(.system(size: 13))
-                                .foregroundColor(.white.opacity(0.8))
+                                .font(AppTheme.Fonts.body(size: 13))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
                 }
@@ -359,16 +339,11 @@ struct AdditionalYogasSheet: View {
             }
         }
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.05))
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(
-                            isDosha
-                            ? (item.status == "A" ? Color.red.opacity(0.3) : Color.orange.opacity(0.2))
-                            : Color.purple.opacity(0.2),
-                            lineWidth: 1
-                        )
+                    RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                        .stroke(statusColor.opacity(0.3), lineWidth: 1)
                 )
         )
     }
@@ -377,13 +352,13 @@ struct AdditionalYogasSheet: View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 12))
-                .foregroundColor(.white.opacity(0.5))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             Text(label + ":")
-                .font(.system(size: 12))
-                .foregroundColor(.white.opacity(0.5))
+                .font(AppTheme.Fonts.caption())
+                .foregroundColor(AppTheme.Colors.textTertiary)
             Text(value)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.white.opacity(0.8))
+                .font(AppTheme.Fonts.caption().weight(.medium))
+                .foregroundColor(AppTheme.Colors.textPrimary)
         }
     }
     
@@ -391,38 +366,25 @@ struct AdditionalYogasSheet: View {
         let (text, color) = statusInfo(status, isDosha: isDosha)
         
         return Text(text)
-            .font(.system(size: 10, weight: .bold))
+            .font(AppTheme.Fonts.caption(size: 10).weight(.bold))
             .foregroundColor(color)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(color.opacity(0.15))
+            .background(AppTheme.Colors.inputBackground)
             .clipShape(Capsule())
+            .overlay(Capsule().stroke(color.opacity(0.3), lineWidth: 1))
     }
     
     private func statusInfo(_ status: String, isDosha: Bool) -> (String, Color) {
         switch status.uppercased() {
         case "A":
-            return (DoshaDescriptions.status("A").uppercased(), isDosha ? .red : .green)
+            return (DoshaDescriptions.status("A").uppercased(), isDosha ? AppTheme.Colors.error : AppTheme.Colors.success)
         case "R":
-            return (DoshaDescriptions.status("R").uppercased(), .orange)
+            return (DoshaDescriptions.status("R").uppercased(), AppTheme.Colors.gold)
         case "C":
-            return (DoshaDescriptions.status("C").uppercased(), .gray)
+            return (DoshaDescriptions.status("C").uppercased(), AppTheme.Colors.textTertiary)
         default:
-            return (status, .gray)
-        }
-    }
-    
-    private func strengthGradient(item: YogaItem, isDosha: Bool) -> LinearGradient {
-        if isDosha {
-            if item.status == "A" {
-                return LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing)
-            } else if item.status == "R" {
-                return LinearGradient(colors: [.orange, .yellow], startPoint: .leading, endPoint: .trailing)
-            } else {
-                return LinearGradient(colors: [.gray, .gray.opacity(0.5)], startPoint: .leading, endPoint: .trailing)
-            }
-        } else {
-            return LinearGradient(colors: [.purple, .blue], startPoint: .leading, endPoint: .trailing)
+            return (status, AppTheme.Colors.textTertiary)
         }
     }
     
@@ -432,11 +394,11 @@ struct AdditionalYogasSheet: View {
         VStack(spacing: 16) {
             Image(systemName: "sparkles")
                 .font(.system(size: 48))
-                .foregroundColor(.white.opacity(0.3))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             
             Text("No \(filterType.rawValue) found")
-                .font(.system(size: 16))
-                .foregroundColor(.white.opacity(0.5))
+                .font(AppTheme.Fonts.body(size: 16))
+                .foregroundColor(AppTheme.Colors.textSecondary)
         }
         .padding(40)
     }

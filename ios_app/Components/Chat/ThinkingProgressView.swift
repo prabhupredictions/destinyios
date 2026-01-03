@@ -86,7 +86,7 @@ struct LoadingDots: View {
         HStack(spacing: 3) {
             ForEach(0..<3, id: \.self) { index in
                 Circle()
-                    .fill(Color("GoldAccent"))
+                    .fill(AppTheme.Colors.gold)
                     .frame(width: 6, height: 6)
                     .opacity(animating[index] ? 1 : 0.3)
                     .scaleEffect(animating[index] ? 1.2 : 0.8)

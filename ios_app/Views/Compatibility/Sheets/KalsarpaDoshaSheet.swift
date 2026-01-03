@@ -29,17 +29,9 @@ struct KalsarpaDoshaSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient - deep cosmic theme
-                LinearGradient(
-                    colors: [
-                        Color(hex: "0a0a1a"),
-                        Color(hex: "1a1a3a"),
-                        Color(hex: "0a0a1a")
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                // Background
+                AppTheme.Colors.mainBackground
+                    .ignoresSafeArea()
                 
                 // Subtle star field effect
                 starFieldOverlay
@@ -49,8 +41,8 @@ struct KalsarpaDoshaSheet: View {
                         // Partner Picker
                         partnerPicker
                         
+                        // Hero Section
                         if let data = currentData {
-                            // Hero Section with premium animation
                             heroSection(data)
                             
                             // Consolidated Dosha Details Card
@@ -74,12 +66,13 @@ struct KalsarpaDoshaSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                     }
                 }
             }
@@ -98,10 +91,10 @@ struct KalsarpaDoshaSheet: View {
     
     private var starFieldOverlay: some View {
         GeometryReader { geo in
-            ForEach(0..<30, id: \.self) { i in
+            ForEach(0..<20, id: \.self) { i in
                 Circle()
-                    .fill(Color.white.opacity(Double.random(in: 0.1...0.4)))
-                    .frame(width: CGFloat.random(in: 1...3))
+                .fill(Color.white.opacity(Double.random(in: 0.1...0.3)))
+                    .frame(width: CGFloat.random(in: 1...2))
                     .position(
                         x: CGFloat.random(in: 0...geo.size.width),
                         y: CGFloat.random(in: 0...geo.size.height)
@@ -116,27 +109,29 @@ struct KalsarpaDoshaSheet: View {
         HStack(spacing: 0) {
             ForEach([boyName, girlName].indices, id: \.self) { index in
                 Button {
-                    withAnimation(.easeInOut(duration: 0.3)) {
+                    withAnimation(.spring(response: 0.3)) {
                         selectedPartner = index
                     }
                 } label: {
                     Text(index == 0 ? boyName : girlName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(selectedPartner == index ? .white : .white.opacity(0.5))
+                        .font(AppTheme.Fonts.caption(size: 14).weight(.semibold))
+                        .foregroundColor(selectedPartner == index ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
                         .padding(.vertical, 10)
-                        .padding(.horizontal, 24)
+                        .frame(maxWidth: .infinity)
                         .background(
                             selectedPartner == index
-                            ? LinearGradient(colors: [.purple.opacity(0.4), .blue.opacity(0.3)], startPoint: .leading, endPoint: .trailing)
-                            : LinearGradient(colors: [.clear, .clear], startPoint: .leading, endPoint: .trailing)
+                            ? AppTheme.Colors.gold
+                            : Color.clear
                         )
-                        .clipShape(Capsule())
                 }
             }
         }
-        .padding(4)
-        .background(Color.white.opacity(0.08))
+        .background(AppTheme.Colors.inputBackground)
         .clipShape(Capsule())
+        .overlay(
+            Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+        )
+        .padding(.horizontal, 20)
     }
     
     // MARK: - Hero Section
@@ -146,34 +141,23 @@ struct KalsarpaDoshaSheet: View {
             if data.isPresent {
                 // Animated snake in cosmic circle
                 ZStack {
-                    // Outer glow
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [.purple.opacity(0.2), .clear],
-                                center: .center,
-                                startRadius: 60,
-                                endRadius: 100
-                            )
-                        )
-                        .frame(width: 200, height: 200)
-                    
-                    // Orbital ring
+                    // Orbit
                     Circle()
                         .stroke(
                             AngularGradient(
-                                colors: [.purple.opacity(0.6), .blue.opacity(0.3), .purple.opacity(0.6)],
+                                colors: [AppTheme.Colors.gold.opacity(0.6), AppTheme.Colors.goldDim.opacity(0.3), AppTheme.Colors.gold.opacity(0.6)],
                                 center: .center
                             ),
-                            lineWidth: 3
+                            lineWidth: 2
                         )
                         .frame(width: 160, height: 160)
                         .rotationEffect(.degrees(animateOrbit ? 360 : 0))
                     
                     // Inner circle
                     Circle()
-                        .fill(Color.black.opacity(0.3))
+                        .fill(AppTheme.Colors.cardBackground)
                         .frame(width: 140, height: 140)
+                        .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1))
                     
                     // Snake emoji with animation
                     Text("🐍")
@@ -185,56 +169,28 @@ struct KalsarpaDoshaSheet: View {
                 VStack(spacing: 12) {
                     // Status badge
                     Text("kalsarpa_dosha".localized.uppercased())
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.red.opacity(0.9))
+                        .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.error)
                         .tracking(3)
                     
                     // Main status
                     Text("DETECTED")
-                        .font(.system(size: 24, weight: .black))
-                        .foregroundColor(.white)
+                        .font(AppTheme.Fonts.title(size: 24))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
-                    // Yoga Name - This is what the user wanted to see!
+                    // Yoga Name
                     Text(data.displayName)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.purple, .pink],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .font(AppTheme.Fonts.body(size: 18).weight(.bold))
+                        .foregroundStyle(AppTheme.Colors.gold)
                     
                     // Completeness & Severity badges
                     HStack(spacing: 12) {
                         if let completeness = data.completeness {
-                            HStack(spacing: 4) {
-                                Circle()
-                                    .fill(completeness == "complete" ? Color.orange : Color.yellow)
-                                    .frame(width: 6, height: 6)
-                                Text(completeness == "complete" ? "complete_formation".localized : "partial_formation".localized)
-                                    .font(.system(size: 11, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.7))
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color.white.opacity(0.08))
-                            .clipShape(Capsule())
+                            statusBadge(text: completeness == "complete" ? "complete_formation".localized : "partial_formation".localized, color: completeness == "complete" ? .orange : .yellow)
                         }
                         
                         if let severity = data.severity, severity != "none" {
-                            HStack(spacing: 4) {
-                                Circle()
-                                    .fill(severityColor(severity))
-                                    .frame(width: 6, height: 6)
-                                Text(severity.capitalized)
-                                    .font(.system(size: 11, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.7))
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color.white.opacity(0.08))
-                            .clipShape(Capsule())
+                            statusBadge(text: severity.capitalized, color: severityColor(severity))
                         }
                     }
                 }
@@ -242,20 +198,9 @@ struct KalsarpaDoshaSheet: View {
                 // No Kalsarpa - Positive state
                 ZStack {
                     Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [.green.opacity(0.15), .clear],
-                                center: .center,
-                                startRadius: 40,
-                                endRadius: 90
-                            )
-                        )
-                        .frame(width: 180, height: 180)
-                    
-                    Circle()
                         .stroke(
                             LinearGradient(
-                                colors: [.green.opacity(0.5), .teal.opacity(0.3)],
+                                colors: [AppTheme.Colors.success.opacity(0.5), AppTheme.Colors.success.opacity(0.2)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
@@ -270,23 +215,41 @@ struct KalsarpaDoshaSheet: View {
                 
                 VStack(spacing: 8) {
                     Text("no_kalsarpa".localized.uppercased())
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.green)
+                        .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.success)
                         .tracking(2)
                     
                     Text("planets_balanced".localized)
-                        .font(.system(size: 14))
-                        .foregroundColor(.white.opacity(0.6))
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                 }
             }
         }
         .padding(28)
         .frame(maxWidth: .infinity)
-        .background(premiumCardBackground)
+        .background(
+             RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                 .fill(AppTheme.Colors.cardBackground)
+                 .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
     }
     
-    // MARK: - Yoga Details Card (Cleaned up - no Type/Count)
+    private func statusBadge(text: String, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 6, height: 6)
+            Text(text)
+                .font(AppTheme.Fonts.caption(size: 11).weight(.medium))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(AppTheme.Colors.inputBackground)
+        .clipShape(Capsule())
+        .overlay(Capsule().stroke(color.opacity(0.3), lineWidth: 1))
+    }
     
     // MARK: - Consolidated Dosha Details Card
     
@@ -296,15 +259,15 @@ struct KalsarpaDoshaSheet: View {
             HStack {
                 ZStack {
                     Circle()
-                        .fill(LinearGradient(colors: [.purple.opacity(0.3), .indigo.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .fill(AppTheme.Colors.inputBackground)
                         .frame(width: 32, height: 32)
                     Image(systemName: "sparkle")
-                        .foregroundColor(.purple)
+                        .foregroundColor(AppTheme.Colors.gold)
                         .font(.system(size: 14))
                 }
                 Text("dosha_details".localized)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(AppTheme.Fonts.body(size: 15).weight(.bold))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
             }
             
@@ -315,30 +278,31 @@ struct KalsarpaDoshaSheet: View {
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(data.displayName + " Kala Sarpa")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(AppTheme.Fonts.body(size: 16).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Text(doshaDescription(data.doshaName ?? data.type ?? ""))
-                        .font(.system(size: 12))
-                        .foregroundColor(.white.opacity(0.6))
+                        .font(AppTheme.Fonts.caption())
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                         .lineLimit(2)
                 }
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.purple.opacity(0.1))
+            .background(AppTheme.Colors.inputBackground)
             .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1))
             
             // Affected Life Areas Section
             if let areas = data.lifeAreas, !areas.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 8) {
                         Image(systemName: "heart.text.square.fill")
-                            .foregroundColor(.orange)
+                            .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: 14))
                         Text("affected_areas".localized)
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.8))
+                            .font(AppTheme.Fonts.body(size: 13).weight(.semibold))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                     
                     FlowLayout(spacing: 8) {
@@ -347,16 +311,16 @@ struct KalsarpaDoshaSheet: View {
                                 Text(areaIcon(area))
                                     .font(.system(size: 11))
                                 Text(area)
-                                    .font(.system(size: 11, weight: .medium))
-                                    .foregroundColor(.white)
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                                    .foregroundColor(AppTheme.Colors.textPrimary)
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(Color.orange.opacity(0.15))
+                            .background(AppTheme.Colors.inputBackground)
                             .clipShape(Capsule())
                             .overlay(
                                 Capsule()
-                                    .stroke(Color.orange.opacity(0.25), lineWidth: 1)
+                                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                             )
                         }
                     }
@@ -367,22 +331,22 @@ struct KalsarpaDoshaSheet: View {
             if let period = data.peakPeriod, !period.isEmpty {
                 HStack(spacing: 12) {
                     Image(systemName: "clock.fill")
-                        .foregroundColor(.cyan)
+                        .foregroundColor(AppTheme.Colors.goldDim)
                         .font(.system(size: 16))
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text("peak_period".localized)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.white.opacity(0.5))
+                            .font(AppTheme.Fonts.caption())
+                            .foregroundColor(AppTheme.Colors.textTertiary)
                         Text(period)
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
+                            .font(AppTheme.Fonts.body(size: 14).weight(.bold))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
                     }
                     
                     Spacer()
                 }
                 .padding(12)
-                .background(Color.cyan.opacity(0.08))
+                .background(AppTheme.Colors.inputBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             
@@ -391,24 +355,24 @@ struct KalsarpaDoshaSheet: View {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 8) {
                         Image(systemName: "doc.text.fill")
-                            .foregroundColor(.indigo)
+                            .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: 14))
                         Text("analysis_notes".localized)
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.white.opacity(0.8))
+                            .font(AppTheme.Fonts.body(size: 13).weight(.semibold))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(notes, id: \.self) { note in
                             HStack(alignment: .top, spacing: 8) {
                                 Circle()
-                                    .fill(Color.indigo.opacity(0.5))
+                                    .fill(AppTheme.Colors.gold.opacity(0.5))
                                     .frame(width: 5, height: 5)
                                     .padding(.top, 5)
                                 
                                 Text(note)
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.75))
+                                    .font(AppTheme.Fonts.caption())
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
                             }
                         }
                     }
@@ -416,7 +380,11 @@ struct KalsarpaDoshaSheet: View {
             }
         }
         .padding(20)
-        .background(premiumCardBackground)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
     }
     
     // MARK: - Remedies Card
@@ -426,15 +394,15 @@ struct KalsarpaDoshaSheet: View {
             HStack {
                 ZStack {
                     Circle()
-                        .fill(LinearGradient(colors: [.yellow.opacity(0.3), .orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .fill(AppTheme.Colors.inputBackground)
                         .frame(width: 32, height: 32)
                     Image(systemName: "sparkles")
-                        .foregroundColor(.yellow)
+                        .foregroundColor(AppTheme.Colors.gold)
                         .font(.system(size: 14))
                 }
                 Text("recommended_remedies".localized)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(AppTheme.Fonts.body(size: 15).weight(.bold))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
             }
             
@@ -445,18 +413,23 @@ struct KalsarpaDoshaSheet: View {
                             .font(.system(size: 16))
                         
                         Text(remedies[index])
-                            .font(.system(size: 13))
-                            .foregroundColor(.white.opacity(0.85))
+                            .font(AppTheme.Fonts.caption())
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.yellow.opacity(0.05))
+                    .background(AppTheme.Colors.inputBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1))
                 }
             }
         }
         .padding(20)
-        .background(premiumCardBackground)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
     }
     
     // MARK: - No Data View
@@ -465,36 +438,18 @@ struct KalsarpaDoshaSheet: View {
         VStack(spacing: 20) {
             ZStack {
                 Circle()
-                    .fill(Color.white.opacity(0.05))
+                    .fill(AppTheme.Colors.inputBackground)
                     .frame(width: 80, height: 80)
                 Image(systemName: "questionmark")
                     .font(.system(size: 32, weight: .light))
-                    .foregroundColor(.white.opacity(0.3))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
             }
             
             Text("no_kalsarpa_data".localized)
-                .font(.system(size: 15))
-                .foregroundColor(.white.opacity(0.5))
+                .font(AppTheme.Fonts.body(size: 16))
+                .foregroundColor(AppTheme.Colors.textSecondary)
         }
         .padding(50)
-    }
-    
-    // MARK: - Premium Card Background
-    
-    private var premiumCardBackground: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(Color.white.opacity(0.04))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.white.opacity(0.1), .white.opacity(0.05), .white.opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            )
     }
     
     // MARK: - Helpers

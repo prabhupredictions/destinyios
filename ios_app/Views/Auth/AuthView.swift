@@ -13,7 +13,22 @@ struct AuthView: View {
     var body: some View {
         ZStack {
             // Background
-            backgroundView
+            AppTheme.Colors.mainBackground.ignoresSafeArea()
+            
+            // Cosmic background effect
+            GeometryReader { geo in
+                Circle()
+                    .fill(AppTheme.Colors.premiumGradient.opacity(0.1))
+                    .frame(width: 500, height: 500)
+                    .blur(radius: 100)
+                    .offset(x: geo.size.width - 150, y: -200)
+                
+                Circle()
+                    .fill(Color(hex: "4A148C").opacity(0.1)) // Deep purple accent
+                    .frame(width: 400, height: 400)
+                    .blur(radius: 80)
+                    .offset(x: -150, y: geo.size.height - 300)
+            }
             
             // Content
             VStack(spacing: 0) {
@@ -60,36 +75,6 @@ struct AuthView: View {
         }
     }
     
-    // MARK: - Background
-    private var backgroundView: some View {
-        ZStack {
-            // Gradient background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.96, green: 0.95, blue: 0.98),
-                    Color(red: 0.94, green: 0.94, blue: 0.97),
-                    Color(red: 0.92, green: 0.92, blue: 0.96)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            // Decorative circles
-            GeometryReader { geo in
-                Circle()
-                    .fill(Color("NavyPrimary").opacity(0.03))
-                    .frame(width: 500, height: 500)
-                    .offset(x: geo.size.width - 150, y: -200)
-                
-                Circle()
-                    .fill(Color("GoldAccent").opacity(0.05))
-                    .frame(width: 400, height: 400)
-                    .offset(x: -150, y: geo.size.height - 300)
-            }
-        }
-    }
-    
     // MARK: - Logo Section
     private var logoSection: some View {
         // Destiny logo from assets
@@ -97,30 +82,33 @@ struct AuthView: View {
             .resizable()
             .scaledToFit()
             .frame(width: 180, height: 180)
+            .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 20, x: 0, y: 0)
     }
     
     // MARK: - Welcome Section
     private var welcomeSection: some View {
         VStack(spacing: 12) {
             Text("welcome_to_destiny".localized)
-                .font(.system(size: 28, weight: .bold))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.display(size: 32))
+                .foregroundColor(AppTheme.Colors.gold)
             
             Text("sign_in_save".localized)
-                .font(.system(size: 16, weight: .regular))
-                .foregroundColor(Color("TextDark").opacity(0.6))
+                .font(AppTheme.Fonts.body(size: 16))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
         }
     }
     
     // MARK: - Auth Buttons
     private var authButtonsSection: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             // Apple Sign In (first per iOS HIG)
             AuthButton(
                 icon: "apple.logo",
                 iconImage: nil,
                 title: "Continue with Apple",
-                style: .dark
+                style: .primary
             ) {
                 Task { await viewModel.signInWithApple() }
             }
@@ -130,7 +118,7 @@ struct AuthView: View {
                 icon: nil,
                 iconImage: "google_logo",
                 title: "Continue with Google",
-                style: .light
+                style: .secondary
             ) {
                 Task { await viewModel.signInWithGoogle() }
             }
@@ -140,7 +128,7 @@ struct AuthView: View {
                 icon: "envelope.fill",
                 iconImage: nil,
                 title: "Continue with Email",
-                style: .light
+                style: .secondary
             ) {
                 // TODO: Email sign in
             }
@@ -148,8 +136,8 @@ struct AuthView: View {
             // Error message
             if let error = viewModel.errorMessage {
                 Text(error)
-                    .font(.system(size: 13))
-                    .foregroundColor(.red)
+                    .font(AppTheme.Fonts.caption(size: 13))
+                    .foregroundColor(AppTheme.Colors.error)
                     .padding(.top, 8)
             }
         }
@@ -163,13 +151,13 @@ struct AuthView: View {
             // Divider
             HStack {
                 Rectangle()
-                    .fill(Color("TextDark").opacity(0.2))
+                    .fill(AppTheme.Colors.separator)
                     .frame(height: 1)
                 Text("or".localized)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color("TextDark").opacity(0.4))
+                    .font(AppTheme.Fonts.caption(size: 13))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
                 Rectangle()
-                    .fill(Color("TextDark").opacity(0.2))
+                    .fill(AppTheme.Colors.separator)
                     .frame(height: 1)
             }
             .padding(.horizontal, 40)
@@ -180,8 +168,9 @@ struct AuthView: View {
                 viewModel.continueAsGuest()
             }) {
                 Text("continue_as_guest".localized)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.body(size: 16))
+                    .fontWeight(.medium)
+                    .foregroundColor(AppTheme.Colors.gold)
             }
             .padding(.top, 4)
         }
@@ -191,25 +180,27 @@ struct AuthView: View {
     private var termsSection: some View {
         VStack(spacing: 8) {
             Text("by_continuing".localized)
-                .font(.system(size: 12))
-                .foregroundColor(Color("TextDark").opacity(0.5))
+                .font(AppTheme.Fonts.caption(size: 12))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             
             HStack(spacing: 4) {
                 Button("Terms of Service") {
                     // TODO: Open terms
                 }
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.caption(size: 12))
+                .fontWeight(.medium)
+                .foregroundColor(AppTheme.Colors.goldDim)
                 
                 Text("and".localized)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
                 
                 Button("Privacy Policy") {
                     // TODO: Open privacy
                 }
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.caption(size: 12))
+                .fontWeight(.medium)
+                .foregroundColor(AppTheme.Colors.goldDim)
             }
         }
         .padding(.bottom, 30)
@@ -218,22 +209,28 @@ struct AuthView: View {
     // MARK: - Loading Overlay
     private var loadingOverlay: some View {
         ZStack {
-            Color.black.opacity(0.3)
+            Color.black.opacity(0.6)
                 .ignoresSafeArea()
             
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
                     .scaleEffect(1.3)
                 
                 Text("signing_in".localized)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white)
+                    .font(AppTheme.Fonts.body(size: 14))
+                    .fontWeight(.medium)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
             }
             .padding(30)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color("NavyPrimary").opacity(0.95))
+                    .fill(AppTheme.Colors.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 4)
             )
         }
     }
@@ -252,7 +249,7 @@ struct AuthView: View {
 // MARK: - Auth Button Component
 struct AuthButton: View {
     enum Style {
-        case dark, light
+        case primary, secondary
     }
     
     let icon: String?          // SF Symbol name (optional)
@@ -262,7 +259,10 @@ struct AuthButton: View {
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            HapticManager.shared.play(.light)
+            action()
+        }) {
             HStack(spacing: 12) {
                 // Show either SF Symbol or asset image
                 if let iconImage = iconImage {
@@ -276,28 +276,35 @@ struct AuthButton: View {
                 }
                 
                 Text(title)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(AppTheme.Fonts.body(size: 16).weight(.semibold))
             }
-            .foregroundColor(style == .dark ? .white : Color("NavyPrimary"))
+            .foregroundColor(style == .primary ? AppTheme.Colors.mainBackground : AppTheme.Colors.textPrimary)
             .frame(maxWidth: .infinity)
             .frame(height: 54)
             .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(style == .dark ? Color("NavyPrimary") : Color.white)
+                Group {
+                    if style == .primary {
+                        AppTheme.Colors.premiumGradient
+                    } else {
+                        AppTheme.Colors.inputBackground
+                    }
+                }
             )
+            .cornerRadius(14)
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
                     .stroke(
-                        style == .light ? Color("NavyPrimary").opacity(0.2) : Color.clear,
+                        style == .secondary ? AppTheme.Colors.gold.opacity(0.3) : Color.clear,
                         lineWidth: 1
                     )
             )
             .shadow(
-                color: style == .dark ? Color("NavyPrimary").opacity(0.2) : Color.black.opacity(0.05),
-                radius: style == .dark ? 8 : 4,
-                y: style == .dark ? 4 : 2
+                color: style == .primary ? AppTheme.Colors.gold.opacity(0.3) : Color.black.opacity(0.1),
+                radius: 8,
+                y: 4
             )
         }
+        .buttonStyle(ScaleButtonStyle())
     }
 }
 

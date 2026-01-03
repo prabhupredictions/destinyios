@@ -144,21 +144,30 @@ class ProfileService {
     // MARK: - Restore Profile Locally
     
     /// Restore profile data to local storage (UserDefaults + DataManager)
-    func restoreProfileLocally(_ profile: ProfileResponse, dataManager: DataManager = .shared) {
+    func restoreProfileLocally(_ profile: ProfileResponse, dataManager: DataManager = .shared) throws -> Bool {
         let defaults = UserDefaults.standard
+        let savedEmail = profile.userEmail
         
         // Store user info
         if let name = profile.userName, !name.isEmpty {
             defaults.set(name, forKey: "userName")
         }
-        defaults.set(profile.userEmail, forKey: "userEmail")
+        defaults.set(savedEmail, forKey: "userEmail")
         
-        // Store quota info
-        defaults.set(profile.questionsAsked, forKey: "quotaUsed")
+        // Store quota info (User-Scoped AND Global for session)
+        let quotaKey = StorageKeys.userKey(for: StorageKeys.quotaUsed, email: savedEmail)
+        defaults.set(profile.questionsAsked, forKey: quotaKey)
+        defaults.set(profile.questionsAsked, forKey: "quotaUsed") // Global for UI
         defaults.set(profile.isPremium, forKey: "isPremium")
         
         // Store birth profile if exists
         if let birth = profile.birthProfile {
+            // Create user-scoped keys
+            let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData, email: savedEmail)
+            let hasDataKey = StorageKeys.userKey(for: StorageKeys.hasBirthData, email: savedEmail)
+            let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: savedEmail)
+            let timeUnknownKey = StorageKeys.userKey(for: StorageKeys.birthTimeUnknown, email: savedEmail)
+            
             // Create BirthData for UserDefaults
             let birthData = BirthData(
                 dob: birth.dateOfBirth,
@@ -169,18 +178,22 @@ class ProfileService {
             )
             
             if let encoded = try? JSONEncoder().encode(birthData) {
-                defaults.set(encoded, forKey: "userBirthData")
+                defaults.set(encoded, forKey: dataKey)
+                defaults.set(true, forKey: hasDataKey)
+                
+                // Update Global keys for session
+                defaults.set(encoded, forKey: "userBirthData") // Temp global for legacy/UI
                 defaults.set(true, forKey: "hasBirthData")
             }
             
             if let gender = birth.gender {
-                defaults.set(gender, forKey: "userGender")
+                defaults.set(gender, forKey: genderKey)
             }
-            defaults.set(birth.birthTimeUnknown, forKey: "birthTimeUnknown")
+            defaults.set(birth.birthTimeUnknown, forKey: timeUnknownKey)
             
             // Save to SwiftData
             let userProfile = UserBirthProfile(
-                email: profile.userEmail,
+                email: savedEmail,
                 isGuestEmail: profile.isGeneratedEmail,
                 dateOfBirth: birth.dateOfBirth,
                 timeOfBirth: birth.timeOfBirth ?? "12:00",
@@ -193,8 +206,10 @@ class ProfileService {
             )
             dataManager.saveBirthProfile(userProfile)
             
-            print("[ProfileService] Restored birth profile locally")
+            print("[ProfileService] Restored birth profile locally for \(savedEmail)")
         }
+        
+        return true
     }
 }
 

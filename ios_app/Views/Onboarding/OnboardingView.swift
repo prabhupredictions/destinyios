@@ -13,28 +13,21 @@ struct OnboardingView: View {
     var body: some View {
         ZStack {
             // Premium gradient background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.96, green: 0.95, blue: 0.98),
-                    Color(red: 0.94, green: 0.93, blue: 0.97),
-                    Color(red: 0.92, green: 0.91, blue: 0.96)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppTheme.Colors.mainBackground.ignoresSafeArea()
             
             // Decorative background elements
             GeometryReader { geo in
                 Circle()
-                    .fill(Color("NavyPrimary").opacity(0.03))
+                    .fill(AppTheme.Colors.gold.opacity(0.05))
                     .frame(width: 400, height: 400)
                     .offset(x: -100, y: -100)
+                    .blur(radius: 60)
                 
                 Circle()
-                    .fill(Color("GoldAccent").opacity(0.05))
+                    .fill(Color(hex: "4A148C").opacity(0.1)) // Deep purple accent
                     .frame(width: 300, height: 300)
                     .offset(x: geo.size.width - 100, y: geo.size.height - 200)
+                    .blur(radius: 50)
             }
             
             VStack(spacing: 0) {
@@ -43,8 +36,8 @@ struct OnboardingView: View {
                     if currentSlide < slides.count - 1 {
                         Button(action: onComplete) {
                             Text("skip".localized)
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Color("TextDark").opacity(0.6))
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
                     Spacer()
@@ -73,7 +66,7 @@ struct OnboardingView: View {
                     HStack(spacing: 10) {
                         ForEach(0..<slides.count, id: \.self) { index in
                             Capsule()
-                                .fill(index == currentSlide ? Color("NavyPrimary") : Color("NavyPrimary").opacity(0.2))
+                                .fill(index == currentSlide ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary.opacity(0.3))
                                 .frame(width: index == currentSlide ? 24 : 8, height: 8)
                                 .animation(.spring(response: 0.3), value: currentSlide)
                         }
@@ -92,18 +85,12 @@ struct OnboardingView: View {
                                 Image(systemName: "arrow.right")
                                     .font(.system(size: 14, weight: .semibold))
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "0B0F19")) // Dark text on gold
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.9)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                            .background(AppTheme.Colors.premiumGradient)
                             .cornerRadius(16)
-                            .shadow(color: Color("NavyPrimary").opacity(0.3), radius: 10, y: 5)
+                            .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 5)
                         }
                         .padding(.horizontal, 24)
                     }

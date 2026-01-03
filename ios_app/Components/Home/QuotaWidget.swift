@@ -16,7 +16,7 @@ struct QuotaWidget: View {
     
     private var progressColor: Color {
         if progress > 0.5 {
-            return Color("GoldAccent")
+            return AppTheme.Colors.gold
         } else if progress > 0.2 {
             return Color.orange
         } else {

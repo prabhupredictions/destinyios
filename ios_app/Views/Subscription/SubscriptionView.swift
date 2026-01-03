@@ -35,17 +35,9 @@ struct SubscriptionView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 40)
             }
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.95, green: 0.94, blue: 0.96),
-                        Color(red: 0.96, green: 0.95, blue: 0.98)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            )
+                .padding(.bottom, 40)
+            }
+            .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
             .navigationTitle("Premium")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -56,7 +48,7 @@ struct SubscriptionView: View {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 24))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 }
                 #else
@@ -65,13 +57,15 @@ struct SubscriptionView: View {
                 }
                 #endif
             }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .alert("Error", isPresented: $showError) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage)
             }
         }
-    }
+
     
     // MARK: - Header Section
     private var headerSection: some View {
@@ -79,29 +73,23 @@ struct SubscriptionView: View {
             // Crown icon
             ZStack {
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(AppTheme.Colors.premiumGradient)
                     .frame(width: 80, height: 80)
-                    .shadow(color: Color("GoldAccent").opacity(0.4), radius: 15, y: 5)
+                    .shadow(color: AppTheme.Colors.gold.opacity(0.4), radius: 15, y: 5)
                 
                 Image(systemName: "crown.fill")
                     .font(.system(size: 36))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "0B0F19"))
             }
             
             VStack(spacing: 8) {
                 Text("unlock_premium".localized)
-                    .font(.system(size: 26, weight: .bold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.display(size: 26))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 
                 Text("get_cosmic_guidance".localized)
-                    .font(.system(size: 16))
-                    .foregroundColor(Color("TextDark").opacity(0.6))
+                    .font(AppTheme.Fonts.body(size: 16))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
         }
         .padding(.vertical, 12)
@@ -116,11 +104,13 @@ struct SubscriptionView: View {
             FeatureRow(icon: "sparkles", title: "Priority Responses", description: "Faster, more detailed answers")
         }
         .padding(20)
-        .background(
+        .background(AppTheme.Colors.cardBackground)
+        .cornerRadius(16)
+        .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
+                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.2), radius: 10, y: 4)
     }
     
     // MARK: - Pricing Card
@@ -129,28 +119,28 @@ struct SubscriptionView: View {
             if let product = subscriptionManager.monthlyProduct {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(product.displayPrice)
-                        .font(.system(size: 36, weight: .bold))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.display(size: 36))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Text("/ month")
-                        .font(.system(size: 16))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("$4.99")
-                        .font(.system(size: 36, weight: .bold))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.display(size: 36))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Text("/ month")
-                        .font(.system(size: 16))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
             
             Text("cancel_anytime".localized)
-                .font(.system(size: 14))
-                .foregroundColor(Color("TextDark").opacity(0.5))
+                .font(AppTheme.Fonts.caption(size: 14))
+                .foregroundColor(AppTheme.Colors.textTertiary)
         }
         .padding(.vertical, 8)
     }
@@ -165,26 +155,20 @@ struct SubscriptionView: View {
             HStack(spacing: 10) {
                 if isPurchasing || subscriptionManager.isLoading {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "0B0F19")))
                 } else {
                     Image(systemName: "crown.fill")
                         .font(.system(size: 16))
                 }
                 Text(isPurchasing ? "Processing..." : "Subscribe Now")
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 17))
             }
-            .foregroundColor(.white)
+            .foregroundColor(Color(hex: "0B0F19"))
             .frame(maxWidth: .infinity)
             .frame(height: 56)
-            .background(
-                LinearGradient(
-                    colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.85)],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
+            .background(AppTheme.Colors.premiumGradient)
             .cornerRadius(16)
-            .shadow(color: Color("NavyPrimary").opacity(0.3), radius: 10, y: 5)
+            .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 5)
         }
         .disabled(isPurchasing || subscriptionManager.isLoading)
     }
@@ -200,16 +184,16 @@ struct SubscriptionView: View {
             }
         }) {
             Text("restore_purchases".localized)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.body(size: 15))
+                .foregroundColor(AppTheme.Colors.gold)
         }
     }
     
     // MARK: - Disclaimer
     private var disclaimerText: some View {
         Text("subscription_terms".localized)
-            .font(.system(size: 11))
-            .foregroundColor(Color("TextDark").opacity(0.4))
+            .font(AppTheme.Fonts.caption(size: 11))
+            .foregroundColor(AppTheme.Colors.textTertiary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 16)
     }
@@ -249,29 +233,29 @@ struct FeatureRow: View {
         HStack(spacing: 16) {
             ZStack {
                 Circle()
-                    .fill(Color("GoldAccent").opacity(0.15))
+                    .fill(AppTheme.Colors.gold.opacity(0.15))
                     .frame(width: 44, height: 44)
                 
                 Image(systemName: icon)
                     .font(.system(size: 18))
-                    .foregroundColor(Color("GoldAccent"))
+                    .foregroundColor(AppTheme.Colors.gold)
             }
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.title(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 
                 Text(description)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color("TextDark").opacity(0.6))
+                    .font(AppTheme.Fonts.body(size: 13))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
             Spacer()
             
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 20))
-                .foregroundColor(.green)
+                .foregroundColor(Color.green)
         }
     }
 }

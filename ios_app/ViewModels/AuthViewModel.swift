@@ -67,6 +67,11 @@ class AuthViewModel {
         let guestUser = await authService.signInAsGuest()
         
         handleAuthSuccess(user: guestUser, isGuest: true)
+        
+        // DEBUG: Print state after guest login
+        let hasBirth = UserDefaults.standard.bool(forKey: "hasBirthData")
+        print("[DEBUG] After guest login - hasBirthData: \(hasBirth), isAuthenticated: \(isAuthenticated)")
+        
         self.isLoading = false
     }
     
@@ -80,6 +85,7 @@ class AuthViewModel {
     /// Async version for testing
     func signOutAsync() async {
         let wasGuest = UserDefaults.standard.bool(forKey: "isGuest")
+        let previousEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         
         await authService.signOut()
         
@@ -100,16 +106,28 @@ class AuthViewModel {
         UserDefaults.standard.removeObject(forKey: "userName")
         UserDefaults.standard.set(false, forKey: "isAuthenticated")
         
-        // For GUEST users: clear birth data and quota (they get fresh start)
-        // For REGISTERED users: keep birth data locally cached by email
+        // Clear global session keys (UI resets to no birth data)
+        UserDefaults.standard.removeObject(forKey: "userBirthData")
+        UserDefaults.standard.set(false, forKey: "hasBirthData")
+        UserDefaults.standard.removeObject(forKey: "quotaUsed")
+        UserDefaults.standard.removeObject(forKey: "isPremium")
+        
+        print("[DEBUG] SignOut - hasBirthData set to false, isAuthenticated: \(UserDefaults.standard.bool(forKey: "isAuthenticated"))")
+        
+        // For GUEST users: clear their user-scoped data (they get fresh start)
+        // For REGISTERED users: keep birth data locally cached by email for quick re-login
         if wasGuest {
-            UserDefaults.standard.removeObject(forKey: "quotaUsed")
-            UserDefaults.standard.removeObject(forKey: "userBirthData")
-            UserDefaults.standard.removeObject(forKey: "hasBirthData")
-            UserDefaults.standard.removeObject(forKey: "userGender")
-            UserDefaults.standard.removeObject(forKey: "birthTimeUnknown")
+            // Clear all user-scoped data for this guest
+            let keys = StorageKeys.allKeys(for: previousEmail)
+            keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+            
+            // Also clear caches for guest
+            TodaysPredictionCache.shared.clear(forUser: previousEmail)
+            AstroDataCache.shared.clearAll(forUser: previousEmail)
+            CompatibilityHistoryService.shared.clearAll(forUser: previousEmail)
         }
-        // Note: Registered users' birth data is preserved in SwiftData by email key
+        // For registered users, we do NOT clear. The keys are user-scoped, so next user won't see them.
+        // When this user logs in again, their data will be waiting.
     }
     
     // MARK: - Private Helpers
@@ -151,12 +169,37 @@ class AuthViewModel {
         
         if let email = user.email {
             UserDefaults.standard.set(email, forKey: "userEmail")
+            
+            // HYDRATE SESSION FROM LOCAL CACHE (Instant Login)
+            // Check if we have data for this user isolated locally
+            let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData, email: email)
+            let hasDataKey = StorageKeys.userKey(for: StorageKeys.hasBirthData, email: email)
+            let quotaKey = StorageKeys.userKey(for: StorageKeys.quotaUsed, email: email)
+            let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: email)
+            
+            if UserDefaults.standard.bool(forKey: hasDataKey),
+               let data = UserDefaults.standard.data(forKey: dataKey) {
+                
+                // Copy to Session (Global) keys for UI
+                UserDefaults.standard.set(data, forKey: "userBirthData")
+                UserDefaults.standard.set(true, forKey: "hasBirthData")
+                print("[AuthViewModel] Hydrated session from local cache for: \(email)")
+                
+                if let gender = UserDefaults.standard.string(forKey: genderKey) {
+                    UserDefaults.standard.set(gender, forKey: "userGender")
+                }
+            }
+            
+            // Restore Quota
+            if let quota = UserDefaults.standard.object(forKey: quotaKey) as? Int {
+                UserDefaults.standard.set(quota, forKey: "quotaUsed")
+            }
         }
         if let name = user.name {
             UserDefaults.standard.set(name, forKey: "userName")
         }
         
-        // For registered users, try to fetch existing profile from server
+        // For registered users, try to fetch/sync latest profile from server
         if !isGuest, let email = user.email {
             Task {
                 await fetchAndRestoreProfile(email: email)
@@ -169,7 +212,7 @@ class AuthViewModel {
         do {
             if let profile = try await ProfileService.shared.fetchProfile(email: email) {
                 // Restore profile data locally
-                ProfileService.shared.restoreProfileLocally(profile)
+                try ProfileService.shared.restoreProfileLocally(profile)
                 
                 // Update hasBirthData flag if profile has birth data
                 if profile.birthProfile != nil {
@@ -184,7 +227,9 @@ class AuthViewModel {
             }
             
             // Sync chat history from server
+            // Sync chat history and compatibility history from server
             await ChatHistorySyncService.shared.syncFromServer(userEmail: email, dataManager: DataManager.shared)
+            await CompatibilityHistoryService.shared.syncFromServer(userEmail: email)
             
         } catch {
             print("[AuthViewModel] Failed to fetch profile: \(error)")

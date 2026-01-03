@@ -58,7 +58,7 @@ struct CompatibilityResultView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 0.97, green: 0.96, blue: 0.98)
+            AppTheme.Colors.mainBackground
                 .ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
@@ -212,7 +212,7 @@ struct CompatibilityResultView: View {
                 
                 // Background track
                 Circle()
-                    .stroke(Color("NavyPrimary").opacity(0.06), lineWidth: 8)
+                    .stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 8)
                     .frame(width: 100, height: 100)
                 
                 // Animated progress ring with gradient
@@ -235,39 +235,39 @@ struct CompatibilityResultView: View {
                 VStack(spacing: 2) {
                     Text("\(result.totalScore)")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Text("out_of".localized + " \(result.maxScore)")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.45))
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                         .tracking(-0.3)
                 }
             }
             
             VStack(spacing: 4) {
                 Text(compatibilityLevel)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(AppTheme.Fonts.title(size: 16))
                     .foregroundColor(levelColor)
                     .tracking(-0.5)
                 
                 Text("\(Int(result.percentage * 100))%")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color("TextDark").opacity(0.35))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
         .background(
             ZStack {
-                // Glassmorphism base
+                // Dark Card base
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(.ultraThinMaterial)
+                    .fill(AppTheme.Colors.cardBackground)
                 
-                // White overlay
+                // Gold overlay stroke
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.white.opacity(0.85))
+                    .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
             }
-            .shadow(color: Color("NavyPrimary").opacity(0.08), radius: 16, y: 6)
+            .shadow(color: Color.black.opacity(0.3), radius: 16, y: 6)
         )
     }
     
@@ -278,9 +278,9 @@ struct CompatibilityResultView: View {
     }
     
     private var levelColor: Color {
-        if result.percentage >= 0.75 { return Color(red: 0.2, green: 0.7, blue: 0.4) }
-        else if result.percentage >= 0.5 { return Color("GoldAccent") }
-        else { return .orange }
+        if result.percentage >= 0.75 { return AppTheme.Colors.success }
+        else if result.percentage >= 0.5 { return AppTheme.Colors.gold }
+        else { return AppTheme.Colors.error }
     }
 
     // MARK: - Dosha Buttons Row
@@ -331,8 +331,8 @@ struct CompatibilityResultView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             Text("ashtakoot_grid".localized)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(Color("TextDark").opacity(0.45))
+                .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
+                .foregroundColor(AppTheme.Colors.textTertiary)
                 .tracking(0.5)
                 .padding(.horizontal, 4)
             
@@ -350,15 +350,12 @@ struct CompatibilityResultView: View {
         .background(
             ZStack {
                 RoundedRectangle(cornerRadius: 18)
-                    .fill(.ultraThinMaterial)
+                    .fill(AppTheme.Colors.cardBackground)
                 
                 RoundedRectangle(cornerRadius: 18)
-                    .fill(Color.white.opacity(0.85))
-                
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color("NavyPrimary").opacity(0.04), lineWidth: 1)
+                    .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
             }
-            .shadow(color: Color("NavyPrimary").opacity(0.06), radius: 12, y: 4)
+            .shadow(color: Color.black.opacity(0.3), radius: 12, y: 4)
         )
     }
     
@@ -399,19 +396,12 @@ struct ActionButton: View {
         }) {
             VStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.7)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
+                    .foregroundStyle(AppTheme.Colors.premiumGradient)
                     .symbolEffect(.bounce, value: isPressed)
                 
                 Text(label)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.75))
+                    .font(AppTheme.Fonts.caption(size: 10).weight(.semibold))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
@@ -421,15 +411,12 @@ struct ActionButton: View {
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: 14)
-                        .fill(.ultraThinMaterial)
+                        .fill(AppTheme.Colors.cardBackground)
                     
                     RoundedRectangle(cornerRadius: 14)
-                        .fill(Color.white.opacity(0.9))
-                    
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color("NavyPrimary").opacity(0.06), lineWidth: 1)
+                        .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
                 }
-                .shadow(color: Color("NavyPrimary").opacity(isPressed ? 0.02 : 0.08), radius: isPressed ? 4 : 10, y: isPressed ? 1 : 4)
+                .shadow(color: Color.black.opacity(0.2), radius: isPressed ? 4 : 10, y: isPressed ? 1 : 4)
             )
             .scaleEffect(isPressed ? 0.96 : 1.0)
         }
@@ -492,21 +479,21 @@ struct CompactPartnerCard: View {
             
             VStack(spacing: 2) {
                 Text(name)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.title(size: 14))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                     .lineLimit(1)
                     .tracking(-0.3)
                 
                 if let dob = dob, !dob.isEmpty {
                     Text(dob)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
                 
                 if let city = city, !city.isEmpty {
                     Text(city)
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundColor(Color("TextDark").opacity(0.35))
+                        .font(AppTheme.Fonts.caption(size: 9))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                         .lineLimit(1)
                 }
             }
@@ -516,15 +503,12 @@ struct CompactPartnerCard: View {
         .background(
             ZStack {
                 RoundedRectangle(cornerRadius: 18)
-                    .fill(.ultraThinMaterial)
+                    .fill(AppTheme.Colors.cardBackground)
                 
                 RoundedRectangle(cornerRadius: 18)
-                    .fill(Color.white.opacity(0.88))
-                
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                    .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
             }
-            .shadow(color: Color("NavyPrimary").opacity(0.06), radius: 12, y: 4)
+            .shadow(color: Color.black.opacity(0.3), radius: 10, y: 4)
         )
     }
 }
@@ -537,10 +521,10 @@ struct CompactKutaBox: View {
     private var bgGradient: LinearGradient {
         let pct = kuta.percentage
         let baseColor: Color
-        if pct >= 0.75 { baseColor = Color(red: 0.2, green: 0.7, blue: 0.4) }
-        else if pct >= 0.50 { baseColor = Color("GoldAccent") }
+        if pct >= 0.75 { baseColor = AppTheme.Colors.success }
+        else if pct >= 0.50 { baseColor = AppTheme.Colors.gold }
         else if pct >= 0.25 { baseColor = .orange }
-        else { baseColor = .red }
+        else { baseColor = AppTheme.Colors.error }
         
         return LinearGradient(
             colors: [baseColor.opacity(0.12), baseColor.opacity(0.06)],
@@ -551,10 +535,10 @@ struct CompactKutaBox: View {
     
     private var textColor: Color {
         let pct = kuta.percentage
-        if pct >= 0.75 { return Color(red: 0.2, green: 0.65, blue: 0.4) }
-        else if pct >= 0.50 { return Color("GoldAccent") }
+        if pct >= 0.75 { return AppTheme.Colors.success }
+        else if pct >= 0.50 { return AppTheme.Colors.gold }
         else if pct >= 0.25 { return .orange }
-        else { return .red }
+        else { return AppTheme.Colors.error }
     }
     
     var body: some View {
@@ -565,7 +549,7 @@ struct CompactKutaBox: View {
             
             Text(kuta.name.prefix(4).uppercased())
                 .font(.system(size: 8, weight: .semibold))
-                .foregroundColor(Color("TextDark").opacity(0.4))
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .tracking(0.5)
         }
         .frame(maxWidth: .infinity)
@@ -595,99 +579,124 @@ struct FullReportSheet: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("\(boyName) & \(girlName)")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(Color("NavyPrimary"))
-                            
-                            Text("\(result.totalScore)/\(result.maxScore) \("points".localized)")
-                                .font(.system(size: 11))
-                                .foregroundColor(Color("TextDark").opacity(0.5))
-                        }
-                        
-                        Spacer()
-                        
-                        Text("\(Int(result.percentage * 100))%")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(result.percentage >= 0.75 ? Color(red: 0.2, green: 0.7, blue: 0.4) : Color("GoldAccent"))
-                    }
-                    .padding(12)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(result.kutas) { kuta in
-                            HStack {
-                                Text(kuta.name)
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(Color("NavyPrimary"))
-                                
-                                Spacer()
-                                
-                                Text("\(kuta.points)/\(kuta.maxPoints)")
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(kutaColor(kuta.percentage))
-                            }
-                            .padding(.vertical, 5)
-                            
-                            if kuta.id != result.kutas.last?.id { Divider() }
-                        }
-                    }
-                    .padding(12)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
-                    
-                    if !result.summary.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("summary".localized)
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundColor(Color("TextDark").opacity(0.5))
-                            
-                            
-
-                            // Preprocess markdown for better display
-                            let processedSummary = preprocessMarkdownForReport(result.summary)
-                            
-                            if let attrString = try? AttributedString(
-                                markdown: processedSummary,
-                                options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
-                            ) {
-                                Text(attrString)
-                                    .font(.system(size: 13))
-                                    .foregroundColor(Color("NavyPrimary"))
-                                    .lineSpacing(4)
-                            } else {
-                                Text(result.summary)
-                                    .font(.system(size: 13))
-                                    .foregroundColor(Color("NavyPrimary"))
-                                    .lineSpacing(4)
-                            }
-                        }
-                        .padding(12)
-                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
-                    }
+                    headerSection
+                    kutasList
+                    summarySection
                 }
                 .padding(14)
             }
-            .background(Color(red: 0.96, green: 0.95, blue: 0.97))
+            .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
             .navigationTitle("full_compatibility_report".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 20))
-                            .foregroundColor(Color("TextDark").opacity(0.25))
+                            .font(.system(size: 24))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }
             }
         }
     }
     
+    private var headerSection: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(boyName) & \(girlName)")
+                    .font(AppTheme.Fonts.title(size: 14))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                
+                Text("\(result.totalScore)/\(result.maxScore) \("points".localized)")
+                    .font(AppTheme.Fonts.caption(size: 11))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+            }
+            
+            Spacer()
+            
+            Text("\(Int(result.percentage * 100))%")
+                .font(AppTheme.Fonts.title(size: 22))
+                .foregroundColor(result.percentage >= 0.75 ? AppTheme.Colors.success : AppTheme.Colors.gold)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                .fill(AppTheme.Colors.cardBackground)
+                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
+    }
+    
+    private var kutasList: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(result.kutas) { kuta in
+                HStack {
+                    Text(kuta.name)
+                        .font(AppTheme.Fonts.body(size: 12).weight(.medium))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    
+                    Spacer()
+                    
+                    Text("\(kuta.points)/\(kuta.maxPoints)")
+                        .font(AppTheme.Fonts.body(size: 12).weight(.bold))
+                        .foregroundColor(kutaColor(kuta.percentage))
+                }
+                .padding(.vertical, 5)
+                
+                if kuta.id != result.kutas.last?.id { 
+                    Divider()
+                        .background(AppTheme.Colors.gold.opacity(0.1))
+                }
+            }
+        }
+        .padding(12)
+        .background(
+             RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                 .fill(AppTheme.Colors.cardBackground)
+                 .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+        )
+    }
+    
+    private var summarySection: some View {
+        Group {
+            if !result.summary.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("summary".localized)
+                        .font(AppTheme.Fonts.caption().weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                    
+                    // Preprocess markdown for better display
+                    let processedSummary = preprocessMarkdownForReport(result.summary)
+                    
+                    if let attrString = try? AttributedString(
+                        markdown: processedSummary,
+                        options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+                    ) {
+                        Text(attrString)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .lineSpacing(4)
+                    } else {
+                        Text(result.summary)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .lineSpacing(4)
+                    }
+                }
+                .padding(12)
+                .background(
+                     RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                         .fill(AppTheme.Colors.cardBackground)
+                         .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+                )
+            }
+        }
+    }
+    
     private func kutaColor(_ pct: Double) -> Color {
-        if pct >= 0.75 { return Color(red: 0.2, green: 0.7, blue: 0.4) }
-        else if pct >= 0.50 { return Color("GoldAccent") }
+        if pct >= 0.75 { return AppTheme.Colors.success }
+        else if pct >= 0.50 { return AppTheme.Colors.gold }
         else if pct >= 0.25 { return .orange }
-        else { return .red }
+        else { return AppTheme.Colors.error }
     }
 }
 
@@ -704,21 +713,24 @@ struct AskDestinySheet: View {
     private let service = CompatibilityService()
     private let predictionService = PredictionService()
     
+    // Quota and subscription UI state
+    @State private var showQuotaExhausted = false
+    @State private var showSubscription = false
+    @AppStorage("isGuest") private var isGuest = false
+    @AppStorage("isAuthenticated") private var isAuthenticated = false
+    @AppStorage("hasBirthData") private var hasBirthData = false
+    
     // Premium Dark Theme Colors
-    private let darkBg = Color(red: 0.08, green: 0.08, blue: 0.14)
-    private let cardBg = Color(red: 0.12, green: 0.12, blue: 0.20)
-    private let accentGold = Color(red: 0.90, green: 0.72, blue: 0.35)
+    private let darkBg = AppTheme.Colors.mainBackground
+    private let cardBg = AppTheme.Colors.cardBackground
+    private let accentGold = AppTheme.Colors.gold
     private let accentPurple = Color(red: 0.55, green: 0.36, blue: 0.96)
     
     var body: some View {
         ZStack {
             // Dark gradient background
-            LinearGradient(
-                colors: [darkBg, Color(red: 0.10, green: 0.08, blue: 0.18)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppTheme.Colors.mainBackground
+                .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Premium Header
@@ -771,22 +783,75 @@ struct AskDestinySheet: View {
         .onChange(of: messages.count) { _ in
             saveChatHistory()
         }
+        .sheet(isPresented: $showQuotaExhausted) {
+            QuotaExhaustedView(
+                isGuest: isGuest,
+                onSignIn: { signOutAndReauth() },
+                onUpgrade: {
+                    if isGuest {
+                        signOutAndReauth()
+                    } else {
+                        showSubscription = true
+                    }
+                }
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.hidden)
+        }
+        .sheet(isPresented: $showSubscription) {
+            SubscriptionView()
+        }
     }
     
     // MARK: - Persistence
     private func loadChatHistory() {
-        guard let sessionId = result.sessionId else { return }
-        if let item = CompatibilityHistoryService.shared.get(sessionId: sessionId) {
-            // Only load if local messages are empty (fresh open), otherwise keep current
-            if messages.isEmpty {
-                self.messages = item.chatMessages.map { $0.toMessage() }
+        print("[AskDestinySheet] loadChatHistory called, sessionId='\(result.sessionId ?? "NIL")'")
+        guard let sessionId = result.sessionId else { 
+            print("[AskDestinySheet] loadChatHistory: no sessionId, skipping")
+            return 
+        }
+        // Use compat_ prefix to match stored format
+        let storageSessionId = sessionId.hasPrefix("compat_") ? sessionId : "compat_\(sessionId)"
+        print("[AskDestinySheet] loadChatHistory: looking for storageSessionId='\(storageSessionId)'")
+        if let item = CompatibilityHistoryService.shared.get(sessionId: storageSessionId) {
+            print("[AskDestinySheet] loadChatHistory: found item with \(item.chatMessages.count) messages")
+            
+            // Filter out the initial analysis message (starts with "---" or contains "COMPATIBILITY VERDICT")
+            // Only load actual follow-up Q&A messages
+            let followupMessages = item.chatMessages.filter { msg in
+                let content = msg.content.trimmingCharacters(in: .whitespacesAndNewlines)
+                // Skip if it's the initial analysis
+                if content.hasPrefix("---") || content.contains("COMPATIBILITY VERDICT") {
+                    print("[AskDestinySheet] Skipping initial analysis message (length: \(content.count))")
+                    return false
+                }
+                return true
             }
+            
+            print("[AskDestinySheet] loadChatHistory: \(followupMessages.count) actual follow-up messages")
+            
+            // Only load if local messages are empty (fresh open), otherwise keep current
+            if messages.isEmpty && !followupMessages.isEmpty {
+                print("[AskDestinySheet] loadChatHistory: loading \(followupMessages.count) messages into view")
+                self.messages = followupMessages.map { $0.toMessage() }
+                print("[AskDestinySheet] loadChatHistory: loaded \(messages.count) messages")
+            } else {
+                print("[AskDestinySheet] loadChatHistory: no follow-up messages to load")
+            }
+        } else {
+            print("[AskDestinySheet] loadChatHistory: no stored item found")
         }
     }
     
     private func saveChatHistory() {
-        guard let sessionId = result.sessionId, !messages.isEmpty else { return }
-        CompatibilityHistoryService.shared.updateChatMessages(sessionId: sessionId, messages: messages)
+        print("[AskDestinySheet] saveChatHistory called, sessionId='\(result.sessionId ?? "NIL")', messages.count=\(messages.count)")
+        guard let sessionId = result.sessionId, !messages.isEmpty else { 
+            print("[AskDestinySheet] saveChatHistory: early return (sessionId nil or messages empty)")
+            return 
+        }
+        // Use compat_ prefix to match stored format
+        let storageSessionId = sessionId.hasPrefix("compat_") ? sessionId : "compat_\(sessionId)"
+        CompatibilityHistoryService.shared.updateChatMessages(sessionId: storageSessionId, messages: messages)
     }
     
     // MARK: - Premium Header
@@ -795,21 +860,21 @@ struct AskDestinySheet: View {
             Button(action: { dismiss() }) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppTheme.Colors.mainBackground)
                     .frame(width: 40, height: 40)
-                    .background(Circle().fill(cardBg))
+                    .background(Circle().fill(AppTheme.Colors.gold))
             }
             
             Spacer()
             
             VStack(spacing: 2) {
                 Text("Ask Destiny")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(AppTheme.Fonts.title(size: 18))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 
                 Text("\(boyName) & \(girlName)")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.white.opacity(0.6))
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
             Spacer()
@@ -817,39 +882,34 @@ struct AskDestinySheet: View {
             // Score Badge
             ZStack {
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [accentPurple.opacity(0.3), accentGold.opacity(0.2)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(AppTheme.Colors.inputBackground)
+                    .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                     .frame(width: 40, height: 40)
                 
                 Text("\(result.totalScore)")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(accentGold)
+                    .font(AppTheme.Fonts.body(size: 14).weight(.bold))
+                    .foregroundColor(AppTheme.Colors.gold)
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(cardBg.opacity(0.8))
+        .background(AppTheme.Colors.cardBackground.opacity(0.8))
     }
     
     // MARK: - Quick Action Chips
     private var quickActionChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                PremiumActionChip(icon: "✨", label: "Overall Match", gradient: [accentPurple, accentGold]) {
+                PremiumActionChip(icon: "✨", label: "Overall Match", gradient: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.7)]) {
                     sendQuickQuestion("How is our overall compatibility?")
                 }
-                PremiumActionChip(icon: "⚠️", label: "Doshas", gradient: [.red.opacity(0.8), .orange]) {
+                PremiumActionChip(icon: "⚠️", label: "Doshas", gradient: [AppTheme.Colors.error.opacity(0.8), AppTheme.Colors.error]) {
                     sendQuickQuestion("Are there any doshas affecting this match?")
                 }
-                PremiumActionChip(icon: "💍", label: "Marriage", gradient: [.pink, accentPurple]) {
+                PremiumActionChip(icon: "💍", label: "Marriage", gradient: [AppTheme.Colors.success, AppTheme.Colors.success.opacity(0.7)]) {
                     sendQuickQuestion("Is this a good match for marriage?")
                 }
-                PremiumActionChip(icon: "🔮", label: "Timing", gradient: [.blue, accentPurple]) {
+                PremiumActionChip(icon: "🔮", label: "Timing", gradient: [AppTheme.Colors.goldDim, AppTheme.Colors.gold]) {
                     sendQuickQuestion("What is the best time for our relationship?")
                 }
             }
@@ -930,27 +990,27 @@ struct AskDestinySheet: View {
         HStack(spacing: 12) {
             // Text Input
             HStack {
-                TextField("Ask about this match...", text: $message)
-                    .font(.system(size: 15))
-                    .foregroundColor(.white)
+                TextField("ask_about_match".localized, text: $message)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                     .focused($isInputFocused)
                     .disabled(isLoading)
                 
                 if !message.isEmpty {
                     Button(action: { message = "" }) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.white.opacity(0.3))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(cardBg)
+                RoundedRectangle(cornerRadius: AppTheme.Styles.inputHeight / 2)
+                    .fill(AppTheme.Colors.inputBackground)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .stroke(isInputFocused ? accentPurple.opacity(0.5) : Color.clear, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: AppTheme.Styles.inputHeight / 2)
+                            .stroke(isInputFocused ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
                     )
             )
             
@@ -960,31 +1020,31 @@ struct AskDestinySheet: View {
                     Group {
                         if message.isEmpty || isLoading {
                             Circle()
-                                .fill(Color.gray.opacity(0.3))
+                                .fill(AppTheme.Colors.inputBackground)
                         } else {
                             Circle()
-                                .fill(LinearGradient(colors: [accentPurple, accentGold], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .fill(AppTheme.Colors.gold)
                         }
                     }
                     .frame(width: 48, height: 48)
                     
                     if isLoading {
                         ProgressView()
-                            .tint(.white)
+                            .tint(AppTheme.Colors.mainBackground)
                             .scaleEffect(0.8)
                     } else {
                         Image(systemName: "arrow.up")
                             .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(message.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.mainBackground)
                     }
                 }
-                .shadow(color: message.isEmpty ? .clear : accentPurple.opacity(0.4), radius: 8, y: 4)
+                .shadow(color: message.isEmpty ? .clear : AppTheme.Colors.gold.opacity(0.4), radius: 8, y: 4)
             }
             .disabled(message.isEmpty || isLoading)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(cardBg.opacity(0.95))
+        .background(AppTheme.Colors.cardBackground.opacity(0.95))
     }
     
     // MARK: - Quick Question
@@ -996,6 +1056,12 @@ struct AskDestinySheet: View {
     // MARK: - Send Message
     private func sendMessage() {
         guard !message.isEmpty else { return }
+        
+        // Check quota before sending
+        if !QuotaManager.shared.canAsk {
+            showQuotaExhausted = true
+            return
+        }
         
         // Validate session ID
         guard let sessionId = result.sessionId, !sessionId.isEmpty else {
@@ -1016,10 +1082,14 @@ struct AskDestinySheet: View {
         // Call API
         Task {
             do {
+                // Get actual user email for backend storage
+                let currentUserEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "anonymous@user.com"
+                print("[AskDestinySheet] Follow-up request with userEmail: '\(currentUserEmail)'")
+                
                 let request = CompatibilityFollowUpRequest(
                     query: userQuestion,
                     sessionId: sessionId,
-                    userEmail: "user@example.com"
+                    userEmail: currentUserEmail
                 )
                 
                 let response = try await service.followUp(request: request)
@@ -1048,13 +1118,40 @@ struct AskDestinySheet: View {
                         messages.append(CompatChatMessage(content: "I couldn't process that. Please try again.", isUser: false, type: .error))
                     }
                 }
-            } catch {
+            } catch let error as NSError {
                 await MainActor.run {
                     isLoading = false
-                    messages.append(CompatChatMessage(content: "Error: \(error.localizedDescription)", isUser: false, type: .error))
+                    // Check for 403 quota exceeded error from backend
+                    if error.domain == NSURLErrorDomain && error.code == 403 ||
+                       error.localizedDescription.lowercased().contains("quota") {
+                        showQuotaExhausted = true
+                    } else {
+                        messages.append(CompatChatMessage(content: "Error: \(error.localizedDescription)", isUser: false, type: .error))
+                    }
                 }
             }
         }
+    }
+    
+    // MARK: - Sign Out and Re-auth (for guest → sign in flow)
+    private func signOutAndReauth() {
+        // Clear all guest data so user starts fresh with Apple Sign-In
+        isGuest = false
+        isAuthenticated = false
+        hasBirthData = false
+        
+        let keysToRemove = [
+            "userEmail", "userName", "quotaUsed", "userBirthData",
+            "hasBirthData", "userGender", "birthTimeUnknown", "isGuest"
+        ]
+        keysToRemove.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        UserDefaults.standard.set(false, forKey: "isAuthenticated")
+        
+        let keychain = KeychainService.shared
+        keychain.delete(forKey: KeychainService.Keys.userId)
+        keychain.delete(forKey: KeychainService.Keys.authToken)
+        
+        print("[AskDestinySheet] Guest data cleared for fresh sign-in")
     }
     
     // MARK: - Handle Redirect
@@ -1096,15 +1193,62 @@ struct AskDestinySheet: View {
             let predictionRequest = PredictionRequest(query: query, birthData: predictionBirthData)
             let predictionResponse = try await predictionService.predict(request: predictionRequest)
             
+            let answerContent = "**\(target)'s Analysis:**\n\n\(predictionResponse.answer)"
+            
+            // Store ONLY the assistant answer in compatibility thread backend
+            // Note: User question already stored by /follow-up API before redirect
+            if let sessionId = result.sessionId {
+                let threadId = sessionId.hasPrefix("compat_") ? sessionId : "compat_\(sessionId)"
+                let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+                
+                // Store only the assistant answer (user question already stored by /follow-up)
+                await storeMessageInCompatibilityThread(
+                    threadId: threadId, 
+                    userEmail: userEmail, 
+                    role: "assistant", 
+                    content: answerContent
+                )
+                print("[AskDestinySheet] Stored redirect answer in compatibility thread: \(threadId)")
+            }
+            
             await MainActor.run {
                 isLoading = false
-                messages.append(CompatChatMessage(content: "**\(target)'s Analysis:**\n\n\(predictionResponse.answer)", isUser: false, type: .ai))
+                messages.append(CompatChatMessage(content: answerContent, isUser: false, type: .ai))
             }
         } catch {
             await MainActor.run {
                 isLoading = false
                 messages.append(CompatChatMessage(content: "Error analyzing \(target): \(error.localizedDescription)", isUser: false, type: .error))
             }
+        }
+    }
+    
+    // MARK: - Store Message in Backend
+    private func storeMessageInCompatibilityThread(threadId: String, userEmail: String, role: String, content: String) async {
+        guard !userEmail.isEmpty else { return }
+        
+        let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(userEmail)/\(threadId)/messages"
+        guard var urlComponents = URLComponents(string: urlString) else { return }
+        
+        urlComponents.queryItems = [
+            URLQueryItem(name: "role", value: role),
+            URLQueryItem(name: "content", value: content),
+            URLQueryItem(name: "area", value: "compatibility")
+        ]
+        
+        guard let url = urlComponents.url else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                print("[AskDestinySheet] storeMessageInCompatibilityThread response: \(httpResponse.statusCode)")
+            }
+        } catch {
+            print("[AskDestinySheet] Failed to store message in backend: \(error)")
         }
     }
 }
@@ -1135,8 +1279,8 @@ struct CompatMessageBubble: View {
             VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
                 if message.isUser {
                     Text(message.content)
-                        .font(.system(size: 14))
-                        .foregroundColor(.white)
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundColor(AppTheme.Colors.mainBackground)
                         .lineSpacing(4)
                 } else {
                     MarkdownTextView(
@@ -1147,8 +1291,8 @@ struct CompatMessageBubble: View {
                 }
                 
                 Text(message.timestamp, style: .time)
-                    .font(.system(size: 10))
-                    .foregroundColor(.white.opacity(0.4))
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(message.isUser ? AppTheme.Colors.mainBackground.opacity(0.7) : AppTheme.Colors.textTertiary)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
@@ -1161,18 +1305,18 @@ struct CompatMessageBubble: View {
     
     private var textColor: Color {
         switch message.type {
-        case .error: return .red.opacity(0.9)
-        case .info: return accentGold
-        default: return .white.opacity(0.9)
+        case .error: return AppTheme.Colors.error
+        case .info: return AppTheme.Colors.gold
+        default: return AppTheme.Colors.textPrimary
         }
     }
     
     @ViewBuilder
     private var bubbleBackground: some View {
         if message.isUser {
-            LinearGradient(colors: [accentPurple, accentPurple.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            AppTheme.Colors.gold
         } else {
-            Color(red: 0.15, green: 0.15, blue: 0.22)
+            AppTheme.Colors.cardBackground
         }
     }
 }
@@ -1187,14 +1331,14 @@ struct CompatTypingIndicator: View {
             HStack(spacing: 4) {
                 ForEach(0..<3, id: \.self) { i in
                     Circle()
-                        .fill(accentPurple)
+                        .fill(AppTheme.Colors.gold)
                         .frame(width: 8, height: 8)
                         .scaleEffect(dotScale[i])
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(Color(red: 0.15, green: 0.15, blue: 0.22))
+            .background(AppTheme.Colors.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             
             Spacer()
@@ -1226,21 +1370,18 @@ struct PremiumActionChip: View {
                 Text(icon)
                     .font(.system(size: 14))
                 Text(label)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.white)
+                    .font(AppTheme.Fonts.caption().weight(.medium))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
             .background(
-                LinearGradient(colors: gradient.map { $0.opacity(0.25) }, startPoint: .leading, endPoint: .trailing)
+                AppTheme.Colors.cardBackground
             )
             .clipShape(Capsule())
             .overlay(
                 Capsule()
-                    .stroke(
-                        LinearGradient(colors: gradient.map { $0.opacity(0.5) }, startPoint: .leading, endPoint: .trailing),
-                        lineWidth: 1
-                    )
+                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
             )
         }
     }
@@ -1255,12 +1396,12 @@ struct QuickChip: View {
         HStack(spacing: 3) {
             Text(emoji).font(.system(size: 10))
             Text(text)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textSecondary)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
-        .background(RoundedRectangle(cornerRadius: 12).stroke(Color("GoldAccent").opacity(0.25), lineWidth: 1))
+        .background(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.Colors.gold.opacity(0.25), lineWidth: 1))
     }
 }
 

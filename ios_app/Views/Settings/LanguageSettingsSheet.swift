@@ -27,53 +27,63 @@ struct LanguageSettingsSheet: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    ForEach(languages, id: \.code) { language in
-                        Button {
-                            selectLanguage(language)
-                        } label: {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(language.nativeName)
-                                        .font(.system(size: 16, weight: .medium))
-                                        .foregroundColor(Color("NavyPrimary"))
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                
+                List {
+                    Section {
+                        ForEach(languages, id: \.code) { language in
+                            Button {
+                                selectLanguage(language)
+                            } label: {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(language.nativeName)
+                                            .font(AppTheme.Fonts.body(size: 16))
+                                            .foregroundColor(AppTheme.Colors.textPrimary)
+                                        
+                                        if language.name != language.nativeName {
+                                            Text(language.name)
+                                                .font(AppTheme.Fonts.caption(size: 13))
+                                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                        }
+                                    }
                                     
-                                    if language.name != language.nativeName {
-                                        Text(language.name)
-                                            .font(.system(size: 13))
-                                            .foregroundColor(Color("TextDark").opacity(0.5))
+                                    Spacer()
+                                    
+                                    if appLanguageCode == language.code {
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(AppTheme.Colors.gold)
+                                            .font(.system(size: 14, weight: .semibold))
                                     }
                                 }
-                                
-                                Spacer()
-                                
-                                if appLanguageCode == language.code {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(Color("GoldAccent"))
-                                        .font(.system(size: 14, weight: .semibold))
-                                }
                             }
+                            .listRowBackground(AppTheme.Colors.cardBackground)
                         }
+                    } header: {
+                        Text("select_language".localized)
+                            .font(AppTheme.Fonts.title(size: 14))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    } footer: {
+                        Text("language_note".localized)
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
                     }
-                } header: {
-                    Text("select_language".localized)
-                } footer: {
-                    Text("language_note".localized)
-                        .font(.caption)
                 }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
             }
-            .listStyle(.insetGrouped)
             .navigationTitle("language".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("done".localized) {
+                    PremiumCloseButton {
                         dismiss()
                     }
-                    .foregroundColor(Color("NavyPrimary"))
                 }
             }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
     }
     

@@ -30,7 +30,7 @@ struct NorthIndianChartView: View {
             }
             .aspectRatio(1, contentMode: .fit)
             .frame(width: gridSize, height: gridSize)
-            .shadow(color: Color(red: 1, green: 0.8, blue: 0.2).opacity(0.1), radius: 4, x: 0, y: 2)
+            .shadow(color: AppTheme.Colors.gold.opacity(0.1), radius: 4, x: 0, y: 2)
         }
         .padding(8)
     }
@@ -101,16 +101,7 @@ struct NorthIndianChartView: View {
             // 1. Sign Number - Shiny Premium Gold Gradient
             Text("\(signNum)")
                 .font(.system(size: isDiamond ? 12 : 10, weight: .bold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 1, green: 0.9, blue: 0.5).opacity(0.6),
-                            Color(red: 0.85, green: 0.65, blue: 0.2).opacity(0.4)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .foregroundStyle(AppTheme.Colors.premiumGradient)
                 .offset(x: 0, y: -signOffset)
             
             // 2. Planets - Placed on fixed safe points
@@ -254,18 +245,16 @@ struct NorthIndianGrid: View {
             let w = size.width
             let h = size.height
             
-            // Premium Gold Gradient for lines
+            // Premium Gold Gradient for lines (using AppTheme)
             let goldGradient = GraphicsContext.Shading.linearGradient(
                 Gradient(colors: [
-                    Color(red: 0.85, green: 0.65, blue: 0.13), // Darker gold
-                    Color(red: 1.0, green: 0.95, blue: 0.6),   // Bright gold
-                    Color(red: 0.85, green: 0.65, blue: 0.13)  // Darker gold
+                    AppTheme.Colors.gold,
+                    AppTheme.Colors.gold.opacity(0.6),
+                    AppTheme.Colors.gold
                 ]),
                 startPoint: CGPoint(x: 0, y: 0),
                 endPoint: CGPoint(x: w, y: h)
             )
-            
-            let goldColor = Color(red: 0.9, green: 0.75, blue: 0.3)
             
             // Line options
             let thinStroke = StrokeStyle(lineWidth: 1.0, lineCap: .round, lineJoin: .round)
@@ -298,7 +287,7 @@ struct NorthIndianGrid: View {
             
         }
         // Shine/Glow effect on the whole grid
-        .shadow(color: Color(red: 1, green: 0.8, blue: 0.2).opacity(0.3), radius: 2, x: 0, y: 0)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 2, x: 0, y: 0)
     }
 }
 

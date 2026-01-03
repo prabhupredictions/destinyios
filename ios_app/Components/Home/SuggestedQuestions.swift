@@ -38,7 +38,7 @@ struct QuestionRow: View {
                 // Question text
                 Text(question)
                     .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
                 

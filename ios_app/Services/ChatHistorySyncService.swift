@@ -34,9 +34,9 @@ class ChatHistorySyncService {
         let title: String?
         let preview: String?
         let primaryArea: String?
-        let messageCount: Int
-        let isPinned: Bool
-        let isArchived: Bool
+        let messageCount: Int?
+        let isPinned: Bool?
+        let isArchived: Bool?
         let createdAt: String
         let updatedAt: String
         let dateGroup: String?
@@ -171,9 +171,9 @@ class ChatHistorySyncService {
                         preview: thread.preview ?? "",
                         primaryArea: thread.primaryArea,
                         areasDiscussed: detail.areasDiscussed,
-                        messageCount: thread.messageCount,
-                        isArchived: thread.isArchived,
-                        isPinned: thread.isPinned,
+                        messageCount: thread.messageCount ?? 0,
+                        isArchived: thread.isArchived ?? false,
+                        isPinned: thread.isPinned ?? false,
                         createdAt: parseDate(thread.createdAt),
                         updatedAt: parseDate(thread.updatedAt)
                     )

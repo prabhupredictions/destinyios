@@ -6,7 +6,14 @@ struct CompatibilityView: View {
     @State private var selectedTab = 0 // 0 = Boy, 1 = Girl
     @State private var showBoyLocationSearch = false
     @State private var showGirlLocationSearch = false
-    @State private var showChartsSheet = false  // NEW: For chart display
+    @State private var showChartsSheet = false
+    
+    // Quota and subscription UI state
+    @State private var showQuotaExhausted = false
+    @State private var showSubscription = false
+    @AppStorage("isGuest") private var isGuest = false
+    @AppStorage("isAuthenticated") private var isAuthenticated = false
+    @AppStorage("hasBirthData") private var hasBirthData = false
     
     // External callbacks/props
     var initialMatchItem: CompatibilityHistoryItem? = nil
@@ -16,8 +23,9 @@ struct CompatibilityView: View {
     
     var body: some View {
         ZStack {
-            // Animated orbital background with rotating planets
-            MinimalOrbitalBackground()
+            // Dark Midnight Background
+            AppTheme.Colors.mainBackground
+                .ignoresSafeArea()
             
             if viewModel.showResult, let result = viewModel.result {
                 CompatibilityResultView(
@@ -34,7 +42,7 @@ struct CompatibilityView: View {
                     onBack: {
                         viewModel.showResult = false
                     },
-                    onHistory: nil, // Handled internally by CompatibilityResultView now
+                    onHistory: nil,
                     onCharts: {
                         showChartsSheet = true
                     },
@@ -75,10 +83,6 @@ struct CompatibilityView: View {
             if let result = viewModel.result {
                 let boyAsc = result.analysisData?.boy?.chartData?.d1["Ascendant"]?.sign
                 let girlAsc = result.analysisData?.girl?.chartData?.d1["Ascendant"]?.sign
-                let _ = print("[ChartSheet] analysisData: \(result.analysisData != nil)")
-                let _ = print("[ChartSheet] boy: \(result.analysisData?.boy != nil)")
-                let _ = print("[ChartSheet] boyChartData: \(result.analysisData?.boy?.chartData != nil)")
-                let _ = print("[ChartSheet] girlChartData: \(result.analysisData?.girl?.chartData != nil)")
                 ChartComparisonSheet(
                     boyName: viewModel.boyName.isEmpty ? "You" : viewModel.boyName,
                     girlName: viewModel.girlName.isEmpty ? "Partner" : viewModel.girlName,
@@ -88,6 +92,24 @@ struct CompatibilityView: View {
                     girlAscendant: girlAsc
                 )
             }
+        }
+        .sheet(isPresented: $showQuotaExhausted) {
+            QuotaExhaustedView(
+                isGuest: isGuest,
+                onSignIn: { signOutAndReauth() },
+                onUpgrade: {
+                    if isGuest {
+                        signOutAndReauth()
+                    } else {
+                        showSubscription = true
+                    }
+                }
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.hidden)
+        }
+        .sheet(isPresented: $showSubscription) {
+            SubscriptionView()
         }
         .onChange(of: viewModel.showResult) { _, newValue in
             onShowResultChange?(newValue)
@@ -101,12 +123,32 @@ struct CompatibilityView: View {
         .onAppear {
             if let item = initialMatchItem, !hasHandledInitialMatch {
                 hasHandledInitialMatch = true
-                // Slight delay to ensure view is ready
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     viewModel.loadFromHistory(item)
                 }
             }
         }
+    }
+    
+    // MARK: - Sign Out for Guest Re-auth
+    private func signOutAndReauth() {
+        // Clear all guest data so user starts fresh with Apple Sign-In
+        isGuest = false
+        isAuthenticated = false
+        hasBirthData = false
+        
+        let keysToRemove = [
+            "userEmail", "userName", "quotaUsed", "userBirthData",
+            "hasBirthData", "userGender", "birthTimeUnknown", "isGuest"
+        ]
+        keysToRemove.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        UserDefaults.standard.set(false, forKey: "isAuthenticated")
+        
+        let keychain = KeychainService.shared
+        keychain.delete(forKey: KeychainService.Keys.userId)
+        keychain.delete(forKey: KeychainService.Keys.authToken)
+        
+        print("[CompatibilityView] Guest data cleared for fresh sign-in")
     }
     
     // MARK: - Form View
@@ -119,13 +161,13 @@ struct CompatibilityView: View {
                         Text("💕")
                             .font(.system(size: 24))
                         Text("kundali_match".localized)
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(Color("NavyPrimary"))
+                            .font(AppTheme.Fonts.display(size: 24))
+                            .foregroundColor(AppTheme.Colors.gold)
                     }
                     
                     Text("ashtakoot_analysis".localized)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
                 .padding(.top, 20)
                 
@@ -151,8 +193,8 @@ struct CompatibilityView: View {
                 // Error message
                 if let error = viewModel.errorMessage {
                     Text(error)
-                        .font(.system(size: 14))
-                        .foregroundColor(.red)
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundColor(AppTheme.Colors.error)
                         .padding(.horizontal, 20)
                 }
                 
@@ -174,21 +216,16 @@ struct CompatibilityView: View {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     selectedTab = 0
                 }
+                HapticManager.shared.play(.light)
             }) {
                 Text("boys_details".localized)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(selectedTab == 0 ? .white : Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.title(size: 15))
+                    .foregroundColor(selectedTab == 0 ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
                     .background(
                         selectedTab == 0 
-                            ? AnyView(
-                                LinearGradient(
-                                    colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.9)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                            ? AnyView(AppTheme.Colors.premiumGradient)
                             : AnyView(Color.clear)
                     )
                     .cornerRadius(12)
@@ -199,157 +236,320 @@ struct CompatibilityView: View {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     selectedTab = 1
                 }
+                HapticManager.shared.play(.light)
             }) {
                 Text("girls_details".localized)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(selectedTab == 1 ? .white : Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.title(size: 15))
+                    .foregroundColor(selectedTab == 1 ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
                     .background(
                         selectedTab == 1 
-                            ? AnyView(
-                                LinearGradient(
-                                    colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.9)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                            ? AnyView(AppTheme.Colors.premiumGradient)
                             : AnyView(Color.clear)
                     )
                     .cornerRadius(12)
             }
         }
         .padding(4)
-        .background(
+        .background(AppTheme.Colors.cardBackground)
+        .cornerRadius(16)
+        .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color("NavyPrimary").opacity(0.3), lineWidth: 1)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white)
-                )
+                .stroke(AppTheme.Styles.goldBorder.stroke, lineWidth: AppTheme.Styles.goldBorder.width)
         )
     }
     
-    // MARK: - Boy Form Card (You) - Compact Premium Design
+    // MARK: - Boy Form Card (You)
     private var boyFormCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Row 1: Name and Gender inline
-            HStack(spacing: 12) {
-                // Name
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("boys_name".localized)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
-                    
-                    HStack {
+        PremiumCard {
+            VStack(alignment: .leading, spacing: 14) {
+                // Row 1: Name and Gender
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("boys_name".localized)
+                            .font(AppTheme.Fonts.body(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                        
                         Text(viewModel.boyName.isEmpty ? "not_set".localized : viewModel.boyName)
-                            .font(.system(size: 15))
-                            .foregroundColor(Color("TextDark"))
-                        Spacer()
+                            .font(AppTheme.Fonts.body(size: 15))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .padding(.horizontal, 12)
+                            .frame(height: 52)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(AppTheme.Colors.inputBackground)
+                            .cornerRadius(12)
                     }
-                    .padding(.horizontal, 12)
-                    .frame(height: 44)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
-                    .cornerRadius(10)
-                }
-                .frame(maxWidth: .infinity)
-                
-                // Gender (read-only from profile)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("gender".localized.uppercased())
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
                     
-                    HStack(spacing: 4) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("gender".localized.uppercased())
+                            .font(AppTheme.Fonts.body(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                        
                         Text(userGenderDisplayText)
-                            .font(.system(size: 14))
-                            .foregroundColor(Color("TextDark"))
-                            .lineLimit(1)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .padding(.horizontal, 12)
+                            .frame(height: 52)
+                            .frame(minWidth: 100)
+                            .background(AppTheme.Colors.inputBackground)
+                            .cornerRadius(12)
                     }
-                    .padding(.horizontal, 10)
-                    .frame(height: 44)
-                    .frame(minWidth: 100)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
-                    .cornerRadius(10)
-                }
-            }
-            
-            // Row 2: Date and Time inline
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("date_of_birth_caps".localized)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
-                    
-                    HStack {
-                        Text(formattedBoyDate)
-                            .font(.system(size: 15))
-                            .foregroundColor(Color("TextDark"))
-                        Spacer()
-                        Image(systemName: "calendar")
-                            .font(.system(size: 12))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.3))
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(height: 44)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
-                    .cornerRadius(10)
                 }
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("time_caps".localized)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
-                    
-                    HStack {
-                        Text(viewModel.boyTimeUnknown ? "birth_time_unknown".localized : formattedBoyTime)
-                            .font(.system(size: 15))
-                            .foregroundColor(Color("TextDark"))
-                        Spacer()
-                        Image(systemName: "clock")
-                            .font(.system(size: 12))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.3))
+                // Row 2: Date and Time
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("date_of_birth_caps".localized)
+                            .font(AppTheme.Fonts.body(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                        
+                        HStack {
+                            Text(formattedBoyDate)
+                                .font(AppTheme.Fonts.body(size: 15))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                            Spacer()
+                            Image(systemName: "calendar")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
+                        }
+                        .padding(.horizontal, 12)
+                        .frame(height: 52)
+                        .background(AppTheme.Colors.inputBackground)
+                        .cornerRadius(12)
                     }
-                    .padding(.horizontal, 12)
-                    .frame(height: 44)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.96))
-                    .cornerRadius(10)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("time_caps".localized)
+                            .font(AppTheme.Fonts.body(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                        
+                        HStack {
+                            Text(viewModel.boyTimeUnknown ? "birth_time_unknown".localized : formattedBoyTime)
+                                .font(AppTheme.Fonts.body(size: 15))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                            Spacer()
+                            Image(systemName: "clock")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
+                        }
+                        .padding(.horizontal, 12)
+                        .frame(height: 52)
+                        .background(AppTheme.Colors.inputBackground)
+                        .cornerRadius(12)
+                    }
                 }
-            }
-            
-            // Row 3: Place of Birth
-            VStack(alignment: .leading, spacing: 4) {
-                Text("place_of_birth_caps".localized)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(Color("TextDark").opacity(0.4))
                 
-                HStack {
-                    Image(systemName: "location.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                // Row 3: Place of Birth
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("place_of_birth_caps".localized)
+                        .font(AppTheme.Fonts.body(size: 12))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                     
-                    Text(viewModel.boyCity.isEmpty ? "not_set".localized : viewModel.boyCity)
-                        .font(.system(size: 15))
-                        .foregroundColor(Color("TextDark"))
-                    
-                    Spacer()
+                    Button(action: { showBoyLocationSearch = true }) {
+                        HStack {
+                            Image(systemName: "location.fill")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            
+                            Text(viewModel.boyCity.isEmpty ? "select_city".localized : viewModel.boyCity)
+                                .font(AppTheme.Fonts.body(size: 15))
+                                .foregroundColor(viewModel.boyCity.isEmpty ? AppTheme.Colors.textSecondary : AppTheme.Colors.textPrimary)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .frame(height: 52)
+                        .background(AppTheme.Colors.inputBackground)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
+                        )
+                    }
                 }
-                .padding(.horizontal, 12)
-                .frame(height: 44)
-                .background(Color(red: 0.95, green: 0.95, blue: 0.96))
-                .cornerRadius(10)
             }
         }
-        .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.05), radius: 12, y: 4)
-        )
         .padding(.horizontal, 16)
     }
     
-    // User gender display text
+    // MARK: - Girl Form Card (Partner)
+    private var girlFormCard: some View {
+        PremiumCard {
+            VStack(alignment: .leading, spacing: 14) {
+                // Row 1: Name and Gender
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        PremiumTextField(
+                            "girls_name".localized,
+                            text: $viewModel.girlName,
+                            placeholder: "enter_name".localized
+                        )
+                    }
+                    
+                    // Gender Menu
+                    VStack(alignment: .leading, spacing: 4) {
+                         Text("GENDER")
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            
+                        Menu {
+                            Button("prefer_not_to_say".localized) { viewModel.partnerGender = "" }
+                            Button("male".localized) { viewModel.partnerGender = "male" }
+                            Button("female".localized) { viewModel.partnerGender = "female" }
+                            Button("non_binary".localized) { viewModel.partnerGender = "non-binary" }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(genderDisplayText)
+                                    .font(AppTheme.Fonts.body(size: 14))
+                                    .foregroundColor(AppTheme.Colors.textPrimary)
+                                    .lineLimit(1)
+                                Spacer()
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(AppTheme.Colors.gold)
+                            }
+                            .padding(.horizontal, 10)
+                            .frame(height: 52)
+                            .frame(minWidth: 110)
+                            .background(AppTheme.Colors.inputBackground)
+                            .cornerRadius(12)
+                            .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
+                        )
+                        }
+                    }
+                }
+                
+                // Row 2: Date and Time
+                HStack(spacing: 12) {
+                    // Date
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("date_of_birth_caps".localized)
+                             .font(AppTheme.Fonts.body(size: 14))
+                             .foregroundColor(AppTheme.Colors.textSecondary)
+                        MatchDateButton(date: $viewModel.girlBirthDate)
+                    }
+                    
+                    // Time
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("time_caps".localized)
+                             .font(AppTheme.Fonts.body(size: 14))
+                             .foregroundColor(AppTheme.Colors.textSecondary)
+                        
+                        if viewModel.partnerTimeUnknown {
+                            HStack {
+                                Text("birth_time_unknown".localized)
+                                    .font(AppTheme.Fonts.body(size: 15))
+                                    .foregroundColor(AppTheme.Colors.textPrimary.opacity(0.6))
+                                Spacer()
+                                Image(systemName: "clock")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(AppTheme.Colors.gold.opacity(0.3))
+                            }
+                            .padding(.horizontal, 12)
+                            .frame(height: 52)
+                            .background(AppTheme.Colors.inputBackground)
+                            .cornerRadius(12)
+                        } else {
+                            MatchTimeButton(time: $viewModel.girlBirthTime)
+                        }
+                    }
+                }
+                
+                // Time unknown toggle
+                HStack(spacing: 8) {
+                    Button(action: { 
+                         HapticManager.shared.play(.light)
+                         viewModel.partnerTimeUnknown.toggle() 
+                    }) {
+                        Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
+                            .font(.system(size: 18))
+                            .foregroundColor(viewModel.partnerTimeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
+                    }
+                    
+                    Text("partner_birth_time_unknown".localized)
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+                
+                // Warning note
+                if viewModel.partnerTimeUnknown {
+                    HStack(spacing: 6) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.Colors.warning)
+                        
+                        Text("birth_time_warning".localized)
+                            .font(AppTheme.Fonts.body(size: 11))
+                            .foregroundColor(AppTheme.Colors.warning)
+                    }
+                    .padding(10)
+                    .background(AppTheme.Colors.warning.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                
+                // Row 3: Place of Birth
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("place_of_birth_caps".localized)
+                        .font(AppTheme.Fonts.body(size: 12))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                    
+                    Button(action: { showGirlLocationSearch = true }) {
+                        HStack {
+                            Image(systemName: "location.fill")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            
+                            Text(viewModel.girlCity.isEmpty ? "select_city".localized : viewModel.girlCity)
+                                .font(AppTheme.Fonts.body(size: 15))
+                                .foregroundColor(viewModel.girlCity.isEmpty ? AppTheme.Colors.textSecondary : AppTheme.Colors.textPrimary)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .frame(height: 52)
+                        .background(AppTheme.Colors.inputBackground)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
+                        )
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+    
+    // MARK: - Analyze Button
+    private var analyzeButton: some View {
+        PremiumButton(
+            "analyze_match".localized,
+            icon: "sparkles",
+            isLoading: viewModel.isAnalyzing
+        ) {
+            // Check quota before analyzing
+            if QuotaManager.shared.canAsk {
+                Task { await viewModel.analyzeMatch() }
+            } else {
+                showQuotaExhausted = true
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+    }
+    
+    // Helpers
     private var userGenderDisplayText: String {
         switch viewModel.boyGender {
         case "male": return "male".localized
@@ -359,14 +559,12 @@ struct CompatibilityView: View {
         }
     }
     
-    // Formatted date for display
     private var formattedBoyDate: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
         return formatter.string(from: viewModel.boyBirthDate)
     }
     
-    // Formatted time for display
     private var formattedBoyTime: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US")
@@ -374,7 +572,6 @@ struct CompatibilityView: View {
         return formatter.string(from: viewModel.boyBirthTime)
     }
     
-    // Gender display text for dropdown
     private var genderDisplayText: String {
         switch viewModel.partnerGender {
         case "male": return "male".localized
@@ -383,206 +580,9 @@ struct CompatibilityView: View {
         default: return "prefer_not_to_say".localized
         }
     }
-
-    // MARK: - Girl Form Card (Partner) - Compact Premium Design
-    private var girlFormCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Row 1: Name and Gender inline
-            HStack(spacing: 12) {
-                // Name (takes more space)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("girls_name".localized)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
-                    
-                    TextField("enter_name".localized, text: $viewModel.girlName)
-                        .font(.system(size: 15))
-                        .foregroundColor(Color("TextDark"))
-                        .padding(.horizontal, 12)
-                        .frame(height: 44)
-                        .background(Color(red: 0.97, green: 0.97, blue: 0.98))
-                        .cornerRadius(10)
-                }
-                .frame(maxWidth: .infinity)
-                
-                // Gender dropdown (compact)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("gender".localized.uppercased())
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
-                    
-                    Menu {
-                        Button("prefer_not_to_say".localized) { viewModel.partnerGender = "" }
-                        Button("male".localized) { viewModel.partnerGender = "male" }
-                        Button("female".localized) { viewModel.partnerGender = "female" }
-                        Button("non_binary".localized) { viewModel.partnerGender = "non-binary" }
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(genderDisplayText)
-                                .font(.system(size: 14))
-                                .foregroundColor(Color("TextDark"))
-                                .lineLimit(1)
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 10))
-                                .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                        }
-                        .padding(.horizontal, 10)
-                        .frame(height: 44)
-                        .frame(minWidth: 100)
-                        .background(Color(red: 0.97, green: 0.97, blue: 0.98))
-                        .cornerRadius(10)
-                    }
-                }
-            }
-            
-            // Row 2: Date and Time inline
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("date_of_birth_caps".localized)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
-                    
-                    MatchDateButton(date: $viewModel.girlBirthDate)
-                }
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("time_caps".localized)
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color("TextDark").opacity(0.4))
-                    
-                    if viewModel.partnerTimeUnknown {
-                        // Show "Unknown" text when time is unknown
-                        HStack {
-                            Text("birth_time_unknown".localized)
-                                .font(.system(size: 15))
-                                .foregroundColor(Color("TextDark").opacity(0.5))
-                            Spacer()
-                            Image(systemName: "clock")
-                                .font(.system(size: 14))
-                                .foregroundColor(Color("NavyPrimary").opacity(0.3))
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(red: 0.96, green: 0.95, blue: 0.98))
-                        )
-                    } else {
-                        MatchTimeButton(time: $viewModel.girlBirthTime)
-                    }
-                }
-            }
-            
-            // Time unknown toggle (compact inline)
-            HStack(alignment: .top, spacing: 8) {
-                Button(action: { viewModel.partnerTimeUnknown.toggle() }) {
-                    Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
-                        .font(.system(size: 16))
-                        .foregroundColor(viewModel.partnerTimeUnknown ? Color("NavyPrimary") : Color("TextDark").opacity(0.3))
-                }
-                
-                Text("partner_birth_time_unknown".localized)
-                    .font(.system(size: 12))
-                    .foregroundColor(Color("TextDark").opacity(0.5))
-                    .fixedSize(horizontal: false, vertical: true)
-                
-                Spacer()
-            }
-            
-            // Warning note (shown separately for better visibility)
-            if viewModel.partnerTimeUnknown {
-                HStack(alignment: .top, spacing: 6) {
-                    Image(systemName: "info.circle.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(.orange)
-                    
-                    Text("birth_time_warning".localized)
-                        .font(.system(size: 11))
-                        .foregroundColor(.orange)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(10)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.orange.opacity(0.1))
-                )
-            }
-            
-            // Row 3: Place of Birth
-            VStack(alignment: .leading, spacing: 4) {
-                Text("place_of_birth_caps".localized)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundColor(Color("TextDark").opacity(0.4))
-                
-                Button(action: { showGirlLocationSearch = true }) {
-                    HStack {
-                        Image(systemName: "location.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                        
-                        Text(viewModel.girlCity.isEmpty ? "select_city".localized : viewModel.girlCity)
-                            .font(.system(size: 15))
-                            .foregroundColor(viewModel.girlCity.isEmpty ? Color("TextDark").opacity(0.4) : Color("TextDark"))
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 12))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.3))
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(height: 44)
-                    .background(Color(red: 0.97, green: 0.97, blue: 0.98))
-                    .cornerRadius(10)
-                }
-            }
-        }
-        .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.05), radius: 12, y: 4)
-        )
-        .padding(.horizontal, 16)
-    }
-    
-    // MARK: - Analyze Button
-    private var analyzeButton: some View {
-        Button(action: {
-            Task { await viewModel.analyzeMatch() }
-        }) {
-            HStack(spacing: 10) {
-                if viewModel.isAnalyzing {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(0.9)
-                } else {
-                    Text("analyze_match".localized)
-                        .font(.system(size: 17, weight: .semibold))
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 14))
-                }
-            }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .frame(height: 56)
-            .background(
-                LinearGradient(
-                    colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.9)],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .cornerRadius(16)
-            .shadow(color: Color("NavyPrimary").opacity(0.4), radius: 10, y: 5)
-        }
-        .disabled(viewModel.isAnalyzing)
-        .padding(.horizontal, 20)
-        .padding(.top, 16)
-    }
 }
 
-// MARK: - Match Date Button
+// MARK: - Helper Components (Dark Mode)
 struct MatchDateButton: View {
     @Binding var date: Date
     @State private var showPicker = false
@@ -591,20 +591,20 @@ struct MatchDateButton: View {
         Button(action: { showPicker = true }) {
             HStack {
                 Text(formatDate(date))
-                    .font(.system(size: 15))
-                    .foregroundColor(Color("NavyPrimary"))
-                
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
-                
                 Image(systemName: "calendar")
                     .font(.system(size: 14))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .background(
+            .padding(.horizontal, 12)
+            .frame(height: 52)
+            .background(AppTheme.Colors.inputBackground)
+            .cornerRadius(12)
+            .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(red: 0.96, green: 0.95, blue: 0.98))
+                    .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
             )
         }
         .sheet(isPresented: $showPicker) {
@@ -619,7 +619,6 @@ struct MatchDateButton: View {
     }
 }
 
-// MARK: - Match Time Button
 struct MatchTimeButton: View {
     @Binding var time: Date
     @State private var showPicker = false
@@ -628,20 +627,20 @@ struct MatchTimeButton: View {
         Button(action: { showPicker = true }) {
             HStack {
                 Text(formatTime(time))
-                    .font(.system(size: 15))
-                    .foregroundColor(Color("NavyPrimary"))
-                
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
-                
                 Image(systemName: "clock")
                     .font(.system(size: 14))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .background(
+            .padding(.horizontal, 12)
+            .frame(height: 52)
+            .background(AppTheme.Colors.inputBackground)
+            .cornerRadius(12)
+            .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(red: 0.96, green: 0.95, blue: 0.98))
+                    .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
             )
         }
         .sheet(isPresented: $showPicker) {
@@ -657,153 +656,7 @@ struct MatchTimeButton: View {
     }
 }
 
-// MARK: - Match Person Form Card (for compatibility)
-struct MatchPersonFormCard: View {
-    let title: String
-    let icon: String
-    @Binding var name: String
-    @Binding var birthDate: Date
-    @Binding var birthTime: Date
-    @Binding var city: String
-    @Binding var latitude: Double
-    @Binding var longitude: Double
-    
-    @State private var showDatePicker = false
-    @State private var showTimePicker = false
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Header
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color("GoldAccent"))
-                
-                Text(title)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
-            }
-            
-            // Name field
-            MatchTextField(
-                placeholder: "Full Name",
-                text: $name,
-                icon: "person"
-            )
-            
-            // Date and Time row
-            HStack(spacing: 12) {
-                // Date button
-                Button(action: { showDatePicker = true }) {
-                    MatchFieldButton(
-                        label: formatDate(birthDate),
-                        icon: "calendar"
-                    )
-                }
-                
-                // Time button
-                Button(action: { showTimePicker = true }) {
-                    MatchFieldButton(
-                        label: formatTime(birthTime),
-                        icon: "clock"
-                    )
-                }
-            }
-            
-            // City field with geocoding
-            MatchTextField(
-                placeholder: "Birth City",
-                text: $city,
-                icon: "mappin"
-            )
-            .onChange(of: city) { _, newValue in
-                // Mock geocoding - in production use LocationService
-                if !newValue.isEmpty {
-                    latitude = 17.385
-                    longitude = 78.4867
-                }
-            }
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
-        )
-        .sheet(isPresented: $showDatePicker) {
-            MatchDatePickerSheet(date: $birthDate, title: "Select Date")
-        }
-        .sheet(isPresented: $showTimePicker) {
-            MatchTimePickerSheet(time: $birthTime, title: "Select Time")
-        }
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
-    }
-    
-    private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-}
-
-// MARK: - Match Text Field
-struct MatchTextField: View {
-    let placeholder: String
-    @Binding var text: String
-    let icon: String
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundColor(Color("NavyPrimary").opacity(0.5))
-                .frame(width: 24)
-            
-            TextField(placeholder, text: $text)
-                .font(.system(size: 16))
-                .foregroundColor(Color("NavyPrimary"))
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.96, green: 0.95, blue: 0.98))
-        )
-    }
-}
-
-// MARK: - Match Field Button
-struct MatchFieldButton: View {
-    let label: String
-    let icon: String
-    
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 14))
-                .foregroundColor(Color("NavyPrimary").opacity(0.5))
-            
-            Text(label)
-                .font(.system(size: 14))
-                .foregroundColor(Color("NavyPrimary"))
-            
-            Spacer()
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.96, green: 0.95, blue: 0.98))
-        )
-    }
-}
-
-// MARK: - Match Date Picker Sheet
+// MARK: - Picker Sheets (Dark Mode)
 struct MatchDatePickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var date: Date
@@ -811,40 +664,31 @@ struct MatchDatePickerSheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                DatePicker(
-                    "",
-                    selection: $date,
-                    displayedComponents: .date
-                )
-                .datePickerStyle(.graphical)
-                .padding()
-                
-                Spacer()
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                VStack {
+                    DatePicker("", selection: $date, displayedComponents: .date)
+                        .datePickerStyle(.graphical)
+                        .colorScheme(.dark)
+                        .accentColor(AppTheme.Colors.gold)
+                        .padding()
+                    Spacer()
+                }
             }
             .navigationTitle(title)
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
-                #if os(iOS)
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
-                }
-                #else
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
-                #endif
             }
+            .navigationBarTitleDisplayMode(.inline)
+             .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
         }
         .presentationDetents([.medium])
     }
 }
 
-// MARK: - Match Time Picker Sheet
 struct MatchTimePickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var time: Date
@@ -852,55 +696,31 @@ struct MatchTimePickerSheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                DatePicker(
-                    "",
-                    selection: $time,
-                    displayedComponents: .hourAndMinute
-                )
-                #if os(iOS)
-                .datePickerStyle(.wheel)
-                #else
-                .datePickerStyle(.graphical)
-                #endif
-                .labelsHidden()
-                .environment(\.locale, Locale(identifier: "en_US"))
-                .padding()
-                
-                Spacer()
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                VStack {
+                    DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
+                        .datePickerStyle(.wheel)
+                        .colorScheme(.dark)
+                        .labelsHidden()
+                        .padding()
+                    Spacer()
+                }
             }
             .navigationTitle(title)
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
-                #if os(iOS)
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("done".localized) { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
-                }
-                #else
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("done".localized) { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                    Button("Done") { dismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
-                #endif
             }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
         }
         .presentationDetents([.medium])
     }
-    
-    // MARK: - Helper Functions
-    
-    /// Extract ascendant sign from chart data (D1)
-    private func extractAscendant(from chartData: ChartData?) -> String? {
-        guard let d1 = chartData?.d1,
-              let asc = d1["Ascendant"] else { return nil }
-        return asc.sign
-    }
 }
 
-// MARK: - Preview
 #Preview {
     CompatibilityView()
 }

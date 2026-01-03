@@ -13,12 +13,13 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 0.95, green: 0.94, blue: 0.96)
+                AppTheme.Colors.mainBackground
                     .ignoresSafeArea()
                 
                 if viewModel.isLoading {
                     ProgressView()
                         .scaleEffect(1.2)
+                        .tint(AppTheme.Colors.gold)
                 } else if viewModel.items.isEmpty {
                     emptyStateView
                 } else {
@@ -33,15 +34,17 @@ struct HistoryView: View {
                 #if os(iOS)
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
                 #else
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
                 #endif
             }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .task {
                 await viewModel.loadHistory()
             }
@@ -53,49 +56,49 @@ struct HistoryView: View {
         VStack(spacing: 16) {
             Image(systemName: "clock.arrow.circlepath")
                 .font(.system(size: 48))
-                .foregroundColor(Color("NavyPrimary").opacity(0.3))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.3))
             
             Text("No History Yet")
-                .font(.system(size: 18, weight: .medium))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.title(size: 22))
+                .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text("Your chats and matches will appear here.")
-                .font(.system(size: 14))
-                .foregroundColor(Color("TextDark").opacity(0.6))
+                .font(AppTheme.Fonts.body(size: 16))
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
         }
     }
     
     // MARK: - History List
     private var historyListView: some View {
-        List {
-            ForEach(viewModel.groupedItems.keys.sorted(by: >), id: \.self) { date in
-                Section(header: sectionHeader(for: date)) {
-                    ForEach(viewModel.groupedItems[date] ?? []) { item in
-                        HistoryRowView(item: item) {
-                            // Handle selection
-                            handleSelection(item)
-                        }
-                        .listRowBackground(Color.white)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    }
-                    .onDelete { indexSet in
-                        Task {
-                            await viewModel.deleteItems(at: indexSet, for: date)
+        ScrollView {
+            LazyVStack(spacing: 24) {
+                ForEach(viewModel.groupedItems.keys.sorted(by: >), id: \.self) { date in
+                    Section(header: sectionHeader(for: date)) {
+                        VStack(spacing: 12) {
+                            ForEach(viewModel.groupedItems[date] ?? []) { item in
+                                HistoryRowView(item: item) {
+                                    handleSelection(item)
+                                }
+                            }
                         }
                     }
                 }
             }
+            .padding(16)
         }
-        .listStyle(.insetGrouped)
-        .scrollContentBackground(.hidden)
     }
     
     private func sectionHeader(for date: Date) -> some View {
-        Text(viewModel.formatSectionDate(date))
-            .font(.system(size: 13, weight: .semibold))
-            .foregroundColor(Color("TextDark").opacity(0.6))
-            .textCase(nil)
+        HStack {
+            Text(viewModel.formatSectionDate(date))
+                .font(AppTheme.Fonts.title(size: 14))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .textCase(nil)
+            Spacer()
+        }
+        .padding(.top, 8)
+        .padding(.bottom, 4)
     }
     
     // MARK: - Selection Handler
@@ -120,29 +123,32 @@ struct HistoryRowView: View {
     let onTap: () -> Void
     
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
+        Button(action: {
+            HapticManager.shared.play(.light)
+            onTap()
+        }) {
+            HStack(spacing: 16) {
                 // Icon
                 ZStack {
                     Circle()
                         .fill(iconBackgroundColor)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 48, height: 48)
                     
                     Image(systemName: iconName)
-                        .font(.system(size: 16))
+                        .font(.system(size: 20))
                         .foregroundColor(iconColor)
                 }
                 
                 // Content
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .font(AppTheme.Fonts.title(size: 16))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                         .lineLimit(1)
                     
                     Text(subtitle)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color("TextDark").opacity(0.6))
+                        .font(AppTheme.Fonts.caption(size: 13))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                         .lineLimit(1)
                 }
                 
@@ -151,15 +157,22 @@ struct HistoryRowView: View {
                 // Time / Extra Info
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(formatTime(item.date))
-                        .font(.system(size: 12))
-                        .foregroundColor(Color("TextDark").opacity(0.5))
+                        .font(AppTheme.Fonts.caption(size: 12))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                     
                     extraInfoView
                 }
             }
-            .padding(.vertical, 4)
+            .padding(16)
+            .background(AppTheme.Colors.cardBackground)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppTheme.Colors.separator, lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle())
     }
     
     // MARK: - Helpers determining content
@@ -174,7 +187,7 @@ struct HistoryRowView: View {
     private var subtitle: String {
         switch item {
         case .chat(let thread): return thread.preview
-        case .match(_): return "Compatibility Match"
+        case .match(_): return "compatibility_match_subtitle".localized
         }
     }
     
@@ -189,8 +202,8 @@ struct HistoryRowView: View {
     
     private var iconColor: Color {
         switch item {
-        case .chat: return Color("GoldAccent")
-        case .match: return Color(red: 0.91, green: 0.71, blue: 0.72) // Rose Gold
+        case .chat: return AppTheme.Colors.gold
+        case .match: return Color(red: 0.96, green: 0.52, blue: 0.65) // Rose Gold equivalent
         }
     }
     
@@ -205,7 +218,7 @@ struct HistoryRowView: View {
             if thread.isPinned {
                 Image(systemName: "pin.fill")
                     .font(.system(size: 10))
-                    .foregroundColor(Color("GoldAccent"))
+                    .foregroundColor(AppTheme.Colors.gold)
             }
         case .match(let match):
             // scorePercentage is non-optional

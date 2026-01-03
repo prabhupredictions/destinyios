@@ -12,7 +12,7 @@ struct DashaView: View {
                 
                 Text("Vimshottari Dasha (\(dashaResponse?.year ?? 2024))")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
             }
             
             if let periods = dashaResponse?.periods {

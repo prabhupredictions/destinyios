@@ -341,8 +341,9 @@ final class DataManager {
             return getBirthProfile(for: email)
         }
         
-        // Try generated email from stored birth data
-        if let data = UserDefaults.standard.data(forKey: "userBirthData"),
+        // Try generated email from stored birth data (User-Scoped)
+        let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData)
+        if let data = UserDefaults.standard.data(forKey: dataKey),
            let birthData = try? JSONDecoder().decode(BirthData.self, from: data) {
             let generatedEmail = EmailGenerator.generateFromComponents(
                 dateOfBirth: birthData.dob,

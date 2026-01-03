@@ -36,6 +36,9 @@ struct HomeView: View {
                     headerSection
                         .padding(.top, 10)
                     
+                    // Offline indicator
+                    OfflineBanner()
+                    
                     if viewModel.isLoading {
                         ProgressView()
                             .tint(AppTheme.Colors.gold)

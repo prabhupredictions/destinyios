@@ -13,16 +13,7 @@ struct SplashView: View {
     var body: some View {
         ZStack {
             // Background gradient
-            LinearGradient(
-                colors: [
-                    Color("NavyPrimary").opacity(0.95),
-                    Color("NavyPrimary"),
-                    Color(red: 0.05, green: 0.05, blue: 0.15)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppTheme.Colors.mainBackground.ignoresSafeArea()
             
             // Animated stars background
             StarsBackgroundView()
@@ -40,13 +31,13 @@ struct SplashView: View {
                 ZStack {
                     // Outer glow
                     Circle()
-                        .fill(Color("GoldAccent").opacity(0.2))
+                        .fill(AppTheme.Colors.gold.opacity(0.2))
                         .frame(width: 200, height: 200)
                         .blur(radius: 50)
                     
                     // Inner glow
                     Circle()
-                        .fill(Color("GoldAccent").opacity(0.4))
+                        .fill(AppTheme.Colors.gold.opacity(0.4))
                         .frame(width: 160, height: 160)
                         .blur(radius: 30)
                     
@@ -54,19 +45,9 @@ struct SplashView: View {
                     ZStack {
                         // Golden circle background with gradient
                         Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 0.95, green: 0.80, blue: 0.40),
-                                        Color(red: 0.85, green: 0.68, blue: 0.30),
-                                        Color(red: 0.90, green: 0.75, blue: 0.35)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
+                            .fill(AppTheme.Colors.gold)
                             .frame(width: 140, height: 140)
-                            .shadow(color: Color("GoldAccent").opacity(0.6), radius: 25, y: 5)
+                            .shadow(color: AppTheme.Colors.gold.opacity(0.6), radius: 25, y: 5)
                         
                         // Logo image - properly fitted (78% of circle)
                         Image("logo")
@@ -85,20 +66,20 @@ struct SplashView: View {
                 VStack(spacing: 16) {
                     // Main title
                     Text("destiny_app_title".localized)
-                        .font(.system(size: 42, weight: .bold, design: .default))
+                        .font(AppTheme.Fonts.display(size: 42))
                         .foregroundColor(.white)
                         .tracking(12)
                         .shadow(color: .black.opacity(0.3), radius: 2, y: 2)
                     
                     // Subtitle
                     Text("ai_astrology_subtitle".localized)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(Color("GoldAccent"))
+                        .font(AppTheme.Fonts.title(size: 16))
+                        .foregroundColor(AppTheme.Colors.gold)
                         .tracking(8)
                     
                     // Tagline
                     Text("worlds_advanced_ai".localized)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(AppTheme.Fonts.body(size: 11))
                         .foregroundColor(.white.opacity(0.7))
                         .tracking(2)
                         .padding(.top, 8)
@@ -113,7 +94,7 @@ struct SplashView: View {
                     HStack(spacing: 8) {
                         ForEach(0..<3, id: \.self) { index in
                             Circle()
-                                .fill(Color("GoldAccent"))
+                                .fill(AppTheme.Colors.gold)
                                 .frame(width: 6, height: 6)
                                 .opacity(subtitleOpacity)
                                 .scaleEffect(subtitleOpacity > 0.5 ? 1.0 : 0.5)
@@ -127,7 +108,7 @@ struct SplashView: View {
                     }
                     
                     Text("aligning_stars".localized)
-                        .font(.system(size: 13, weight: .light))
+                        .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(.white.opacity(0.5))
                         .italic()
                 }
@@ -198,13 +179,13 @@ struct OrbitalRingsView: View {
         ZStack {
             // Inner ring
             Circle()
-                .stroke(Color("GoldAccent").opacity(0.2), lineWidth: 1)
+                .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
                 .frame(width: 200, height: 200)
                 .rotationEffect(.degrees(rotation))
             
             // Outer ring
             Circle()
-                .stroke(Color("GoldAccent").opacity(0.1), lineWidth: 1)
+                .stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
                 .frame(width: 300, height: 300)
                 .rotationEffect(.degrees(-rotation * 0.5))
             

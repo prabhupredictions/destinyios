@@ -93,11 +93,19 @@ class CompatibilityViewModel {
                 boyLatitude = birthData.latitude
                 boyLongitude = birthData.longitude
                 
-                // Load time unknown flag
-                boyTimeUnknown = UserDefaults.standard.bool(forKey: "birthTimeUnknown")
-                
-                // Load gender
-                boyGender = UserDefaults.standard.string(forKey: "userGender") ?? ""
+                // Load time unknown flag (using user-scoped key)
+                if let email = UserDefaults.standard.string(forKey: "userEmail") {
+                    let timeUnknownKey = StorageKeys.userKey(for: StorageKeys.birthTimeUnknown, email: email)
+                    boyTimeUnknown = UserDefaults.standard.bool(forKey: timeUnknownKey)
+                    
+                    // Load gender (using user-scoped key)
+                    let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: email)
+                    boyGender = UserDefaults.standard.string(forKey: genderKey) ?? ""
+                } else {
+                    // Fallback for legacy data
+                    boyTimeUnknown = UserDefaults.standard.bool(forKey: "birthTimeUnknown")
+                    boyGender = UserDefaults.standard.string(forKey: "userGender") ?? ""
+                }
                 
                 userDataLoaded = true
             } catch {
@@ -174,9 +182,13 @@ class CompatibilityViewModel {
                     place: girlCity
                 ),
                 sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
-                userEmail: nil
+                userEmail: UserDefaults.standard.string(forKey: "userEmail")  // Pass real email for history storage
             )
             
+            // DEBUG: Log userEmail being sent
+            let debugEmail = UserDefaults.standard.string(forKey: "userEmail")
+            print("[CompatibilityViewModel] DEBUG: UserDefaults 'userEmail' = '\(debugEmail ?? "NIL")'")
+            print("[CompatibilityViewModel] DEBUG: request.userEmail = '\(request.userEmail ?? "NIL")'")
             print("[CompatibilityViewModel] GENERATED session_id in request: \(request.sessionId ?? "NIL")")
             
             // Call streaming API with progress callback
@@ -214,9 +226,11 @@ class CompatibilityViewModel {
     // MARK: - History
     private func saveToHistory(result: CompatibilityResult) {
         guard let sid = result.sessionId else { return }
+        // Use compat_ prefix to match backend thread_id format
+        let storageSessionId = sid.hasPrefix("compat_") ? sid : "compat_\(sid)"
         
         let item = CompatibilityHistoryItem(
-            sessionId: sid,
+            sessionId: storageSessionId,
             timestamp: Date(),
             boyName: boyName,
             boyDob: formattedBoyDob,

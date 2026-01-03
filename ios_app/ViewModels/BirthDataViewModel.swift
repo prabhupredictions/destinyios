@@ -100,16 +100,19 @@ class BirthDataViewModel {
     
     // MARK: - Load Saved Data
     func loadSaved() {
+        let email = userEmail ?? "guest"
+        
         // Try to load from SwiftData first
-        if let email = userEmail, !isGuest {
+        if !isGuest {
             if let profile = dataManager.getBirthProfile(for: email) {
                 loadFromProfile(profile)
                 return
             }
         }
         
-        // Fallback to UserDefaults
-        if let data = UserDefaults.standard.data(forKey: "userBirthData"),
+        // Fallback to UserDefaults (User-Scoped)
+        let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData, email: email)
+        if let data = UserDefaults.standard.data(forKey: dataKey),
            let saved = try? JSONDecoder().decode(BirthData.self, from: data) {
             
             let dateFormatter = DateFormatter()
@@ -127,8 +130,12 @@ class BirthDataViewModel {
             cityOfBirth = saved.cityOfBirth ?? ""
             latitude = saved.latitude
             longitude = saved.longitude
-            gender = UserDefaults.standard.string(forKey: "userGender") ?? ""
-            timeUnknown = UserDefaults.standard.bool(forKey: "birthTimeUnknown")
+            
+            let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: email)
+            gender = UserDefaults.standard.string(forKey: genderKey) ?? ""
+            
+            let timeUnknownKey = StorageKeys.userKey(for: StorageKeys.birthTimeUnknown, email: email)
+            timeUnknown = UserDefaults.standard.bool(forKey: timeUnknownKey)
         }
     }
     
@@ -187,7 +194,7 @@ class BirthDataViewModel {
         // Save to SwiftData
         dataManager.saveBirthProfile(profile)
         
-        // Also save to UserDefaults for backward compatibility
+        // Also save to UserDefaults (User-Scoped)
         let birthData = BirthData(
             dob: formattedDOB,
             time: formattedTOB,
@@ -198,12 +205,26 @@ class BirthDataViewModel {
         
         do {
             let encoded = try JSONEncoder().encode(birthData)
-            UserDefaults.standard.set(encoded, forKey: "userBirthData")
-            UserDefaults.standard.set(true, forKey: "hasBirthData")
-            UserDefaults.standard.set(gender, forKey: "userGender")
-            UserDefaults.standard.set(timeUnknown, forKey: "birthTimeUnknown")
             
-            // Store user name
+            // Use user-scoped keys for persistent storage
+            let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData, email: email)
+            UserDefaults.standard.set(encoded, forKey: dataKey)
+            
+            let hasDataKey = StorageKeys.userKey(for: StorageKeys.hasBirthData, email: email)
+            UserDefaults.standard.set(true, forKey: hasDataKey)
+            
+            // ALSO update global session keys for immediate UI access
+            UserDefaults.standard.set(encoded, forKey: "userBirthData")  // Global for HomeViewModel
+            // NOTE: hasBirthData is now set by BirthDataView AFTER ProfileSetupLoadingView completes
+            // This allows the loading screen to show before navigating to MainTabView
+            
+            let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: email)
+            UserDefaults.standard.set(gender, forKey: genderKey)
+            
+            let timeUnknownKey = StorageKeys.userKey(for: StorageKeys.birthTimeUnknown, email: email)
+            UserDefaults.standard.set(timeUnknown, forKey: timeUnknownKey)
+            
+            // Store user name (global is fine for UI, verified on login)
             if !userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 UserDefaults.standard.set(userName, forKey: "userName")
             }
@@ -219,6 +240,7 @@ class BirthDataViewModel {
             // Sync chat history from server (restore any past conversations)
             Task {
                 await ChatHistorySyncService.shared.syncFromServer(userEmail: email, dataManager: dataManager)
+                await CompatibilityHistoryService.shared.syncFromServer(userEmail: email)
             }
             
             return true

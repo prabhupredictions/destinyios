@@ -39,11 +39,11 @@ struct LanguageSelectionView: View {
     var body: some View {
         ZStack {
             // Background
-            Color("NavyPrimary").ignoresSafeArea()
+            AppTheme.Colors.mainBackground.ignoresSafeArea()
             
             // Cosmic background effect
             Circle()
-                .fill(Color("PurpleAccent").opacity(0.1))
+                .fill(AppTheme.Colors.gold.opacity(0.1))
                 .frame(width: 400, height: 400)
                 .blur(radius: 60)
                 .offset(x: -100, y: -200)
@@ -57,16 +57,16 @@ struct LanguageSelectionView: View {
                     // Logo or Icon
                     Image(systemName: "globe")
                         .font(.system(size: 40))
-                        .foregroundColor(Color("GoldAccent"))
+                        .foregroundColor(AppTheme.Colors.gold)
                         .padding(.bottom, 8)
                         
                     Text("Destiny AI Astrology")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(AppTheme.Fonts.display(size: 28))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Text("Your cosmic journey begins in your language")
-                        .font(.system(size: 16))
-                        .foregroundColor(.white.opacity(0.7))
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                 }
                 .opacity(animateContent ? 1 : 0)
@@ -98,14 +98,14 @@ struct LanguageSelectionView: View {
                     Button(action: confirmSelection) {
                         Text(continueButtonText)
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "0B0F19")) // Dark text on gold
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .background(
-                                RoundedRectangle(cornerRadius: 30)
-                                    .fill(Color("PurpleAccent")) // Premium purple button
-                                    .shadow(color: Color("PurpleAccent").opacity(0.4), radius: 10, y: 4)
+                                AppTheme.Colors.premiumGradient
                             )
+                            .cornerRadius(16)
+                            .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 4)
                     }
                     .padding(.horizontal, 40)
                     .padding(.bottom, 40)
@@ -179,37 +179,32 @@ struct LanguageGridItem: View {
             VStack(spacing: 8) {
                 Text(language.nativeName)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                     .minimumScaleFactor(0.8)
                 
                 Text(language.name)
                     .font(.system(size: 12))
-                    .foregroundColor(.white.opacity(0.6))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 90)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.white.opacity(0.15) : Color.white.opacity(0.05))
+                    .fill(isSelected ? AppTheme.Colors.gold.opacity(0.15) : AppTheme.Colors.cardBackground)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(isSelected ? Color("GoldAccent") : Color.white.opacity(0.1), lineWidth: isSelected ? 2 : 1)
+                            .stroke(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.separator, lineWidth: isSelected ? 2 : 1)
                     )
             )
             .scaleEffect(isSelected ? 1.05 : 1.0)
+            .animation(.spring(response: 0.3), value: isSelected)
         }
         .buttonStyle(ScaleButtonStyle())
     }
 }
 
 // Reuse or define ScaleButtonStyle
-struct ScaleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1)
-            .animation(.easeInOut(duration: 0.2), value: configuration.isPressed)
-    }
-}
+
 
 #Preview {
     LanguageSelectionView(isCompleted: .constant(false))

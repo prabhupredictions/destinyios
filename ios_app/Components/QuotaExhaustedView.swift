@@ -36,7 +36,7 @@ struct QuotaExhaustedView: View {
                         
                         Image(systemName: "sparkles")
                             .font(.system(size: 48))
-                            .foregroundColor(Color("GoldAccent"))
+                            .foregroundColor(AppTheme.Colors.gold)
                     }
                     .padding(.top, 24)
                     

@@ -6,7 +6,7 @@ import SwiftUI
 /// Optimized for performance - no regex in parsing
 struct MarkdownTextView: View {
     let content: String
-    var textColor: Color = Color("NavyPrimary")
+    var textColor: Color = AppTheme.Colors.textPrimary
     var fontSize: CGFloat = 15
     
     @State private var blocks: [MarkdownBlock] = []
@@ -211,7 +211,7 @@ struct MarkdownTextView: View {
                 ForEach(items, id: \.self) { item in
                     HStack(alignment: .top, spacing: 8) {
                         Text("•")
-                            .foregroundColor(Color("GoldAccent"))
+                            .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: fontSize, weight: .bold))
                         renderInlineMarkdown(item)
                     }
@@ -223,7 +223,7 @@ struct MarkdownTextView: View {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                     HStack(alignment: .top, spacing: 8) {
                         Text("\(index + 1).")
-                            .foregroundColor(Color("GoldAccent"))
+                            .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: fontSize, weight: .semibold))
                             .frame(minWidth: 20, alignment: .trailing)
                         renderInlineMarkdown(item)
@@ -234,16 +234,20 @@ struct MarkdownTextView: View {
         case .codeBlock(let code):
             Text(code)
                 .font(.system(size: fontSize - 1, design: .monospaced))
-                .foregroundColor(Color("NavyPrimary"))
+                .foregroundColor(AppTheme.Colors.textPrimary)
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
+                .background(AppTheme.Colors.inputBackground)
+                .cornerRadius(AppTheme.Styles.cornerRadius)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
+                        .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                )
             
         case .blockquote(let text):
             HStack(spacing: 12) {
                 Rectangle()
-                    .fill(Color("GoldAccent"))
+                    .fill(AppTheme.Colors.gold)
                     .frame(width: 3)
                 renderInlineMarkdown(text)
                     .italic()
@@ -275,7 +279,7 @@ struct MarkdownTextView: View {
         return HStack(spacing: 6) {
             Text(cleanText)
                 .font(.system(size: headerFontSize, weight: weight))
-                .foregroundColor(Color("GoldAccent"))
+                .foregroundColor(AppTheme.Colors.gold)
         }
         .padding(.top, 8)
         .padding(.bottom, 2)
@@ -290,13 +294,13 @@ struct MarkdownTextView: View {
             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
         ) {
             Text(attrString)
-                .font(.system(size: fontSize))
+                .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
                 .lineSpacing(4)
                 .textSelection(.enabled)
         } else {
             Text(text)
-                .font(.system(size: fontSize))
+                .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
                 .lineSpacing(4)
         }
@@ -349,31 +353,26 @@ struct PremiumTypingIndicator: View {
             HStack(spacing: 10) {
                 // AI Avatar
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color("GoldAccent"), Color("GoldAccent").opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(AppTheme.Colors.gold)
                     .frame(width: 28, height: 28)
                     .overlay(
                         Text("D")
                             .font(.system(size: 14, weight: .bold, design: .serif))
-                            .foregroundColor(.white)
+                            .foregroundColor(AppTheme.Colors.mainBackground)
                     )
                 
                 // Typing label + dots
                 HStack(spacing: 4) {
                     Text("Analyzing")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary").opacity(0.7))
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .fontWeight(.medium)
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                     
                     // Bouncing dots
                     HStack(spacing: 3) {
                         ForEach(0..<3, id: \.self) { index in
                             Circle()
-                                .fill(Color("GoldAccent"))
+                                .fill(AppTheme.Colors.gold)
                                 .frame(width: 6, height: 6)
                                 .scaleEffect(dotScales[index])
                                 .offset(y: animationPhase == index ? -4 : 0)
@@ -385,8 +384,11 @@ struct PremiumTypingIndicator: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.08), radius: 8, y: 3)
+                    .fill(AppTheme.Colors.cardBackground)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
             )
             
             Spacer()

@@ -28,7 +28,7 @@ struct LocationSearchView: View {
                     resultsList
                 }
             }
-            .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+            .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
             .navigationTitle("Select City")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -36,9 +36,10 @@ struct LocationSearchView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
             }
+            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
         }
         .onAppear {
             isSearchFocused = true
@@ -50,11 +51,11 @@ struct LocationSearchView: View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 16))
-                .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             
             TextField("Search for a city...", text: $searchText)
-                .font(.system(size: 16))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.body(size: 16))
+                .foregroundColor(AppTheme.Colors.textPrimary)
                 .focused($isSearchFocused)
                 .onChange(of: searchText) { _, newValue in
                     locationService.search(query: newValue)
@@ -63,17 +64,17 @@ struct LocationSearchView: View {
             if !searchText.isEmpty {
                 Button(action: { searchText = "" }) {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(Color("NavyPrimary").opacity(0.3))
+                    .font(.system(size: 16))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
                 }
             }
         }
         .padding(16)
-        .background(Color.white)
+        .background(AppTheme.Colors.inputBackground)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color("NavyPrimary").opacity(0.15), lineWidth: 1)
+                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
         )
         .padding(16)
     }
@@ -84,11 +85,14 @@ struct LocationSearchView: View {
             Spacer()
             ProgressView()
                 .scaleEffect(1.2)
+                .tint(AppTheme.Colors.gold)
             Text("Searching...")
-                .font(.system(size: 14))
-                .foregroundColor(Color("TextDark").opacity(0.6))
+                .font(AppTheme.Fonts.body(size: 14))
+                .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
         }
+        .frame(maxWidth: .infinity)
+        .background(AppTheme.Colors.mainBackground)
     }
     
     // MARK: - Empty View
@@ -97,17 +101,19 @@ struct LocationSearchView: View {
             Spacer()
             Image(systemName: "mappin.slash")
                 .font(.system(size: 40))
-                .foregroundColor(Color("NavyPrimary").opacity(0.3))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             
             Text("No cities found")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.body(size: 16).weight(.medium))
+                .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text("Try a different search term")
-                .font(.system(size: 14))
-                .foregroundColor(Color("TextDark").opacity(0.6))
+                .font(AppTheme.Fonts.body(size: 14))
+                .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
         }
+        .frame(maxWidth: .infinity)
+        .background(AppTheme.Colors.mainBackground)
     }
     
     // MARK: - Results List
@@ -121,17 +127,17 @@ struct LocationSearchView: View {
                         HStack(spacing: 12) {
                             Image(systemName: "mappin.circle.fill")
                                 .font(.system(size: 24))
-                                .foregroundColor(Color("GoldAccent"))
+                                .foregroundColor(AppTheme.Colors.gold)
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(result.title)
-                                    .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(Color("NavyPrimary"))
+                                    .font(AppTheme.Fonts.body(size: 15).weight(.medium))
+                                    .foregroundColor(AppTheme.Colors.textPrimary)
                                 
                                 if !result.subtitle.isEmpty {
                                     Text(result.subtitle)
-                                        .font(.system(size: 13))
-                                        .foregroundColor(Color("TextDark").opacity(0.5))
+                                        .font(AppTheme.Fonts.caption(size: 13))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
                             }
                             
@@ -139,19 +145,22 @@ struct LocationSearchView: View {
                             
                             // Source indicator
                             Text(result.source == .apple ? "🍎" : "G")
-                                .font(.system(size: 10))
-                                .foregroundColor(Color("TextDark").opacity(0.3))
+                                .font(AppTheme.Fonts.caption(size: 10))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 14)
+                        .background(AppTheme.Colors.mainBackground) // Ensure fill for tap target
                     }
                     .buttonStyle(.plain)
                     
                     Divider()
                         .padding(.leading, 52)
+                        .background(AppTheme.Colors.separator)
                 }
             }
         }
+        .background(AppTheme.Colors.mainBackground)
     }
     
     // MARK: - Select Location

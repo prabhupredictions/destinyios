@@ -16,15 +16,18 @@ struct ChatInputBar: View {
         HStack(spacing: 12) {
             // Text field
             TextField("Ask anything...", text: $text, axis: .vertical)
-                .font(.system(size: 16))
-                .foregroundColor(Color("NavyPrimary"))
+                .font(AppTheme.Fonts.body(size: 16))
+                .foregroundColor(AppTheme.Colors.textPrimary)
                 .lineLimit(1...5)
                 .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.vertical, 14)
                 .background(
                     RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.05), radius: 8, y: 2)
+                        .fill(AppTheme.Colors.inputBackground)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(isFocused ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.3), lineWidth: isFocused ? 1.5 : 1)
+                        )
                 )
                 .focused($isFocused)
                 .onSubmit {
@@ -36,35 +39,30 @@ struct ChatInputBar: View {
             // Send button
             Button(action: onSend) {
                 ZStack {
-                    Circle()
-                        .fill(
-                            canSend
-                            ? LinearGradient(
-                                colors: [Color("NavyPrimary"), Color("NavyPrimary").opacity(0.85)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            : LinearGradient(
-                                colors: [Color("NavyPrimary").opacity(0.3), Color("NavyPrimary").opacity(0.2)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 44, height: 44)
+                    Group {
+                        if canSend {
+                            Circle()
+                                .fill(AppTheme.Colors.premiumGradient)
+                        } else {
+                            Circle()
+                                .fill(AppTheme.Colors.surfaceBackground)
+                        }
+                    }
+                        .frame(width: 48, height: 48)
                         .shadow(
-                            color: canSend ? Color("NavyPrimary").opacity(0.3) : Color.clear,
+                            color: canSend ? AppTheme.Colors.gold.opacity(0.3) : Color.clear,
                             radius: 8,
                             y: 4
                         )
                     
                     if isLoading || isStreaming {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(0.8)
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                            .scaleEffect(0.9)
                     } else {
                         Image(systemName: "arrow.up")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(canSend ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
                     }
                 }
             }
@@ -74,7 +72,7 @@ struct ChatInputBar: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            Color(red: 0.96, green: 0.95, blue: 0.98)
+            AppTheme.Colors.mainBackground
                 .ignoresSafeArea(edges: .bottom)
         )
     }
@@ -99,7 +97,7 @@ struct ChatInputBar: View {
                     text = ""
                 }
             }
-            .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+            .background(AppTheme.Colors.mainBackground)
         }
     }
     

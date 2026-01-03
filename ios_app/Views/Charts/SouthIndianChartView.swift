@@ -28,7 +28,7 @@ struct SouthIndianChartView: View {
                 chartContent
             }
             .frame(width: gridSize, height: gridSize)
-            .shadow(color: Color(red: 1, green: 0.8, blue: 0.2).opacity(0.1), radius: 4, x: 0, y: 2)
+            .shadow(color: AppTheme.Colors.gold.opacity(0.1), radius: 4, x: 0, y: 2)
         }
         .padding(8)
     }
@@ -69,13 +69,9 @@ struct SouthIndianChartView: View {
                 .font(.system(size: 11, weight: isAscendant ? .bold : .semibold))
                 .foregroundStyle(
                     isAscendant ?
+                    AnyShapeStyle(AppTheme.Colors.premiumGradient) :
                     AnyShapeStyle(LinearGradient(
-                        colors: [Color(red: 1, green: 0.9, blue: 0.5), Color(red: 0.85, green: 0.65, blue: 0.2)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )) :
-                    AnyShapeStyle(LinearGradient(
-                        colors: [Color.white.opacity(0.5), Color.white.opacity(0.3)],
+                        colors: [.white.opacity(0.5), .white.opacity(0.3)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ))
@@ -145,12 +141,12 @@ struct SouthIndianGrid: View {
             let w = size.width
             let h = size.height
             
-            // Premium Gold Gradient
+            // Premium Gold Gradient (using AppTheme)
             let goldGradient = GraphicsContext.Shading.linearGradient(
                 Gradient(colors: [
-                    Color(red: 0.85, green: 0.65, blue: 0.13),
-                    Color(red: 1.0, green: 0.95, blue: 0.6),
-                    Color(red: 0.85, green: 0.65, blue: 0.13)
+                    AppTheme.Colors.gold,
+                    AppTheme.Colors.gold.opacity(0.6),
+                    AppTheme.Colors.gold
                 ]),
                 startPoint: CGPoint(x: 0, y: 0),
                 endPoint: CGPoint(x: w, y: h)
@@ -219,7 +215,7 @@ struct SouthIndianGrid: View {
             context.stroke(Path(centerRect), with: goldGradient, style: mediumStroke)
         }
         // Subtle glow
-        .shadow(color: Color(red: 1, green: 0.8, blue: 0.2).opacity(0.2), radius: 2, x: 0, y: 0)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.2), radius: 2, x: 0, y: 0)
     }
 }
 

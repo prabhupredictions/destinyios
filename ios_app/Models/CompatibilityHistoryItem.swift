@@ -58,6 +58,15 @@ struct CompatChatMessageData: Codable, Identifiable {
     let timestamp: Date
     let type: String  // "user", "ai", "info", "error"
     
+    // Memberwise initializer for direct instantiation
+    init(id: String, content: String, isUser: Bool, timestamp: Date, type: String = "ai") {
+        self.id = id
+        self.content = content
+        self.isUser = isUser
+        self.timestamp = timestamp
+        self.type = type
+    }
+    
     init(from message: CompatChatMessage) {
         self.id = message.id.uuidString
         self.content = message.content

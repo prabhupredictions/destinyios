@@ -21,12 +21,12 @@ struct PlanetaryPositionsSheet: View {
                 GeometryReader { geo in
                     ZStack {
                         // Deep Base
-                        Color(red: 0.05, green: 0.07, blue: 0.15).ignoresSafeArea()
+                        AppTheme.Colors.mainBackground.ignoresSafeArea()
                         
                         // Central Blue Glow
                         RadialGradient(
                             colors: [
-                                Color(red: 0.12, green: 0.16, blue: 0.28).opacity(0.8),
+                                Color(hex: "1A2138").opacity(0.8),
                                 .clear
                             ],
                             center: .center,
@@ -37,7 +37,7 @@ struct PlanetaryPositionsSheet: View {
                         // Top-Left Gold Nebula/Star Glow
                         RadialGradient(
                             colors: [
-                                Color(red: 0.85, green: 0.65, blue: 0.2).opacity(0.08),
+                                AppTheme.Colors.gold.opacity(0.1),
                                 .clear
                             ],
                             center: .topLeading,
@@ -48,7 +48,7 @@ struct PlanetaryPositionsSheet: View {
                         // Bottom-Right Purple/Deep Nebula
                         RadialGradient(
                             colors: [
-                                Color(red: 0.3, green: 0.1, blue: 0.4).opacity(0.15),
+                                Color(hex: "4A148C").opacity(0.15),
                                 .clear
                             ],
                             center: .bottomTrailing,
@@ -131,7 +131,7 @@ struct PlanetaryPositionsSheet: View {
                 
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }
-                        .foregroundColor(.white)
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
             }
             .onAppear {
@@ -185,7 +185,7 @@ struct PlanetaryPositionsSheet: View {
             HStack {
                 Text("Planetary Positions")
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
             }
             
@@ -205,40 +205,38 @@ struct PlanetaryPositionsSheet: View {
 
     // MARK: - Minimal Birth Info (Clean, no box)
     private func minimalBirthInfo(_ details: AstroBirthDetails, city: String, ascendant: String) -> some View {
-        let premiumGold = Color(red: 212/255, green: 175/255, blue: 55/255)
-        
         return HStack(spacing: 8) {
             // Date
             Text(formatBirthDate(details.dob))
                 .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.white)
+                .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text("•")
-                .foregroundColor(premiumGold.opacity(0.6))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             
             // Time
             Text(formatBirthTime(details.time))
                 .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.white)
+                .foregroundColor(AppTheme.Colors.textPrimary)
             
             // City (if available)
             if !city.isEmpty {
                 Text("•")
-                    .foregroundColor(premiumGold.opacity(0.6))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                 
                 Text(city)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .lineLimit(1)
             }
             
             // Ascendant
             Text("•")
-                .foregroundColor(premiumGold.opacity(0.6))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             
             Text("Asc: \(ascendant)")
                 .font(.system(size: 14, weight: .semibold)) // Slightly bolder
-                .foregroundColor(Color("GoldAccent")) // Gold color to stand out
+                .foregroundColor(AppTheme.Colors.gold) // Gold color to stand out
         }
         .padding(.vertical, 4)
     }
@@ -375,19 +373,19 @@ struct PremiumPlanetRow: View {
                 
                 Text(planetSymbol(for: name))
                     .font(.system(size: 22))
-                    .foregroundColor(Color("GoldAccent"))
+                    .foregroundColor(AppTheme.Colors.gold)
             }
             
-            // Main Info Column
+                // Main Info Column
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(name.localized)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     // Badges
                     if data.isRetrograde == true {
-                        Badge(text: "R", color: .red)
+                        Badge(text: "R", color: AppTheme.Colors.error)
                     }
                     if data.isCombust == true {
                         Badge(text: "C", color: .orange)
@@ -400,15 +398,15 @@ struct PremiumPlanetRow: View {
                 HStack(spacing: 6) {
                     Text(data.sign)
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color("GoldAccent").opacity(0.9))
+                        .foregroundColor(AppTheme.Colors.gold)
                     
                     Text("•")
                         .font(.system(size: 10))
-                        .foregroundColor(.white.opacity(0.4))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                     
                     Text(formatDegree(data.degree))
                         .font(.system(size: 13, design: .monospaced))
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
             
@@ -418,23 +416,23 @@ struct PremiumPlanetRow: View {
             VStack(alignment: .trailing, spacing: 4) {
                 Text("House \(data.house)")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(Color("GoldAccent"))
+                    .foregroundColor(AppTheme.Colors.gold)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
                     .background(
                         Capsule()
-                            .fill(Color("GoldAccent").opacity(0.15))
-                            .strokeBorder(Color("GoldAccent").opacity(0.3), lineWidth: 1)
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
+                            .strokeBorder(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                     )
                 
                 if let nak = nakshatra {
                     VStack(alignment: .trailing, spacing: 1) {
                         Text(nak.nakshatra)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.white.opacity(0.9))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                         Text("Pada \(nak.pada)")
                             .font(.system(size: 10))
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }
             }
@@ -442,13 +440,13 @@ struct PremiumPlanetRow: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(red: 0.1, green: 0.1, blue: 0.2).opacity(0.6)) // Dark bluish glass
+                .fill(AppTheme.Colors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.15), .clear],
+                        colors: [AppTheme.Colors.gold.opacity(0.3), .clear],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),

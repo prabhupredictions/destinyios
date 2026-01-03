@@ -53,6 +53,18 @@ final class CompatibilityService: CompatibilityServiceProtocol {
         urlRequest.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
         urlRequest.httpBody = try JSONEncoder().encode(request)
         
+        // DEBUG: Log the JSON being sent
+        if let jsonBody = urlRequest.httpBody, let jsonString = String(data: jsonBody, encoding: .utf8) {
+            print("[CompatibilityService] DEBUG: Sending JSON body:")
+            print("[CompatibilityService] DEBUG: user_email in JSON = \(jsonString.contains("user_email") ? "PRESENT" : "MISSING")")
+            // Print just the user_email part
+            if let range = jsonString.range(of: "user_email") {
+                let start = jsonString.index(range.lowerBound, offsetBy: -1, limitedBy: jsonString.startIndex) ?? range.lowerBound
+                let end = jsonString.index(range.upperBound, offsetBy: 50, limitedBy: jsonString.endIndex) ?? jsonString.endIndex
+                print("[CompatibilityService] DEBUG: user_email snippet: \(jsonString[start..<end])...")
+            }
+        }
+        
         // Make streaming request
         let (bytes, response) = try await streamSession.bytes(for: urlRequest)
         

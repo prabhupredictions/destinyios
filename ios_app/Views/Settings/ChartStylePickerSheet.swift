@@ -7,73 +7,86 @@ struct ChartStylePickerSheet: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    // North Indian Style
-                    Button {
-                        chartStyle = "north"
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("North Indian Style")
-                                    .foregroundColor(Color("NavyPrimary"))
-                                    .font(.body)
-                                Text("Diamond layout, houses fixed, signs rotate")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            if chartStyle == "north" {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(Color("GoldAccent"))
-                                    .font(.system(size: 14, weight: .semibold))
-                            }
-                        }
-                    }
-                    
-                    // South Indian Style
-                    Button {
-                        chartStyle = "south"
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("South Indian Style")
-                                    .foregroundColor(Color("NavyPrimary"))
-                                    .font(.body)
-                                Text("Grid layout, signs fixed, houses rotate")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            if chartStyle == "south" {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(Color("GoldAccent"))
-                                    .font(.system(size: 14, weight: .semibold))
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                
+                List {
+                    Section {
+                        // North Indian Style
+                        Button {
+                            chartStyle = "north"
+                            HapticManager.shared.play(.light)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("North Indian Style")
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                        .font(AppTheme.Fonts.body(size: 16))
+                                    Text("Diamond layout, houses fixed, signs rotate")
+                                        .font(AppTheme.Fonts.caption(size: 12))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                }
+                                
+                                Spacer()
+                                
+                                if chartStyle == "north" {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(AppTheme.Colors.gold)
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
                             }
                         }
+                        .listRowBackground(AppTheme.Colors.cardBackground)
+                        
+                        // South Indian Style
+                        Button {
+                            chartStyle = "south"
+                            HapticManager.shared.play(.light)
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("South Indian Style")
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                        .font(AppTheme.Fonts.body(size: 16))
+                                    Text("Grid layout, signs fixed, houses rotate")
+                                        .font(AppTheme.Fonts.caption(size: 12))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                }
+                                
+                                Spacer()
+                                
+                                if chartStyle == "south" {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(AppTheme.Colors.gold)
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                            }
+                        }
+                        .listRowBackground(AppTheme.Colors.cardBackground)
+                    } header: {
+                        Text("Select Chart Style")
+                            .font(AppTheme.Fonts.title(size: 14))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    } footer: {
+                        Text("This affects how birth charts are displayed in compatibility analysis.")
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
                     }
-                } header: {
-                    Text("Select Chart Style")
-                } footer: {
-                    Text("This affects how birth charts are displayed in compatibility analysis.")
-                        .font(.caption)
                 }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
             }
-            .listStyle(.insetGrouped)
             .navigationTitle("Chart Style")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
+                    PremiumCloseButton {
                         dismiss()
                     }
-                    .foregroundColor(Color("NavyPrimary"))
                 }
             }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
     }
 }

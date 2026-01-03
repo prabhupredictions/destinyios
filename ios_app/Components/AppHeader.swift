@@ -26,7 +26,7 @@ struct AppHeader: View {
                 Button(action: { onMenuTap?() }) {
                     Image(systemName: "line.3.horizontal")
                         .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 44, height: 44)
                 }
             } else {
@@ -39,8 +39,8 @@ struct AppHeader: View {
             // Logo or title
             if let title = title {
                 Text(title)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.title(size: 18))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
             } else {
                 LogoView()
             }
@@ -54,19 +54,23 @@ struct AppHeader: View {
                         // Show user's first letter in a circle
                         ZStack {
                             Circle()
-                                .fill(Color("NavyPrimary"))
+                                .fill(AppTheme.Colors.premiumGradient)
                                 .frame(width: 32, height: 32)
+                                .overlay(
+                                    Circle()
+                                        .stroke(AppTheme.Colors.gold, lineWidth: 1)
+                                )
                             
                             Text(initial)
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.white)
+                                .font(AppTheme.Fonts.body(size: 14).weight(.bold))
+                                .foregroundColor(AppTheme.Colors.mainBackground)
                         }
                         .frame(width: 44, height: 44)
                     } else {
                         // Guest user - show person icon
                         Image(systemName: "person.circle.fill")
                             .font(.system(size: 26))
-                            .foregroundColor(Color("NavyPrimary").opacity(0.7))
+                            .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
                             .frame(width: 44, height: 44)
                     }
                 }
@@ -77,17 +81,22 @@ struct AppHeader: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
+        .background(AppTheme.Colors.mainBackground)
     }
 }
 
 // MARK: - Logo View
 struct LogoView: View {
     var body: some View {
-        // Destiny wordmark logo
+        // Destiny wordmark logo - ensuring it looks good on dark bg
+        // If image is black text, we might need a different asset or filter.
+        // Assuming current asset works or we might need to tint it if it's template.
         Image("destiny_home")
             .resizable()
             .scaledToFit()
-            .frame(height: 28)  // Height controls size, width auto-scales
+            .frame(height: 28)
+            // If the logo is black text, we invert it for dark mode or specific tint
+            // .colorInvert() // Only if the asset is black-on-transparent
     }
 }
 
@@ -105,7 +114,7 @@ struct ChatHeader: View {
             Button(action: { onBackTap?() }) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 44, height: 44)
             }
             
@@ -113,7 +122,7 @@ struct ChatHeader: View {
             Button(action: { onHistoryTap?() }) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .frame(width: 40, height: 40)
             }
             
@@ -128,7 +137,7 @@ struct ChatHeader: View {
             Button(action: { onChartTap?() }) {
                 Image(systemName: "globe.asia.australia")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .frame(width: 40, height: 40)
             }
             
@@ -136,12 +145,13 @@ struct ChatHeader: View {
             Button(action: { onNewChatTap?() }) {
                 Image(systemName: "square.and.pencil")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+        .background(AppTheme.Colors.mainBackground)
     }
 }
 
@@ -158,7 +168,7 @@ struct MatchResultHeader: View {
             Button(action: { onBackTap?() }) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 44, height: 44)
             }
             
@@ -166,7 +176,7 @@ struct MatchResultHeader: View {
             Button(action: { onHistoryTap?() }) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .frame(width: 40, height: 40)
             }
             
@@ -177,8 +187,8 @@ struct MatchResultHeader: View {
                 Text("💕")
                     .font(.system(size: 16))
                 Text("kundali_match".localized)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .font(AppTheme.Fonts.title(size: 16))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
             }
             
             Spacer()
@@ -187,7 +197,7 @@ struct MatchResultHeader: View {
             Button(action: { onChartTap?() }) {
                 Image(systemName: "globe.asia.australia")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .frame(width: 40, height: 40)
             }
             
@@ -195,12 +205,13 @@ struct MatchResultHeader: View {
             Button(action: { onNewMatchTap?() }) {
                 Image(systemName: "square.and.pencil")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+        .background(AppTheme.Colors.mainBackground)
     }
 }
 
@@ -210,7 +221,7 @@ struct MatchResultHeader: View {
         AppHeader()
         Spacer()
     }
-    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+    .background(AppTheme.Colors.mainBackground)
 }
 
 #Preview("Chat Header") {
@@ -218,7 +229,7 @@ struct MatchResultHeader: View {
         ChatHeader()
         Spacer()
     }
-    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+    .background(AppTheme.Colors.mainBackground)
 }
 
 #Preview("Match Result Header") {
@@ -226,11 +237,12 @@ struct MatchResultHeader: View {
         MatchResultHeader()
         Spacer()
     }
-    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+    .background(AppTheme.Colors.mainBackground)
 }
 
 #Preview("Logo") {
     LogoView()
         .padding()
+        .background(AppTheme.Colors.mainBackground)
 }
 

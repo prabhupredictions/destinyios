@@ -1,6 +1,8 @@
 import Foundation
 
-struct BirthData: Codable, Equatable, Sendable {
+struct BirthData: Codable, Equatable, Sendable, Identifiable {
+    var id: String { "\(dob)_\(time)_\(latitude)_\(longitude)" }
+    
     var dob: String           // "YYYY-MM-DD"
     var time: String          // "HH:MM"
     var latitude: Double
@@ -16,7 +18,12 @@ struct BirthData: Codable, Equatable, Sendable {
         case houseSystem = "house_system"
     }
     
-    // Default initializer
+    /// Round a coordinate to 6 decimal places (backend validation requirement)
+    private static func roundCoordinate(_ value: Double) -> Double {
+        (value * 1_000_000).rounded() / 1_000_000
+    }
+    
+    // Default initializer - auto-rounds coordinates
     init(
         dob: String,
         time: String,
@@ -28,20 +35,20 @@ struct BirthData: Codable, Equatable, Sendable {
     ) {
         self.dob = dob
         self.time = time
-        self.latitude = latitude
-        self.longitude = longitude
+        self.latitude = Self.roundCoordinate(latitude)
+        self.longitude = Self.roundCoordinate(longitude)
         self.cityOfBirth = cityOfBirth
         self.ayanamsa = ayanamsa
         self.houseSystem = houseSystem
     }
     
-    // Custom decoder to handle missing optional fields
+    // Custom decoder to handle missing optional fields - auto-rounds coordinates
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         dob = try container.decode(String.self, forKey: .dob)
         time = try container.decode(String.self, forKey: .time)
-        latitude = try container.decode(Double.self, forKey: .latitude)
-        longitude = try container.decode(Double.self, forKey: .longitude)
+        latitude = Self.roundCoordinate(try container.decode(Double.self, forKey: .latitude))
+        longitude = Self.roundCoordinate(try container.decode(Double.self, forKey: .longitude))
         cityOfBirth = try container.decodeIfPresent(String.self, forKey: .cityOfBirth)
         ayanamsa = try container.decodeIfPresent(String.self, forKey: .ayanamsa) ?? "lahiri"
         houseSystem = try container.decodeIfPresent(String.self, forKey: .houseSystem) ?? "equal"

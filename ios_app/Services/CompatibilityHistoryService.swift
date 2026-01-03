@@ -2,20 +2,31 @@ import Foundation
 
 // MARK: - Compatibility History Service
 /// Manages persistence of compatibility match history using UserDefaults
+/// All data is stored per-user to prevent data mixing between accounts
 final class CompatibilityHistoryService {
     
     // MARK: - Constants
-    private static let storageKey = "compatibility_match_history"
+    private static let storageKeyPrefix = "compatibility_history_"
     private static let maxItems = 10
     
     // MARK: - Singleton
     static let shared = CompatibilityHistoryService()
     private init() {}
     
+    /// Get current user's email for storage key
+    private var currentUserEmail: String {
+        UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+    }
+    
+    /// Get storage key for current user
+    private var storageKey: String {
+        "\(Self.storageKeyPrefix)\(currentUserEmail)"
+    }
+    
     // MARK: - Load All
-    /// Loads all saved history items, sorted by most recent first
+    /// Loads all saved history items for current user, sorted by most recent first
     func loadAll() -> [CompatibilityHistoryItem] {
-        guard let data = UserDefaults.standard.data(forKey: Self.storageKey) else {
+        guard let data = UserDefaults.standard.data(forKey: storageKey) else {
             return []
         }
         
@@ -23,13 +34,13 @@ final class CompatibilityHistoryService {
             let items = try JSONDecoder().decode([CompatibilityHistoryItem].self, from: data)
             return items.sorted { $0.timestamp > $1.timestamp }
         } catch {
-            print("[HistoryService] Failed to decode history: \(error)")
+            print("[CompatibilityHistoryService] Failed to decode history for \(currentUserEmail): \(error)")
             return []
         }
     }
     
     // MARK: - Save
-    /// Saves a new history item. If session already exists, updates it.
+    /// Saves a new history item for current user. If session already exists, updates it.
     func save(_ item: CompatibilityHistoryItem) {
         var items = loadAll()
         
@@ -53,13 +64,19 @@ final class CompatibilityHistoryService {
     // MARK: - Update Chat Messages
     /// Updates chat messages for an existing session
     func updateChatMessages(sessionId: String, messages: [CompatChatMessage]) {
+        print("[CompatibilityHistoryService] updateChatMessages called for sessionId: '\(sessionId)', messageCount: \(messages.count)")
         var items = loadAll()
+        print("[CompatibilityHistoryService] Loaded \(items.count) items. SessionIds: \(items.map { $0.sessionId })")
         
         if let index = items.firstIndex(where: { $0.sessionId == sessionId }) {
+            print("[CompatibilityHistoryService] FOUND sessionId at index \(index), updating...")
             // Convert messages to Codable format
             let messageData = messages.map { CompatChatMessageData(from: $0) }
             items[index].chatMessages = messageData
             persist(items)
+            print("[CompatibilityHistoryService] Persisted \(messageData.count) messages")
+        } else {
+            print("[CompatibilityHistoryService] WARNING: sessionId '\(sessionId)' NOT FOUND in stored items!")
         }
     }
     
@@ -80,9 +97,17 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Clear All
-    /// Clears all history
+    /// Clears all history for current user
     func clearAll() {
-        UserDefaults.standard.removeObject(forKey: Self.storageKey)
+        UserDefaults.standard.removeObject(forKey: storageKey)
+        print("[CompatibilityHistoryService] Cleared history for \(currentUserEmail)")
+    }
+    
+    /// Clears all history for a specific user (used on logout)
+    func clearAll(forUser email: String) {
+        let key = "\(Self.storageKeyPrefix)\(email)"
+        UserDefaults.standard.removeObject(forKey: key)
+        print("[CompatibilityHistoryService] Cleared history for \(email)")
     }
     
     // MARK: - Get Item
@@ -95,9 +120,9 @@ final class CompatibilityHistoryService {
     private func persist(_ items: [CompatibilityHistoryItem]) {
         do {
             let data = try JSONEncoder().encode(items)
-            UserDefaults.standard.set(data, forKey: Self.storageKey)
+            UserDefaults.standard.set(data, forKey: storageKey)
         } catch {
-            print("[HistoryService] Failed to encode history: \(error)")
+            print("[CompatibilityHistoryService] Failed to encode history: \(error)")
         }
     }
     
@@ -152,38 +177,181 @@ final class CompatibilityHistoryService {
             
             print("[CompatibilityHistoryService] Found \(compatThreads.count) compatibility threads")
             
-            // Convert to local format and merge with existing
+            // Fetch full details for each thread and convert to local format
             for thread in compatThreads {
-                // Parse names from title if available (format: "Match: Name1 & Name2")
-                var boyName = "Partner"
-                var girlName = "Partner"
-                if let title = thread.title, title.contains("&") {
-                    let parts = title.replacingOccurrences(of: "Match: ", with: "").components(separatedBy: " & ")
-                    if parts.count == 2 {
-                        boyName = parts[0]
-                        girlName = parts[1]
-                    }
+                // Skip if already exists locally
+                if get(sessionId: thread.id) != nil {
+                    continue
                 }
                 
-                // Create minimal history item (full details from server not available without fetching each thread)
-                let item = CompatibilityHistoryItem(
-                    sessionId: thread.id,
-                    timestamp: ISO8601DateFormatter().date(from: thread.createdAt) ?? Date(),
-                    boyName: boyName,
-                    boyDob: "",  // Not available from thread list
-                    boyCity: "",
-                    girlName: girlName,
-                    girlDob: "",
-                    girlCity: "",
-                    totalScore: 0,
-                    maxScore: 36,
-                    result: nil,  // Not available from thread list
-                    chatMessages: []
-                )
+                // Fetch thread details with metadata
+                let threadDetailURL = URL(string: "\(APIConfig.baseURL)/chat-history/threads/\(userEmail)/\(thread.id)")
+                guard let detailURL = threadDetailURL else { continue }
                 
-                // Only add if not already exists
-                if get(sessionId: thread.id) == nil {
+                var detailRequest = URLRequest(url: detailURL)
+                detailRequest.httpMethod = "GET"
+                detailRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+                
+                do {
+                    let (detailData, detailResponse) = try await URLSession.shared.data(for: detailRequest)
+                    
+                    guard let httpDetailResponse = detailResponse as? HTTPURLResponse,
+                          httpDetailResponse.statusCode == 200 else {
+                        print("[CompatibilityHistoryService] Failed to fetch details for \(thread.id)")
+                        continue
+                    }
+                    
+                    // Parse thread detail with metadata and messages
+                    struct MessageItem: Codable {
+                        let id: String?  // Changed from Int? - backend returns string
+                        let role: String
+                        let content: String
+                        let createdAt: String?
+                        
+                        enum CodingKeys: String, CodingKey {
+                            case id, role, content
+                            case createdAt = "created_at"
+                        }
+                    }
+                    
+                    struct ThreadDetailResponse: Codable {
+                        let id: String
+                        let title: String?
+                        let metadata: CompatibilityResponse?
+                        let messages: [MessageItem]?
+                        let createdAt: String?
+                        let updatedAt: String?
+                        
+                        enum CodingKeys: String, CodingKey {
+                            case id, title, metadata, messages
+                            case createdAt = "created_at"
+                            case updatedAt = "updated_at"
+                        }
+                    }
+                    
+                    let threadDetail = try JSONDecoder().decode(ThreadDetailResponse.self, from: detailData)
+                    
+                    // Extract data from metadata
+                    var boyName = "Partner"
+                    var girlName = "Partner"
+                    var boyDob = ""
+                    var girlDob = ""
+                    var boyCity = ""
+                    var girlCity = ""
+                    var totalScore = 0
+                    var kutas: [KutaDetail] = []
+                    var result: CompatibilityResult? = nil
+                    
+                    if let metadata = threadDetail.metadata {
+                        // Parse names from title
+                        if let title = threadDetail.title, title.contains("&") {
+                            let parts = title.replacingOccurrences(of: "Match: ", with: "").components(separatedBy: " & ")
+                            if parts.count == 2 {
+                                boyName = parts[0]
+                                girlName = parts[1]
+                            }
+                        }
+                        
+                        // Extract birth details from analysisData
+                        if let analysisData = metadata.analysisData {
+                            if let boyDetails = analysisData.boy?.details {
+                                boyDob = boyDetails.dob
+                                boyCity = boyDetails.place  // BirthDetails uses 'place' not 'city'
+                            }
+                            if let girlDetails = analysisData.girl?.details {
+                                girlDob = girlDetails.dob
+                                girlCity = girlDetails.place  // BirthDetails uses 'place' not 'city'
+                            }
+                            // Extract score from ashtakoot (Dictionary access)
+                            if let ashtakoot = analysisData.joint?.ashtakootMatching,
+                               let scoreValue = ashtakoot["total_score"]?.value {
+                                if let scoreInt = scoreValue as? Int {
+                                    totalScore = scoreInt
+                                } else if let scoreDouble = scoreValue as? Double {
+                                    totalScore = Int(scoreDouble)
+                                }
+                            }
+                            
+                            // Build kutas array from ashtakootMatching.guna_scores
+                            if let ashtakoot = analysisData.joint?.ashtakootMatching {
+                                // Same structure as CompatibilityViewModel
+                                if let gunaScores = ashtakoot["guna_scores"]?.value as? [String: Any] {
+                                    let kutaNames: [(String, String, Int)] = [
+                                        ("varna", "Varna", 1),
+                                        ("vashya", "Vashya", 2),
+                                        ("tara", "Tara", 3),
+                                        ("yoni", "Yoni", 4),
+                                        ("maitri", "Maitri", 5),
+                                        ("gana", "Gana", 6),
+                                        ("bhakoot", "Bhakoot", 7),
+                                        ("nadi", "Nadi", 8)
+                                    ]
+                                    
+                                    for (key, name, maxPoints) in kutaNames {
+                                        if let kutaData = gunaScores[key] as? [String: Any],
+                                           let score = kutaData["score"] as? Int {
+                                            kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: score))
+                                        } else if let kutaData = gunaScores[key] as? [String: Any],
+                                                  let score = kutaData["score"] as? Double {
+                                            kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: Int(score)))
+                                        }
+                                    }
+                                    print("[CompatibilityHistoryService] Built \(kutas.count) kutas from guna_scores")
+                                } else {
+                                    print("[CompatibilityHistoryService] No guna_scores found in ashtakootMatching")
+                                }
+                            }
+                        }
+                        
+                        // Create CompatibilityResult from metadata using proper init
+                        result = CompatibilityResult(
+                            totalScore: totalScore,
+                            maxScore: 36,
+                            kutas: kutas,  // Now populated from ashtakootMatching
+                            summary: metadata.llmAnalysis ?? "",
+                            recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
+                            analysisData: metadata.analysisData,
+                            sessionId: metadata.sessionId
+                        )
+                    }
+                    
+                    // Convert backend messages to local format
+                    var restoredMessages: [CompatChatMessageData] = []
+                    if let backendMessages = threadDetail.messages {
+                        for msg in backendMessages {
+                            let chatMsg = CompatChatMessageData(
+                                id: UUID().uuidString,
+                                content: msg.content,
+                                isUser: msg.role == "user",
+                                timestamp: ISO8601DateFormatter().date(from: msg.createdAt ?? "") ?? Date(),
+                                type: msg.role == "user" ? "user" : "ai"
+                            )
+                            restoredMessages.append(chatMsg)
+                        }
+                        print("[CompatibilityHistoryService] Restored \(restoredMessages.count) chat messages from server")
+                    }
+                    
+                    // Create full history item
+                    let item = CompatibilityHistoryItem(
+                        sessionId: thread.id,
+                        timestamp: ISO8601DateFormatter().date(from: threadDetail.createdAt ?? thread.createdAt) ?? Date(),
+                        boyName: boyName,
+                        boyDob: boyDob,
+                        boyCity: boyCity,
+                        girlName: girlName,
+                        girlDob: girlDob,
+                        girlCity: girlCity,
+                        totalScore: totalScore,
+                        maxScore: 36,
+                        result: result,
+                        chatMessages: restoredMessages
+                    )
+                    
                     save(item)
+                    print("[CompatibilityHistoryService] Restored full history: \(thread.id)")
+                    
+                } catch {
+                    print("[CompatibilityHistoryService] Failed to parse thread \(thread.id): \(error)")
                 }
             }
             
