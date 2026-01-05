@@ -32,7 +32,7 @@ struct ChartStylePickerSheet: View {
                                 if chartStyle == "north" {
                                     Image(systemName: "checkmark")
                                         .foregroundColor(AppTheme.Colors.gold)
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(AppTheme.Fonts.title(size: 14))
                                 }
                             }
                         }
@@ -58,7 +58,7 @@ struct ChartStylePickerSheet: View {
                                 if chartStyle == "south" {
                                     Image(systemName: "checkmark")
                                         .foregroundColor(AppTheme.Colors.gold)
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(AppTheme.Fonts.title(size: 14))
                                 }
                             }
                         }

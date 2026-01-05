@@ -26,7 +26,7 @@ struct PlanetaryPositionsSheet: View {
                         // Central Blue Glow
                         RadialGradient(
                             colors: [
-                                Color(hex: "1A2138").opacity(0.8),
+                                AppTheme.Colors.secondaryBackground.opacity(0.8),
                                 .clear
                             ],
                             center: .center,
@@ -48,7 +48,7 @@ struct PlanetaryPositionsSheet: View {
                         // Bottom-Right Purple/Deep Nebula
                         RadialGradient(
                             colors: [
-                                Color(hex: "4A148C").opacity(0.15),
+                                AppTheme.Colors.purpleAccent.opacity(0.15),
                                 .clear
                             ],
                             center: .bottomTrailing,
@@ -70,7 +70,7 @@ struct PlanetaryPositionsSheet: View {
                 } else if let error = errorMessage {
                      VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 40))
+                            .font(AppTheme.Fonts.display(size: 40))
                             .foregroundColor(.red.opacity(0.8))
                         Text("Failed to load chart")
                             .font(.headline)
@@ -184,7 +184,7 @@ struct PlanetaryPositionsSheet: View {
         return VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Planetary Positions")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(AppTheme.Fonts.title(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
             }
@@ -208,7 +208,7 @@ struct PlanetaryPositionsSheet: View {
         return HStack(spacing: 8) {
             // Date
             Text(formatBirthDate(details.dob))
-                .font(.system(size: 14, weight: .medium))
+                .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text("•")
@@ -216,7 +216,7 @@ struct PlanetaryPositionsSheet: View {
             
             // Time
             Text(formatBirthTime(details.time))
-                .font(.system(size: 14, weight: .medium))
+                .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
             // City (if available)
@@ -225,7 +225,7 @@ struct PlanetaryPositionsSheet: View {
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                 
                 Text(city)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .lineLimit(1)
             }
@@ -235,7 +235,7 @@ struct PlanetaryPositionsSheet: View {
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             
             Text("Asc: \(ascendant)")
-                .font(.system(size: 14, weight: .semibold)) // Slightly bolder
+                .font(AppTheme.Fonts.title(size: 14)) // Slightly bolder
                 .foregroundColor(AppTheme.Colors.gold) // Gold color to stand out
         }
         .padding(.vertical, 4)
@@ -372,7 +372,7 @@ struct PremiumPlanetRow: View {
                     .frame(width: 48, height: 48)
                 
                 Text(planetSymbol(for: name))
-                    .font(.system(size: 22))
+                    .font(AppTheme.Fonts.title(size: 22))
                     .foregroundColor(AppTheme.Colors.gold)
             }
             
@@ -380,7 +380,7 @@ struct PremiumPlanetRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(name.localized)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     // Badges
@@ -397,15 +397,15 @@ struct PremiumPlanetRow: View {
                 
                 HStack(spacing: 6) {
                     Text(data.sign)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(AppTheme.Colors.gold)
                     
                     Text("•")
-                        .font(.system(size: 10))
+                        .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                     
                     Text(formatDegree(data.degree))
-                        .font(.system(size: 13, design: .monospaced))
+                        .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
@@ -415,7 +415,7 @@ struct PremiumPlanetRow: View {
             // Detailed Right Column (House & Nakshatra)
             VStack(alignment: .trailing, spacing: 4) {
                 Text("House \(data.house)")
-                    .font(.system(size: 12, weight: .bold))
+                    .font(AppTheme.Fonts.title(size: 12))
                     .foregroundColor(AppTheme.Colors.gold)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
@@ -428,10 +428,10 @@ struct PremiumPlanetRow: View {
                 if let nak = nakshatra {
                     VStack(alignment: .trailing, spacing: 1) {
                         Text(nak.nakshatra)
-                            .font(.system(size: 11, weight: .medium))
+                            .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                         Text("Pada \(nak.pada)")
-                            .font(.system(size: 10))
+                            .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }
@@ -486,7 +486,7 @@ struct Badge: View {
     
     var body: some View {
         Text(text)
-            .font(.system(size: 10, weight: .bold))
+            .font(AppTheme.Fonts.title(size: 10))
             .foregroundColor(color.opacity(0.9))
             .padding(.horizontal, 6)
             .padding(.vertical, 2)

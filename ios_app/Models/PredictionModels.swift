@@ -10,6 +10,11 @@ struct PredictionRequest: Codable, Sendable {
     var platform: String = "ios"
     var includeReasoningTrace: Bool = false
     
+    /// Quota context for server-side recording
+    /// - "chat": Default for main chat screen questions
+    /// - "compatibility": For redirects from compatibility follow-up (so quota is recorded against compatibility)
+    var quotaContext: String?
+    
     enum CodingKeys: String, CodingKey {
         case query
         case birthData = "birth_data"
@@ -18,6 +23,7 @@ struct PredictionRequest: Codable, Sendable {
         case userEmail = "user_email"
         case platform
         case includeReasoningTrace = "include_reasoning_trace"
+        case quotaContext = "quota_context"
     }
 }
 
@@ -39,6 +45,19 @@ struct PredictionResponse: Codable, Identifiable, Sendable {
     let executionTimeMs: Double
     let createdAt: String
     
+    // New optional fields from backend
+    let reasoningTrace: ReasoningTrace?
+    let reasoningSummary: String?
+    let advice: String?
+    let sources: [String]?
+    let query: String?
+    let subArea: String?
+    let ascendant: String?
+    let plannerUsed: String?
+    let llmCalls: Int?
+    let trainingSampleId: String?
+    let completedAt: String?
+    
     var id: String { predictionId }
     
     enum CodingKeys: String, CodingKey {
@@ -55,7 +74,38 @@ struct PredictionResponse: Codable, Identifiable, Sendable {
         case lifeArea = "life_area"
         case executionTimeMs = "execution_time_ms"
         case createdAt = "created_at"
+        case reasoningTrace = "reasoning_trace"
+        case reasoningSummary = "reasoning_summary"
+        case advice, sources, query
+        case subArea = "sub_area"
+        case ascendant
+        case plannerUsed = "planner_used"
+        case llmCalls = "llm_calls"
+        case trainingSampleId = "training_sample_id"
+        case completedAt = "completed_at"
     }
+}
+
+// MARK: - Reasoning Trace (for debug/premium features)
+struct ReasoningTrace: Codable, Sendable {
+    let traceId: String?
+    let status: String?
+    let architecture: String?
+    let stepSummary: String?
+    let steps: [ReasoningStep]?
+    
+    enum CodingKeys: String, CodingKey {
+        case traceId = "trace_id"
+        case status, architecture
+        case stepSummary = "step_summary"
+        case steps
+    }
+}
+
+struct ReasoningStep: Codable, Sendable {
+    let type: String?
+    let content: String?
+    let timestamp: String?
 }
 
 // MARK: - Timing Prediction
@@ -67,10 +117,25 @@ struct TimingPrediction: Codable, Sendable {
 }
 
 // MARK: - Network Error
-enum NetworkError: Error {
+enum NetworkError: Error, LocalizedError {
     case invalidURL
     case noData
     case decodingError(Error)
     case serverError(String)
     case unauthorized
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "Invalid URL."
+        case .noData:
+            return "No data received from server."
+        case .decodingError(let error):
+            return "Failed to process response: \(error.localizedDescription)"
+        case .serverError(let message):
+            return message
+        case .unauthorized:
+            return "Session expired. Please sign in again."
+        }
+    }
 }

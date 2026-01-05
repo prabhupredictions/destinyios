@@ -68,12 +68,12 @@ struct ProfileSetupLoadingView: View {
                     // Center icon
                     if showCheckmark {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 50))
+                            .font(AppTheme.Fonts.display(size: 50))
                             .foregroundColor(AppTheme.Colors.gold)
                             .transition(.scale.combined(with: .opacity))
                     } else {
                         Image(systemName: currentPhase.icon)
-                            .font(.system(size: 40))
+                            .font(AppTheme.Fonts.display(size: 40))
                             .foregroundColor(AppTheme.Colors.gold)
                             .symbolEffect(.pulse, options: .repeating)
                     }

@@ -237,7 +237,7 @@ struct ChartComparisonSheet: View {
             if chartType == .d1 {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Planet Details")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 12))
                         .foregroundColor(Color("GoldAccent").opacity(0.9))
                         .padding(.horizontal, 4)
                     

@@ -7,11 +7,11 @@ struct TransitsView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(Color("GoldAccent"))
                 
                 Text("Transits (\(transitResponse?.year ?? 2024))")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(AppTheme.Colors.textPrimary)
             }
             
@@ -45,7 +45,7 @@ struct TransitPlanetSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(planet)
-                .font(.system(size: 14, weight: .bold))
+                .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(Color("NavyPrimary"))
             
             ForEach(events, id: \.date) { event in
@@ -55,11 +55,11 @@ struct TransitPlanetSection: View {
                         .foregroundColor(.secondary)
                     
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 10))
+                        .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(.gray)
                     
                     Text("\(event.sign) (H\(event.houseFromLagna))")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(Color("NavyPrimary"))
                 }
                 .padding(.leading, 8)

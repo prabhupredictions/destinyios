@@ -143,6 +143,56 @@ class CompatibilityViewModel {
             return
         }
         
+        // Check quota before proceeding
+        let currentEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        
+        await MainActor.run {
+            isAnalyzing = true
+            showStreamingView = true
+            currentStep = .calculatingCharts
+            streamingText = ""
+            errorMessage = nil
+        }
+        
+        // Verify quota with backend
+        do {
+            let accessResponse = try await QuotaManager.shared.canAccessFeature(.compatibility, email: currentEmail)
+            if !accessResponse.canAccess {
+                await MainActor.run {
+                    isAnalyzing = false
+                    showStreamingView = false
+                    // Professional Quota UI - Daily=banner, Overall/Feature=sheet (handled by View)
+                    if accessResponse.reason == "daily_limit_reached" {
+                        // DAILY LIMIT: Show error message (banner), no sheet
+                        if let resetAtStr = accessResponse.resetAt,
+                           let date = ISO8601DateFormatter().date(from: resetAtStr) {
+                            let timeFormatter = DateFormatter()
+                            timeFormatter.timeStyle = .short
+                            let timeStr = timeFormatter.string(from: date)
+                            errorMessage = "Daily limit reached. Resets at \(timeStr)."
+                        } else {
+                            errorMessage = "Daily limit reached. Resets tomorrow."
+                        }
+                    } else if accessResponse.reason == "overall_limit_reached" {
+                        // OVERALL LIMIT: Set flag for View to show sheet
+                        if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
+                            errorMessage = "FREE_LIMIT_GUEST"  // Special marker for View to show sheet
+                        } else {
+                            errorMessage = "FREE_LIMIT_REGISTERED"  // Special marker for View to show sheet
+                        }
+                    } else {
+                        // FEATURE NOT AVAILABLE: Set flag for View to show sheet
+                        errorMessage = "FEATURE_UPGRADE_REQUIRED"  // Special marker for View to show sheet
+                    }
+                }
+                return
+            }
+        } catch {
+            print("Quota check failed: \(error)")
+        }
+        
+        // Quota is now recorded server-side by /compatibility/analyze endpoint
+
         await MainActor.run {
             isAnalyzing = true
             showStreamingView = true

@@ -55,7 +55,7 @@ struct HistoryView: View {
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 48))
+                .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.3))
             
             Text("No History Yet")
@@ -135,7 +135,7 @@ struct HistoryRowView: View {
                         .frame(width: 48, height: 48)
                     
                     Image(systemName: iconName)
-                        .font(.system(size: 20))
+                        .font(AppTheme.Fonts.title(size: 20))
                         .foregroundColor(iconColor)
                 }
                 
@@ -217,7 +217,7 @@ struct HistoryRowView: View {
         case .chat(let thread):
             if thread.isPinned {
                 Image(systemName: "pin.fill")
-                    .font(.system(size: 10))
+                    .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.gold)
             }
         case .match(let match):
@@ -225,7 +225,7 @@ struct HistoryRowView: View {
             let score = match.scorePercentage
             if score > 0 {
                 Text("\(Int(score * 100))%")
-                    .font(.system(size: 12, weight: .bold))
+                    .font(AppTheme.Fonts.title(size: 12))
                     .foregroundColor(matchScoreColor(score))
             }
         }

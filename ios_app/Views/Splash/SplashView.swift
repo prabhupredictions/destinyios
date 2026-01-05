@@ -1,198 +1,256 @@
 import SwiftUI
+import CoreHaptics
 
-/// Premium splash screen with animated logo and cosmic theme
+/// Tier 4 Visionary Splash Screen (SwiftUI Canvas Version)
+/// Features: Animated fluid background, cinematic blur-in reveal, pulsing glow, shimmer, parallax stars, haptics
 struct SplashView: View {
     // MARK: - Animation States
     @State private var logoScale: CGFloat = 0.6
     @State private var logoOpacity: Double = 0
     @State private var titleOpacity: Double = 0
+    @State private var titleBlur: CGFloat = 10
     @State private var subtitleOpacity: Double = 0
     @State private var orbitRotation: Double = 0
     @State private var starsOpacity: Double = 0
+    @State private var hapticEngine: CHHapticEngine?
     
     var body: some View {
-        ZStack {
-            // Background gradient
-            AppTheme.Colors.mainBackground.ignoresSafeArea()
-            
-            // Animated stars background
-            StarsBackgroundView()
-                .opacity(starsOpacity)
-            
-            // Orbital rings (decorative)
-            OrbitalRingsView(rotation: orbitRotation)
-                .opacity(0.3)
-            
-            // Main content
-            VStack(spacing: 0) {
-                Spacer()
+        GeometryReader { geometry in
+            ZStack {
+                // Layer 1: Liquid Gold Fluid Background (Canvas-based)
+                LiquidGoldBackground()
                 
-                // Logo with premium glow effect
-                ZStack {
-                    // Outer glow
-                    Circle()
-                        .fill(AppTheme.Colors.gold.opacity(0.2))
-                        .frame(width: 200, height: 200)
-                        .blur(radius: 50)
+                // Layer 2: Animated Stars (3-layer parallax)
+                ParallaxStarField()
+                    .opacity(starsOpacity)
+                
+                // Layer 3: Orbital rings (decorative)
+                OrbitalRingsView(rotation: orbitRotation)
+                    .opacity(0.3)
+                
+                // Layer 4: Main content
+                VStack(spacing: 0) {
+                    Spacer()
                     
-                    // Inner glow
-                    Circle()
-                        .fill(AppTheme.Colors.gold.opacity(0.4))
-                        .frame(width: 160, height: 160)
-                        .blur(radius: 30)
-                    
-                    // Logo container
+                    // Logo with premium pulsing glow and shimmer
                     ZStack {
-                        // Golden circle background with gradient
-                        Circle()
-                            .fill(AppTheme.Colors.gold)
-                            .frame(width: 140, height: 140)
-                            .shadow(color: AppTheme.Colors.gold.opacity(0.6), radius: 25, y: 5)
+                        // Outer pulsing glow
+                        PulsingGlowView(
+                            color: AppTheme.Colors.gold.opacity(0.2),
+                            size: AppTheme.Splash.glowOuterSize,
+                            blurRadius: AppTheme.Splash.glowBlurOuter
+                        )
                         
-                        // Logo image - properly fitted (78% of circle)
-                        Image("logo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 110, height: 110)
-                    }
-                }
-                .scaleEffect(logoScale)
-                .opacity(logoOpacity)
-                
-                Spacer()
-                    .frame(height: 40)
-                
-                // App name - Premium typography
-                VStack(spacing: 16) {
-                    // Main title
-                    Text("destiny_app_title".localized)
-                        .font(AppTheme.Fonts.display(size: 42))
-                        .foregroundColor(.white)
-                        .tracking(12)
-                        .shadow(color: .black.opacity(0.3), radius: 2, y: 2)
-                    
-                    // Subtitle
-                    Text("ai_astrology_subtitle".localized)
-                        .font(AppTheme.Fonts.title(size: 16))
-                        .foregroundColor(AppTheme.Colors.gold)
-                        .tracking(8)
-                    
-                    // Tagline
-                    Text("worlds_advanced_ai".localized)
-                        .font(AppTheme.Fonts.body(size: 11))
-                        .foregroundColor(.white.opacity(0.7))
-                        .tracking(2)
-                        .padding(.top, 8)
-                }
-                .opacity(titleOpacity)
-                
-                Spacer()
-                
-                // Loading indicator - minimal and elegant
-                VStack(spacing: 20) {
-                    // Custom loader dots
-                    HStack(spacing: 8) {
-                        ForEach(0..<3, id: \.self) { index in
+                        // Inner pulsing glow
+                        PulsingGlowView(
+                            color: AppTheme.Colors.gold.opacity(0.4),
+                            size: AppTheme.Splash.glowInnerSize,
+                            blurRadius: AppTheme.Splash.glowBlurInner
+                        )
+                        
+                        // Logo container with shimmer
+                        ZStack {
+                            // Golden circle background
                             Circle()
                                 .fill(AppTheme.Colors.gold)
-                                .frame(width: 6, height: 6)
-                                .opacity(subtitleOpacity)
-                                .scaleEffect(subtitleOpacity > 0.5 ? 1.0 : 0.5)
-                                .animation(
-                                    .easeInOut(duration: 0.6)
-                                    .repeatForever(autoreverses: true)
-                                    .delay(Double(index) * 0.2),
-                                    value: subtitleOpacity
-                                )
+                                .frame(width: AppTheme.Splash.logoContainerSize, height: AppTheme.Splash.logoContainerSize)
+                                .shadow(color: AppTheme.Colors.gold.opacity(0.6), radius: 25, y: 5)
+                            
+                            // Logo image
+                            Image("logo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: AppTheme.Splash.logoImageSize, height: AppTheme.Splash.logoImageSize)
                         }
+                        .overlay(
+                            // Shimmer sweep effect
+                            ShimmerOverlayView()
+                                .mask(Circle().frame(width: AppTheme.Splash.logoContainerSize))
+                        )
+                    }
+                    .scaleEffect(logoScale)
+                    .opacity(logoOpacity)
+                    
+                    Spacer()
+                        .frame(height: AppTheme.Splash.logoToTitleSpacing)
+                    
+                    // App name - Cinematic blur-in typography
+                    VStack(spacing: 16) {
+                        // Main title with blur-in effect
+                        Text("destiny_app_title".localized)
+                            .font(AppTheme.Fonts.display(size: 42))
+                            .foregroundColor(.white)
+                            .tracking(AppTheme.Splash.titleTracking)
+                            .shadow(color: .black.opacity(0.3), radius: 2, y: 2)
+                            .blur(radius: titleBlur)
+                            .opacity(titleOpacity)
+                        
+                        // Subtitle
+                        Text("ai_astrology_subtitle".localized)
+                            .font(AppTheme.Fonts.title(size: 16))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .tracking(AppTheme.Splash.subtitleTracking)
+                            .opacity(subtitleOpacity)
+                        
+                        // Tagline
+                        Text("worlds_advanced_ai".localized)
+                            .font(AppTheme.Fonts.body(size: 11))
+                            .foregroundColor(.white.opacity(0.7))
+                            .tracking(AppTheme.Splash.taglineTracking)
+                            .padding(.top, 8)
+                            .opacity(subtitleOpacity)
                     }
                     
-                    Text("aligning_stars".localized)
-                        .font(AppTheme.Fonts.body(size: 13))
-                        .foregroundColor(.white.opacity(0.5))
-                        .italic()
+                    Spacer()
+                    
+                    // Loading indicator with animated dots
+                    VStack(spacing: 20) {
+                        HStack(spacing: AppTheme.Splash.loaderDotSpacing) {
+                            ForEach(0..<3, id: \.self) { index in
+                                Circle()
+                                    .fill(AppTheme.Colors.gold)
+                                    .frame(width: AppTheme.Splash.loaderDotSize, height: AppTheme.Splash.loaderDotSize)
+                                    .scaleEffect(subtitleOpacity > 0.5 ? 1.0 : 0.5)
+                                    .animation(
+                                        .easeInOut(duration: 0.6)
+                                        .repeatForever(autoreverses: true)
+                                        .delay(Double(index) * 0.2),
+                                        value: subtitleOpacity
+                                    )
+                            }
+                        }
+                        
+                        Text("aligning_stars".localized)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(.white.opacity(0.5))
+                            .italic()
+                    }
+                    .opacity(subtitleOpacity)
+                    .padding(.bottom, AppTheme.Splash.loaderBottomPadding)
                 }
-                .opacity(subtitleOpacity)
-                .padding(.bottom, 70)
             }
         }
+        .ignoresSafeArea()
         .onAppear {
+            prepareHaptics()
             startAnimations()
         }
     }
     
     // MARK: - Animations
     private func startAnimations() {
-        // Logo animation
-        withAnimation(.spring(response: 0.8, dampingFraction: 0.6)) {
+        // Logo spring animation
+        withAnimation(.spring(response: AppTheme.Splash.logoAnimationDuration, dampingFraction: 0.6)) {
             logoScale = 1.0
             logoOpacity = 1.0
         }
         
-        // Title fade in
-        withAnimation(.easeOut(duration: 0.6).delay(0.3)) {
+        // Play haptic on logo appearance
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            playHaptic()
+        }
+        
+        // Title blur-in (cinematic reveal)
+        withAnimation(.easeOut(duration: 1.5).delay(AppTheme.Splash.titleFadeDelay)) {
             titleOpacity = 1.0
+            titleBlur = 0
         }
         
         // Subtitle fade in
-        withAnimation(.easeOut(duration: 0.5).delay(0.6)) {
+        withAnimation(.easeOut(duration: 0.5).delay(AppTheme.Splash.subtitleFadeDelay)) {
             subtitleOpacity = 1.0
         }
         
         // Stars fade in
-        withAnimation(.easeIn(duration: 1.0).delay(0.2)) {
+        withAnimation(.easeIn(duration: 1.0).delay(AppTheme.Splash.starsFadeDelay)) {
             starsOpacity = 1.0
         }
         
         // Continuous orbit rotation
-        withAnimation(.linear(duration: 30).repeatForever(autoreverses: false)) {
+        withAnimation(.linear(duration: AppTheme.Splash.orbitRotationDuration).repeatForever(autoreverses: false)) {
             orbitRotation = 360
+        }
+    }
+    
+    // MARK: - Haptics
+    private func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        do {
+            hapticEngine = try CHHapticEngine()
+            try hapticEngine?.start()
+        } catch {
+            print("Haptic engine error: \(error)")
+        }
+    }
+    
+    private func playHaptic() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7)
+        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
+        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
+        
+        do {
+            let pattern = try CHHapticPattern(events: [event], parameters: [])
+            let player = try hapticEngine?.makePlayer(with: pattern)
+            try player?.start(atTime: 0)
+        } catch {
+            print("Haptic playback error: \(error)")
         }
     }
 }
 
-// MARK: - Supporting Views
+// MARK: - Parallax Star Field (3-layer depth)
+struct ParallaxStarField: View {
+    var body: some View {
+        ZStack {
+            StarLayer(starCount: 25, minSize: 1, maxSize: 1.5, opacityRange: 0.2...0.4)  // Far
+            StarLayer(starCount: 20, minSize: 1.5, maxSize: 2.5, opacityRange: 0.4...0.6) // Mid
+            StarLayer(starCount: 15, minSize: 2, maxSize: 3, opacityRange: 0.6...0.9)     // Near
+        }
+    }
+}
 
-/// Animated stars background
-struct StarsBackgroundView: View {
+struct StarLayer: View {
+    let starCount: Int
+    let minSize: CGFloat
+    let maxSize: CGFloat
+    let opacityRange: ClosedRange<Double>
+    
     var body: some View {
         GeometryReader { geo in
-            ForEach(0..<30, id: \.self) { i in
+            ForEach(0..<starCount, id: \.self) { _ in
                 Circle()
                     .fill(Color.white)
-                    .frame(width: CGFloat.random(in: 1...3))
+                    .frame(width: CGFloat.random(in: minSize...maxSize))
                     .position(
                         x: CGFloat.random(in: 0...geo.size.width),
                         y: CGFloat.random(in: 0...geo.size.height)
                     )
-                    .opacity(Double.random(in: 0.3...0.8))
+                    .opacity(Double.random(in: opacityRange))
             }
         }
     }
 }
 
-/// Decorative orbital rings
+// MARK: - Orbital Rings (Using AppTheme Constants)
 struct OrbitalRingsView: View {
     let rotation: Double
     
     var body: some View {
         ZStack {
-            // Inner ring
             Circle()
                 .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
-                .frame(width: 200, height: 200)
+                .frame(width: AppTheme.Splash.ringInnerSize, height: AppTheme.Splash.ringInnerSize)
                 .rotationEffect(.degrees(rotation))
             
-            // Outer ring
             Circle()
                 .stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
-                .frame(width: 300, height: 300)
+                .frame(width: AppTheme.Splash.ringMiddleSize, height: AppTheme.Splash.ringMiddleSize)
                 .rotationEffect(.degrees(-rotation * 0.5))
             
-            // Outermost ring
             Circle()
                 .stroke(Color.white.opacity(0.05), lineWidth: 1)
-                .frame(width: 400, height: 400)
+                .frame(width: AppTheme.Splash.ringOuterSize, height: AppTheme.Splash.ringOuterSize)
                 .rotationEffect(.degrees(rotation * 0.3))
         }
     }

@@ -118,7 +118,7 @@ struct BirthDataView: View {
                     )
                 
                 Image(systemName: "person.crop.circle.badge.plus")
-                    .font(.system(size: 36))
+                    .font(AppTheme.Fonts.display(size: 36))
                     .foregroundColor(AppTheme.Colors.gold)
             }
             .shadow(color: AppTheme.Colors.gold.opacity(0.2), radius: 15, x: 0, y: 0)
@@ -179,7 +179,7 @@ struct BirthDataView: View {
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: viewModel.timeUnknown ? "checkmark.square.fill" : "square")
-                                    .font(.system(size: 18))
+                                    .font(AppTheme.Fonts.title(size: 18))
                                     .foregroundColor(viewModel.timeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                 
                                 Text("i_dont_know_birth_time".localized)
@@ -256,15 +256,17 @@ struct BirthDataView: View {
         let isGuest = UserDefaults.standard.bool(forKey: "isGuest")
         
         do {
-            // Register user with subscription service (creates if doesn't exist)
-            try await QuotaManager.shared.registerWithServer(
+            // Register user with subscription service
+            // Backend assigns plan based on isGeneratedEmail flag:
+            // - isGeneratedEmail=true -> free_guest plan
+            // - isGeneratedEmail=false -> free_registered plan
+            try await QuotaManager.shared.registerUser(
                 email: userEmail,
-                userType: isGuest ? .guest : .registered,
                 isGeneratedEmail: isGuest
             )
-            print("Registered user with backend: \(userEmail), isGuest: \(isGuest)")
+            print("✅ Registered user with backend: \(userEmail), isGuest: \(isGuest)")
         } catch {
-            print("Failed to register with backend: \(error)")
+            print("❌ Failed to register with backend: \(error)")
             // Continue anyway - local data is saved
         }
     }
@@ -284,7 +286,7 @@ struct PremiumSelectionRow: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
                     Image(systemName: icon)
-                        .font(.system(size: 14))
+                        .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.gold)
                     Text(title)
                         .font(AppTheme.Fonts.caption(size: 13))
@@ -297,7 +299,7 @@ struct PremiumSelectionRow: View {
                         .foregroundColor(isDisabled ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12))
+                        .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                 }
                 .padding()
@@ -324,7 +326,7 @@ struct PremiumMenuRow: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.gold)
                 Text(title)
                     .font(AppTheme.Fonts.caption(size: 13))
@@ -344,7 +346,7 @@ struct PremiumMenuRow: View {
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12))
+                        .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                 }
                 .padding()

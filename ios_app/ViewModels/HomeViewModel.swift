@@ -15,7 +15,7 @@ class HomeViewModel {
     var errorMessage: String?
     var isGuest = false
     var isPremium = false
-    var userType: UserType = .guest
+    var planDisplayName: String = "Free"
     
     // MARK: - New Premium State
     var currentDasha: String = "Loading..."
@@ -45,18 +45,16 @@ class HomeViewModel {
         // Load from UserDefaults
         userName = UserDefaults.standard.string(forKey: "userName") ?? "there"
         isGuest = UserDefaults.standard.bool(forKey: "isGuest")
+        isPremium = UserDefaults.standard.bool(forKey: "isPremium")
         
-        // Set user type based on flags
+        // Set default quota based on local flags (will be updated from server)
         if isPremium {
-            userType = .premium
             quotaTotal = Int.max
             quotaRemaining = Int.max
         } else if isGuest {
-            userType = .guest
-            quotaTotal = 3  // Guest quota
+            quotaTotal = 3  // Guest default
         } else {
-            userType = .registered
-            quotaTotal = 10  // Registered user quota
+            quotaTotal = 10  // Registered default
         }
         
         // Load cached quota (will be updated from backend in loadHomeData)
@@ -160,22 +158,16 @@ class HomeViewModel {
         
         do {
             // Sync with server - this updates QuotaManager's internal state
-            _ = try await quotaManager.syncStatusFromServer(email: userEmail)
+            try await quotaManager.syncStatus(email: userEmail)
             
             // Get the updated status from QuotaManager
-            let status = quotaManager.currentStatus
             await MainActor.run {
-                // Update from status
-                let questionsUsed = status.questionsUsed
-                let questionsLimit = status.questionsLimit
+                isPremium = quotaManager.isPremium
+                planDisplayName = quotaManager.planDisplayName
                 
-                quotaTotal = questionsLimit
-                quotaRemaining = status.remainingQuestions
-                isPremium = status.userType == .premium
-                userType = status.userType
-                
-                // Cache for offline
-                UserDefaults.standard.set(questionsUsed, forKey: "quotaUsed")
+                // For now, quota info comes from server via canAccessFeature
+                // Local tracking is a fallback
+                UserDefaults.standard.set(quotaManager.totalQuestionsAsked, forKey: "quotaUsed")
             }
         } catch {
             print("Failed to sync quota from backend: \(error)")
@@ -185,7 +177,7 @@ class HomeViewModel {
     
     // MARK: - Actions
     func decrementQuota() {
-        if quotaRemaining > 0 && userType != .premium {
+        if quotaRemaining > 0 && !isPremium {
             quotaRemaining -= 1
             let used = quotaTotal - quotaRemaining
             UserDefaults.standard.set(used, forKey: "quotaUsed")
@@ -198,7 +190,7 @@ class HomeViewModel {
     
     // MARK: - Computed Properties
     var quotaProgress: Double {
-        guard quotaTotal > 0, userType != .premium else { return 1.0 }
+        guard quotaTotal > 0, !isPremium else { return 1.0 }
         return Double(quotaTotal - quotaRemaining) / Double(quotaTotal)
     }
     

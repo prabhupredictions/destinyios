@@ -175,7 +175,7 @@ struct CompatibilityResultView: View {
                 
                 // Pulsing heart
                 Image(systemName: "heart.fill")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(AppTheme.Fonts.title(size: 16))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color(red: 0.95, green: 0.45, blue: 0.55), Color(red: 0.85, green: 0.3, blue: 0.45)],
@@ -548,7 +548,7 @@ struct CompactKutaBox: View {
                 .foregroundColor(textColor)
             
             Text(kuta.name.prefix(4).uppercased())
-                .font(.system(size: 8, weight: .semibold))
+                .font(AppTheme.Fonts.caption(size: 8))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .tracking(0.5)
         }
@@ -592,7 +592,7 @@ struct FullReportSheet: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
+                            .font(AppTheme.Fonts.title(size: 24))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }
@@ -719,6 +719,7 @@ struct AskDestinySheet: View {
     @AppStorage("isGuest") private var isGuest = false
     @AppStorage("isAuthenticated") private var isAuthenticated = false
     @AppStorage("hasBirthData") private var hasBirthData = false
+    @State private var quotaErrorMessage: String?
     
     // Premium Dark Theme Colors
     private let darkBg = AppTheme.Colors.mainBackground
@@ -786,6 +787,7 @@ struct AskDestinySheet: View {
         .sheet(isPresented: $showQuotaExhausted) {
             QuotaExhaustedView(
                 isGuest: isGuest,
+                customMessage: quotaErrorMessage,
                 onSignIn: { signOutAndReauth() },
                 onUpgrade: {
                     if isGuest {
@@ -859,7 +861,7 @@ struct AskDestinySheet: View {
         HStack {
             Button(action: { dismiss() }) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 18))
                     .foregroundColor(AppTheme.Colors.mainBackground)
                     .frame(width: 40, height: 40)
                     .background(Circle().fill(AppTheme.Colors.gold))
@@ -936,17 +938,17 @@ struct AskDestinySheet: View {
                         .frame(width: 44, height: 44)
                     
                     Text("✦")
-                        .font(.system(size: 20))
+                        .font(AppTheme.Fonts.title(size: 20))
                         .foregroundColor(.white)
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Destiny AI")
-                        .font(.system(size: 14, weight: .bold))
+                        .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(.white)
                     
                     Text("Your Vedic Astrology Guide")
-                        .font(.system(size: 11))
+                        .font(AppTheme.Fonts.caption(size: 11))
                         .foregroundColor(.white.opacity(0.6))
                 }
                 
@@ -955,16 +957,16 @@ struct AskDestinySheet: View {
                 // Match Score
                 VStack(spacing: 2) {
                     Text("\(result.totalScore)/\(result.maxScore)")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(accentGold)
                     Text("Score")
-                        .font(.system(size: 9, weight: .medium))
+                        .font(AppTheme.Fonts.caption(size: 9))
                         .foregroundColor(.white.opacity(0.5))
                 }
             }
             
             Text("I have analyzed the compatibility between **\(boyName)** and **\(girlName)**. Ask me anything about this match - predictions, doshas, timing, or remedies!")
-                .font(.system(size: 13))
+                .font(AppTheme.Fonts.body(size: 13))
                 .foregroundColor(.white.opacity(0.85))
                 .lineSpacing(4)
         }
@@ -995,6 +997,12 @@ struct AskDestinySheet: View {
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .focused($isInputFocused)
                     .disabled(isLoading)
+                    .submitLabel(.send)
+                    .onSubmit {
+                        if !message.isEmpty && !isLoading {
+                            sendMessage()
+                        }
+                    }
                 
                 if !message.isEmpty {
                     Button(action: { message = "" }) {
@@ -1034,7 +1042,7 @@ struct AskDestinySheet: View {
                             .scaleEffect(0.8)
                     } else {
                         Image(systemName: "arrow.up")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(message.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.mainBackground)
                     }
                 }
@@ -1057,30 +1065,78 @@ struct AskDestinySheet: View {
     private func sendMessage() {
         guard !message.isEmpty else { return }
         
-        // Check quota before sending
-        if !QuotaManager.shared.canAsk {
-            showQuotaExhausted = true
-            return
-        }
-        
-        // Validate session ID
-        guard let sessionId = result.sessionId, !sessionId.isEmpty else {
-            messages.append(CompatChatMessage(
-                content: "Session not available. Please run a new compatibility analysis first.",
-                isUser: false,
-                type: .error
-            ))
-            return
-        }
-        
-        // Add user message
+        // Capture message before async
         let userQuestion = message
-        messages.append(CompatChatMessage(content: userQuestion, isUser: true, type: .user))
         message = ""
-        isLoading = true
         
-        // Call API
         Task {
+            // Check quota for COMPATIBILITY feature (follow-ups share quota)
+            let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+            do {
+                let accessResponse = try await QuotaManager.shared.canAccessFeature(.compatibility, email: email)
+                if !accessResponse.canAccess {
+                    await MainActor.run {
+                        message = userQuestion  // Restore message
+                        
+                        // Professional Quota UI - Daily=message, Overall/Feature=sheet
+                        if accessResponse.reason == "daily_limit_reached" {
+                            // DAILY LIMIT: Show info message in chat, no sheet
+                            let timeMsg: String
+                            if let resetAtStr = accessResponse.resetAt,
+                               let date = ISO8601DateFormatter().date(from: resetAtStr) {
+                                let timeFormatter = DateFormatter()
+                                timeFormatter.timeStyle = .short
+                                let timeStr = timeFormatter.string(from: date)
+                                timeMsg = "Daily limit reached. Resets at \(timeStr)."
+                            } else {
+                                timeMsg = "Daily limit reached. Resets tomorrow."
+                            }
+                            messages.append(CompatChatMessage(content: timeMsg, isUser: false, type: .info))
+                            // No sheet for daily limit
+                        } else if accessResponse.reason == "overall_limit_reached" {
+                            // OVERALL LIMIT: Show upgrade sheet
+                            if email.contains("guest") || email.contains("@gen.com") {
+                                quotaErrorMessage = "Free questions used. Sign In or Subscribe to continue."
+                            } else {
+                                quotaErrorMessage = "You've reached your free limit. Subscribe for unlimited access."
+                            }
+                            showQuotaExhausted = true
+                        } else {
+                            // FEATURE NOT AVAILABLE: Show upgrade sheet
+                            quotaErrorMessage = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
+                            showQuotaExhausted = true
+                        }
+                    }
+                    return
+                }
+            } catch {
+                print("❌ Quota check failed: \(error)")
+                await MainActor.run {
+                    message = userQuestion
+                    showQuotaExhausted = true
+                }
+                return
+            }
+            
+            // Validate session ID
+            guard let sessionId = result.sessionId, !sessionId.isEmpty else {
+                await MainActor.run {
+                    messages.append(CompatChatMessage(
+                        content: "Session not available. Please run a new compatibility analysis first.",
+                        isUser: false,
+                        type: .error
+                    ))
+                }
+                return
+            }
+            
+            // Add user message
+            await MainActor.run {
+                messages.append(CompatChatMessage(content: userQuestion, isUser: true, type: .user))
+                isLoading = true
+            }
+            
+            // Call API
             do {
                 // Get actual user email for backend storage
                 let currentUserEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "anonymous@user.com"
@@ -1096,6 +1152,35 @@ struct AskDestinySheet: View {
                 
                 // Handle response
                 if response.status == "redirect" {
+                    // CRITICAL: Check COMPATIBILITY quota before redirecting to individual analysis
+                    // Redirects use quota_context=compatibility on backend, so check COMPATIBILITY quota here too
+                    let quotaEmail = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+                    do {
+                        let quotaCheck = try await QuotaManager.shared.canAccessFeature(.compatibility, email: quotaEmail)
+                        if !quotaCheck.canAccess {
+                            // Compatibility quota exhausted - cannot redirect
+                            await MainActor.run {
+                                isLoading = false
+                                if quotaCheck.reason == "daily_limit_reached" {
+                                    // Daily limit: show info message
+                                    messages.append(CompatChatMessage(
+                                        content: "Daily limit reached for compatibility questions. Try again tomorrow.",
+                                        isUser: false,
+                                        type: .info
+                                    ))
+                                } else {
+                                    // Overall limit or feature not available: show upgrade sheet
+                                    quotaErrorMessage = quotaCheck.upgradeCta?.message ?? "Upgrade to continue asking compatibility questions."
+                                    showQuotaExhausted = true
+                                }
+                            }
+                            return
+                        }
+                    } catch {
+                        print("❌ Compatibility quota check failed: \(error)")
+                        // On error, attempt redirect anyway (server will catch it)
+                    }
+                    
                     await handleRedirect(query: userQuestion, target: response.target ?? "Person", birthData: response.birthData)
                 } else if response.status == "blocked" {
                     await MainActor.run {
@@ -1103,9 +1188,13 @@ struct AskDestinySheet: View {
                         messages.append(CompatChatMessage(content: response.message ?? "Query not allowed", isUser: false, type: .error))
                     }
                 } else if let answer = response.answer {
+                    // Quota is now recorded server-side by /compatibility/follow-up endpoint
+                    
                     await MainActor.run {
                         isLoading = false
-                        messages.append(CompatChatMessage(content: answer, isUser: false, type: .ai))
+                        var aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
+                        aiMessage.executionTimeMs = response.executionTimeMs ?? 0
+                        messages.append(aiMessage)
                     }
                 } else if let msg = response.message {
                     await MainActor.run {
@@ -1179,6 +1268,7 @@ struct AskDestinySheet: View {
             return
         }
         
+        
         do {
             let predictionBirthData = BirthData(
                 dob: bd.dob,
@@ -1190,7 +1280,17 @@ struct AskDestinySheet: View {
                 houseSystem: "equal"
             )
             
-            let predictionRequest = PredictionRequest(query: query, birthData: predictionBirthData)
+            // Fix: Pass userEmail to avoid backend geocoding issues (especially if city is a name)
+            let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+            
+            var predictionRequest = PredictionRequest(
+                query: query, 
+                birthData: predictionBirthData,
+                userEmail: userEmail
+            )
+            // Set quota context to 'compatibility' so server records against compatibility quota, not chat
+            predictionRequest.quotaContext = "compatibility"
+            
             let predictionResponse = try await predictionService.predict(request: predictionRequest)
             
             let answerContent = "**\(target)'s Analysis:**\n\n\(predictionResponse.answer)"
@@ -1199,7 +1299,6 @@ struct AskDestinySheet: View {
             // Note: User question already stored by /follow-up API before redirect
             if let sessionId = result.sessionId {
                 let threadId = sessionId.hasPrefix("compat_") ? sessionId : "compat_\(sessionId)"
-                let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? ""
                 
                 // Store only the assistant answer (user question already stored by /follow-up)
                 await storeMessageInCompatibilityThread(
@@ -1210,6 +1309,8 @@ struct AskDestinySheet: View {
                 )
                 print("[AskDestinySheet] Stored redirect answer in compatibility thread: \(threadId)")
             }
+            
+            // Quota is now recorded server-side by /predict endpoint using quotaContext='compatibility'
             
             await MainActor.run {
                 isLoading = false
@@ -1260,6 +1361,7 @@ struct CompatChatMessage: Identifiable {
     let isUser: Bool
     let type: MessageType
     let timestamp = Date()
+    var executionTimeMs: Double = 0  // For consistency with main chat
     
     enum MessageType: String, Codable {
         case user, ai, info, error
@@ -1271,6 +1373,7 @@ struct CompatMessageBubble: View {
     let message: CompatChatMessage
     let accentGold: Color
     let accentPurple: Color
+    var userQuery: String = ""  // For rating feedback
     
     var body: some View {
         HStack {
@@ -1290,9 +1393,35 @@ struct CompatMessageBubble: View {
                     )
                 }
                 
-                Text(message.timestamp, style: .time)
-                    .font(AppTheme.Fonts.caption())
-                    .foregroundColor(message.isUser ? AppTheme.Colors.mainBackground.opacity(0.7) : AppTheme.Colors.textTertiary)
+                // Metadata row with timestamp, execution time, and rating
+                HStack(spacing: 6) {
+                    Text(message.timestamp, style: .time)
+                        .font(AppTheme.Fonts.caption())
+                        .foregroundColor(message.isUser ? AppTheme.Colors.mainBackground.opacity(0.7) : AppTheme.Colors.textTertiary)
+                    
+                    // Execution time (if available) - consistent with main chat
+                    if !message.isUser && message.executionTimeMs > 0 {
+                        Text("•")
+                            .font(AppTheme.Fonts.caption())
+                            .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.6))
+                        
+                        Text(formatExecutionTime(message.executionTimeMs))
+                            .font(AppTheme.Fonts.caption())
+                            .foregroundColor(AppTheme.Colors.textTertiary)
+                    }
+                    
+                    // Star rating for AI messages (not info/error messages)
+                    if !message.isUser && message.type == .ai && message.content.count > 50 {
+                        Spacer()
+                        
+                        InlineMessageRating(
+                            messageId: message.id.uuidString,
+                            query: userQuery.isEmpty ? "Compatibility question" : userQuery,
+                            responseText: String(message.content.prefix(500)),
+                            predictionId: nil  // No prediction ID for follow-ups
+                        )
+                    }
+                }
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
@@ -1317,6 +1446,19 @@ struct CompatMessageBubble: View {
             AppTheme.Colors.gold
         } else {
             AppTheme.Colors.cardBackground
+        }
+    }
+    
+    private func formatExecutionTime(_ ms: Double) -> String {
+        let seconds = ms / 1000
+        if seconds < 1 {
+            return String(format: "%.0fms", ms)
+        } else if seconds < 60 {
+            return String(format: "%.1fs", seconds)
+        } else {
+            let mins = Int(seconds) / 60
+            let secs = Int(seconds) % 60
+            return "\(mins)m \(secs)s"
         }
     }
 }
@@ -1368,7 +1510,7 @@ struct PremiumActionChip: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Text(icon)
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                 Text(label)
                     .font(AppTheme.Fonts.caption().weight(.medium))
                     .foregroundColor(AppTheme.Colors.textPrimary)
@@ -1394,7 +1536,7 @@ struct QuickChip: View {
     
     var body: some View {
         HStack(spacing: 3) {
-            Text(emoji).font(.system(size: 10))
+            Text(emoji).font(AppTheme.Fonts.caption(size: 10))
             Text(text)
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary)

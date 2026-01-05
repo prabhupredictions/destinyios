@@ -21,16 +21,28 @@ struct AppTheme {
         static let gold = Color(hex: "D4AF37") // Classic Gold
         static let goldLight = Color(hex: "F2D06B") // Highlight Gold
         static let goldDim = Color(hex: "8A7638") // Muted Gold for borders/dividers
+        static let goldChampagne = Color(hex: "FFF8E1") // Light Champagne Gold
+        static let goldDeep = Color(hex: "8B7226") // Deep gold for shadows
+        
+        // Additional Accents
+        static let purpleAccent = Color(hex: "4A148C") // Deep purple for decorative elements
+        static let darkNavyContrast = Color(hex: "1A1E3C") // Dark navy for contrast text
         
         // Status Colors
         static let success = Color(hex: "4CAF50")
         static let warning = Color(hex: "FFC107")
         static let error = Color(hex: "FF5252")
+        static let info = Color(hex: "2196F3")
         
         // Text Colors
         static let textPrimary = Color(hex: "FFFFFF")
         static let textSecondary = Color(hex: "A0AEC0")
         static let textTertiary = Color(hex: "718096")
+        static let textOnGold = Color(hex: "0B0F19") // Dark text for gold backgrounds
+        
+        // Tab Bar
+        static let tabBarBackground = Color(hex: "0A0E1A") // Tab bar navy
+        static let tabInactive = Color.white.opacity(0.5)
         
         // Gradients
         static let premiumGradient = LinearGradient(
@@ -40,9 +52,28 @@ struct AppTheme {
         )
         
         static let backgroundGradient = LinearGradient(
-            gradient: Gradient(colors: [Color(hex: "0F1422"), Color(hex: "0B0F19")]),
+            gradient: Gradient(colors: [Color(hex: "0F1422"), mainBackground]),
             startPoint: .top,
             endPoint: .bottom
+        )
+        
+        static let premiumCardGradient = LinearGradient(
+            stops: [
+                .init(color: Color(hex: "FFFDE7"), location: 0.0),
+                .init(color: Color(hex: "F5D580"), location: 0.3),
+                .init(color: gold, location: 0.6),
+                .init(color: Color(hex: "B8962C"), location: 0.85),
+                .init(color: goldDeep, location: 1.0)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
+        static let tabGlowGradient = RadialGradient(
+            colors: [gold.opacity(0.5), Color.clear],
+            center: .center,
+            startRadius: 0,
+            endRadius: 30
         )
     }
     
@@ -72,6 +103,48 @@ struct AppTheme {
         static let cardShadow = ShadowStyle(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 4)
         static let goldBorder = OverlayStyle(stroke: Colors.gold.opacity(0.3), width: 1)
         static let inputBorder = OverlayStyle(stroke: Colors.gold.opacity(0.15), width: 1)
+    }
+    
+    // MARK: - Splash Screen (Tier 4 Visionary)
+    struct Splash {
+        // Logo Sizes
+        static let logoContainerSize: CGFloat = 140
+        static let logoImageSize: CGFloat = 110
+        static let glowOuterSize: CGFloat = 200
+        static let glowInnerSize: CGFloat = 160
+        
+        // Glow Effects
+        static let glowBlurOuter: CGFloat = 50
+        static let glowBlurInner: CGFloat = 30
+        static let glowPulseMin: CGFloat = 0.9
+        static let glowPulseMax: CGFloat = 1.1
+        
+        // Orbital Rings
+        static let ringInnerSize: CGFloat = 200
+        static let ringMiddleSize: CGFloat = 300
+        static let ringOuterSize: CGFloat = 400
+        
+        // Loader
+        static let loaderDotSize: CGFloat = 6
+        static let loaderDotSpacing: CGFloat = 8
+        
+        // Typography Tracking
+        static let titleTracking: CGFloat = 12
+        static let subtitleTracking: CGFloat = 8
+        static let taglineTracking: CGFloat = 2
+        
+        // Animation Timings
+        static let logoAnimationDuration: Double = 0.8
+        static let titleFadeDelay: Double = 0.3
+        static let subtitleFadeDelay: Double = 0.6
+        static let starsFadeDelay: Double = 0.2
+        static let orbitRotationDuration: Double = 30
+        static let glowPulseDuration: Double = 2.0
+        static let shimmerDuration: Double = 1.5
+        
+        // Spacing
+        static let logoToTitleSpacing: CGFloat = 40
+        static let loaderBottomPadding: CGFloat = 70
     }
 }
 

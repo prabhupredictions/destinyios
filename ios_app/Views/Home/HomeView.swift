@@ -99,7 +99,7 @@ struct HomeView: View {
                         .frame(width: 40, height: 40)
                     
                     Image(systemName: "clock.arrow.circlepath")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -109,7 +109,7 @@ struct HomeView: View {
             // Logo / Brand (Centered)
             HStack(spacing: 8) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 20))
+                    .font(AppTheme.Fonts.title(size: 20))
                     .foregroundColor(AppTheme.Colors.gold)
                 
                 Text("Destiny")
@@ -128,7 +128,7 @@ struct HomeView: View {
                         .frame(width: 40, height: 40)
                     
                     Image(systemName: "person.fill")
-                        .font(.system(size: 16))
+                        .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -143,8 +143,8 @@ struct HomeView: View {
                 // Header Row
                 HStack(alignment: .top) {
                     Text("Today's Cosmic Vibe")
-                        .font(.system(size: 18, weight: .medium, design: .serif)) // Compact
-                        .foregroundColor(Color(hex: "E8D4A0"))
+                        .font(.system(size: 18, weight: .medium, design: .serif))
+                        .foregroundColor(AppTheme.Colors.goldLight)
                         .tracking(0.3)
                     
                     Spacer(minLength: 50)
@@ -153,7 +153,7 @@ struct HomeView: View {
                 // Insight Text - more compact
                 Text(viewModel.dailyInsight)
                     .font(.system(size: 14, weight: .regular, design: .default))
-                    .foregroundColor(Color(hex: "D1D5DB"))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .lineSpacing(3)
                     .lineLimit(3) // Limit lines for compact layout
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -167,18 +167,18 @@ struct HomeView: View {
                 VStack(spacing: 1) {
                     // Zodiac Symbol: 18px (Slightly larger)
                     Text(zodiacSymbol(for: viewModel.moonSign))
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(Color(hex: "1A1E3C"))
+                        .font(AppTheme.Fonts.title(size: 18))
+                        .foregroundColor(AppTheme.Colors.darkNavyContrast)
                     
                     // "Moon in": 9px
                     Text("Moon in")
-                        .font(.system(size: 9, weight: .light))
-                        .foregroundColor(Color(hex: "1A1E3C"))
+                        .font(AppTheme.Fonts.caption(size: 9))
+                        .foregroundColor(AppTheme.Colors.darkNavyContrast)
                     
                     // Sign name: 10px
                     Text(fullZodiacName(for: viewModel.moonSign))
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color(hex: "1A1E3C"))
+                        .font(AppTheme.Fonts.title(size: 10))
+                        .foregroundColor(AppTheme.Colors.darkNavyContrast)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
                 }
@@ -188,11 +188,11 @@ struct HomeView: View {
                     ZStack {
                         RadialGradient(
                             gradient: Gradient(stops: [
-                                .init(color: Color(hex: "FFFDE7"), location: 0.0),
-                                .init(color: Color(hex: "F5D580"), location: 0.3),
-                                .init(color: Color(hex: "D4AF37"), location: 0.6),
-                                .init(color: Color(hex: "B8962C"), location: 0.85),
-                                .init(color: Color(hex: "8B7226"), location: 1.0)
+                                .init(color: AppTheme.Colors.goldChampagne, location: 0.0),
+                                .init(color: AppTheme.Colors.goldLight, location: 0.3),
+                                .init(color: AppTheme.Colors.gold, location: 0.6),
+                                .init(color: AppTheme.Colors.gold.opacity(0.85), location: 0.85),
+                                .init(color: AppTheme.Colors.goldDeep, location: 1.0)
                             ]),
                             center: .center,
                             startRadius: 3,
@@ -213,7 +213,7 @@ struct HomeView: View {
                     Circle()
                         .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
                 )
-                .shadow(color: Color(hex: "D4AF37").opacity(0.5), radius: 10, x: 0, y: 3)
+                .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 10, x: 0, y: 3)
                 .offset(x: 8, y: -8) // Adjusted for smaller badge
                 .zIndex(100)
             }
@@ -285,7 +285,7 @@ struct HomeView: View {
             HStack {
                 Image(systemName: "hourglass")
                     .foregroundColor(AppTheme.Colors.gold)
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                 
                 Text(viewModel.currentDasha)
                     .font(AppTheme.Fonts.title(size: 16))
@@ -328,7 +328,7 @@ struct HomeView: View {
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12))
+                                .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
                         }
                         .padding(.horizontal, 16)
@@ -405,7 +405,7 @@ struct LifeAreaGridItem: View {
                             .frame(width: 20, height: 20) // Reduced from default
                         
                         Image(systemName: iconName)
-                            .font(.system(size: 10)) // Reduced icon size
+                            .font(AppTheme.Fonts.caption(size: 10)) // Reduced icon size
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                     
@@ -438,7 +438,7 @@ struct LifeAreaGridItem: View {
                         .fill(statusColor)
                         .frame(width: 4, height: 4)
                     Text(status.status)
-                        .font(.system(size: 8, weight: .medium)) // Reduced to 8
+                        .font(AppTheme.Fonts.caption(size: 8)) // Reduced to 8
                         .foregroundColor(statusColor)
                         .lineLimit(1)
                 }
@@ -447,7 +447,7 @@ struct LifeAreaGridItem: View {
                 
                 // Arrow at Bottom Right
                 Image(systemName: "arrow.right.circle.fill")
-                    .font(.system(size: 14)) // Reduced to 14
+                    .font(AppTheme.Fonts.body(size: 14)) // Reduced to 14
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
             }
         }

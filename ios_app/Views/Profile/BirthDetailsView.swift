@@ -75,7 +75,7 @@ struct BirthDetailsView: View {
                     .fill(AppTheme.Colors.gold.opacity(0.1))
                     .frame(width: 56, height: 56)
                 Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 32))
+                    .font(AppTheme.Fonts.display(size: 32))
                     .foregroundColor(AppTheme.Colors.gold)
             }
             
@@ -131,7 +131,7 @@ struct BirthDetailsView: View {
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             Spacer()
                             Image(systemName: "chevron.down")
-                                .font(.system(size: 11))
+                                .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                         .padding(.horizontal, 12)
@@ -181,7 +181,7 @@ struct BirthDetailsView: View {
     private func readOnlyRow(label: String, value: String, icon: String) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 14))
+                .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .frame(width: 22)
             
@@ -198,7 +198,7 @@ struct BirthDetailsView: View {
             Spacer()
             
             Image(systemName: "lock.fill")
-                .font(.system(size: 10))
+                .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.5))
         }
         .padding(.horizontal, 12)
@@ -210,7 +210,7 @@ struct BirthDetailsView: View {
         VStack(spacing: 8) {
             HStack(spacing: 6) {
                 Image(systemName: "info.circle.fill")
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                 
                 Text("need_update_birth_data".localized)
@@ -227,7 +227,7 @@ struct BirthDetailsView: View {
             Button(action: { openEmail() }) {
                 HStack(spacing: 6) {
                     Image(systemName: "envelope.fill")
-                        .font(.system(size: 12))
+                        .font(AppTheme.Fonts.caption(size: 12))
                     Text("support@destinyaiastrology.com")
                         .font(AppTheme.Fonts.body(size: 12))
                 }

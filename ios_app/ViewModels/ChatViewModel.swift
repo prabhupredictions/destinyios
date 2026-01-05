@@ -16,6 +16,8 @@ class ChatViewModel {
     var chatHistory: [LocalChatThread] = []
     var showHistory = false
     var suggestedQuestions: [String] = []  // Follow-up suggestions from API
+    var showQuotaSheet = false
+    var quotaDetails: String?
     
     // Current session/thread
     var currentSessionId: String = ""
@@ -130,6 +132,11 @@ class ChatViewModel {
         streamingContent = ""  // Reset so typing indicator shows
         
         // Add user message
+        // Check quota before proceeding
+        let currentEmail = userEmail
+        
+        
+        // Add user message immediately for responsiveness
         let userMessage = LocalChatMessage(
             threadId: currentThreadId,
             role: .user,
@@ -138,7 +145,59 @@ class ChatViewModel {
         messages.append(userMessage)
         dataManager.saveMessage(userMessage)
         
-        // Record question usage in backend (async, don't block UI)
+        isLoading = true
+        isStreaming = true
+        
+        // Verify quota with backend
+        do {
+            let accessResponse = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: currentEmail)
+            if !accessResponse.canAccess {
+                isLoading = false
+                isStreaming = false
+                
+                // Remove message
+                if let idx = messages.lastIndex(where: { $0.id == userMessage.id }) {
+                    messages.remove(at: idx)
+                    dataManager.deleteMessage(userMessage)
+                }
+                
+                // Detailed Error Handling - Professional Quota UI
+                // Daily limit: Red banner only (temporary)
+                // Overall limit / Feature not available: Bottom sheet only (upgrade prompt)
+                if accessResponse.reason == "daily_limit_reached" {
+                    // DAILY LIMIT: Show red banner only, no sheet
+                    if let resetAtStr = accessResponse.resetAt,
+                       let date = ISO8601DateFormatter().date(from: resetAtStr) {
+                        let timeFormatter = DateFormatter()
+                        timeFormatter.timeStyle = .short
+                        let timeStr = timeFormatter.string(from: date)
+                        errorMessage = "Daily limit reached. Resets at \(timeStr)."
+                    } else {
+                        errorMessage = "Daily limit reached. Resets tomorrow."
+                    }
+                    // No sheet for daily limit - just banner
+                } else if accessResponse.reason == "overall_limit_reached" {
+                    // OVERALL LIMIT: Show bottom sheet only, no banner
+                    if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
+                        quotaDetails = "Free questions used. Sign In or Subscribe to continue."
+                    } else {
+                        quotaDetails = "You've reached your free limit. Subscribe for unlimited access."
+                    }
+                    showQuotaSheet = true
+                } else {
+                    // FEATURE NOT AVAILABLE: Show bottom sheet only
+                    quotaDetails = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
+                    showQuotaSheet = true
+                }
+                return
+            }
+        } catch {
+            print("Quota check failed: \(error)")
+        }
+        
+        // Record question usage in backend (async)
+        // Note: usage is recorded *after* checks pass, but ideally should be *after* successful response?
+        // Current logic: record *attempt*.
         Task {
             await recordQuotaUsage()
         }
@@ -309,41 +368,20 @@ class ChatViewModel {
     
     // MARK: - Quota Management
     private func recordQuotaUsage() async {
-        do {
-            // Record usage in backend
-            try await QuotaManager.shared.recordQuestionOnServer(email: userEmail)
-            
-            // Update local cache
-            var used = UserDefaults.standard.integer(forKey: "quotaUsed")
-            used += 1
-            UserDefaults.standard.set(used, forKey: "quotaUsed")
-            
-            print("Recorded question usage for: \(userEmail)")
-        } catch {
-            print("Failed to record quota usage: \(error)")
-            // Still increment local cache as fallback
-            var used = UserDefaults.standard.integer(forKey: "quotaUsed")
-            used += 1
-            UserDefaults.standard.set(used, forKey: "quotaUsed")
-        }
+        // Quota is now recorded server-side by /predict endpoint
+        // Just update local cache for UI display
+        var used = UserDefaults.standard.integer(forKey: "quotaUsed")
+        used += 1
+        UserDefaults.standard.set(used, forKey: "quotaUsed")
+        print("✅ Quota recorded server-side for: \(userEmail)")
     }
     
     var canSend: Bool {
         !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming
     }
     
-    /// Check if user can ask another question (has remaining quota)
+    /// Check if user can ask another question (uses server-synced state)
     var canAskQuestion: Bool {
-        let isGuest = UserDefaults.standard.bool(forKey: "isGuest")
-        let isPremium = UserDefaults.standard.bool(forKey: "isPremium")
-        
-        // Premium users always can ask
-        if isPremium { return true }
-        
-        // Check quota
-        let used = UserDefaults.standard.integer(forKey: "quotaUsed")
-        let limit = isGuest ? 3 : 10  // Guest: 3, Registered: 10
-        
-        return used < limit
+        QuotaManager.shared.canAsk
     }
 }

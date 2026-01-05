@@ -169,10 +169,12 @@ struct CompatibilityFollowUpResponse: Codable, Sendable {
     let message: String?      // Error or info message
     let birthData: BirthDetails? // For redirect: target's birth details
     let reason: String?       // Reason for redirect
+    let executionTimeMs: Double?  // Execution time in milliseconds
     
     enum CodingKeys: String, CodingKey {
         case status, target, answer, message, reason
         case birthData = "birth_data"
+        case executionTimeMs = "execution_time_ms"
     }
 }
 

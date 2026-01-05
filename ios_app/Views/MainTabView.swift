@@ -137,7 +137,7 @@ struct CustomTabBar: View {
             ZStack {
                 // Sleek Glassy Background
                 Rectangle()
-                    .fill(Color(hex: "0A0E1A").opacity(0.85)) // Deep Navy matching theme, high opacity
+                    .fill(AppTheme.Colors.tabBarBackground.opacity(0.85))
                     .background(.ultraThinMaterial) // Glass blur
                     .ignoresSafeArea()
                 
@@ -148,7 +148,7 @@ struct CustomTabBar: View {
                             LinearGradient(
                                 colors: [
                                     Color.clear,
-                                    Color(hex: "D4AF37").opacity(0.5), // Center Gold
+                                    AppTheme.Colors.gold.opacity(0.5),
                                     Color.clear
                                 ],
                                 startPoint: .leading,
@@ -179,9 +179,9 @@ struct TabBarItem: View {
                     .symbolEffect(.bounce, value: isSelected)
                 
                 Text(title)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(AppTheme.Fonts.caption(size: 11))
             }
-            .foregroundColor(isSelected ? (accentColor ?? Color(hex: "D4AF37")) : Color.white.opacity(0.5)) // Gold or Dim White
+            .foregroundColor(isSelected ? (accentColor ?? AppTheme.Colors.gold) : AppTheme.Colors.tabInactive)
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
@@ -200,7 +200,7 @@ struct AskTabButton: View {
                     // Outer glow when selected
                     if isSelected {
                         Circle()
-                            .fill(Color(hex: "D4AF37").opacity(0.3))
+                            .fill(AppTheme.Colors.gold.opacity(0.3))
                             .frame(width: 64, height: 64)
                     }
                     
@@ -209,8 +209,8 @@ struct AskTabButton: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color(hex: "FFF8E1"), // Light Champagne
-                                    Color(hex: "FDD835")  // Gold
+                                    AppTheme.Colors.goldChampagne,
+                                    AppTheme.Colors.gold
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -218,22 +218,22 @@ struct AskTabButton: View {
                         )
                         .frame(width: 56, height: 56)
                         .shadow(
-                            color: Color(hex: "FDD835").opacity(0.5),
+                            color: AppTheme.Colors.gold.opacity(0.5),
                             radius: isSelected ? 12 : 8,
                             y: 4
                         )
                     
                     // Icon
                     Image(systemName: "bubble.left.and.bubble.right.fill")
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(Color(hex: "1A1F2E")) // Dark Navy icon for contrast
+                        .font(AppTheme.Fonts.title(size: 22))
+                        .foregroundColor(AppTheme.Colors.darkNavyContrast)
                         .symbolEffect(.bounce, value: isSelected)
                 }
                 .offset(y: -20)
                 
                 Text("ask".localized)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(isSelected ? Color(hex: "D4AF37") : Color.white.opacity(0.6)) // Gold or Dim White
+                    .font(AppTheme.Fonts.caption(size: 11))
+                    .foregroundColor(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.tabInactive)
                     .offset(y: -16)
             }
         }

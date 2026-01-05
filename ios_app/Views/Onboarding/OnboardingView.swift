@@ -24,7 +24,7 @@ struct OnboardingView: View {
                     .blur(radius: 60)
                 
                 Circle()
-                    .fill(Color(hex: "4A148C").opacity(0.1)) // Deep purple accent
+                    .fill(AppTheme.Colors.purpleAccent.opacity(0.1))
                     .frame(width: 300, height: 300)
                     .offset(x: geo.size.width - 100, y: geo.size.height - 200)
                     .blur(radius: 50)
@@ -81,11 +81,11 @@ struct OnboardingView: View {
                         }) {
                             HStack(spacing: 8) {
                                 Text("continue".localized)
-                                    .font(.system(size: 17, weight: .semibold))
+                                    .font(AppTheme.Fonts.title(size: 17))
                                 Image(systemName: "arrow.right")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(AppTheme.Fonts.title(size: 14))
                             }
-                            .foregroundColor(Color(hex: "0B0F19")) // Dark text on gold
+                            .foregroundColor(AppTheme.Colors.textOnGold)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .background(AppTheme.Colors.premiumGradient)

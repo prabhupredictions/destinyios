@@ -7,11 +7,11 @@ struct DashaView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
                 Image(systemName: "hourglass")
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(Color("GoldAccent"))
                 
                 Text("Vimshottari Dasha (\(dashaResponse?.year ?? 2024))")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(AppTheme.Colors.textPrimary)
             }
             
@@ -51,10 +51,10 @@ struct DashaRow: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(period.mahadasha) - \(period.antardasha)")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(Color("NavyPrimary"))
                 Text(period.pratyantardasha)
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(.secondary)
             }
             
@@ -62,9 +62,9 @@ struct DashaRow: View {
             
             VStack(alignment: .trailing, spacing: 4) {
                 Text(period.start)
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
                 Text(period.end)
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
             }
             .foregroundColor(Color("TextDark").opacity(0.6))
         }

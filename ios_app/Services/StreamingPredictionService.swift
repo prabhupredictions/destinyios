@@ -155,7 +155,18 @@ class StreamingPredictionService {
                 followUpSuggestions: json["follow_up_suggestions"] as? [String] ?? [],
                 lifeArea: json["life_area"] as? String ?? "",
                 executionTimeMs: json["execution_time_ms"] as? Double ?? 0,
-                createdAt: json["created_at"] as? String ?? ISO8601DateFormatter().string(from: Date())
+                createdAt: json["created_at"] as? String ?? ISO8601DateFormatter().string(from: Date()),
+                reasoningTrace: nil,
+                reasoningSummary: json["reasoning_summary"] as? String,
+                advice: json["advice"] as? String,
+                sources: json["sources"] as? [String],
+                query: json["query"] as? String,
+                subArea: json["sub_area"] as? String,
+                ascendant: json["ascendant"] as? String,
+                plannerUsed: json["planner_used"] as? String,
+                llmCalls: json["llm_calls"] as? Int,
+                trainingSampleId: json["training_sample_id"] as? String,
+                completedAt: json["completed_at"] as? String
             )
             return .answer(response: response)
             

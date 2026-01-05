@@ -2,202 +2,336 @@ import Foundation
 import Combine
 import SwiftData
 
-/// User types for quota tracking and backend identification
-enum UserType: String, Codable, Sendable {
-    case guest = "guest"              // Not logged in, using generated email
-    case registered = "registered"    // Logged in with email/Google
-    case premium = "premium"          // Active subscription
+// MARK: - Feature & Plan Models
+
+/// Feature IDs matching backend
+enum FeatureID: String, Codable, Sendable {
+    case aiQuestions = "ai_questions"  // Shared pool for chat + follow-ups
+    case compatibility = "compatibility"
+    case history = "history"
+    case profiles = "multiple_profiles"
+    case alerts = "alerts"
+    case earlyAccess = "early_access"
+}
+
+/// Feature entitlement info from server
+struct PlanEntitlement: Codable, Sendable, Identifiable {
+    let featureId: String
+    let displayName: String
+    let description: String?  // Feature description from backend
+    let marketingText: String?  // Custom rich marketing copy for this plan
+    let dailyLimit: Int   // -1 = unlimited
+    let overallLimit: Int  // -1 = unlimited
     
-    /// Display name for UI
-    var displayName: String {
-        switch self {
-        case .guest: return "Guest"
-        case .registered: return "Free User"
-        case .premium: return "Premium"
+    var id: String { featureId }
+    var isUnlimited: Bool { dailyLimit == -1 && overallLimit == -1 }
+    
+    /// Display text for this entitlement (user-facing)
+    /// Prefer marketingText if available, otherwise generate from displayName
+    var displayText: String {
+        // Use custom marketing text if available
+        if let text = marketingText, !text.isEmpty {
+            return text
         }
-    }
-    
-    /// Question limit for this user type
-    var questionLimit: Int {
-        switch self {
-        case .guest: return 3
-        case .registered: return 10
-        case .premium: return Int.max // Unlimited
+        // For unlimited features (both daily and overall = -1)
+        if overallLimit == -1 {
+            return "Unlimited \(displayName.lowercased())"
         }
+        // For limited features, just show the feature name (don't expose internal limits)
+        return displayName
     }
     
-    /// Whether user can upgrade
-    var canUpgrade: Bool {
-        self != .premium
+    enum CodingKeys: String, CodingKey {
+        case featureId = "feature_id"
+        case displayName = "display_name"
+        case description
+        case marketingText = "marketing_text"
+        case dailyLimit = "daily_limit"
+        case overallLimit = "overall_limit"
+    }
+}
+
+/// Subscription plan info from server
+struct PlanInfo: Codable, Sendable, Identifiable {
+    let planId: String
+    let displayName: String
+    let description: String?
+    let isFree: Bool
+    let priceMonthly: Double?
+    let priceYearly: Double?
+    let currency: String?
+    let appleProductIdMonthly: String?
+    let appleProductIdYearly: String?
+    let entitlements: [PlanEntitlement]?
+    
+    var id: String { planId }
+    var isPaid: Bool { !isFree }
+    
+    /// Helper to get display features for paywall UI
+    var displayFeatures: [String] {
+        guard let ents = entitlements else { return [] }
+        return ents.map { $0.displayText }
     }
     
-    /// Upgrade message based on type
-    var upgradeMessage: String {
-        switch self {
-        case .guest:
-            return "Sign in for 10 free questions, or go Premium for unlimited access"
-        case .registered:
-            return "Upgrade to Premium for unlimited questions and exclusive features"
-        case .premium:
-            return ""
-        }
+    enum CodingKeys: String, CodingKey {
+        case planId = "plan_id"
+        case displayName = "display_name"
+        case description
+        case isFree = "is_free"
+        case priceMonthly = "price_monthly"
+        case priceYearly = "price_yearly"
+        case currency
+        case appleProductIdMonthly = "apple_product_id_monthly"
+        case appleProductIdYearly = "apple_product_id_yearly"
+        case entitlements
+    }
+}
+
+/// Limit info for a feature
+struct LimitInfo: Codable, Sendable {
+    let used: Int
+    let limit: Int
+    let remaining: Int
+    
+    var isUnlimited: Bool { limit == -1 }
+    var hasRemaining: Bool { isUnlimited || remaining > 0 }
+    
+    var displayText: String {
+        if isUnlimited { return "Unlimited" }
+        return "\(remaining) remaining"
+    }
+}
+
+/// Feature access response from /can-access
+struct FeatureAccessResponse: Codable, Sendable {
+    let canAccess: Bool
+    let feature: String?
+    let planId: String?
+    let reason: String?
+    let requiresQuota: Bool?
+    let limits: [String: LimitInfo]?
+    let resetAt: String?
+    let upgradeCta: UpgradeCTA?
+    
+    enum CodingKeys: String, CodingKey {
+        case canAccess = "can_access"
+        case feature
+        case planId = "plan_id"
+        case reason
+        case requiresQuota = "requires_quota"
+        case limits
+        case resetAt = "reset_at"
+        case upgradeCta = "upgrade_cta"
     }
     
-    /// Upgrade CTA button text
-    var upgradeButtonText: String {
-        switch self {
-        case .guest: return "Sign In or Upgrade"
-        case .registered: return "Upgrade to Premium"
-        case .premium: return ""
+    /// User-friendly denial reason
+    var denialMessage: String {
+        switch reason {
+        case "daily_limit_reached": return "Daily limit reached. Resets at midnight."
+        case "overall_limit_reached": return "You've used all your questions."
+        case "feature_not_available": return upgradeCta?.message ?? "Upgrade to access this feature."
+        default: return "Unable to access this feature."
         }
     }
 }
 
-/// Quota status for a user
-struct QuotaStatus: Sendable {
-    let userType: UserType
-    let questionsUsed: Int
-    let questionsLimit: Int
-    let canAsk: Bool
-    let remainingQuestions: Int
+struct UpgradeCTA: Codable, Sendable {
+    let message: String
+    let suggestedPlan: String
     
-    init(userType: UserType, questionsUsed: Int) {
-        self.userType = userType
-        self.questionsUsed = questionsUsed
-        self.questionsLimit = userType.questionLimit
-        self.remainingQuestions = max(0, userType.questionLimit - questionsUsed)
-        self.canAsk = questionsUsed < userType.questionLimit
-    }
-    
-    /// Progress for UI (0.0 to 1.0)
-    var progress: Double {
-        if userType == .premium { return 1.0 }
-        return Double(questionsUsed) / Double(questionsLimit)
-    }
-    
-    /// Status text for display
-    var statusText: String {
-        if userType == .premium {
-            return "Unlimited questions"
-        }
-        return "\(remainingQuestions) of \(questionsLimit) questions remaining"
-    }
-    
-    /// Short status for header
-    var shortStatus: String {
-        if userType == .premium { return "∞" }
-        return "\(remainingQuestions)"
+    enum CodingKeys: String, CodingKey {
+        case message
+        case suggestedPlan = "suggested_plan"
     }
 }
 
-/// Manages user quota tracking
+/// Usage response from /use
+struct UseFeatureResponse: Codable, Sendable {
+    let success: Bool
+    let feature: String?
+    let usage: UsageInfo?
+    let error: String?
+}
+
+struct UsageInfo: Codable, Sendable {
+    let daily: LimitInfo
+    let overall: LimitInfo
+}
+
+/// Per-feature usage statistics from backend
+struct FeatureUsageInfo: Codable, Sendable {
+    let daily: Int
+    let overall: Int
+    let lastUsed: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case daily
+        case overall
+        case lastUsed = "last_used"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        daily = try container.decodeIfPresent(Int.self, forKey: .daily) ?? 0
+        overall = try container.decodeIfPresent(Int.self, forKey: .overall) ?? 0
+        lastUsed = try container.decodeIfPresent(String.self, forKey: .lastUsed)
+    }
+}
+
+/// Status response from /status
+struct SubscriptionStatus: Codable, Sendable {
+    let userEmail: String
+    let planId: String?
+    let plan: PlanInfo?
+    let isGeneratedEmail: Bool
+    let featureUsage: [String: FeatureUsageInfo]  // Per-feature usage (chat, compatibility, etc.)
+    let isPremium: Bool
+    let features: [String]
+    let subscriptionStatus: String?
+    let subscriptionExpiresAt: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case userEmail = "user_email"
+        case planId = "plan_id"
+        case plan
+        case isGeneratedEmail = "is_generated_email"
+        case featureUsage = "feature_usage"
+        case isPremium = "is_premium"
+        case features
+        case subscriptionStatus = "subscription_status"
+        case subscriptionExpiresAt = "subscription_expires_at"
+    }
+    
+    /// Helper to get total questions across all features (for backward compat)
+    var totalQuestionsAsked: Int {
+        featureUsage.values.reduce(0) { $0 + $1.overall }
+    }
+}
+
+// MARK: - QuotaManager
+
+/// Manages user quota and subscription status
 @MainActor
 class QuotaManager: ObservableObject {
     static let shared = QuotaManager()
     
-    @Published private(set) var currentStatus: QuotaStatus
+    // MARK: - Published State
+    @Published private(set) var currentPlan: PlanInfo?
+    @Published private(set) var isPremium: Bool = false
+    @Published private(set) var availableFeatures: [String] = []
+    @Published private(set) var totalQuestionsAsked: Int = 0
+    @Published private(set) var availablePlans: [PlanInfo] = []
+    
+    /// Current plan ID (convenience accessor for dynamic button text)
+    var currentPlanId: String? {
+        currentPlan?.planId ?? UserDefaults.standard.string(forKey: "currentPlanId")
+    }
     
     private let dataManager: DataManager
     
     init(dataManager: DataManager = DataManager.shared) {
         self.dataManager = dataManager
-        self.currentStatus = QuotaStatus(userType: .guest, questionsUsed: 0)
-        refresh()
     }
     
-    /// Refresh quota status from storage
-    func refresh() {
-        let userType = getCurrentUserType()
-        let questionsUsed = getQuestionsUsed()
-        currentStatus = QuotaStatus(userType: userType, questionsUsed: questionsUsed)
-    }
+    // MARK: - Feature Access
     
-    /// Get current user type
-    func getCurrentUserType() -> UserType {
-        // Check premium first (StoreKit)
-        if UserDefaults.standard.bool(forKey: "isPremium") {
-            return .premium
+    /// Check if user can access a feature
+    func canAccessFeature(_ feature: FeatureID, email: String) async throws -> FeatureAccessResponse {
+        var components = URLComponents(string: APIConfig.baseURL + "/subscription/can-access")!
+        components.queryItems = [
+            URLQueryItem(name: "email", value: email),
+            URLQueryItem(name: "feature", value: feature.rawValue)
+        ]
+        
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
         }
         
-        // Check if logged in with real email
-        let isGuest = UserDefaults.standard.bool(forKey: "isGuest")
-        if !isGuest {
-            if let email = UserDefaults.standard.string(forKey: "userEmail"),
-               !email.isEmpty,
-               !EmailGenerator.isGeneratedEmail(email) {
-                return .registered
+        return try JSONDecoder().decode(FeatureAccessResponse.self, from: data)
+    }
+    
+    /// Simple bool check for feature access
+    func canAsk(feature: FeatureID = .aiQuestions, email: String) async -> Bool {
+        do {
+            let response = try await canAccessFeature(feature, email: email)
+            return response.canAccess
+        } catch {
+            print("❌ canAsk error: \(error)")
+            return false
+        }
+    }
+    
+    // MARK: - Record Usage
+    
+    /// Record feature usage after successful action
+    func recordFeatureUsage(_ feature: FeatureID, email: String) async throws -> UseFeatureResponse {
+        let url = URL(string: APIConfig.baseURL + "/subscription/use")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        let body: [String: String] = [
+            "email": email,
+            "feature_id": feature.rawValue
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        let result = try JSONDecoder().decode(UseFeatureResponse.self, from: data)
+        
+        if result.success {
+            totalQuestionsAsked += 1
+            if let profile = dataManager.getCurrentUserProfile() {
+                profile.totalQuestionsAsked += 1
+                try? dataManager.context.save()
             }
         }
         
-        return .guest
+        return result
     }
     
-    /// Get questions used from profile
-    func getQuestionsUsed() -> Int {
-        if let profile = dataManager.getCurrentUserProfile() {
-            return profile.totalQuestionsAsked
-        }
-        return 0
-    }
+    // MARK: - Plans
     
-    /// Check if user can ask a question
-    var canAsk: Bool {
-        currentStatus.canAsk
-    }
-    
-    /// Increment question count after successful question
-    func recordQuestion() {
-        if let profile = dataManager.getCurrentUserProfile() {
-            profile.totalQuestionsAsked += 1
-            try? dataManager.context.save()
-            refresh()
-        }
-    }
-    
-    /// Reset quota (for testing or admin)
-    func resetQuota() {
-        if let profile = dataManager.getCurrentUserProfile() {
-            profile.totalQuestionsAsked = 0
-            try? dataManager.context.save()
-            refresh()
-        }
-    }
-    
-    /// Get user type string for API
-    var userTypeForAPI: String {
-        getCurrentUserType().rawValue
-    }
-    
-    // MARK: - Server Sync
-    
-    /// Response model from subscription API
-    struct SubscriptionStatus: Codable {
-        let userEmail: String
-        let userType: String
-        let questionsAsked: Int
-        let questionsLimit: Int
-        let questionsRemaining: Int
-        let canAsk: Bool
-        let isPremium: Bool
-        let subscriptionStatus: String?
-        let subscriptionExpiresAt: String?
+    /// Fetch available subscription plans for paywall
+    func fetchPlans() async throws -> [PlanInfo] {
+        let url = URL(string: APIConfig.baseURL + "/subscription/plans")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
         
-        enum CodingKeys: String, CodingKey {
-            case userEmail = "user_email"
-            case userType = "user_type"
-            case questionsAsked = "questions_asked"
-            case questionsLimit = "questions_limit"
-            case questionsRemaining = "questions_remaining"
-            case canAsk = "can_ask"
-            case isPremium = "is_premium"
-            case subscriptionStatus = "subscription_status"
-            case subscriptionExpiresAt = "subscription_expires_at"
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
         }
+        
+        let plans = try JSONDecoder().decode([PlanInfo].self, from: data)
+        availablePlans = plans
+        return plans
     }
+    
+    /// Get paid plans only (for paywall)
+    var paidPlans: [PlanInfo] {
+        availablePlans.filter { $0.isPaid }
+    }
+    
+    // MARK: - Registration & Sync
     
     /// Register user with backend (call on birth data save or login)
-    func registerWithServer(email: String, userType: UserType, isGeneratedEmail: Bool) async throws {
-        let url = URL(string: APIConfig.baseURL + APIConfig.subscriptionRegister)!
+    func registerUser(email: String, isGeneratedEmail: Bool) async throws {
+        let url = URL(string: APIConfig.baseURL + "/subscription/register")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -205,7 +339,6 @@ class QuotaManager: ObservableObject {
         
         let body: [String: Any] = [
             "email": email,
-            "user_type": userType.rawValue,
             "is_generated_email": isGeneratedEmail
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -217,14 +350,12 @@ class QuotaManager: ObservableObject {
         }
         
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
-        await MainActor.run {
-            updateFromServerStatus(status)
-        }
+        updateFromStatus(status)
     }
     
-    /// Sync status from server (call before predictions)
-    func syncStatusFromServer(email: String) async throws -> Bool {
-        var components = URLComponents(string: APIConfig.baseURL + APIConfig.subscriptionStatus)!
+    /// Sync status from server
+    func syncStatus(email: String) async throws {
+        var components = URLComponents(string: APIConfig.baseURL + "/subscription/status")!
         components.queryItems = [URLQueryItem(name: "email", value: email)]
         
         var request = URLRequest(url: components.url!)
@@ -238,49 +369,45 @@ class QuotaManager: ObservableObject {
         }
         
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
-        await MainActor.run {
-            updateFromServerStatus(status)
-        }
-        
-        return status.canAsk
-    }
-    
-    /// Record question with server (call after successful prediction)
-    func recordQuestionOnServer(email: String) async throws {
-        var components = URLComponents(string: APIConfig.baseURL + APIConfig.subscriptionRecord)!
-        components.queryItems = [URLQueryItem(name: "email", value: email)]
-        
-        var request = URLRequest(url: components.url!)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw URLError(.badServerResponse)
-        }
-        
-        // Also update local state
-        await MainActor.run {
-            recordQuestion()  // Local update
-        }
+        updateFromStatus(status)
     }
     
     /// Update local state from server status
-    private func updateFromServerStatus(_ status: SubscriptionStatus) {
-        let serverUserType = UserType(rawValue: status.userType) ?? .guest
+    private func updateFromStatus(_ status: SubscriptionStatus) {
+        currentPlan = status.plan
+        isPremium = status.isPremium
+        availableFeatures = status.features
+        totalQuestionsAsked = status.totalQuestionsAsked
         
-        // Update local storage
         UserDefaults.standard.set(status.isPremium, forKey: "isPremium")
+        UserDefaults.standard.set(status.planId, forKey: "currentPlanId")
         
-        // Sync questions count with profile if available
         if let profile = dataManager.getCurrentUserProfile() {
-            profile.totalQuestionsAsked = status.questionsAsked
+            profile.totalQuestionsAsked = status.totalQuestionsAsked
             try? dataManager.context.save()
         }
-        
-        // Update published status
-        currentStatus = QuotaStatus(userType: serverUserType, questionsUsed: status.questionsAsked)
+    }
+    
+    // MARK: - Convenience
+    
+    /// Display name for current plan
+    var planDisplayName: String {
+        currentPlan?.displayName ?? "Free"
+    }
+    
+    /// Check if user can upgrade
+    var canUpgrade: Bool {
+        currentPlan?.isFree ?? true
+    }
+    
+    /// Simple sync check for UI - uses cached features list
+    /// For authoritative check, use `canAsk(feature:email:)` async method
+    var canAsk: Bool {
+        isPremium || availableFeatures.contains("chat")
+    }
+    
+    /// Check if current user is a guest (based on cached plan)
+    var isGuest: Bool {
+        currentPlan?.planId == "free_guest"
     }
 }
-

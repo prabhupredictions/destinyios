@@ -59,7 +59,7 @@ struct AstrologySettingsSheet: View {
                                     if ayanamsa == option.key {
                                         Image(systemName: "checkmark")
                                             .foregroundColor(AppTheme.Colors.gold)
-                                            .font(.system(size: 14, weight: .semibold))
+                                            .font(AppTheme.Fonts.title(size: 14))
                                     }
                                 }
                             }
@@ -93,7 +93,7 @@ struct AstrologySettingsSheet: View {
                                     if houseSystem == option.key {
                                         Image(systemName: "checkmark")
                                             .foregroundColor(AppTheme.Colors.gold)
-                                            .font(.system(size: 14, weight: .semibold))
+                                            .font(AppTheme.Fonts.title(size: 14))
                                     }
                                 }
                             }
@@ -127,7 +127,7 @@ struct AstrologySettingsSheet: View {
                                     if chartStyle == option.key {
                                         Image(systemName: "checkmark")
                                             .foregroundColor(AppTheme.Colors.gold)
-                                            .font(.system(size: 14, weight: .semibold))
+                                            .font(AppTheme.Fonts.title(size: 14))
                                     }
                                 }
                             }

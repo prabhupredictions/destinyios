@@ -24,7 +24,7 @@ struct AuthView: View {
                     .offset(x: geo.size.width - 150, y: -200)
                 
                 Circle()
-                    .fill(Color(hex: "4A148C").opacity(0.1)) // Deep purple accent
+                    .fill(AppTheme.Colors.purpleAccent.opacity(0.1))
                     .frame(width: 400, height: 400)
                     .blur(radius: 80)
                     .offset(x: -150, y: geo.size.height - 300)
@@ -272,7 +272,7 @@ struct AuthButton: View {
                         .frame(width: 20, height: 20)
                 } else if let icon = icon {
                     Image(systemName: icon)
-                        .font(.system(size: 18, weight: .medium))
+                        .font(AppTheme.Fonts.title(size: 18))
                 }
                 
                 Text(title)

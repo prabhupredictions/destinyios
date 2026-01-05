@@ -57,11 +57,11 @@ struct OnboardingSlideView: View {
                     Button(action: onGetStarted) {
                         HStack(spacing: 10) {
                             Text("get_started".localized)
-                                .font(.system(size: 17, weight: .semibold))
+                                .font(AppTheme.Fonts.title(size: 17))
                             Image(systemName: "sparkles")
-                                .font(.system(size: 14, weight: .semibold))
+                                .font(AppTheme.Fonts.title(size: 14))
                         }
-                        .foregroundColor(Color(hex: "0B0F19")) // Dark text on gold
+                        .foregroundColor(AppTheme.Colors.textOnGold)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .background(AppTheme.Colors.premiumGradient)
@@ -113,7 +113,7 @@ struct OnboardingSlideView: View {
                     .frame(width: 100, height: 100)
                 
                 Image(systemName: slide.icon)
-                    .font(.system(size: 44, weight: .medium))
+                    .font(AppTheme.Fonts.display(size: 44))
                     .foregroundStyle(AppTheme.Colors.premiumGradient)
             }
         }
@@ -128,7 +128,7 @@ struct StatsCard: View {
             VStack(spacing: 6) {
                 HStack(spacing: 4) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
-                        .font(.system(size: 14))
+                        .font(AppTheme.Fonts.body(size: 14))
                         .foregroundStyle(AppTheme.Colors.premiumGradient)
                         .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 2, y: 1)
                     Text("2.2M+")
@@ -151,7 +151,7 @@ struct StatsCard: View {
                 HStack(spacing: 3) {
                     ForEach(0..<4, id: \.self) { _ in
                         Image(systemName: "star.fill")
-                            .font(.system(size: 14))
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundStyle(AppTheme.Colors.premiumGradient)
                             .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 2, y: 1)
                     }
@@ -188,7 +188,7 @@ struct FeaturesListView: View {
                             .frame(width: 48, height: 48)
                         
                         Image(systemName: feature.icon)
-                            .font(.system(size: 20, weight: .medium))
+                            .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                     

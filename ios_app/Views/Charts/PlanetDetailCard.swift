@@ -43,12 +43,12 @@ struct PlanetDetailCard: View {
             HStack(spacing: 4) {
                 // Symbol
                 Text(planetSymbol)
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(planetColor)
                 
                 // Code
                 Text(planet.code)
-                    .font(.system(size: 11, weight: .bold))
+                    .font(AppTheme.Fonts.title(size: 11))
                     .foregroundColor(Color("GoldAccent"))
                 
                 Spacer()
@@ -111,7 +111,7 @@ struct PlanetDetailCard: View {
     
     private func statusBadge(text: String, color: Color) -> some View {
         Text(text)
-            .font(.system(size: 8, weight: .bold))
+            .font(AppTheme.Fonts.title(size: 8))
             .foregroundColor(color.opacity(0.9))
             .frame(width: 14, height: 14)
             .background(
@@ -124,10 +124,10 @@ struct PlanetDetailCard: View {
     private func detailRow(icon: String, value: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 8))
+                .font(AppTheme.Fonts.caption(size: 8))
                 .foregroundColor(Color("GoldAccent").opacity(0.8))
             Text(value)
-                .font(.system(size: 9))
+                .font(AppTheme.Fonts.caption(size: 9))
                 .foregroundColor(.white.opacity(0.8))
                 .lineLimit(1)
         }

@@ -86,7 +86,7 @@ struct AdditionalYogasSheet: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(AppTheme.Fonts.title(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
                             .frame(width: 32, height: 32)
                             .background(Circle().fill(AppTheme.Colors.secondaryBackground))
@@ -188,7 +188,7 @@ struct AdditionalYogasSheet: View {
     private func summaryCard(count: Int, label: String, icon: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Text(icon)
-                .font(.system(size: 24))
+                .font(AppTheme.Fonts.title(size: 24))
             
             Text("\(count)")
                 .font(AppTheme.Fonts.title(size: 24))
@@ -235,7 +235,7 @@ struct AdditionalYogasSheet: View {
             } label: {
                 HStack(spacing: 12) {
                     Text(isDosha ? "⚠️" : "✨")
-                        .font(.system(size: 18))
+                        .font(AppTheme.Fonts.title(size: 18))
                     
                     VStack(alignment: .leading, spacing: 4) {
                         Text(item.displayName)
@@ -269,7 +269,7 @@ struct AdditionalYogasSheet: View {
                     statusBadge(item.status, isDosha: isDosha)
                     
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 12))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
@@ -288,7 +288,7 @@ struct AdditionalYogasSheet: View {
                         if let houses = item.uniqueHouses, !houses.isEmpty {
                             HStack(spacing: 6) {
                                 Image(systemName: "house.fill")
-                                    .font(.system(size: 12))
+                                    .font(AppTheme.Fonts.caption(size: 12))
                                     .foregroundColor(AppTheme.Colors.goldDim)
                                 Text("Houses:")
                                     .font(AppTheme.Fonts.caption())
@@ -305,7 +305,7 @@ struct AdditionalYogasSheet: View {
                         if let planets = item.uniquePlanets, !planets.isEmpty {
                             HStack(spacing: 6) {
                                 Image(systemName: "sparkle")
-                                    .font(.system(size: 12))
+                                    .font(AppTheme.Fonts.caption(size: 12))
                                     .foregroundColor(AppTheme.Colors.gold)
                                 Text(planets)
                                     .font(AppTheme.Fonts.caption().weight(.medium))
@@ -322,7 +322,7 @@ struct AdditionalYogasSheet: View {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Image(systemName: "info.circle.fill")
-                                    .font(.system(size: 12))
+                                    .font(AppTheme.Fonts.caption(size: 12))
                                     .foregroundColor(AppTheme.Colors.textTertiary)
                                 Text("Formation")
                                     .font(AppTheme.Fonts.caption())
@@ -351,7 +351,7 @@ struct AdditionalYogasSheet: View {
     private func detailRow(icon: String, label: String, value: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 12))
+                .font(AppTheme.Fonts.caption(size: 12))
                 .foregroundColor(AppTheme.Colors.textTertiary)
             Text(label + ":")
                 .font(AppTheme.Fonts.caption())
@@ -393,7 +393,7 @@ struct AdditionalYogasSheet: View {
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "sparkles")
-                .font(.system(size: 48))
+                .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.textTertiary)
             
             Text("No \(filterType.rawValue) found")

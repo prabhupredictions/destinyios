@@ -83,15 +83,15 @@ struct CompatibilityHistorySheet: View {
     private var emptyState: some View {
         VStack(spacing: 16) {
             Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 60))
+                .font(AppTheme.Fonts.display(size: 60))
                 .foregroundColor(.gray.opacity(0.4))
             
             Text("no_match_history".localized)
-                .font(.system(size: 18, weight: .semibold))
+                .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(.gray)
             
             Text("no_match_history_desc".localized)
-                .font(.system(size: 14))
+                .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(.gray.opacity(0.7))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
@@ -141,7 +141,7 @@ struct CompatibilityHistorySheet: View {
     private var deleteSelectedBar: some View {
         HStack {
             Text("\(selectedItems.count) " + "selected".localized)
-                .font(.system(size: 14, weight: .medium))
+                .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(.gray)
             
             Spacer()
@@ -153,7 +153,7 @@ struct CompatibilityHistorySheet: View {
                     Image(systemName: "trash")
                     Text("delete".localized)
                 }
-                .font(.system(size: 14, weight: .semibold))
+                .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(.white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
@@ -228,7 +228,7 @@ struct HistoryItemRow: View {
                 // Selection circle in edit mode
                 if isEditMode {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 22))
+                        .font(AppTheme.Fonts.title(size: 22))
                         .foregroundColor(isSelected ? .blue : .gray.opacity(0.4))
                 }
                 
@@ -240,10 +240,10 @@ struct HistoryItemRow: View {
                     
                     VStack(spacing: 0) {
                         Text("\(item.totalScore)")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(scoreColor)
                         Text("/\(item.maxScore)")
-                            .font(.system(size: 10))
+                            .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(.gray)
                     }
                 }
@@ -251,20 +251,20 @@ struct HistoryItemRow: View {
                 // Details
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.displayTitle)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 15))
                         .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.2))
                     
                     HStack(spacing: 8) {
                         Text(item.displayDate)
-                            .font(.system(size: 12))
+                            .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(.gray)
                         
                         if item.chatMessages.count > 0 {
                             HStack(spacing: 3) {
                                 Image(systemName: "bubble.left.fill")
-                                    .font(.system(size: 10))
+                                    .font(AppTheme.Fonts.caption(size: 10))
                                 Text("\(item.chatMessages.count)")
-                                    .font(.system(size: 11))
+                                    .font(AppTheme.Fonts.caption(size: 11))
                             }
                             .foregroundColor(accentGold)
                         }
@@ -276,7 +276,7 @@ struct HistoryItemRow: View {
                 // Chevron
                 if !isEditMode {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(.gray.opacity(0.4))
                 }
             }

@@ -360,26 +360,19 @@ final class DataManager {
     
     /// Check if user can ask a question (quota check)
     func canAskQuestion() -> Bool {
-        guard let profile = getCurrentUserProfile() else {
-            // No profile = guest with no history, allow first question
-            return true
-        }
-        return profile.canAskQuestion
+        return QuotaManager.shared.canAsk
     }
     
     /// Increment question count for current user
     func incrementQuestionCount() {
-        guard let profile = getCurrentUserProfile() else { return }
-        profile.incrementQuestionCount()
-        try? context.save()
+        // Deprecated: Usage is now tracked via API calls in ViewModels.
+        // Kept for backward compatibility.
     }
     
     /// Get remaining questions for current user
     func getRemainingQuestions() -> Int {
-        guard let profile = getCurrentUserProfile() else {
-            return 3 // Default for new guest
-        }
-        return profile.remainingQuestions
+        // Deprecated: Exact count is now managed by backend
+        return QuotaManager.shared.canAsk ? 1 : 0
     }
     
     /// Delete birth profile

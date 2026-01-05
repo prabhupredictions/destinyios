@@ -1,44 +1,51 @@
 import SwiftUI
 import StoreKit
 
-/// Subscription screen using native StoreKit 2 (iOS 17+)
+/// Subscription screen matching target mockup design
+/// Features displayed from backend with marketing_text
 struct SubscriptionView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @StateObject private var quotaManager = QuotaManager.shared
     @State private var isPurchasing = false
+    @State private var purchasingPlanId: String?
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var plans: [PlanInfo] = []
+    @State private var isLoading = true
+    @State private var showDestinyMatchingInfo = false
     
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
-                    // Custom header
-                    headerSection
-                    
-                    // Features list
-                    featuresSection
-                    
-                    // Pricing card
-                    pricingCard
-                    
-                    // Subscribe button
-                    subscribeButton
-                    
-                    // Restore purchases
-                    restoreButton
-                    
-                    // Disclaimer
-                    disclaimerText
+                VStack(spacing: 20) {
+                    if isLoading {
+                        ProgressView("Loading plans...")
+                            .padding(.vertical, 40)
+                    } else if plans.isEmpty {
+                        Text("No plans available")
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .padding(.vertical, 40)
+                    } else {
+                        // Plan cards with feature lists
+                        planCardsSection
+                        
+                        // Collapsible "What is Destiny Matching™?"
+                        destinyMatchingSection
+                        
+                        // Restore purchases
+                        restoreButton
+                        
+                        // Footer disclaimers
+                        footerDisclaimers
+                    }
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 20)
-                .padding(.bottom, 40)
-            }
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
                 .padding(.bottom, 40)
             }
             .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
-            .navigationTitle("Premium")
+            .navigationTitle("Choose a plan")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -46,131 +53,110 @@ struct SubscriptionView: View {
                 #if os(iOS)
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
+                        Image(systemName: "chevron.left")
+                            .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 }
-                #else
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
-                }
                 #endif
             }
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
             .alert("Error", isPresented: $showError) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage)
             }
+            .task {
+                await loadPlans()
+            }
         }
-
+    }
     
-    // MARK: - Header Section
-    private var headerSection: some View {
+    // MARK: - Load Plans from Backend
+    private func loadPlans() async {
+        isLoading = true
+        do {
+            var fetchedPlans = try await quotaManager.fetchPlans()
+            // Filter to show only paid plans (core, plus)
+            fetchedPlans = fetchedPlans.filter { !$0.isFree && $0.planId != "free_guest" && $0.planId != "free_registered" }
+            // Sort by price (cheapest first)
+            fetchedPlans.sort { ($0.priceMonthly ?? 0) < ($1.priceMonthly ?? 0) }
+            await MainActor.run {
+                plans = fetchedPlans
+                isLoading = false
+            }
+        } catch {
+            print("Failed to load plans: \(error)")
+            await MainActor.run {
+                isLoading = false
+            }
+        }
+    }
+    
+    // MARK: - Plan Cards Section
+    private var planCardsSection: some View {
         VStack(spacing: 16) {
-            // Crown icon
-            ZStack {
-                Circle()
-                    .fill(AppTheme.Colors.premiumGradient)
-                    .frame(width: 80, height: 80)
-                    .shadow(color: AppTheme.Colors.gold.opacity(0.4), radius: 15, y: 5)
-                
-                Image(systemName: "crown.fill")
-                    .font(.system(size: 36))
-                    .foregroundColor(Color(hex: "0B0F19"))
+            // Find core plan for reference
+            let corePlan = plans.first { $0.planId == "core" }
+            // Get user's current plan for dynamic button text
+            let userCurrentPlanId = quotaManager.currentPlanId ?? "free_guest"
+            
+            ForEach(plans) { plan in
+                PlanCardWithFeatures(
+                    plan: plan,
+                    product: subscriptionManager.monthlyProduct(for: plan.planId),
+                    isPurchasing: isPurchasing && purchasingPlanId == plan.planId,
+                    isPlus: plan.planId == "plus",
+                    corePlan: corePlan,
+                    userCurrentPlanId: userCurrentPlanId
+                ) {
+                    Task {
+                        await purchaseSubscription(planId: plan.planId)
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Destiny Matching Info Section
+    private var destinyMatchingSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showDestinyMatchingInfo.toggle()
+                }
+            } label: {
+                HStack {
+                    Image(systemName: showDestinyMatchingInfo ? "chevron.up" : "chevron.down")
+                        .font(AppTheme.Fonts.title(size: 14))
+                    Text("What is Destiny Matching™?")
+                        .font(AppTheme.Fonts.body(size: 15))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(AppTheme.Fonts.body(size: 14))
+                }
+                .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
-            VStack(spacing: 8) {
-                Text("unlock_premium".localized)
-                    .font(AppTheme.Fonts.display(size: 26))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                
-                Text("get_cosmic_guidance".localized)
-                    .font(AppTheme.Fonts.body(size: 16))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-            }
-        }
-        .padding(.vertical, 12)
-    }
-    
-    // MARK: - Features Section
-    private var featuresSection: some View {
-        VStack(spacing: 16) {
-            FeatureRow(icon: "infinity", title: "Unlimited Questions", description: "Ask as many questions as you want")
-            FeatureRow(icon: "heart.fill", title: "Unlimited Matches", description: "Compare unlimited birth charts")
-            FeatureRow(icon: "chart.pie.fill", title: "Advanced Charts", description: "Detailed planetary analysis")
-            FeatureRow(icon: "sparkles", title: "Priority Responses", description: "Faster, more detailed answers")
-        }
-        .padding(20)
-        .background(AppTheme.Colors.cardBackground)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.2), radius: 10, y: 4)
-    }
-    
-    // MARK: - Pricing Card
-    private var pricingCard: some View {
-        VStack(spacing: 12) {
-            if let product = subscriptionManager.monthlyProduct {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(product.displayPrice)
-                        .font(AppTheme.Fonts.display(size: 36))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
+            if showDestinyMatchingInfo {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Destiny Matching™ looks beyond surface-level compatibility.")
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                     
-                    Text("/ month")
-                        .font(AppTheme.Fonts.body(size: 16))
+                    Text("While many astrology apps focus on pointing out mismatches, Destiny examines how two charts interact, where differences show up, and how alignment can be found even when things feel misaligned.")
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                    
+                    Text("It uses astrology to help you understand and navigate relationships in context, not simply label them as good or bad.")
+                        .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
-            } else {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("$4.99")
-                        .font(AppTheme.Fonts.display(size: 36))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                    
-                    Text("/ month")
-                        .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                }
+                .padding()
+                .background(AppTheme.Colors.cardBackground)
+                .cornerRadius(12)
             }
-            
-            Text("cancel_anytime".localized)
-                .font(AppTheme.Fonts.caption(size: 14))
-                .foregroundColor(AppTheme.Colors.textTertiary)
         }
-        .padding(.vertical, 8)
-    }
-    
-    // MARK: - Subscribe Button
-    private var subscribeButton: some View {
-        Button(action: {
-            Task {
-                await purchaseSubscription()
-            }
-        }) {
-            HStack(spacing: 10) {
-                if isPurchasing || subscriptionManager.isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "0B0F19")))
-                } else {
-                    Image(systemName: "crown.fill")
-                        .font(.system(size: 16))
-                }
-                Text(isPurchasing ? "Processing..." : "Subscribe Now")
-                    .font(AppTheme.Fonts.title(size: 17))
-            }
-            .foregroundColor(Color(hex: "0B0F19"))
-            .frame(maxWidth: .infinity)
-            .frame(height: 56)
-            .background(AppTheme.Colors.premiumGradient)
-            .cornerRadius(16)
-            .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 5)
-        }
-        .disabled(isPurchasing || subscriptionManager.isLoading)
+        .padding(.top, 8)
     }
     
     // MARK: - Restore Button
@@ -178,7 +164,7 @@ struct SubscriptionView: View {
         Button(action: {
             Task {
                 await subscriptionManager.restorePurchases()
-                if subscriptionManager.isPremium {
+                if quotaManager.isPremium {
                     dismiss()
                 }
             }
@@ -187,75 +173,245 @@ struct SubscriptionView: View {
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.gold)
         }
+        .padding(.top, 8)
     }
     
-    // MARK: - Disclaimer
-    private var disclaimerText: some View {
-        Text("subscription_terms".localized)
-            .font(AppTheme.Fonts.caption(size: 11))
-            .foregroundColor(AppTheme.Colors.textTertiary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 16)
+    // MARK: - Footer Disclaimers
+    private var footerDisclaimers: some View {
+        VStack(spacing: 8) {
+            Text("Subscription automatically renews unless canceled at least 24 hours before the end of the current period.")
+                .font(AppTheme.Fonts.caption(size: 11))
+                .foregroundColor(AppTheme.Colors.textTertiary)
+                .multilineTextAlignment(.center)
+            
+            Text("Unlimited access is subject to fair use.")
+                .font(AppTheme.Fonts.caption(size: 11))
+                .italic()
+                .foregroundColor(AppTheme.Colors.textTertiary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
     }
     
     // MARK: - Purchase Action
-    private func purchaseSubscription() async {
-        guard let product = subscriptionManager.monthlyProduct else {
-            errorMessage = "Product not available"
+    private func purchaseSubscription(planId: String) async {
+        guard let product = subscriptionManager.monthlyProduct(for: planId) else {
+            errorMessage = "Product not available. Please try again later."
             showError = true
             return
         }
         
         isPurchasing = true
+        purchasingPlanId = planId
         
         do {
             let success = try await subscriptionManager.purchase(product)
             isPurchasing = false
+            purchasingPlanId = nil
             
             if success {
                 dismiss()
             }
         } catch {
             isPurchasing = false
+            purchasingPlanId = nil
             errorMessage = error.localizedDescription
             showError = true
         }
     }
 }
 
-// MARK: - Feature Row
-struct FeatureRow: View {
-    let icon: String
-    let title: String
-    let description: String
+// MARK: - Plan Card with Full Feature List
+struct PlanCardWithFeatures: View {
+    let plan: PlanInfo
+    let product: Product?
+    let isPurchasing: Bool
+    let isPlus: Bool
+    let corePlan: PlanInfo?
+    let userCurrentPlanId: String  // User's current plan for dynamic button text
+    let onPurchase: () -> Void
+    
+    /// Features to display - DYNAMIC based on marketing_text from database
+    /// Only shows features that have marketing_text (differentiators from free plan)
+    private var displayFeatures: [PlanEntitlement] {
+        guard let entitlements = plan.entitlements else { 
+            print("[SubscriptionView] No entitlements for plan: \(plan.planId)")
+            return [] 
+        }
+        
+        print("[SubscriptionView] Plan \(plan.planId) has \(entitlements.count) entitlements")
+        
+        if isPlus {
+            // For Plus: show only plus-exclusive features with marketing_text
+            // Features that are either not in Core OR have different text (like "unlimited")
+            let coreFeatureTexts = Dictionary(uniqueKeysWithValues: 
+                (corePlan?.entitlements ?? []).compactMap { e -> (String, String)? in
+                    guard let text = e.marketingText else { return nil }
+                    return (e.featureId, text)
+                }
+            )
+            
+            let plusOnly = entitlements.filter { ent in
+                // Must have marketing_text to display
+                guard let text = ent.marketingText, !text.isEmpty else { return false }
+                // Show if: not in core, OR has different marketing_text than core
+                if let coreText = coreFeatureTexts[ent.featureId] {
+                    return text != coreText  // Different text (e.g., "unlimited" vs "up to 3")
+                }
+                return true  // Feature not in Core at all
+            }
+            print("[SubscriptionView] Plus exclusive features: \(plusOnly.map { $0.featureId })")
+            return plusOnly
+        } else {
+            // For Core: show ONLY features with marketing_text (paid differentiators)
+            let filtered = entitlements.filter { ent in
+                ent.marketingText != nil && !ent.marketingText!.isEmpty
+            }
+            print("[SubscriptionView] Core features: \(filtered.map { $0.featureId })")
+            return filtered
+        }
+    }
     
     var body: some View {
-        HStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(AppTheme.Colors.gold.opacity(0.15))
-                    .frame(width: 44, height: 44)
+        VStack(alignment: .leading, spacing: 16) {
+            // Header: Plan Name + Price
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(plan.displayName)
+                        .font(AppTheme.Fonts.title(size: 24))
+                        .foregroundColor(AppTheme.Colors.gold)
+                    
+                    if let desc = plan.description {
+                        Text(desc)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                    }
+                }
                 
-                Image(systemName: icon)
-                    .font(.system(size: 18))
-                    .foregroundColor(AppTheme.Colors.gold)
+                Spacer()
+                
+                // Price
+                VStack(alignment: .trailing, spacing: 2) {
+                    if let product = product {
+                        Text(product.displayPrice)
+                            .font(AppTheme.Fonts.title(size: 20))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                    } else {
+                        Text("$\(String(format: "%.2f", plan.priceMonthly ?? 0))")
+                            .font(AppTheme.Fonts.title(size: 20))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                    }
+                    Text("/ month")
+                        .font(AppTheme.Fonts.caption(size: 12))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
             }
+            
+            // For Plus: "Everything in Core, plus:" header
+            if isPlus {
+                Text("Everything in Core, plus:")
+                    .font(AppTheme.Fonts.title(size: 15))
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .padding(.top, 4)
+            }
+            
+            // Feature List with checkmarks and descriptions
+            VStack(alignment: .leading, spacing: 14) {
+                ForEach(displayFeatures) { feature in
+                    FeatureItemRow(feature: feature)
+                }
+            }
+            .padding(.top, 4)
+            
+            // CTA Button
+            Button(action: onPurchase) {
+                HStack {
+                    if isPurchasing {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.mainBackground))
+                    }
+                    Text(isPurchasing ? "Processing..." : buttonText)
+                        .font(AppTheme.Fonts.title(size: 16))
+                }
+                .foregroundColor(AppTheme.Colors.mainBackground)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(AppTheme.Colors.gold)
+                .cornerRadius(25)
+            }
+            .disabled(isPurchasing)
+            .padding(.top, 8)
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(AppTheme.Colors.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+        )
+    }
+    
+    private var priceDisplay: String {
+        if let product = product {
+            return "\(product.displayPrice) / month"
+        }
+        return "$\(String(format: "%.2f", plan.priceMonthly ?? 0)) / month"
+    }
+    
+    /// Dynamic button text based on user's current plan
+    private var buttonText: String {
+        if isPlus {
+            // Plus card: "Choose Plus" for free users, "Upgrade to Plus" for Core users
+            return userCurrentPlanId == "core" ? "Upgrade to Plus" : "Choose Plus"
+        } else {
+            // Core card: "Choose Core" for all users
+            return "Choose Core"
+        }
+    }
+}
+
+// MARK: - Feature Item Row (Checkmark + Title + Description)
+struct FeatureItemRow: View {
+    let feature: PlanEntitlement
+    
+    /// Check if feature is "coming soon"
+    private var isComingSoon: Bool {
+        feature.featureId == "alerts" || feature.featureId == "multiple_profiles"
+    }
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            // Gold checkmark
+            Image(systemName: "checkmark")
+                .font(AppTheme.Fonts.title(size: 14))
+                .foregroundColor(AppTheme.Colors.gold)
+                .frame(width: 16, height: 16)
+                .padding(.top, 2)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(AppTheme.Fonts.title(size: 15))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
+                // Feature title (bold) with optional "(coming soon)"
+                HStack(spacing: 4) {
+                    Text(feature.displayName)
+                        .font(AppTheme.Fonts.title(size: 15))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    
+                    if isComingSoon {
+                        Text("(coming soon)")
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
+                    }
+                }
                 
-                Text(description)
-                    .font(AppTheme.Fonts.body(size: 13))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
+                // Description below (from marketing_text)
+                if let description = feature.marketingText, !description.isEmpty {
+                    Text(description)
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
-            
-            Spacer()
-            
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 20))
-                .foregroundColor(Color.green)
         }
     }
 }

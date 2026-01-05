@@ -149,13 +149,13 @@ struct InlineMessageRating: View {
                     .foregroundColor(.green)
                 Text("Rated")
                     .font(.system(size: 10))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.5))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .fixedSize()
             } else {
                 // Rate label
                 Text("Rate")
                     .font(.system(size: 10))
-                    .foregroundColor(Color("NavyPrimary").opacity(0.4))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
                     .fixedSize()
                 
                 // Compact star buttons
@@ -166,7 +166,7 @@ struct InlineMessageRating: View {
                         } label: {
                             Image(systemName: star <= selectedRating ? "star.fill" : "star")
                                 .font(.system(size: 12))
-                                .foregroundColor(star <= selectedRating ? Color("GoldAccent") : Color("NavyPrimary").opacity(0.25))
+                                .foregroundColor(star <= selectedRating ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.6))
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)

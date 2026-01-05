@@ -27,7 +27,7 @@ struct AskDestinyQuestionsSheet: View {
                         // Title
                         VStack(spacing: 8) {
                             Image(systemName: "sparkles")
-                                .font(.system(size: 28))
+                                .font(AppTheme.Fonts.title(size: 28))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
                             Text("Ask Destiny")
@@ -35,7 +35,7 @@ struct AskDestinyQuestionsSheet: View {
                                 .foregroundColor(AppTheme.Colors.gold)
                             
                             Text("What's on your mind today?")
-                                .font(.system(size: 14))
+                                .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                         .padding(.top, 10)
@@ -63,7 +63,7 @@ struct AskDestinyQuestionsSheet: View {
                                 .fill(AppTheme.Colors.textSecondary.opacity(0.3))
                                 .frame(height: 1)
                             Text("or ask your own")
-                                .font(.system(size: 12))
+                                .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                             Rectangle()
                                 .fill(AppTheme.Colors.textSecondary.opacity(0.3))
@@ -76,7 +76,7 @@ struct AskDestinyQuestionsSheet: View {
                         HStack(spacing: 12) {
                             TextField("Type your question...", text: $customQuestion)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
-                                .font(.system(size: 16))
+                                .font(AppTheme.Fonts.body(size: 16))
                                 .focused($isInputFocused)
                                 .submitLabel(.send)
                                 .onSubmit {
@@ -93,7 +93,7 @@ struct AskDestinyQuestionsSheet: View {
                                 }
                             }) {
                                 Image(systemName: "arrow.up.circle.fill")
-                                    .font(.system(size: 28))
+                                    .font(AppTheme.Fonts.title(size: 28))
                                     .foregroundColor(customQuestion.isEmpty ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold)
                             }
                             .disabled(customQuestion.isEmpty)
@@ -120,7 +120,7 @@ struct AskDestinyQuestionsSheet: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
+                            .font(AppTheme.Fonts.title(size: 24))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 }
@@ -143,14 +143,14 @@ struct MindQuestionCard: View {
         Button(action: onTap) {
             HStack {
                 Text(question)
-                    .font(.system(size: 16))
+                    .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .multilineTextAlignment(.leading)
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             }
             .padding(.horizontal, 18)

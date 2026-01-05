@@ -123,7 +123,7 @@ struct MangalDoshaSheet: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(AppTheme.Fonts.title(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
                             .frame(width: 32, height: 32)
                             .background(Circle().fill(AppTheme.Colors.secondaryBackground))
@@ -152,19 +152,19 @@ struct MangalDoshaSheet: View {
     private func positionPill(label: String, value: String, subValue: String?, color: Color) -> some View {
         VStack(spacing: 6) {
             Text(label)
-                .font(.system(size: 11, weight: .medium))
+                .font(AppTheme.Fonts.caption(size: 11))
                 .foregroundColor(.white.opacity(0.6))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             
             Text(value)
-                .font(.system(size: 16, weight: .bold))
+                .font(AppTheme.Fonts.title(size: 16))
                 .foregroundColor(.white)
                 .lineLimit(1)
             
             if let sub = subValue {
                 Text(sub)
-                    .font(.system(size: 10))
+                    .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(color.opacity(0.9))
             }
         }
@@ -266,11 +266,11 @@ struct MangalDoshaSheet: View {
                 
                 VStack(spacing: 4) {
                     Text("\(Int(score * 100))%")
-                        .font(.system(size: 36, weight: .bold))
+                        .font(AppTheme.Fonts.display(size: 36))
                         .foregroundColor(.white)
                     
                     Text(category.capitalized)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(categoryColor(category))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 4)
@@ -286,15 +286,15 @@ struct MangalDoshaSheet: View {
                     Image(systemName: "checkmark.seal.fill")
                         .foregroundColor(.green)
                     Text("dosha_cancelled".localized)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(.green)
                     Text("(\(Int(cancellationStrength * 100))%)")
-                        .font(.system(size: 12))
+                        .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(.white.opacity(0.7))
                 }
                 
                 Text(reason)
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -324,18 +324,18 @@ struct MangalDoshaSheet: View {
     private func miniDoshaCard(name: String, data: MangalDoshaData?, color: Color) -> some View {
         VStack(spacing: 12) {
             Text(name)
-                .font(.system(size: 14, weight: .bold))
+                .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(.white)
             
             if let data = data {
                 // Score
                 Text("\(Int(data.doshaScore * 100))%")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(AppTheme.Fonts.display(size: 28))
                     .foregroundColor(color)
                 
                 // Severity badge
                 Text(data.severity.capitalized)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(.white)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
@@ -348,12 +348,12 @@ struct MangalDoshaSheet: View {
                         .fill(data.hasMangalDosha ? Color.orange : Color.green)
                         .frame(width: 8, height: 8)
                     Text(data.hasMangalDosha ? "present".localized : "absent".localized)
-                        .font(.system(size: 11))
+                        .font(AppTheme.Fonts.caption(size: 11))
                         .foregroundColor(.white.opacity(0.7))
                 }
             } else {
                 Text("no_data".localized)
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(.white.opacity(0.5))
             }
         }
@@ -381,7 +381,7 @@ struct MangalDoshaSheet: View {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .foregroundColor(.purple)
                 Text("synastry_aspects".localized)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(AppTheme.Fonts.title(size: 16))
                     .foregroundColor(.white)
             }
             
@@ -389,7 +389,7 @@ struct MangalDoshaSheet: View {
             if !beneficialAspects.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("beneficial".localized)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 12))
                         .foregroundColor(.green)
                     
                     ForEach(beneficialAspects.indices, id: \.self) { i in
@@ -401,9 +401,9 @@ struct MangalDoshaSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: "plus.circle.fill")
                                 .foregroundColor(.green)
-                                .font(.system(size: 12))
+                                .font(AppTheme.Fonts.caption(size: 12))
                             Text("\(planet) (\(type))")
-                                .font(.system(size: 12, weight: .medium))
+                                .font(AppTheme.Fonts.title(size: 12))
                                 .foregroundColor(.white)
                         }
                     }
@@ -414,7 +414,7 @@ struct MangalDoshaSheet: View {
             if !challengingAspects.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("challenging".localized)
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 12))
                         .foregroundColor(.orange)
                     
                     ForEach(challengingAspects.indices, id: \.self) { i in
@@ -425,9 +425,9 @@ struct MangalDoshaSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: "exclamationmark.circle.fill")
                                 .foregroundColor(.orange)
-                                .font(.system(size: 12))
+                                .font(AppTheme.Fonts.caption(size: 12))
                             Text("\(planet) (\(type))")
-                                .font(.system(size: 12, weight: .medium))
+                                .font(AppTheme.Fonts.title(size: 12))
                                 .foregroundColor(.white)
                         }
                     }
@@ -456,7 +456,7 @@ struct MangalDoshaSheet: View {
                     Image(systemName: "lightbulb.fill")
                         .foregroundColor(.yellow)
                     Text("recommendations".localized)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(.white)
                 }
                 
@@ -465,7 +465,7 @@ struct MangalDoshaSheet: View {
                         Text("•")
                             .foregroundColor(.yellow)
                         Text(recommendations[i])
-                            .font(.system(size: 13))
+                            .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
                 }
@@ -535,14 +535,14 @@ struct MangalDoshaSheet: View {
                 // Center content
                 VStack(spacing: 4) {
                     Text(data.hasMangalDosha ? "🔴" : "✅")
-                        .font(.system(size: 32))
+                        .font(AppTheme.Fonts.display(size: 32))
                     
                     Text("\(Int(data.doshaScore * 100))%")
                         .font(.system(size: 36, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                     
                     Text(data.severityLabel.uppercased())
-                        .font(.system(size: 12, weight: .bold))
+                        .font(AppTheme.Fonts.title(size: 12))
                         .foregroundColor(severityColor(data.severity))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 4)
@@ -554,7 +554,7 @@ struct MangalDoshaSheet: View {
             
             if let explanation = data.explanation {
                 Text(explanation)
-                    .font(.system(size: 13))
+                    .font(AppTheme.Fonts.body(size: 13))
                     .foregroundColor(.white.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
@@ -585,11 +585,11 @@ struct MangalDoshaSheet: View {
                         .fill(Color.red.opacity(0.2))
                         .frame(width: 36, height: 36)
                     Image(systemName: "location.circle.fill")
-                        .font(.system(size: 18))
+                        .font(AppTheme.Fonts.title(size: 18))
                         .foregroundColor(.red)
                 }
                 Text("mars_position".localized)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 15))
                     .foregroundColor(.white)
                 Spacer()
             }
@@ -647,7 +647,7 @@ struct MangalDoshaSheet: View {
                 Image(systemName: hasExceptions ? "checkmark.shield.fill" : "xmark.shield.fill")
                     .foregroundColor(hasExceptions ? .green : .red.opacity(0.7))
                 Text(hasExceptions ? "cancellation_active".localized : "mangal_dosha_status".localized)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(.white)
                 Spacer()
             }
@@ -671,7 +671,7 @@ struct MangalDoshaSheet: View {
     private func cancellationStrengthMeter(_ data: MangalDoshaData) -> some View {
         HStack {
             Text("strength".localized)
-                .font(.system(size: 12))
+                .font(AppTheme.Fonts.caption(size: 12))
                 .foregroundColor(.white.opacity(0.6))
             
             GeometryReader { geometry in
@@ -693,7 +693,7 @@ struct MangalDoshaSheet: View {
             .frame(height: 8)
             
             Text("\(Int((1.0 - data.doshaScore) * 100))%")
-                .font(.system(size: 12, weight: .semibold))
+                .font(AppTheme.Fonts.title(size: 12))
                 .foregroundColor(.green)
         }
     }
@@ -718,11 +718,11 @@ struct MangalDoshaSheet: View {
                         .fill(Color.blue.opacity(0.2))
                         .frame(width: 36, height: 36)
                     Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 18))
+                        .font(AppTheme.Fonts.title(size: 18))
                         .foregroundColor(.blue)
                 }
                 Text("dosha_calculation".localized)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 15))
                     .foregroundColor(.white)
                 Spacer()
             }
@@ -763,11 +763,11 @@ struct MangalDoshaSheet: View {
                 // Final Score
                 HStack {
                     Text("final_score".localized)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 13))
                         .foregroundColor(.white.opacity(0.8))
                     Spacer()
                     Text(String(format: "%.0f%%", data.doshaScore * 100))
-                        .font(.system(size: 18, weight: .bold))
+                        .font(AppTheme.Fonts.title(size: 18))
                         .foregroundColor(severityColor(data.severity))
                 }
             }
@@ -786,7 +786,7 @@ struct MangalDoshaSheet: View {
     private func breakdownRow(label: String, value: Double, maxValue: Double, color: Color, isAdditive: Bool) -> some View {
         HStack(spacing: 12) {
             Text(label)
-                .font(.system(size: 12))
+                .font(AppTheme.Fonts.caption(size: 12))
                 .foregroundColor(.white.opacity(0.7))
                 .frame(width: 110, alignment: .leading)
             
@@ -803,7 +803,7 @@ struct MangalDoshaSheet: View {
             .frame(height: 8)
             
             Text(isAdditive ? String(format: "+%.0f%%", value * 100) : String(format: "-%.0f%%", value * 100))
-                .font(.system(size: 11, weight: .semibold))
+                .font(AppTheme.Fonts.title(size: 11))
                 .foregroundColor(color)
                 .frame(width: 45, alignment: .trailing)
         }
@@ -817,7 +817,7 @@ struct MangalDoshaSheet: View {
                 Image(systemName: icon)
                     .foregroundColor(color)
                 Text("\(title) (\(factors.count))")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(.white)
                 Spacer()
             }
@@ -826,12 +826,12 @@ struct MangalDoshaSheet: View {
                 ForEach(factors, id: \.self) { factor in
                     HStack(alignment: .top, spacing: 8) {
                         Image(systemName: color == .green ? "checkmark" : "exclamationmark")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(AppTheme.Fonts.title(size: 10))
                             .foregroundColor(color)
                             .frame(width: 16, height: 16)
                         
                         Text(factor)
-                            .font(.system(size: 13))
+                            .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
                 }
@@ -857,7 +857,7 @@ struct MangalDoshaSheet: View {
                 Image(systemName: "sparkles")
                     .foregroundColor(.yellow)
                 Text("recommended_remedies".localized)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(.white)
                 Spacer()
             }
@@ -866,10 +866,10 @@ struct MangalDoshaSheet: View {
                 ForEach(remedies, id: \.self) { remedy in
                     HStack(alignment: .top, spacing: 10) {
                         Text("🙏")
-                            .font(.system(size: 14))
+                            .font(AppTheme.Fonts.body(size: 14))
                         
                         Text(remedy)
-                            .font(.system(size: 13))
+                            .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
                 }
@@ -892,11 +892,11 @@ struct MangalDoshaSheet: View {
     private var noDataView: some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 48))
+                .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(.white.opacity(0.3))
             
             Text("No Mangal Dosha data available")
-                .font(.system(size: 16))
+                .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(.white.opacity(0.5))
         }
         .padding(40)

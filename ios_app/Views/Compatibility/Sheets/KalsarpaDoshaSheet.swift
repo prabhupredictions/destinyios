@@ -68,7 +68,7 @@ struct KalsarpaDoshaSheet: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(AppTheme.Fonts.title(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
                             .frame(width: 32, height: 32)
                             .background(Circle().fill(AppTheme.Colors.secondaryBackground))
@@ -161,7 +161,7 @@ struct KalsarpaDoshaSheet: View {
                     
                     // Snake emoji with animation
                     Text("🐍")
-                        .font(.system(size: 56))
+                        .font(AppTheme.Fonts.display(size: 56))
                         .scaleEffect(animateSnake ? 1.08 : 0.95)
                         .rotationEffect(.degrees(animateSnake ? 8 : -8))
                 }
@@ -209,7 +209,7 @@ struct KalsarpaDoshaSheet: View {
                         .frame(width: 140, height: 140)
                     
                     Text("✨")
-                        .font(.system(size: 52))
+                        .font(AppTheme.Fonts.display(size: 52))
                         .scaleEffect(animateSnake ? 1.05 : 0.98)
                 }
                 
@@ -263,7 +263,7 @@ struct KalsarpaDoshaSheet: View {
                         .frame(width: 32, height: 32)
                     Image(systemName: "sparkle")
                         .foregroundColor(AppTheme.Colors.gold)
-                        .font(.system(size: 14))
+                        .font(AppTheme.Fonts.body(size: 14))
                 }
                 Text("dosha_details".localized)
                     .font(AppTheme.Fonts.body(size: 15).weight(.bold))
@@ -274,7 +274,7 @@ struct KalsarpaDoshaSheet: View {
             // Dosha Name and Description
             HStack(spacing: 12) {
                 Text("🐍")
-                    .font(.system(size: 24))
+                    .font(AppTheme.Fonts.title(size: 24))
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(data.displayName + " Kala Sarpa")
@@ -299,7 +299,7 @@ struct KalsarpaDoshaSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: "heart.text.square.fill")
                             .foregroundColor(AppTheme.Colors.gold)
-                            .font(.system(size: 14))
+                            .font(AppTheme.Fonts.body(size: 14))
                         Text("affected_areas".localized)
                             .font(AppTheme.Fonts.body(size: 13).weight(.semibold))
                             .foregroundColor(AppTheme.Colors.textSecondary)
@@ -309,7 +309,7 @@ struct KalsarpaDoshaSheet: View {
                         ForEach(areas, id: \.self) { area in
                             HStack(spacing: 4) {
                                 Text(areaIcon(area))
-                                    .font(.system(size: 11))
+                                    .font(AppTheme.Fonts.caption(size: 11))
                                 Text(area)
                                     .font(AppTheme.Fonts.caption(size: 11))
                                     .foregroundColor(AppTheme.Colors.textPrimary)
@@ -332,7 +332,7 @@ struct KalsarpaDoshaSheet: View {
                 HStack(spacing: 12) {
                     Image(systemName: "clock.fill")
                         .foregroundColor(AppTheme.Colors.goldDim)
-                        .font(.system(size: 16))
+                        .font(AppTheme.Fonts.body(size: 16))
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text("peak_period".localized)
@@ -356,7 +356,7 @@ struct KalsarpaDoshaSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: "doc.text.fill")
                             .foregroundColor(AppTheme.Colors.gold)
-                            .font(.system(size: 14))
+                            .font(AppTheme.Fonts.body(size: 14))
                         Text("analysis_notes".localized)
                             .font(AppTheme.Fonts.body(size: 13).weight(.semibold))
                             .foregroundColor(AppTheme.Colors.textSecondary)
@@ -398,7 +398,7 @@ struct KalsarpaDoshaSheet: View {
                         .frame(width: 32, height: 32)
                     Image(systemName: "sparkles")
                         .foregroundColor(AppTheme.Colors.gold)
-                        .font(.system(size: 14))
+                        .font(AppTheme.Fonts.body(size: 14))
                 }
                 Text("recommended_remedies".localized)
                     .font(AppTheme.Fonts.body(size: 15).weight(.bold))
@@ -410,7 +410,7 @@ struct KalsarpaDoshaSheet: View {
                 ForEach(remedies.indices, id: \.self) { index in
                     HStack(alignment: .top, spacing: 12) {
                         Text("🙏")
-                            .font(.system(size: 16))
+                            .font(AppTheme.Fonts.body(size: 16))
                         
                         Text(remedies[index])
                             .font(AppTheme.Fonts.caption())
@@ -441,7 +441,7 @@ struct KalsarpaDoshaSheet: View {
                     .fill(AppTheme.Colors.inputBackground)
                     .frame(width: 80, height: 80)
                 Image(systemName: "questionmark")
-                    .font(.system(size: 32, weight: .light))
+                    .font(AppTheme.Fonts.display(size: 32))
                     .foregroundColor(AppTheme.Colors.textTertiary)
             }
             

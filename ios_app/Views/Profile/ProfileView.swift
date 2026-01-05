@@ -5,6 +5,7 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @StateObject private var quotaManager = QuotaManager.shared
     @State private var authViewModel = AuthViewModel()
     
     // User preferences from storage
@@ -112,12 +113,12 @@ struct ProfileView: View {
                     }
                     
                     // Premium badge if subscribed
-                    if subscriptionManager.isPremium {
+                    if quotaManager.isPremium {
                         HStack(spacing: 4) {
                             Image(systemName: "crown.fill")
-                                .font(.system(size: 10))
+                                .font(AppTheme.Fonts.caption(size: 10))
                             Text("Premium")
-                                .font(.system(size: 11, weight: .semibold))
+                                .font(AppTheme.Fonts.title(size: 11))
                         }
                         .foregroundColor(AppTheme.Colors.mainBackground)
                         .padding(.horizontal, 8)
@@ -197,16 +198,16 @@ struct ProfileView: View {
                             .frame(width: 40, height: 40)
                         
                         Image(systemName: "crown.fill")
-                            .font(.system(size: 18))
+                            .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(.white)
                     }
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(subscriptionManager.isPremium ? "Manage Subscription" : "Upgrade to Premium")
+                        Text(quotaManager.isPremium ? "Manage Subscription" : "Upgrade to Premium")
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(.white)
                         
-                        Text(subscriptionManager.isPremium ? "View details" : "Unlock unlimited insights")
+                        Text(quotaManager.isPremium ? "View details" : "Unlock unlimited insights")
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -214,7 +215,7 @@ struct ProfileView: View {
                     Spacer()
                     
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(.white.opacity(0.6))
                 }
             }
@@ -417,7 +418,7 @@ struct FAQItem: View {
                         Spacer()
                         
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(AppTheme.Fonts.title(size: 12))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 }

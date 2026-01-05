@@ -9,7 +9,9 @@ struct CompatibilityView: View {
     @State private var showChartsSheet = false
     
     // Quota and subscription UI state
+    // Quota and subscription UI state
     @State private var showQuotaExhausted = false
+    @State private var quotaErrorMessage: String?
     @State private var showSubscription = false
     @AppStorage("isGuest") private var isGuest = false
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -96,6 +98,7 @@ struct CompatibilityView: View {
         .sheet(isPresented: $showQuotaExhausted) {
             QuotaExhaustedView(
                 isGuest: isGuest,
+                customMessage: quotaErrorMessage,
                 onSignIn: { signOutAndReauth() },
                 onUpgrade: {
                     if isGuest {
@@ -159,7 +162,7 @@ struct CompatibilityView: View {
                 VStack(spacing: 8) {
                     HStack(spacing: 6) {
                         Text("💕")
-                            .font(.system(size: 24))
+                            .font(AppTheme.Fonts.title(size: 24))
                         Text("kundali_match".localized)
                             .font(AppTheme.Fonts.display(size: 24))
                             .foregroundColor(AppTheme.Colors.gold)
@@ -310,7 +313,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             Spacer()
                             Image(systemName: "calendar")
-                                .font(.system(size: 14))
+                                .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
                         }
                         .padding(.horizontal, 12)
@@ -330,7 +333,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             Spacer()
                             Image(systemName: "clock")
-                                .font(.system(size: 14))
+                                .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
                         }
                         .padding(.horizontal, 12)
@@ -349,7 +352,7 @@ struct CompatibilityView: View {
                     Button(action: { showBoyLocationSearch = true }) {
                         HStack {
                             Image(systemName: "location.fill")
-                                .font(.system(size: 14))
+                                .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
                             Text(viewModel.boyCity.isEmpty ? "select_city".localized : viewModel.boyCity)
@@ -359,7 +362,7 @@ struct CompatibilityView: View {
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12))
+                                .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                         .padding(.horizontal, 12)
@@ -410,7 +413,7 @@ struct CompatibilityView: View {
                                     .lineLimit(1)
                                 Spacer()
                                 Image(systemName: "chevron.down")
-                                    .font(.system(size: 10))
+                                    .font(AppTheme.Fonts.caption(size: 10))
                                     .foregroundColor(AppTheme.Colors.gold)
                             }
                             .padding(.horizontal, 10)
@@ -449,7 +452,7 @@ struct CompatibilityView: View {
                                     .foregroundColor(AppTheme.Colors.textPrimary.opacity(0.6))
                                 Spacer()
                                 Image(systemName: "clock")
-                                    .font(.system(size: 14))
+                                    .font(AppTheme.Fonts.body(size: 14))
                                     .foregroundColor(AppTheme.Colors.gold.opacity(0.3))
                             }
                             .padding(.horizontal, 12)
@@ -469,7 +472,7 @@ struct CompatibilityView: View {
                          viewModel.partnerTimeUnknown.toggle() 
                     }) {
                         Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
-                            .font(.system(size: 18))
+                            .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(viewModel.partnerTimeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
                     }
                     
@@ -482,7 +485,7 @@ struct CompatibilityView: View {
                 if viewModel.partnerTimeUnknown {
                     HStack(spacing: 6) {
                         Image(systemName: "info.circle.fill")
-                            .font(.system(size: 12))
+                            .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.warning)
                         
                         Text("birth_time_warning".localized)
@@ -503,7 +506,7 @@ struct CompatibilityView: View {
                     Button(action: { showGirlLocationSearch = true }) {
                         HStack {
                             Image(systemName: "location.fill")
-                                .font(.system(size: 14))
+                                .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
                             Text(viewModel.girlCity.isEmpty ? "select_city".localized : viewModel.girlCity)
@@ -513,7 +516,7 @@ struct CompatibilityView: View {
                             Spacer()
                             
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12))
+                                .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                         .padding(.horizontal, 12)
@@ -538,11 +541,51 @@ struct CompatibilityView: View {
             icon: "sparkles",
             isLoading: viewModel.isAnalyzing
         ) {
-            // Check quota before analyzing
-            if QuotaManager.shared.canAsk {
-                Task { await viewModel.analyzeMatch() }
-            } else {
-                showQuotaExhausted = true
+            Task {
+                // Check quota for COMPATIBILITY feature
+                let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+                do {
+                    let accessResponse = try await QuotaManager.shared.canAccessFeature(.compatibility, email: email)
+                    if accessResponse.canAccess {
+                        await viewModel.analyzeMatch()
+                        // Quota is now recorded server-side by /compatibility/analyze endpoint
+                    } else {
+                        await MainActor.run {
+                            // Professional Quota UI - Daily=banner, Overall/Feature=sheet
+                            if accessResponse.reason == "daily_limit_reached" {
+                                // DAILY LIMIT: Show message (for banner), no sheet
+                                if let resetAtStr = accessResponse.resetAt,
+                                   let date = ISO8601DateFormatter().date(from: resetAtStr) {
+                                    let timeFormatter = DateFormatter()
+                                    timeFormatter.timeStyle = .short
+                                    let timeStr = timeFormatter.string(from: date)
+                                    viewModel.errorMessage = "Daily limit reached. Resets at \(timeStr)."
+                                } else {
+                                    viewModel.errorMessage = "Daily limit reached. Resets tomorrow."
+                                }
+                                // No sheet for daily limit
+                            } else if accessResponse.reason == "overall_limit_reached" {
+                                // OVERALL LIMIT: Show sheet only
+                                if email.contains("guest") || email.contains("@gen.com") {
+                                    quotaErrorMessage = "Free questions used. Sign In or Subscribe to continue."
+                                } else {
+                                    quotaErrorMessage = "You've reached your free limit. Subscribe for unlimited access."
+                                }
+                                showQuotaExhausted = true
+                            } else {
+                                // FEATURE NOT AVAILABLE: Show sheet only
+                                quotaErrorMessage = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
+                                showQuotaExhausted = true
+                            }
+                        }
+                    }
+                } catch {
+                    print("❌ Quota check failed: \(error)")
+                    await MainActor.run {
+                        quotaErrorMessage = "Unable to check compatibility access."
+                        showQuotaExhausted = true
+                    }
+                }
             }
         }
         .padding(.horizontal, 20)
@@ -595,7 +638,7 @@ struct MatchDateButton: View {
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
                 Image(systemName: "calendar")
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
             }
             .padding(.horizontal, 12)
@@ -631,7 +674,7 @@ struct MatchTimeButton: View {
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
                 Image(systemName: "clock")
-                    .font(.system(size: 14))
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
             }
             .padding(.horizontal, 12)

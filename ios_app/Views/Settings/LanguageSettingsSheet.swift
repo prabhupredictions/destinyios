@@ -54,7 +54,7 @@ struct LanguageSettingsSheet: View {
                                     if appLanguageCode == language.code {
                                         Image(systemName: "checkmark")
                                             .foregroundColor(AppTheme.Colors.gold)
-                                            .font(.system(size: 14, weight: .semibold))
+                                            .font(AppTheme.Fonts.title(size: 14))
                                     }
                                 }
                             }

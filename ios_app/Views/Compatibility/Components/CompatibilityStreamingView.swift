@@ -18,11 +18,11 @@ struct CompatibilityStreamingView: View {
                 // Header
                 HStack {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 16))
+                        .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(Color("GoldAccent"))
                     
                     Text("analyzing_match".localized)
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(AppTheme.Fonts.title(size: 17))
                         .foregroundColor(Color("NavyPrimary"))
                     
                     Spacer()
@@ -124,7 +124,7 @@ struct StepRowView: View {
                 
                 if isCompleted {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 14, weight: .bold))
+                        .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(.green)
                 } else if isActive {
                     ProgressView()
@@ -132,7 +132,7 @@ struct StepRowView: View {
                         .scaleEffect(0.7)
                 } else {
                     Image(systemName: step.icon)
-                        .font(.system(size: 14))
+                        .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(Color("NavyPrimary").opacity(0.3))
                 }
             }
@@ -145,7 +145,7 @@ struct StepRowView: View {
                 
                 if isActive {
                     Text("processing".localized)
-                        .font(.system(size: 11))
+                        .font(AppTheme.Fonts.caption(size: 11))
                         .foregroundColor(Color("GoldAccent"))
                 }
             }
@@ -155,7 +155,7 @@ struct StepRowView: View {
             // Time indicator for completed steps
             if isCompleted {
                 Text("✓")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(AppTheme.Fonts.title(size: 12))
                     .foregroundColor(.green)
             }
         }
@@ -188,17 +188,17 @@ struct StreamingTextView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 Image(systemName: "brain.head.profile")
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(Color("GoldAccent"))
                 
                 Text("AI Analysis")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 11))
                     .foregroundColor(Color("GoldAccent"))
             }
             
             HStack(alignment: .bottom, spacing: 0) {
                 Text(text)
-                    .font(.system(size: 13))
+                    .font(AppTheme.Fonts.body(size: 13))
                     .foregroundColor(Color("NavyPrimary"))
                     .lineSpacing(4)
                 

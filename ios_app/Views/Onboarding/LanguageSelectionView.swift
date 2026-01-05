@@ -7,8 +7,6 @@ struct LanguageSelectionView: View {
     // UserDefaults to save selection
     @AppStorage("appLanguage") private var appLanguage = "English"
     @AppStorage("appLanguageCode") private var appLanguageCode = "en"
-    // AppleLanguages is array [String], not supported by AppStorage directly
-    // usage is handled manually in helper functions
     
     @State private var selectedCode: String?
     @State private var animateContent = false
@@ -48,15 +46,12 @@ struct LanguageSelectionView: View {
                 .blur(radius: 60)
                 .offset(x: -100, y: -200)
             
-            VStack(spacing: 30) {
-                Spacer()
-                    .frame(height: 20) // Top spacing to prevent truncation
-                
-                // Header
+            // Main content - proper VStack layout (not overlay)
+            VStack(spacing: 0) {
+                // Header (fixed)
                 VStack(spacing: 12) {
-                    // Logo or Icon
                     Image(systemName: "globe")
-                        .font(.system(size: 40))
+                        .font(AppTheme.Fonts.display(size: 40))
                         .foregroundColor(AppTheme.Colors.gold)
                         .padding(.bottom, 8)
                         
@@ -69,10 +64,12 @@ struct LanguageSelectionView: View {
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                 }
+                .padding(.top, 40)
+                .padding(.bottom, 20)
                 .opacity(animateContent ? 1 : 0)
                 .offset(y: animateContent ? 0 : 20)
                 
-                // Language Grid
+                // Language Grid (scrollable, takes remaining space)
                 ScrollView(showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(languages) { language in
@@ -85,30 +82,26 @@ struct LanguageSelectionView: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 100) // Space for button
+                    .padding(.vertical, 8)
                 }
                 .opacity(animateContent ? 1 : 0)
                 .offset(y: animateContent ? 0 : 30)
-            }
-            
-            // Continue Button (Fixed at bottom)
-            VStack {
-                Spacer()
+                
+                // Continue Button (fixed at bottom, NOT overlaying)
                 if selectedCode != nil {
                     Button(action: confirmSelection) {
                         Text(continueButtonText)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(Color(hex: "0B0F19")) // Dark text on gold
+                            .font(AppTheme.Fonts.title(size: 18))
+                            .foregroundColor(AppTheme.Colors.textOnGold)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(
-                                AppTheme.Colors.premiumGradient
-                            )
+                            .background(AppTheme.Colors.premiumGradient)
                             .cornerRadius(16)
                             .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 4)
                     }
                     .padding(.horizontal, 40)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, 30)
+                    .padding(.top, 16)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
@@ -122,8 +115,6 @@ struct LanguageSelectionView: View {
     
     private var continueButtonText: String {
         guard let code = selectedCode else { return "Continue" }
-        // Simple mapping for demonstration, in a real app these would be localized too
-        // or fetched from the respective bundle
         switch code {
         case "hi": return "जारी रखें"
         case "es": return "Continuar"
@@ -142,7 +133,6 @@ struct LanguageSelectionView: View {
             selectedCode = language.code
         }
         
-        // Save
         appLanguageCode = language.code
         appLanguage = language.name
         
@@ -178,16 +168,19 @@ struct LanguageGridItem: View {
         Button(action: action) {
             VStack(spacing: 8) {
                 Text(language.nativeName)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(AppTheme.Fonts.title(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
                 
                 Text(language.name)
-                    .font(.system(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(AppTheme.Colors.textSecondary)
+                    .lineLimit(1)
             }
+            .padding(.horizontal, 4)
             .frame(maxWidth: .infinity)
-            .frame(height: 90)
+            .frame(height: 80) // Slightly smaller cards
             .background(
                 RoundedRectangle(cornerRadius: 16)
                     .fill(isSelected ? AppTheme.Colors.gold.opacity(0.15) : AppTheme.Colors.cardBackground)
@@ -196,15 +189,11 @@ struct LanguageGridItem: View {
                             .stroke(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.separator, lineWidth: isSelected ? 2 : 1)
                     )
             )
-            .scaleEffect(isSelected ? 1.05 : 1.0)
             .animation(.spring(response: 0.3), value: isSelected)
         }
         .buttonStyle(ScaleButtonStyle())
     }
 }
-
-// Reuse or define ScaleButtonStyle
-
 
 #Preview {
     LanguageSelectionView(isCompleted: .constant(false))

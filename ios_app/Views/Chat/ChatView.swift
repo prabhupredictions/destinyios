@@ -79,6 +79,7 @@ struct ChatView: View {
         .sheet(isPresented: $showQuotaExhausted) {
             QuotaExhaustedView(
                 isGuest: isGuest,
+                customMessage: viewModel.quotaDetails,
                 onSignIn: { signOutAndReauth() },
                 onUpgrade: { 
                     // For guests: require sign-in first, then they can upgrade
@@ -129,13 +130,21 @@ struct ChatView: View {
                 }
             }
             
-            // Handle initial thread ID
             if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {
                 hasHandledInitialThread = true
                 if let thread = viewModel.dataManager.fetchThread(id: threadId) {
                     viewModel.loadThread(thread)
                 }
             }
+        }
+        // Sync ViewModel quota state to View
+        .onChange(of: viewModel.showQuotaSheet) { oldValue, newValue in
+            showQuotaExhausted = newValue
+        }
+        .onChange(of: showQuotaExhausted) { oldValue, newValue in
+             if !newValue {
+                 viewModel.showQuotaSheet = false
+             }
         }
     }
     
@@ -244,7 +253,7 @@ struct ChatView: View {
     private func errorBanner(_ message: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 14))
+                .font(AppTheme.Fonts.body(size: 14))
             Text(message)
                 .font(AppTheme.Fonts.body(size: 14))
         }
@@ -355,7 +364,7 @@ struct ChatHistorySidebar: View {
                         if grouped.isEmpty {
                             VStack(spacing: 16) {
                                 Image(systemName: "bubble.left.and.bubble.right")
-                                    .font(.system(size: 48))
+                                    .font(AppTheme.Fonts.display(size: 48))
                                     .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
                                 
                                 Text("no_chat_history".localized)
@@ -418,7 +427,7 @@ struct HistoryRow: View {
                 // Pin indicator
                 if thread.isPinned {
                     Image(systemName: "pin.fill")
-                        .font(.system(size: 12))
+                        .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 

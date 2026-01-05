@@ -14,14 +14,24 @@ class SubscriptionManager: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     
-    // MARK: - Product IDs
-    /// Configure these in App Store Connect
-    static let monthlyProductID = "com.destinyai.premium.monthly"
-    static let yearlyProductID = "com.destinyai.premium.yearly"
+    // MARK: - Product IDs (Configure in App Store Connect)
+    
+    /// Core plan
+    static let coreMonthlyProductID = "com.daa.core.monthly"
+    static let coreYearlyProductID = "com.daa.core.yearly"
+    
+    /// Advanced plan
+    static let advancedMonthlyProductID = "com.daa.advanced.monthly"
+    static let advancedYearlyProductID = "com.daa.advanced.yearly"
+    
+    /// Premium plan
+    static let premiumMonthlyProductID = "com.daa.premium.monthly"
+    static let premiumYearlyProductID = "com.daa.premium.yearly"
     
     private let productIDs: Set<String> = [
-        monthlyProductID,
-        yearlyProductID
+        coreMonthlyProductID, coreYearlyProductID,
+        advancedMonthlyProductID, advancedYearlyProductID,
+        premiumMonthlyProductID, premiumYearlyProductID
     ]
     
     // MARK: - Transaction Listener
@@ -29,10 +39,8 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Init
     private init() {
-        // Start listening for transactions
         transactionListener = listenForTransactions()
         
-        // Load products
         Task {
             await loadProducts()
             await updatePurchasedProducts()
@@ -60,6 +68,22 @@ class SubscriptionManager: ObservableObject {
         }
     }
     
+    /// Get products for a specific plan
+    func productsForPlan(_ planId: String) -> [Product] {
+        let prefix = "com.daa.\(planId)."
+        return products.filter { $0.id.hasPrefix(prefix) }
+    }
+    
+    /// Get monthly product for a plan
+    func monthlyProduct(for planId: String) -> Product? {
+        products.first { $0.id == "com.daa.\(planId).monthly" }
+    }
+    
+    /// Get yearly product for a plan
+    func yearlyProduct(for planId: String) -> Product? {
+        products.first { $0.id == "com.daa.\(planId).yearly" }
+    }
+    
     // MARK: - Purchase
     
     /// Purchase a subscription product
@@ -72,16 +96,9 @@ class SubscriptionManager: ObservableObject {
             
             switch result {
             case .success(let verification):
-                // Verify the transaction
                 let transaction = try checkVerified(verification)
-                
-                // Verify with backend
                 await verifyWithBackend(transaction: transaction)
-                
-                // Finish the transaction
                 await transaction.finish()
-                
-                // Update purchased products
                 await updatePurchasedProducts()
                 
                 isLoading = false
@@ -124,41 +141,33 @@ class SubscriptionManager: ObservableObject {
         }
     }
     
-    // MARK: - Check Entitlement
+    // MARK: - Entitlement Check
     
-    /// Check if user has premium entitlement
-    var isPremium: Bool {
+    /// Check if user has any active subscription
+    var hasActiveSubscription: Bool {
         !purchasedProductIDs.isEmpty
     }
     
-    /// Get monthly product
-    var monthlyProduct: Product? {
-        products.first { $0.id == Self.monthlyProductID }
-    }
-    
-    /// Get yearly product
-    var yearlyProduct: Product? {
-        products.first { $0.id == Self.yearlyProductID }
+    /// Get the active plan ID from purchased products
+    var activePlanId: String? {
+        for productId in purchasedProductIDs {
+            if productId.contains(".core.") { return "core" }
+            if productId.contains(".advanced.") { return "advanced" }
+            if productId.contains(".premium.") { return "premium" }
+        }
+        return nil
     }
     
     // MARK: - Transaction Listener
     
-    /// Listen for transaction updates
     private func listenForTransactions() -> Task<Void, Never> {
         Task.detached { [weak self] in
             for await result in Transaction.updates {
                 do {
                     let transaction = try Self.checkVerifiedStatic(result)
-                    
-                    // Verify with backend
                     await self?.verifyWithBackend(transaction: transaction)
-                    
-                    // Finish transaction
                     await transaction.finish()
-                    
-                    // Update purchased products on main actor
                     await self?.updatePurchasedProducts()
-                    
                 } catch {
                     print("Transaction verification failed: \(error)")
                 }
@@ -168,12 +177,10 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Verification
     
-    /// Verify a transaction result
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         try Self.checkVerifiedStatic(result)
     }
     
-    /// Static version for use in detached tasks
     private nonisolated static func checkVerifiedStatic<T>(_ result: VerificationResult<T>) throws -> T {
         switch result {
         case .unverified:
@@ -183,15 +190,12 @@ class SubscriptionManager: ObservableObject {
         }
     }
     
-    /// Update purchased products from current entitlements
     func updatePurchasedProducts() async {
         var purchased: Set<String> = []
         
         for await result in Transaction.currentEntitlements {
             do {
                 let transaction = try checkVerified(result)
-                
-                // Only include active subscriptions
                 if transaction.revocationDate == nil {
                     purchased.insert(transaction.productID)
                 }
@@ -201,17 +205,11 @@ class SubscriptionManager: ObservableObject {
         }
         
         purchasedProductIDs = purchased
-        
-        // Update local premium flag
         UserDefaults.standard.set(!purchased.isEmpty, forKey: "isPremium")
-        
-        // Refresh QuotaManager
-        QuotaManager.shared.refresh()
     }
     
     // MARK: - Backend Verification
     
-    /// Verify transaction with backend and upgrade user
     private func verifyWithBackend(transaction: Transaction) async {
         guard let email = getCurrentUserEmail() else {
             print("No user email for backend verification")
@@ -219,13 +217,12 @@ class SubscriptionManager: ObservableObject {
         }
         
         do {
-            // Get the signed transaction
             guard let jwsRepresentation = transaction.jwsRepresentation else {
                 print("No JWS representation available")
                 return
             }
             
-            let url = URL(string: APIConfig.baseURL + APIConfig.subscriptionVerify)!
+            let url = URL(string: APIConfig.baseURL + "/subscription/verify")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -243,26 +240,22 @@ class SubscriptionManager: ObservableObject {
             
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 {
-                    print("Backend verification successful for \(email)")
+                    print("✅ Backend verification successful for \(email)")
+                    // Sync quota status after successful verification
+                    try? await QuotaManager.shared.syncStatus(email: email)
                 } else {
-                    print("Backend verification failed: HTTP \(httpResponse.statusCode)")
+                    print("❌ Backend verification failed: HTTP \(httpResponse.statusCode)")
                 }
             }
         } catch {
             print("Backend verification error: \(error)")
-            // Don't throw - just log the error
-            // The StoreKit transaction is still valid locally
         }
     }
     
-    /// Get current user email
     private func getCurrentUserEmail() -> String? {
-        // Try to get from DataManager
         if let profile = DataManager.shared.getCurrentUserProfile() {
             return profile.email
         }
-        
-        // Fallback to UserDefaults
         return UserDefaults.standard.string(forKey: "userEmail")
     }
 }
@@ -276,12 +269,9 @@ enum SubscriptionError: Error, LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .verificationFailed:
-            return "Transaction verification failed"
-        case .purchaseFailed:
-            return "Purchase could not be completed"
-        case .productNotFound:
-            return "Product not found"
+        case .verificationFailed: return "Transaction verification failed"
+        case .purchaseFailed: return "Purchase could not be completed"
+        case .productNotFound: return "Product not found"
         }
     }
 }
@@ -289,15 +279,10 @@ enum SubscriptionError: Error, LocalizedError {
 // MARK: - Transaction Extension
 
 extension Transaction {
-    /// Get JWS representation if available
     var jwsRepresentation: String? {
-        // StoreKit 2 provides signed transaction data via jsonRepresentation
-        // For now, return the original transaction ID as a fallback
-        // Full JWS requires access to the original signed payload
         return String(self.originalID)
     }
     
-    /// Get environment as string
     var subscriptionEnvironment: SubscriptionEnvironmentType {
         #if DEBUG
         return .sandbox

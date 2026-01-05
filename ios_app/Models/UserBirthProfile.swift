@@ -57,43 +57,12 @@ final class UserBirthProfile {
         self.updatedAt = updatedAt
     }
     
-    // MARK: - User Type
-    
-    /// Get user type based on profile
-    var userType: UserType {
-        if isPremium { return .premium }
-        if isGuestEmail { return .guest }
-        return .registered
-    }
-    
-    // MARK: - Quota Logic
-    
-    /// Question limit based on user type
-    var questionLimit: Int {
-        userType.questionLimit
-    }
-    
-    /// Check if user can ask another question
-    var canAskQuestion: Bool {
-        totalQuestionsAsked < questionLimit
-    }
-    
-    /// Remaining questions
-    var remainingQuestions: Int {
-        max(0, questionLimit - totalQuestionsAsked)
-    }
+    // MARK: - Quota Helpers
     
     /// Increment question count
     func incrementQuestionCount() {
         totalQuestionsAsked += 1
         updatedAt = Date()
-    }
-    
-    /// Get quota status
-    // MARK: - Quota Status Helper
-    
-    var quotaStatus: QuotaStatus {
-        QuotaStatus(userType: userType, questionsUsed: totalQuestionsAsked)
     }
 }
 
