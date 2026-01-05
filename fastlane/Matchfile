@@ -1,0 +1,24 @@
+# Matchfile - Code signing configuration
+# Destiny AI Astrology iOS App
+
+# Git repo containing certificates and profiles (PRIVATE repo!)
+# You need to create this private repo first
+git_url(ENV['MATCH_GIT_URL'] || "https://github.com/prabhupredictions/certificates.git")
+
+# Storage mode
+storage_mode("git")
+
+# Type of signing (appstore, adhoc, development)
+type("appstore")
+
+# App identifier
+app_identifier(ENV['APP_IDENTIFIER'] || "com.destinyai.astrology")
+
+# Your team ID (get from Apple Developer Portal → Membership)
+team_id(ENV['TEAM_ID'] || "YOUR_TEAM_ID")
+
+# Username (Apple ID)
+username(ENV['APPLE_ID'] || "support@destinyaiastrology.com")
+
+# For CI/CD, set MATCH_PASSWORD environment variable
+# This decrypts the certificates stored in the git repo

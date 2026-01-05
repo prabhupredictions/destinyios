@@ -1,0 +1,75 @@
+name: iOS Deploy to TestFlight
+
+on:
+    push:
+        branches: [test, main]
+    workflow_dispatch:
+
+env:
+    APP_IDENTIFIER: com.destinyai.astrology
+    APPLE_ID: support@destinyaiastrology.com
+
+jobs:
+    deploy:
+        runs-on: macos-14
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Setup Xcode
+              uses: maxim-lobanov/setup-xcode@v1
+              with:
+                  xcode-version: latest-stable
+
+            - name: Show Xcode Version
+              run: xcodebuild -version
+
+            - name: Setup Ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.0"
+                  bundler-cache: true
+
+            - name: Install Fastlane
+              run: |
+                  gem install bundler
+                  gem install fastlane
+
+            - name: Create App Store Connect API Key
+              run: |
+                  mkdir -p ~/private_keys
+                  echo "${{ secrets.APP_STORE_CONNECT_KEY }}" > ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
+
+            - name: Setup Git for Match
+              run: |
+                  git config --global user.email "ci@github.com"
+                  git config --global user.name "GitHub Actions"
+
+            # Deploy TEST build (when pushing to test branch)
+            - name: Deploy to TestFlight (Test Environment)
+              if: github.ref == 'refs/heads/test'
+              run: fastlane beta_test
+              env:
+                  TEAM_ID: ${{ secrets.TEAM_ID }}
+                  APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+                  APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+                  APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
+                  APP_STORE_CONNECT_API_KEY_IS_KEY_CONTENT_BASE64: false
+                  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+                  MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+                  MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+
+            # Deploy PRODUCTION build (when pushing to main branch)
+            - name: Deploy to TestFlight (Production Environment)
+              if: github.ref == 'refs/heads/main'
+              run: fastlane beta_prod
+              env:
+                  TEAM_ID: ${{ secrets.TEAM_ID }}
+                  APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+                  APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+                  APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
+                  APP_STORE_CONNECT_API_KEY_IS_KEY_CONTENT_BASE64: false
+                  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+                  MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+                  MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}

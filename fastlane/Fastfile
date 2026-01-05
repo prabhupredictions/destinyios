@@ -1,0 +1,113 @@
+# Fastfile - iOS automation lanes
+# Destiny AI Astrology iOS App
+
+default_platform(:ios)
+
+platform :ios do
+  
+  # ============================================
+  # BUILD & TEST (runs on every push)
+  # ============================================
+  
+  desc "Run unit tests"
+  lane :test do
+    run_tests(
+      scheme: "ios_app",
+      device: "iPhone 15 Pro",
+      clean: true
+    )
+  end
+
+  # ============================================
+  # TESTFLIGHT DEPLOYMENTS
+  # ============================================
+
+  desc "Deploy TEST build to TestFlight (uses test API)"
+  lane :beta_test do
+    setup_ci if ENV['CI']
+    
+    # Generate app-store provisioning profile
+    match(
+      type: "appstore",
+      readonly: is_ci
+    )
+    
+    # Increment build number using GitHub run number or timestamp
+    increment_build_number(
+      build_number: ENV['GITHUB_RUN_NUMBER'] || Time.now.to_i.to_s
+    )
+    
+    # Build the app with Test configuration
+    build_app(
+      scheme: "ios_app",
+      configuration: "Test",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          ENV['APP_IDENTIFIER'] => "match AppStore #{ENV['APP_IDENTIFIER']}"
+        }
+      }
+    )
+    
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      changelog: "Test build - #{ENV['GITHUB_SHA'] || 'local'}"
+    )
+  end
+
+  desc "Deploy PRODUCTION build to TestFlight (uses prod API)"
+  lane :beta_prod do
+    setup_ci if ENV['CI']
+    
+    match(
+      type: "appstore",
+      readonly: is_ci
+    )
+    
+    increment_build_number(
+      build_number: ENV['GITHUB_RUN_NUMBER'] || Time.now.to_i.to_s
+    )
+    
+    # Build with Production configuration
+    build_app(
+      scheme: "ios_app",
+      configuration: "Release",  # Production uses Release
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          ENV['APP_IDENTIFIER'] => "match AppStore #{ENV['APP_IDENTIFIER']}"
+        }
+      }
+    )
+    
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      changelog: "Production build - #{ENV['GITHUB_SHA'] || 'local'}"
+    )
+  end
+
+  # ============================================
+  # APP STORE RELEASE
+  # ============================================
+
+  desc "Submit to App Store (after TestFlight testing)"
+  lane :release do
+    deliver(
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      skip_screenshots: true,
+      skip_metadata: false
+    )
+  end
+
+  # ============================================
+  # HELPER FUNCTIONS
+  # ============================================
+
+  def is_ci
+    ENV['CI'] == 'true'
+  end
+
+end
