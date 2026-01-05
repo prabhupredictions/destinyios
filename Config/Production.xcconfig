@@ -1,0 +1,6 @@
+// Production Configuration
+// Used for App Store builds that connect to production API
+
+API_BASE_URL = https:/$()/astroapi-prod-dsqvza5jza-el.a.run.app
+API_KEY = astro_live_destinyai_production_key_2024
+ENVIRONMENT = production
