@@ -20,18 +20,13 @@ class SubscriptionManager: ObservableObject {
     static let coreMonthlyProductID = "com.daa.core.monthly"
     static let coreYearlyProductID = "com.daa.core.yearly"
     
-    /// Advanced plan
-    static let advancedMonthlyProductID = "com.daa.advanced.monthly"
-    static let advancedYearlyProductID = "com.daa.advanced.yearly"
-    
-    /// Premium plan
-    static let premiumMonthlyProductID = "com.daa.premium.monthly"
-    static let premiumYearlyProductID = "com.daa.premium.yearly"
+    /// Plus plan
+    static let plusMonthlyProductID = "com.daa.plus.monthly"
+    static let plusYearlyProductID = "com.daa.plus.yearly"
     
     private let productIDs: Set<String> = [
         coreMonthlyProductID, coreYearlyProductID,
-        advancedMonthlyProductID, advancedYearlyProductID,
-        premiumMonthlyProductID, premiumYearlyProductID
+        plusMonthlyProductID, plusYearlyProductID
     ]
     
     // MARK: - Transaction Listener
@@ -152,8 +147,7 @@ class SubscriptionManager: ObservableObject {
     var activePlanId: String? {
         for productId in purchasedProductIDs {
             if productId.contains(".core.") { return "core" }
-            if productId.contains(".advanced.") { return "advanced" }
-            if productId.contains(".premium.") { return "premium" }
+            if productId.contains(".plus.") { return "plus" }
         }
         return nil
     }
