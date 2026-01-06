@@ -403,7 +403,7 @@ class QuotaManager: ObservableObject {
     /// Simple sync check for UI - uses cached features list
     /// For authoritative check, use `canAsk(feature:email:)` async method
     var canAsk: Bool {
-        isPremium || availableFeatures.contains("chat")
+        isPremium || availableFeatures.contains(FeatureID.aiQuestions.rawValue)
     }
     
     /// Check if current user is a guest (based on cached plan)
