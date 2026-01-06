@@ -1,0 +1,6 @@
+// Local Development Configuration
+// Used for Debug builds on Simulator
+
+API_BASE_URL = http:/$()/127.0.0.1:8000
+API_KEY = astro_ios_G5iY3-1Z7ymE46hYwKTbK1bSz2x5Vn4BeymPOvyy3ic
+ENVIRONMENT = local

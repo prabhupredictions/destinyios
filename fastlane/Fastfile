@@ -41,10 +41,11 @@ platform :ios do
     build_app(
       scheme: "ios_app",
       configuration: "Test",
+      destination: "generic/platform=iOS",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          ENV['APP_IDENTIFIER'] => "match AppStore #{ENV['APP_IDENTIFIER']}"
+          "com.destinyai.astrology" => "match AppStore com.destinyai.astrology"
         }
       }
     )
@@ -73,10 +74,11 @@ platform :ios do
     build_app(
       scheme: "ios_app",
       configuration: "Release",  # Production uses Release
+      destination: "generic/platform=iOS",
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          ENV['APP_IDENTIFIER'] => "match AppStore #{ENV['APP_IDENTIFIER']}"
+          "com.destinyai.astrology" => "match AppStore com.destinyai.astrology"
         }
       }
     )
