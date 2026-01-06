@@ -343,6 +343,7 @@ struct ProfileView: View {
             text += " [\(AppEnvironment.current.rawValue.uppercased())]"
         }
         // Force test build trigger
+        // Build timestamp: 2026-01-06T16:28
         return text
     }
 }
