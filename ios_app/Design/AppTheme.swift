@@ -146,6 +146,39 @@ struct AppTheme {
         static let logoToTitleSpacing: CGFloat = 40
         static let loaderBottomPadding: CGFloat = 70
     }
+    
+    // MARK: - Language Selection (Premium)
+    struct LanguageSelection {
+        // Card dimensions
+        static let cardHeight: CGFloat = 85
+        static let cardCornerRadius: CGFloat = 18
+        static let cardSpacing: CGFloat = 14
+        
+        // Glassmorphism
+        static let glassOpacity: Double = 0.08
+        static let glassBorderOpacity: Double = 0.12
+        static let glassBlur: CGFloat = 0.5
+        
+        // Selection state
+        static let selectedGlowRadius: CGFloat = 15
+        static let selectedBorderWidth: CGFloat = 1.5
+        static let selectedBackgroundOpacity: Double = 0.18
+        
+        // Animation timings
+        static let staggerDelay: Double = 0.04
+        static let entranceDuration: Double = 0.5
+        static let selectionSpring: Animation = .spring(response: 0.35, dampingFraction: 0.7)
+        
+        // Particle effect
+        static let particleCount: Int = 12
+        static let particleSize: CGFloat = 4
+        static let particleDuration: Double = 0.6
+        
+        // Celestial icon
+        static let iconSize: CGFloat = 50
+        static let iconGlowRadius: CGFloat = 25
+        static let iconRotationDuration: Double = 20.0
+    }
 }
 
 // MARK: - Helpers
