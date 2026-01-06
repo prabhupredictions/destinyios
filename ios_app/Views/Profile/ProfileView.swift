@@ -342,6 +342,7 @@ struct ProfileView: View {
         if AppEnvironment.current != .production {
             text += " [\(AppEnvironment.current.rawValue.uppercased())]"
         }
+        // Force test build trigger
         return text
     }
 }
