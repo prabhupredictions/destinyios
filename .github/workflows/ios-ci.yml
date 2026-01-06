@@ -28,6 +28,8 @@ jobs:
           xcodebuild build \
             -scheme ios_app \
             -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Run Tests
@@ -36,6 +38,8 @@ jobs:
             -scheme ios_app \
             -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
             -resultBundlePath TestResults.xcresult \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Upload Test Results
