@@ -50,8 +50,9 @@ platform :ios do
       }
     )
     
-    # Upload to TestFlight
+    # Upload to TestFlight using App Store Connect API Key
     upload_to_testflight(
+      api_key_path: "~/private_keys/api_key.json",
       skip_waiting_for_build_processing: true,
       changelog: "Test build - #{ENV['GITHUB_SHA'] || 'local'}"
     )
@@ -83,7 +84,9 @@ platform :ios do
       }
     )
     
+    # Upload to TestFlight using App Store Connect API Key
     upload_to_testflight(
+      api_key_path: "~/private_keys/api_key.json",
       skip_waiting_for_build_processing: true,
       changelog: "Production build - #{ENV['GITHUB_SHA'] || 'local'}"
     )

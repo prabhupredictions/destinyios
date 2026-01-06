@@ -39,7 +39,14 @@ jobs:
             - name: Create App Store Connect API Key
               run: |
                   mkdir -p ~/private_keys
-                  echo "${{ secrets.APP_STORE_CONNECT_KEY }}" > ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
+                  cat > ~/private_keys/api_key.json << EOF
+                  {
+                    "key_id": "${{ secrets.APP_STORE_CONNECT_KEY_ID }}",
+                    "issuer_id": "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}",
+                    "key": "${{ secrets.APP_STORE_CONNECT_KEY }}",
+                    "in_house": false
+                  }
+                  EOF
 
             - name: Setup Git for Match
               run: |
