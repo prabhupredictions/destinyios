@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 /// ViewModel for birth data collection with location integration
+@MainActor
 @Observable
 class BirthDataViewModel {
     // MARK: - Form State

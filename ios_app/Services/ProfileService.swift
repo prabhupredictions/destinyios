@@ -144,6 +144,7 @@ class ProfileService {
     // MARK: - Restore Profile Locally
     
     /// Restore profile data to local storage (UserDefaults + DataManager)
+    @MainActor
     func restoreProfileLocally(_ profile: ProfileResponse, dataManager: DataManager = .shared) throws -> Bool {
         let defaults = UserDefaults.standard
         let savedEmail = profile.userEmail
