@@ -10,5 +10,11 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>ENVIRONMENT</key>
+	<string>$(ENVIRONMENT)</string>
+	<key>API_BASE_URL</key>
+	<string>$(API_BASE_URL)</string>
+	<key>API_KEY</key>
+	<string>$(API_KEY)</string>
 </dict>
 </plist>
