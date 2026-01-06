@@ -50,9 +50,18 @@ platform :ios do
       }
     )
     
+    # Create App Store Connect API Key
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_content: ENV['APP_STORE_CONNECT_API_KEY_KEY'],
+      is_key_content_base64: false,
+      in_house: false
+    )
+    
     # Upload to TestFlight using App Store Connect API Key
     upload_to_testflight(
-      api_key_path: "~/private_keys/api_key.json",
+      api_key: api_key,
       skip_waiting_for_build_processing: true,
       changelog: "Test build - #{ENV['GITHUB_SHA'] || 'local'}"
     )
@@ -84,9 +93,18 @@ platform :ios do
       }
     )
     
+    # Create App Store Connect API Key
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_content: ENV['APP_STORE_CONNECT_API_KEY_KEY'],
+      is_key_content_base64: false,
+      in_house: false
+    )
+    
     # Upload to TestFlight using App Store Connect API Key
     upload_to_testflight(
-      api_key_path: "~/private_keys/api_key.json",
+      api_key: api_key,
       skip_waiting_for_build_processing: true,
       changelog: "Production build - #{ENV['GITHUB_SHA'] || 'local'}"
     )
