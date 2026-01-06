@@ -2,7 +2,6 @@
 # Destiny AI Astrology iOS App
 
 # Git repo containing certificates and profiles (PRIVATE repo!)
-# You need to create this private repo first
 git_url(ENV['MATCH_GIT_URL'] || "https://github.com/prabhupredictions/certificates.git")
 
 # Storage mode
@@ -14,8 +13,8 @@ type("appstore")
 # App identifier
 app_identifier(ENV['APP_IDENTIFIER'] || "com.destinyai.astrology")
 
-# Your team ID (get from Apple Developer Portal → Membership)
-team_id(ENV['TEAM_ID'] || "YOUR_TEAM_ID")
+# Your team ID
+team_id(ENV['TEAM_ID'] || "GTP5DH5548")
 
 # Username (Apple ID)
 username(ENV['APPLE_ID'] || "support@destinyaiastrology.com")

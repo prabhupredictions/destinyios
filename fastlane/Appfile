@@ -7,12 +7,11 @@ app_identifier(ENV['APP_IDENTIFIER'] || "com.destinyai.astrology")
 # Your Apple Developer Account Email
 apple_id(ENV['APPLE_ID'] || "support@destinyaiastrology.com")
 
-# Your Apple Developer Team ID (get this from Apple Developer Portal)
-# Go to: https://developer.apple.com/account → Membership → Team ID
-team_id(ENV['TEAM_ID'] || "YOUR_TEAM_ID")
+# Your Apple Developer Team ID
+team_id(ENV['TEAM_ID'] || "GTP5DH5548")
 
-# App Store Connect Team ID (usually same as team_id for individual developers)
-itc_team_id(ENV['ITC_TEAM_ID'] || ENV['TEAM_ID'] || "YOUR_TEAM_ID")
+# App Store Connect Team ID (same as team_id for individual developers)
+itc_team_id(ENV['ITC_TEAM_ID'] || ENV['TEAM_ID'] || "GTP5DH5548")
 
 # For CI/CD, these are set via environment variables
-# For local development, you can set them here or in your shell profile
+# For local development, the defaults above will be used
