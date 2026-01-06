@@ -4,3 +4,9 @@
 API_BASE_URL = https:/$()/astroapi-test-dsqvza5jza-el.a.run.app
 API_KEY = astro_live_destinyai_production_key_2024
 ENVIRONMENT = test
+
+// Code Signing Settings (for CI/CD with Fastlane Match)
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = Apple Distribution
+DEVELOPMENT_TEAM = GTP5DH5548
+PROVISIONING_PROFILE_SPECIFIER = match AppStore com.destinyai.astrology
