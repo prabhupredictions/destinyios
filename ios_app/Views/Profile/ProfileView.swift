@@ -337,7 +337,12 @@ struct ProfileView: View {
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        return "\(version) (\(build))"
+        var text = "\(version) (\(build))"
+        
+        if AppEnvironment.current != .production {
+            text += " [\(AppEnvironment.current.rawValue.uppercased())]"
+        }
+        return text
     }
 }
 
