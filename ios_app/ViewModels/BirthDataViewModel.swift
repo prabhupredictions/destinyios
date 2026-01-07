@@ -56,6 +56,7 @@ class BirthDataViewModel {
     
     var formattedDOB: String {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")  // Ensures Gregorian calendar + ASCII digits
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: dateOfBirth)
     }
@@ -63,6 +64,7 @@ class BirthDataViewModel {
     var formattedTOB: String {
         if timeUnknown { return "12:00" }
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")  // Ensures 24-hour format regardless of device
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: timeOfBirth)
     }

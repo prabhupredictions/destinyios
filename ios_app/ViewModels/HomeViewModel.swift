@@ -110,10 +110,30 @@ class HomeViewModel {
                 self.applyPredictionResponse(response)
                 self.isLoading = false
             }
-        } catch {
-            print("Error fetching prediction: \(error)")
+        } catch let networkError as NetworkError {
+            // Handle specific network errors
+            let detailedMessage: String
+            switch networkError {
+            case .serverError(let message):
+                detailedMessage = "Server error: \(message)"
+            case .decodingError(let underlying):
+                detailedMessage = "Data error: \(underlying.localizedDescription)"
+            case .unauthorized:
+                detailedMessage = "Session expired. Please sign in again."
+            case .invalidURL:
+                detailedMessage = "Invalid request URL."
+            case .noData:
+                detailedMessage = "No data received from server."
+            }
+            print("[HomeViewModel] Prediction API error: \(detailedMessage)")
             await MainActor.run {
-                self.errorMessage = "Failed to load cosmic data."
+                self.errorMessage = detailedMessage
+                self.isLoading = false
+            }
+        } catch {
+            print("[HomeViewModel] Prediction error: \(error)")
+            await MainActor.run {
+                self.errorMessage = "Failed to load cosmic data: \(error.localizedDescription)"
                 self.isLoading = false
             }
         }
@@ -143,10 +163,53 @@ class HomeViewModel {
         // Try userBirthData (new) then birthData (legacy)
         let key = UserDefaults.standard.object(forKey: "userBirthData") != nil ? "userBirthData" : "birthData"
         guard let data = UserDefaults.standard.data(forKey: key),
-              let birthData = try? JSONDecoder().decode(UserBirthData.self, from: data) else {
+              var birthData = try? JSONDecoder().decode(UserBirthData.self, from: data) else {
             return nil
         }
+        
+        // Normalize time to 24-hour format (HH:mm)
+        // This handles legacy data that may be stored as "8:30 PM" instead of "20:30"
+        birthData = normalizeTimeFormat(birthData)
+        
         return birthData
+    }
+    
+    /// Convert 12-hour time (e.g., "8:30 PM") to 24-hour (e.g., "20:30")
+    private func normalizeTimeFormat(_ data: UserBirthData) -> UserBirthData {
+        let time = data.time
+        
+        // Check if already in HH:mm format (24-hour)
+        let hhmmRegex = "^\\d{2}:\\d{2}$"
+        if time.range(of: hhmmRegex, options: .regularExpression) != nil {
+            return data // Already normalized
+        }
+        
+        // Try to parse 12-hour format (h:mm a or hh:mm a)
+        let formatter12 = DateFormatter()
+        formatter12.locale = Locale(identifier: "en_US_POSIX")
+        formatter12.dateFormat = "h:mm a"
+        
+        if let date = formatter12.date(from: time) {
+            let formatter24 = DateFormatter()
+            formatter24.dateFormat = "HH:mm"
+            let normalizedTime = formatter24.string(from: date)
+            
+            print("[HomeViewModel] Normalized time from '\(time)' to '\(normalizedTime)'")
+            
+            // Create new UserBirthData with normalized time
+            return UserBirthData(
+                dob: data.dob,
+                time: normalizedTime,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                ayanamsa: data.ayanamsa,
+                houseSystem: data.houseSystem,
+                cityOfBirth: data.cityOfBirth
+            )
+        }
+        
+        // If can't parse, return as-is (API will catch the error)
+        return data
     }
     
     // MARK: - Backend Sync

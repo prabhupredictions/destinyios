@@ -315,9 +315,12 @@ struct PlanetaryPositionsSheet: View {
         }
         
         // Convert BirthData (local storage) -> UserBirthData (API request)
+        // Normalize time to 24-hour format for legacy data
+        let normalizedTime = normalizeTimeFormat(savedBirthData.time)
+        
         let apiBirthData = UserBirthData(
             dob: savedBirthData.dob,
-            time: savedBirthData.time,
+            time: normalizedTime,
             latitude: savedBirthData.latitude,
             longitude: savedBirthData.longitude,
             ayanamsa: savedBirthData.ayanamsa,
@@ -353,6 +356,30 @@ struct PlanetaryPositionsSheet: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
+    }
+    
+    /// Normalize time to 24-hour format (handles legacy "8:30 PM" -> "20:30")
+    private func normalizeTimeFormat(_ time: String) -> String {
+        // Check if already in HH:mm format (24-hour)
+        let hhmmRegex = "^\\d{2}:\\d{2}$"
+        if time.range(of: hhmmRegex, options: .regularExpression) != nil {
+            return time // Already normalized
+        }
+        
+        // Try to parse 12-hour format
+        let formatter12 = DateFormatter()
+        formatter12.locale = Locale(identifier: "en_US_POSIX")
+        formatter12.dateFormat = "h:mm a"
+        
+        if let date = formatter12.date(from: time) {
+            let formatter24 = DateFormatter()
+            formatter24.dateFormat = "HH:mm"
+            let normalizedTime = formatter24.string(from: date)
+            print("[PlanetaryPositionsSheet] Normalized time from '\(time)' to '\(normalizedTime)'")
+            return normalizedTime
+        }
+        
+        return time // Return as-is if can't parse
     }
 }
 

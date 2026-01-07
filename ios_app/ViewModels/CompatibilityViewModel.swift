@@ -81,11 +81,21 @@ class CompatibilityViewModel {
                     boyBirthDate = date
                 }
                 
-                // Parse time
+                // Parse time (handle both 24-hour "HH:mm" and legacy 12-hour "h:mm a")
                 let timeFormatter = DateFormatter()
+                timeFormatter.locale = Locale(identifier: "en_US_POSIX")
                 timeFormatter.dateFormat = "HH:mm"
                 if let time = timeFormatter.date(from: birthData.time) {
                     boyBirthTime = time
+                } else {
+                    // Fallback: try 12-hour format for legacy data
+                    let formatter12 = DateFormatter()
+                    formatter12.locale = Locale(identifier: "en_US_POSIX")
+                    formatter12.dateFormat = "h:mm a"
+                    if let time = formatter12.date(from: birthData.time) {
+                        boyBirthTime = time
+                        print("[CompatibilityViewModel] Parsed legacy 12-hour time: \(birthData.time)")
+                    }
                 }
                 
                 // Set location
@@ -204,8 +214,10 @@ class CompatibilityViewModel {
         do {
             // Build API request
             let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")  // Ensures Gregorian + ASCII
             dateFormatter.dateFormat = "yyyy-MM-dd"
             let timeFormatter = DateFormatter()
+            timeFormatter.locale = Locale(identifier: "en_US_POSIX")  // Ensures 24-hour format
             timeFormatter.dateFormat = "HH:mm:ss"
             
             // Round coordinates to 6 decimal places (backend validation requirement)

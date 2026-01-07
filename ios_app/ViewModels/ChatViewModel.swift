@@ -347,6 +347,10 @@ class ChatViewModel {
             return nil
         }
         
+        // Normalize time to 24-hour format (HH:mm)
+        // This handles legacy data that may be stored as "8:30 PM" instead of "20:30"
+        birthData = normalizeTimeFormat(birthData)
+        
         // Apply user's preferred astrology settings
         let ayanamsa = UserDefaults.standard.string(forKey: "ayanamsa") ?? "lahiri"
         let houseSystem = UserDefaults.standard.string(forKey: "houseSystem") ?? "equal"
@@ -354,6 +358,44 @@ class ChatViewModel {
         birthData.houseSystem = houseSystem
         
         return birthData
+    }
+    
+    /// Convert 12-hour time (e.g., "8:30 PM") to 24-hour (e.g., "20:30")
+    private func normalizeTimeFormat(_ data: BirthData) -> BirthData {
+        let time = data.time
+        
+        // Check if already in HH:mm format (24-hour)
+        let hhmmRegex = "^\\d{2}:\\d{2}$"
+        if time.range(of: hhmmRegex, options: .regularExpression) != nil {
+            return data // Already normalized
+        }
+        
+        // Try to parse 12-hour format (h:mm a or hh:mm a)
+        let formatter12 = DateFormatter()
+        formatter12.locale = Locale(identifier: "en_US_POSIX")
+        formatter12.dateFormat = "h:mm a"
+        
+        if let date = formatter12.date(from: time) {
+            let formatter24 = DateFormatter()
+            formatter24.dateFormat = "HH:mm"
+            let normalizedTime = formatter24.string(from: date)
+            
+            print("[ChatViewModel] Normalized time from '\(time)' to '\(normalizedTime)'")
+            
+            // Create new BirthData with normalized time
+            return BirthData(
+                dob: data.dob,
+                time: normalizedTime,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                cityOfBirth: data.cityOfBirth,
+                ayanamsa: data.ayanamsa,
+                houseSystem: data.houseSystem
+            )
+        }
+        
+        // If can't parse, return as-is (API will catch the error)
+        return data
     }
     
     func clearChat() {
