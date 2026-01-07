@@ -158,11 +158,14 @@ struct CompatibilityView: View {
     private var compatibilityForm: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
-                // Header
+                // Header with gold interlocking rings icon
                 VStack(spacing: 8) {
-                    HStack(spacing: 6) {
-                        Text("💕")
-                            .font(AppTheme.Fonts.title(size: 24))
+                    HStack(spacing: 8) {
+                        Image("match_icon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                        
                         Text("kundali_match".localized)
                             .font(AppTheme.Fonts.display(size: 24))
                             .foregroundColor(AppTheme.Colors.gold)

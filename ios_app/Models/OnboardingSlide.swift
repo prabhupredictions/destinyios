@@ -21,7 +21,7 @@ struct OnboardingSlide: Identifiable, Sendable {
             isFeatureSlide: false
         ),
         OnboardingSlide(
-            icon: "logo",
+            icon: "onboarding_clarity",
             title: "Clarity for everyday decisions",
             subtitle: nil,
             description: "Destiny is a personal space to understand patterns in your life. It helps you navigate love, work, and friendships, and think things through in the moment, using astrology as the language to add context.",
@@ -29,7 +29,7 @@ struct OnboardingSlide: Identifiable, Sendable {
             isFeatureSlide: false
         ),
         OnboardingSlide(
-            icon: "telescope_icon",
+            icon: "onboarding_personalization",
             title: "Built for real personalization",
             subtitle: nil,
             description: "With billions of astrological combinations, finding the right insight is like finding one key that fits in a barrel full of keys. Destiny uses a proprietary algorithm, developed over 12+ years and powered by AI, to translate your birth details into clearer, more personal guidance for everyday life.",
@@ -37,7 +37,7 @@ struct OnboardingSlide: Identifiable, Sendable {
             isFeatureSlide: false
         ),
         OnboardingSlide(
-            icon: "list.bullet.rectangle",
+            icon: "onboarding_features",
             title: "Here's what you can do",
             subtitle: nil,
             description: "",

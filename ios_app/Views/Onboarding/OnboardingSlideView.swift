@@ -1,30 +1,33 @@
 import SwiftUI
 
 /// Individual onboarding slide with premium visuals
+/// Features: FloatingIcon, gold gradient text, premium styling
 struct OnboardingSlideView: View {
     let slide: OnboardingSlide
     var onGetStarted: () -> Void
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 28) {
-                Spacer(minLength: 40)
+            VStack(spacing: slide.isFeatureSlide ? 20 : AppTheme.Onboarding.iconToTitleSpacing) {
+                Spacer(minLength: slide.isFeatureSlide ? 30 : AppTheme.Onboarding.contentTopPadding)
                 
-                // Icon section
-                iconView
-                    .frame(height: 120)
+                // Floating Icon with glow
+                FloatingIcon {
+                    iconContent
+                }
+                .frame(height: AppTheme.Onboarding.iconContainerSize)
                 
-                // Title section
-                VStack(spacing: 12) {
+                // Title section with gold gradient
+                VStack(spacing: AppTheme.Onboarding.titleToDescriptionSpacing) {
                     Text(slide.title)
-                        .font(AppTheme.Fonts.display(size: 26))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .font(AppTheme.Fonts.display(size: AppTheme.Onboarding.titleSize))
+                        .goldGradient()
                         .multilineTextAlignment(.center)
                         .lineSpacing(4)
                     
                     if let subtitle = slide.subtitle {
                         Text(subtitle)
-                            .font(AppTheme.Fonts.title(size: 18))
+                            .font(AppTheme.Fonts.title(size: AppTheme.Onboarding.subtitleSize))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .multilineTextAlignment(.center)
                     }
@@ -41,7 +44,7 @@ struct OnboardingSlideView: View {
                 // Description
                 if !slide.description.isEmpty {
                     Text(slide.description)
-                        .font(AppTheme.Fonts.body(size: 16))
+                        .font(AppTheme.Fonts.body(size: AppTheme.Onboarding.descriptionSize))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                         .lineSpacing(6)
@@ -52,70 +55,43 @@ struct OnboardingSlideView: View {
                 if slide.isFeatureSlide {
                     FeaturesListView()
                         .padding(.top, 8)
-                    
-                    // Get Started button on features slide
-                    Button(action: onGetStarted) {
-                        HStack(spacing: 10) {
-                            Text("get_started".localized)
-                                .font(AppTheme.Fonts.title(size: 17))
-                            Image(systemName: "sparkles")
-                                .font(AppTheme.Fonts.title(size: 14))
-                        }
-                        .foregroundColor(AppTheme.Colors.textOnGold)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(AppTheme.Colors.premiumGradient)
-                        .cornerRadius(16)
-                        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 5)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 16)
+                        .padding(.bottom, 20)
                 }
                 
-                Spacer(minLength: 20)
+                Spacer(minLength: 160) // Increased bottom space for feature slide truncation fix
             }
         }
     }
     
-    // MARK: - Icon View
-    // iOS HIG standard: Onboarding icons 80-120pt with consistent visual weight
-    private let iconContainerSize: CGFloat = 120
-    private let iconSize: CGFloat = 88
-    
+    // MARK: - Icon Content
     @ViewBuilder
-    private var iconView: some View {
-        if slide.icon == "logo" {
-            // Destiny logo - larger for better visibility
-            Image("logo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 110, height: 110)
-                .frame(width: iconContainerSize, height: iconContainerSize)
-        } else if slide.icon == "chatgpt" {
-            // ChatGPT logo - centered in container
+    private var iconContent: some View {
+        if slide.icon == "chatgpt" {
+            // ChatGPT logo
             Image("chatgpt_logo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: iconSize, height: iconSize)
-                .frame(width: iconContainerSize, height: iconContainerSize)
-        } else if slide.icon == "telescope_icon" {
-            // Telescope icon - centered in container
-            Image("telescope_icon")
+                .frame(width: AppTheme.Onboarding.iconSize * 0.85, height: AppTheme.Onboarding.iconSize * 0.85)
+        } else if slide.icon.hasPrefix("onboarding_") {
+            // Custom onboarding icons from assets
+            // Personalization icon needs to be larger
+            let pScale: CGFloat = slide.icon.contains("personalization") ? 1.15 : 1.0
+            
+            Image(slide.icon)
                 .resizable()
                 .scaledToFit()
-                .frame(width: iconSize, height: iconSize)
-                .frame(width: iconContainerSize, height: iconContainerSize)
+                .frame(width: AppTheme.Onboarding.iconSize * pScale, height: AppTheme.Onboarding.iconSize * pScale)
+        } else if slide.icon == "logo" {
+            // Destiny logo
+            Image("logo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: AppTheme.Onboarding.iconSize + 10, height: AppTheme.Onboarding.iconSize + 10)
         } else {
-            // SF Symbol icon with background
-            ZStack {
-                Circle()
-                    .fill(AppTheme.Colors.mainBackground.opacity(0.5)) // Adjusted for visibility
-                    .frame(width: 100, height: 100)
-                
-                Image(systemName: slide.icon)
-                    .font(AppTheme.Fonts.display(size: 44))
-                    .foregroundStyle(AppTheme.Colors.premiumGradient)
-            }
+            // SF Symbol icon with gradient
+            Image(systemName: slide.icon)
+                .font(.system(size: 50, weight: .light))
+                .foregroundStyle(AppTheme.Colors.premiumGradient)
         }
     }
 }
@@ -149,27 +125,38 @@ struct StatsCard: View {
             // Rating stat
             VStack(spacing: 6) {
                 HStack(spacing: 3) {
+                    // 4 filled stars
                     ForEach(0..<4, id: \.self) { _ in
                         Image(systemName: "star.fill")
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundStyle(AppTheme.Colors.premiumGradient)
                             .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 2, y: 1)
                     }
+                    // 1 empty star
+                    Image(systemName: "star")
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundStyle(AppTheme.Colors.gold.opacity(0.4))
                 }
-                Text("4.0 rating")
+                Text("4/5 rating")
                     .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(AppTheme.Colors.textTertiary)
             }
             .frame(maxWidth: .infinity)
         }
         .padding(.vertical, 20)
-        .background(AppTheme.Colors.cardBackground)
-        .cornerRadius(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(AppTheme.Colors.cardBackground.opacity(0.8))
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(.ultraThinMaterial.opacity(0.3))
+                )
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
+                .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.2), radius: 10, y: 4)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.1), radius: 15, y: 5)
     }
 }
 
@@ -178,18 +165,22 @@ struct FeaturesListView: View {
     let features = OnboardingFeature.features
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             ForEach(features) { feature in
                 HStack(spacing: 16) {
-                    // Icon container
+                    // Icon container with glassmorphism
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(AppTheme.Colors.gold.opacity(0.15))
-                            .frame(width: 48, height: 48)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(.ultraThinMaterial.opacity(0.2))
+                            )
+                            .frame(width: 44, height: 44)
                         
                         Image(systemName: feature.icon)
-                            .font(AppTheme.Fonts.title(size: 20))
-                            .foregroundColor(AppTheme.Colors.gold)
+                            .font(AppTheme.Fonts.title(size: 18))
+                            .foregroundStyle(AppTheme.Colors.premiumGradient)
                     }
                     
                     // Text content
@@ -213,9 +204,15 @@ struct FeaturesListView: View {
 }
 
 #Preview("Slide 1") {
-    OnboardingSlideView(slide: OnboardingSlide.slides[0], onGetStarted: {})
+    ZStack {
+        CosmicBackgroundView()
+        OnboardingSlideView(slide: OnboardingSlide.slides[0], onGetStarted: {})
+    }
 }
 
 #Preview("Features Slide") {
-    OnboardingSlideView(slide: OnboardingSlide.slides[3], onGetStarted: {})
+    ZStack {
+        CosmicBackgroundView()
+        OnboardingSlideView(slide: OnboardingSlide.slides[3], onGetStarted: {})
+    }
 }

@@ -39,8 +39,8 @@ struct LanguageSelectionView: View {
     
     var body: some View {
         ZStack {
-            // Background
-            backgroundLayer
+            // Premium cosmic background (same as Onboarding)
+            CosmicBackgroundView()
             
             // Main content
             VStack(spacing: 0) {
@@ -50,10 +50,10 @@ struct LanguageSelectionView: View {
                 // Language Grid
                 languageGrid
                 
-                // Continue Button
-                if selectedCode != nil {
-                    continueButton
-                }
+                Spacer(minLength: 8)
+                
+                // Continue Button (always visible)
+                continueButton
             }
             
             // Particle overlay
@@ -64,27 +64,6 @@ struct LanguageSelectionView: View {
         }
         .onAppear {
             startAnimations()
-        }
-    }
-    
-    // MARK: - Background
-    private var backgroundLayer: some View {
-        ZStack {
-            AppTheme.Colors.mainBackground.ignoresSafeArea()
-            
-            // Cosmic glow - top left
-            Circle()
-                .fill(AppTheme.Colors.gold.opacity(0.08))
-                .frame(width: 350, height: 350)
-                .blur(radius: 80)
-                .offset(x: -120, y: -180)
-            
-            // Cosmic glow - bottom right
-            Circle()
-                .fill(AppTheme.Colors.purpleAccent.opacity(0.1))
-                .frame(width: 300, height: 300)
-                .blur(radius: 70)
-                .offset(x: 150, y: 300)
         }
     }
     
@@ -133,7 +112,7 @@ struct LanguageSelectionView: View {
             
             Text("Destiny AI Astrology")
                 .font(AppTheme.Fonts.display(size: 26))
-                .foregroundColor(AppTheme.Colors.textPrimary)
+                .goldGradient()
             
             Text("Your cosmic journey begins in your language")
                 .font(AppTheme.Fonts.body(size: 15))
@@ -141,75 +120,87 @@ struct LanguageSelectionView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
         }
-        .padding(.top, 50)
-        .padding(.bottom, 24)
+        .padding(.top, 30)
+        .padding(.bottom, 16)
         .opacity(animateContent ? 1 : 0)
         .offset(y: animateContent ? 0 : 20)
     }
     
-    // MARK: - Language Grid
     private var languageGrid: some View {
-        ScrollView(showsIndicators: false) {
-            LazyVGrid(columns: columns, spacing: AppTheme.LanguageSelection.cardSpacing) {
-                ForEach(Array(languages.enumerated()), id: \.element.id) { index, language in
-                    PremiumLanguageCard(
-                        language: language,
-                        isSelected: selectedCode == language.code
-                    ) {
-                        selectLanguage(language)
-                    }
-                    .opacity(animateContent ? 1 : 0)
-                    .offset(y: animateContent ? 0 : 30)
-                    .animation(
-                        .easeOut(duration: AppTheme.LanguageSelection.entranceDuration)
-                        .delay(Double(index) * AppTheme.LanguageSelection.staggerDelay),
-                        value: animateContent
-                    )
+        LazyVGrid(columns: columns, spacing: AppTheme.LanguageSelection.cardSpacing) {
+            ForEach(Array(languages.enumerated()), id: \.element.id) { index, language in
+                PremiumLanguageCard(
+                    language: language,
+                    isSelected: selectedCode == language.code
+                ) {
+                    selectLanguage(language)
                 }
+                .opacity(animateContent ? 1 : 0)
+                .offset(y: animateContent ? 0 : 30)
+                .animation(
+                    .easeOut(duration: AppTheme.LanguageSelection.entranceDuration)
+                    .delay(Double(index) * AppTheme.LanguageSelection.staggerDelay),
+                    value: animateContent
+                )
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
     }
     
     // MARK: - Continue Button
+    @ViewBuilder
     private var continueButton: some View {
+        let isEnabled = selectedCode != nil
+        
         Button(action: confirmSelection) {
             HStack(spacing: 10) {
                 Text(continueButtonText)
                     .font(AppTheme.Fonts.title(size: 17))
                 
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 14, weight: .semibold))
+                if isEnabled {
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 14, weight: .semibold))
+                }
             }
-            .foregroundColor(AppTheme.Colors.textOnGold)
+            .foregroundColor(isEnabled ? AppTheme.Colors.textOnGold : AppTheme.Colors.textSecondary)
             .frame(maxWidth: .infinity)
             .frame(height: 54)
             .background(
                 ZStack {
-                    AppTheme.Colors.premiumCardGradient
-                    
-                    // Top highlight
-                    VStack {
-                        Rectangle()
-                            .fill(Color.white.opacity(0.25))
-                            .frame(height: 1)
-                        Spacer()
+                    if isEnabled {
+                        AppTheme.Colors.premiumCardGradient
+                        
+                        // Top highlight
+                        VStack {
+                            Rectangle()
+                                .fill(Color.white.opacity(0.25))
+                                .frame(height: 1)
+                            Spacer()
+                        }
+                    } else {
+                        // Disabled state - muted background
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(AppTheme.Colors.cardBackground)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(AppTheme.Colors.separator, lineWidth: 1)
+                            )
                     }
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: 14))
-            .shadow(color: AppTheme.Colors.gold.opacity(0.35), radius: 12, y: 5)
+            .shadow(color: isEnabled ? AppTheme.Colors.gold.opacity(0.35) : Color.clear, radius: 12, y: 5)
         }
+        .disabled(!isEnabled)
         .padding(.horizontal, 32)
         .padding(.bottom, 30)
-        .padding(.top, 16)
-        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .animation(.easeInOut(duration: 0.25), value: isEnabled)
     }
     
     // MARK: - Helpers
     private var continueButtonText: String {
-        guard let code = selectedCode else { return "Continue" }
+        guard let code = selectedCode else { return "Select a language" }
         switch code {
         case "hi": return "जारी रखें"
         case "es": return "Continuar"

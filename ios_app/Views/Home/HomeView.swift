@@ -106,16 +106,11 @@ struct HomeView: View {
             
             Spacer()
             
-            // Logo / Brand (Centered)
-            HStack(spacing: 8) {
-                Image(systemName: "sparkles")
-                    .font(AppTheme.Fonts.title(size: 20))
-                    .foregroundColor(AppTheme.Colors.gold)
-                
-                Text("Destiny")
-                    .font(AppTheme.Fonts.display(size: 28))
-                    .foregroundColor(AppTheme.Colors.gold)
-            }
+            // Logo / Brand (Centered) - Gold "Destiny" logo from assets
+            Image("destiny_home")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 32)
             
             Spacer()
             

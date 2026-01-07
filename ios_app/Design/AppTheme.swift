@@ -150,9 +150,9 @@ struct AppTheme {
     // MARK: - Language Selection (Premium)
     struct LanguageSelection {
         // Card dimensions
-        static let cardHeight: CGFloat = 85
-        static let cardCornerRadius: CGFloat = 18
-        static let cardSpacing: CGFloat = 14
+        static let cardHeight: CGFloat = 72
+        static let cardCornerRadius: CGFloat = 16
+        static let cardSpacing: CGFloat = 10
         
         // Glassmorphism
         static let glassOpacity: Double = 0.08
@@ -178,6 +178,118 @@ struct AppTheme {
         static let iconSize: CGFloat = 50
         static let iconGlowRadius: CGFloat = 25
         static let iconRotationDuration: Double = 20.0
+    }
+    
+    // MARK: - Premium Onboarding
+    struct Onboarding {
+        // Cosmic Background
+        static let nebulaSize: CGFloat = 500
+        static let nebulaBlur: CGFloat = 100
+        static let nebulaRotationDuration: Double = 60.0
+        static let starCount: Int = 30
+        static let starMinSize: CGFloat = 1.5
+        static let starMaxSize: CGFloat = 3.5
+        static let starTwinkleDuration: Double = 2.0
+        
+        // Tilt Parallax (CoreMotion)
+        static let tiltSensitivity: CGFloat = 25.0
+        static let tiltSmoothing: Double = 0.15
+        
+        // Floating Icon Animation
+        static let floatAmplitude: CGFloat = 8.0
+        static let floatDuration: Double = 3.0
+        
+        // Shimmer Button
+        static let shimmerDuration: Double = 2.5
+        static let shimmerAngle: Double = 25.0
+        static let shimmerWidth: CGFloat = 80.0
+        
+        // Scroll Transition
+        static let parallaxIntensity: CGFloat = 0.3
+        static let fadeThreshold: CGFloat = 0.7
+        
+        // Icon Container
+        static let iconContainerSize: CGFloat = 140
+        static let iconSize: CGFloat = 100
+        static let iconGlowRadius: CGFloat = 30
+        static let iconGlowOpacity: Double = 0.4
+        
+        // Typography
+        static let titleSize: CGFloat = 30
+        static let subtitleSize: CGFloat = 17
+        static let descriptionSize: CGFloat = 16
+        
+        // Spacing
+        static let contentTopPadding: CGFloat = 60
+        static let iconToTitleSpacing: CGFloat = 36
+        static let titleToDescriptionSpacing: CGFloat = 16
+    }
+    
+    // MARK: - Cosmic Gradients
+    struct CosmicGradients {
+        static let nebulaGold = RadialGradient(
+            colors: [Colors.gold.opacity(0.25), Colors.gold.opacity(0.05), Color.clear],
+            center: .center,
+            startRadius: 50,
+            endRadius: 250
+        )
+        
+        static let nebulaPurple = RadialGradient(
+            colors: [Colors.purpleAccent.opacity(0.3), Colors.purpleAccent.opacity(0.05), Color.clear],
+            center: .center,
+            startRadius: 30,
+            endRadius: 200
+        )
+        
+        static let iconGlow = RadialGradient(
+            colors: [Colors.gold.opacity(0.5), Colors.gold.opacity(0.1), Color.clear],
+            center: .center,
+            startRadius: 20,
+            endRadius: 70
+        )
+    }
+    
+    // MARK: - Visionary UI (2025 Trends)
+    struct Visionary {
+        // Bento Grid Layout
+        struct BentoGrid {
+            static let spacing: CGFloat = 10
+            static let largeCellHeight: CGFloat = 120
+            static let smallCellHeight: CGFloat = 100
+            static let cornerRadius: CGFloat = 16
+            static let iconSize: CGFloat = 22
+            static let iconContainerSize: CGFloat = 40
+            static let titleSize: CGFloat = 14
+            static let descriptionSize: CGFloat = 11
+            static let horizontalPadding: CGFloat = 16
+        }
+        
+        // Glass Button (Crystal Effect)
+        struct GlassButton {
+            static let height: CGFloat = 56
+            static let cornerRadius: CGFloat = 18
+            static let borderWidth: CGFloat = 1.5
+            static let borderOpacity: Double = 0.4
+            static let shadowRadius: CGFloat = 20
+            static let shadowOpacity: Double = 0.4
+            static let innerHighlightOpacity: Double = 0.15
+        }
+        
+        // Typewriter Text Animation
+        struct Typewriter {
+            static let characterDelay: Double = 0.04
+            static let cursorBlinkDuration: Double = 0.5
+            static let cursorWidth: CGFloat = 2
+            static let startDelay: Double = 0.3
+        }
+        
+        // Glass Card (Bento Cells)
+        struct GlassCard {
+            static let backgroundOpacity: Double = 0.08
+            static let borderOpacity: Double = 0.2
+            static let borderWidth: CGFloat = 1
+            static let blurRadius: CGFloat = 0.5
+        }
     }
 }
 

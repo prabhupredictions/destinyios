@@ -77,8 +77,8 @@ struct AuthView: View {
     
     // MARK: - Logo Section
     private var logoSection: some View {
-        // Destiny logo from assets
-        Image("logo")
+        // Destiny logo (gold version) from assets
+        Image("logo_gold")
             .resizable()
             .scaledToFit()
             .frame(width: 180, height: 180)
