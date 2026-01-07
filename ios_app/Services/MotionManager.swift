@@ -34,8 +34,12 @@ final class MotionManager: ObservableObject {
             
             DispatchQueue.main.async {
                 withAnimation(.easeOut(duration: self.smoothing)) {
-                    self.xOffset = CGFloat(roll) * self.sensitivity
-                    self.yOffset = CGFloat(pitch) * self.sensitivity
+                    // Safety Clamp (Prevent uncontrolled spinning)
+                    let clampedRoll = min(1.0, max(-1.0, roll))
+                    let clampedPitch = min(1.0, max(-1.0, pitch))
+                    
+                    self.xOffset = CGFloat(clampedRoll) * self.sensitivity
+                    self.yOffset = CGFloat(clampedPitch) * self.sensitivity
                 }
             }
         }

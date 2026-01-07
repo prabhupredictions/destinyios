@@ -248,7 +248,7 @@ struct AppTheme {
         static let starTwinkleDuration: Double = 2.0
         
         // Tilt Parallax (CoreMotion)
-        static let tiltSensitivity: CGFloat = 25.0
+        static let tiltSensitivity: CGFloat = 2.0
         static let tiltSmoothing: Double = 0.15
         
         // Floating Icon Animation
