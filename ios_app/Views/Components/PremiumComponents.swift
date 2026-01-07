@@ -329,6 +329,157 @@ struct BentoGridFeaturesView: View {
     }
 }
 
+// MARK: - 3D Tilt Modifier (Device Motion)
+/// Applies 3D rotation effect based on device tilt using MotionManager
+struct Tilt3DModifier: ViewModifier {
+    @StateObject private var motionManager = MotionManager()
+    let intensity: CGFloat
+    let perspective: CGFloat
+    
+    init(intensity: CGFloat = 15, perspective: CGFloat = 0.5) {
+        self.intensity = intensity
+        self.perspective = perspective
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .rotation3DEffect(
+                .degrees(Double(motionManager.yOffset * intensity / 25)),
+                axis: (x: 1, y: 0, z: 0),
+                perspective: perspective
+            )
+            .rotation3DEffect(
+                .degrees(Double(motionManager.xOffset * intensity / 25)),
+                axis: (x: 0, y: 1, z: 0),
+                perspective: perspective
+            )
+            .onAppear { motionManager.start() }
+            .onDisappear { motionManager.stop() }
+    }
+}
+
+// MARK: - Inertia Motion Modifier (Proprioception/Weight)
+/// Simulates mass by making content "lag" behind device movement
+struct InertiaModifier: ViewModifier {
+    @StateObject private var motionManager = MotionManager()
+    let intensity: CGFloat
+    
+    init(intensity: CGFloat = 10) {
+        self.intensity = intensity
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .offset(
+                x: motionManager.xOffset * intensity,
+                y: motionManager.yOffset * intensity
+            )
+            .animation(.interpolatingSpring(stiffness: 100, damping: 10), value: motionManager.xOffset)
+            .onAppear { motionManager.start() }
+            .onDisappear { motionManager.stop() }
+    }
+}
+
+// MARK: - Bio-Rhythm "Heartbeat" Modifier
+/// Synchronizes Visual Pulse + Haptic Heartbeat + Sound Drone
+struct BioRhythmModifier: ViewModifier {
+    let bpm: Double
+    let intensity: CGFloat // Scale factor
+    let active: Bool
+    
+    @State private var scale: CGFloat = 1.0
+    @State private var opacity: Double = 1.0
+    @State private var timer: Timer?
+    
+    init(bpm: Double = 60, intensity: CGFloat = 1.05, active: Bool = true) {
+        self.bpm = bpm
+        self.intensity = intensity
+        self.active = active
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(scale)
+            .opacity(opacity)
+            .onChange(of: active) { isActive in
+                if isActive {
+                    startHeartbeat()
+                } else {
+                    stopHeartbeat()
+                }
+            }
+            .onAppear {
+                if active { startHeartbeat() }
+            }
+            .onDisappear {
+                stopHeartbeat()
+            }
+    }
+    
+    private func startHeartbeat() {
+        stopHeartbeat() // Clear existing
+        
+        let interval = 60.0 / bpm
+        
+        // Initial beat
+        pulse()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
+            pulse()
+        }
+    }
+    
+    private func stopHeartbeat() {
+        timer?.invalidate()
+        timer = nil
+        // Reset state
+        withAnimation(.easeOut(duration: 0.3)) {
+            scale = 1.0
+            opacity = 1.0
+        }
+    }
+    
+    private func pulse() {
+        guard active else { return }
+        
+        // 1. Haptic (The "Thud")
+        HapticManager.shared.playHeartbeat()
+        
+        // 2. Visual (Expand then Contract)
+        withAnimation(.easeIn(duration: 0.15)) {
+            scale = intensity
+            opacity = 1.0
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            withAnimation(.easeOut(duration: 0.4)) {
+                scale = 1.0
+                opacity = 0.95
+            }
+        }
+    }
+}
+
+extension View {
+    /// Applies 3D rotation based on device tilt (gyroscope)
+    /// - Parameters:
+    ///   - intensity: How much tilt affects rotation (default: 15)
+    ///   - perspective: Perspective depth (default: 0.5)
+    func tilt3D(intensity: CGFloat = 15, perspective: CGFloat = 0.5) -> some View {
+        modifier(Tilt3DModifier(intensity: intensity, perspective: perspective))
+    }
+    
+    /// Applies simulated mass/weight to the view (Lag on tilt)
+    func premiumInertia(intensity: CGFloat = 10) -> some View {
+        modifier(InertiaModifier(intensity: intensity))
+    }
+    
+    /// Makes the view "breathe" with a bio-rhythmic heartbeat (Haptic + Visual)
+    func bioRhythm(bpm: Double = 60, intensity: CGFloat = 1.03, active: Bool = true) -> some View {
+        modifier(BioRhythmModifier(bpm: bpm, intensity: intensity, active: active))
+    }
+}
+
 #Preview("Shimmer Button") {
     ZStack {
         AppTheme.Colors.mainBackground.ignoresSafeArea()

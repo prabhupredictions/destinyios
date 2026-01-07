@@ -42,7 +42,11 @@ struct OnboardingView: View {
     private var topBar: some View {
         HStack {
             if currentSlideIndex < slides.count - 1 {
-                Button(action: onComplete) {
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    SoundManager.shared.playButtonTap()
+                    onComplete()
+                }) {
                     Text("skip".localized)
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
@@ -99,12 +103,16 @@ struct OnboardingView: View {
             if currentSlideIndex < slides.count - 1 {
                 // Continue button for slides 1-3
                 ShimmerButton(title: "continue".localized, icon: "arrow.right") {
+                    HapticManager.shared.premiumContinue()
+                    SoundManager.shared.playButtonTap()
                     goToNextSlide()
                 }
                 .padding(.horizontal, 24)
             } else {
                 // Get Started button on last slide
                 ShimmerButton(title: "get_started".localized, icon: "sparkles") {
+                    HapticManager.shared.premiumSuccess()
+                    SoundManager.shared.playSuccess()
                     onComplete()
                 }
                 .padding(.horizontal, 24)

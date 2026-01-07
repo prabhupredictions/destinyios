@@ -14,6 +14,9 @@ struct LanguageSelectionView: View {
     @State private var showParticles = false
     @State private var iconRotation: Double = 0
     
+    // Sound Manager
+    @ObservedObject private var soundManager = SoundManager.shared
+    
     // Supported languages
     private let languages: [LanguageOption] = [
         LanguageOption(code: "en", name: "English", nativeName: "English", symbol: "A"),
@@ -44,6 +47,27 @@ struct LanguageSelectionView: View {
             
             // Main content
             VStack(spacing: 0) {
+                // Top Bar with Sound Toggle (Professional Top Right Position)
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        SoundManager.shared.toggleSound()
+                    }) {
+                        Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .contentTransition(.symbolEffect(.replace))
+                            .padding(8)
+                            .background(Color.white.opacity(0.1))
+                            .clipShape(Circle())
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+                .padding(.bottom, -10) // Tweak spacing to header
+                
                 // Header with animated celestial icon
                 headerSection
                 
@@ -146,6 +170,7 @@ struct LanguageSelectionView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 4)
+        .premiumInertia(intensity: 10) // Subtle physics weight
     }
     
     // MARK: - Continue Button
@@ -241,8 +266,9 @@ struct LanguageSelectionView: View {
         appLanguage = language.name
         
         // Haptic feedback
-        let impact = UIImpactFeedbackGenerator(style: .medium)
-        impact.impactOccurred()
+        // Haptic feedback
+        HapticManager.shared.play(.light)
+        SoundManager.shared.playCardSelect()
     }
     
     private func confirmSelection() {
@@ -252,8 +278,9 @@ struct LanguageSelectionView: View {
         UserDefaults.standard.synchronize()
         
         // Success haptic
-        let notification = UINotificationFeedbackGenerator()
-        notification.notificationOccurred(.success)
+        // Success haptic
+        HapticManager.shared.premiumSuccess()
+        SoundManager.shared.playSuccess()
         
         withAnimation(.easeInOut(duration: 0.5)) {
             isCompleted = true

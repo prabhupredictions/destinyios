@@ -11,16 +11,17 @@ struct OnboardingSlideView: View {
             VStack(spacing: slide.isFeatureSlide ? 20 : AppTheme.Onboarding.iconToTitleSpacing) {
                 Spacer(minLength: slide.isFeatureSlide ? 30 : AppTheme.Onboarding.contentTopPadding)
                 
-                // Floating Icon with glow
+                // Floating Icon with glow and 3D tilt
                 FloatingIcon {
                     iconContent
                 }
+                .tilt3D(intensity: 45) // Increased intensity for stronger 3D effect
                 .frame(height: AppTheme.Onboarding.iconContainerSize)
                 
                 // Title section with gold gradient
                 VStack(spacing: AppTheme.Onboarding.titleToDescriptionSpacing) {
                     Text(slide.title)
-                        .font(AppTheme.Fonts.display(size: AppTheme.Onboarding.titleSize))
+                        .font(AppTheme.Fonts.premiumDisplay(size: AppTheme.Onboarding.titleSize))
                         .goldGradient()
                         .multilineTextAlignment(.center)
                         .lineSpacing(4)
@@ -60,6 +61,7 @@ struct OnboardingSlideView: View {
                 
                 Spacer(minLength: 160) // Increased bottom space for feature slide truncation fix
             }
+            .premiumInertia(intensity: 15) // Heavy, substantial feel when tilting
         }
     }
     

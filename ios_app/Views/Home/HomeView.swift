@@ -13,6 +13,9 @@ struct HomeView: View {
     @State private var showProfile = false
     @State private var contentOpacity: Double = 0
     
+    // Sound Manager
+    @ObservedObject private var soundManager = SoundManager.shared
+    
     // Menu Sheet States
     @State private var showHistorySheet = false
     
@@ -114,17 +117,38 @@ struct HomeView: View {
             
             Spacer()
             
-            // Profile Button
-            Button(action: { showProfile = true }) {
-                ZStack {
-                    Circle()
-                        .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
-                        .background(Circle().fill(AppTheme.Colors.secondaryBackground))
-                        .frame(width: 40, height: 40)
-                    
-                    Image(systemName: "person.fill")
-                        .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(AppTheme.Colors.gold)
+            // Right Side Buttons
+            HStack(spacing: 12) {
+                // Sound Toggle
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    soundManager.toggleSound()
+                }) {
+                    ZStack {
+                        Circle()
+                            .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
+                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .contentTransition(.symbolEffect(.replace))
+                    }
+                }
+                
+                // Profile Button
+                Button(action: { showProfile = true }) {
+                    ZStack {
+                        Circle()
+                            .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
+                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: "person.fill")
+                            .font(AppTheme.Fonts.body(size: 16))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
                 }
             }
         }
@@ -155,6 +179,8 @@ struct HomeView: View {
             }
             .padding(.vertical, 4) // Reduce internal padding
         }
+        .premiumInertia(intensity: 12) // Heavy cosmic object feel
+
         .aspectRatio(2.5, contentMode: .fit) // 2.5:1 width:height ratio (Taller)
         .overlay(alignment: .topTrailing) {
             // Moon Sign Badge - Proportional to 2.5:1 Card

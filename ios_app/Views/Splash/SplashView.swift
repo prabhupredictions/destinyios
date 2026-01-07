@@ -1,5 +1,5 @@
 import SwiftUI
-import CoreHaptics
+
 
 /// Tier 4 Visionary Splash Screen (SwiftUI Canvas Version)
 /// Features: Animated fluid background, cinematic blur-in reveal, pulsing glow, shimmer, parallax stars, haptics
@@ -12,7 +12,7 @@ struct SplashView: View {
     @State private var subtitleOpacity: Double = 0
     @State private var orbitRotation: Double = 0
     @State private var starsOpacity: Double = 0
-    @State private var hapticEngine: CHHapticEngine?
+
     
     var body: some View {
         GeometryReader { geometry in
@@ -67,9 +67,11 @@ struct SplashView: View {
                             ShimmerOverlayView()
                                 .mask(Circle().frame(width: AppTheme.Splash.logoContainerSize))
                         )
+                        .bioRhythm(bpm: 60, active: true) // Living heartbeat
                     }
                     .scaleEffect(logoScale)
                     .opacity(logoOpacity)
+                    .premiumInertia(intensity: 20) // Heavy gold object feel
                     
                     Spacer()
                         .frame(height: AppTheme.Splash.logoToTitleSpacing)
@@ -129,11 +131,13 @@ struct SplashView: View {
                     .padding(.bottom, AppTheme.Splash.loaderBottomPadding)
                 }
             }
+
         }
         .ignoresSafeArea()
         .onAppear {
-            prepareHaptics()
             startAnimations()
+            // Bio-Sync Start: Heartbeat + Sound
+            SoundManager.shared.playSuccess() // "Ascension" chime
         }
     }
     
@@ -143,11 +147,6 @@ struct SplashView: View {
         withAnimation(.spring(response: AppTheme.Splash.logoAnimationDuration, dampingFraction: 0.6)) {
             logoScale = 1.0
             logoOpacity = 1.0
-        }
-        
-        // Play haptic on logo appearance
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            playHaptic()
         }
         
         // Title blur-in (cinematic reveal)
@@ -169,32 +168,6 @@ struct SplashView: View {
         // Continuous orbit rotation
         withAnimation(.linear(duration: AppTheme.Splash.orbitRotationDuration).repeatForever(autoreverses: false)) {
             orbitRotation = 360
-        }
-    }
-    
-    // MARK: - Haptics
-    private func prepareHaptics() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        do {
-            hapticEngine = try CHHapticEngine()
-            try hapticEngine?.start()
-        } catch {
-            print("Haptic engine error: \(error)")
-        }
-    }
-    
-    private func playHaptic() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.7)
-        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5)
-        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
-        
-        do {
-            let pattern = try CHHapticPattern(events: [event], parameters: [])
-            let player = try hapticEngine?.makePlayer(with: pattern)
-            try player?.start(atTime: 0)
-        } catch {
-            print("Haptic playback error: \(error)")
         }
     }
 }

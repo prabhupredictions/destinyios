@@ -3,6 +3,49 @@ import SwiftUI
 
 /// Centralized Theme System for Destiny AI Astrology App
 /// Defines a premium dark aesthetic with Navy/Gold palette.
+///
+/// # THE SOUL OF THE APP (Sensory Philosophy)
+/// This app is not just software; it is a "Living Organism" designed to connect with the user's subconscious.
+/// Future development MUST adhere to this 5-Sense Sensory Stack:
+///
+/// ## 1. SEE (Visual) 👁️
+///   - **Aesthetic:** Divine Luxury. Deep Space Navy + Living Gold.
+///   - **Holography:** Use `Tilt3DModifier` to make icons rotate in 3D space based on device tilt.
+///   - **Materials:** UI elements are not pixels; they are heavy gold/glass slabs.
+///   - **Typography:** `Playfair Display` (Serif) for Soul/Titles, `San Francisco` for Brain/Body.
+///
+/// ## 2. HEAR (Sound) 👂
+///   - **Philosophy:** "Spiritual Connection" over "Notification".
+///   - **Frequencies:** Use 432Hz (Healing) and 528Hz (Miracle).
+///   - **Synthesis:** Use `SoundManager`'s Tibetan Bowl synthesizer (Additive Synthesis). NO generic beeps.
+///   - **Subliminal:** The app emits a silent 10Hz Alpha Wave (Binaural Drone) at 3% volume to induce flow state.
+///   - **Envelope:** Attack times > 40ms. Sounds should feel like "touching a cloud" or "tapping water".
+///
+/// ## 3. TOUCH (Haptics) 🫳
+///   - **Philosophy:** "Physicality".
+///   - **Heartbeat:** Use `HapticManager.playHeartbeat()` (Core Haptics) during AI processing. The phone must throb like a heart.
+///   - **Texture:** Use `playShimmer()` for success. It feels like a high-frequency electric purr.
+///   - **Mechanism:** Taps are soft thuds, not sharp clicks.
+///
+/// ## 4. PROPRIOCEPTION (Weight) ⚖️
+///   - **Philosophy:** "Mass".
+///   - **Inertia:** Use `.premiumInertia()` modifier. Content must "lag" behind device tilt.
+///   - **Illusion:** This tricks the brain into feeling the data has physical weight (Gold Tablet Effect).
+///
+/// ## 5. BIO-SYNC (Rhythm) 💓
+///   - **Rate:** 60 BPM (Resting Heart Rate).
+///   - **Coherence:** Visual scales, Audio Drones, and Haptics must pulse in sync to calm the user.
+///
+/// ## 6. ATMOSPHERE (Environment) 🌌
+///   - **Philosophy:** "Cosmic Context".
+///   - **Particles:** Use Parallax Star Fields (`ParallaxStarField`) to provide depth.
+///   - **Fluidity:** Backgrounds should be `LiquidGoldBackground` or similar animated shaders. Never static.
+///
+/// ## 7. MOTION (Physics) 🌊
+///   - **Philosophy:** "Water".
+///   - **Springs:** No linear animations. Use `interpolatingSpring(stiffness: 100, damping: 10)` for organic movement.
+///   - **Transitions:** Elements should float into place, not snap.
+///
 struct AppTheme {
     
     // MARK: - Colors
@@ -79,6 +122,19 @@ struct AppTheme {
     
     // MARK: - Typography
     struct Fonts {
+        // Custom font family names (must match font family name, not PostScript name for variable fonts)
+        private static let playfairDisplay = "Playfair Display"
+        
+        /// Premium display font (Playfair Display) - for headlines that need luxury feel
+        static func premiumDisplay(size: CGFloat) -> Font {
+            if let _ = UIFont(name: playfairDisplay, size: size) {
+                return .custom(playfairDisplay, size: size)
+            }
+            // Fallback to system serif if custom font fails to load
+            return .system(size: size, weight: .bold, design: .serif)
+        }
+        
+        /// Standard display font (System Serif) - for general headlines
         static func display(size: CGFloat) -> Font {
             return .system(size: size, weight: .bold, design: .serif)
         }
