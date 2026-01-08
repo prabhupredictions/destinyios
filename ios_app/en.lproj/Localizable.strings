@@ -80,7 +80,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "Enter Birth Details";
 "your_name" = "Your Name";
-"enter_your_name" = "Enter your name";
+"enter_your_name" = "Enter Your Name";
 "date_of_birth" = "Date of Birth";
 "time_of_birth" = "Time of Birth";
 "birth_time_unknown" = "Birth time unknown";
@@ -161,6 +161,7 @@
 "birth_city" = "Birth City";
 "select_date" = "Select Date";
 "select_time" = "Select Time";
+"select_gender" = "Select Gender";
 "partner_birth_time_unknown" = "I don't know partner's birth time";
 "birth_time_warning" = "Note: Results may be less accurate without exact birth time";
 
@@ -193,7 +194,7 @@
 "need_update_birth_data" = "Need to update birth data?";
 "contact_support_birth_data" = "For changes to your date, time, or place of birth, please contact our support team. This ensures accuracy in your astrological readings.";
 "gender_identity" = "Gender Identity";
-"select_birth_city" = "Select your birth city";
+"select_birth_city" = "Select Birth City";
 
 // MARK: - Match Result Screen Redesign
 "kundali_match" = "Chart Match";

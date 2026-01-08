@@ -1,53 +1,54 @@
 import SwiftUI
 
 /// Premium authentication screen with multiple sign-in options
+/// Aligned with Splash/Language/Onboarding visual consistency
 struct AuthView: View {
     // MARK: - State
     @State private var viewModel = AuthViewModel()
     @AppStorage("isAuthenticated") private var isAuthenticatedStorage = false
     
     // Animation states
-    @State private var logoScale: CGFloat = 0.8
+    @State private var logoScale: CGFloat = 0.6
     @State private var contentOpacity: Double = 0
+    @State private var contentOffset: CGFloat = 20
+    @State private var orbitRotation: Double = 0
+    
+    // Sound Manager
+    @ObservedObject private var soundManager = SoundManager.shared
     
     var body: some View {
         ZStack {
-            // Background
-            AppTheme.Colors.mainBackground.ignoresSafeArea()
+            // Layer 1: Cosmic Background
+            CosmicBackgroundView()
+                .ignoresSafeArea()
             
-            // Cosmic background effect
-            GeometryReader { geo in
-                Circle()
-                    .fill(AppTheme.Colors.premiumGradient.opacity(0.1))
-                    .frame(width: 500, height: 500)
-                    .blur(radius: 100)
-                    .offset(x: geo.size.width - 150, y: -200)
-                
-                Circle()
-                    .fill(AppTheme.Colors.purpleAccent.opacity(0.1))
-                    .frame(width: 400, height: 400)
-                    .blur(radius: 80)
-                    .offset(x: -150, y: geo.size.height - 300)
-            }
+            // Layer 2: Orbital Rings (Ambient decoration)
+            OrbitalRingsView(rotation: orbitRotation)
+                .opacity(0.25)
             
-            // Content
+            // Layer 3: Content
             VStack(spacing: 0) {
+                // Sound Toggle (Top Right)
+                soundToggle
+                
                 Spacer()
                 
-                // Logo section
+                // Logo section with animated glow
                 logoSection
                     .scaleEffect(logoScale)
                 
                 // Welcome text
                 welcomeSection
                     .opacity(contentOpacity)
-                    .padding(.top, 24)
+                    .offset(y: contentOffset)
+                    .padding(.top, 28)
                 
                 Spacer()
                 
                 // Auth buttons
                 authButtonsSection
                     .opacity(contentOpacity)
+                    .offset(y: contentOffset)
                 
                 // Guest option
                 guestSection
@@ -59,6 +60,7 @@ struct AuthView: View {
                 termsSection
                     .opacity(contentOpacity)
             }
+            .padding(.bottom, 20)
             
             // Loading overlay
             if viewModel.isLoading {
@@ -66,69 +68,126 @@ struct AuthView: View {
             }
         }
         .onAppear {
-            animateIn()
+            startAnimations()
         }
         .onChange(of: viewModel.isAuthenticated) { _, isAuth in
             if isAuth {
+                HapticManager.shared.playSuccess()
                 isAuthenticatedStorage = true
             }
         }
     }
     
-    // MARK: - Logo Section
+    // MARK: - Sound Toggle (Consistency with Language Screen)
+    private var soundToggle: some View {
+        HStack {
+            Spacer()
+            
+            Button(action: {
+                HapticManager.shared.play(.light)
+                SoundManager.shared.toggleSound()
+            }) {
+                Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .contentTransition(.symbolEffect(.replace))
+                    .padding(8)
+                    .background(Color.white.opacity(0.1))
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 16)
+    }
+    
+    // MARK: - Logo Section (Refined: Smaller & Elegant)
     private var logoSection: some View {
-        // Destiny logo (gold version) from assets
-        Image("logo_gold")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 180, height: 180)
-            .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 20, x: 0, y: 0)
+        ZStack {
+            // Outer pulsing glow
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [AppTheme.Colors.gold.opacity(0.25), Color.clear],
+                        center: .center,
+                        startRadius: 20,
+                        endRadius: 80
+                    )
+                )
+                .frame(width: AppTheme.Auth.glowSize, height: AppTheme.Auth.glowSize)
+                .blur(radius: AppTheme.Auth.glowBlur)
+            
+            // Rotating orbit ring
+            Circle()
+                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                .frame(width: AppTheme.Auth.ringSize, height: AppTheme.Auth.ringSize)
+                .rotationEffect(.degrees(orbitRotation))
+            
+            // Small orbiting dot
+            Circle()
+                .fill(AppTheme.Colors.goldLight)
+                .frame(width: AppTheme.Auth.dotSize, height: AppTheme.Auth.dotSize)
+                .offset(x: AppTheme.Auth.ringSize / 2)
+                .rotationEffect(.degrees(orbitRotation))
+            
+            // Logo with shadow
+            Image("logo_gold")
+                .resizable()
+                .scaledToFit()
+                .frame(width: AppTheme.Auth.logoSize, height: AppTheme.Auth.logoSize)
+                .offset(x: AppTheme.Auth.logoOpticalOffset.x, y: AppTheme.Auth.logoOpticalOffset.y)
+                .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 15, x: 0, y: 0)
+        }
+        .bioRhythm(bpm: 60, intensity: 1.05, active: !viewModel.isLoading)
+        .tilt3D(intensity: 10)
     }
     
     // MARK: - Welcome Section
     private var welcomeSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: AppTheme.Auth.logoToTextSpacing) {
             Text("welcome_to_destiny".localized)
-                .font(AppTheme.Fonts.display(size: 32))
-                .foregroundColor(AppTheme.Colors.gold)
+                .font(AppTheme.Fonts.display(size: AppTheme.Auth.titleSize))
+                .goldGradient()
             
             Text("sign_in_save".localized)
-                .font(AppTheme.Fonts.body(size: 16))
+                .font(AppTheme.Fonts.body(size: AppTheme.Auth.subtitleSize))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                .padding(.horizontal, AppTheme.Auth.textPadding)
         }
     }
     
     // MARK: - Auth Buttons
     private var authButtonsSection: some View {
-        VStack(spacing: 16) {
-            // Apple Sign In (first per iOS HIG)
+        VStack(spacing: 14) {
+            // Apple Sign In (Gold Slab)
             AuthButton(
                 icon: "apple.logo",
                 iconImage: nil,
                 title: "Continue with Apple",
-                style: .primary
+                style: .goldSlab,
+                iconScale: 1.15  // Apple logo has more whitespace
             ) {
                 Task { await viewModel.signInWithApple() }
             }
             
-            // Google Sign In
+            // Google Sign In (Glass Slab)
             AuthButton(
                 icon: nil,
                 iconImage: "google_logo",
                 title: "Continue with Google",
-                style: .secondary
+                style: .glassSlab,
+                iconScale: 1.0   // Image asset - no scaling needed
             ) {
                 Task { await viewModel.signInWithGoogle() }
             }
             
-            // Email Sign In
+            // Email Sign In (Glass Slab)
             AuthButton(
                 icon: "envelope.fill",
                 iconImage: nil,
                 title: "Continue with Email",
-                style: .secondary
+                style: .glassSlab,
+                iconScale: 0.95  // Envelope fills bounding box well
             ) {
                 // TODO: Email sign in
             }
@@ -139,36 +198,53 @@ struct AuthView: View {
                     .font(AppTheme.Fonts.caption(size: 13))
                     .foregroundColor(AppTheme.Colors.error)
                     .padding(.top, 8)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 32)
         .disabled(viewModel.isLoading)
     }
-    
+
     // MARK: - Guest Section
     private var guestSection: some View {
         VStack(spacing: 12) {
-            // Divider
+            // Divider with gold fade
             HStack {
                 Rectangle()
-                    .fill(AppTheme.Colors.separator)
+                    .fill(
+                        LinearGradient(
+                            colors: [.clear, AppTheme.Colors.gold.opacity(0.3), .clear],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .frame(height: 1)
+                
                 Text("or".localized)
                     .font(AppTheme.Fonts.caption(size: 13))
                     .foregroundColor(AppTheme.Colors.textTertiary)
+                
                 Rectangle()
-                    .fill(AppTheme.Colors.separator)
+                    .fill(
+                        LinearGradient(
+                            colors: [.clear, AppTheme.Colors.gold.opacity(0.3), .clear],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .frame(height: 1)
             }
-            .padding(.horizontal, 40)
-            .padding(.top, 20)
+            .padding(.horizontal, AppTheme.Auth.textPadding)
+            .padding(.top, 18)
             
             // Guest button
             Button(action: {
+                HapticManager.shared.playButtonTap()
+                SoundManager.shared.playButtonTap()
                 viewModel.continueAsGuest()
             }) {
                 Text("continue_as_guest".localized)
-                    .font(AppTheme.Fonts.body(size: 16))
+                    .font(AppTheme.Fonts.body(size: AppTheme.Auth.subtitleSize))
                     .fontWeight(.medium)
                     .foregroundColor(AppTheme.Colors.gold)
             }
@@ -178,32 +254,32 @@ struct AuthView: View {
     
     // MARK: - Terms Section
     private var termsSection: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             Text("by_continuing".localized)
-                .font(AppTheme.Fonts.caption(size: 12))
+                .font(AppTheme.Fonts.caption(size: 11))
                 .foregroundColor(AppTheme.Colors.textTertiary)
             
             HStack(spacing: 4) {
-                Button("Terms of Service") {
+                Button("terms_of_service".localized) {
                     // TODO: Open terms
                 }
-                .font(AppTheme.Fonts.caption(size: 12))
+                .font(AppTheme.Fonts.caption(size: 11))
                 .fontWeight(.medium)
                 .foregroundColor(AppTheme.Colors.goldDim)
                 
                 Text("and".localized)
-                    .font(AppTheme.Fonts.caption(size: 12))
+                    .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(AppTheme.Colors.textTertiary)
                 
-                Button("Privacy Policy") {
+                Button("privacy_policy".localized) {
                     // TODO: Open privacy
                 }
-                .font(AppTheme.Fonts.caption(size: 12))
+                .font(AppTheme.Fonts.caption(size: 11))
                 .fontWeight(.medium)
                 .foregroundColor(AppTheme.Colors.goldDim)
             }
         }
-        .padding(.bottom, 30)
+        .padding(.bottom, 28)
     }
     
     // MARK: - Loading Overlay
@@ -234,73 +310,121 @@ struct AuthView: View {
             )
         }
     }
-    
+
     // MARK: - Animations
-    private func animateIn() {
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+    private func startAnimations() {
+        // Logo spring
+        withAnimation(AppTheme.Auth.logoSpring) {
             logoScale = 1.0
         }
-        withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
+        
+        // Content fade + slide
+        withAnimation(.easeOut(duration: AppTheme.Auth.entranceDuration).delay(AppTheme.Auth.entranceDelay)) {
             contentOpacity = 1.0
+            contentOffset = 0
+        }
+        
+        // Continuous orbit rotation
+        withAnimation(.linear(duration: 30).repeatForever(autoreverses: false)) {
+            orbitRotation = 360
         }
     }
 }
 
-// MARK: - Auth Button Component
+// MARK: - Premium Auth Button Component
 struct AuthButton: View {
     enum Style {
-        case primary, secondary
+        case goldSlab   // Primary: Heavy Gold
+        case glassSlab  // Secondary: Frosted Glass
     }
     
-    let icon: String?          // SF Symbol name (optional)
-    let iconImage: String?     // Asset image name (optional)
+    let icon: String?
+    let iconImage: String?
     let title: String
     let style: Style
+    let iconScale: CGFloat // Per-icon optical adjustment
     let action: () -> Void
     
     var body: some View {
         Button(action: {
-            HapticManager.shared.play(.light)
+            HapticManager.shared.playButtonTap()
+            SoundManager.shared.playButtonTap()
             action()
         }) {
             HStack(spacing: 12) {
-                // Show either SF Symbol or asset image
-                if let iconImage = iconImage {
-                    Image(iconImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                } else if let icon = icon {
-                    Image(systemName: icon)
-                        .font(AppTheme.Fonts.title(size: 18))
+                // Icon container with consistent sizing
+                Group {
+                    if let iconImage = iconImage {
+                        Image(iconImage)
+                            .resizable()
+                            .scaledToFit()
+                    } else if let icon = icon {
+                        Image(systemName: icon)
+                            .resizable()
+                            .scaledToFit()
+                            .fontWeight(.medium)
+                            .scaleEffect(iconScale) // Per-icon optical compensation
+                    }
                 }
+                .frame(width: AppTheme.Auth.iconSize, height: AppTheme.Auth.iconSize)
                 
                 Text(title)
-                    .font(AppTheme.Fonts.body(size: 16).weight(.semibold))
+                    .font(AppTheme.Fonts.title(size: 16))
             }
-            .foregroundColor(style == .primary ? AppTheme.Colors.mainBackground : AppTheme.Colors.textPrimary)
+            .foregroundColor(style == .goldSlab ? Color(hex: "0B0F19") : AppTheme.Colors.textPrimary)
             .frame(maxWidth: .infinity)
-            .frame(height: 54)
+            .frame(height: AppTheme.Auth.buttonHeight)
             .background(
                 Group {
-                    if style == .primary {
-                        AppTheme.Colors.premiumGradient
+                    if style == .goldSlab {
+                        ZStack {
+                            AppTheme.Colors.premiumCardGradient
+                            // ... (Rest of button styling)
+                            // Top highlight
+                            VStack {
+                                Rectangle()
+                                    .fill(Color.white.opacity(0.4))
+                                    .frame(height: 1)
+                                Spacer()
+                            }
+                            
+                            // Subtle inner shadow gradient for realism
+                            LinearGradient(
+                                colors: [.black.opacity(0.1), .clear],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            )
+                            .mask(
+                                VStack {
+                                    Spacer()
+                                    Rectangle().frame(height: 4)
+                                }
+                            )
+                        }
                     } else {
-                        AppTheme.Colors.inputBackground
+                        // Glass Slab
+                        RoundedRectangle(cornerRadius: AppTheme.Auth.buttonCornerRadius)
+                            .fill(.ultraThinMaterial.opacity(0.1))
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.Auth.buttonCornerRadius)
+                                    .fill(AppTheme.Colors.cardBackground.opacity(0.6))
+                            )
                     }
                 }
             )
-            .cornerRadius(14)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.Auth.buttonCornerRadius))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: AppTheme.Auth.buttonCornerRadius)
                     .stroke(
-                        style == .secondary ? AppTheme.Colors.gold.opacity(0.3) : Color.clear,
-                        lineWidth: 1
+                        style == .goldSlab
+                            ? Color.white.opacity(0.25)
+                            : AppTheme.Colors.gold.opacity(0.3),
+                        lineWidth: style == .goldSlab ? 0.5 : 1
                     )
             )
             .shadow(
-                color: style == .primary ? AppTheme.Colors.gold.opacity(0.3) : Color.black.opacity(0.1),
-                radius: 8,
+                color: style == .goldSlab ? AppTheme.Colors.gold.opacity(0.3) : Color.black.opacity(0.2),
+                radius: style == .goldSlab ? 10 : 8,
                 y: 4
             )
         }
@@ -311,3 +435,4 @@ struct AuthButton: View {
 #Preview {
     AuthView()
 }
+

@@ -205,30 +205,7 @@ struct StarLayer: View {
     }
 }
 
-// MARK: - Orbital Rings (Using AppTheme Constants)
-struct OrbitalRingsView: View {
-    let rotation: Double
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
-                .frame(width: AppTheme.Splash.ringInnerSize, height: AppTheme.Splash.ringInnerSize)
-                .rotationEffect(.degrees(rotation))
-            
-            Circle()
-                .stroke(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
-                .frame(width: AppTheme.Splash.ringMiddleSize, height: AppTheme.Splash.ringMiddleSize)
-                .rotationEffect(.degrees(-rotation * 0.5))
-            
-            Circle()
-                .stroke(Color.white.opacity(0.05), lineWidth: 1)
-                .frame(width: AppTheme.Splash.ringOuterSize, height: AppTheme.Splash.ringOuterSize)
-                .rotationEffect(.degrees(rotation * 0.3))
-        }
-    }
-}
-
 #Preview {
     SplashView()
 }
+

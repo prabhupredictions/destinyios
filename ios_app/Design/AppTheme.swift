@@ -134,6 +134,11 @@ struct AppTheme {
             return .system(size: size, weight: .bold, design: .serif)
         }
         
+        /// Semantic Alias for 'Soul' Font (Sensory Stack)
+        static func soul(size: CGFloat) -> Font {
+            return premiumDisplay(size: size)
+        }
+        
         /// Standard display font (System Serif) - for general headlines
         static func display(size: CGFloat) -> Font {
             return .system(size: size, weight: .bold, design: .serif)
@@ -234,6 +239,72 @@ struct AppTheme {
         static let iconSize: CGFloat = 50
         static let iconGlowRadius: CGFloat = 25
         static let iconRotationDuration: Double = 20.0
+    }
+    
+    // MARK: - Auth Screen (Premium)
+    struct Auth {
+        // Logo & Header
+        static let logoSize: CGFloat = 70
+        static let logoOpticalOffset: CGPoint = CGPoint(x: 6, y: 0) // Optical correction for 'D' shape
+        static let glowSize: CGFloat = 140
+        static let glowBlur: CGFloat = 20
+        static let ringSize: CGFloat = 110
+        static let dotSize: CGFloat = 5
+        static let titleSize: CGFloat = 28
+        static let subtitleSize: CGFloat = 15
+        
+        // Spacing
+        static let logoToTextSpacing: CGFloat = 20
+        static let textPadding: CGFloat = 44
+        static let contentTopPadding: CGFloat = 28
+        
+        // Animations
+        static let entranceDuration: Double = 0.7
+        static let entranceDelay: Double = 0.25
+        static let logoSpring = Animation.spring(response: 0.7, dampingFraction: 0.65)
+        
+        // Buttons
+        static let buttonHeight: CGFloat = 54
+        static let buttonCornerRadius: CGFloat = 14
+        static let iconSize: CGFloat = 20
+    }
+    
+    // MARK: - Birth Data Entry Screen
+    struct BirthData {
+        // Header
+        static let headerIconSize: CGFloat = 60
+        static let headerGlowSize: CGFloat = 80
+        static let headerGlowBlur: CGFloat = 25
+        static let headerTitleSize: CGFloat = 24
+        static let headerSubtitleSize: CGFloat = 14
+        static let headerSpacing: CGFloat = 10
+        
+        // Form Layout
+        static let formSpacing: CGFloat = 16
+        static let labelSpacing: CGFloat = 8
+        static let sectionTopPadding: CGFloat = 40  // Clear Sound Toggle
+        static let horizontalPadding: CGFloat = 24
+        static let contentSpacing: CGFloat = 24
+        
+        // Input Fields
+        static let inputRowSpacing: CGFloat = 8
+        static let inputHeight: CGFloat = 50     // Standard input height
+        static let inputCornerRadius: CGFloat = 12
+        static let inputFontSize: CGFloat = 16
+        static let labelFontSize: CGFloat = 13
+        static let iconFontSize: CGFloat = 14
+        
+        // Time Section
+        static let timeVStackSpacing: CGFloat = 12
+        static let checkboxFontSize: CGFloat = 18
+        static let checkboxLabelSize: CGFloat = 13
+        
+        // Sound Toggle
+        static let soundToggleSize: CGFloat = 16
+        static let soundTogglePadding: CGFloat = 8
+        static let soundToggleBackground: Color = Color.white.opacity(0.1)
+        static let soundToggleTopPadding: CGFloat = 16
+        static let soundToggleTrailingPadding: CGFloat = 24
     }
     
     // MARK: - Premium Onboarding

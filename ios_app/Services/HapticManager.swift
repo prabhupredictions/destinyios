@@ -161,4 +161,13 @@ class HapticManager {
     func premiumCardSelect() {
         play(.light)
     }
+    
+    // MARK: - Semantic Aliases (Soul of the App)
+    func playButtonTap() {
+        premiumButtonPress()
+    }
+    
+    func playSuccess() {
+        premiumSuccess()
+    }
 }

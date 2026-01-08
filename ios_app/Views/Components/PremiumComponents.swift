@@ -43,7 +43,7 @@ struct ShimmerButton: View {
     let icon: String?
     let action: () -> Void
     
-    @State private var shimmerOffset: CGFloat = -200
+    @State private var shimmerPhase: CGFloat = 0
     
     init(title: String, icon: String? = "arrow.right", action: @escaping () -> Void) {
         self.title = title
@@ -66,20 +66,36 @@ struct ShimmerButton: View {
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(
-                ZStack {
-                    // Base gradient
-                    AppTheme.Colors.premiumCardGradient
-                    
-                    // Top highlight
-                    VStack {
+                GeometryReader { geo in
+                    ZStack {
+                        // Base gradient
+                        AppTheme.Colors.premiumCardGradient
+                        
+                        // Top highlight
+                        VStack {
+                            Rectangle()
+                                .fill(Color.white.opacity(0.3))
+                                .frame(height: 1)
+                            Spacer()
+                        }
+                        
+                        // Shimmer overlay - now uses full width
                         Rectangle()
-                            .fill(Color.white.opacity(0.3))
-                            .frame(height: 1)
-                        Spacer()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.clear,
+                                        Color.white.opacity(0.4),
+                                        Color.clear
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: geo.size.width * 0.4) // 40% of button width
+                            .rotationEffect(.degrees(15))
+                            .offset(x: shimmerPhase * (geo.size.width + 100) - geo.size.width * 0.5)
                     }
-                    
-                    // Shimmer overlay
-                    shimmerOverlay
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -90,37 +106,13 @@ struct ShimmerButton: View {
         }
     }
     
-    private var shimmerOverlay: some View {
-        GeometryReader { geo in
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.clear,
-                            Color.white.opacity(0.4),
-                            Color.clear
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .frame(width: AppTheme.Onboarding.shimmerWidth)
-                .rotationEffect(.degrees(AppTheme.Onboarding.shimmerAngle))
-                .offset(x: shimmerOffset)
-                .mask(Rectangle())
-        }
-    }
-    
     private func startShimmer() {
-        // Start from off-screen left
-        shimmerOffset = -200
-        
-        // Animate to off-screen right
+        shimmerPhase = 0
         withAnimation(
             .linear(duration: AppTheme.Onboarding.shimmerDuration)
             .repeatForever(autoreverses: false)
         ) {
-            shimmerOffset = 500
+            shimmerPhase = 1
         }
     }
 }

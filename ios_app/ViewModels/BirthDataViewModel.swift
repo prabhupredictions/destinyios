@@ -16,6 +16,10 @@ class BirthDataViewModel {
     var gender = ""
     var timeUnknown = false
     
+    // Selection state for placeholders (mandatory field tracking)
+    var isDateSelected = false
+    var isTimeSelected = false
+    
     // MARK: - UI State
     var isLoading = false
     var errorMessage: String?
@@ -37,10 +41,14 @@ class BirthDataViewModel {
     var isValid: Bool {
         !userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !cityOfBirth.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        latitude != 0 && longitude != 0
+        latitude != 0 && longitude != 0 &&
+        isDateSelected &&
+        (isTimeSelected || timeUnknown) &&
+        !gender.isEmpty  // Gender is mandatory
     }
     
     var formattedDate: String {
+        guard isDateSelected else { return "select_date".localized }
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
         return formatter.string(from: dateOfBirth)
@@ -48,6 +56,7 @@ class BirthDataViewModel {
     
     var formattedTime: String {
         if timeUnknown { return "birth_time_unknown".localized }
+        guard isTimeSelected else { return "select_time".localized }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US")
         formatter.dateFormat = "h:mm a"

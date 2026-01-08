@@ -11,50 +11,66 @@ struct BirthDataView: View {
     @State private var showDatePicker = false
     @State private var showTimePicker = false
     @State private var showLocationSearch = false
+    @State private var showGenderSheet = false
     
     // Profile setup loading - setting this triggers fullScreenCover via item binding
     @State private var savedBirthData: BirthData?
     
+    // Sound Manager
+    @ObservedObject private var soundManager = SoundManager.shared
+    
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background
-                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                // Layer 1: Premium Cosmic Background (consistent with Splash/Language/Onboarding/Auth)
+                CosmicBackgroundView()
+                    .ignoresSafeArea()
                 
-                // Cosmic background effect
-                GeometryReader { geo in
-                    Circle()
-                        .fill(AppTheme.Colors.premiumGradient.opacity(0.1))
-                        .frame(width: 500, height: 500)
-                        .blur(radius: 100)
-                        .offset(x: geo.size.width - 150, y: -200)
-                }
-                
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 32) {
-                        // Header
-                        headerSection
-                            .padding(.top, 20)
-                        
-                        // Form fields
-                        formSection
-                        
-                        // Error message
-                        if let error = viewModel.errorMessage {
-                            Text(error)
-                                .font(AppTheme.Fonts.caption())
-                                .foregroundColor(AppTheme.Colors.error)
+                // Layer 2: Content with overlaid Sound Toggle
+                ZStack(alignment: .topTrailing) {
+                    // Main Content (Scrollable, with top padding for Sound Toggle)
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: AppTheme.BirthData.contentSpacing) {
+                            // Compact Header
+                            headerSection
+                                .padding(.top, AppTheme.BirthData.sectionTopPadding)
+                            
+                            // Form fields (Glass Slabs)
+                            formSection
+                            
+                            // Error message
+                            if let error = viewModel.errorMessage {
+                                Text(error)
+                                    .font(AppTheme.Fonts.caption())
+                                    .foregroundColor(AppTheme.Colors.error)
+                            }
+                            
+                            // Submit button with bio-rhythm when valid
+                            submitButton
+                                .padding(.top, AppTheme.BirthData.inputRowSpacing)
+                            
+                            Spacer(minLength: 20)
                         }
-                        
-                        // Submit button
-                        submitButton
-                            .padding(.top, 16)
-                        
-                        Spacer(minLength: 40)
+                        .padding(.horizontal, AppTheme.BirthData.horizontalPadding)
                     }
-                    .padding(.horizontal, 24)
+                    .opacity(contentOpacity)
+                    
+                    // Sound Toggle - Fixed, Transparent, Floating
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        SoundManager.shared.toggleSound()
+                    }) {
+                        Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                            .font(.system(size: AppTheme.BirthData.soundToggleSize, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .contentTransition(.symbolEffect(.replace))
+                            .padding(AppTheme.BirthData.soundTogglePadding)
+                            .background(AppTheme.BirthData.soundToggleBackground)
+                            .clipShape(Circle())
+                    }
+                    .padding(.trailing, AppTheme.BirthData.soundToggleTrailingPadding)
+                    .padding(.top, AppTheme.BirthData.soundToggleTopPadding)
                 }
-                .opacity(contentOpacity)
             }
             .navigationBarBackButtonHidden(true)
         }
@@ -64,14 +80,22 @@ struct BirthDataView: View {
                 contentOpacity = 1.0
             }
         }
-        .sheet(isPresented: $showDatePicker) {
+        .sheet(isPresented: $showDatePicker, onDismiss: {
+            // Mark date as selected when user closes the picker
+            viewModel.isDateSelected = true
+            HapticManager.shared.play(.light)
+        }) {
             DatePickerSheet(
                 title: "date_of_birth".localized,
                 selection: $viewModel.dateOfBirth,
                 components: .date
             )
         }
-        .sheet(isPresented: $showTimePicker) {
+        .sheet(isPresented: $showTimePicker, onDismiss: {
+            // Mark time as selected when user closes the picker
+            viewModel.isTimeSelected = true
+            HapticManager.shared.play(.light)
+        }) {
             DatePickerSheet(
                 title: "time_of_birth".localized,
                 selection: $viewModel.timeOfBirth,
@@ -84,6 +108,19 @@ struct BirthDataView: View {
                 latitude: $viewModel.latitude,
                 longitude: $viewModel.longitude,
                 placeId: $viewModel.placeId
+            )
+        }
+        .sheet(isPresented: $showGenderSheet) {
+            PremiumSelectionSheet(
+                title: "gender_identity".localized,
+                selectedValue: $viewModel.gender,
+                options: [
+                    ("male", "male".localized),
+                    ("female", "female".localized),
+                    ("non-binary", "non_binary".localized),
+                    ("prefer_not_to_say", "prefer_not_to_say".localized)
+                ],
+                onDismiss: { showGenderSheet = false }
             )
         }
         .fullScreenCover(item: $savedBirthData) { birthData in
@@ -104,54 +141,61 @@ struct BirthDataView: View {
         }
     }
     
-    // MARK: - Header
+    // MARK: - Header (Compact, consistent with Auth screen)
     private var headerSection: some View {
-        VStack(spacing: 12) {
-            // Icon
+        VStack(spacing: AppTheme.BirthData.headerSpacing) {
+            // Compact Icon with Pulsing Glow
             ZStack {
+                // Outer glow
+                PulsingGlowView(
+                    color: AppTheme.Colors.gold.opacity(0.3),
+                    size: AppTheme.BirthData.headerGlowSize,
+                    blurRadius: AppTheme.BirthData.headerGlowBlur
+                )
+                
+                // Circle container
                 Circle()
                     .fill(AppTheme.Colors.inputBackground)
-                    .frame(width: 80, height: 80)
+                    .frame(width: AppTheme.BirthData.headerIconSize, height: AppTheme.BirthData.headerIconSize)
                     .overlay(
                         Circle()
-                            .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                            .stroke(AppTheme.Colors.gold.opacity(0.4), lineWidth: 1)
                     )
                 
                 Image(systemName: "person.crop.circle.badge.plus")
-                    .font(AppTheme.Fonts.display(size: 36))
+                    .font(AppTheme.Fonts.display(size: AppTheme.BirthData.headerIconSize * 0.47)) // Proportional
                     .foregroundColor(AppTheme.Colors.gold)
             }
-            .shadow(color: AppTheme.Colors.gold.opacity(0.2), radius: 15, x: 0, y: 0)
             
             Text("create_birth_chart".localized)
-                .font(AppTheme.Fonts.display(size: 26))
+                .font(AppTheme.Fonts.display(size: AppTheme.BirthData.headerTitleSize))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text("enter_details_desc".localized)
-                .font(AppTheme.Fonts.body(size: 15))
+                .font(AppTheme.Fonts.body(size: AppTheme.BirthData.headerSubtitleSize))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
-                .lineSpacing(4)
+                .lineSpacing(3)
         }
     }
     
-    // MARK: - Form Section
+    // MARK: - Form Section (No Card wrapper for compactness)
     private var formSection: some View {
-        PremiumCard {
-            VStack(spacing: 20) {
-                // Name (mandatory)
-                PremiumTextField(
-                    "your_name".localized,
-                    text: $viewModel.userName,
-                    placeholder: "enter_your_name".localized,
-                    icon: "person.circle"
-                )
-                
-                // Date of Birth
+        VStack(spacing: AppTheme.BirthData.formSpacing) {
+            // Name (mandatory) - Using reusable PremiumInputField
+            PremiumInputField(
+                label: "your_name".localized,
+                icon: "person.circle",
+                placeholder: "enter_your_name".localized,
+                text: $viewModel.userName
+            )
+            
+            // Date of Birth
                 PremiumSelectionRow(
                     icon: "calendar",
                     title: "date_of_birth".localized,
-                    value: viewModel.formattedDate
+                    value: viewModel.formattedDate,
+                    isPlaceholder: !viewModel.isDateSelected
                 ) {
                     showDatePicker = true
                 }
@@ -162,7 +206,8 @@ struct BirthDataView: View {
                         icon: "clock",
                         title: "time_of_birth".localized,
                         value: viewModel.formattedTime,
-                        isDisabled: viewModel.timeUnknown
+                        isDisabled: viewModel.timeUnknown,
+                        isPlaceholder: !viewModel.isTimeSelected && !viewModel.timeUnknown
                     ) {
                         if !viewModel.timeUnknown {
                             showTimePicker = true
@@ -196,33 +241,38 @@ struct BirthDataView: View {
                 PremiumSelectionRow(
                     icon: "location",
                     title: "place_of_birth".localized,
-                    value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth
+                    value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth,
+                    isPlaceholder: viewModel.cityOfBirth.isEmpty
                 ) {
                     showLocationSearch = true
                 }
                 
-                // Gender Identity
-                PremiumMenuRow(
+                // Gender Identity (Mandatory)
+                // Gender Identity (Mandatory)
+                PremiumSelectionRow(
                     icon: "person",
                     title: "gender_identity".localized,
-                    selection: $viewModel.gender,
-                    options: [
-                        ("", "prefer_not_to_say".localized),
-                        ("male", "male".localized),
-                        ("female", "female".localized),
-                        ("non-binary", "non_binary".localized)
-                    ]
-                )
-            }
+                    value: viewModel.gender.isEmpty ? "select_gender".localized : (
+                        // Map value to localized label
+                        ["male": "male".localized, 
+                         "female": "female".localized, 
+                         "non-binary": "non_binary".localized, 
+                         "prefer_not_to_say": "prefer_not_to_say".localized][viewModel.gender] ?? viewModel.gender
+                    ),
+                    isPlaceholder: viewModel.gender.isEmpty
+                ) {
+                   showGenderSheet = true
+                }
         }
     }
     
-    // MARK: - Submit Button
+    // MARK: - Submit Button (ShimmerButton - consistent with Onboarding)
     private var submitButton: some View {
-        PremiumButton(
-            "continue".localized,
-            icon: "arrow.right"
-        ) {
+        ShimmerButton(title: "continue".localized, icon: "arrow.right") {
+            // Play premium haptic and sound
+            HapticManager.shared.premiumContinue()
+            SoundManager.shared.playButtonTap()
+            
             if viewModel.save() {
                 // Register with backend subscription service
                 Task {
@@ -238,12 +288,12 @@ struct BirthDataView: View {
                     cityOfBirth: viewModel.cityOfBirth
                 )
                 
-                // DEBUG: Setting savedBirthData triggers fullScreenCover automatically
                 print("[DEBUG] BirthData saved, triggering ProfileSetupLoadingView via item binding")
             }
         }
         .disabled(!viewModel.isValid)
-        .opacity(viewModel.isValid ? 1 : 0.6)
+        .opacity(viewModel.isValid ? 1 : 0.5)
+        .bioRhythm(bpm: 60, intensity: 1.02, active: viewModel.isValid) // Subtle pulse when valid
     }
     
     // MARK: - Backend Registration
@@ -279,6 +329,7 @@ struct PremiumSelectionRow: View {
     let title: String
     let value: String
     var isDisabled: Bool = false
+    var isPlaceholder: Bool = false  // New: use muted color for placeholder text
     let action: () -> Void
     
     var body: some View {
@@ -296,7 +347,7 @@ struct PremiumSelectionRow: View {
                 HStack {
                     Text(value)
                         .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(isDisabled ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
+                        .foregroundColor(isDisabled || isPlaceholder ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                     Spacer()
                     Image(systemName: "chevron.down")
                         .font(AppTheme.Fonts.caption(size: 12))
@@ -320,6 +371,7 @@ struct PremiumMenuRow: View {
     let icon: String
     let title: String
     @Binding var selection: String
+    var placeholder: String = "Select"
     let options: [(String, String)]
     
     var body: some View {
@@ -337,13 +389,14 @@ struct PremiumMenuRow: View {
                 ForEach(options, id: \.0) { value, label in
                     Button(label) {
                         selection = value
+                        HapticManager.shared.play(.light)
                     }
                 }
             } label: {
                 HStack {
-                    Text(options.first(where: { $0.0 == selection })?.1 ?? "Select")
+                    Text(options.first(where: { $0.0 == selection })?.1 ?? placeholder)
                         .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .foregroundColor(selection.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                     Spacer()
                     Image(systemName: "chevron.down")
                         .font(AppTheme.Fonts.caption(size: 12))
@@ -371,23 +424,14 @@ struct DatePickerSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                CosmicBackgroundView().ignoresSafeArea()
                 
                 VStack {
-                    DatePicker(
-                        title,
+                    // Custom Gold Picker
+                    PremiumDatePicker(
                         selection: $selection,
-                        displayedComponents: components
+                        mode: components
                     )
-                    #if os(iOS)
-                    .datePickerStyle(.wheel)
-                    #else
-                    .datePickerStyle(.graphical)
-                    #endif
-                    .colorScheme(.dark)
-                    .labelsHidden()
-                    // Use English locale for time picker to show AM/PM
-                    .environment(\.locale, components == .hourAndMinute ? Locale(identifier: "en_US") : .current)
                     .padding()
                     
                     Spacer()
@@ -397,6 +441,7 @@ struct DatePickerSheet: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("done".localized) {

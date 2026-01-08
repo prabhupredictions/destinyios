@@ -15,20 +15,25 @@ struct LocationSearchView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Search field
-                searchField
+            ZStack {
+                // Background
+                CosmicBackgroundView()
+                    .ignoresSafeArea()
                 
-                // Results
-                if locationService.isSearching {
-                    loadingView
-                } else if locationService.suggestions.isEmpty && !searchText.isEmpty {
-                    emptyView
-                } else {
-                    resultsList
+                VStack(spacing: 0) {
+                    // Search field
+                    searchField
+                    
+                    // Results
+                    if locationService.isSearching {
+                        loadingView
+                    } else if locationService.suggestions.isEmpty && !searchText.isEmpty {
+                        emptyView
+                    } else {
+                        resultsList
+                    }
                 }
             }
-            .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
             .navigationTitle("Select City")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -40,7 +45,9 @@ struct LocationSearchView: View {
                 }
             }
             .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
         }
+        .preferredColorScheme(.dark)
         .onAppear {
             isSearchFocused = true
         }
@@ -53,13 +60,21 @@ struct LocationSearchView: View {
                 .font(.system(size: 16))
                 .foregroundColor(AppTheme.Colors.textTertiary)
             
-            TextField("Search for a city...", text: $searchText)
-                .font(AppTheme.Fonts.body(size: 16))
-                .foregroundColor(AppTheme.Colors.textPrimary)
-                .focused($isSearchFocused)
-                .onChange(of: searchText) { _, newValue in
-                    locationService.search(query: newValue)
+            ZStack(alignment: .leading) {
+                if searchText.isEmpty {
+                    Text("Search for a city...")
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                 }
+                
+                TextField("", text: $searchText)
+                    .font(AppTheme.Fonts.body(size: 16))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .focused($isSearchFocused)
+                    .onChange(of: searchText) { _, newValue in
+                        locationService.search(query: newValue)
+                    }
+            }
             
             if !searchText.isEmpty {
                 Button(action: { searchText = "" }) {
@@ -92,7 +107,7 @@ struct LocationSearchView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        .background(AppTheme.Colors.mainBackground)
+        .background(Color.clear)
     }
     
     // MARK: - Empty View
@@ -113,7 +128,7 @@ struct LocationSearchView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        .background(AppTheme.Colors.mainBackground)
+        .background(Color.clear)
     }
     
     // MARK: - Results List
@@ -150,7 +165,7 @@ struct LocationSearchView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 14)
-                        .background(AppTheme.Colors.mainBackground) // Ensure fill for tap target
+                        .background(Color.white.opacity(0.001)) // Ensure fill for tap target, but transparent
                     }
                     .buttonStyle(.plain)
                     
@@ -160,7 +175,7 @@ struct LocationSearchView: View {
                 }
             }
         }
-        .background(AppTheme.Colors.mainBackground)
+        .background(Color.clear)
     }
     
     // MARK: - Select Location
