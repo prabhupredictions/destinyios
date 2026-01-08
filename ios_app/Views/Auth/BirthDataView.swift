@@ -13,6 +13,8 @@ struct BirthDataView: View {
     @State private var showLocationSearch = false
     @State private var showGenderSheet = false
     
+    @FocusState private var isNameFocused: Bool
+    
     // Profile setup loading - setting this triggers fullScreenCover via item binding
     @State private var savedBirthData: BirthData?
     
@@ -73,7 +75,7 @@ struct BirthDataView: View {
                 }
             }
             .onTapGesture {
-                hideKeyboard()
+                isNameFocused = false
             }
             .navigationBarBackButtonHidden(true)
         }
@@ -190,7 +192,8 @@ struct BirthDataView: View {
                 label: "your_name".localized,
                 icon: "person.circle",
                 placeholder: "enter_your_name".localized,
-                text: $viewModel.userName
+                text: $viewModel.userName,
+                isFocused: $isNameFocused
             )
             
             // Date of Birth
@@ -200,7 +203,7 @@ struct BirthDataView: View {
                     value: viewModel.formattedDate,
                     isPlaceholder: !viewModel.isDateSelected
                 ) {
-                    hideKeyboard()
+                    isNameFocused = false
                     showDatePicker = true
                 }
                 
@@ -213,6 +216,7 @@ struct BirthDataView: View {
                         isDisabled: viewModel.timeUnknown,
                         isPlaceholder: !viewModel.isTimeSelected && !viewModel.timeUnknown
                     ) {
+                        isNameFocused = false
                         hideKeyboard()
                         if !viewModel.timeUnknown {
                             showTimePicker = true
@@ -249,7 +253,7 @@ struct BirthDataView: View {
                     value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth,
                     isPlaceholder: viewModel.cityOfBirth.isEmpty
                 ) {
-                    hideKeyboard()
+                    isNameFocused = false
                     showLocationSearch = true
                 }
                 
@@ -267,7 +271,7 @@ struct BirthDataView: View {
                     ),
                     isPlaceholder: viewModel.gender.isEmpty
                 ) {
-                   hideKeyboard()
+                   isNameFocused = false
                    showGenderSheet = true
                 }
         }
@@ -276,7 +280,7 @@ struct BirthDataView: View {
     // MARK: - Submit Button (ShimmerButton - consistent with Onboarding)
     private var submitButton: some View {
         ShimmerButton(title: "continue".localized, icon: "arrow.right") {
-            hideKeyboard()
+            isNameFocused = false
             // Play premium haptic and sound
             HapticManager.shared.premiumContinue()
             SoundManager.shared.playButtonTap()
@@ -430,38 +434,51 @@ struct DatePickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                CosmicBackgroundView().ignoresSafeArea()
-                
-                VStack {
-                    // Custom Gold Picker
-                    PremiumDatePicker(
-                        selection: $selection,
-                        mode: components
-                    )
-                    .padding()
-                    
-                    Spacer()
-                }
-            }
-            .navigationTitle(title)
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("done".localized) {
-                        dismiss()
+        ZStack {
+            CosmicBackgroundView().ignoresSafeArea()
+            
+            VStack(spacing: 20) {
+                // Header (Handle + Title + Done)
+                ZStack(alignment: .top) {
+                    // 1. Handle & Title centered
+                    VStack(spacing: 16) {
+                        Capsule()
+                            .fill(Color.white.opacity(0.1))
+                            .frame(width: 40, height: 4)
+                            .padding(.top, 10)
+                        
+                        Text(title)
+                            .font(AppTheme.Fonts.title(size: 20)) // Soul Typography
+                            .foregroundColor(AppTheme.Colors.textPrimary)
                     }
-                    .foregroundColor(AppTheme.Colors.gold)
+                    .frame(maxWidth: .infinity)
+                    
+                    // 2. Done Button (Top Right)
+                    HStack {
+                        Spacer()
+                        Button("done".localized) {
+                            HapticManager.shared.play(.light)
+                            dismiss()
+                        }
+                        .font(AppTheme.Fonts.body(size: 17).weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .padding(.trailing, 20)
+                        .padding(.top, 24) // Align with title basically
+                    }
                 }
+                
+                // Custom Gold Picker
+                PremiumDatePicker(
+                    selection: $selection,
+                    mode: components
+                )
+                .padding(.horizontal)
+                
+                Spacer()
             }
-            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
         }
         #if os(iOS)
-        .presentationDetents([.medium])
+        .presentationDetents([.height(350)]) // Fixed height for custom sheet
         #endif
     }
 }
