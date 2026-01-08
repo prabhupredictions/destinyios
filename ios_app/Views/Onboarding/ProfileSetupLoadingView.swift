@@ -32,38 +32,18 @@ struct ProfileSetupLoadingView: View {
     
     var body: some View {
         ZStack {
-            // Background
-            AppTheme.Colors.mainBackground
+            // Background: Cosmic Context (Animated Parallax)
+            CosmicBackgroundView()
                 .ignoresSafeArea()
-            
-            // Gradient overlay
-            LinearGradient(
-                colors: [
-                    AppTheme.Colors.gold.opacity(0.1),
-                    Color.clear,
-                    AppTheme.Colors.gold.opacity(0.05)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
             
             VStack(spacing: 40) {
                 Spacer()
                 
-                // Animated cosmic icon
+                // Animated cosmic icon (Golden Holograph)
                 ZStack {
-                    // Outer ring animation
-                    Circle()
-                        .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 2)
-                        .frame(width: 120, height: 120)
-                        .rotationEffect(.degrees(progress * 360))
-                    
-                    // Inner ring animation
-                    Circle()
-                        .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 2)
-                        .frame(width: 90, height: 90)
-                        .rotationEffect(.degrees(-progress * 180))
+                    // Rotating Orbital Rings (Theme Consistent)
+                    OrbitalRingsView(rotation: progress * 360)
+                        .scaleEffect(0.8) // Scale down slightly to fit layout
                     
                     // Center icon
                     if showCheckmark {
@@ -79,30 +59,31 @@ struct ProfileSetupLoadingView: View {
                     }
                 }
                 .animation(.spring(response: 0.5), value: showCheckmark)
+                .padding(.bottom, 20)
                 
-                // Status text
+                // Status text (Typography: Soul & Brain)
                 VStack(spacing: 12) {
                     Text("setting_up_profile".localized)
-                        .font(.title2)
-                        .fontWeight(.semibold)
+                        .font(AppTheme.Fonts.display(size: 28)) // Soul Typography
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Text(currentPhase.rawValue)
-                        .font(.subheadline)
+                        .font(AppTheme.Fonts.body(size: 16)) // Brain Typography
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .animation(.easeInOut, value: currentPhase)
                 }
                 
-                // Progress bar
+                // Progress bar (Gold Tablet styling)
                 ProgressView(value: progress)
                     .progressViewStyle(GoldProgressStyle())
-                    .frame(width: 200)
+                    .frame(width: 220)
+                    .padding(.top, 10)
                 
                 Spacer()
                 
                 // Subtle cosmic message
                 Text("cosmic_alignment".localized)
-                    .font(.caption)
+                    .font(AppTheme.Fonts.caption())
                     .foregroundColor(AppTheme.Colors.textTertiary)
                     .padding(.bottom, 40)
             }
@@ -113,7 +94,15 @@ struct ProfileSetupLoadingView: View {
     }
     
     private func performSetup() async {
-        // Convert BirthData to UserBirthData for API calls
+        // Bio-Sync: Start Heartbeat Haptics
+        // We simulate a heartbeat loop during processing
+        let heartbeatTask = Task {
+            while !Task.isCancelled {
+                HapticManager.shared.playHeartbeat()
+                try? await Task.sleep(nanoseconds: 1_200_000_000) // 1.2s beat (~50 BPM - Meditative)
+            }
+        }
+        
         let userBirthData = UserBirthData(
             dob: birthData.dob,
             time: birthData.time,
@@ -124,7 +113,7 @@ struct ProfileSetupLoadingView: View {
             cityOfBirth: birthData.cityOfBirth
         )
         
-        // Phase 1: Calculate chart (fetch full chart data)
+        // Phase 1: Calculate chart
         currentPhase = .calculatingChart
         withAnimation(.linear(duration: 1.5)) { progress = 0.3 }
         
@@ -134,12 +123,12 @@ struct ProfileSetupLoadingView: View {
             print("[ProfileSetup] Chart fetch failed: \(error)")
         }
         
-        // Phase 2: Analyze planets (visual pause)
+        // Phase 2: Analyze planets
         currentPhase = .analyzingPlanets
         withAnimation(.linear(duration: 1.0)) { progress = 0.6 }
-        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5s visual pause
+        try? await Task.sleep(nanoseconds: 800_000_000)
         
-        // Phase 3: Generate insights (fetch today's prediction)
+        // Phase 3: Generate insights
         currentPhase = .generatingInsights
         withAnimation(.linear(duration: 1.5)) { progress = 0.9 }
         
@@ -150,17 +139,21 @@ struct ProfileSetupLoadingView: View {
             print("[ProfileSetup] Prediction fetch failed: \(error)")
         }
         
+        // Stop heartbeat before completion
+        heartbeatTask.cancel()
+        
         // Phase 4: Complete
         currentPhase = .complete
-        withAnimation(.easeOut(duration: 0.3)) { 
+        HapticManager.shared.playSuccess() // Success haptic ("shimmer")
+        SoundManager.shared.playSuccess() // Success sound
+        
+        withAnimation(.easeOut(duration: 0.3)) {
             progress = 1.0
             showCheckmark = true
         }
         
-        // Brief pause to show completion
-        try? await Task.sleep(nanoseconds: 800_000_000) // 0.8s
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
         
-        // Navigate to Home
         await MainActor.run {
             onComplete()
         }
