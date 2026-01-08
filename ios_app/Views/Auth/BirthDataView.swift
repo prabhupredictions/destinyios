@@ -72,6 +72,9 @@ struct BirthDataView: View {
                     .padding(.top, AppTheme.BirthData.soundToggleTopPadding)
                 }
             }
+            .onTapGesture {
+                hideKeyboard()
+            }
             .navigationBarBackButtonHidden(true)
         }
         .onAppear {
@@ -197,6 +200,7 @@ struct BirthDataView: View {
                     value: viewModel.formattedDate,
                     isPlaceholder: !viewModel.isDateSelected
                 ) {
+                    hideKeyboard()
                     showDatePicker = true
                 }
                 
@@ -209,6 +213,7 @@ struct BirthDataView: View {
                         isDisabled: viewModel.timeUnknown,
                         isPlaceholder: !viewModel.isTimeSelected && !viewModel.timeUnknown
                     ) {
+                        hideKeyboard()
                         if !viewModel.timeUnknown {
                             showTimePicker = true
                         }
@@ -244,6 +249,7 @@ struct BirthDataView: View {
                     value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth,
                     isPlaceholder: viewModel.cityOfBirth.isEmpty
                 ) {
+                    hideKeyboard()
                     showLocationSearch = true
                 }
                 
@@ -261,6 +267,7 @@ struct BirthDataView: View {
                     ),
                     isPlaceholder: viewModel.gender.isEmpty
                 ) {
+                   hideKeyboard()
                    showGenderSheet = true
                 }
         }
@@ -269,6 +276,7 @@ struct BirthDataView: View {
     // MARK: - Submit Button (ShimmerButton - consistent with Onboarding)
     private var submitButton: some View {
         ShimmerButton(title: "continue".localized, icon: "arrow.right") {
+            hideKeyboard()
             // Play premium haptic and sound
             HapticManager.shared.premiumContinue()
             SoundManager.shared.playButtonTap()
@@ -460,4 +468,11 @@ struct DatePickerSheet: View {
 
 #Preview {
     BirthDataView()
+}
+
+// MARK: - Keyboard Helper
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }
