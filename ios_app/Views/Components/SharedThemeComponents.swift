@@ -51,6 +51,7 @@ struct PremiumInputField: View {
     let icon: String
     let placeholder: String
     @Binding var text: String
+    var isFocused: FocusState<Bool>.Binding? // Optional focus binding
     
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.BirthData.labelSpacing) {
@@ -79,6 +80,8 @@ struct PremiumInputField: View {
                     .font(AppTheme.Fonts.body(size: AppTheme.BirthData.inputFontSize))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .padding()
+                    .submitLabel(.done) // Add "Done" button
+                    .focused(isFocused ?? FocusState<Bool>().projectedValue) // Bind if provided, otherwise dummy
             }
             .background(AppTheme.Colors.inputBackground)
             .cornerRadius(AppTheme.BirthData.inputCornerRadius)
@@ -116,6 +119,7 @@ struct PremiumWheelPicker: UIViewRepresentable {
         picker.dataSource = context.coordinator
         picker.delegate = context.coordinator
         picker.backgroundColor = .clear
+        picker.overrideUserInterfaceStyle = .dark // Force dark mode override
         return picker
     }
     
@@ -152,9 +156,15 @@ struct PremiumWheelPicker: UIViewRepresentable {
         // MARK: - Delegate (Styling)
         func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
             let title = parent.data[component][row]
+            
+            // Center alignment
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+            
             return NSAttributedString(string: title, attributes: [
                 .foregroundColor: UIColor(red: 212/255, green: 175/255, blue: 55/255, alpha: 1.0), // #D4AF37 (Gold)
-                .font: UIFont.systemFont(ofSize: 20, weight: .medium)
+                .font: UIFont.systemFont(ofSize: 20, weight: .medium),
+                .paragraphStyle: paragraphStyle
             ])
         }
         
@@ -328,16 +338,18 @@ struct PremiumSelectionSheet: View {
                                 onDismiss()
                             }) {
                                 HStack {
+                                    Spacer() // Center
                                     Text(label)
                                         .font(AppTheme.Fonts.body(size: 18))
                                         .foregroundColor(selectedValue == value ? AppTheme.Colors.gold : AppTheme.Colors.textPrimary)
-                                    
-                                    Spacer()
+                                        .multilineTextAlignment(.center)
+                                    Spacer() // Center
                                     
                                     if selectedValue == value {
                                         Image(systemName: "checkmark")
                                             .font(.system(size: 16, weight: .bold))
                                             .foregroundColor(AppTheme.Colors.gold)
+                                            .padding(.leading, 8)
                                     }
                                 }
                                 .padding(.vertical, 16)
