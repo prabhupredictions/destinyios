@@ -169,12 +169,14 @@ struct ProfileView: View {
                     action: { showLanguageSettings = true }
                 )
                 
-                PremiumListItem(
-                    title: "Astrology Settings",
-                    subtitle: "Ayanamsa & House System",
-                    icon: "star.circle.fill",
-                    action: { showAstrologySettings = true }
-                )
+                if AppTheme.Features.showAstrologySettings {
+                    PremiumListItem(
+                        title: "Astrology Settings",
+                        subtitle: "Ayanamsa & House System",
+                        icon: "star.circle.fill",
+                        action: { showAstrologySettings = true }
+                    )
+                }
                 
                 PremiumListItem(
                     title: "Chart Style",
@@ -375,7 +377,7 @@ struct FAQHelpView: View {
                         
                         FAQItem(
                             question: "What astrological systems are supported?",
-                            answer: "We currently support Vedic (Jyotish) astrology with multiple Ayanamsa options including Lahiri, Raman, and Krishnamurti. You can change these in Astrology Settings."
+                            answer: "We use Vedic (Jyotish) astrology with Lahiri Ayanamsa and Whole Sign house system for accurate calculations."
                         )
                         
                         FAQItem(

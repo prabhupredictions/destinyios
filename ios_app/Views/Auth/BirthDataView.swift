@@ -58,20 +58,22 @@ struct BirthDataView: View {
                     .opacity(contentOpacity)
                     
                     // Sound Toggle - Fixed, Transparent, Floating
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        SoundManager.shared.toggleSound()
-                    }) {
-                        Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                            .font(.system(size: AppTheme.BirthData.soundToggleSize, weight: .medium))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                            .contentTransition(.symbolEffect(.replace))
-                            .padding(AppTheme.BirthData.soundTogglePadding)
-                            .background(AppTheme.BirthData.soundToggleBackground)
-                            .clipShape(Circle())
+                    if AppTheme.Features.showSoundToggle {
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            SoundManager.shared.toggleSound()
+                        }) {
+                            Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                                .font(.system(size: AppTheme.BirthData.soundToggleSize, weight: .medium))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .contentTransition(.symbolEffect(.replace))
+                                .padding(AppTheme.BirthData.soundTogglePadding)
+                                .background(AppTheme.BirthData.soundToggleBackground)
+                                .clipShape(Circle())
+                        }
+                        .padding(.trailing, AppTheme.BirthData.soundToggleTrailingPadding)
+                        .padding(.top, AppTheme.BirthData.soundToggleTopPadding)
                     }
-                    .padding(.trailing, AppTheme.BirthData.soundToggleTrailingPadding)
-                    .padding(.top, AppTheme.BirthData.soundToggleTopPadding)
                 }
             }
             .onTapGesture {

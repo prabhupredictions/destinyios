@@ -1277,7 +1277,7 @@ struct AskDestinySheet: View {
                 longitude: bd.lon,
                 cityOfBirth: bd.place,
                 ayanamsa: "lahiri",
-                houseSystem: "equal"
+                houseSystem: "whole_sign"
             )
             
             // Fix: Pass userEmail to avoid backend geocoding issues (especially if city is a name)

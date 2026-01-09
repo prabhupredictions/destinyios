@@ -353,7 +353,7 @@ class ChatViewModel {
         
         // Apply user's preferred astrology settings
         let ayanamsa = UserDefaults.standard.string(forKey: "ayanamsa") ?? "lahiri"
-        let houseSystem = UserDefaults.standard.string(forKey: "houseSystem") ?? "equal"
+        let houseSystem = UserDefaults.standard.string(forKey: "houseSystem") ?? "whole_sign"
         birthData.ayanamsa = ayanamsa
         birthData.houseSystem = houseSystem
         

@@ -28,7 +28,7 @@ class SoundManager: ObservableObject {
     private var healingDroneBuffer: AVAudioPCMBuffer?
     
     private init() {
-        self.isSoundEnabled = UserDefaults.standard.object(forKey: "isSoundEnabled") as? Bool ?? true
+        self.isSoundEnabled = UserDefaults.standard.object(forKey: "isSoundEnabled") as? Bool ?? false
         mixer = engine.mainMixerNode
         setupEngine()
         prepareBuffers()

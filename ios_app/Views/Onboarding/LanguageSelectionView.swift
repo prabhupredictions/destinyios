@@ -48,25 +48,27 @@ struct LanguageSelectionView: View {
             // Main content
             VStack(spacing: 0) {
                 // Top Bar with Sound Toggle (Professional Top Right Position)
-                HStack {
-                    Spacer()
-                    
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        SoundManager.shared.toggleSound()
-                    }) {
-                        Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                            .contentTransition(.symbolEffect(.replace))
-                            .padding(8)
-                            .background(Color.white.opacity(0.1))
-                            .clipShape(Circle())
+                if AppTheme.Features.showSoundToggle {
+                    HStack {
+                        Spacer()
+                        
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            SoundManager.shared.toggleSound()
+                        }) {
+                            Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .contentTransition(.symbolEffect(.replace))
+                                .padding(8)
+                                .background(Color.white.opacity(0.1))
+                                .clipShape(Circle())
+                        }
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, -10) // Tweak spacing to header
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
-                .padding(.bottom, -10) // Tweak spacing to header
                 
                 // Header with animated celestial icon
                 headerSection

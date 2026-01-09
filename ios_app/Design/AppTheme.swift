@@ -48,6 +48,17 @@ import SwiftUI
 ///
 struct AppTheme {
     
+    // MARK: - Feature Flags (Dark Delivery)
+    /// Toggle these to enable/disable features without code removal
+    struct Features {
+        /// Show sound toggle button in UI (set to true to re-enable)
+        static let showSoundToggle = false
+        
+        /// Show Astrology Settings (Ayanamsa & House System) in Profile
+        /// When false, app uses defaults: Lahiri ayanamsa + Whole Sign house system
+        static let showAstrologySettings = false
+    }
+    
     // MARK: - Colors
     struct Colors {
         // Main Backgrounds

@@ -79,25 +79,28 @@ struct AuthView: View {
     }
     
     // MARK: - Sound Toggle (Consistency with Language Screen)
+    @ViewBuilder
     private var soundToggle: some View {
-        HStack {
-            Spacer()
-            
-            Button(action: {
-                HapticManager.shared.play(.light)
-                SoundManager.shared.toggleSound()
-            }) {
-                Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .contentTransition(.symbolEffect(.replace))
-                    .padding(8)
-                    .background(Color.white.opacity(0.1))
-                    .clipShape(Circle())
+        if AppTheme.Features.showSoundToggle {
+            HStack {
+                Spacer()
+                
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    SoundManager.shared.toggleSound()
+                }) {
+                    Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .contentTransition(.symbolEffect(.replace))
+                        .padding(8)
+                        .background(Color.white.opacity(0.1))
+                        .clipShape(Circle())
+                }
             }
+            .padding(.horizontal, 24)
+            .padding(.top, 16)
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 16)
     }
     
     // MARK: - Logo Section (Refined: Smaller & Elegant)

@@ -120,20 +120,22 @@ struct HomeView: View {
             // Right Side Buttons
             HStack(spacing: 12) {
                 // Sound Toggle
-                Button(action: {
-                    HapticManager.shared.play(.light)
-                    soundManager.toggleSound()
-                }) {
-                    ZStack {
-                        Circle()
-                            .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
-                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
-                            .frame(width: 40, height: 40)
-                        
-                        Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                            .font(AppTheme.Fonts.body(size: 14))
-                            .foregroundColor(AppTheme.Colors.gold)
-                            .contentTransition(.symbolEffect(.replace))
+                if AppTheme.Features.showSoundToggle {
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        soundManager.toggleSound()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
+                                .background(Circle().fill(AppTheme.Colors.secondaryBackground))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                                .font(AppTheme.Fonts.body(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .contentTransition(.symbolEffect(.replace))
+                        }
                     }
                 }
                 

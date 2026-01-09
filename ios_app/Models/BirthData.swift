@@ -31,7 +31,7 @@ struct BirthData: Codable, Equatable, Sendable, Identifiable {
         longitude: Double,
         cityOfBirth: String? = nil,
         ayanamsa: String = "lahiri",
-        houseSystem: String = "equal"
+        houseSystem: String = "whole_sign"
     ) {
         self.dob = dob
         self.time = time
@@ -51,7 +51,7 @@ struct BirthData: Codable, Equatable, Sendable, Identifiable {
         longitude = Self.roundCoordinate(try container.decode(Double.self, forKey: .longitude))
         cityOfBirth = try container.decodeIfPresent(String.self, forKey: .cityOfBirth)
         ayanamsa = try container.decodeIfPresent(String.self, forKey: .ayanamsa) ?? "lahiri"
-        houseSystem = try container.decodeIfPresent(String.self, forKey: .houseSystem) ?? "equal"
+        houseSystem = try container.decodeIfPresent(String.self, forKey: .houseSystem) ?? "whole_sign"
     }
     
     // Validation

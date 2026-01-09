@@ -6,7 +6,7 @@ struct AstrologySettingsSheet: View {
     
     // Settings stored in UserDefaults
     @AppStorage("ayanamsa") private var ayanamsa = "lahiri"
-    @AppStorage("houseSystem") private var houseSystem = "equal"
+    @AppStorage("houseSystem") private var houseSystem = "whole_sign"
     @AppStorage("chartStyle") private var chartStyle = "north"  // North Indian default
     
     // Ayanamsa options matching API
