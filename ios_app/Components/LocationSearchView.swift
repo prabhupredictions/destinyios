@@ -41,7 +41,7 @@ struct LocationSearchView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
-                        .foregroundColor(AppTheme.Colors.gold)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                 }
             }
             .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)

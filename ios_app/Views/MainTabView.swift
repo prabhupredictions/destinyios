@@ -129,16 +129,15 @@ struct CustomTabBar: View {
             }
             .frame(width: 60) // Fixed width touch target
         }
-        .padding(.horizontal, 40) // Position icons comfortably near edges (standard ~30-40pt)
-        .padding(.top, 6)       // Ultra lean top padding
+        .padding(.horizontal, 30) // HIG: ~30pt minimum from edges
+        .padding(.top, 4)        // Minimal top padding
         .padding(.bottom, 0)    // Use Safe Area
         .frame(maxWidth: .infinity)
         .background(
             ZStack {
-                // Sleek Glassy Background
+                // Sleek Transparent Background
                 Rectangle()
-                    .fill(AppTheme.Colors.tabBarBackground.opacity(0.85))
-                    .background(.ultraThinMaterial) // Glass blur
+                    .fill(Color.clear) // Transparent
                     .ignoresSafeArea()
                 
                 // Top Border Line
@@ -201,7 +200,7 @@ struct AskTabButton: View {
                     if isSelected {
                         Circle()
                             .fill(AppTheme.Colors.gold.opacity(0.3))
-                            .frame(width: 64, height: 64)
+                            .frame(width: 56, height: 56) // Reduced
                     }
                     
                     // Main button - champagne gold gradient
@@ -216,11 +215,11 @@ struct AskTabButton: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 56, height: 56)
+                        .frame(width: 48, height: 48) // Compact HIG
                         .shadow(
                             color: AppTheme.Colors.gold.opacity(0.5),
-                            radius: isSelected ? 12 : 8,
-                            y: 4
+                            radius: isSelected ? 10 : 6,
+                            y: 3
                         )
                     
                     // Icon
@@ -229,12 +228,12 @@ struct AskTabButton: View {
                         .foregroundColor(AppTheme.Colors.darkNavyContrast)
                         .symbolEffect(.bounce, value: isSelected)
                 }
-                .offset(y: -20)
+                .offset(y: -12) // Reduced offset for minimal space
                 
                 Text("ask".localized)
                     .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.tabInactive)
-                    .offset(y: -16)
+                    .offset(y: -10) // Adjusted for smaller FAB
             }
         }
         .buttonStyle(.plain)

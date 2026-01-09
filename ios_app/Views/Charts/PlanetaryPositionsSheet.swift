@@ -289,11 +289,12 @@ struct PlanetaryPositionsSheet: View {
         // Map D9 (API returns flat structure, which is D9 data directly)
         var d9Map: [String: D9PlanetPosition] = [:]
         for (key, divData) in response.divisionalCharts {
-            // divData.house is String in model, converting to Int
-            let houseInt = Int(divData.house)
+            // divData fields are now optional - safely unwrap
+            guard let sign = divData.sign, let houseStr = divData.house else { continue }
+            let houseInt = Int(houseStr)
             d9Map[key] = D9PlanetPosition(
                 house: houseInt,
-                sign: divData.sign
+                sign: sign
             )
         }
         

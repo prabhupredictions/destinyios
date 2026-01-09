@@ -162,7 +162,7 @@ struct PremiumWheelPicker: UIViewRepresentable {
             paragraphStyle.alignment = .center
             
             return NSAttributedString(string: title, attributes: [
-                .foregroundColor: UIColor(red: 212/255, green: 175/255, blue: 55/255, alpha: 1.0), // #D4AF37 (Gold)
+                .foregroundColor: UIColor.white, // White text for consistency
                 .font: UIFont.systemFont(ofSize: 20, weight: .medium),
                 .paragraphStyle: paragraphStyle
             ])
@@ -341,7 +341,7 @@ struct PremiumSelectionSheet: View {
                                     Spacer() // Center
                                     Text(label)
                                         .font(AppTheme.Fonts.body(size: 18))
-                                        .foregroundColor(selectedValue == value ? AppTheme.Colors.gold : AppTheme.Colors.textPrimary)
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
                                         .multilineTextAlignment(.center)
                                     Spacer() // Center
                                     

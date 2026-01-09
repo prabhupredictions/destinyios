@@ -463,7 +463,7 @@ struct DatePickerSheet: View {
                             dismiss()
                         }
                         .font(AppTheme.Fonts.body(size: 17).weight(.semibold))
-                        .foregroundColor(AppTheme.Colors.gold)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                         .padding(.trailing, 20)
                         .padding(.top, 24) // Align with title basically
                     }

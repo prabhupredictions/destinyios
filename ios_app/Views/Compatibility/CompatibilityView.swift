@@ -208,10 +208,11 @@ struct CompatibilityView: View {
                 analyzeButton
                 
                 // Spacer for tab bar
-                Spacer(minLength: 120)
+                Spacer(minLength: 20)
             }
             .padding(.top, 8)
         }
+        .padding(.bottom, 90) // Reserve space for Transparent Tab Bar
     }
     
     // MARK: - Tab Selector

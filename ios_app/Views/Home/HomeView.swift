@@ -1,7 +1,7 @@
 import SwiftUI
 import Combine
 
-/// Premium "Midnight Gold" Home Screen
+/// Premium "Sensory Home" Screen (Divine Luxury Edition)
 struct HomeView: View {
     // MARK: - Callbacks
     var onQuestionSelected: ((String) -> Void)? = nil
@@ -12,70 +12,96 @@ struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     @State private var showProfile = false
     @State private var contentOpacity: Double = 0
+    @State private var headerOffset: CGFloat = -20
     
     // Sound Manager
     @ObservedObject private var soundManager = SoundManager.shared
     
     // Menu Sheet States
     @State private var showHistorySheet = false
+    @State private var selectedFilter: String = "All" // Filter State
+    private let filterOptions = ["All", "Good", "Steady", "Caution"]
     
     // MARK: - Body
     var body: some View {
         ZStack {
-            // 1. Theme Background
-            AppTheme.Colors.mainBackground
-                .ignoresSafeArea()
+            // 1. Theme Background (Cosmic/Parallax)
+            // Background
+            CosmicBackgroundView()
             
-            // 2. Starfield/Nebula Overlay (Optional, simple gradient for now)
-            AppTheme.Colors.backgroundGradient
-                .ignoresSafeArea()
-                .opacity(0.5)
+            // GLOBAL AMBIENT SPOTLIGHT REMOVED
+            // Returning to crisp black background for professional contrast.
             
-            // 3. Main Content
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
-                    
-                    // A. Cosmic Header
-                    headerSection
-                        .padding(.top, 10)
-                    
-                    // Offline indicator
-                    OfflineBanner()
-                    
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .tint(AppTheme.Colors.gold)
-                            .frame(maxWidth: .infinity, minHeight: 200)
-                    } else {
-                        // B. Hero: Daily Insight
-                        insightHeroSection
+            VStack(spacing: 0) {
+                // A. STICKY Header (Fixed at Top - iOS HIG)
+                headerSection
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
+                    .background(Color.clear) // Transparent header
+                    .offset(y: headerOffset)
+                
+                // 2. Scrollable Content
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) { // iOS HIG: 24pt between major sections
                         
-                        // D. Cosmic Status Strip (Dasha + Transits) - Seamless Integration
-                        cosmicStatusStrip
-                            .padding(.bottom, -10) // Negative padding to pull next section closer (reduce gap)
+                        // Offline indicator
+                        OfflineBanner()
                         
-                        // E. Life Areas
-                        lifeAreasGridSection
-                            .padding(.horizontal, 0) // No extra padding here (using outer padding)
-                            .padding(.bottom, 20)
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .tint(AppTheme.Colors.gold)
+                                .frame(maxWidth: .infinity, minHeight: 200)
+                        } else {
+                            // 1. Hero: Cosmic Vibe
+                            insightHeroSection
+                            
+                            // 2. How is my day today? (Life Areas with filters)
+                            lifeAreasGridSection
+                            
+                            // 3. What's in my mind? (Quick Questions)
+                            whatsInMyMindSection
+                            
+                            // 4. Current Dasha
+                            if let dasha = viewModel.dashaInsight {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Current Dasha")
+                                        .font(AppTheme.Fonts.premiumDisplay(size: 18))
+                                        .goldGradient()
+                                    
+                                    DashaInsightCard(dasha: dasha)
+                                }
+                            }
+                            
+                            // 5. Current Transit Influences (Horizontal Scroll)
+                            if !viewModel.transitInfluences.isEmpty {
+                                TransitInfluencesSection(transits: viewModel.transitInfluences)
+                            }
+                            
+                            // 6. Dosha Status
+                            doshaStatusSection
+                            
+                            // 7. Yoga Cards
+                            yogaHighlightsSection
+                            
+                            Spacer(minLength: 20)
+                        }
+                        
+                        Spacer(minLength: 20)
                     }
-                    
-                    Spacer(minLength: 100)
+                    .padding(.horizontal, 12) // 8pt grid: 1.5 units
                 }
-                .padding(.horizontal, 10) // Reduced main padding to maximize width
+                .padding(.bottom, 90) // Reserve space for Transparent Tab Bar (Content won't scroll behind it)
+                .refreshable {
+                    await viewModel.loadHomeData()
+                }
             }
             .opacity(contentOpacity)
-            .refreshable {
-                await viewModel.loadHomeData()
-            }
         }
         .task {
             await viewModel.loadHomeData()
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.6)) {
-                contentOpacity = 1.0
-            }
+            startEntranceAnimation()
         }
         .sheet(isPresented: $showProfile) {
             ProfileView()
@@ -88,32 +114,46 @@ struct HomeView: View {
         }
     }
     
+    // MARK: - Animations
+    private func startEntranceAnimation() {
+        withAnimation(.easeOut(duration: 0.8)) {
+            contentOpacity = 1.0
+            headerOffset = 0
+        }
+    }
+    
     // MARK: - Components
     
-    // A. Header
+    // A. 3D Gold Header
     private var headerSection: some View {
         HStack {
-            // History Button (Left Side)
-            Button(action: { showHistorySheet = true }) {
+            // History Button (Left)
+            Button(action: {
+                HapticManager.shared.play(.light)
+                showHistorySheet = true
+            }) {
                 ZStack {
                     Circle()
-                        .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
-                        .background(Circle().fill(AppTheme.Colors.secondaryBackground))
-                        .frame(width: 40, height: 40)
+                        .fill(Color.clear) // Transparent
+                        .frame(width: 44, height: 44)
+                        .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                     
                     Image(systemName: "clock.arrow.circlepath")
-                        .font(AppTheme.Fonts.title(size: 16))
+                        .font(AppTheme.Fonts.title(size: 18))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
             
             Spacer()
             
-            // Logo / Brand (Centered) - Gold "Destiny" logo from assets
+            // "Destiny" 3D Text (The Soul)
+            // "Destiny" Logo
             Image("destiny_home")
                 .resizable()
                 .scaledToFit()
-                .frame(height: 32)
+                .frame(height: 40) // Increased by 1.25x (32 * 1.25 = 40)
+                .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 10, x: 0, y: 5)
+                .premiumInertia(intensity: 15) // Floats above logic
             
             Spacer()
             
@@ -127,12 +167,12 @@ struct HomeView: View {
                     }) {
                         ZStack {
                             Circle()
-                                .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
-                                .background(Circle().fill(AppTheme.Colors.secondaryBackground))
-                                .frame(width: 40, height: 40)
+                                .fill(Color.clear) // Transparent
+                                .frame(width: 44, height: 44)
+                                .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                             
                             Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                                .font(AppTheme.Fonts.body(size: 14))
+                                .font(AppTheme.Fonts.body(size: 16))
                                 .foregroundColor(AppTheme.Colors.gold)
                                 .contentTransition(.symbolEffect(.replace))
                         }
@@ -140,15 +180,18 @@ struct HomeView: View {
                 }
                 
                 // Profile Button
-                Button(action: { showProfile = true }) {
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    showProfile = true
+                }) {
                     ZStack {
                         Circle()
-                            .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
-                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
-                            .frame(width: 40, height: 40)
+                            .fill(Color.clear) // Transparent
+                            .frame(width: 44, height: 44)
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                         
                         Image(systemName: "person.fill")
-                            .font(AppTheme.Fonts.body(size: 16))
+                            .font(AppTheme.Fonts.body(size: 18))
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
@@ -156,96 +199,133 @@ struct HomeView: View {
         }
     }
     
-    // B. Hero Section (Frosted Dark Glass)
-    // B. Hero Section (3:1 Aspect Ratio)
+    // B. Hero Section (Divine Glass Slab - Visual First)
+    // B. Hero: Cosmic Vibe (Compact)
+    // B. Hero: Cosmic Vibe (3D Floating Bronze)
     private var insightHeroSection: some View {
-        PremiumCard(style: .hero) {
-            VStack(alignment: .leading, spacing: 8) {
-                // Header Row
-                HStack(alignment: .top) {
-                    Text("Today's Cosmic Vibe")
-                        .font(.system(size: 18, weight: .medium, design: .serif))
-                        .foregroundColor(AppTheme.Colors.goldLight)
-                        .tracking(0.3)
-                    
-                    Spacer(minLength: 50)
-                }
+        ZStack(alignment: .topTrailing) {
+            // 1. The Card Body (Physical Bronze/Glass Slab)
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Today's Cosmic Vibe")
+                    .font(.system(size: 20, weight: .semibold, design: .serif)) // Serif as per reference
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color(red: 1.0, green: 0.88, blue: 0.51), Color(red: 0.72, green: 0.54, blue: 0.27)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: Color.black.opacity(0.5), radius: 1, x: 0, y: 1)
                 
-                // Insight Text - more compact
-                Text(viewModel.dailyInsight)
-                    .font(.system(size: 14, weight: .regular, design: .default))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .lineSpacing(3)
-                    .lineLimit(3) // Limit lines for compact layout
+                Text(viewModel.dailyInsight.isEmpty ? "With Mercury and Venus active in the dasha, communication and relationships will play a significant role today. Focus on maintaining harmony..." : viewModel.dailyInsight)
+                    .font(AppTheme.Fonts.body(size: 13)) // Reduced to fit
+                    .foregroundColor(Color.white.opacity(0.95))
+                    .lineSpacing(3) // Tighter spacing
+                    .lineLimit(nil) // Allow full text
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.vertical, 4) // Reduce internal padding
-        }
-        .premiumInertia(intensity: 12) // Heavy cosmic object feel
-
-        .aspectRatio(2.5, contentMode: .fit) // 2.5:1 width:height ratio (Taller)
-        .overlay(alignment: .topTrailing) {
-            // Moon Sign Badge - Proportional to 2.5:1 Card
-            if !viewModel.moonSign.isEmpty {
-                VStack(spacing: 1) {
-                    // Zodiac Symbol: 18px (Slightly larger)
-                    Text(zodiacSymbol(for: viewModel.moonSign))
-                        .font(AppTheme.Fonts.title(size: 18))
-                        .foregroundColor(AppTheme.Colors.darkNavyContrast)
-                    
-                    // "Moon in": 9px
-                    Text("Moon in")
-                        .font(AppTheme.Fonts.caption(size: 9))
-                        .foregroundColor(AppTheme.Colors.darkNavyContrast)
-                    
-                    // Sign name: 10px
-                    Text(fullZodiacName(for: viewModel.moonSign))
-                        .font(AppTheme.Fonts.title(size: 10))
-                        .foregroundColor(AppTheme.Colors.darkNavyContrast)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
-                .frame(width: 68, height: 68) // Increased to 68px for taller card
-                .background(
-                    // 3D Metallic Radial Gradient
-                    ZStack {
+            .padding(24) // Spacing inside the card
+            .padding(.top, 8) // Slight adjust for Title
+            .padding(.trailing, 70) // Prevent text from hitting the Orb
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(
+                        LinearGradient(
+                            stops: [
+                                .init(color: Color(red: 0.29, green: 0.29, blue: 0.33), location: 0.0), // Dark Slate (4A4A55)
+                                .init(color: Color(red: 0.56, green: 0.50, blue: 0.37), location: 0.5), // Muted Bronze (8E7F5E)
+                                .init(color: Color(red: 0.72, green: 0.54, blue: 0.27), location: 1.0)  // Rich Gold (B88A44)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    // Inner glow for 3D volume
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .strokeBorder(Color.white.opacity(0.1), lineWidth: 0.5)
+                    )
+                    // Deep Physical Shadow
+                    .shadow(color: Color.black.opacity(0.5), radius: 15, x: 0, y: 8)
+            )
+            
+            // 2. The Floating Orb (Pinned Top-Right INSIDE)
+            ZStack {
+                // Sphere Gradient (Radiant)
+                Circle()
+                    .fill(
                         RadialGradient(
-                            gradient: Gradient(stops: [
-                                .init(color: AppTheme.Colors.goldChampagne, location: 0.0),
-                                .init(color: AppTheme.Colors.goldLight, location: 0.3),
-                                .init(color: AppTheme.Colors.gold, location: 0.6),
-                                .init(color: AppTheme.Colors.gold.opacity(0.85), location: 0.85),
-                                .init(color: AppTheme.Colors.goldDeep, location: 1.0)
+                            gradient: Gradient(colors: [
+                                Color(red: 1.0, green: 0.95, blue: 0.7), // Flash white/gold center
+                                Color(red: 1.0, green: 0.85, blue: 0.45) // Rich Gold Edge
                             ]),
                             center: .center,
-                            startRadius: 3,
-                            endRadius: 35
-                        )
-                        
-                        // Specular Highlight
-                        RadialGradient(
-                            colors: [Color.white.opacity(0.5), Color.clear],
-                            center: UnitPoint(x: 0.3, y: 0.3),
                             startRadius: 0,
-                            endRadius: 25
+                            endRadius: 45
                         )
-                    }
-                )
-                .clipShape(Circle())
-                .overlay(
-                    Circle()
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
-                )
-                .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 10, x: 0, y: 3)
-                .offset(x: 8, y: -8) // Adjusted for smaller badge
-                .zIndex(100)
+                    )
+                    // Glow
+                    .shadow(color: AppTheme.Colors.gold.opacity(0.6), radius: 10, x: 0, y: 0)
+                
+                // Content
+                VStack(spacing: 0) {
+                    Image(systemName: "sunrise.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
+                        .padding(.top, 4)
+                    
+                    Text("Asc")
+                        .font(.system(size: 9, weight: .black))
+                        .textCase(.uppercase)
+                        .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
+                        .padding(.top, 0)
+                    
+                    Text(viewModel.ascendantSign)
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .padding(.bottom, 4)
+                }
             }
+            .frame(width: 70, height: 70)
+            .offset(x: -16, y: 16) // Pinned INSIDE the card
+        }
+        .padding(.horizontal, 0) // Full Edge-to-Edge
+        .padding(.top, 20)
+        .onAppear {
+            HapticManager.shared.playHeartbeat()
+        }
+    }
+    
+    // Decorative sparkles for hero card
+    private var sparkleDecorations: some View {
+        ZStack {
+            Image(systemName: "sparkle")
+                .font(.system(size: 10))
+                .foregroundColor(AppTheme.Colors.goldLight.opacity(0.7))
+                .offset(x: -120, y: -50)
+            
+            Image(systemName: "sparkle")
+                .font(.system(size: 8))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
+                .offset(x: 130, y: -40)
+            
+            Image(systemName: "sparkle")
+                .font(.system(size: 6))
+                .foregroundColor(AppTheme.Colors.goldLight.opacity(0.6))
+                .offset(x: -100, y: 45)
+            
+            Image(systemName: "sparkle")
+                .font(.system(size: 7))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.4))
+                .offset(x: 110, y: 50)
         }
     }
     
     // Helper to get zodiac symbol and full name
     private func zodiacSymbol(for sign: String) -> String {
-        // Handle short codes and full names
         let map: [String: String] = [
             "Ar": "♈\u{FE0E}", "Aries": "♈\u{FE0E}",
             "Ta": "♉\u{FE0E}", "Taurus": "♉\u{FE0E}",
@@ -263,26 +343,25 @@ struct HomeView: View {
         return map[sign] ?? map[sign.prefix(2).capitalized] ?? "☽"
     }
     
-    // Helper for full name display
     private func fullZodiacName(for sign: String) -> String {
-        let map: [String: String] = [
-            "Ar": "Aries",      "Aries": "Aries",
-            "Ta": "Taurus",     "Taurus": "Taurus",
-            "Ge": "Gemini",     "Gemini": "Gemini",
-            "Cn": "Cancer",     "Cancer": "Cancer",
-            "Le": "Leo",        "Leo": "Leo",
-            "Vi": "Virgo",      "Virgo": "Virgo",
-            "Li": "Libra",      "Libra": "Libra",
-            "Sc": "Scorpio",    "Scorpio": "Scorpio",
-            "Sag": "Sagittarius", "Sagittarius": "Sagittarius", "Sg": "Sagittarius",
-            "Cp": "Capricorn",  "Capricorn": "Capricorn", "Cap": "Capricorn",
-            "Aq": "Aquarius",   "Aquarius": "Aquarius",
-            "Pi": "Pisces",     "Pisces": "Pisces"
+        let fullMap: [String: String] = [
+            "Ar": "Aries", "Aries": "Aries",
+            "Ta": "Taurus", "Taurus": "Taurus",
+            "Ge": "Gemini", "Gemini": "Gemini",
+            "Cn": "Cancer", "Cancer": "Cancer",
+            "Le": "Leo", "Leo": "Leo",
+            "Vi": "Virgo", "Virgo": "Virgo",
+            "Li": "Libra", "Libra": "Libra",
+            "Sc": "Scorpio", "Scorpio": "Scorpio",
+            "Sg": "Sagittarius", "Sagittarius": "Sagittarius", "Sag": "Sagittarius",
+            "Cp": "Capricorn", "Capricorn": "Capricorn", "Cap": "Capricorn",
+            "Aq": "Aquarius", "Aquarius": "Aquarius",
+            "Pi": "Pisces", "Pisces": "Pisces"
         ]
-        return map[sign] ?? map[sign.prefix(2).capitalized] ?? sign
+        return fullMap[sign] ?? sign
     }
     
-    // C. Cosmic Status Strip (Dasha + Transits combined)
+    // C. Cosmic Status Strip
     private var cosmicStatusStrip: some View {
         let transits = viewModel.currentTransits.map { transit in
             (planet: transit.planet, sign: transit.sign)
@@ -293,73 +372,115 @@ struct HomeView: View {
                 ("Sun", "Leo"), ("Moon", "Capricorn"), ("Mars", "Scorpio")
             ] : transits
         )
+        .premiumInertia(intensity: 0.5)
     }
     
-    // Old Dasha Status (kept for reference, no longer used)
-    private var dashaStatusSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Current Dasha")
-                    .font(AppTheme.Fonts.title(size: 14))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
+    // E. How is my day today? (formerly Life Areas)
+    // selectedFilter and filterOptions already declared at top of struct
+    
+    private var lifeAreasGridSection: some View {
+        VStack(spacing: 8) { // iOS HIG: 8pt internal spacing
+            // Header (no extra padding - parent handles it)
+            Text("How is my day today?")
+                .font(AppTheme.Fonts.premiumDisplay(size: 18))
+                .goldGradient()
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Filter Tabs (Compact)
+            HStack(spacing: 8) {
+                ForEach(filterOptions, id: \.self) { filter in
+                    Button(action: {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedFilter = filter
+                        }
+                        HapticManager.shared.play(.light)
+                    }) {
+                        Text(filter)
+                            .font(AppTheme.Fonts.caption(size: 11))
+                            .fontWeight(selectedFilter == filter ? .semibold : .regular)
+                            .foregroundColor(selectedFilter == filter ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(selectedFilter == filter ?
+                                          AppTheme.Colors.gold.opacity(0.1) : Color.clear)
+                                    .overlay(
+                                        Capsule()
+                                            .strokeBorder(
+                                                selectedFilter == filter ?
+                                                AppTheme.Colors.gold.opacity(0.5) :
+                                                AppTheme.Colors.textSecondary.opacity(0.2),
+                                                lineWidth: 1
+                                            )
+                                    )
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
                 Spacer()
             }
             
-            HStack {
-                Image(systemName: "hourglass")
-                    .foregroundColor(AppTheme.Colors.gold)
-                    .font(AppTheme.Fonts.body(size: 14))
-                
-                Text(viewModel.currentDasha)
-                    .font(AppTheme.Fonts.title(size: 16))
-                    .foregroundColor(AppTheme.Colors.goldLight)
-                    .monospacedDigit()
-                
-                Spacer()
-                
-                // Active Pulse Dot
-                Circle()
-                    .fill(AppTheme.Colors.success)
-                    .frame(width: 8, height: 8)
-                    .shadow(color: AppTheme.Colors.success.opacity(0.5), radius: 4)
+            // Horizontal Scrolling Celestial Orbs (filtered)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 0) { // Edge-to-edge orbs
+                    ForEach(filteredAreas, id: \.area) { item in
+                        CelestialOrbView(
+                            icon: iconName(for: item.area),
+                            title: item.area,
+                            status: item.status.status
+                        ) {
+                            HapticManager.shared.play(.light)
+                            onQuestionSelected?("Tell me about \(item.area)")
+                        }
+                    }
+                }
+                .padding(.horizontal, 12) // Match parent edge
+                .padding(.vertical, 2)
             }
-            .padding(16)
-            .background(AppTheme.Colors.cardBackground)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
-            )
+            .padding(.horizontal, -12) // Negative margin to extend to edges
         }
     }
     
-    // D. Ask Destiny
-    private var askDestinySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Ask Destiny")
-                .font(AppTheme.Fonts.display(size: 20))
-                .foregroundColor(AppTheme.Colors.textPrimary)
+    // F. What's in my mind? (Quick Questions - taps go to Chat)
+    // F. What's in my mind? (Compact List View)
+    private var whatsInMyMindSection: some View {
+        VStack(alignment: .leading, spacing: 8) { // iOS HIG: 8pt internal spacing
+            // Header (no extra padding - parent handles it)
+            Text("What's in my mind?")
+                .font(AppTheme.Fonts.premiumDisplay(size: 18))
+                .goldGradient()
             
-            VStack(spacing: 8) {
-                ForEach(viewModel.suggestedQuestions, id: \.self) { question in
-                    Button(action: { onQuestionSelected?(question) }) {
+            // Quick Questions (Compact List)
+            let questions = viewModel.suggestedQuestions.isEmpty ?
+                ["When will I get married?", "Best career direction?", "Financial outlook?", "Health check"] :
+                Array(viewModel.suggestedQuestions.prefix(4))
+            
+            VStack(spacing: 8) { // iOS HIG: 8pt grid
+                ForEach(questions, id: \.self) { question in
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        onQuestionSelected?(question)
+                    }) {
                         HStack {
                             Text(question)
-                                .font(AppTheme.Fonts.body(size: 15))
-                                .foregroundColor(AppTheme.Colors.textPrimary.opacity(0.9))
-                            
+                                .font(AppTheme.Fonts.caption(size: 13))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                .lineLimit(1)
                             Spacer()
-                            
                             Image(systemName: "chevron.right")
-                                .font(AppTheme.Fonts.caption(size: 12))
-                                .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                         }
                         .padding(.horizontal, 16)
-                        .padding(.vertical, 14)
+                        .padding(.vertical, 10)
                         .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
-                                .background(AppTheme.Colors.secondaryBackground.opacity(0.5))
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.black.opacity(0.1))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .strokeBorder(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
+                                )
                         )
                     }
                     .buttonStyle(.plain)
@@ -368,141 +489,155 @@ struct HomeView: View {
         }
     }
     
-    // E. Life Areas Grid
-    private var lifeAreasGridSection: some View {
-        VStack(spacing: 16) {
-            // Header (Centered, No Sparkle)
-            Text("What the stars suggest")
-                .font(AppTheme.Fonts.display(size: 22))
-                .foregroundColor(AppTheme.Colors.gold)
-                .frame(maxWidth: .infinity)
-                .padding(.bottom, 6)
-            
-            // 3-Column Grid
-            let columns = [
-                GridItem(.flexible(), spacing: 10),
-                GridItem(.flexible(), spacing: 10),
-                GridItem(.flexible(), spacing: 10)
-            ]
-            
-            LazyVGrid(columns: columns, spacing: 10) {
-                ForEach(Array(viewModel.lifeAreas.keys.sorted()), id: \.self) { key in
-                    if let status = viewModel.lifeAreas[key] {
-                        LifeAreaGridItem(area: key, status: status) { question in
-                            onQuestionSelected?(question)
-                        }
-                    }
-                }
-            }
+    // G. Transit Alerts
+    private var transitAlertsSection: some View {
+        TransitAlertCard(transits: viewModel.currentTransits)
+            .padding(.horizontal, 12)
+    }
+    
+    // H. Dosha Status
+    private var doshaStatusSection: some View {
+        DoshaStatusSection(
+            mangalDosha: viewModel.doshaStatus.mangal,
+            kalaSarpa: viewModel.doshaStatus.kalaSarpa
+        )
+    }
+    
+    // I. Yoga Highlights
+    private var yogaHighlightsSection: some View {
+        YogaHighlightCard(yogas: viewModel.yogaCombinations)
+    }
+    
+    // J. Dasha Widget
+    private var dashaWidgetSection: some View {
+        DashaProgressWidget(
+            currentPeriod: viewModel.currentDashaPeriod,
+            upcomingPeriod: viewModel.upcomingDashaPeriod
+        )
+    }
+    
+    // Icon helper for orbs
+    private func iconName(for area: String) -> String {
+        switch area.lowercased() {
+        case "career": return "briefcase.fill"
+        case "relationship": return "heart.fill"
+        case "finance": return "banknote.fill"
+        case "health": return "cross.case.fill"
+        case "family": return "house.fill"
+        case "education": return "book.fill"
+        case "investment": return "chart.line.uptrend.xyaxis"
+        case "sudden events": return "star.fill"
+        default: return "star.fill"
         }
     }
     
-    // F. Transit Scroller (Premium)
-    private var transitScroller: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            TransitsCarousel()
+    // MARK: - Filtering Helpers
+    struct LifeAreaItem {
+        let area: String
+        let status: LifeAreaStatus
+    }
+    
+    var allAreas: [LifeAreaItem] {
+        let areas = viewModel.lifeAreas
+        if areas.isEmpty { return [] }
+        
+        // Helper to safely get status (API uses lowercase keys)
+        func getStatus(_ key: String) -> LifeAreaStatus {
+            return areas[key.lowercased()] ?? areas[key] ?? LifeAreaStatus(status: "Neutral", brief: "Balanced energy")
+        }
+        
+        // API keys are lowercase, but we display Title Case
+        return [
+            LifeAreaItem(area: "Career", status: getStatus("career")),
+            LifeAreaItem(area: "Relationship", status: getStatus("relationship")),
+            LifeAreaItem(area: "Finance", status: getStatus("finance")),
+            LifeAreaItem(area: "Health", status: getStatus("health")),
+            LifeAreaItem(area: "Family", status: getStatus("family")),
+            LifeAreaItem(area: "Education", status: getStatus("education")),
+            LifeAreaItem(area: "Investment", status: getStatus("investment")),
+            LifeAreaItem(area: "Sudden Events", status: getStatus("sudden_events"))
+        ]
+    }
+    
+    var filteredAreas: [LifeAreaItem] {
+        if selectedFilter == "All" { return allAreas }
+        return allAreas.filter { item in
+            let s = item.status.status.lowercased()
+            if selectedFilter == "Good" { return s == "good" || s == "excellent" }
+            if selectedFilter == "Steady" { return s == "steady" || s == "neutral" }
+            if selectedFilter == "Caution" { return s == "caution" || s == "difficult" || s == "challenging" }
+            return false
         }
     }
 }
 
 // MARK: - Subviews
 
-struct LifeAreaGridItem: View {
+/// Luxury 3-Column Tile (Compact Crystal)
+struct LifeAreaLuxuryTile: View {
     let area: String
     let status: LifeAreaStatus
-    let onQuestionSelected: (String) -> Void
+    let action: (String) -> Void
     
     var body: some View {
         Button(action: {
-            // Generate contextual question based on area and insight
-            let question = "As per today's analysis of \(area.lowercased()) related matters, \"\(status.brief)\". Could you elaborate more on this?"
-            onQuestionSelected(question)
+            action("Tell me about \(area)")
         }) {
-            VStack(alignment: .leading, spacing: 4) { // Tighter vertical spacing
-                // Header: Icon + Title + Status
-                HStack(spacing: 4) {
-                    // Icon Circle (Soft Golden Background)
-                    ZStack {
-                        Circle()
-                            .fill(AppTheme.Colors.gold.opacity(0.15)) // Soft gold bg
-                            .frame(width: 20, height: 20) // Reduced from default
-                        
-                        Image(systemName: iconName)
-                            .font(AppTheme.Fonts.caption(size: 10)) // Reduced icon size
-                            .foregroundColor(AppTheme.Colors.gold)
-                    }
+            // WRAPPER: The Deep 3D Crystal
+            DivineGlassCard(cornerRadius: 16) {
+                VStack(spacing: 8) {
+                    // Icon
+                    Image(systemName: iconName)
+                        .font(.system(size: 24, weight: .semibold)) // Slightly smaller for 3-col
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 5)
                     
                     // Title
                     Text(area.localized)
-                        .font(AppTheme.Fonts.title(size: 11))
+                        .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                
-                Spacer()
-            }
-            
-            // Content: Insight
-            Text(status.brief)
-                .font(AppTheme.Fonts.body(size: 9)) // Reduced to 9
-                .foregroundColor(AppTheme.Colors.textSecondary)
-                .lineLimit(4)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
-                .minimumScaleFactor(0.8)
-            
-            Spacer(minLength: 0)
-            
-            // Footer: Status (Left) + Arrow (Right)
-            HStack {
-                // Status Badge at Bottom Left
-                HStack(spacing: 2) {
+                        .minimumScaleFactor(0.8)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 80) // Compact Square-ish
+                .overlay(alignment: .bottomTrailing) {
+                    // Chat Indicator (Sparkle/Bubble) with Gold Gradient
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .padding(6)
+                        .offset(x: 4, y: 4)
+                        .opacity(0.9)
+                        .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 2)
+                }
+                .overlay(alignment: .topTrailing) {
+                    // Status Dot (Subtle)
                     Circle()
                         .fill(statusColor)
-                        .frame(width: 4, height: 4)
-                    Text(status.status)
-                        .font(AppTheme.Fonts.caption(size: 8)) // Reduced to 8
-                        .foregroundColor(statusColor)
-                        .lineLimit(1)
+                        .frame(width: 6, height: 6)
+                        .padding(8)
+                        .shadow(color: statusColor.opacity(0.8), radius: 3)
                 }
-                
-                Spacer()
-                
-                // Arrow at Bottom Right
-                Image(systemName: "arrow.right.circle.fill")
-                    .font(AppTheme.Fonts.body(size: 14)) // Reduced to 14
-                    .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
             }
+            .frame(height: 110)
         }
-        .padding(8) // Reduced internal padding
-        .frame(height: 116) // Squared height (approx width on standard phone)
-
-            .background(
-                ZStack {
-                    // Card Background
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(AppTheme.Colors.cardBackground)
-                    
-                    // Shiny Radial Gradient Border
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            RadialGradient(
-                                gradient: Gradient(colors: [
-                                    AppTheme.Colors.gold.opacity(0.6),
-                                    AppTheme.Colors.gold.opacity(0.1)
-                                ]),
-                                center: .topLeading,
-                                startRadius: 0,
-                                endRadius: 200
-                            ),
-                            lineWidth: 1.5
-                        )
-                }
-            )
-        }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle())
     }
     
+    // Helpers
     var iconName: String {
         switch area.lowercased() {
         case "career": return "briefcase.fill"
@@ -512,6 +647,7 @@ struct LifeAreaGridItem: View {
         case "family": return "house.fill"
         case "education": return "book.fill"
         case "investment": return "chart.line.uptrend.xyaxis"
+        case "sudden events": return "star.fill"
         default: return "star.fill"
         }
     }
@@ -525,8 +661,6 @@ struct LifeAreaGridItem: View {
         }
     }
 }
-
-
 
 #Preview {
     HomeView()

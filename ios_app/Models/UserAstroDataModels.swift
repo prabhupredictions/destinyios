@@ -139,8 +139,8 @@ struct NakshatraData: Codable {
 }
 
 struct DivisionalPlanetData: Codable {
-    let sign: String
-    let house: String // API returns string, potentially "1", "2" etc.
+    let sign: String?   // Made optional - API may return empty or missing
+    let house: String?  // Made optional - API may return empty or missing
 }
 
 struct HouseData: Codable {
@@ -413,13 +413,46 @@ struct TransitEvent: Codable {
 
 // MARK: - Today's Prediction
 
+// NEW: Dasha Insight from API
+struct DashaInsight: Codable {
+    let period: String
+    let quality: String  // "Good" | "Steady" | "Caution"
+    let theme: String
+    let endDate: String?
+    let meaning: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case period, quality, theme, meaning
+        case endDate = "end_date"
+    }
+}
+
+// NEW: Transit Influence card data
+struct TransitInfluence: Codable, Identifiable {
+    let planet: String
+    let sign: String
+    let house: Int
+    let description: String
+    let badge: String
+    let badgeType: String  // "positive" | "caution" | "warning" | "neutral"
+    
+    var id: String { planet }
+    
+    enum CodingKeys: String, CodingKey {
+        case planet, sign, house, description, badge
+        case badgeType = "badge_type"
+    }
+}
+
 struct TodaysPredictionResponse: Codable {
     let predictionId: String
     let targetDate: String
     let currentDasha: String
+    let dashaInsight: DashaInsight?  // NEW
     let lifeAreas: [String: LifeAreaStatus]
     let mindQuestions: [String]
     let todaysInsight: String
+    let transitInfluences: [TransitInfluence]?  // NEW
     let timingAdvice: TimingAdvice?
     let currentTransits: [String: TransitPosition]?
     
@@ -427,9 +460,11 @@ struct TodaysPredictionResponse: Codable {
         case predictionId = "prediction_id"
         case targetDate = "target_date"
         case currentDasha = "current_dasha"
+        case dashaInsight = "dasha_insight"
         case lifeAreas = "life_areas"
         case mindQuestions = "mind_questions"
         case todaysInsight = "todays_insight"
+        case transitInfluences = "transit_influences"
         case timingAdvice = "timing_advice"
         case currentTransits = "current_transits"
     }
@@ -458,3 +493,4 @@ struct TransitPosition: Codable {
         case houseFromMoon = "house_from_moon"
     }
 }
+

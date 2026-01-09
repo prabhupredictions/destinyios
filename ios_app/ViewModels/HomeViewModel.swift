@@ -23,11 +23,42 @@ class HomeViewModel {
     var lifeAreas: [String: LifeAreaStatus] = [:]
     var currentTransits: [TransitDisplayData] = []
     
+    // New Data for Enhanced Sections
+    var fullAstroData: UserAstroDataResponse?
+    var dashaResponse: DashaResponse?
+    var currentDashaPeriod: DashaPeriod?
+    var upcomingDashaPeriod: DashaPeriod?
+    var yogaCombinations: [YogaDetail] = []
+    var doshaStatus: (mangal: AstroMangalDoshaResult?, kalaSarpa: AstroKalaSarpaResult?) = (nil, nil)
+    
+    // NEW: Premium Transit & Dasha UI
+    var dashaInsight: DashaInsight?
+    var transitInfluences: [TransitInfluence] = []
+
+    
     struct TransitDisplayData: Identifiable {
         let id = UUID()
         let planet: String
         let sign: String
         let house: Int
+    }
+    
+    // MARK: - Computed Properties
+    var ascendantSign: String {
+        // Safe access to house 1 (Ascendant)
+        guard let data = fullAstroData,
+              let house1 = data.houses["1"] else {
+            return "Asc"
+        }
+        
+        let signNum = house1.signNum
+        // Ensure signNum is valid (1-12)
+        guard signNum >= 1 && signNum <= 12 else { return "Asc" }
+        
+        // Convert to index (0-11)
+        let index = signNum - 1
+        let abbrev = ChartConstants.orderedSigns[index]
+        return ChartConstants.signFullNames[abbrev] ?? abbrev
     }
     
     // MARK: - Dependencies
@@ -88,53 +119,116 @@ class HomeViewModel {
             return
         }
         
+        // Create a task group to fetch all data concurrently
+        await withTaskGroup(of: Void.self) { group in
+            // 1. Fetch Todays Prediction (Existing)
+            group.addTask {
+                await self.fetchTodaysPrediction(birthData: birthData)
+            }
+            
+            // 2. Fetch Full Chart Data (for Yogas, Doshas)
+            group.addTask {
+                await self.fetchFullChart(birthData: birthData)
+            }
+            
+            // 3. Fetch Dasha Periods (for Widget)
+            group.addTask {
+                await self.fetchDashaPeriods(birthData: birthData)
+            }
+        }
+        
+        await MainActor.run {
+            self.isLoading = false
+        }
+    }
+    
+    private func fetchTodaysPrediction(birthData: UserBirthData) async {
         // Check local cache first
         if let cached = TodaysPredictionCache.shared.get() {
             await MainActor.run {
                 self.applyPredictionResponse(cached)
-                self.isLoading = false
             }
             return
         }
         
         do {
-            // Pass user email for backend caching
             let userEmail = UserDefaults.standard.string(forKey: "userEmail")
             let request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail)
             let response = try await predictionService.getTodaysPrediction(request: request)
             
-            // Cache locally
             TodaysPredictionCache.shared.set(response)
             
             await MainActor.run {
                 self.applyPredictionResponse(response)
-                self.isLoading = false
-            }
-        } catch let networkError as NetworkError {
-            // Handle specific network errors
-            let detailedMessage: String
-            switch networkError {
-            case .serverError(let message):
-                detailedMessage = "Server error: \(message)"
-            case .decodingError(let underlying):
-                detailedMessage = "Data error: \(underlying.localizedDescription)"
-            case .unauthorized:
-                detailedMessage = "Session expired. Please sign in again."
-            case .invalidURL:
-                detailedMessage = "Invalid request URL."
-            case .noData:
-                detailedMessage = "No data received from server."
-            }
-            print("[HomeViewModel] Prediction API error: \(detailedMessage)")
-            await MainActor.run {
-                self.errorMessage = detailedMessage
-                self.isLoading = false
             }
         } catch {
             print("[HomeViewModel] Prediction error: \(error)")
             await MainActor.run {
-                self.errorMessage = "Failed to load cosmic data: \(error.localizedDescription)"
-                self.isLoading = false
+                // Don't override general error if other calls succeed, just log it
+                // self.errorMessage = "Failed to load prediction" 
+            }
+        }
+    }
+    
+    private func fetchFullChart(birthData: UserBirthData) async {
+        do {
+            let response = try await UserChartService.shared.fetchFullChartData(birthData: birthData)
+            await MainActor.run {
+                self.fullAstroData = response
+                // Process Yogas & Doshas
+                // Process All Yogas & Doshas
+                var allCombinations: [YogaDetail] = []
+                
+                if let yogas = response.analysis.yogas?.yogas {
+                    allCombinations.append(contentsOf: yogas)
+                }
+                
+                if let doshas = response.analysis.yogas?.doshas {
+                    allCombinations.append(contentsOf: doshas)
+                }
+                
+                // Sort: Active first, then by strength
+                self.yogaCombinations = allCombinations.sorted {
+                    if $0.status == "A" && $1.status != "A" { return true }
+                    if $0.status != "A" && $1.status == "A" { return false }
+                    return $0.strength > $1.strength
+                }
+                self.doshaStatus = (response.analysis.mangalDosha, response.analysis.kalaSarpa)
+            }
+        } catch {
+            print("[HomeViewModel] Full Chart error: \(error)")
+        }
+    }
+    
+    private func fetchDashaPeriods(birthData: UserBirthData) async {
+        do {
+            let response = try await UserChartService.shared.fetchDashaPeriods(birthData: birthData)
+            await MainActor.run {
+                self.dashaResponse = response
+                self.calculateCurrentDashaPeriod(response)
+            }
+        } catch {
+            print("[HomeViewModel] Dasha error: \(error)")
+        }
+    }
+    
+    private func calculateCurrentDashaPeriod(_ response: DashaResponse) {
+        let now = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        // Find current period
+        if let current = response.periods.first(where: { period in
+            guard let start = dateFormatter.date(from: period.start),
+                  let end = dateFormatter.date(from: period.end) else { return false }
+            return start <= now && end >= now
+        }) {
+            self.currentDashaPeriod = current
+            
+            // Find next period
+            if let index = response.periods.firstIndex(where: { $0.start == current.start }),
+               index + 1 < response.periods.count {
+                self.upcomingDashaPeriod = response.periods[index + 1]
             }
         }
     }
@@ -146,7 +240,13 @@ class HomeViewModel {
         self.suggestedQuestions = response.mindQuestions
         self.lifeAreas = response.lifeAreas
         
-        // Parse Transits
+        // NEW: Apply Dasha Insight
+        self.dashaInsight = response.dashaInsight
+        
+        // NEW: Apply Transit Influences
+        self.transitInfluences = response.transitInfluences ?? []
+        
+        // Parse Transits (legacy)
         if let transits = response.currentTransits {
             self.currentTransits = transits.map { key, value in
                 TransitDisplayData(planet: key, sign: value.sign, house: value.houseFromLagna)
