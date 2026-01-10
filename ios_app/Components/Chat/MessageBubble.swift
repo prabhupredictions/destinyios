@@ -41,7 +41,7 @@ struct MessageBubble: View {
             }
             
             if !isUser {
-                Spacer(minLength: 60)
+                Spacer(minLength: 16) // Modern full-width AI messages
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
@@ -84,16 +84,12 @@ struct MessageBubble: View {
             Group {
                 if isUser {
                     AppTheme.Colors.premiumGradient
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 5, y: 2)
                 } else {
-                    AppTheme.Colors.surfaceBackground
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 18)
-                                .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
-                        )
+                    Color.clear // Modern: no bubble for AI messages
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: AppTheme.Colors.gold.opacity(isUser ? 0.3 : 0.05), radius: 5, y: 2)
         )
     }
     
@@ -169,18 +165,18 @@ struct MessageBubble: View {
         HStack(spacing: 6) {
             // Timestamp
             Text(formatTime(message.createdAt))
-                .font(AppTheme.Fonts.caption())
-                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textTertiary)
             
             // Execution time (if available from API response)
             if message.executionTimeMs > 0 {
                 Text("•")
-                    .font(AppTheme.Fonts.caption())
-                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.6))
                 
                 Text(formatExecutionTime(message.executionTimeMs))
-                    .font(AppTheme.Fonts.caption())
-                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
             }
             
             Spacer()

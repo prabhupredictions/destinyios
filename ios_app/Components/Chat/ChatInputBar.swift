@@ -24,6 +24,7 @@ struct ChatInputBar: View {
                 .background(
                     RoundedRectangle(cornerRadius: 24)
                         .fill(AppTheme.Colors.inputBackground)
+                        .shadow(color: isFocused ? AppTheme.Colors.gold.opacity(0.15) : .clear, radius: 10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 24)
                                 .stroke(isFocused ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.3), lineWidth: isFocused ? 1.5 : 1)
