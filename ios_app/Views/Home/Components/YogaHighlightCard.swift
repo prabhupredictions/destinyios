@@ -77,8 +77,9 @@ struct YogaHighlightCard: View {
                             PremiumYogaCard(yoga: yoga)
                         }
                     }
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 12) // Internal spacing
                 }
+                .padding(.horizontal, -12) // Extend to screen edges (matches Transit section)
             }
         }
     }
@@ -102,7 +103,7 @@ struct PremiumYogaCard: View {
         if yoga.isDosha {
             return AppTheme.Colors.error // Red for Caution
         } else {
-            return AppTheme.Colors.gold // Gold for Good
+            return Color.green // Green for Good
         }
     }
     

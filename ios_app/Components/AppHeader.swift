@@ -94,7 +94,7 @@ struct LogoView: View {
         Image("destiny_home")
             .resizable()
             .scaledToFit()
-            .frame(height: 28)
+            .frame(height: 32) // Standard height across all screens
             // If the logo is black text, we invert it for dark mode or specific tint
             // .colorInvert() // Only if the asset is black-on-transparent
     }

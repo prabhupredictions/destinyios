@@ -108,8 +108,8 @@ struct CustomTabBar: View {
             // Ask Tab (Center - FAB Style)
             AskTabButton(isSelected: selectedTab == 1) {
                 withAnimation(.spring(response: 0.3)) {
-                    // Show Ask sheet instead of navigating directly
-                    showAskSheet = true
+                    // Navigate directly to Chat screen (skip intermediate sheet)
+                    selectedTab = 1
                 }
             }
             .frame(width: 80) // Fixed width for center

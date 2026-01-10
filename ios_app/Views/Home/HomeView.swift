@@ -78,7 +78,7 @@ struct HomeView: View {
                             }
                             
                             // 6. Dosha Status
-                            doshaStatusSection
+                            // doshaStatusSection // Removed per user request
                             
                             // 7. Yoga Cards
                             yogaHighlightsSection
@@ -151,7 +151,7 @@ struct HomeView: View {
             Image("destiny_home")
                 .resizable()
                 .scaledToFit()
-                .frame(height: 40) // Increased by 1.25x (32 * 1.25 = 40)
+                .frame(height: 32) // Standard height across all screens
                 .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 10, x: 0, y: 5)
                 .premiumInertia(intensity: 15) // Floats above logic
             
@@ -200,14 +200,13 @@ struct HomeView: View {
     }
     
     // B. Hero Section (Divine Glass Slab - Visual First)
-    // B. Hero: Cosmic Vibe (Compact)
-    // B. Hero: Cosmic Vibe (3D Floating Bronze)
     private var insightHeroSection: some View {
         ZStack(alignment: .topTrailing) {
-            // 1. The Card Body (Physical Bronze/Glass Slab)
-            VStack(alignment: .leading, spacing: 12) {
+            // Card Content
+            VStack(alignment: .leading, spacing: 8) {
+                // Title
                 Text("Today's Cosmic Vibe")
-                    .font(.system(size: 20, weight: .semibold, design: .serif)) // Serif as per reference
+                    .font(.system(size: 20, weight: .semibold, design: .serif))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [Color(red: 1.0, green: 0.88, blue: 0.51), Color(red: 0.72, green: 0.54, blue: 0.27)],
@@ -216,83 +215,77 @@ struct HomeView: View {
                         )
                     )
                     .shadow(color: Color.black.opacity(0.5), radius: 1, x: 0, y: 1)
+                    .padding(.trailing, 60) // Prevent overlap with orb
                 
+                // Body Text (full width, flows naturally)
                 Text(viewModel.dailyInsight.isEmpty ? "With Mercury and Venus active in the dasha, communication and relationships will play a significant role today. Focus on maintaining harmony..." : viewModel.dailyInsight)
-                    .font(AppTheme.Fonts.body(size: 13)) // Reduced to fit
+                    .font(AppTheme.Fonts.body(size: 13))
                     .foregroundColor(Color.white.opacity(0.95))
-                    .lineSpacing(3) // Tighter spacing
-                    .lineLimit(nil) // Allow full text
+                    .lineSpacing(3)
+                    .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(24) // Spacing inside the card
-            .padding(.top, 8) // Slight adjust for Title
-            .padding(.trailing, 70) // Prevent text from hitting the Orb
-            .background(
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(
-                        LinearGradient(
-                            stops: [
-                                .init(color: Color(red: 0.29, green: 0.29, blue: 0.33), location: 0.0), // Dark Slate (4A4A55)
-                                .init(color: Color(red: 0.56, green: 0.50, blue: 0.37), location: 0.5), // Muted Bronze (8E7F5E)
-                                .init(color: Color(red: 0.72, green: 0.54, blue: 0.27), location: 1.0)  // Rich Gold (B88A44)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    // Inner glow for 3D volume
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24)
-                            .strokeBorder(Color.white.opacity(0.1), lineWidth: 0.5)
-                    )
-                    // Deep Physical Shadow
-                    .shadow(color: Color.black.opacity(0.5), radius: 15, x: 0, y: 8)
-            )
+            .padding(24)
             
-            // 2. The Floating Orb (Pinned Top-Right INSIDE)
+            // Floating Orb (overlayed, doesn't affect text flow)
             ZStack {
-                // Sphere Gradient (Radiant)
                 Circle()
                     .fill(
                         RadialGradient(
                             gradient: Gradient(colors: [
-                                Color(red: 1.0, green: 0.95, blue: 0.7), // Flash white/gold center
-                                Color(red: 1.0, green: 0.85, blue: 0.45) // Rich Gold Edge
+                                Color(red: 1.0, green: 0.95, blue: 0.7),
+                                Color(red: 1.0, green: 0.85, blue: 0.45)
                             ]),
                             center: .center,
                             startRadius: 0,
-                            endRadius: 45
+                            endRadius: 35
                         )
                     )
-                    // Glow
                     .shadow(color: AppTheme.Colors.gold.opacity(0.6), radius: 10, x: 0, y: 0)
                 
-                // Content
                 VStack(spacing: 0) {
                     Image(systemName: "sunrise.fill")
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
                         .padding(.top, 4)
                     
-                    Text("Asc")
-                        .font(.system(size: 9, weight: .black))
-                        .textCase(.uppercase)
+                    Text("ASC")
+                        .font(.system(size: 8, weight: .black))
                         .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
-                        .padding(.top, 0)
                     
                     Text(viewModel.ascendantSign)
-                        .font(.system(size: 9, weight: .semibold))
+                        .font(.system(size: 8, weight: .semibold))
                         .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                        .padding(.bottom, 4)
+                        .padding(.bottom, 3)
                 }
             }
-            .frame(width: 70, height: 70)
-            .offset(x: -16, y: 16) // Pinned INSIDE the card
+            .frame(width: 60, height: 60) // Slightly smaller orb
+            .offset(x: -16, y: 16)
         }
-        .padding(.horizontal, 0) // Full Edge-to-Edge
+        // Background container
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color(red: 0.29, green: 0.29, blue: 0.33), location: 0.0),
+                            .init(color: Color(red: 0.56, green: 0.50, blue: 0.37), location: 0.5),
+                            .init(color: Color(red: 0.72, green: 0.54, blue: 0.27), location: 1.0)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
+                        .strokeBorder(Color.white.opacity(0.1), lineWidth: 0.5)
+                )
+                .shadow(color: Color.black.opacity(0.5), radius: 15, x: 0, y: 8)
+        )
+        .padding(.horizontal, 0)
         .padding(.top, 20)
         .onAppear {
             HapticManager.shared.playHeartbeat()
