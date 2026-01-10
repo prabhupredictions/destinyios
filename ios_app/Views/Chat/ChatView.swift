@@ -27,8 +27,8 @@ struct ChatView: View {
     
     var body: some View {
         ZStack {
-            // Dark Background
-            AppTheme.Colors.mainBackground.ignoresSafeArea()
+            // Cosmic Background (Soul of the App)
+            CosmicBackgroundView()
             
             VStack(spacing: 0) {
                 // Header
@@ -197,7 +197,7 @@ struct ChatView: View {
                         .frame(height: 1)
                         .id("bottomAnchor")
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 12) // Optimized per HIG
                 .padding(.vertical, 16)
             }
             .defaultScrollAnchor(.bottom)  // iOS 17+ - start at bottom

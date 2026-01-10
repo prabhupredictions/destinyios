@@ -54,7 +54,7 @@ struct MessageBubble: View {
             if isUser {
                 // User message - plain text
                 Text(message.content)
-                    .font(AppTheme.Fonts.body(size: 15))
+                    .font(AppTheme.Fonts.body(size: 16)) // HIG standard body text
                     .foregroundColor(AppTheme.Colors.mainBackground) // Dark text on gold gradient
             } else if isLoadingState {
                 // AI loading state - show progress inside bubble
@@ -64,7 +64,7 @@ struct MessageBubble: View {
                 MarkdownTextView(
                     content: displayContent,
                     textColor: AppTheme.Colors.textPrimary,
-                    fontSize: 15
+                    fontSize: 16 // HIG standard body text
                 )
             }
             
@@ -78,8 +78,8 @@ struct MessageBubble: View {
                 sourcesView(message.sources)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 12) // Optimized per HIG (less visual padding)
+        .padding(.vertical, 10)
         .background(
             Group {
                 if isUser {
