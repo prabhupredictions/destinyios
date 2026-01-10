@@ -144,12 +144,26 @@ struct ProfileView: View {
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
             
-            PremiumListItem(
-                title: "Birth Details",
-                subtitle: "Date, time, and place of birth",
-                icon: "calendar.circle.fill",
-                action: { showBirthDetails = true }
-            )
+            VStack(spacing: 12) {
+                PremiumListItem(
+                    title: "Birth Details",
+                    subtitle: "Date, time, and place of birth",
+                    icon: "calendar.circle.fill",
+                    action: { showBirthDetails = true }
+                )
+                
+                NavigationLink {
+                    PartnerManagerView()
+                } label: {
+                    PremiumListItem<EmptyView>(
+                        title: "saved_partners".localized,
+                        subtitle: "Manage partner profiles for matching",
+                        icon: "person.2.fill",
+                        showChevron: true
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
         }
     }
     

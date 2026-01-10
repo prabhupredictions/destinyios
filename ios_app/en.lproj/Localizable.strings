@@ -460,3 +460,13 @@
 // MARK: - Profile Setup
 "setting_up_profile" = "Setting Up Your Profile";
 "cosmic_alignment" = "Aligning the cosmos just for you...";
+
+// Partner Profile Manager
+"select_saved_partner" = "Select Saved Partner";
+"saved_partners" = "Saved Partners";
+"add_partner" = "Add Partner";
+"edit_partner" = "Edit Partner";
+"no_saved_partners" = "No Saved Partners";
+"save_partner_description" = "Save partner profiles for quick matching";
+"save_for_future" = "Save for future matching";
+

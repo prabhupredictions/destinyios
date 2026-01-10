@@ -17,6 +17,7 @@ final class DataManager {
             LocalChatThread.self,
             LocalChatMessage.self,
             UserBirthProfile.self,
+            PartnerProfile.self,
         ])
         
         let config = ModelConfiguration(

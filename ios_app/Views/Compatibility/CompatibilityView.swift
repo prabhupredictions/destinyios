@@ -7,6 +7,8 @@ struct CompatibilityView: View {
     @State private var showBoyLocationSearch = false
     @State private var showGirlLocationSearch = false
     @State private var showChartsSheet = false
+    @State private var showPartnerPicker = false  // Partner picker integration
+    @State private var savePartnerForFuture = false // Consent for saving
     
     // Quota and subscription UI state
     // Quota and subscription UI state
@@ -113,6 +115,38 @@ struct CompatibilityView: View {
         }
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
+        }
+        .sheet(isPresented: $showPartnerPicker) {
+            PartnerPickerSheet(
+                isPresented: $showPartnerPicker,
+                gender: nil  // Show all partners, let user pick
+            ) { partner in
+                // Fill form with selected partner data
+                viewModel.girlName = partner.name
+                viewModel.partnerGender = partner.gender
+                viewModel.girlCity = partner.cityOfBirth ?? ""
+                viewModel.girlLatitude = partner.latitude ?? 0
+                viewModel.girlLongitude = partner.longitude ?? 0
+                viewModel.partnerTimeUnknown = partner.birthTimeUnknown
+                
+                // Parse and set date
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                if let date = dateFormatter.date(from: partner.dateOfBirth) {
+                    viewModel.girlBirthDate = date
+                }
+                
+                // Parse and set time if available
+                if let timeString = partner.timeOfBirth {
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "HH:mm"
+                    if let time = timeFormatter.date(from: timeString) {
+                        viewModel.girlBirthTime = time
+                    }
+                }
+                
+                HapticManager.shared.playSuccess()
+            }
         }
         .onChange(of: viewModel.showResult) { _, newValue in
             onShowResultChange?(newValue)
@@ -388,6 +422,28 @@ struct CompatibilityView: View {
     private var girlFormCard: some View {
         PremiumCard {
             VStack(alignment: .leading, spacing: 14) {
+                // Select Saved Partner button
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    showPartnerPicker = true
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.crop.circle.badge.checkmark")
+                            .font(.system(size: 16))
+                        Text("select_saved_partner".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
+                    }
+                    .foregroundStyle(AppTheme.Colors.premiumGradient)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(AppTheme.Colors.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(AppTheme.Styles.goldBorder.stroke, lineWidth: 1)
+                    )
+                    .cornerRadius(10)
+                }
+                
                 // Row 1: Name and Gender
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
