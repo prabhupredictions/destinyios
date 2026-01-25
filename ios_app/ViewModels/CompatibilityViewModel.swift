@@ -351,6 +351,7 @@ class CompatibilityViewModel {
     
     // MARK: - Save Partner
     // MARK: - Save Partners (Smart)
+    @MainActor
     func saveAllPartners(context: ModelContext) {
         // Iterate through all partners
         for partner in partners {
