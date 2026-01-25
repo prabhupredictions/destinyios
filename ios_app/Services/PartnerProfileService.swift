@@ -201,6 +201,29 @@ class PartnerProfileService {
         try? context.save()
     }
     
+    /// Save partner only if not exists (Smart Save)
+    @MainActor
+    func savePartnerSmartly(_ partner: PartnerProfile, context: ModelContext) {
+        let descriptor = FetchDescriptor<PartnerProfile>()
+        let existingPartners = (try? context.fetch(descriptor)) ?? []
+        
+        // Match based on astrological identity (DOB + Time + Place)
+        // Name is ignored as users might save "John" then "John Doe" for same person
+        let exists = existingPartners.contains { existing in
+            existing.dateOfBirth == partner.dateOfBirth &&
+            existing.timeOfBirth == partner.timeOfBirth &&
+            existing.cityOfBirth?.lowercased() == partner.cityOfBirth?.lowercased()
+        }
+        
+        if !exists {
+            context.insert(partner)
+            try? context.save()
+            print("[PartnerProfileService] Saved new partner: \(partner.name)")
+        } else {
+            print("[PartnerProfileService] Partner already exists (Astrological Match): \(partner.name) (Skipping save)")
+        }
+    }
+    
     /// Delete partner locally
     @MainActor
     func deletePartnerLocally(id: String, context: ModelContext) {

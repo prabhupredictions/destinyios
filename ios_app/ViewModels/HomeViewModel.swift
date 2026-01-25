@@ -143,26 +143,37 @@ class HomeViewModel {
     }
     
     private func fetchTodaysPrediction(birthData: UserBirthData) async {
-        // Check local cache first
+        let profileId = ProfileContextManager.shared.activeProfileId
+        let profileName = ProfileContextManager.shared.activeProfileName
+        
+        print("[HomeViewModel] fetchTodaysPrediction for profile: \(profileName) (id: \(profileId))")
+        print("[HomeViewModel] Birth data DOB: \(birthData.dob)")
+        
+        // Check local cache first (profile-scoped via TodaysPredictionCache)
         if let cached = TodaysPredictionCache.shared.get() {
+            print("[HomeViewModel] Cache HIT for profile: \(profileId)")
             await MainActor.run {
                 self.applyPredictionResponse(cached)
             }
             return
         }
         
+        print("[HomeViewModel] Cache MISS for profile: \(profileId) - calling API...")
+        
         do {
             let userEmail = UserDefaults.standard.string(forKey: "userEmail")
-            let request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail)
+            var request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail)
+            
             let response = try await predictionService.getTodaysPrediction(request: request)
             
+            print("[HomeViewModel] API response received for profile: \(profileId)")
             TodaysPredictionCache.shared.set(response)
             
             await MainActor.run {
                 self.applyPredictionResponse(response)
             }
         } catch {
-            print("[HomeViewModel] Prediction error: \(error)")
+            print("[HomeViewModel] Prediction error for \(profileId): \(error)")
             await MainActor.run {
                 // Don't override general error if other calls succeed, just log it
                 // self.errorMessage = "Failed to load prediction" 
@@ -260,7 +271,13 @@ class HomeViewModel {
     }
     
     private func loadBirthData() -> UserBirthData? {
-        // Try userBirthData (new) then birthData (legacy)
+        // Check active profile first (for Switch Profile feature)
+        if let profileBirthData = ProfileContextManager.shared.activeBirthData {
+            print("[HomeViewModel] Using birth data from active profile: \(ProfileContextManager.shared.activeProfileName)")
+            return normalizeTimeFormat(profileBirthData)
+        }
+        
+        // Fallback: Try userBirthData (new) then birthData (legacy)
         let key = UserDefaults.standard.object(forKey: "userBirthData") != nil ? "userBirthData" : "birthData"
         guard let data = UserDefaults.standard.data(forKey: key),
               var birthData = try? JSONDecoder().decode(UserBirthData.self, from: data) else {

@@ -24,6 +24,7 @@ class BirthDataViewModel {
     var isLoading = false
     var errorMessage: String?
     var showLocationSearch = false
+    var birthDataTakenEmail: String? = nil  // Set when guest tries to use registered user's birth data
     
     // MARK: - Dependencies
     private let dataManager: DataManager
@@ -31,8 +32,8 @@ class BirthDataViewModel {
     private var isGuest: Bool = false
     
     // MARK: - Init
-    init(dataManager: DataManager = DataManager.shared) {
-        self.dataManager = dataManager
+    init(dataManager: DataManager? = nil) {
+        self.dataManager = dataManager ?? DataManager.shared
         loadUserInfo()
     }
     
@@ -246,13 +247,48 @@ class BirthDataViewModel {
                 UserDefaults.standard.set(email, forKey: "userEmail")
             }
             
-            // Sync to server profile (fire and forget)
-            syncToServerProfile(email: email)
+            // Sync to server profile and check for conflicts
+            // This Task checks if birth data belongs to a registered user
+            Task {
+                let result = await syncToServerProfileAsync(email: email)
+                if case .birthDataTaken(let existingEmail) = result {
+                    // Guest trying to use registered user's birth data
+                    // Set this to trigger sign-in prompt in the view
+                    self.birthDataTakenEmail = existingEmail
+                    if let existingEmail = existingEmail {
+                        self.errorMessage = "This birth data is already registered. Please sign in as \(existingEmail)"
+                    } else {
+                        self.errorMessage = "This birth data is already registered. Please sign in."
+                    }
+                }
+            }
             
             // Sync chat history from server (restore any past conversations)
+            // Works for both guests and registered users
+            // - Guests: recover history if they erase data or login from another phone
+            // - Registered: restore history on new device
+            // Clear-before-sync in sync services prevents duplicates
             Task {
                 await ChatHistorySyncService.shared.syncFromServer(userEmail: email, dataManager: dataManager)
                 await CompatibilityHistoryService.shared.syncFromServer(userEmail: email)
+            }
+            
+            // Create self partner profile for Switch Profile feature
+            // This creates a PartnerProfile with is_self=true so user can switch back to themselves
+            Task {
+                await ProfileService.shared.createSelfPartnerProfile(
+                    email: email,
+                    userName: userName.isEmpty ? "Me" : userName,
+                    birthProfile: ProfileService.BirthProfileResponse(
+                        dateOfBirth: formattedDOB,
+                        timeOfBirth: formattedTOB,
+                        cityOfBirth: cityOfBirth,
+                        latitude: latitude,
+                        longitude: longitude,
+                        gender: gender.isEmpty ? nil : gender,
+                        birthTimeUnknown: timeUnknown
+                    )
+                )
             }
             
             return true
@@ -262,43 +298,74 @@ class BirthDataViewModel {
         }
     }
     
-    /// Sync birth data to server profile for cross-device support
+    /// Result of server profile sync
+    enum SyncResult {
+        case success
+        case birthDataTaken(existingEmail: String?)
+        case error(String)
+    }
+    
+    /// Sync birth data to server profile - async version that can detect conflicts
+    private func syncToServerProfileAsync(email: String) async -> SyncResult {
+        do {
+            // Get user name from UserDefaults (set during Google/Apple sign-in)
+            let storedUserName = UserDefaults.standard.string(forKey: "userName") ?? ""
+            
+            let profileRequest: [String: Any] = [
+                "email": email,
+                "user_name": storedUserName,  // From sign-in, backend defaults to "Destiny User" if empty
+                "user_type": isGuest ? "guest" : "registered",
+                "is_generated_email": isGuest,
+                "birth_profile": [
+                    "date_of_birth": formattedDOB,
+                    "time_of_birth": formattedTOB,
+                    "city_of_birth": cityOfBirth,
+                    "latitude": latitude,
+                    "longitude": longitude,
+                    "gender": gender.isEmpty ? nil : gender,
+                    "birth_time_unknown": timeUnknown
+                ] as [String: Any?]
+            ]
+            
+            let url = URL(string: "\(APIConfig.baseURL)/subscription/profile")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            request.httpBody = try JSONSerialization.data(withJSONObject: profileRequest)
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("[ProfileSync] Server response: \(httpResponse.statusCode)")
+                
+                // Handle 409 Conflict - birth data already belongs to registered user
+                if httpResponse.statusCode == 409 {
+                    if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let detail = json["detail"] as? [String: Any],
+                       let existingEmail = detail["existing_email"] as? String {
+                        return .birthDataTaken(existingEmail: existingEmail)
+                    }
+                    return .birthDataTaken(existingEmail: nil)
+                }
+                
+                if httpResponse.statusCode == 200 {
+                    return .success
+                } else {
+                    return .error("Server error: \(httpResponse.statusCode)")
+                }
+            }
+            return .success
+        } catch {
+            print("[ProfileSync] Failed to sync: \(error)")
+            return .error(error.localizedDescription)
+        }
+    }
+    
+    /// Fire-and-forget version for backwards compatibility
     private func syncToServerProfile(email: String) {
         Task {
-            do {
-                // Get user name from UserDefaults (set during Google/Apple sign-in)
-                let storedUserName = UserDefaults.standard.string(forKey: "userName") ?? ""
-                
-                let profileRequest: [String: Any] = [
-                    "email": email,
-                    "user_name": storedUserName,  // From sign-in, backend defaults to "Destiny User" if empty
-                    "user_type": isGuest ? "guest" : "registered",
-                    "is_generated_email": isGuest,
-                    "birth_profile": [
-                        "date_of_birth": formattedDOB,
-                        "time_of_birth": formattedTOB,
-                        "city_of_birth": cityOfBirth,
-                        "latitude": latitude,
-                        "longitude": longitude,
-                        "gender": gender.isEmpty ? nil : gender,
-                        "birth_time_unknown": timeUnknown
-                    ] as [String: Any?]
-                ]
-                
-                let url = URL(string: "\(APIConfig.baseURL)/subscription/profile")!
-                var request = URLRequest(url: url)
-                request.httpMethod = "POST"
-                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-                request.httpBody = try JSONSerialization.data(withJSONObject: profileRequest)
-                
-                let (_, response) = try await URLSession.shared.data(for: request)
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("[ProfileSync] Saved to server: \(httpResponse.statusCode)")
-                }
-            } catch {
-                print("[ProfileSync] Failed to sync: \(error)")
-            }
+            _ = await syncToServerProfileAsync(email: email)
         }
     }
     

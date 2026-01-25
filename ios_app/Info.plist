@@ -4,6 +4,19 @@
 <dict>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+    <key>GIDClientID</key>
+    <string>668639087682-pgt066dmusjrpqthgb6ci5tq1pv3cs25.apps.googleusercontent.com</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.668639087682-pgt066dmusjrpqthgb6ci5tq1pv3cs25</string>
+            </array>
+        </dict>
+    </array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>UIBackgroundModes</key>

@@ -13,7 +13,7 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppTheme.Colors.mainBackground
+                CosmicBackgroundView()
                     .ignoresSafeArea()
                 
                 if viewModel.isLoading {
@@ -44,9 +44,14 @@ struct HistoryView: View {
                 #endif
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .task {
                 await viewModel.loadHistory()
+            }
+            .onChange(of: ProfileContextManager.shared.activeProfileId) { _, _ in
+                Task {
+                    await viewModel.loadHistory()
+                }
             }
         }
     }
@@ -215,18 +220,48 @@ struct HistoryRowView: View {
     private var extraInfoView: some View {
         switch item {
         case .chat(let thread):
-            if thread.isPinned {
-                Image(systemName: "pin.fill")
-                    .font(AppTheme.Fonts.caption(size: 10))
-                    .foregroundColor(AppTheme.Colors.gold)
+            VStack(alignment: .trailing, spacing: 2) {
+                // Message count
+                if thread.messageCount > 0 {
+                    Text("\(thread.messageCount)")
+                        .font(AppTheme.Fonts.title(size: 14))
+                        .foregroundColor(AppTheme.Colors.gold)
+                }
+                
+                // Pin indicator
+                if thread.isPinned {
+                    Image(systemName: "pin.fill")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.gold)
+                } else {
+                    Text("Messages")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
+                }
             }
         case .match(let match):
-            // scorePercentage is non-optional
-            let score = match.scorePercentage
-            if score > 0 {
-                Text("\(Int(score * 100))%")
-                    .font(AppTheme.Fonts.title(size: 12))
-                    .foregroundColor(matchScoreColor(score))
+            // Display score clearly with context
+            VStack(alignment: .trailing, spacing: 2) {
+                // Raw score (e.g., "15/36")
+                Text("\(match.totalScore)/\(match.maxScore)")
+                    .font(AppTheme.Fonts.title(size: 14))
+                    .foregroundColor(matchScoreColor(match.scorePercentage / 100))
+                
+                // User question count if any chats exist
+                let userQuestionCount = match.chatMessages.filter { $0.isUser }.count
+                if userQuestionCount > 0 {
+                    HStack(spacing: 3) {
+                        Image(systemName: "bubble.left.fill")
+                            .font(AppTheme.Fonts.caption(size: 9))
+                        Text("\(userQuestionCount)")
+                            .font(AppTheme.Fonts.caption(size: 10))
+                    }
+                    .foregroundColor(AppTheme.Colors.gold)
+                } else {
+                    Text("Match")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
+                }
             }
         }
     }

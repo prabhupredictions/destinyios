@@ -78,20 +78,34 @@ struct PlanetDetailCard: View {
         .padding(8)
         .frame(maxWidth: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color(red: 0.1, green: 0.1, blue: 0.2).opacity(0.6)) // Dark bluish glass
+            RoundedRectangle(cornerRadius: 12)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.1, green: 0.12, blue: 0.22).opacity(0.9),
+                            Color(red: 0.05, green: 0.06, blue: 0.12).opacity(0.95)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 12)
                 .stroke(
                     LinearGradient(
-                        colors: [.white.opacity(0.1), .clear],
+                        colors: [
+                            AppTheme.Colors.gold.opacity(0.3),
+                            AppTheme.Colors.gold.opacity(0.05),
+                            Color.white.opacity(0.05)
+                        ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 0.5
+                    lineWidth: 0.8
                 )
         )
+        .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
     }
     
     @ViewBuilder

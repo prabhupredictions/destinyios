@@ -40,6 +40,7 @@ class ChatHistorySyncService {
         let createdAt: String
         let updatedAt: String
         let dateGroup: String?
+        let profileId: String?  // For Switch Profile feature
         
         enum CodingKeys: String, CodingKey {
             case id, title, preview
@@ -50,6 +51,7 @@ class ChatHistorySyncService {
             case createdAt = "created_at"
             case updatedAt = "updated_at"
             case dateGroup = "date_group"
+            case profileId = "profile_id"
         }
     }
     
@@ -58,14 +60,14 @@ class ChatHistorySyncService {
         let title: String?
         let preview: String?
         let primaryArea: String?
-        let messageCount: Int
-        let isPinned: Bool
-        let isArchived: Bool
+        let messageCount: Int?
+        let isPinned: Bool?
+        let isArchived: Bool?
         let createdAt: String
         let updatedAt: String
         let messages: [MessageResponse]
-        let areasDiscussed: [String]
-        let hasBirthData: Bool
+        let areasDiscussed: [String]?
+        let hasBirthData: Bool?
         
         enum CodingKeys: String, CodingKey {
             case id, title, preview, messages
@@ -90,9 +92,10 @@ class ChatHistorySyncService {
         let toolCalls: [[String: String]]?
         let sources: [String]?
         let createdAt: String
+        let rating: Int?
         
         enum CodingKeys: String, CodingKey {
-            case id, role, content, area, confidence, sources
+            case id, role, content, area, confidence, sources, rating
             case traceId = "trace_id"
             case toolCalls = "tool_calls"
             case createdAt = "created_at"
@@ -101,9 +104,15 @@ class ChatHistorySyncService {
     
     // MARK: - Sync Methods
     
-    /// Fetch all threads from server for a user
-    func fetchThreads(userEmail: String) async throws -> [ThreadResponse] {
-        let urlString = "\(baseURL)/chat-history/threads/\(userEmail)"
+    /// Fetch all threads from server for a user (optionally filtered by profile)
+    func fetchThreads(userEmail: String, profileId: String? = nil) async throws -> [ThreadResponse] {
+        var urlString = "\(baseURL)/chat-history/threads/\(userEmail)"
+        
+        // Add profile_id filter if provided
+        if let profileId = profileId {
+            urlString += "?profile_id=\(profileId)"
+        }
+        
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
         }
@@ -151,13 +160,21 @@ class ChatHistorySyncService {
     }
     
     /// Sync all chat history from server to local SwiftData
+    /// Fetches ALL threads for the user email (not filtered by profile) for client-side filtering
+    /// NOTE: Clears existing local threads first to prevent duplicates from ID mismatch
     func syncFromServer(userEmail: String, dataManager: DataManager) async {
-        print("[ChatHistorySync] Starting sync for \(userEmail)")
+        print("[ChatHistorySync] Starting full sync for \(userEmail)")
         
         do {
-            // 1. Fetch all threads
-            let threads = try await fetchThreads(userEmail: userEmail)
-            print("[ChatHistorySync] Found \(threads.count) threads")
+            // 0. CRITICAL: Clear existing local threads for this user to prevent duplicates
+            // Local messages have client-generated UUIDs, server has server-generated UUIDs
+            // Deduplication by ID fails when IDs don't match, causing duplicates
+            dataManager.deleteAllThreads(for: userEmail)
+            print("[ChatHistorySync] Cleared local threads for \(userEmail) before sync")
+            
+            // 1. Fetch ALL threads for user (no profile filter - client-side filtering)
+            let threads = try await fetchThreads(userEmail: userEmail, profileId: nil)
+            print("[ChatHistorySync] Found \(threads.count) total threads for \(userEmail)")
             
             // 2. For each thread, fetch messages and save locally
             for thread in threads {
@@ -167,10 +184,11 @@ class ChatHistorySyncService {
                         id: thread.id,
                         sessionId: thread.id,  // Use thread ID as session
                         userEmail: userEmail,
+                        profileId: thread.profileId,  // Switch Profile feature
                         title: thread.title ?? "Conversation",
                         preview: thread.preview ?? "",
                         primaryArea: thread.primaryArea,
-                        areasDiscussed: detail.areasDiscussed,
+                        areasDiscussed: detail.areasDiscussed ?? [],
                         messageCount: thread.messageCount ?? 0,
                         isArchived: thread.isArchived ?? false,
                         isPinned: thread.isPinned ?? false,
@@ -196,14 +214,15 @@ class ChatHistorySyncService {
                             toolCalls: toolCallStrings,
                             sources: message.sources ?? [],
                             createdAt: parseDate(message.createdAt),
-                            isStreaming: false
+                            isStreaming: false,
+                            rating: message.rating
                         )
                         dataManager.saveMessage(localMessage)
                     }
                 }
             }
             
-            print("[ChatHistorySync] Sync complete - \(threads.count) threads synced")
+            print("[ChatHistorySync] Sync complete - \(threads.count) threads synced for \(userEmail)")
             
         } catch {
             print("[ChatHistorySync] Error: \(error)")

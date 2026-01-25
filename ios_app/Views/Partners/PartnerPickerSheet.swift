@@ -14,9 +14,15 @@ struct PartnerPickerSheet: View {
     @State private var viewModel = PartnerProfileViewModel()
     @State private var searchText = ""
     @State private var showAddForm = false
+    @State private var showUpgradePrompt = false
+    @State private var limitMessage: String?
     
     private var filteredPartners: [PartnerProfile] {
         var result = viewModel.partners
+        
+        // Exclude the active profile (can't match with yourself)
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
+        result = result.filter { $0.id != activeProfileId }
         
         // Filter by gender if specified
         if let gender = gender {
@@ -35,9 +41,10 @@ struct PartnerPickerSheet: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                AppTheme.Colors.mainBackground
+                // Background
+                CosmicBackgroundView()
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -56,8 +63,10 @@ struct PartnerPickerSheet: View {
                     addNewButton
                 }
             }
-            .navigationTitle("Select Partner")
+            .navigationTitle("Select Birth Chart")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .preferredColorScheme(.dark)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -84,6 +93,20 @@ struct PartnerPickerSheet: View {
                     await viewModel.loadPartners()
                 }
             }
+            .sheet(isPresented: $showUpgradePrompt) {
+                SubscriptionView()
+            }
+            .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
+                Button("Upgrade") {
+                    limitMessage = nil
+                    showUpgradePrompt = true
+                }
+                Button("OK", role: .cancel) {
+                    limitMessage = nil
+                }
+            } message: {
+                Text(limitMessage ?? "")
+            }
         }
     }
     
@@ -92,15 +115,19 @@ struct PartnerPickerSheet: View {
     private var searchBar: some View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(AppTheme.Colors.textSecondary)
+                .foregroundColor(AppTheme.Colors.gold)
             
-            TextField("Search partners...", text: $searchText)
+            TextField("Search birth charts...", text: $searchText)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .autocorrectionDisabled()
         }
         .padding(12)
-        .background(AppTheme.Colors.cardBackground)
+        .background(AppTheme.Colors.inputBackground.opacity(0.3))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: 1)
+        )
         .cornerRadius(12)
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -114,7 +141,7 @@ struct PartnerPickerSheet: View {
             Spacer()
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-            Text("Loading partners...")
+            Text("Loading profiles...")
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
@@ -129,9 +156,10 @@ struct PartnerPickerSheet: View {
             Image(systemName: "person.2.slash")
                 .font(.system(size: 50))
                 .foregroundStyle(AppTheme.Colors.premiumGradient)
+                .opacity(0.8)
             
             if viewModel.partners.isEmpty {
-                Text("No saved partners yet")
+                Text("No saved profiles yet")
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             } else {
@@ -172,6 +200,7 @@ struct PartnerPickerSheet: View {
                     Circle()
                         .fill(AppTheme.Colors.premiumGradient)
                         .frame(width: 44, height: 44)
+                        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 5)
                     
                     Text(partner.avatarInitial)
                         .font(AppTheme.Fonts.title(size: 18))
@@ -206,13 +235,13 @@ struct PartnerPickerSheet: View {
                 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(AppTheme.Colors.premiumGradient)
+                    .foregroundStyle(AppTheme.Colors.gold.opacity(0.5))
             }
             .padding(14)
-            .background(AppTheme.Colors.cardBackground)
+            .background(AppTheme.Colors.cardBackground.opacity(0.2)) // Transparent background
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(AppTheme.Styles.goldBorder.stroke, lineWidth: 0.5)
+                    .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
             )
             .cornerRadius(12)
         }
@@ -223,24 +252,44 @@ struct PartnerPickerSheet: View {
     private var addNewButton: some View {
         Button(action: {
             HapticManager.shared.play(.light)
-            showAddForm = true
+            checkAndShowAddForm()
         }) {
             HStack(spacing: 8) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 20))
-                Text("Add New Partner")
+                Text("Add New Birth Chart")
                     .font(AppTheme.Fonts.body(size: 16))
             }
             .foregroundStyle(AppTheme.Colors.premiumGradient)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(AppTheme.Colors.cardBackground)
+            .background(AppTheme.Colors.surfaceBackground)
             .overlay(
                 Rectangle()
-                    .fill(AppTheme.Styles.goldBorder.stroke)
-                    .frame(height: 0.5),
+                    .fill(AppTheme.Colors.gold.opacity(0.2))
+                    .frame(height: 1),
                 alignment: .top
             )
+        }
+        .background(AppTheme.Colors.mainBackground)
+    }
+    
+    // MARK: - Quota Check
+    
+    private func checkAndShowAddForm() {
+        Task {
+            let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+            let result = await QuotaManager.shared.canAddProfile(email: email, currentCount: viewModel.partners.count)
+            
+            await MainActor.run {
+                if result.canAdd {
+                    showAddForm = true
+                } else if result.limit == 0 {
+                    showUpgradePrompt = true
+                } else {
+                    limitMessage = "You can save up to \(result.limit) profiles. Upgrade to Plus for unlimited profiles."
+                }
+            }
         }
     }
 }

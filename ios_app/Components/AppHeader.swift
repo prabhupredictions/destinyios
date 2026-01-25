@@ -107,60 +107,99 @@ struct ChatHeader: View {
     var onNewChatTap: (() -> Void)? = nil
     var onChartTap: (() -> Void)? = nil
     var onProfileTap: (() -> Void)? = nil
+    var onProfileSwitcherTap: (() -> Void)? = nil  // NEW: Switch profile
+    
+    // Profile Context
+    private let profileContext = ProfileContextManager.shared
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Back button (since tab bar is hidden on chat)
-            Button(action: { onBackTap?() }) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 18, weight: .semibold))
+        VStack(spacing: 4) {
+            // Profile Context Indicator (appears when viewing as another profile)
+            if !profileContext.isUsingSelf {
+                Button(action: { onProfileSwitcherTap?() }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "person.crop.circle.badge.checkmark")
+                            .font(.caption)
+                        
+                        Text("Viewing as \(profileContext.activeProfileName)")
+                            .font(AppTheme.Fonts.caption())
+                        
+                        Image(systemName: "chevron.down")
+                            .font(.caption2)
+                    }
                     .foregroundColor(AppTheme.Colors.gold)
-                    .frame(width: 44, height: 44)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
+                            .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                    )
+                }
             }
             
-            // History button
-            Button(action: { onHistoryTap?() }) {
-                Image(systemName: "clock.arrow.circlepath")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .frame(width: 40, height: 40)
-            }
-            
-            Spacer()
-            
-            // Logo
-            LogoView()
-            
-            Spacer()
-            
-            // Chart button
-            Button(action: { onChartTap?() }) {
-                Image(systemName: "globe.asia.australia")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .frame(width: 40, height: 40)
-            }
-            
-            // New chat button
-            Button(action: { onNewChatTap?() }) {
-                Image(systemName: "square.and.pencil")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.gold)
-                    .frame(width: 40, height: 40)
+            // Main Header Row
+            HStack(spacing: 12) {
+                // Back button (since tab bar is hidden on chat)
+                Button(action: { onBackTap?() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 44, height: 44)
+                }
+                
+                // History button
+                Button(action: { onHistoryTap?() }) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
+                        .frame(width: 40, height: 40)
+                }
+                
+                Spacer()
+                
+                // Logo
+                LogoView()
+                
+                Spacer()
+                
+                // Chart button
+                Button(action: { onChartTap?() }) {
+                    Image(systemName: "globe.asia.australia")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
+                        .frame(width: 40, height: 40)
+                }
+                
+                // New chat button
+                Button(action: { onNewChatTap?() }) {
+                    Image(systemName: "square.and.pencil")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 40, height: 40)
+                }
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(AppTheme.Colors.mainBackground)
+        .background(Color.clear)
     }
 }
 
 // MARK: - Match Result Header (with back, history, charts, new match buttons)
 struct MatchResultHeader: View {
+    var boyName: String
+    var girlName: String
     var onBackTap: (() -> Void)? = nil
     var onHistoryTap: (() -> Void)? = nil
     var onChartTap: (() -> Void)? = nil
     var onNewMatchTap: (() -> Void)? = nil
+    var transparent: Bool = false
+    
+    // Helper to get first name
+    private func firstName(_ fullName: String) -> String {
+        return fullName.components(separatedBy: " ").first ?? fullName
+    }
     
     var body: some View {
         HStack(spacing: 12) {
@@ -176,19 +215,30 @@ struct MatchResultHeader: View {
             Button(action: { onHistoryTap?() }) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
                     .frame(width: 40, height: 40)
             }
             
             Spacer()
             
-            // Title with heart icon
+            // Center: Name - Icon - Name
             HStack(spacing: 4) {
-                Text("💕")
-                    .font(.system(size: 16))
-                Text("kundali_match".localized)
-                    .font(AppTheme.Fonts.title(size: 16))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
+                Text(firstName(boyName))
+                    .font(AppTheme.Fonts.title(size: 18))
+                    .foregroundColor(AppTheme.Colors.gold) // Standardizing text to Gold to match logo
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                
+                Image("match_icon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 32)
+                
+                Text(firstName(girlName))
+                    .font(AppTheme.Fonts.title(size: 18))
+                    .foregroundColor(AppTheme.Colors.gold) // Standardizing text to Gold to match logo
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
             
             Spacer()
@@ -197,7 +247,7 @@ struct MatchResultHeader: View {
             Button(action: { onChartTap?() }) {
                 Image(systemName: "globe.asia.australia")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
                     .frame(width: 40, height: 40)
             }
             
@@ -211,8 +261,17 @@ struct MatchResultHeader: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(AppTheme.Colors.mainBackground)
+        .background(transparent ? Color.clear : AppTheme.Colors.mainBackground)
     }
+}
+
+// Helper for blur
+struct BlurView: UIViewRepresentable {
+    let style: UIBlurEffect.Style
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        return UIVisualEffectView(effect: UIBlurEffect(style: style))
+    }
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
 
 // MARK: - Previews
@@ -234,7 +293,7 @@ struct MatchResultHeader: View {
 
 #Preview("Match Result Header") {
     VStack {
-        MatchResultHeader()
+        MatchResultHeader(boyName: "Prabhu", girlName: "Raju")
         Spacer()
     }
     .background(AppTheme.Colors.mainBackground)

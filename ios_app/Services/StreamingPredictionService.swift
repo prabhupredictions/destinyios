@@ -50,7 +50,8 @@ class StreamingPredictionService {
             ],
             "session_id": request.sessionId ?? UUID().uuidString,
             "conversation_id": request.conversationId ?? UUID().uuidString,
-            "user_email": request.userEmail ?? ""
+            "user_email": request.userEmail ?? "",
+            "profile_id": ProfileContextManager.shared.activeProfileId  // Profile-scoped threads
         ]
         
         urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)

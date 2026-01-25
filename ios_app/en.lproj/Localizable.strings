@@ -102,6 +102,9 @@
 // MARK: - Compatibility/Match
 "compatibility" = "Compatibility";
 "partner_details" = "Partner Details";
+"your_details" = "Your Details";
+"loaded_from_profile" = "Loaded from profile";
+"or_enter_manually" = "or enter manually";
 "calculate_match" = "Calculate Match";
 "match_score" = "Match Score";
 "boys_details" = "You";
@@ -124,6 +127,7 @@
 // MARK: - Birth Data Entry
 "create_birth_chart" = "Create your birth chart";
 "enter_details_desc" = "Enter your birth details to generate your\nchart and personalize your insights";
+"enter_details_desc_compatibility" = "Enter partner details to calculate compatibility\nand unlock your cosmic synergy";
 
 // MARK: - Subscription
 "unlock_premium" = "Unlock Destiny Premium";
@@ -470,3 +474,26 @@
 "save_partner_description" = "Save partner profiles for quick matching";
 "save_for_future" = "Save for future matching";
 
+// MARK: - Multi-Partner Comparison
+"comparison_results" = "Comparison Results";
+"partners_compared" = "partners compared";
+"comparing_with" = "Comparing with";
+"compare_all" = "Compare All";
+"remove_partner" = "Remove Partner";
+
+"syncing_cosmic_data" = "Syncing cosmic data...";
+"restoring_your_insights" = "Restoring your insights";
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "Sign In Required";
+"sign_in_to_check_compatibility" = "Sign in to check compatibility";
+"sign_in_to_continue_asking" = "Sign in to continue asking questions";
+"sign_in_to_continue_matching" = "Sign in to unlock compatibility matching";
+"sign_in_to_view_plans" = "Sign in to view subscription plans";
+"sign_in_to_switch_profiles" = "Sign in to switch between profiles";
+"sign_in_to_save_profiles" = "Sign in to save and manage profiles";
+"back" = "Back";
+
+// MARK: - Match History
+"no_match_history" = "No matches yet";
+"no_match_history_desc" = "Calculate compatibility with partners to build your history";

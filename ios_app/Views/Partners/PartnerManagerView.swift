@@ -12,6 +12,8 @@ struct PartnerManagerView: View {
     @State private var editingPartner: PartnerProfile?
     @State private var partnerToDelete: PartnerProfile?
     @State private var showDeleteConfirmation = false
+    @State private var showUpgradePrompt = false
+    @State private var limitMessage: String?
     
     var body: some View {
         ZStack {
@@ -56,7 +58,7 @@ struct PartnerManagerView: View {
             }
         }
         .confirmationDialog(
-            "Delete Partner?",
+            "Delete Profile?",
             isPresented: $showDeleteConfirmation,
             presenting: partnerToDelete
         ) { partner in
@@ -70,7 +72,7 @@ struct PartnerManagerView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: { partner in
-            Text("This will permanently remove \(partner.name) from your saved partners.")
+            Text("This will permanently remove \(partner.name) from your saved profiles.")
         }
         .alert("Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
@@ -83,6 +85,41 @@ struct PartnerManagerView: View {
                 await viewModel.loadPartners()
             }
             SoundManager.shared.playButtonTap()
+        }
+        .sheet(isPresented: $showUpgradePrompt) {
+            SubscriptionView()
+        }
+        .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
+            Button("Upgrade") {
+                limitMessage = nil
+                showUpgradePrompt = true
+            }
+            Button("OK", role: .cancel) {
+                limitMessage = nil
+            }
+        } message: {
+            Text(limitMessage ?? "")
+        }
+    }
+    
+    // MARK: - Quota Check
+    
+    private func checkAndShowAddForm() {
+        Task {
+            let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+            let result = await QuotaManager.shared.canAddProfile(email: email, currentCount: viewModel.partners.count)
+            
+            await MainActor.run {
+                if result.canAdd {
+                    showAddForm = true
+                } else if result.limit == 0 {
+                    // Free user - show upgrade directly
+                    showUpgradePrompt = true
+                } else {
+                    // Core user at limit
+                    limitMessage = "You can save up to \(result.limit) profiles. Upgrade to Plus for unlimited profiles."
+                }
+            }
         }
     }
     
@@ -101,7 +138,7 @@ struct PartnerManagerView: View {
             
             Spacer()
             
-            Text("Saved Partners")
+            Text("Saved Birth Charts")
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
@@ -109,7 +146,7 @@ struct PartnerManagerView: View {
             
             Button(action: {
                 HapticManager.shared.play(.medium)
-                showAddForm = true
+                checkAndShowAddForm()
             }) {
                 HStack(spacing: 4) {
                     Image(systemName: "plus")
@@ -135,7 +172,7 @@ struct PartnerManagerView: View {
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
                 .scaleEffect(1.5)
             
-            Text("Loading partners...")
+            Text("Loading profiles...")
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -156,20 +193,20 @@ struct PartnerManagerView: View {
                 .foregroundStyle(AppTheme.Colors.premiumGradient)
                 .modifier(Tilt3DModifier())
             
-            Text("No Saved Partners")
+            Text("No Saved Birth Charts")
                 .font(AppTheme.Fonts.title(size: 24))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Save partner profiles for quick matching")
+            Text("Save profiles for quick matching")
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
             
             Button(action: {
                 HapticManager.shared.play(.medium)
-                showAddForm = true
+                checkAndShowAddForm()
             }) {
-                Text("Add Partner")
+                Text("Add Profile")
                     .font(AppTheme.Fonts.title(size: 16))
                     .foregroundColor(AppTheme.Colors.mainBackground)
                     .padding(.horizontal, 32)

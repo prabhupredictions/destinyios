@@ -31,7 +31,7 @@ struct AskDestinyQuestionsSheet: View {
                                 .foregroundColor(AppTheme.Colors.gold)
                             
                             Text("Ask Destiny")
-                                .font(.system(size: 24, weight: .semibold, design: .serif))
+                                .font(AppTheme.Fonts.premiumDisplay(size: 24))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
                             Text("What's on your mind today?")
@@ -116,6 +116,7 @@ struct AskDestinyQuestionsSheet: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { dismiss() }) {

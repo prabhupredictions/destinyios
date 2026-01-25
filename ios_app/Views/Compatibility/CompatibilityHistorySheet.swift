@@ -1,27 +1,20 @@
 import SwiftUI
 
 // MARK: - Compatibility History Sheet
-/// Shows list of past compatibility matches with delete functionality
+/// Shows list of past compatibility matches with swipe-to-delete
 struct CompatibilityHistorySheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var historyItems: [CompatibilityHistoryItem] = []
-    @State private var selectedItems: Set<String> = []
-    @State private var isEditMode = false
     @State private var itemToDelete: CompatibilityHistoryItem?
     @State private var showDeleteConfirmation = false
-    @State private var showClearAllConfirmation = false
     
     var onSelect: ((CompatibilityHistoryItem) -> Void)?
     
-    // Colors
-    private let accentGold = Color(red: 0.9, green: 0.7, blue: 0.3)
-    private let navyPrimary = Color(red: 0.1, green: 0.1, blue: 0.2)
-    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                // Background
-                Color(red: 0.96, green: 0.95, blue: 0.97)
+                // Background - Dark Cosmic Theme
+                CosmicBackgroundView()
                     .ignoresSafeArea()
                 
                 if historyItems.isEmpty {
@@ -30,27 +23,13 @@ struct CompatibilityHistorySheet: View {
                     historyList
                 }
             }
-            .navigationTitle("match_history".localized)
+            .navigationTitle("Match History")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if !historyItems.isEmpty {
-                        Button(isEditMode ? "done".localized : "edit".localized) {
-                            withAnimation {
-                                isEditMode.toggle()
-                                if !isEditMode {
-                                    selectedItems.removeAll()
-                                }
-                            }
-                        }
-                    }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
             }
             .alert("delete_match".localized, isPresented: $showDeleteConfirmation) {
@@ -65,15 +44,8 @@ struct CompatibilityHistorySheet: View {
                     Text("delete_match_confirmation".localized + " \(item.displayTitle)?")
                 }
             }
-            .alert("clear_all_history".localized, isPresented: $showClearAllConfirmation) {
-                Button("cancel".localized, role: .cancel) {}
-                Button("clear_all".localized, role: .destructive) {
-                    clearAll()
-                }
-            } message: {
-                Text("clear_all_history_confirmation".localized)
-            }
         }
+        .preferredColorScheme(.dark)
         .onAppear {
             loadHistory()
         }
@@ -84,15 +56,15 @@ struct CompatibilityHistorySheet: View {
         VStack(spacing: 16) {
             Image(systemName: "clock.arrow.circlepath")
                 .font(AppTheme.Fonts.display(size: 60))
-                .foregroundColor(.gray.opacity(0.4))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.3))
             
             Text("no_match_history".localized)
                 .font(AppTheme.Fonts.title(size: 18))
-                .foregroundColor(.gray)
+                .foregroundColor(AppTheme.Colors.textPrimary)
             
             Text("no_match_history_desc".localized)
                 .font(AppTheme.Fonts.body(size: 14))
-                .foregroundColor(.gray.opacity(0.7))
+                .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
         }
@@ -100,70 +72,29 @@ struct CompatibilityHistorySheet: View {
     
     // MARK: - History List
     private var historyList: some View {
-        VStack(spacing: 0) {
-            List {
-                ForEach(historyItems) { item in
-                    HistoryItemRow(
-                        item: item,
-                        isEditMode: isEditMode,
-                        isSelected: selectedItems.contains(item.sessionId),
-                        onTap: {
-                            if isEditMode {
-                                toggleSelection(item)
-                            } else {
-                                onSelect?(item)
-                                dismiss()
-                            }
-                        }
-                    )
-                    .listRowBackground(Color.white)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
-                            itemToDelete = item
-                            showDeleteConfirmation = true
-                        } label: {
-                            Label("delete".localized, systemImage: "trash")
-                        }
+        List {
+            ForEach(historyItems) { item in
+                HistoryItemRow(
+                    item: item,
+                    onTap: {
+                        onSelect?(item)
+                        dismiss()
+                    }
+                )
+                .listRowBackground(AppTheme.Colors.cardBackground)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        itemToDelete = item
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("delete".localized, systemImage: "trash")
                     }
                 }
             }
-            .listStyle(.plain)
-            
-            // Bottom bar for edit mode
-            if isEditMode && !selectedItems.isEmpty {
-                deleteSelectedBar
-            }
         }
-    }
-    
-    // MARK: - Delete Selected Bar
-    private var deleteSelectedBar: some View {
-        HStack {
-            Text("\(selectedItems.count) " + "selected".localized)
-                .font(AppTheme.Fonts.title(size: 14))
-                .foregroundColor(.gray)
-            
-            Spacer()
-            
-            Button(action: {
-                deleteSelected()
-            }) {
-                HStack(spacing: 6) {
-                    Image(systemName: "trash")
-                    Text("delete".localized)
-                }
-                .font(AppTheme.Fonts.title(size: 14))
-                .foregroundColor(.white)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(Color.red)
-                .cornerRadius(8)
-            }
-        }
-        .padding(16)
-        .background(Color.white)
-        .shadow(color: .black.opacity(0.05), radius: 5, y: -2)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
     
     // MARK: - Actions
@@ -171,53 +102,18 @@ struct CompatibilityHistorySheet: View {
         historyItems = CompatibilityHistoryService.shared.loadAll()
     }
     
-    private func toggleSelection(_ item: CompatibilityHistoryItem) {
-        if selectedItems.contains(item.sessionId) {
-            selectedItems.remove(item.sessionId)
-        } else {
-            selectedItems.insert(item.sessionId)
-        }
-    }
-    
     private func deleteItem(_ item: CompatibilityHistoryItem) {
         withAnimation {
             CompatibilityHistoryService.shared.delete(sessionId: item.sessionId)
             historyItems.removeAll { $0.sessionId == item.sessionId }
         }
-        // Haptic feedback
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
-    }
-    
-    private func deleteSelected() {
-        withAnimation {
-            CompatibilityHistoryService.shared.delete(sessionIds: selectedItems)
-            historyItems.removeAll { selectedItems.contains($0.sessionId) }
-            selectedItems.removeAll()
-            isEditMode = false
-        }
-        // Haptic feedback
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
-    }
-    
-    private func clearAll() {
-        withAnimation {
-            CompatibilityHistoryService.shared.clearAll()
-            historyItems.removeAll()
-            isEditMode = false
-        }
-        // Haptic feedback
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
+        HapticManager.shared.play(.heavy)
     }
 }
 
 // MARK: - History Item Row
 struct HistoryItemRow: View {
     let item: CompatibilityHistoryItem
-    let isEditMode: Bool
-    let isSelected: Bool
     let onTap: () -> Void
     
     private let accentGold = Color(red: 0.9, green: 0.7, blue: 0.3)
@@ -225,13 +121,6 @@ struct HistoryItemRow: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 14) {
-                // Selection circle in edit mode
-                if isEditMode {
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .font(AppTheme.Fonts.title(size: 22))
-                        .foregroundColor(isSelected ? .blue : .gray.opacity(0.4))
-                }
-                
                 // Score badge
                 ZStack {
                     Circle()
@@ -244,7 +133,7 @@ struct HistoryItemRow: View {
                             .foregroundColor(scoreColor)
                         Text("/\(item.maxScore)")
                             .font(AppTheme.Fonts.caption(size: 10))
-                            .foregroundColor(.gray)
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 }
                 
@@ -252,18 +141,20 @@ struct HistoryItemRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.displayTitle)
                         .font(AppTheme.Fonts.title(size: 15))
-                        .foregroundColor(Color(red: 0.1, green: 0.1, blue: 0.2))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     HStack(spacing: 8) {
                         Text(item.displayDate)
                             .font(AppTheme.Fonts.caption(size: 12))
-                            .foregroundColor(.gray)
+                            .foregroundColor(AppTheme.Colors.textSecondary)
                         
-                        if item.chatMessages.count > 0 {
+                        // User question count
+                        let userQuestionCount = item.chatMessages.filter { $0.isUser }.count
+                        if userQuestionCount > 0 {
                             HStack(spacing: 3) {
                                 Image(systemName: "bubble.left.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text("\(item.chatMessages.count)")
+                                Text("\(userQuestionCount)")
                                     .font(AppTheme.Fonts.caption(size: 11))
                             }
                             .foregroundColor(accentGold)
@@ -274,11 +165,9 @@ struct HistoryItemRow: View {
                 Spacer()
                 
                 // Chevron
-                if !isEditMode {
-                    Image(systemName: "chevron.right")
-                        .font(AppTheme.Fonts.title(size: 14))
-                        .foregroundColor(.gray.opacity(0.4))
-                }
+                Image(systemName: "chevron.right")
+                    .font(AppTheme.Fonts.title(size: 14))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
             }
             .padding(.vertical, 8)
         }

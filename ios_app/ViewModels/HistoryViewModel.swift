@@ -35,8 +35,8 @@ class HistoryViewModel {
     // CompatibilityHistoryService is a singleton
     
     // MARK: - Init
-    init(dataManager: DataManager = .shared) {
-        self.dataManager = dataManager
+    init(dataManager: DataManager? = nil) {
+        self.dataManager = dataManager ?? DataManager.shared
     }
     
     // MARK: - Grouped Items by Date
@@ -62,15 +62,84 @@ class HistoryViewModel {
         
         // 1. Fetch Chat Threads
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        let threads = dataManager.fetchAllThreads(for: userEmail)
-        let chatItems = threads.map { UnifiedHistoryItem.chat($0) }
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
         
-        // 2. Fetch Match History
-        let matches = CompatibilityHistoryService.shared.loadAll()
-        let matchItems = matches.map { UnifiedHistoryItem.match($0) }
+        print("[HistoryViewModel] Loading history for profileId: \(activeProfileId)")
         
-        // 3. Merge and Sort (Newest first)
-        let allItems = chatItems + matchItems
+        // Fetch threads filtered by profile (Switch Profile feature)
+        let allThreads = dataManager.fetchAllThreads(for: userEmail, profileId: activeProfileId)
+        
+        // Separate regular chat threads from compatibility threads
+        var chatItems: [UnifiedHistoryItem] = []
+        var compatThreadIds: Set<String> = []
+        
+        for thread in allThreads where thread.messageCount > 0 {
+            let id = thread.id.lowercased()
+            let title = thread.title.lowercased()
+            
+            // DEBUG: Log all threads
+            print("[HistoryViewModel] Thread: '\(thread.title)' | id: \(thread.id.prefix(30)) | area: \(thread.primaryArea ?? "nil")")
+            
+            // Detect compatibility-related threads
+            let isCompatSession = id.hasPrefix("compat_sess_")  // Main match result
+            let isCompatFollowUp = id.hasPrefix("compat_") && !isCompatSession  // e.g., compat_followup_, compat_conv_
+            let isConvPrefix = id.hasPrefix("conv_")  // Follow-up conversation
+            let isCompatArea = thread.primaryArea?.lowercased() == "compatibility"
+            let hasCompatInAreas = thread.areasDiscussed.contains { $0.lowercased() == "compatibility" }
+            let isMainMatch = title.hasPrefix("match:")
+            
+            // Track all compatibility-related thread IDs to avoid duplicates with local matches
+            if isCompatSession || isCompatFollowUp || isConvPrefix {
+                compatThreadIds.insert(thread.id)
+            }
+            
+            // Decision logic:
+            // INCLUDE: Main match results (compat_sess_* with "Match:" title), regular general chats
+            // EXCLUDE: Compatibility follow-ups (compat_* but not compat_sess_, conv_*, compatArea without Match:)
+            let isExcludedCompatFollowUp = (isCompatFollowUp || isConvPrefix) ||  // ID-based follow-up
+                                           (isCompatArea && !isMainMatch && !isCompatSession) ||  // Area-based follow-up
+                                           (hasCompatInAreas && !isMainMatch && !isCompatSession)  // AreasDiscussed-based
+            
+            print("[HistoryViewModel]   isCompatSession:\(isCompatSession) isMainMatch:\(isMainMatch) isExcluded:\(isExcludedCompatFollowUp)")
+            
+            if !isExcludedCompatFollowUp {
+                chatItems.append(.chat(thread))
+            } else {
+                print("[HistoryViewModel] Excluding compat follow-up: '\(thread.title)'")
+            }
+        }
+        
+        // 2. Fetch Local Match History (these have full CompatibilityResult for proper navigation)
+        let localMatches = CompatibilityHistoryService.shared.loadAll()
+        let localMatchSessionIds = Set(localMatches.map { $0.sessionId })
+        
+        // 3. For compat_sess_ threads, PREFER local match items (they have full results + proper navigation)
+        // Remove server chat items that have a matching local match item
+        let filteredChatItems = chatItems.filter { item in
+            if case .chat(let thread) = item {
+                // If this is a compat session AND we have a local match with the same sessionId,
+                // use the local match instead (it has full CompatibilityResult data)
+                if thread.id.lowercased().hasPrefix("compat_sess_") {
+                    let hasLocalMatch = localMatchSessionIds.contains(thread.id) || 
+                                        localMatchSessionIds.contains("compat_\(thread.id)") ||
+                                        localMatchSessionIds.contains(thread.id.replacingOccurrences(of: "compat_", with: ""))
+                    if hasLocalMatch {
+                        print("[HistoryViewModel] Preferring local match over server thread: \(thread.id)")
+                        return false  // Use local match instead
+                    }
+                }
+                return true
+            }
+            return true
+        }
+        
+        // 4. All local matches are included (no filtering against server threads anymore)
+        let matchItems = localMatches.map { UnifiedHistoryItem.match($0) }
+        
+        print("[HistoryViewModel] Chat items: \(filteredChatItems.count), Local match items: \(matchItems.count)")
+        
+        // 5. Merge and Sort (Newest first)
+        let allItems = filteredChatItems + matchItems
         self.items = allItems.sorted { $0.date > $1.date }
         
         isLoading = false

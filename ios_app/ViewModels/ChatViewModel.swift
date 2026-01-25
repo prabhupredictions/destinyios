@@ -33,11 +33,11 @@ class ChatViewModel {
     
     // MARK: - Init
     init(
-        predictionService: PredictionServiceProtocol = PredictionService(),
-        dataManager: DataManager = .shared
+        predictionService: PredictionServiceProtocol? = nil,
+        dataManager: DataManager? = nil
     ) {
-        self.predictionService = predictionService
-        self.dataManager = dataManager
+        self.predictionService = predictionService ?? PredictionService()
+        self.dataManager = dataManager ?? DataManager.shared
         
         loadUserSession()
     }
@@ -53,8 +53,12 @@ class ChatViewModel {
         // Load history
         loadHistory()
         
-        // Start new thread or load latest
-        let threads = dataManager.fetchThreads(for: currentSessionId)
+        // Start new thread or load latest for CURRENT PROFILE
+        // Must filter by profile ID to show correct thread when profile is switched
+        let threads = dataManager.fetchThreads(
+            for: currentSessionId,
+            profileId: ProfileContextManager.shared.activeProfileId
+        )
         if let latestThread = threads.first {
             loadThread(latestThread)
         } else {
@@ -64,7 +68,11 @@ class ChatViewModel {
     
     // MARK: - History Management
     func loadHistory() {
-        chatHistory = dataManager.fetchThreads(for: currentSessionId)
+        // Filter by active profile for Switch Profile feature
+        chatHistory = dataManager.fetchThreads(
+            for: currentSessionId,
+            profileId: ProfileContextManager.shared.activeProfileId
+        )
     }
     
     func loadThread(_ thread: LocalChatThread) {
@@ -78,10 +86,11 @@ class ChatViewModel {
     }
     
     func startNewChat() {
-        // Create new thread
+        // Create new thread with profile context
         let thread = dataManager.createThread(
             sessionId: currentSessionId,
-            userEmail: userEmail
+            userEmail: userEmail,
+            profileId: ProfileContextManager.shared.activeProfileId  // Switch Profile feature
         )
         currentThreadId = thread.id
         messages = []
@@ -107,9 +116,10 @@ class ChatViewModel {
     
     // MARK: - Welcome Message
     private func addWelcomeMessage() {
-        // Get user's name (from Google/Apple sign-in or "Destiny User" default)
-        let userName = UserDefaults.standard.string(forKey: "userName") ?? "Destiny User"
-        let greeting = "Hello \(userName)! I'm Destiny, your personal astrology guide. What would you like to know about your day, relationships, or path ahead?"
+        // Use active profile name for Switch Profile feature
+        // If viewing as another profile, greet them by that name
+        let profileName = ProfileContextManager.shared.activeProfileName
+        let greeting = "Hello \(profileName)! I'm Destiny, your personal astrology guide. What would you like to know about your day, relationships, or path ahead?"
         
         let welcome = LocalChatMessage(
             threadId: currentThreadId,
@@ -179,7 +189,8 @@ class ChatViewModel {
                 } else if accessResponse.reason == "overall_limit_reached" {
                     // OVERALL LIMIT: Show bottom sheet only, no banner
                     if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
-                        quotaDetails = "Free questions used. Sign In or Subscribe to continue."
+                        // Guest users should only see Sign In option (no subscribe)
+                        quotaDetails = "sign_in_to_continue_asking".localized
                     } else {
                         quotaDetails = "You've reached your free limit. Subscribe for unlimited access."
                     }
@@ -272,6 +283,7 @@ class ChatViewModel {
                 messages[index].area = response?.lifeArea ?? ""
                 messages[index].confidence = response?.confidenceLabel ?? ""
                 messages[index].executionTimeMs = response?.executionTimeMs ?? 0
+                messages[index].traceId = response?.predictionId  // Link for rating sync
                 
                 await streamWords(finalAnswer, messageId: streamingId)
                 
@@ -294,6 +306,7 @@ class ChatViewModel {
                     messages[index].area = resp.lifeArea
                     messages[index].confidence = resp.confidenceLabel
                     messages[index].executionTimeMs = resp.executionTimeMs
+                    messages[index].traceId = resp.predictionId  // Link for rating sync
                     await streamWords(resp.answer, messageId: streamingId)
                     messages[index].content = resp.answer
                     messages[index].isStreaming = false
@@ -342,6 +355,25 @@ class ChatViewModel {
     
     // MARK: - Helpers
     private func loadBirthData() -> BirthData? {
+        // Check active profile first (for Switch Profile feature)
+        if let profileBirthData = ProfileContextManager.shared.activeBirthData {
+            print("[ChatViewModel] Using birth data from active profile: \(ProfileContextManager.shared.activeProfileName)")
+            
+            // Convert UserBirthData to BirthData
+            var birthData = BirthData(
+                dob: profileBirthData.dob,
+                time: profileBirthData.time,
+                latitude: profileBirthData.latitude,
+                longitude: profileBirthData.longitude,
+                cityOfBirth: profileBirthData.cityOfBirth,
+                ayanamsa: profileBirthData.ayanamsa,
+                houseSystem: profileBirthData.houseSystem
+            )
+            birthData = normalizeTimeFormat(birthData)
+            return birthData
+        }
+        
+        // Fallback: Load from UserDefaults
         guard let data = UserDefaults.standard.data(forKey: "userBirthData"),
               var birthData = try? JSONDecoder().decode(BirthData.self, from: data) else {
             return nil

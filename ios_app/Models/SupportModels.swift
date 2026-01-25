@@ -41,11 +41,19 @@ struct CompatibilityRequest: Codable, Sendable {
     let girl: BirthDetails
     var sessionId: String?
     var userEmail: String?
+    var profileId: String?  // Active profile for thread scoping
+    
+    // Multi-partner comparison support
+    var comparisonGroupId: String?
+    var partnerIndex: Int?
     
     enum CodingKeys: String, CodingKey {
         case boy, girl
         case sessionId = "session_id"
         case userEmail = "user_email"
+        case profileId = "profile_id"
+        case comparisonGroupId = "comparison_group_id"
+        case partnerIndex = "partner_index"
     }
 }
 
@@ -67,11 +75,17 @@ struct CompatibilityResponse: Codable, Sendable {
     let llmAnalysis: String?
     let analysisData: AnalysisData?
     
+    // Multi-partner comparison support
+    let comparisonGroupId: String?
+    let partnerIndex: Int?
+    
     enum CodingKeys: String, CodingKey {
         case sessionId = "session_id"
         case predictionId = "prediction_id"
         case llmAnalysis = "llm_analysis"
         case analysisData = "analysis_data"
+        case comparisonGroupId = "comparison_group_id"
+        case partnerIndex = "partner_index"
         case status
     }
 }
@@ -183,5 +197,6 @@ struct User: Codable, Identifiable, Sendable {
     let id: String
     var email: String?
     var name: String?
+    var provider: String? // "apple" or "google"
 }
 

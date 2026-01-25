@@ -2,13 +2,21 @@ import SwiftUI
 
 /// Compatibility/Match analysis screen
 struct CompatibilityView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var viewModel = CompatibilityViewModel()
     @State private var selectedTab = 0 // 0 = Boy, 1 = Girl
     @State private var showBoyLocationSearch = false
     @State private var showGirlLocationSearch = false
     @State private var showChartsSheet = false
-    @State private var showPartnerPicker = false  // Partner picker integration
-    @State private var savePartnerForFuture = false // Consent for saving
+    @State private var showPartnerPicker = false
+    @State private var savePartnerForFuture = false
+    
+    // Picker States
+    @State private var showBoyDatePicker = false
+    @State private var showBoyTimePicker = false
+    @State private var showGirlDatePicker = false
+    @State private var showGirlTimePicker = false
+    @State private var showGenderSheet = false
     
     // Quota and subscription UI state
     // Quota and subscription UI state
@@ -27,11 +35,34 @@ struct CompatibilityView: View {
     
     var body: some View {
         ZStack {
-            // Dark Midnight Background
-            AppTheme.Colors.mainBackground
-                .ignoresSafeArea()
+            // Cosmic Background (Soul of the App)
+            CosmicBackgroundView()
             
-            if viewModel.showResult, let result = viewModel.result {
+            // Multi-Partner: Comparison Overview
+            if viewModel.showComparisonOverview && !viewModel.comparisonResults.isEmpty {
+                ComparisonOverviewView(
+                    results: viewModel.comparisonResults,
+                    userName: viewModel.boyName.isEmpty ? "You" : viewModel.boyName,
+                    onSelectPartner: { index in
+                        // Navigate to individual result
+                        if viewModel.comparisonResults.indices.contains(index) {
+                            viewModel.result = viewModel.comparisonResults[index].result
+                            viewModel.girlName = viewModel.comparisonResults[index].partner.name
+                            viewModel.showComparisonOverview = false  // Hide overview first
+                            viewModel.showResult = true
+                        }
+                    },
+                    onBack: {
+                        viewModel.showComparisonOverview = false
+                    },
+                    onNewMatch: {
+                        viewModel.reset()
+                        viewModel.showComparisonOverview = false
+                    }
+                )
+            }
+            // Single Partner or Individual Result View
+            else if viewModel.showResult, let result = viewModel.result {
                 CompatibilityResultView(
                     result: result,
                     boyName: viewModel.boyName,
@@ -44,7 +75,13 @@ struct CompatibilityView: View {
                         viewModel.reset()
                     },
                     onBack: {
-                        viewModel.showResult = false
+                        // If we came from comparison overview, go back there
+                        if !viewModel.comparisonResults.isEmpty && viewModel.partners.count > 1 {
+                            viewModel.showResult = false
+                            viewModel.showComparisonOverview = true
+                        } else {
+                            viewModel.showResult = false
+                        }
                     },
                     onHistory: nil,
                     onCharts: {
@@ -60,11 +97,24 @@ struct CompatibilityView: View {
             
             // Premium streaming progress overlay
             if viewModel.showStreamingView {
-                CompatibilityStreamingView(
-                    isVisible: $viewModel.showStreamingView,
-                    currentStep: $viewModel.currentStep,
-                    streamingText: $viewModel.streamingText
-                )
+                if viewModel.partners.count > 1 {
+                    // Multi-partner progress view
+                    MultiPartnerStreamingView(
+                        isVisible: $viewModel.showStreamingView,
+                        partners: viewModel.partners,
+                        completedResults: viewModel.comparisonResults,
+                        currentPartnerIndex: viewModel.activePartnerIndex,
+                        currentStep: viewModel.currentStep,
+                        totalPartners: viewModel.partners.filter { $0.isComplete }.count
+                    )
+                } else {
+                    // Single partner progress view
+                    CompatibilityStreamingView(
+                        isVisible: $viewModel.showStreamingView,
+                        currentStep: $viewModel.currentStep,
+                        streamingText: $viewModel.streamingText
+                    )
+                }
             }
         }
         .sheet(isPresented: $showBoyLocationSearch) {
@@ -81,6 +131,34 @@ struct CompatibilityView: View {
                 latitude: $viewModel.girlLatitude,
                 longitude: $viewModel.girlLongitude,
                 placeId: .constant(nil)
+            )
+        }
+        .sheet(isPresented: $showBoyDatePicker) {
+            DatePickerSheet(
+                title: "date_of_birth".localized,
+                selection: $viewModel.boyBirthDate,
+                components: .date
+            )
+        }
+        .sheet(isPresented: $showBoyTimePicker) {
+            DatePickerSheet(
+                title: "time_of_birth".localized,
+                selection: $viewModel.boyBirthTime,
+                components: .hourAndMinute
+            )
+        }
+        .sheet(isPresented: $showGirlDatePicker) {
+            DatePickerSheet(
+                title: "date_of_birth".localized,
+                selection: $viewModel.girlBirthDate,
+                components: .date
+            )
+        }
+        .sheet(isPresented: $showGirlTimePicker) {
+            DatePickerSheet(
+                title: "time_of_birth".localized,
+                selection: $viewModel.girlBirthTime,
+                components: .hourAndMinute
             )
         }
         .sheet(isPresented: $showChartsSheet) {
@@ -115,6 +193,19 @@ struct CompatibilityView: View {
         }
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
+        }
+        .sheet(isPresented: $showGenderSheet) {
+            PremiumSelectionSheet(
+                title: "gender_identity".localized,
+                selectedValue: $viewModel.partnerGender,
+                options: [
+                    ("male", "male".localized),
+                    ("female", "female".localized),
+                    ("non-binary", "non_binary".localized),
+                    ("prefer_not_to_say", "prefer_not_to_say".localized)
+                ],
+                onDismiss: { showGenderSheet = false }
+            )
         }
         .sheet(isPresented: $showPartnerPicker) {
             PartnerPickerSheet(
@@ -165,491 +256,560 @@ struct CompatibilityView: View {
                 }
             }
         }
+        .onChange(of: ProfileContextManager.shared.activeProfileId) { oldProfileId, newProfileId in
+            // When profile switches, clear old match result and reload user data
+            if oldProfileId != newProfileId {
+                viewModel.reset()
+                // Reload user birth data for the new profile
+                viewModel.reloadUserData()
+            }
+        }
     }
     
     // MARK: - Sign Out for Guest Re-auth
     private func signOutAndReauth() {
-        // Clear all guest data so user starts fresh with Apple Sign-In
-        isGuest = false
+        // PHASE 12: DO NOT clear guest data here!
+        // Preserve guest birth data for carry-forward during sign-in.
         isAuthenticated = false
-        hasBirthData = false
-        
-        let keysToRemove = [
-            "userEmail", "userName", "quotaUsed", "userBirthData",
-            "hasBirthData", "userGender", "birthTimeUnknown", "isGuest"
-        ]
-        keysToRemove.forEach { UserDefaults.standard.removeObject(forKey: $0) }
         UserDefaults.standard.set(false, forKey: "isAuthenticated")
         
-        let keychain = KeychainService.shared
-        keychain.delete(forKey: KeychainService.Keys.userId)
-        keychain.delete(forKey: KeychainService.Keys.authToken)
-        
-        print("[CompatibilityView] Guest data cleared for fresh sign-in")
+        print("[CompatibilityView] Navigating to Auth (guest data preserved for carry-forward)")
     }
     
-    // MARK: - Form View
+    // MARK: - Form View (Compact Single-Screen Design)
     private var compatibilityForm: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
-                // Header with gold interlocking rings icon
-                VStack(spacing: 8) {
-                    HStack(spacing: 8) {
-                        Image("match_icon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 32, height: 32)
-                        
-                        Text("kundali_match".localized)
-                            .font(AppTheme.Fonts.display(size: 24))
-                            .foregroundColor(AppTheme.Colors.gold)
-                    }
+        VStack(spacing: 0) {
+            // Header with gold interlocking rings icon
+            // Header with gold interlocking rings icon (BirthDataView Style)
+            VStack(spacing: 12) { // Reduced spacing (was 16)
+                // Compact Icon with Pulsing Glow
+                ZStack {
+                    // Outer glow
+                    PulsingGlowView(
+                        color: AppTheme.Colors.gold.opacity(0.3),
+                        size: 80, // Reduced (was 90)
+                        blurRadius: 25
+                    )
                     
+                    // Circle container
+                    Circle()
+                        .fill(AppTheme.Colors.inputBackground)
+                        .frame(width: 64, height: 64) // Reduced (was 72)
+                        .overlay(
+                            Circle()
+                                .stroke(AppTheme.Colors.gold.opacity(0.4), lineWidth: 1)
+                        )
+                    
+                    // Match Icon
+                    Image("match_icon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30) // Reduced (was 34)
+                        .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 5)
+                }
+                
+                VStack(spacing: 6) { // Reduced text spacing (was 8)
                     Text("ashtakoot_analysis".localized)
-                        .font(AppTheme.Fonts.body(size: 14))
+                        .font(AppTheme.Fonts.display(size: 22)) // Bold serif to match BirthDataView
+                        .foregroundColor(AppTheme.Colors.textPrimary) 
+                        .tracking(0.5) // Reduced tracking slightly
+                    
+                    Text("enter_details_desc_compatibility".localized)
+                        .font(AppTheme.Fonts.body(size: 13)) // Slightly smaller (was 14)
                         .foregroundColor(AppTheme.Colors.textSecondary)
-                }
-                .padding(.top, 20)
-                
-                // Tab Selector
-                tabSelector
-                    .padding(.horizontal, 20)
-                
-                // Form based on selected tab
-                if selectedTab == 0 {
-                    boyFormCard
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .leading).combined(with: .opacity),
-                            removal: .move(edge: .trailing).combined(with: .opacity)
-                        ))
-                } else {
-                    girlFormCard
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing).combined(with: .opacity),
-                            removal: .move(edge: .leading).combined(with: .opacity)
-                        ))
-                }
-                
-                // Error message
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                        .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(AppTheme.Colors.error)
+                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 20)
                 }
-                
-                // Analyze button
+            }
+            .padding(.top, 10) // Reduced top padding (was 24)
+            .padding(.bottom, 16) // Reduced bottom padding (was 20)
+            
+            // Unified Form Section (No Card Wrapper - Blends with Background)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    
+                    // ═══════════════════════════════════════════════
+                    // SECTION 1: Your Details (Compact Read-Only)
+                    // ═══════════════════════════════════════════════
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            Text("your_details".localized)
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .textCase(.uppercase)
+                            Spacer()
+                            
+                            if AppTheme.Features.allowMatchScreenUserEdit {
+                                Button(action: {
+                                    HapticManager.shared.play(.light)
+                                }) {
+                                    Text("Change")
+                                        .font(AppTheme.Fonts.caption(size: 11))
+                                        .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
+                                }
+                            }
+                        }
+                        
+                        // User Summary (Compact)
+                        Text(viewModel.formattedUserSummary)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 11)
+                            .padding(.horizontal, 10)
+                            .background(AppTheme.Colors.inputBackground.opacity(0.6)) // Match partner fields
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
+                            )
+                    }
+                    .padding(.horizontal, 4) // Align with fields
+                    
+                    // Divider (Gold Separation)
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, AppTheme.Colors.gold.opacity(0.3), .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(height: 1)
+                    
+                    // ═══════════════════════════════════════════════
+                    // SECTION 2: Partner Details
+                    // ═══════════════════════════════════════════════
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            Text("partner_details".localized)
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .textCase(.uppercase)
+                        }
+                        
+                        // Compact Manual Entry Section (with search in name field)
+                        compactPartnerFields
+                            .id(viewModel.activePartnerIndex) // Force refresh when partner tab changes
+                    }
+                    .padding(.horizontal, 4)
+
+                    // Error message
+                    if let error = viewModel.errorMessage, 
+                       !error.hasPrefix("FREE_LIMIT") && !error.hasPrefix("FEATURE_") {
+                        Text(error)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(AppTheme.Colors.error)
+                            .padding(.top, 4)
+                            .padding(.horizontal, 8)
+                    }
+                    
+                    // Bottom padding for scrolling
+                    Spacer(minLength: 100) 
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+            }
+            
+            // Analyze Button (Fixed at bottom, above tab bar)
+            VStack {
                 analyzeButton
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 90) // Clear tab bar completely (tab bar + safe area + margin)
+        }
+    }
+    
+    // MARK: - Compact Partner Fields (Grid Layout)
+    private var compactPartnerFields: some View {
+        VStack(spacing: 16) {
+            // Partner Tab Strip (if multi-partner enabled)
+            if AppTheme.Features.multiPartnerComparison {
+                HStack(spacing: 8) {
+                    // Partner pills
+                    ForEach(Array(viewModel.partners.enumerated()), id: \.offset) { index, partner in
+                        Button(action: { 
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                viewModel.activePartnerIndex = index 
+                            }
+                        }) {
+                            HStack(spacing: 4) {
+                                Text("Partner \(index + 1)")
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                                if partner.isComplete {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 8, weight: .bold))
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(index == viewModel.activePartnerIndex 
+                                ? AppTheme.Colors.gold 
+                                : Color.clear)
+                            .foregroundColor(index == viewModel.activePartnerIndex 
+                                ? AppTheme.Colors.textOnGold 
+                                : AppTheme.Colors.gold)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(AppTheme.Colors.gold.opacity(index == viewModel.activePartnerIndex ? 0 : 0.5), lineWidth: 1)
+                            )
+                        }
+                    }
+                    
+                    // Add button (max 3 partners)
+                    let maxPartners = 3
+                    let canAddMore = viewModel.partners.count < maxPartners
+                    
+                    Button(action: { 
+                        guard canAddMore else { return }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            viewModel.addPartner() 
+                        }
+                    }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 11, weight: .medium))
+                            .padding(6)
+                            .foregroundColor(canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [3]))
+                                    .foregroundColor(canAddMore ? AppTheme.Colors.gold.opacity(0.4) : AppTheme.Colors.textTertiary.opacity(0.3))
+                            )
+                    }
+                    .disabled(!canAddMore)
+                    
+                    Spacer()
+                    
+                    // Delete current partner (if more than 1)
+                    if viewModel.partners.count > 1 {
+                        Button(action: { 
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                viewModel.removePartner(at: viewModel.activePartnerIndex) 
+                            }
+                        }) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.Colors.error.opacity(0.7))
+                                .padding(6)
+                        }
+                    }
+                }
+                .padding(.bottom, 4)
+            }
+            
+            // Name Field with Search Icon (for saved partners)
+            HStack(spacing: 10) {
+                // Name Field with trailing search button
+                HStack(spacing: 6) {
+                    Image(systemName: "person.circle")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+                    ZStack(alignment: .leading) {
+                        if viewModel.girlName.isEmpty {
+                            Text("Partner Name")
+                                .font(AppTheme.Fonts.body(size: 13))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                        }
+                        TextField("", text: $viewModel.girlName)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                    }
+                    
+                    // Search icon to open saved partners
+                    Button(action: { showPartnerPicker = true }) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 14))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 11)
+                .background(AppTheme.Colors.inputBackground.opacity(0.6))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(AppTheme.Colors.goldDim.opacity(0.3), lineWidth: 1)
+                )
                 
-                // Spacer for tab bar
-                Spacer(minLength: 20)
+                // Gender Selection (Compact Button triggering Sheet)
+                Button(action: { 
+                    HapticManager.shared.play(.light)
+                    showGenderSheet = true 
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "person")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+                        Text(viewModel.partnerGender.isEmpty ? "Gender" : viewModel.partnerGender.localized)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(viewModel.partnerGender.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
+                            .lineLimit(1)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 10))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 11)
+                    .background(AppTheme.Colors.inputBackground)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
+                    )
+                }
+                .frame(width: 140)
+            }
+            
+            // Date & Time Row
+            HStack(spacing: 10) {
+                // Date Button
+                Button(action: { showGirlDatePicker = true }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+                        Text(viewModel.currentPartner.birthDateSet ? viewModel.formattedGirlDob : "Select Date")
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(viewModel.currentPartner.birthDateSet ? AppTheme.Colors.textPrimary : AppTheme.Colors.textTertiary)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 11)
+                    .background(AppTheme.Colors.inputBackground)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
+                    )
+                }
+                
+                // Time Button
+                Button(action: { 
+                    if !viewModel.partnerTimeUnknown {
+                        showGirlTimePicker = true 
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock")
+                            .font(.system(size: 12))
+                            .foregroundColor(viewModel.partnerTimeUnknown ? AppTheme.Colors.textTertiary : AppTheme.Colors.gold.opacity(0.7))
+                        Text(viewModel.partnerTimeUnknown ? "Unknown" : (viewModel.currentPartner.birthTimeSet ? viewModel.formattedGirlTime : "Select Time"))
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor((viewModel.partnerTimeUnknown || !viewModel.currentPartner.birthTimeSet) ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 11)
+                    .background(AppTheme.Colors.inputBackground.opacity(viewModel.partnerTimeUnknown ? 0.5 : 1))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
+                    )
+                }
+                .frame(width: 140)
+                .disabled(viewModel.partnerTimeUnknown)
+            }
+            
+            // Place Button (full width) - Moved UP for better vertical flow
+            Button(action: { showGirlLocationSearch = true }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "location")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+                    Text(viewModel.girlCity.isEmpty ? "select_birth_city".localized : viewModel.girlCity)
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(viewModel.girlCity.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
+                        .lineLimit(1)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 11)
+                .background(AppTheme.Colors.inputBackground)
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
+                )
+            }
+            
+            // Time Unknown & Save Row (Moved to Bottom)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 20) {
+                    // Time Unknown Toggle
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        withAnimation { viewModel.partnerTimeUnknown.toggle() }
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
+                                .font(.system(size: 14))
+                                .foregroundColor(viewModel.partnerTimeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                            Text("partner_birth_time_unknown".localized)
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                        }
+                    }
+                    
+                    // Save Partner Toggle
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        withAnimation { savePartnerForFuture.toggle() }
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: savePartnerForFuture ? "checkmark.square.fill" : "square")
+                                .font(.system(size: 14))
+                                .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                            Text("save".localized)
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                        }
+                    }
+                    
+                    Spacer()
+                }
+                
+                if viewModel.partnerTimeUnknown {
+                    Text("Note: Analysis accuracy may be reduced without an exact birth time.")
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .foregroundColor(AppTheme.Colors.warning)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .padding(.top, 8)
         }
-        .padding(.bottom, 90) // Reserve space for Transparent Tab Bar
     }
     
-    // MARK: - Tab Selector
-    private var tabSelector: some View {
-        HStack(spacing: 0) {
-            // Boy's Details Tab
-            Button(action: {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    selectedTab = 0
-                }
-                HapticManager.shared.play(.light)
-            }) {
-                Text("boys_details".localized)
-                    .font(AppTheme.Fonts.title(size: 15))
-                    .foregroundColor(selectedTab == 0 ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(
-                        selectedTab == 0 
-                            ? AnyView(AppTheme.Colors.premiumGradient)
-                            : AnyView(Color.clear)
-                    )
-                    .cornerRadius(12)
-            }
-            
-            // Girl's Details Tab
-            Button(action: {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    selectedTab = 1
-                }
-                HapticManager.shared.play(.light)
-            }) {
-                Text("girls_details".localized)
-                    .font(AppTheme.Fonts.title(size: 15))
-                    .foregroundColor(selectedTab == 1 ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(
-                        selectedTab == 1 
-                            ? AnyView(AppTheme.Colors.premiumGradient)
-                            : AnyView(Color.clear)
-                    )
-                    .cornerRadius(12)
-            }
+    // MARK: - Compact Text Field Helper
+    private func compactTextField(icon: String, placeholder: String, text: Binding<String>) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 12))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+            TextField(placeholder, text: text)
+                .font(AppTheme.Fonts.body(size: 13))
+                .foregroundColor(AppTheme.Colors.textPrimary)
         }
-        .padding(4)
-        .background(AppTheme.Colors.cardBackground)
-        .cornerRadius(16)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 11)
+        .background(AppTheme.Colors.inputBackground)
+        .cornerRadius(8)
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(AppTheme.Styles.goldBorder.stroke, lineWidth: AppTheme.Styles.goldBorder.width)
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
         )
     }
-    
-    // MARK: - Boy Form Card (You)
-    private var boyFormCard: some View {
-        PremiumCard {
-            VStack(alignment: .leading, spacing: 14) {
-                // Row 1: Name and Gender
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("boys_name".localized)
-                            .font(AppTheme.Fonts.body(size: 12))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                        
-                        Text(viewModel.boyName.isEmpty ? "not_set".localized : viewModel.boyName)
-                            .font(AppTheme.Fonts.body(size: 15))
-                            .foregroundColor(AppTheme.Colors.textPrimary)
-                            .padding(.horizontal, 12)
-                            .frame(height: 52)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(AppTheme.Colors.inputBackground)
-                            .cornerRadius(12)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("gender".localized.uppercased())
-                            .font(AppTheme.Fonts.body(size: 12))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                        
-                        Text(userGenderDisplayText)
-                            .font(AppTheme.Fonts.body(size: 14))
-                            .foregroundColor(AppTheme.Colors.textPrimary)
-                            .padding(.horizontal, 12)
-                            .frame(height: 52)
-                            .frame(minWidth: 100)
-                            .background(AppTheme.Colors.inputBackground)
-                            .cornerRadius(12)
-                    }
-                }
-                
-                // Row 2: Date and Time
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("date_of_birth_caps".localized)
-                            .font(AppTheme.Fonts.body(size: 12))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                        
-                        HStack {
-                            Text(formattedBoyDate)
-                                .font(AppTheme.Fonts.body(size: 15))
-                                .foregroundColor(AppTheme.Colors.textPrimary)
-                            Spacer()
-                            Image(systemName: "calendar")
-                                .font(AppTheme.Fonts.body(size: 14))
-                                .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
-                        }
-                        .padding(.horizontal, 12)
-                        .frame(height: 52)
-                        .background(AppTheme.Colors.inputBackground)
-                        .cornerRadius(12)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("time_caps".localized)
-                            .font(AppTheme.Fonts.body(size: 12))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                        
-                        HStack {
-                            Text(viewModel.boyTimeUnknown ? "birth_time_unknown".localized : formattedBoyTime)
-                                .font(AppTheme.Fonts.body(size: 15))
-                                .foregroundColor(AppTheme.Colors.textPrimary)
-                            Spacer()
-                            Image(systemName: "clock")
-                                .font(AppTheme.Fonts.body(size: 14))
-                                .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
-                        }
-                        .padding(.horizontal, 12)
-                        .frame(height: 52)
-                        .background(AppTheme.Colors.inputBackground)
-                        .cornerRadius(12)
-                    }
-                }
-                
-                // Row 3: Place of Birth
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("place_of_birth_caps".localized)
-                        .font(AppTheme.Fonts.body(size: 12))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                    
-                    Button(action: { showBoyLocationSearch = true }) {
-                        HStack {
-                            Image(systemName: "location.fill")
-                                .font(AppTheme.Fonts.body(size: 14))
-                                .foregroundColor(AppTheme.Colors.gold)
-                            
-                            Text(viewModel.boyCity.isEmpty ? "select_city".localized : viewModel.boyCity)
-                                .font(AppTheme.Fonts.body(size: 15))
-                                .foregroundColor(viewModel.boyCity.isEmpty ? AppTheme.Colors.textSecondary : AppTheme.Colors.textPrimary)
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .font(AppTheme.Fonts.caption(size: 12))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                        }
-                        .padding(.horizontal, 12)
-                        .frame(height: 52)
-                        .background(AppTheme.Colors.inputBackground)
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
-                        )
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-    
-    // MARK: - Girl Form Card (Partner)
-    private var girlFormCard: some View {
-        PremiumCard {
-            VStack(alignment: .leading, spacing: 14) {
-                // Select Saved Partner button
-                Button(action: {
-                    HapticManager.shared.play(.light)
-                    showPartnerPicker = true
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "person.crop.circle.badge.checkmark")
-                            .font(.system(size: 16))
-                        Text("select_saved_partner".localized)
-                            .font(AppTheme.Fonts.body(size: 14))
-                    }
-                    .foregroundStyle(AppTheme.Colors.premiumGradient)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(AppTheme.Colors.cardBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(AppTheme.Styles.goldBorder.stroke, lineWidth: 1)
-                    )
-                    .cornerRadius(10)
-                }
-                
-                // Row 1: Name and Gender
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        PremiumTextField(
-                            "girls_name".localized,
-                            text: $viewModel.girlName,
-                            placeholder: "enter_name".localized
-                        )
-                    }
-                    
-                    // Gender Menu
-                    VStack(alignment: .leading, spacing: 4) {
-                         Text("GENDER")
-                            .font(AppTheme.Fonts.body(size: 14))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                            
-                        Menu {
-                            Button("prefer_not_to_say".localized) { viewModel.partnerGender = "" }
-                            Button("male".localized) { viewModel.partnerGender = "male" }
-                            Button("female".localized) { viewModel.partnerGender = "female" }
-                            Button("non_binary".localized) { viewModel.partnerGender = "non-binary" }
-                        } label: {
-                            HStack(spacing: 4) {
-                                Text(genderDisplayText)
-                                    .font(AppTheme.Fonts.body(size: 14))
-                                    .foregroundColor(AppTheme.Colors.textPrimary)
-                                    .lineLimit(1)
-                                Spacer()
-                                Image(systemName: "chevron.down")
-                                    .font(AppTheme.Fonts.caption(size: 10))
-                                    .foregroundColor(AppTheme.Colors.gold)
-                            }
-                            .padding(.horizontal, 10)
-                            .frame(height: 52)
-                            .frame(minWidth: 110)
-                            .background(AppTheme.Colors.inputBackground)
-                            .cornerRadius(12)
-                            .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
-                        )
-                        }
-                    }
-                }
-                
-                // Row 2: Date and Time
-                HStack(spacing: 12) {
-                    // Date
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("date_of_birth_caps".localized)
-                             .font(AppTheme.Fonts.body(size: 14))
-                             .foregroundColor(AppTheme.Colors.textSecondary)
-                        MatchDateButton(date: $viewModel.girlBirthDate)
-                    }
-                    
-                    // Time
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("time_caps".localized)
-                             .font(AppTheme.Fonts.body(size: 14))
-                             .foregroundColor(AppTheme.Colors.textSecondary)
-                        
-                        if viewModel.partnerTimeUnknown {
-                            HStack {
-                                Text("birth_time_unknown".localized)
-                                    .font(AppTheme.Fonts.body(size: 15))
-                                    .foregroundColor(AppTheme.Colors.textPrimary.opacity(0.6))
-                                Spacer()
-                                Image(systemName: "clock")
-                                    .font(AppTheme.Fonts.body(size: 14))
-                                    .foregroundColor(AppTheme.Colors.gold.opacity(0.3))
-                            }
-                            .padding(.horizontal, 12)
-                            .frame(height: 52)
-                            .background(AppTheme.Colors.inputBackground)
-                            .cornerRadius(12)
-                        } else {
-                            MatchTimeButton(time: $viewModel.girlBirthTime)
-                        }
-                    }
-                }
-                
-                // Time unknown toggle
-                HStack(spacing: 8) {
-                    Button(action: { 
-                         HapticManager.shared.play(.light)
-                         viewModel.partnerTimeUnknown.toggle() 
-                    }) {
-                        Image(systemName: viewModel.partnerTimeUnknown ? "checkmark.square.fill" : "square")
-                            .font(AppTheme.Fonts.title(size: 18))
-                            .foregroundColor(viewModel.partnerTimeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
-                    }
-                    
-                    Text("partner_birth_time_unknown".localized)
-                        .font(AppTheme.Fonts.body(size: 13))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                }
-                
-                // Warning note
-                if viewModel.partnerTimeUnknown {
-                    HStack(spacing: 6) {
-                        Image(systemName: "info.circle.fill")
-                            .font(AppTheme.Fonts.caption(size: 12))
-                            .foregroundColor(AppTheme.Colors.warning)
-                        
-                        Text("birth_time_warning".localized)
-                            .font(AppTheme.Fonts.body(size: 11))
-                            .foregroundColor(AppTheme.Colors.warning)
-                    }
-                    .padding(10)
-                    .background(AppTheme.Colors.warning.opacity(0.1))
-                    .cornerRadius(8)
-                }
-                
-                // Row 3: Place of Birth
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("place_of_birth_caps".localized)
-                        .font(AppTheme.Fonts.body(size: 12))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                    
-                    Button(action: { showGirlLocationSearch = true }) {
-                        HStack {
-                            Image(systemName: "location.fill")
-                                .font(AppTheme.Fonts.body(size: 14))
-                                .foregroundColor(AppTheme.Colors.gold)
-                            
-                            Text(viewModel.girlCity.isEmpty ? "select_city".localized : viewModel.girlCity)
-                                .font(AppTheme.Fonts.body(size: 15))
-                                .foregroundColor(viewModel.girlCity.isEmpty ? AppTheme.Colors.textSecondary : AppTheme.Colors.textPrimary)
-                            
-                            Spacer()
-                            
-                            Image(systemName: "chevron.right")
-                                .font(AppTheme.Fonts.caption(size: 12))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                        }
-                        .padding(.horizontal, 12)
-                        .frame(height: 52)
-                        .background(AppTheme.Colors.inputBackground)
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
-                        )
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-    }
-    
+
     // MARK: - Analyze Button
     private var analyzeButton: some View {
-        PremiumButton(
-            "analyze_match".localized,
-            icon: "sparkles",
-            isLoading: viewModel.isAnalyzing
-        ) {
-            Task {
-                // Check quota for COMPATIBILITY feature
-                let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-                do {
-                    let accessResponse = try await QuotaManager.shared.canAccessFeature(.compatibility, email: email)
-                    if accessResponse.canAccess {
-                        await viewModel.analyzeMatch()
-                        // Quota is now recorded server-side by /compatibility/analyze endpoint
-                    } else {
-                        await MainActor.run {
-                            // Professional Quota UI - Daily=banner, Overall/Feature=sheet
-                            if accessResponse.reason == "daily_limit_reached" {
-                                // DAILY LIMIT: Show message (for banner), no sheet
-                                if let resetAtStr = accessResponse.resetAt,
-                                   let date = ISO8601DateFormatter().date(from: resetAtStr) {
-                                    let timeFormatter = DateFormatter()
-                                    timeFormatter.timeStyle = .short
-                                    let timeStr = timeFormatter.string(from: date)
-                                    viewModel.errorMessage = "Daily limit reached. Resets at \(timeStr)."
-                                } else {
-                                    viewModel.errorMessage = "Daily limit reached. Resets tomorrow."
-                                }
-                                // No sheet for daily limit
-                            } else if accessResponse.reason == "overall_limit_reached" {
-                                // OVERALL LIMIT: Show sheet only
-                                if email.contains("guest") || email.contains("@gen.com") {
-                                    quotaErrorMessage = "Free questions used. Sign In or Subscribe to continue."
-                                } else {
-                                    quotaErrorMessage = "You've reached your free limit. Subscribe for unlimited access."
-                                }
-                                showQuotaExhausted = true
-                            } else {
-                                // FEATURE NOT AVAILABLE: Show sheet only
-                                quotaErrorMessage = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
-                                showQuotaExhausted = true
-                            }
-                        }
-                    }
-                } catch {
-                    print("❌ Quota check failed: \(error)")
-                    await MainActor.run {
-                        quotaErrorMessage = "Unable to check compatibility access."
-                        showQuotaExhausted = true
-                    }
+        let buttonTitle: String = {
+            if viewModel.isAnalyzing {
+                return "analyzing".localized
+            } else if viewModel.partners.count > 1 {
+                return "compare_all".localized + " (\(viewModel.partners.count))"
+            } else {
+                return "analyze_match".localized
+            }
+        }()
+        
+        return ZStack {
+            ShimmerButton(
+                title: buttonTitle,
+                icon: viewModel.isAnalyzing ? nil : "sparkles"
+            ) {
+                if !viewModel.isAnalyzing {
+                    HapticManager.shared.playHeartbeat()
+                    analyzeAction()
                 }
+            }
+            .opacity(viewModel.isAnalyzing ? 0.7 : 1)
+            .animation(.easeInOut, value: viewModel.isAnalyzing)
+            
+            if viewModel.isAnalyzing {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.textOnGold))
             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
+    }
+    
+    private func analyzeAction() {
+        Task {
+            let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+            let isMultiPartner = viewModel.partners.count > 1
+            
+            // Check correct feature: multi_profile_match for "Compare All", compatibility for single
+            let featureToCheck: FeatureID = isMultiPartner ? .profiles : .compatibility
+            
+            do {
+                let accessResponse = try await QuotaManager.shared.canAccessFeature(featureToCheck, email: email)
+                if accessResponse.canAccess {
+                    // Save partners if requested (fire and forget)
+                    if savePartnerForFuture {
+                        viewModel.saveAllPartners(context: modelContext)
+                    }
+                    
+                    // Multi-partner vs Single-partner flow
+                    if isMultiPartner {
+                        await viewModel.analyzeAllPartners()
+                    } else {
+                        await viewModel.analyzeMatch()
+                    }
+                    // Quota is now recorded server-side by /compatibility/analyze endpoint
+                } else {
+                    await MainActor.run {
+                        // Professional Quota UI - Daily=banner, Overall/Feature=sheet
+                        if accessResponse.reason == "daily_limit_reached" {
+                            // DAILY LIMIT: Show message (for banner), no sheet
+                            if let resetAtStr = accessResponse.resetAt,
+                               let date = ISO8601DateFormatter().date(from: resetAtStr) {
+                                let timeFormatter = DateFormatter()
+                                timeFormatter.timeStyle = .short
+                                let timeStr = timeFormatter.string(from: date)
+                                viewModel.errorMessage = "Daily limit reached. Resets at \(timeStr)."
+                            } else {
+                                viewModel.errorMessage = "Daily limit reached. Resets tomorrow."
+                            }
+                            // No sheet for daily limit
+                        } else if accessResponse.reason == "overall_limit_reached" {
+                            // OVERALL LIMIT: Show sheet only
+                            if email.contains("guest") || email.contains("@gen.com") {
+                                // Guest users should only see Sign In option (no subscribe)
+                                quotaErrorMessage = "sign_in_to_continue_matching".localized
+                            } else {
+                                quotaErrorMessage = "You've reached your free limit. Subscribe for unlimited access."
+                            }
+                            showQuotaExhausted = true
+                        } else {
+                            // FEATURE NOT AVAILABLE: Show sheet only
+                            quotaErrorMessage = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
+                            showQuotaExhausted = true
+                        }
+                    }
+                }
+            } catch {
+                print("❌ Quota check failed: \(error)")
+                await MainActor.run {
+                    quotaErrorMessage = "Unable to check compatibility access."
+                    showQuotaExhausted = true
+                }
+            }
+        }
     }
     
     // Helpers
@@ -685,144 +845,7 @@ struct CompatibilityView: View {
     }
 }
 
-// MARK: - Helper Components (Dark Mode)
-struct MatchDateButton: View {
-    @Binding var date: Date
-    @State private var showPicker = false
-    
-    var body: some View {
-        Button(action: { showPicker = true }) {
-            HStack {
-                Text(formatDate(date))
-                    .font(AppTheme.Fonts.body(size: 15))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                Spacer()
-                Image(systemName: "calendar")
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
-            }
-            .padding(.horizontal, 12)
-            .frame(height: 52)
-            .background(AppTheme.Colors.inputBackground)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
-            )
-        }
-        .sheet(isPresented: $showPicker) {
-            MatchDatePickerSheet(date: $date, title: "Select Date")
-        }
-    }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
-        return formatter.string(from: date)
-    }
-}
 
-struct MatchTimeButton: View {
-    @Binding var time: Date
-    @State private var showPicker = false
-    
-    var body: some View {
-        Button(action: { showPicker = true }) {
-            HStack {
-                Text(formatTime(time))
-                    .font(AppTheme.Fonts.body(size: 15))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                Spacer()
-                Image(systemName: "clock")
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
-            }
-            .padding(.horizontal, 12)
-            .frame(height: 52)
-            .background(AppTheme.Colors.inputBackground)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
-            )
-        }
-        .sheet(isPresented: $showPicker) {
-            MatchTimePickerSheet(time: $time, title: "Select Time")
-        }
-    }
-    
-    private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: date)
-    }
-}
-
-// MARK: - Picker Sheets (Dark Mode)
-struct MatchDatePickerSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @Binding var date: Date
-    let title: String
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                AppTheme.Colors.mainBackground.ignoresSafeArea()
-                VStack {
-                    DatePicker("", selection: $date, displayedComponents: .date)
-                        .datePickerStyle(.graphical)
-                        .colorScheme(.dark)
-                        .accentColor(AppTheme.Colors.gold)
-                        .padding()
-                    Spacer()
-                }
-            }
-            .navigationTitle(title)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(AppTheme.Colors.gold)
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-             .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
-        }
-        .presentationDetents([.medium])
-    }
-}
-
-struct MatchTimePickerSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @Binding var time: Date
-    let title: String
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                AppTheme.Colors.mainBackground.ignoresSafeArea()
-                VStack {
-                    DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
-                        .datePickerStyle(.wheel)
-                        .colorScheme(.dark)
-                        .labelsHidden()
-                        .padding()
-                    Spacer()
-                }
-            }
-            .navigationTitle(title)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(AppTheme.Colors.gold)
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
-        }
-        .presentationDetents([.medium])
-    }
-}
 
 #Preview {
     CompatibilityView()

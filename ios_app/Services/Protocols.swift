@@ -37,7 +37,7 @@ protocol FeedbackServiceProtocol {
 // MARK: - Auth Service Protocol
 protocol AuthServiceProtocol {
     func signInWithApple() async throws -> User
-    func signInWithGoogle() async throws -> User
+    @MainActor func signInWithGoogle() async throws -> User
     func signInAsGuest() async -> User
     func signOut() async
 }

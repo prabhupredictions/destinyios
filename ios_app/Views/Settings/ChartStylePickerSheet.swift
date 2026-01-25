@@ -80,13 +80,12 @@ struct ChartStylePickerSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    PremiumCloseButton {
-                        dismiss()
-                    }
+                    Button("Done") { dismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
     }
 }

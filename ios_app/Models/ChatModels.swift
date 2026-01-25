@@ -23,6 +23,7 @@ final class LocalChatMessage {
     var createdAt: Date
     var isStreaming: Bool
     var executionTimeMs: Double = 0  // Prediction execution time in milliseconds
+    var rating: Int? // User rating (1-5)
     
     init(
         id: String = UUID().uuidString,
@@ -36,7 +37,8 @@ final class LocalChatMessage {
         sources: [String] = [],
         createdAt: Date = Date(),
         isStreaming: Bool = false,
-        executionTimeMs: Double = 0
+        executionTimeMs: Double = 0,
+        rating: Int? = nil
     ) {
         self.id = id
         self.threadId = threadId
@@ -50,6 +52,7 @@ final class LocalChatMessage {
         self.createdAt = createdAt
         self.isStreaming = isStreaming
         self.executionTimeMs = executionTimeMs
+        self.rating = rating
     }
     
     var messageRole: MessageRole {
@@ -63,6 +66,7 @@ final class LocalChatThread {
     @Attribute(.unique) var id: String
     var sessionId: String
     var userEmail: String
+    var profileId: String?  // Switch Profile feature - scopes thread to specific profile
     var title: String
     var preview: String
     var primaryArea: String?
@@ -77,6 +81,7 @@ final class LocalChatThread {
         id: String = UUID().uuidString,
         sessionId: String,
         userEmail: String,
+        profileId: String? = nil,
         title: String = "New Conversation",
         preview: String = "",
         primaryArea: String? = nil,
@@ -90,6 +95,7 @@ final class LocalChatThread {
         self.id = id
         self.sessionId = sessionId
         self.userEmail = userEmail
+        self.profileId = profileId
         self.title = title
         self.preview = preview
         self.primaryArea = primaryArea
@@ -102,14 +108,21 @@ final class LocalChatThread {
     }
     
     func updateFromMessages(_ messages: [LocalChatMessage]) {
-        if let first = messages.first(where: { $0.messageRole == .user }) {
+        // Only update title if it's a generic title ("New Conversation") or empty
+        // NEVER overwrite "Match:" titles from compatibility results
+        let shouldUpdateTitle = title.isEmpty || 
+                                title == "New Conversation" || 
+                                title == "Conversation"
+        
+        if shouldUpdateTitle, let first = messages.first(where: { $0.messageRole == .user }) {
             title = String(first.content.prefix(40))
         }
         if let last = messages.last {
             preview = String(last.content.prefix(60))
             updatedAt = last.createdAt
         }
-        messageCount = messages.count
+        // Only count user messages (not AI welcome/response messages)
+        messageCount = messages.filter { $0.messageRole == .user }.count
     }
 }
 

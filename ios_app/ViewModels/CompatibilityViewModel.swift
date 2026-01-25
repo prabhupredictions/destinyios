@@ -1,31 +1,82 @@
 import Foundation
 import SwiftUI
+import SwiftData
 
 /// ViewModel for Compatibility/Match screen
 @Observable
 class CompatibilityViewModel {
-    // MARK: - State
+    // MARK: - User ("You") Birth Data
     var boyName: String = ""
-    var girlName: String = ""
-    
-    // Birth data for "You" (user)
     var boyBirthDate: Date = Date()
     var boyBirthTime: Date = Date()
     var boyCity: String = ""
     var boyLatitude: Double = 0
     var boyLongitude: Double = 0
     var boyTimeUnknown: Bool = false
-    var boyGender: String = "" // male, female, non-binary
-    var userDataLoaded: Bool = false // Track if user data was loaded from profile
+    var boyGender: String = ""
+    var userDataLoaded: Bool = false
     
-    // Birth data for "Partner"
-    var girlBirthDate: Date = Date()
-    var girlBirthTime: Date = Date()
-    var girlCity: String = ""
-    var girlLatitude: Double = 0
-    var girlLongitude: Double = 0
-    var partnerTimeUnknown: Bool = false
-    var partnerGender: String = "" // male, female, other
+    // MARK: - Partner Data (via partners array)
+    // All partner fields are now accessed via currentPartner computed property
+    // Legacy accessors for backward-compatible View bindings:
+    var girlName: String {
+        get { currentPartner.name }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].name = newValue 
+        }
+    }
+    var girlBirthDate: Date {
+        get { currentPartner.birthDate }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].birthDate = newValue
+            partners[activePartnerIndex].birthDateSet = true  // Mark as explicitly set
+        }
+    }
+    var girlBirthTime: Date {
+        get { currentPartner.birthTime }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].birthTime = newValue
+            partners[activePartnerIndex].birthTimeSet = true  // Mark as explicitly set
+        }
+    }
+    var girlCity: String {
+        get { currentPartner.city }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].city = newValue 
+        }
+    }
+    var girlLatitude: Double {
+        get { currentPartner.latitude }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].latitude = newValue 
+        }
+    }
+    var girlLongitude: Double {
+        get { currentPartner.longitude }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].longitude = newValue 
+        }
+    }
+    var partnerTimeUnknown: Bool {
+        get { currentPartner.timeUnknown }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].timeUnknown = newValue 
+        }
+    }
+    var partnerGender: String {
+        get { currentPartner.gender }
+        set { 
+            guard partners.indices.contains(activePartnerIndex) else { return }
+            partners[activePartnerIndex].gender = newValue 
+        }
+    }
     
     // Analysis state
     var isAnalyzing = false
@@ -38,6 +89,45 @@ class CompatibilityViewModel {
     var currentStep: AnalysisStep = .calculatingCharts
     var streamingText: String = ""
     var showStreamingView: Bool = false
+    
+    // MARK: - Multi-Partner Support (Future-Ready)
+    /// Array of partners for multi-partner comparison
+    /// In v1 (multiPartnerComparison = false), this has exactly 1 element
+    var partners: [PartnerData] = [PartnerData()]
+    
+    /// Index of active partner being edited (for v1 single-partner mode)
+    var activePartnerIndex: Int = 0
+    
+    /// Stores all comparison results for multi-partner mode
+    var comparisonResults: [ComparisonResult] = []
+    
+    /// Navigation state for multi-partner overview
+    var showComparisonOverview: Bool = false
+    
+    /// Unique ID to group related matches in history (generated when analysis starts with >1 partner)
+    var currentComparisonGroupId: String? = nil
+    
+    // MARK: - Current Partner (v1 Compatibility)
+    /// Convenience accessor for the current partner being edited
+    var currentPartner: PartnerData {
+        get { partners.indices.contains(activePartnerIndex) ? partners[activePartnerIndex] : PartnerData() }
+        set { 
+            if partners.indices.contains(activePartnerIndex) {
+                partners[activePartnerIndex] = newValue 
+            }
+        }
+    }
+    
+    // MARK: - User Summary (for read-only "Your Details" card)
+    var formattedUserSummary: String {
+        var parts: [String] = []
+        if !boyName.isEmpty { parts.append(boyName) }
+        if !boyGender.isEmpty { parts.append(boyGender.capitalized) }
+        parts.append(formattedBoyDob)
+        if !boyTimeUnknown { parts.append(formattedBoyTime) }
+        if !boyCity.isEmpty { parts.append(boyCity) }
+        return parts.joined(separator: " · ")
+    }
     
     // MARK: - Formatted Date Strings
     var formattedBoyDob: String {
@@ -52,6 +142,20 @@ class CompatibilityViewModel {
         return formatter.string(from: girlBirthDate)
     }
     
+    var formattedBoyTime: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: boyBirthTime)
+    }
+    
+    var formattedGirlTime: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: girlBirthTime)
+    }
+    
     // MARK: - Dependencies
     private let compatibilityService: CompatibilityServiceProtocol
     
@@ -62,8 +166,41 @@ class CompatibilityViewModel {
     }
     
     // MARK: - Load User Data
-    /// Load user's birth data from profile (UserDefaults)
+    /// Load user's birth data from profile (ProfileContextManager or UserDefaults)
     private func loadUserDataFromProfile() {
+        // Check active profile first (for Switch Profile feature)
+        if let profileBirthData = ProfileContextManager.shared.activeBirthData {
+            print("[CompatibilityViewModel] Using birth data from active profile: \(ProfileContextManager.shared.activeProfileName)")
+            
+            boyName = ProfileContextManager.shared.activeProfileName
+            
+            // Parse date
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            if let date = dateFormatter.date(from: profileBirthData.dob) {
+                boyBirthDate = date
+            }
+            
+            // Parse time
+            let timeFormatter = DateFormatter()
+            timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+            timeFormatter.dateFormat = "HH:mm"
+            if let time = timeFormatter.date(from: profileBirthData.time) {
+                boyBirthTime = time
+            }
+            
+            // Set location
+            boyCity = profileBirthData.cityOfBirth ?? ""
+            boyLatitude = profileBirthData.latitude
+            boyLongitude = profileBirthData.longitude
+            boyTimeUnknown = profileBirthData.birthTimeUnknown ?? false
+            boyGender = profileBirthData.gender ?? ""
+            
+            userDataLoaded = true
+            return
+        }
+        
+        // Fallback: Load from UserDefaults
         // Load name
         if let savedName = UserDefaults.standard.string(forKey: "userName"), !savedName.isEmpty {
             boyName = savedName
@@ -126,7 +263,7 @@ class CompatibilityViewModel {
     
     // MARK: - Validation
     var isFormValid: Bool {
-        // Names and locations are now required
+        // Names, locations, and dates are now required
         !boyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !girlName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !boyCity.isEmpty &&
@@ -134,7 +271,9 @@ class CompatibilityViewModel {
         boyLatitude != 0 &&
         boyLongitude != 0 &&
         girlLatitude != 0 &&
-        girlLongitude != 0
+        girlLongitude != 0 &&
+        currentPartner.birthDateSet &&  // Date must be explicitly selected
+        (currentPartner.birthTimeSet || partnerTimeUnknown)  // Time must be set OR marked as unknown
     }
     
     // Effective names with fallback
@@ -146,6 +285,119 @@ class CompatibilityViewModel {
         girlName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not Provided" : girlName
     }
     
+    // MARK: - Partner Management (Multi-Partner Ready)
+    /// Add a new empty partner to the list
+    func addPartner() {
+        guard AppTheme.Features.multiPartnerComparison else { return }
+        partners.append(PartnerData())
+        activePartnerIndex = partners.count - 1
+        HapticManager.shared.play(.light)
+    }
+    
+    /// Remove partner at specified index
+    func removePartner(at index: Int) {
+        guard partners.count > 1 else { return }  // Keep at least one
+        guard partners.indices.contains(index) else { return }
+        partners.remove(at: index)
+        // Adjust active index if needed
+        if activePartnerIndex >= partners.count {
+            activePartnerIndex = partners.count - 1
+        }
+        HapticManager.shared.play(.medium)
+    }
+    
+    /// Select a partner for editing
+    func selectPartner(at index: Int) {
+        guard partners.indices.contains(index) else { return }
+        activePartnerIndex = index
+        // Computed properties auto-sync; no manual sync needed
+    }
+    
+    /// Load a saved partner into the current slot
+    func loadSavedPartner(_ partner: PartnerProfile) {
+        var partnerData = PartnerData()
+        partnerData.name = partner.name
+        partnerData.gender = partner.gender
+        partnerData.city = partner.cityOfBirth ?? ""
+        partnerData.latitude = partner.latitude ?? 0
+        partnerData.longitude = partner.longitude ?? 0
+        partnerData.placeId = ""  // Not stored in PartnerProfile
+        
+        // Parse date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        if let date = dateFormatter.date(from: partner.dateOfBirth) {
+            partnerData.birthDate = date
+            partnerData.birthDateSet = true
+        }
+        
+        // Parse time
+        if let timeStr = partner.timeOfBirth {
+            let timeFormatter = DateFormatter()
+            timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+            timeFormatter.dateFormat = "HH:mm"
+            if let time = timeFormatter.date(from: timeStr) {
+                partnerData.birthTime = time
+                partnerData.birthTimeSet = true
+            }
+        }
+        
+        partnerData.timeUnknown = partner.birthTimeUnknown
+        
+        partners[activePartnerIndex] = partnerData
+        HapticManager.shared.play(.light)
+    }
+
+    
+    // MARK: - Save Partner
+    // MARK: - Save Partners (Smart)
+    func saveAllPartners(context: ModelContext) {
+        // Iterate through all partners
+        for partner in partners {
+            // Skip empty/invalid partners
+            guard !partner.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  partner.birthDateSet else { continue }
+            
+            // Format dates
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            let dobStr = dateFormatter.string(from: partner.birthDate)
+            
+            let timeFormatter = DateFormatter()
+            timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+            timeFormatter.dateFormat = "HH:mm"
+            let timeStr = timeFormatter.string(from: partner.birthTime)
+            
+            let newPartner = PartnerProfile(
+                name: partner.name,
+                gender: partner.gender.isEmpty ? "female" : partner.gender,
+                dateOfBirth: dobStr,
+                timeOfBirth: timeStr,
+                cityOfBirth: partner.city,
+                latitude: partner.latitude,
+                longitude: partner.longitude,
+                birthTimeUnknown: partner.timeUnknown,
+                consentGiven: true
+            )
+            
+            // Save locally (Smart Check)
+            PartnerProfileService.shared.savePartnerSmartly(newPartner, context: context)
+            
+            // Sync to API (fire and forget)
+            Task {
+                if let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty {
+                    do {
+                        // API usually handles duplicates (returns existing or updates)
+                        let created = try await PartnerProfileService.shared.createPartner(newPartner, email: email)
+                        print("Synced partner: \(created.name)")
+                    } catch {
+                        print("Failed to sync partner: \(error)")
+                    }
+                }
+            }
+        }
+    }
+
     // MARK: - Actions
     func analyzeMatch() async {
         guard isFormValid else {
@@ -153,7 +405,22 @@ class CompatibilityViewModel {
             return
         }
         
-        // Check quota before proceeding
+        // STEP 1: Check local cache/history BEFORE calling API (FREE if found)
+        // This avoids re-triggering LLM for same match pair - usage count only for NEW matches
+        if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
+            boyDob: boyBirthDate,
+            boyTime: boyBirthTime,
+            girlDob: girlBirthDate,
+            girlTime: girlBirthTime
+        ) {
+            print("[CompatibilityViewModel] Found existing match in cache - loading FREE (no LLM call)")
+            await MainActor.run {
+                loadFromHistory(existingMatch)
+            }
+            return
+        }
+        
+        // STEP 2: Not found in cache - proceed with quota check and API call
         let currentEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         
         await MainActor.run {
@@ -244,7 +511,10 @@ class CompatibilityViewModel {
                     place: girlCity
                 ),
                 sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
-                userEmail: UserDefaults.standard.string(forKey: "userEmail")  // Pass real email for history storage
+                userEmail: UserDefaults.standard.string(forKey: "userEmail"),  // Pass real email for history storage
+                profileId: ProfileContextManager.shared.activeProfileId,  // Profile-scoped threads
+                comparisonGroupId: currentComparisonGroupId,  // Multi-partner grouping
+                partnerIndex: partners.count > 1 ? activePartnerIndex : nil  // Partner order in group
             )
             
             // DEBUG: Log userEmail being sent
@@ -273,8 +543,10 @@ class CompatibilityViewModel {
                 showStreamingView = false
                 showResult = true
                 
-                // Save to history
-                self.saveToHistory(result: result)
+                // Save to history with multi-partner grouping info
+                let groupId = partners.count > 1 ? currentComparisonGroupId : nil
+                let index = partners.count > 1 ? activePartnerIndex : nil
+                self.saveToHistory(result: result, groupId: groupId, partnerIndex: index)
             }
         } catch {
             await MainActor.run {
@@ -285,25 +557,186 @@ class CompatibilityViewModel {
         }
     }
     
+    // MARK: - Multi-Partner Analysis
+    /// Analyzes ALL partners sequentially and populates comparisonResults
+    func analyzeAllPartners() async {
+        guard partners.count >= 1 else { return }
+        
+        // Generate unique group ID for this comparison session
+        currentComparisonGroupId = UUID().uuidString
+        
+        // Clear previous results
+        await MainActor.run {
+            comparisonResults = []
+            isAnalyzing = true
+            showStreamingView = true
+            currentStep = .calculatingCharts
+            streamingText = ""
+            errorMessage = nil
+        }
+        
+        let currentEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        
+        // Check quota once for all partners
+        do {
+            let accessResponse = try await QuotaManager.shared.canAccessFeature(.compatibility, email: currentEmail)
+            if !accessResponse.canAccess {
+                await MainActor.run {
+                    isAnalyzing = false
+                    showStreamingView = false
+                    errorMessage = accessResponse.reason == "daily_limit_reached" 
+                        ? "Daily limit reached" 
+                        : "FREE_LIMIT_REGISTERED"
+                }
+                return
+            }
+        } catch {
+            print("Quota check failed: \(error)")
+        }
+        
+        // Analyze each partner sequentially
+        for (index, partner) in partners.enumerated() {
+            // Update UI to show current partner being analyzed
+            await MainActor.run {
+                activePartnerIndex = index
+                streamingText = "Analyzing \(partner.name.isEmpty ? "Partner \(index + 1)" : partner.name)..."
+                currentStep = .calculatingCharts
+            }
+            
+            // Skip incomplete partners
+            guard partner.isComplete else {
+                print("[Multi-Partner] Skipping incomplete partner at index \(index)")
+                continue
+            }
+            
+            // Check if this partner match already exists in cache (FREE if found)
+            if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
+                boyDob: boyBirthDate,
+                boyTime: boyBirthTime,
+                girlDob: partner.birthDate,
+                girlTime: partner.birthTime
+            ),
+            let cachedCompatibilityResult = existingMatch.result {
+                print("[Multi-Partner] Found existing match for \(partner.name) in cache - loading FREE")
+                await MainActor.run {
+                    // Add to comparison results from cache (no LLM call)
+                    let cachedResult = ComparisonResult(
+                        partner: partner,
+                        result: cachedCompatibilityResult
+                    )
+                    comparisonResults.append(cachedResult)
+                }
+                continue  // Skip API call for this partner
+            }
+            
+            do {
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let timeFormatter = DateFormatter()
+                timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+                timeFormatter.dateFormat = "HH:mm:ss"
+                
+                // Round coordinates
+                let roundedBoyLat = (boyLatitude * 1_000_000).rounded() / 1_000_000
+                let roundedBoyLon = (boyLongitude * 1_000_000).rounded() / 1_000_000
+                let roundedPartnerLat = (partner.latitude * 1_000_000).rounded() / 1_000_000
+                let roundedPartnerLon = (partner.longitude * 1_000_000).rounded() / 1_000_000
+                
+                let request = CompatibilityRequest(
+                    boy: BirthDetails(
+                        dob: dateFormatter.string(from: boyBirthDate),
+                        time: timeFormatter.string(from: boyBirthTime),
+                        lat: roundedBoyLat,
+                        lon: roundedBoyLon,
+                        name: boyName,
+                        place: boyCity
+                    ),
+                    girl: BirthDetails(
+                        dob: dateFormatter.string(from: partner.birthDate),
+                        time: timeFormatter.string(from: partner.birthTime),
+                        lat: roundedPartnerLat,
+                        lon: roundedPartnerLon,
+                        name: partner.name,
+                        place: partner.city
+                    ),
+                    sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
+                    userEmail: currentEmail,
+                    profileId: ProfileContextManager.shared.activeProfileId,  // Profile-scoped threads
+                    comparisonGroupId: currentComparisonGroupId,
+                    partnerIndex: index
+                )
+                
+                // Call API
+                let response: CompatibilityResponse
+                if let service = compatibilityService as? CompatibilityService {
+                    response = try await service.analyzeWithProgress(request: request) { [weak self] step, _ in
+                        self?.updateStep(step)
+                    }
+                } else {
+                    response = try await compatibilityService.analyzeStream(request: request)
+                }
+                
+                let result = parseApiResponse(response)
+                
+                // Add to comparison results
+                await MainActor.run {
+                    let compResult = ComparisonResult(partner: partner, result: result)
+                    comparisonResults.append(compResult)
+                    saveToHistory(result: result, groupId: currentComparisonGroupId, partnerIndex: index)
+                }
+                
+            } catch {
+                print("[Multi-Partner] Analysis failed for partner \(index): \(error)")
+            }
+        }
+        
+        // All done - show overview
+        await MainActor.run {
+            currentStep = .complete
+            isAnalyzing = false
+            showStreamingView = false
+            
+            if comparisonResults.count > 1 {
+                // Multi-partner: show overview
+                showComparisonOverview = true
+            } else if let first = comparisonResults.first {
+                // Single partner fallback: show result directly
+                result = first.result
+                showResult = true
+            }
+        }
+    }
     // MARK: - History
-    private func saveToHistory(result: CompatibilityResult) {
+    private func saveToHistory(result: CompatibilityResult, groupId: String? = nil, partnerIndex: Int? = nil) {
         guard let sid = result.sessionId else { return }
         // Use compat_ prefix to match backend thread_id format
         let storageSessionId = sid.hasPrefix("compat_") ? sid : "compat_\(sid)"
+        
+        // Format times for storage (HH:mm:ss format for backend compatibility)
+        let timeFormatter = DateFormatter()
+        timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+        timeFormatter.dateFormat = "HH:mm:ss"
+        let boyTimeStr = timeFormatter.string(from: boyBirthTime)
+        let girlTimeStr = timeFormatter.string(from: girlBirthTime)
         
         let item = CompatibilityHistoryItem(
             sessionId: storageSessionId,
             timestamp: Date(),
             boyName: boyName,
             boyDob: formattedBoyDob,
+            boyTime: boyTimeStr,
             boyCity: boyCity,
             girlName: girlName,
             girlDob: formattedGirlDob,
+            girlTime: girlTimeStr,
             girlCity: girlCity,
             totalScore: result.totalScore,
             maxScore: result.maxScore,
             result: result,
-            chatMessages: [] // Chat starts empty
+            chatMessages: [], // Chat starts empty
+            comparisonGroupId: groupId,
+            partnerIndex: partnerIndex
         )
         
         CompatibilityHistoryService.shared.save(item)
@@ -378,15 +811,19 @@ class CompatibilityViewModel {
             // First try to get guna_scores nested object
             if let gunaScores = ashtakoot["guna_scores"]?.value as? [String: Any] {
                 for (key, name, maxPoints) in kutaNames {
-                    if let kutaData = gunaScores[key] as? [String: Any],
-                       let score = kutaData["score"] as? Int {
-                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: score))
-                        totalScore += score
-                    } else if let kutaData = gunaScores[key] as? [String: Any],
-                              let score = kutaData["score"] as? Double {
-                        let points = Int(score)
-                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: points))
-                        totalScore += points
+                    if let kutaData = gunaScores[key] as? [String: Any] {
+                        let scoreVal: Int
+                        if let s = kutaData["score"] as? Int {
+                            scoreVal = s
+                        } else if let s = kutaData["score"] as? Double {
+                            scoreVal = Int(s)
+                        } else {
+                            scoreVal = 0
+                        }
+                        
+                        let desc = kutaData["description"] as? String ?? ""
+                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: scoreVal, description: desc))
+                        totalScore += scoreVal
                     }
                 }
             } else {
@@ -395,7 +832,8 @@ class CompatibilityViewModel {
                     if let kutaData = ashtakoot[key]?.value as? [String: Any],
                        let score = kutaData["score"] as? Double {
                         let points = Int(score)
-                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: points))
+                        let desc = kutaData["description"] as? String ?? ""
+                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: points, description: desc))
                         totalScore += points
                     }
                 }
@@ -412,14 +850,14 @@ class CompatibilityViewModel {
         // If no kutas parsed, generate mock
         if kutas.isEmpty {
             kutas = [
-                KutaDetail(name: "Varna", maxPoints: 1, points: 1),
-                KutaDetail(name: "Vashya", maxPoints: 2, points: 1),
-                KutaDetail(name: "Tara", maxPoints: 3, points: 2),
-                KutaDetail(name: "Yoni", maxPoints: 4, points: 2),
-                KutaDetail(name: "Maitri", maxPoints: 5, points: 3),
-                KutaDetail(name: "Gana", maxPoints: 6, points: 3),
-                KutaDetail(name: "Bhakoot", maxPoints: 7, points: 4),
-                KutaDetail(name: "Nadi", maxPoints: 8, points: 4)
+                KutaDetail(name: "Varna", maxPoints: 1, points: 1, description: "Work compatibility"),
+                KutaDetail(name: "Vashya", maxPoints: 2, points: 1, description: "Dominance compatibility"),
+                KutaDetail(name: "Tara", maxPoints: 3, points: 2, description: "Destiny compatibility"),
+                KutaDetail(name: "Yoni", maxPoints: 4, points: 2, description: "Intimacy compatibility"),
+                KutaDetail(name: "Maitri", maxPoints: 5, points: 3, description: "Friendship compatibility"),
+                KutaDetail(name: "Gana", maxPoints: 6, points: 3, description: "Temperament compatibility"),
+                KutaDetail(name: "Bhakoot", maxPoints: 7, points: 4, description: "Emotional compatibility"),
+                KutaDetail(name: "Nadi", maxPoints: 8, points: 4, description: "Health compatibility")
             ]
             totalScore = 20
         }
@@ -461,7 +899,20 @@ class CompatibilityViewModel {
         showResult = false
         errorMessage = nil
         
+        // Reset multi-partner state
+        partners = [PartnerData()]
+        activePartnerIndex = 0
+        comparisonResults = []
+        showComparisonOverview = false
+        currentComparisonGroupId = nil
+        
         // Reload user data from profile
+        loadUserDataFromProfile()
+    }
+    
+    /// Public method to reload user data from active profile
+    /// Called when profile context changes (Switch Profile feature)
+    func reloadUserData() {
         loadUserDataFromProfile()
     }
     
@@ -471,14 +922,14 @@ class CompatibilityViewModel {
         let maxScore = 36
         
         let kutas = [
-            KutaDetail(name: "Varna", maxPoints: 1, points: Int.random(in: 0...1)),
-            KutaDetail(name: "Vashya", maxPoints: 2, points: Int.random(in: 0...2)),
-            KutaDetail(name: "Tara", maxPoints: 3, points: Int.random(in: 0...3)),
-            KutaDetail(name: "Yoni", maxPoints: 4, points: Int.random(in: 0...4)),
-            KutaDetail(name: "Graha Maitri", maxPoints: 5, points: Int.random(in: 0...5)),
-            KutaDetail(name: "Gana", maxPoints: 6, points: Int.random(in: 0...6)),
-            KutaDetail(name: "Bhakoot", maxPoints: 7, points: Int.random(in: 0...7)),
-            KutaDetail(name: "Nadi", maxPoints: 8, points: Int.random(in: 0...8))
+            KutaDetail(name: "Varna", maxPoints: 1, points: Int.random(in: 0...1), description: "Work & Ego match"),
+            KutaDetail(name: "Vashya", maxPoints: 2, points: Int.random(in: 0...2), description: "Mutual attraction"),
+            KutaDetail(name: "Tara", maxPoints: 3, points: Int.random(in: 0...3), description: "Destiny & Luck"),
+            KutaDetail(name: "Yoni", maxPoints: 4, points: Int.random(in: 0...4), description: "Physical compatibility"),
+            KutaDetail(name: "Graha Maitri", maxPoints: 5, points: Int.random(in: 0...5), description: "Mental friendship"),
+            KutaDetail(name: "Gana", maxPoints: 6, points: Int.random(in: 0...6), description: "Temperament match"),
+            KutaDetail(name: "Bhakoot", maxPoints: 7, points: Int.random(in: 0...7), description: "Love & Happiness"),
+            KutaDetail(name: "Nadi", maxPoints: 8, points: Int.random(in: 0...8), description: "Health & Genes")
         ]
         
         let summary: String
@@ -540,6 +991,28 @@ struct KutaDetail: Identifiable, Codable {
     let name: String
     let maxPoints: Int
     let points: Int
+    let description: String
+    
+    // Custom CodingKeys to handle optional description for backwards compatibility
+    enum CodingKeys: String, CodingKey {
+        case name, maxPoints, points, description
+    }
+    
+    init(name: String, maxPoints: Int, points: Int, description: String = "") {
+        self.name = name
+        self.maxPoints = maxPoints
+        self.points = points
+        self.description = description
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decode(String.self, forKey: .name)
+        maxPoints = try container.decode(Int.self, forKey: .maxPoints)
+        points = try container.decode(Int.self, forKey: .points)
+        // Make description optional for backwards compatibility
+        description = try container.decodeIfPresent(String.self, forKey: .description) ?? ""
+    }
     
     var percentage: Double {
         guard maxPoints > 0 else { return 0 }

@@ -12,12 +12,18 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
     let sessionId: String
     let timestamp: Date
     
+    // Multi-Partner Grouping (Optional - nil for legacy single-partner matches)
+    let comparisonGroupId: String?
+    let partnerIndex: Int?  // Order within group (0 = first partner)
+    
     // Partner details
     let boyName: String
     let boyDob: String
+    let boyTime: String?  // Birth time in "HH:mm:ss" format (optional for legacy items)
     let boyCity: String
     let girlName: String
     let girlDob: String
+    let girlTime: String?  // Birth time in "HH:mm:ss" format (optional for legacy items)
     let girlCity: String
     
     // Score
@@ -46,6 +52,92 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
     var scorePercentage: Double {
         guard maxScore > 0 else { return 0 }
         return Double(totalScore) / Double(maxScore) * 100
+    }
+    
+    /// Whether this item is part of a multi-partner comparison group
+    var isInGroup: Bool {
+        comparisonGroupId != nil
+    }
+    
+    // MARK: - Legacy Initializer (backward compatible)
+    init(
+        sessionId: String,
+        timestamp: Date,
+        boyName: String,
+        boyDob: String,
+        boyTime: String? = nil,
+        boyCity: String,
+        girlName: String,
+        girlDob: String,
+        girlTime: String? = nil,
+        girlCity: String,
+        totalScore: Int,
+        maxScore: Int,
+        result: CompatibilityResult?,
+        chatMessages: [CompatChatMessageData],
+        comparisonGroupId: String? = nil,
+        partnerIndex: Int? = nil
+    ) {
+        self.sessionId = sessionId
+        self.timestamp = timestamp
+        self.comparisonGroupId = comparisonGroupId
+        self.partnerIndex = partnerIndex
+        self.boyName = boyName
+        self.boyDob = boyDob
+        self.boyTime = boyTime
+        self.boyCity = boyCity
+        self.girlName = girlName
+        self.girlDob = girlDob
+        self.girlTime = girlTime
+        self.girlCity = girlCity
+        self.totalScore = totalScore
+        self.maxScore = maxScore
+        self.result = result
+        self.chatMessages = chatMessages
+    }
+}
+
+// MARK: - Comparison Group
+/// Represents a group of related compatibility matches (1 user vs N partners)
+struct ComparisonGroup: Identifiable {
+    let id: String  // groupId
+    let timestamp: Date
+    let userName: String
+    let items: [CompatibilityHistoryItem]
+    
+    // MARK: - Computed Properties
+    
+    var partnerCount: Int {
+        items.count
+    }
+    
+    var displayTitle: String {
+        if partnerCount == 1 {
+            return items.first?.displayTitle ?? "Match"
+        } else {
+            return "\(userName) + \(partnerCount) partners"
+        }
+    }
+    
+    var displayDate: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: timestamp)
+    }
+    
+    var bestMatch: CompatibilityHistoryItem? {
+        items.max(by: { $0.totalScore < $1.totalScore })
+    }
+    
+    var averageScore: Double {
+        guard !items.isEmpty else { return 0 }
+        let total = items.reduce(0) { $0 + $1.totalScore }
+        return Double(total) / Double(items.count)
+    }
+    
+    var sortedItems: [CompatibilityHistoryItem] {
+        items.sorted { $0.totalScore > $1.totalScore }
     }
 }
 

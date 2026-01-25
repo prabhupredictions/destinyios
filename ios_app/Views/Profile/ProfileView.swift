@@ -4,6 +4,7 @@ import SwiftUI
 /// Follows standard iOS design patterns with Midnight Gold theme
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     @StateObject private var quotaManager = QuotaManager.shared
     @State private var authViewModel = AuthViewModel()
@@ -21,12 +22,20 @@ struct ProfileView: View {
     @State private var showChartStylePicker = false
     @State private var showSubscription = false
     @State private var showSignOutAlert = false
+    @State private var showGuestSignInSheet = false  // Guest sign-in prompt for subscription
+    
+    /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
+    private var isGuestUser: Bool {
+        // Guest emails use format: YYYYMMDD_HHMM_CityPrefix_LatInt_LngInt@daa.com
+        userEmail.isEmpty || userEmail.contains("guest") || userEmail.hasSuffix("@daa.com") || userEmail.hasSuffix("@gen.com")
+    }
     
     var body: some View {
         NavigationStack {
             ZStack {
                 // Dark Midnight Background
-                AppTheme.Colors.mainBackground
+                // Dark Midnight Background
+                CosmicBackgroundView()
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -58,13 +67,12 @@ struct ProfileView: View {
             }
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.large)
-            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    PremiumCloseButton {
-                        dismiss()
-                    }
+                     Button("Done") { dismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
             }
             .sheet(isPresented: $showBirthDetails) {
@@ -82,6 +90,14 @@ struct ProfileView: View {
             .sheet(isPresented: $showSubscription) {
                 SubscriptionView()
             }
+            .sheet(isPresented: $showGuestSignInSheet) {
+                GuestSignInPromptView(
+                    message: "sign_in_to_view_plans".localized,
+                    onBack: { showGuestSignInSheet = false }
+                )
+                .environment(authViewModel)
+            }
+            .preferredColorScheme(.dark)
         }
     }
     
@@ -156,8 +172,8 @@ struct ProfileView: View {
                     PartnerManagerView()
                 } label: {
                     PremiumListItem<EmptyView>(
-                        title: "saved_partners".localized,
-                        subtitle: "Manage partner profiles for matching",
+                        title: "Manage Birth Charts",
+                        subtitle: "Manage birth charts",
                         icon: "person.2.fill",
                         showChevron: true
                     )
@@ -204,7 +220,14 @@ struct ProfileView: View {
     
     // MARK: - Subscription Section
     private var subscriptionSection: some View {
-        Button(action: { showSubscription = true }) {
+        Button(action: { 
+            // Guest users must sign in first to view plans
+            if isGuestUser {
+                showGuestSignInSheet = true
+            } else {
+                showSubscription = true
+            }
+        }) {
             PremiumCard(style: .hero) {
                 HStack(spacing: 14) {
                     // Premium icon
@@ -259,26 +282,35 @@ struct ProfileView: View {
                 }
                 .buttonStyle(PlainButtonStyle()) // Important for NavLink wrap
                 
-                Link(destination: URL(string: "mailto:support@destinyai.app")!) {
-                    PremiumListItem<EmptyView>(
-                        title: "Contact Support",
-                        icon: "envelope.fill"
-                    )
-                }
+                PremiumListItem<EmptyView>(
+                    title: "Contact Us",
+                    icon: "envelope.fill",
+                    action: {
+                        if let url = URL(string: "https://www.destinyaiastrology.com/#contact") {
+                            openURL(url)
+                        }
+                    }
+                )
                 
-                Link(destination: URL(string: "https://destinyai.app/privacy")!) {
-                    PremiumListItem<EmptyView>(
-                        title: "Privacy Policy",
-                        icon: "hand.raised.fill"
-                    )
-                }
+                PremiumListItem<EmptyView>(
+                    title: "Privacy Policy",
+                    icon: "hand.raised.fill",
+                    action: {
+                        if let url = URL(string: "https://www.destinyaiastrology.com/privacy-policy/") {
+                            openURL(url)
+                        }
+                    }
+                )
                 
-                Link(destination: URL(string: "https://destinyai.app/terms")!) {
-                    PremiumListItem<EmptyView>(
-                        title: "Terms of Service",
-                        icon: "doc.text.fill"
-                    )
-                }
+                PremiumListItem<EmptyView>(
+                    title: "Terms of Service",
+                    icon: "doc.text.fill",
+                    action: {
+                        if let url = URL(string: "https://www.destinyaiastrology.com/terms-of-service/") {
+                            openURL(url)
+                        }
+                    }
+                )
             }
         }
     }
@@ -368,7 +400,8 @@ struct ProfileView: View {
 struct FAQHelpView: View {
     var body: some View {
         ZStack {
-            AppTheme.Colors.mainBackground.ignoresSafeArea()
+            CosmicBackgroundView()
+                .ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 20) {
@@ -379,35 +412,9 @@ struct FAQHelpView: View {
                         .padding(.horizontal)
                     
                     VStack(spacing: 16) {
-                        FAQItem(
-                            question: "How accurate are the predictions?",
-                            answer: "Destiny AI uses authentic Vedic astrology calculations based on your exact birth time and location, combined with AI for personalized insights. The accuracy depends heavily on the precision of your birth data."
-                        )
-                        
-                        FAQItem(
-                            question: "How do I update my birth details?",
-                            answer: "Go to Profile → Birth Details. You can edit your name and gender directly. For date, time, or place changes, please contact support as these affect all your readings."
-                        )
-                        
-                        FAQItem(
-                            question: "What astrological systems are supported?",
-                            answer: "We use Vedic (Jyotish) astrology with Lahiri Ayanamsa and Whole Sign house system for accurate calculations."
-                        )
-                        
-                        FAQItem(
-                            question: "What's the difference between chart styles?",
-                            answer: "North Indian style uses a diamond layout where houses are fixed and signs rotate. South Indian style uses a grid layout where signs are fixed and houses rotate."
-                        )
-                        
-                        FAQItem(
-                            question: "Is my data secure?",
-                            answer: "Yes, all your personal data including birth information is stored securely and encrypted. We never share your data with third parties."
-                        )
-                        
-                        FAQItem(
-                            question: "How do I cancel my subscription?",
-                            answer: "You can manage your subscription through the App Store. Go to Settings → Apple ID → Subscriptions on your device."
-                        )
+                        ForEach(faqItems, id: \.question) { item in
+                            FAQItem(question: item.question, answer: item.answer)
+                        }
                     }
                     .padding(.horizontal)
                 }
@@ -417,6 +424,54 @@ struct FAQHelpView: View {
         .navigationTitle("FAQ & Help")
         .navigationBarTitleDisplayMode(.inline)
     }
+    
+    // START: Merged FAQ Data
+    private var faqItems: [(question: String, answer: String)] {
+        [
+            // 1. Accuracy (Updated from Web)
+            ("How accurate are Destiny's insights?", "By combining the precision of our proprietary AI algorithm with traditional astrological expertise, Destiny's insights have been highly accurate."),
+            
+            // 2. AI vs Human (from Web)
+            ("How is AI astrology different from consulting a human astrologer?", "AI astrology provides objective insights quickly using sophisticated algorithms and extensive databases. In contrast, traditional astrologers offer personalized interpretations based on their experience and manual analysis of astrological charts."),
+            
+            // 3. App Specific: Updating Details (Preserved)
+            ("How do I update my birth details?", "Go to Profile → Birth Details. You can edit your name and gender directly. For date, time, or place changes, please contact support as these affect all your readings."),
+            
+            // 4. Required Info (from Web)
+            ("What information is required to start using Destiny?", "To use Destiny, you'll need to provide your birth date, time, and place. This information allows us to provide highly accurate and personalized astrological advice."),
+            
+            // 5. App Specific: Systems (Preserved)
+            ("What astrological systems are supported?", "We use Vedic (Jyotish) astrology with Lahiri Ayanamsa and Whole Sign house system for accurate calculations."),
+            
+            // 6. App Specific: Chart Styles (Preserved)
+            ("What's the difference between chart styles?", "North Indian style uses a diamond layout where houses are fixed and signs rotate. South Indian style uses a grid layout where signs are fixed and houses rotate."),
+            
+            // 7. Data Safety (Updated from Web)
+            ("Is my data safe with Destiny?", "Absolutely. Destiny employs robust security measures to ensure that your personal information is protected and kept confidential."),
+            
+            // 8. Question Scope (from Web)
+            ("Can I ask any question on Destiny?", "Yes, Destiny is equipped to handle a broad range of questions, whether they are about personal relationships, career choices, or daily life decisions."),
+            
+            // 9. Value Proposition (from Web)
+            ("Why should I consider astrology as a decision-making tool?", "Astrology provides valuable insights into personality traits and life patterns, helping you to better prepare for future opportunities and challenges."),
+            
+            // 10. Data Freshness (from Web)
+            ("How often is the astrological data updated?", "The astrological data used by the AI Astrologer is regularly updated to reflect current cosmic movements and planetary alignments, ensuring that your readings are always up-to-date and relevant."),
+             
+            // 11. Predictive Nature (from Web)
+            ("Can astrology predict my future?", "While astrology does not provide definitive predictions, it offers insights into potential life trends and upcoming opportunities, assisting you in making proactive and informed decisions."),
+            
+            // 12. Real-time (from Web)
+            ("Are the astrological insights provided in real-time?", "Yes, Destiny delivers astrological insights in real-time, enabling you to make informed decisions swiftly based on the latest astrological conditions."),
+            
+            // 13. App Specific: Subscription (Preserved)
+            ("How do I cancel my subscription?", "You can manage your subscription through the App Store. Go to Settings → Apple ID → Subscriptions on your device."),
+            
+            // 14. Terms (from Web)
+            ("Are there any terms and conditions I should be aware of?", "Prior to utilizing Destiny AI Astrology services, please ensure you have reviewed our Privacy Policy and Terms of Service.")
+        ]
+    }
+
 }
 
 // MARK: - FAQ Item Component

@@ -207,23 +207,23 @@ struct KutaGrid: View {
 
 #Preview("Kuta Row") {
     VStack(spacing: 16) {
-        KutaRow(kuta: KutaDetail(name: "Nadi", maxPoints: 8, points: 8))
-        KutaRow(kuta: KutaDetail(name: "Bhakoot", maxPoints: 7, points: 5))
-        KutaRow(kuta: KutaDetail(name: "Gana", maxPoints: 6, points: 2))
+        KutaRow(kuta: KutaDetail(name: "Nadi", maxPoints: 8, points: 8, description: "Health & Genes"))
+        KutaRow(kuta: KutaDetail(name: "Bhakoot", maxPoints: 7, points: 5, description: "Love & Happiness"))
+        KutaRow(kuta: KutaDetail(name: "Gana", maxPoints: 6, points: 2, description: "Temperament match"))
     }
     .padding()
 }
 
 #Preview("Kuta Grid") {
     KutaGrid(kutas: [
-        KutaDetail(name: "Varna", maxPoints: 1, points: 1),
-        KutaDetail(name: "Vashya", maxPoints: 2, points: 1),
-        KutaDetail(name: "Tara", maxPoints: 3, points: 0),
-        KutaDetail(name: "Yoni", maxPoints: 4, points: 4),
-        KutaDetail(name: "Maitri", maxPoints: 5, points: 2),
-        KutaDetail(name: "Gana", maxPoints: 6, points: 6),
-        KutaDetail(name: "Bhakoot", maxPoints: 7, points: 4),
-        KutaDetail(name: "Nadi", maxPoints: 8, points: 4)
+        KutaDetail(name: "Varna", maxPoints: 1, points: 1, description: "Work & Ego"),
+        KutaDetail(name: "Vashya", maxPoints: 2, points: 1, description: "Dominance"),
+        KutaDetail(name: "Tara", maxPoints: 3, points: 0, description: "Destiny"),
+        KutaDetail(name: "Yoni", maxPoints: 4, points: 4, description: "Physical compatibility"),
+        KutaDetail(name: "Maitri", maxPoints: 5, points: 2, description: "Mental friendship"),
+        KutaDetail(name: "Gana", maxPoints: 6, points: 6, description: "Temperament"),
+        KutaDetail(name: "Bhakoot", maxPoints: 7, points: 4, description: "Love"),
+        KutaDetail(name: "Nadi", maxPoints: 8, points: 4, description: "Health")
     ])
     .padding()
 }

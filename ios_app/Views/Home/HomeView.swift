@@ -17,6 +17,20 @@ struct HomeView: View {
     // Sound Manager
     @ObservedObject private var soundManager = SoundManager.shared
     
+    // Profile Context
+    let profileContext = ProfileContextManager.shared
+    @ObservedObject private var quotaManager = QuotaManager.shared
+    @State private var showProfileSwitcher = false
+    @State private var showUpgradePrompt = false
+    @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Switch Profile
+    
+    /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
+    private var isGuestUser: Bool {
+        let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+        // Guest emails use format: YYYYMMDD_HHMM_CityPrefix_LatInt_LngInt@daa.com
+        return email.isEmpty || email.contains("guest") || email.hasSuffix("@daa.com") || email.hasSuffix("@gen.com")
+    }
+    
     // Menu Sheet States
     @State private var showHistorySheet = false
     @State private var selectedFilter: String = "All" // Filter State
@@ -28,6 +42,7 @@ struct HomeView: View {
             // 1. Theme Background (Cosmic/Parallax)
             // Background
             CosmicBackgroundView()
+                .ignoresSafeArea()
             
             // GLOBAL AMBIENT SPOTLIGHT REMOVED
             // Returning to crisp black background for professional contrast.
@@ -48,9 +63,29 @@ struct HomeView: View {
                         OfflineBanner()
                         
                         if viewModel.isLoading {
-                            ProgressView()
-                                .tint(AppTheme.Colors.gold)
-                                .frame(maxWidth: .infinity, minHeight: 200)
+                            VStack(spacing: 20) {
+                                // Animated cosmic icon
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 36, weight: .light))
+                                    .foregroundColor(AppTheme.Colors.gold)
+                                    .symbolEffect(.pulse, options: .repeating)
+                                
+                                VStack(spacing: 8) {
+                                    Text("syncing_cosmic_data".localized)
+                                        .font(AppTheme.Fonts.title(size: 18))
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                    
+                                    Text("restoring_your_insights".localized)
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                }
+                                
+                                ProgressView()
+                                    .tint(AppTheme.Colors.gold)
+                                    .scaleEffect(1.2)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 300)
+                            .padding(.top, 60)
                         } else {
                             // 1. Hero: Cosmic Vibe
                             insightHeroSection
@@ -97,11 +132,19 @@ struct HomeView: View {
             }
             .opacity(contentOpacity)
         }
+        .navigationBarHidden(true)
         .task {
             await viewModel.loadHomeData()
         }
         .onAppear {
             startEntranceAnimation()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
+            // Reload home data when profile switches
+            // Uses profile-scoped cache, so API only called once/day per profile
+            Task {
+                await viewModel.loadHomeData()
+            }
         }
         .sheet(isPresented: $showProfile) {
             ProfileView()
@@ -110,6 +153,18 @@ struct HomeView: View {
             HistoryView(
                 onChatSelected: onChatHistorySelected,
                 onMatchSelected: onMatchHistorySelected
+            )
+        }
+        .sheet(isPresented: $showProfileSwitcher) {
+            ProfileSwitcherSheet()
+        }
+        .sheet(isPresented: $showUpgradePrompt) {
+            SubscriptionView()
+        }
+        .sheet(isPresented: $showGuestSignInSheet) {
+            GuestSignInPromptView(
+                message: "sign_in_to_switch_profiles".localized,
+                onBack: { showGuestSignInSheet = false }
             )
         }
     }
@@ -126,63 +181,45 @@ struct HomeView: View {
     
     // A. 3D Gold Header
     private var headerSection: some View {
-        HStack {
-            // History Button (Left)
+        VStack(spacing: 0) {
+            // Profile Context Indicator (always visible - shows active profile)
             Button(action: {
                 HapticManager.shared.play(.light)
-                showHistorySheet = true
+                // GUEST RULE: Guests must sign in first, not upgrade
+                if isGuestUser {
+                    showGuestSignInSheet = true
+                } else if quotaManager.hasFeature(.switchProfile) {
+                    showProfileSwitcher = true
+                } else {
+                    showUpgradePrompt = true
+                }
             }) {
-                ZStack {
-                    Circle()
-                        .fill(Color.clear) // Transparent
-                        .frame(width: 44, height: 44)
-                        .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                HStack(spacing: 8) {
+                    Image(systemName: profileContext.isUsingSelf ? "person.crop.circle" : "person.crop.circle.badge.checkmark")
+                        .font(.caption)
                     
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(AppTheme.Fonts.title(size: 18))
-                        .foregroundColor(AppTheme.Colors.gold)
+                    Text(profileContext.isUsingSelf ? profileContext.activeProfileName : "Viewing as \(profileContext.activeProfileName)")
+                        .font(AppTheme.Fonts.caption())
+                    
+                    Image(systemName: "chevron.down")
+                        .font(.caption2)
                 }
+                .foregroundColor(AppTheme.Colors.gold)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(AppTheme.Colors.gold.opacity(0.15))
+                        .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                )
             }
+            .padding(.bottom, 8)
             
-            Spacer()
-            
-            // "Destiny" 3D Text (The Soul)
-            // "Destiny" Logo
-            Image("destiny_home")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 32) // Standard height across all screens
-                .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 10, x: 0, y: 5)
-                .premiumInertia(intensity: 15) // Floats above logic
-            
-            Spacer()
-            
-            // Right Side Buttons
-            HStack(spacing: 12) {
-                // Sound Toggle
-                if AppTheme.Features.showSoundToggle {
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        soundManager.toggleSound()
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.clear) // Transparent
-                                .frame(width: 44, height: 44)
-                                .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
-                            
-                            Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                                .font(AppTheme.Fonts.body(size: 16))
-                                .foregroundColor(AppTheme.Colors.gold)
-                                .contentTransition(.symbolEffect(.replace))
-                        }
-                    }
-                }
-                
-                // Profile Button
+            HStack {
+                // History Button (Left)
                 Button(action: {
                     HapticManager.shared.play(.light)
-                    showProfile = true
+                    showHistorySheet = true
                 }) {
                     ZStack {
                         Circle()
@@ -190,9 +227,85 @@ struct HomeView: View {
                             .frame(width: 44, height: 44)
                             .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                         
-                        Image(systemName: "person.fill")
-                            .font(AppTheme.Fonts.body(size: 18))
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(AppTheme.Colors.gold)
+                    }
+                }
+                
+                Spacer()
+                
+                // "Destiny" Logo (always shown)
+                Image("destiny_home")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 32)
+                    .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 10, x: 0, y: 5)
+                    .premiumInertia(intensity: 15)
+                
+                Spacer()
+                
+                // Right Side Buttons
+                HStack(spacing: 12) {
+                    // Profile Switcher Button (if profiles available)
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        // GUEST RULE: Guests must sign in first, not upgrade
+                        if isGuestUser {
+                            showGuestSignInSheet = true
+                        } else if quotaManager.hasFeature(.switchProfile) {
+                            showProfileSwitcher = true
+                        } else {
+                            showUpgradePrompt = true
+                        }
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.clear) // Transparent
+                                .frame(width: 44, height: 44)
+                                .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                            
+                            Image(systemName: "person.2.fill")
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.gold)
+                        }
+                    }
+                    
+                    // Sound Toggle
+                    if AppTheme.Features.showSoundToggle {
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            soundManager.toggleSound()
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.clear) // Transparent
+                                    .frame(width: 44, height: 44)
+                                    .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                                
+                                Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                                    .font(AppTheme.Fonts.body(size: 16))
+                                    .foregroundColor(AppTheme.Colors.gold)
+                                    .contentTransition(.symbolEffect(.replace))
+                            }
+                        }
+                    }
+                    
+                    // Profile Button
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        showProfile = true
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.clear) // Transparent
+                                .frame(width: 44, height: 44)
+                                .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                            
+                            Image(systemName: "person.fill")
+                                .font(AppTheme.Fonts.body(size: 18))
+                                .foregroundColor(AppTheme.Colors.gold)
+                        }
                     }
                 }
             }

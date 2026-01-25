@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-/// Partner profile for compatibility matching
+/// Partner profile for compatibility matching and Switch Profile feature
 /// Stored locally in SwiftData and synced with server
 @Model
 final class PartnerProfile: Identifiable {
@@ -24,6 +24,10 @@ final class PartnerProfile: Identifiable {
     var isSynced: Bool
     var serverSyncedAt: Date?
     
+    // Switch Profile feature
+    var isSelf: Bool                // True if this is the account owner's profile
+    var isActive: Bool              // True if this is the currently active context
+    
     init(
         id: String = UUID().uuidString,
         name: String,
@@ -40,7 +44,9 @@ final class PartnerProfile: Identifiable {
         updatedAt: Date = Date(),
         lastMatchedAt: Date? = nil,
         isSynced: Bool = false,
-        serverSyncedAt: Date? = nil
+        serverSyncedAt: Date? = nil,
+        isSelf: Bool = false,
+        isActive: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -58,6 +64,8 @@ final class PartnerProfile: Identifiable {
         self.lastMatchedAt = lastMatchedAt
         self.isSynced = isSynced
         self.serverSyncedAt = serverSyncedAt
+        self.isSelf = isSelf
+        self.isActive = isActive
     }
     
     // MARK: - Helpers
@@ -108,6 +116,8 @@ struct PartnerProfileResponse: Codable {
     let createdAt: String
     let updatedAt: String
     let lastMatchedAt: String?
+    let isSelf: Bool?
+    let isActive: Bool?
     
     enum CodingKeys: String, CodingKey {
         case id, name, gender, latitude, longitude, timezone
@@ -119,6 +129,8 @@ struct PartnerProfileResponse: Codable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case lastMatchedAt = "last_matched_at"
+        case isSelf = "is_self"
+        case isActive = "is_active"
     }
     
     /// Convert to SwiftData model
@@ -142,7 +154,9 @@ struct PartnerProfileResponse: Codable {
             updatedAt: dateFormatter.date(from: updatedAt) ?? Date(),
             lastMatchedAt: lastMatchedAt.flatMap { dateFormatter.date(from: $0) },
             isSynced: true,
-            serverSyncedAt: Date()
+            serverSyncedAt: Date(),
+            isSelf: isSelf ?? false,
+            isActive: isActive ?? false
         )
     }
 }
@@ -160,6 +174,7 @@ struct PartnerProfileRequest: Codable {
     let longitude: Double?
     let timezone: Double?
     let birthTimeUnknown: Bool
+    let isSelf: Bool
     
     enum CodingKeys: String, CodingKey {
         case name, gender, latitude, longitude, timezone
@@ -167,6 +182,7 @@ struct PartnerProfileRequest: Codable {
         case timeOfBirth = "time_of_birth"
         case cityOfBirth = "city_of_birth"
         case birthTimeUnknown = "birth_time_unknown"
+        case isSelf = "is_self"
     }
     
     init(from profile: PartnerProfile) {
@@ -179,5 +195,6 @@ struct PartnerProfileRequest: Codable {
         self.longitude = profile.longitude
         self.timezone = profile.timezone
         self.birthTimeUnknown = profile.birthTimeUnknown
+        self.isSelf = profile.isSelf
     }
 }

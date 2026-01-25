@@ -8,8 +8,8 @@ struct OnboardingSlideView: View {
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: slide.isFeatureSlide ? 20 : AppTheme.Onboarding.iconToTitleSpacing) {
-                Spacer(minLength: slide.isFeatureSlide ? 30 : AppTheme.Onboarding.contentTopPadding)
+            VStack(spacing: AppTheme.Onboarding.iconToTitleSpacing) {
+                Spacer(minLength: AppTheme.Onboarding.contentTopPadding)
                 
                 // Floating Icon with glow and 3D tilt
                 FloatingIcon {
@@ -170,18 +170,14 @@ struct FeaturesListView: View {
         VStack(spacing: 12) {
             ForEach(features) { feature in
                 HStack(spacing: 16) {
-                    // Icon container with glassmorphism
+                    // Icon container
                     ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(AppTheme.Colors.gold.opacity(0.15))
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(.ultraThinMaterial.opacity(0.2))
-                            )
-                            .frame(width: 44, height: 44)
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppTheme.Colors.gold.opacity(0.1))
+                            .frame(width: 40, height: 40)
                         
                         Image(systemName: feature.icon)
-                            .font(AppTheme.Fonts.title(size: 18))
+                            .font(AppTheme.Fonts.title(size: 16))
                             .foregroundStyle(AppTheme.Colors.premiumGradient)
                     }
                     
@@ -192,13 +188,35 @@ struct FeaturesListView: View {
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         
                         Text(feature.description)
-                            .font(AppTheme.Fonts.body(size: 13))
+                            .font(AppTheme.Fonts.caption(size: 13))
                             .foregroundColor(AppTheme.Colors.textSecondary)
-                            .lineLimit(2)
                     }
                     
                     Spacer()
                 }
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(AppTheme.Colors.cardBackground.opacity(0.3))
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(.ultraThinMaterial.opacity(0.2))
+                        )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    AppTheme.Colors.gold.opacity(0.3),
+                                    AppTheme.Colors.gold.opacity(0.05)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
                 .padding(.horizontal, 24)
             }
         }

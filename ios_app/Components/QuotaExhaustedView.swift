@@ -73,7 +73,11 @@ struct QuotaExhaustedView: View {
     }
     
     private var showUpgrade: Bool {
-        !showContactSupport && (quotaError?.action != "wait" || quotaError == nil)
+        // GUEST RULE: Never show Upgrade for guests - only Sign In
+        if showSignIn {
+            return false
+        }
+        return !showContactSupport && (quotaError?.action != "wait" || quotaError == nil)
     }
     
     private var displayMessage: String {
@@ -86,11 +90,26 @@ struct QuotaExhaustedView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Drag indicator
-            RoundedRectangle(cornerRadius: 3)
-                .fill(Color.gray.opacity(0.3))
-                .frame(width: 40, height: 5)
-                .padding(.top, 12)
+            // Header with Drag Indicator and Close Button
+            ZStack(alignment: .top) {
+                // Drag indicator
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 40, height: 5)
+                    .padding(.top, 12)
+                
+                // Close Button
+                HStack {
+                    Spacer()
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.8))
+                    }
+                    .padding(.trailing, 16)
+                    .padding(.top, 16)
+                }
+            }
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 28) {

@@ -18,7 +18,9 @@ struct UserAstroDataRequest: Codable {
             longitude: roundedLong,
             ayanamsa: birthData.ayanamsa,
             houseSystem: birthData.houseSystem,
-            cityOfBirth: birthData.cityOfBirth
+            cityOfBirth: birthData.cityOfBirth,
+            gender: birthData.gender,
+            birthTimeUnknown: birthData.birthTimeUnknown
         )
         self.userEmail = userEmail
     }
@@ -37,11 +39,15 @@ struct UserBirthData: Codable {
     let ayanamsa: String
     let houseSystem: String
     let cityOfBirth: String?
+    let gender: String?
+    let birthTimeUnknown: Bool?
     
     enum CodingKeys: String, CodingKey {
         case dob, time, latitude, longitude
         case ayanamsa, houseSystem = "house_system"
         case cityOfBirth = "city_of_birth"
+        case gender
+        case birthTimeUnknown = "birth_time_unknown"
     }
     
     /// Round a coordinate to 6 decimal places (backend validation requirement)
@@ -49,7 +55,7 @@ struct UserBirthData: Codable {
         (value * 1_000_000).rounded() / 1_000_000
     }
     
-    init(dob: String, time: String, latitude: Double, longitude: Double, ayanamsa: String, houseSystem: String, cityOfBirth: String?) {
+    init(dob: String, time: String, latitude: Double, longitude: Double, ayanamsa: String, houseSystem: String, cityOfBirth: String?, gender: String? = nil, birthTimeUnknown: Bool? = nil) {
         self.dob = dob
         self.time = time
         self.latitude = Self.roundCoordinate(latitude)
@@ -57,6 +63,8 @@ struct UserBirthData: Codable {
         self.ayanamsa = ayanamsa
         self.houseSystem = houseSystem
         self.cityOfBirth = cityOfBirth
+        self.gender = gender
+        self.birthTimeUnknown = birthTimeUnknown
     }
     
     init(from decoder: Decoder) throws {
@@ -68,6 +76,8 @@ struct UserBirthData: Codable {
         ayanamsa = try container.decode(String.self, forKey: .ayanamsa)
         houseSystem = try container.decode(String.self, forKey: .houseSystem)
         cityOfBirth = try container.decodeIfPresent(String.self, forKey: .cityOfBirth)
+        gender = try container.decodeIfPresent(String.self, forKey: .gender)
+        birthTimeUnknown = try container.decodeIfPresent(Bool.self, forKey: .birthTimeUnknown)
     }
 }
 

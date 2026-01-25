@@ -12,6 +12,7 @@ struct BirthDataView: View {
     @State private var showTimePicker = false
     @State private var showLocationSearch = false
     @State private var showGenderSheet = false
+    @State private var showSignInPrompt = false  // For birthDataTaken case
     
     @FocusState private var isNameFocused: Bool
     
@@ -145,6 +146,21 @@ struct BirthDataView: View {
                 birthData: birthData,
                 userEmail: UserDefaults.standard.string(forKey: "userEmail") ?? ""
             )
+        }
+        .sheet(isPresented: $showSignInPrompt) {
+            // Guest tried to use birth data that belongs to a registered user
+            GuestSignInPromptView(
+                message: viewModel.errorMessage ?? "This birth data is already registered. Please sign in to continue.",
+                onBack: { showSignInPrompt = false }
+            )
+        }
+        .onChange(of: viewModel.birthDataTakenEmail) { _, email in
+            if email != nil {
+                // Cancel the ProfileSetupLoadingView if showing
+                savedBirthData = nil
+                // Show sign-in prompt
+                showSignInPrompt = true
+            }
         }
     }
     
@@ -329,6 +345,14 @@ struct BirthDataView: View {
                 isGeneratedEmail: isGuest
             )
             print("✅ Registered user with backend: \(userEmail), isGuest: \(isGuest)")
+        } catch let error as ArchivedGuestError {
+            // Guest already upgraded to registered - show sign-in prompt
+            print("🔔 Archived guest detected! Upgraded to: \(error.upgradedToEmail ?? "unknown")")
+            await MainActor.run {
+                viewModel.errorMessage = error.localizedDescription
+                // Cancel the ProfileSetupLoadingView
+                savedBirthData = nil
+            }
         } catch {
             print("❌ Failed to register with backend: \(error)")
             // Continue anyway - local data is saved
@@ -338,152 +362,10 @@ struct BirthDataView: View {
 
 // MARK: - Helper Components
 
-struct PremiumSelectionRow: View {
-    let icon: String
-    let title: String
-    let value: String
-    var isDisabled: Bool = false
-    var isPlaceholder: Bool = false  // New: use muted color for placeholder text
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
-                    Image(systemName: icon)
-                        .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(AppTheme.Colors.gold)
-                    Text(title)
-                        .font(AppTheme.Fonts.caption(size: 13))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                }
-                
-                HStack {
-                    Text(value)
-                        .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(isDisabled || isPlaceholder ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
-                    Spacer()
-                    Image(systemName: "chevron.down")
-                        .font(AppTheme.Fonts.caption(size: 12))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                }
-                .padding()
-                .background(AppTheme.Colors.inputBackground)
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
-                )
-            }
-        }
-        .disabled(isDisabled)
-        .opacity(isDisabled ? 0.6 : 1)
-    }
-}
-
-struct PremiumMenuRow: View {
-    let icon: String
-    let title: String
-    @Binding var selection: String
-    var placeholder: String = "Select"
-    let options: [(String, String)]
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .foregroundColor(AppTheme.Colors.gold)
-                Text(title)
-                    .font(AppTheme.Fonts.caption(size: 13))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-            }
-            
-            Menu {
-                ForEach(options, id: \.0) { value, label in
-                    Button(label) {
-                        selection = value
-                        HapticManager.shared.play(.light)
-                    }
-                }
-            } label: {
-                HStack {
-                    Text(options.first(where: { $0.0 == selection })?.1 ?? placeholder)
-                        .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(selection.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
-                    Spacer()
-                    Image(systemName: "chevron.down")
-                        .font(AppTheme.Fonts.caption(size: 12))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                }
-                .padding()
-                .background(AppTheme.Colors.inputBackground)
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(AppTheme.Styles.inputBorder.stroke, lineWidth: AppTheme.Styles.inputBorder.width)
-                )
-            }
-        }
-    }
-}
+// Components moved to SharedThemeComponents.swift
 
 // MARK: - Date Picker Sheet
-struct DatePickerSheet: View {
-    let title: String
-    @Binding var selection: Date
-    let components: DatePickerComponents
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        ZStack {
-            CosmicBackgroundView().ignoresSafeArea()
-            
-            VStack(spacing: 20) {
-                // Header (Handle + Title + Done)
-                ZStack(alignment: .top) {
-                    // 1. Handle & Title centered
-                    VStack(spacing: 16) {
-                        Capsule()
-                            .fill(Color.white.opacity(0.1))
-                            .frame(width: 40, height: 4)
-                            .padding(.top, 10)
-                        
-                        Text(title)
-                            .font(AppTheme.Fonts.title(size: 20)) // Soul Typography
-                            .foregroundColor(AppTheme.Colors.textPrimary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    
-                    // 2. Done Button (Top Right)
-                    HStack {
-                        Spacer()
-                        Button("done".localized) {
-                            HapticManager.shared.play(.light)
-                            dismiss()
-                        }
-                        .font(AppTheme.Fonts.body(size: 17).weight(.semibold))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .padding(.trailing, 20)
-                        .padding(.top, 24) // Align with title basically
-                    }
-                }
-                
-                // Custom Gold Picker
-                PremiumDatePicker(
-                    selection: $selection,
-                    mode: components
-                )
-                .padding(.horizontal)
-                
-                Spacer()
-            }
-        }
-        #if os(iOS)
-        .presentationDetents([.height(350)]) // Fixed height for custom sheet
-        #endif
-    }
-}
+// DatePickerSheet moved to SharedThemeComponents.swift
 
 #Preview {
     BirthDataView()

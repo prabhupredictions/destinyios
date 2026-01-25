@@ -3,10 +3,27 @@ import SwiftUI
 /// Premium authentication screen with multiple sign-in options
 /// Aligned with Splash/Language/Onboarding visual consistency
 struct AuthView: View {
-    // MARK: - State
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @StateObject private var quotaManager = QuotaManager.shared
     @State private var viewModel = AuthViewModel()
+    
+    // User preferences from storage
+    @AppStorage("userName") private var userName: String = ""
+    @AppStorage("userEmail") private var userEmail: String = ""
+    @AppStorage("chartStyle") private var chartStyle: String = "north"
+    @AppStorage("isGuest") private var isGuest: Bool = false
     @AppStorage("isAuthenticated") private var isAuthenticatedStorage = false
     
+    // Navigation states for settings sheets
+    @State private var showBirthDetails = false
+    @State private var showLanguageSettings = false
+    @State private var showAstrologySettings = false
+    
+    // ... (rest of View)
+
+
     // Animation states
     @State private var logoScale: CGFloat = 0.6
     @State private var contentOpacity: Double = 0
@@ -184,6 +201,7 @@ struct AuthView: View {
                 Task { await viewModel.signInWithGoogle() }
             }
             
+            /*
             // Email Sign In (Glass Slab)
             AuthButton(
                 icon: "envelope.fill",
@@ -194,6 +212,7 @@ struct AuthView: View {
             ) {
                 // TODO: Email sign in
             }
+            */
             
             // Error message
             if let error = viewModel.errorMessage {
@@ -264,7 +283,9 @@ struct AuthView: View {
             
             HStack(spacing: 4) {
                 Button("terms_of_service".localized) {
-                    // TODO: Open terms
+                     if let url = URL(string: "https://www.destinyaiastrology.com/terms-of-service/") {
+                         openURL(url)
+                     }
                 }
                 .font(AppTheme.Fonts.caption(size: 11))
                 .fontWeight(.medium)
@@ -275,7 +296,9 @@ struct AuthView: View {
                     .foregroundColor(AppTheme.Colors.textTertiary)
                 
                 Button("privacy_policy".localized) {
-                    // TODO: Open privacy
+                     if let url = URL(string: "https://www.destinyaiastrology.com/privacy-policy/") {
+                         openURL(url)
+                     }
                 }
                 .font(AppTheme.Fonts.caption(size: 11))
                 .fontWeight(.medium)
@@ -374,7 +397,7 @@ struct AuthButton: View {
                 Text(title)
                     .font(AppTheme.Fonts.title(size: 16))
             }
-            .foregroundColor(style == .goldSlab ? Color(hex: "0B0F19") : AppTheme.Colors.textPrimary)
+            .foregroundColor(style == .goldSlab ? AppTheme.Colors.textOnGold : AppTheme.Colors.textPrimary)
             .frame(maxWidth: .infinity)
             .frame(height: AppTheme.Auth.buttonHeight)
             .background(

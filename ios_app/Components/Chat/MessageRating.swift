@@ -131,7 +131,7 @@ struct MessageRating: View {
 // MARK: - Inline Message Rating (Compact version for metadata row)
 /// Compact star rating that fits inline with timestamp/processing time
 struct InlineMessageRating: View {
-    let messageId: String
+    let message: LocalChatMessage
     let query: String
     let responseText: String
     let predictionId: String?
@@ -142,15 +142,27 @@ struct InlineMessageRating: View {
     
     var body: some View {
         HStack(spacing: 4) {
-            if hasSubmitted {
-                // Compact thank you
+            if hasSubmitted || (message.rating != nil && message.rating! > 0) {
+                // Compact thank you or already rated state
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 10))
                     .foregroundColor(.green)
-                Text("Rated")
-                    .font(.system(size: 10))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .fixedSize()
+                
+                // Show stars if already rated
+                if let rating = message.rating, rating > 0 {
+                   HStack(spacing: 1) {
+                        ForEach(1...5, id: \.self) { star in
+                             Image(systemName: star <= rating ? "star.fill" : "star")
+                                .font(.system(size: 10))
+                                .foregroundColor(star <= rating ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.3))
+                        }
+                    }
+                } else {
+                    Text("Rated")
+                        .font(.system(size: 10))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .fixedSize()
+                }
             } else {
                 // Rate label
                 Text("Rate")
@@ -209,6 +221,9 @@ struct InlineMessageRating: View {
                 await MainActor.run {
                     isSubmitting = false
                     hasSubmitted = true
+                    
+                    // Persist locally immediately
+                    message.rating = rating
                     
                     let notification = UINotificationFeedbackGenerator()
                     notification.notificationOccurred(.success)

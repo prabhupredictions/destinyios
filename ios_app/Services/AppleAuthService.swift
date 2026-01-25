@@ -1,5 +1,9 @@
 import Foundation
 import AuthenticationServices
+import UIKit
+#if canImport(GoogleSignIn)
+import GoogleSignIn
+#endif
 
 /// Real Apple Sign-In implementation using AuthenticationServices
 class AppleAuthService: NSObject, AuthServiceProtocol {
@@ -21,12 +25,31 @@ class AppleAuthService: NSObject, AuthServiceProtocol {
         }
     }
     
-    // MARK: - Google Sign In (placeholder - needs GoogleSignIn SDK)
+    // MARK: - Google Sign In
     
+    @MainActor
     func signInWithGoogle() async throws -> User {
-        // TODO: Implement with GoogleSignIn SDK
-        // For now, throw an error or use mock
-        throw AuthError.notImplemented("Google Sign-In requires GoogleSignIn SDK setup")
+        #if canImport(GoogleSignIn)
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            print("❌ [AppleAuth] No root view controller found")
+            throw AuthError.notImplemented("No root view controller found")
+        }
+        
+        print("🚀 [AppleAuth] Starting Google Sign-In...")
+        let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+        print("✅ [AppleAuth] Google Sign-In Success!")
+        let user = result.user
+        
+        return User(
+            id: user.userID ?? "unknown_google_id",
+            email: user.profile?.email,
+            name: user.profile?.name,
+            provider: "google"
+        )
+        #else
+        throw AuthError.notImplemented("GoogleSignIn SDK not imported. Please add the package via Xcode.")
+        #endif
     }
     
     // MARK: - Guest Sign In
@@ -36,7 +59,8 @@ class AppleAuthService: NSObject, AuthServiceProtocol {
         return User(
             id: guestId,
             email: nil,
-            name: nil  // Backend will default to "Destiny User"
+            name: nil,  // Backend will default to "Destiny User"
+            provider: "guest"
         )
     }
     
@@ -109,7 +133,8 @@ extension AppleAuthService: ASAuthorizationControllerDelegate {
         let user = User(
             id: userId,
             email: email,
-            name: displayName
+            name: displayName,
+            provider: "apple"
         )
         
         print("[AppleAuth] User: id=\(userId), email=\(email ?? "nil"), name=\(displayName ?? "nil")")

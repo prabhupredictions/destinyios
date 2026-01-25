@@ -17,47 +17,9 @@ struct PlanetaryPositionsSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Premium Deep Space Nebula Background
-                GeometryReader { geo in
-                    ZStack {
-                        // Deep Base
-                        AppTheme.Colors.mainBackground.ignoresSafeArea()
-                        
-                        // Central Blue Glow
-                        RadialGradient(
-                            colors: [
-                                AppTheme.Colors.secondaryBackground.opacity(0.8),
-                                .clear
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: max(geo.size.width, geo.size.height) * 0.8
-                        )
-                        
-                        // Top-Left Gold Nebula/Star Glow
-                        RadialGradient(
-                            colors: [
-                                AppTheme.Colors.gold.opacity(0.1),
-                                .clear
-                            ],
-                            center: .topLeading,
-                            startRadius: 0,
-                            endRadius: 300
-                        )
-                        
-                        // Bottom-Right Purple/Deep Nebula
-                        RadialGradient(
-                            colors: [
-                                AppTheme.Colors.purpleAccent.opacity(0.15),
-                                .clear
-                            ],
-                            center: .bottomTrailing,
-                            startRadius: 0,
-                            endRadius: 400
-                        )
-                    }
-                }
-                .ignoresSafeArea()
+                // Premium Cosmic Background
+                CosmicBackgroundView()
+                    .ignoresSafeArea()
                 
                 if isLoading {
                     VStack(spacing: 16) {
@@ -114,7 +76,7 @@ struct PlanetaryPositionsSheet: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             // .toolbarBackground(.visible, for: .navigationBar) // was solid NavyPrimary
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     // Chart Style Toggles
                     Menu {
                         Button(action: { chartStyle = "north" }) {
@@ -129,8 +91,8 @@ struct PlanetaryPositionsSheet: View {
                     }
                 }
                 
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") { dismiss() }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -307,16 +269,53 @@ struct PlanetaryPositionsSheet: View {
         isLoading = true
         errorMessage = nil
         
-        // Read from correct key: "userBirthData" (not "userBirthProfile")
-        guard let storedData = UserDefaults.standard.data(forKey: "userBirthData"),
-              let savedBirthData = try? JSONDecoder().decode(BirthData.self, from: storedData) else {
+        // Use active profile's birth data (Switch Profile feature)
+        guard let activeBirthData = ProfileContextManager.shared.activeBirthData else {
+            // Fallback: Try legacy UserDefaults
+            if let storedData = UserDefaults.standard.data(forKey: "userBirthData"),
+               let savedBirthData = try? JSONDecoder().decode(BirthData.self, from: storedData) {
+                loadChartFromBirthData(savedBirthData)
+                return
+            }
+            
             isLoading = false
             errorMessage = "No birth profile found."
             return
         }
         
-        // Convert BirthData (local storage) -> UserBirthData (API request)
-        // Normalize time to 24-hour format for legacy data
+        print("[PlanetaryPositionsSheet] Loading chart for: \(ProfileContextManager.shared.activeProfileName)")
+        
+        // Create API request with active profile's birth data
+        let apiBirthData = UserBirthData(
+            dob: activeBirthData.dob,
+            time: normalizeTimeFormat(activeBirthData.time),
+            latitude: activeBirthData.latitude,
+            longitude: activeBirthData.longitude,
+            ayanamsa: activeBirthData.ayanamsa,
+            houseSystem: activeBirthData.houseSystem,
+            cityOfBirth: activeBirthData.cityOfBirth
+        )
+        
+        Task {
+            do {
+                let chart = try await UserChartService.shared.fetchFullChartData(birthData: apiBirthData)
+                
+                await MainActor.run {
+                    self.chartData = chart
+                    self.cityOfBirth = activeBirthData.cityOfBirth ?? ""
+                    self.isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = error.localizedDescription
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    /// Helper to load chart from legacy BirthData format
+    private func loadChartFromBirthData(_ savedBirthData: BirthData) {
         let normalizedTime = normalizeTimeFormat(savedBirthData.time)
         
         let apiBirthData = UserBirthData(
@@ -468,13 +467,26 @@ struct PremiumPlanetRow: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(AppTheme.Colors.cardBackground)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.1, green: 0.12, blue: 0.22).opacity(0.9),
+                            Color(red: 0.05, green: 0.06, blue: 0.12).opacity(0.95)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [AppTheme.Colors.gold.opacity(0.3), .clear],
+                        colors: [
+                            AppTheme.Colors.gold.opacity(0.3),
+                            AppTheme.Colors.gold.opacity(0.05),
+                            Color.white.opacity(0.05)
+                        ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),

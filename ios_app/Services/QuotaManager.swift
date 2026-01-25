@@ -2,6 +2,21 @@ import Foundation
 import Combine
 import SwiftData
 
+// MARK: - Errors
+
+/// Thrown when an archived guest tries to use the app again with same birth data
+/// The user should be prompted to sign in to their registered account instead
+struct ArchivedGuestError: Error, LocalizedError {
+    let upgradedToEmail: String?
+    
+    var errorDescription: String? {
+        if let email = upgradedToEmail {
+            return "This account was upgraded to \(email). Please sign in."
+        }
+        return "You already have a registered account. Please sign in."
+    }
+}
+
 // MARK: - Feature & Plan Models
 
 /// Feature IDs matching backend
@@ -9,7 +24,9 @@ enum FeatureID: String, Codable, Sendable {
     case aiQuestions = "ai_questions"  // Shared pool for chat + follow-ups
     case compatibility = "compatibility"
     case history = "history"
-    case profiles = "multiple_profiles"
+    case profiles = "multiple_profile_match"
+    case switchProfile = "switch_profile"
+    case maintainProfile = "maintain_profile"  // Save/create profiles (Core: 5, Plus: Unlimited)
     case alerts = "alerts"
     case earlyAccess = "early_access"
 }
@@ -229,8 +246,8 @@ class QuotaManager: ObservableObject {
     
     private let dataManager: DataManager
     
-    init(dataManager: DataManager = DataManager.shared) {
-        self.dataManager = dataManager
+    init(dataManager: DataManager? = nil) {
+        self.dataManager = dataManager ?? DataManager.shared
     }
     
     // MARK: - Feature Access
@@ -330,6 +347,7 @@ class QuotaManager: ObservableObject {
     // MARK: - Registration & Sync
     
     /// Register user with backend (call on birth data save or login)
+    /// Throws ArchivedGuestError if guest account was already upgraded to registered
     func registerUser(email: String, isGeneratedEmail: Bool) async throws {
         let url = URL(string: APIConfig.baseURL + "/subscription/register")!
         var request = URLRequest(url: url)
@@ -345,7 +363,23 @@ class QuotaManager: ObservableObject {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+        
+        // Handle 409 Conflict - guest was already upgraded to registered account
+        if httpResponse.statusCode == 409 {
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               let error = detail["error"] as? String,
+               error == "archived_guest" {
+                let upgradedTo = detail["upgraded_to_email"] as? String
+                print("[QuotaManager] 🔔 Archived guest detected! Upgraded to: \(upgradedTo ?? "unknown")")
+                throw ArchivedGuestError(upgradedToEmail: upgradedTo)
+            }
+        }
+        
+        guard httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
         
@@ -409,5 +443,46 @@ class QuotaManager: ObservableObject {
     /// Check if current user is a guest (based on cached plan)
     var isGuest: Bool {
         currentPlan?.planId == "free_guest"
+    }
+    
+    /// Check if user has access to a specific feature (cached)
+    func hasFeature(_ feature: FeatureID) -> Bool {
+        isPremium || availableFeatures.contains(feature.rawValue)
+    }
+    
+    // MARK: - Profile Management
+    
+    /// Check if user can add a new profile based on maintain_profile entitlement
+    /// Returns: (canAdd, limit, showUpgrade)
+    /// - canAdd: true if user can add another profile
+    /// - limit: the maximum allowed (-1 = unlimited)
+    /// - showUpgrade: true if user should see upgrade prompt
+    func canAddProfile(email: String, currentCount: Int) async -> (canAdd: Bool, limit: Int, showUpgrade: Bool) {
+        do {
+            let response = try await canAccessFeature(.maintainProfile, email: email)
+            if !response.canAccess {
+                // User doesn't have maintain_profile feature - show upgrade
+                return (false, 0, true)
+            }
+            
+            // Check limits from response
+            if let limits = response.limits, let overall = limits["overall"] {
+                let limit = overall.limit
+                if limit == -1 {
+                    // Unlimited
+                    return (true, -1, false)
+                }
+                // Check if current count is below limit
+                let canAdd = currentCount < limit
+                return (canAdd, limit, !canAdd)
+            }
+            
+            // Default: allow if feature is accessible but no limit info
+            return (true, -1, false)
+        } catch {
+            print("❌ canAddProfile error: \(error)")
+            // Fail open - allow on network error
+            return (true, -1, false)
+        }
     }
 }

@@ -258,6 +258,8 @@ struct YogaItem: Codable, Identifiable {
     let planets: String?
     let houses: String?
     let formation: String?
+    let reason: String?  // Cancellation/reduction reason from API
+    let isDosha: Bool?   // Explicit backend flag
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -267,6 +269,8 @@ struct YogaItem: Codable, Identifiable {
         case planets
         case houses
         case formation
+        case reason
+        case isDosha = "is_dosha"
     }
     
     /// Clean display name - strips numbers/parentheses after Yoga/Dosha

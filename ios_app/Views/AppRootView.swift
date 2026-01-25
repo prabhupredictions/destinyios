@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// Main app container that handles routing between authentication flows
 struct AppRootView: View {
@@ -7,6 +8,9 @@ struct AppRootView: View {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("isAuthenticated") private var isAuthenticated = false
     @AppStorage("hasBirthData") private var hasBirthData = false
+    
+    // MARK: - Model Container
+    @Environment(\.modelContext) private var modelContext
     
     // MARK: - Local State
     @State private var showSplash = true
@@ -50,6 +54,10 @@ struct AppRootView: View {
                 } else {
                     MainTabView()
                         .transition(.opacity)
+                        .onAppear {
+                            // Load active profile context on main app view
+                            loadProfileContext()
+                        }
                 }
             }
             .animation(.easeInOut(duration: 0.4), value: hasCompletedLanguageSelection)
@@ -72,6 +80,13 @@ struct AppRootView: View {
                 }
             }
         }
+    }
+    
+    // MARK: - Profile Context
+    
+    /// Load active profile from persistence
+    private func loadProfileContext() {
+        ProfileContextManager.shared.loadActiveProfile(context: modelContext)
     }
 }
 

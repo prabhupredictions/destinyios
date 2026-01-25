@@ -13,70 +13,55 @@ struct KalsarpaDoshaSheet: View {
     let boyName: String
     let girlName: String
     
-    @State private var selectedPartner: Int = 0
     @State private var animateSnake: Bool = false
     @State private var animateOrbit: Bool = false
-    @Environment(\.dismiss) private var dismiss
     
-    private var currentData: KalaSarpaData? {
-        selectedPartner == 0 ? boyData : girlData
+    // MARK: - Scenario Logic
+    
+    enum KalsarpaScenario {
+        case none
+        case one(isBoy: Bool)
+        case both
     }
     
-    private var currentName: String {
-        selectedPartner == 0 ? boyName : girlName
+    private var scenario: KalsarpaScenario {
+        let boyHas = boyData?.isPresent == true
+        let girlHas = girlData?.isPresent == true
+        
+        if boyHas && girlHas { return .both }
+        if boyHas { return .one(isBoy: true) }
+        if girlHas { return .one(isBoy: false) }
+        return .none
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background
-                AppTheme.Colors.mainBackground
-                    .ignoresSafeArea()
-                
-                // Subtle star field effect
-                starFieldOverlay
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Partner Picker
-                        partnerPicker
-                        
-                        // Hero Section
-                        if let data = currentData {
-                            heroSection(data)
-                            
-                            // Consolidated Dosha Details Card
-                            if data.isPresent {
-                                doshaDetailsCard(data)
-                            }
-                            
-                            // Remedies (separate card for emphasis)
-                            if let remedies = data.remedies, !remedies.isEmpty {
-                                remediesCard(remedies)
-                            }
-                        } else {
-                            noDataView
-                        }
-                    }
-                    .padding()
-                    .padding(.bottom, 50)
-                }
-            }
-            .navigationTitle("kalsarpa_analysis".localized)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .font(AppTheme.Fonts.title(size: 14))
-                            .foregroundColor(AppTheme.Colors.gold)
-                            .frame(width: 32, height: 32)
-                            .background(Circle().fill(AppTheme.Colors.secondaryBackground))
-                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+        ZStack {
+            // Background
+            CosmicBackgroundView()
+                .ignoresSafeArea()
+            
+            // Subtle star field effect
+            starFieldOverlay
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    switch scenario {
+                    case .none:
+                        divineProtectionView
+                    case .one(let isBoy):
+                        singleDoshaView(isBoy: isBoy)
+                    case .both:
+                        mutualDoshaView
                     }
                 }
+                .padding()
+                .padding(.bottom, 50)
             }
         }
+        .navigationTitle("kalsarpa_analysis".localized)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .onAppear {
             withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
                 animateSnake = true
@@ -103,136 +88,322 @@ struct KalsarpaDoshaSheet: View {
         }
     }
     
-    // MARK: - Partner Picker
+    // MARK: - Scenario 1: Divine Protection (None)
     
-    private var partnerPicker: some View {
-        HStack(spacing: 0) {
-            ForEach([boyName, girlName].indices, id: \.self) { index in
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        selectedPartner = index
-                    }
-                } label: {
-                    Text(index == 0 ? boyName : girlName)
-                        .font(AppTheme.Fonts.caption(size: 14).weight(.semibold))
-                        .foregroundColor(selectedPartner == index ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
-                        .padding(.vertical, 10)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            selectedPartner == index
-                            ? AppTheme.Colors.gold
-                            : Color.clear
-                        )
-                }
+    private var divineProtectionView: some View {
+        VStack(spacing: 30) {
+            // Hero
+            ZStack {
+                Circle()
+                    .fill(AppTheme.Colors.success.opacity(0.1))
+                    .frame(width: 160, height: 160)
+                
+                Circle()
+                    .stroke(AppTheme.Colors.success.opacity(0.3), lineWidth: 1)
+                    .frame(width: 140, height: 140)
+                
+                Image(systemName: "shield.check.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(AppTheme.Colors.success)
+                    .shadow(color: AppTheme.Colors.success.opacity(0.5), radius: 10)
             }
-        }
-        .background(AppTheme.Colors.inputBackground)
-        .clipShape(Capsule())
-        .overlay(
-            Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
-        )
-        .padding(.horizontal, 20)
-    }
-    
-    // MARK: - Hero Section
-    
-    private func heroSection(_ data: KalaSarpaData) -> some View {
-        VStack(spacing: 20) {
-            if data.isPresent {
-                // Animated snake in cosmic circle
-                ZStack {
-                    // Orbit
-                    Circle()
-                        .stroke(
-                            AngularGradient(
-                                colors: [AppTheme.Colors.gold.opacity(0.6), AppTheme.Colors.goldDim.opacity(0.3), AppTheme.Colors.gold.opacity(0.6)],
-                                center: .center
-                            ),
-                            lineWidth: 2
-                        )
-                        .frame(width: 160, height: 160)
-                        .rotationEffect(.degrees(animateOrbit ? 360 : 0))
-                    
-                    // Inner circle
-                    Circle()
-                        .fill(AppTheme.Colors.cardBackground)
-                        .frame(width: 140, height: 140)
-                        .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1))
-                    
-                    // Snake emoji with animation
-                    Text("🐍")
-                        .font(AppTheme.Fonts.display(size: 56))
-                        .scaleEffect(animateSnake ? 1.08 : 0.95)
-                        .rotationEffect(.degrees(animateSnake ? 8 : -8))
+            .padding(.top, 20)
+            
+            VStack(spacing: 12) {
+                Text("Divine Protection")
+                    .font(AppTheme.Fonts.title(size: 24))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                
+                Text("Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.")
+                    .font(AppTheme.Fonts.body(size: 16))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(6)
+            }
+            .padding(.horizontal)
+            
+            // Positive Reinforcement Card
+            VStack(spacing: 16) {
+                HStack {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(AppTheme.Colors.gold)
+                    Text("Relationship Benefits")
+                        .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    Spacer()
                 }
                 
-                VStack(spacing: 12) {
-                    // Status badge
-                    Text("kalsarpa_dosha".localized.uppercased())
-                        .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
-                        .foregroundColor(AppTheme.Colors.error)
-                        .tracking(3)
-                    
-                    // Main status
-                    Text("DETECTED")
-                        .font(AppTheme.Fonts.title(size: 24))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                    
-                    // Yoga Name
-                    Text(data.displayName)
-                        .font(AppTheme.Fonts.body(size: 18).weight(.bold))
-                        .foregroundStyle(AppTheme.Colors.gold)
-                    
-                    // Completeness & Severity badges
-                    HStack(spacing: 12) {
-                        if let completeness = data.completeness {
-                            statusBadge(text: completeness == "complete" ? "complete_formation".localized : "partial_formation".localized, color: completeness == "complete" ? .orange : .yellow)
-                        }
-                        
-                        if let severity = data.severity, severity != "none" {
-                            statusBadge(text: severity.capitalized, color: severityColor(severity))
-                        }
-                    }
+                HStack(spacing: 20) {
+                    benefitItem(icon: "heart.circle.fill", text: "Emotional\nHarmony")
+                    benefitItem(icon: "arrow.up.circle.fill", text: "Smooth\nProgression")
+                    benefitItem(icon: "sun.max.fill", text: "Positive\nenergy")
                 }
-            } else {
-                // No Kalsarpa - Positive state
+            }
+            .padding(20)
+            .background(
                 ZStack {
-                    Circle()
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Color.black.opacity(0.45))
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(
+                            LinearGradient(
+                                stops: [
+                                    .init(color: Color.white.opacity(0.08), location: 0),
+                                    .init(color: Color.white.opacity(0.0), location: 0.45)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
                         .stroke(
                             LinearGradient(
-                                colors: [AppTheme.Colors.success.opacity(0.5), AppTheme.Colors.success.opacity(0.2)],
+                                colors: [
+                                    Color.white.opacity(0.4),
+                                    Color.white.opacity(0.1),
+                                    Color.white.opacity(0.05)
+                                ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 2
+                            lineWidth: 1
                         )
-                        .frame(width: 140, height: 140)
-                    
-                    Text("✨")
-                        .font(AppTheme.Fonts.display(size: 52))
-                        .scaleEffect(animateSnake ? 1.05 : 0.98)
-                }
-                
+                )
+                .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
+            )
+        }
+    }
+    
+    private func benefitItem(icon: String, text: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 32))
+                .foregroundColor(AppTheme.Colors.gold)
+            Text(text)
+                .font(AppTheme.Fonts.caption(size: 12))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    // MARK: - Scenario 2: Single Dosha (One)
+    
+    private func singleDoshaView(isBoy: Bool) -> some View {
+        let affectedName = isBoy ? boyName : girlName
+        let affectedData = isBoy ? boyData : girlData
+        let safeName = isBoy ? girlName : boyName
+        
+        return VStack(spacing: 24) {
+            // Comparison Card
+            HStack(spacing: 0) {
+                // Affected Side
                 VStack(spacing: 8) {
-                    Text("no_kalsarpa".localized.uppercased())
-                        .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
+                    ZStack {
+                        Circle()
+                            .fill(AppTheme.Colors.error.opacity(0.1))
+                            .frame(width: 60, height: 60)
+                        Text("🐍")
+                            .font(.system(size: 30))
+                    }
+                    Text(affectedName)
+                        .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    Text("Has Dosha")
+                        .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.error)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppTheme.Colors.error.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Divider
+                Rectangle()
+                    .fill(AppTheme.Colors.textTertiary.opacity(0.2))
+                    .frame(width: 1, height: 80)
+                
+                // Safe Side
+                VStack(spacing: 8) {
+                    ZStack {
+                        Circle()
+                            .fill(AppTheme.Colors.success.opacity(0.1))
+                            .frame(width: 60, height: 60)
+                        Image(systemName: "shield.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(AppTheme.Colors.success)
+                    }
+                    Text(safeName)
+                        .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    Text("Protected")
+                        .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                         .foregroundColor(AppTheme.Colors.success)
-                        .tracking(2)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppTheme.Colors.success.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.vertical, 20)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Color.black.opacity(0.4))
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(
+                            LinearGradient(
+                                stops: [
+                                    .init(color: Color.white.opacity(0.06), location: 0),
+                                    .init(color: Color.white.opacity(0.0), location: 0.4)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.3),
+                                    Color.white.opacity(0.08),
+                                    Color.white.opacity(0.03)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+                .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 6)
+            )
+            
+            // Detailed Analysis for Affected Partner
+            if let data = affectedData {
+                VStack(spacing: 16) {
+                    Text("\(affectedName)'s Analysis")
+                        .font(AppTheme.Fonts.title(size: 20))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    Text("planets_balanced".localized)
-                        .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
+                    doshaDetailsCard(data)
+                    
+                    if let remedies = data.remedies, !remedies.isEmpty {
+                        remediesCard(remedies, forName: affectedName)
+                    }
                 }
             }
         }
-        .padding(28)
-        .frame(maxWidth: .infinity)
-        .background(
-             RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
-                 .fill(AppTheme.Colors.cardBackground)
-                 .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
-        )
+    }
+    
+    // MARK: - Scenario 3: Mutual Dosha (Both)
+    
+    private var mutualDoshaView: some View {
+        VStack(spacing: 24) {
+            // Hero
+            ZStack {
+                Circle()
+                    .fill(AppTheme.Colors.gold.opacity(0.1))
+                    .frame(width: 140, height: 140)
+                
+                HStack(spacing: -10) {
+                    Text("🐍")
+                        .font(.system(size: 50))
+                        .scaleEffect(x: -1, y: 1)
+                    Text("🐍")
+                        .font(.system(size: 50))
+                }
+            }
+            
+            VStack(spacing: 12) {
+                Text("Mutual Kalsarpa")
+                    .font(AppTheme.Fonts.title(size: 24))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                
+                Text("Dosha Samya Detected")
+                    .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
+                    .foregroundColor(AppTheme.Colors.gold)
+                
+                Text("Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.")
+                    .font(AppTheme.Fonts.body(size: 16))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(6)
+            }
+            .padding(.horizontal)
+            
+            // Partner Details Comparison
+            if let bData = boyData, let gData = girlData {
+                VStack(spacing: 16) {
+                    compactDoshaRow(name: boyName, data: bData)
+                    compactDoshaRow(name: girlName, data: gData)
+                }
+                .padding()
+                .background(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(Color.black.opacity(0.4))
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(
+                                LinearGradient(
+                                    stops: [
+                                        .init(color: Color.white.opacity(0.06), location: 0),
+                                        .init(color: Color.white.opacity(0.0), location: 0.4)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.3),
+                                        Color.white.opacity(0.08),
+                                        Color.white.opacity(0.03)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+                    .shadow(color: Color.black.opacity(0.3), radius: 12, x: 0, y: 6)
+                )
+                
+                // Shared Remedies
+                let allRemedies = Array(Set((bData.remedies ?? []) + (gData.remedies ?? []))).prefix(3).map { String($0) }
+                if !allRemedies.isEmpty {
+                    remediesCard(allRemedies, forName: "Both")
+                }
+            }
+        }
+    }
+    
+    private func compactDoshaRow(name: String, data: KalaSarpaData) -> some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(name)
+                    .font(AppTheme.Fonts.body(size: 14).weight(.bold))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                Text(data.displayName)
+                    .font(AppTheme.Fonts.caption())
+                    .foregroundColor(AppTheme.Colors.gold)
+            }
+            Spacer()
+            statusBadge(text: data.severity?.capitalized ?? "Unknown", color: severityColor(data.severity ?? ""))
+        }
+        .padding()
+        .background(AppTheme.Colors.inputBackground)
+        .cornerRadius(10)
     }
     
     private func statusBadge(text: String, color: Color) -> some View {
@@ -381,15 +552,45 @@ struct KalsarpaDoshaSheet: View {
         }
         .padding(20)
         .background(
-            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
-                .fill(AppTheme.Colors.cardBackground)
-                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+            ZStack {
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.black.opacity(0.45))
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(
+                        LinearGradient(
+                            stops: [
+                                .init(color: Color.white.opacity(0.08), location: 0),
+                                .init(color: Color.white.opacity(0.0), location: 0.45)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.4),
+                                Color.white.opacity(0.1),
+                                Color.white.opacity(0.05)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
         )
     }
     
     // MARK: - Remedies Card
     
-    private func remediesCard(_ remedies: [String]) -> some View {
+    // MARK: - Remedies Card
+    
+    private func remediesCard(_ remedies: [String], forName: String? = nil) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 ZStack {
@@ -400,7 +601,7 @@ struct KalsarpaDoshaSheet: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .font(AppTheme.Fonts.body(size: 14))
                 }
-                Text("recommended_remedies".localized)
+                Text(forName != nil ? "Remedies for \(forName!)" : "recommended_remedies".localized)
                     .font(AppTheme.Fonts.body(size: 15).weight(.bold))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
@@ -415,6 +616,7 @@ struct KalsarpaDoshaSheet: View {
                         Text(remedies[index])
                             .font(AppTheme.Fonts.caption())
                             .foregroundColor(AppTheme.Colors.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -426,9 +628,37 @@ struct KalsarpaDoshaSheet: View {
         }
         .padding(20)
         .background(
-            RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius)
-                .fill(AppTheme.Colors.cardBackground)
-                .overlay(AppTheme.Styles.goldBorder.stroke, in: RoundedRectangle(cornerRadius: AppTheme.Styles.cornerRadius))
+            ZStack {
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.black.opacity(0.45))
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(
+                        LinearGradient(
+                            stops: [
+                                .init(color: Color.white.opacity(0.08), location: 0),
+                                .init(color: Color.white.opacity(0.0), location: 0.45)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.4),
+                                Color.white.opacity(0.1),
+                                Color.white.opacity(0.05)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
         )
     }
     

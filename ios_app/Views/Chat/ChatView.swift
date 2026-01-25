@@ -17,6 +17,7 @@ struct ChatView: View {
     @State private var showChart = false
     @State private var showQuotaExhausted = false
     @State private var showSubscription = false
+    @State private var showProfileSwitcher = false  // NEW: Profile switcher
     @State private var hasHandledInitialQuestion = false
     @State private var hasHandledInitialThread = false
     
@@ -29,6 +30,7 @@ struct ChatView: View {
         ZStack {
             // Cosmic Background (Soul of the App)
             CosmicBackgroundView()
+                .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Header
@@ -36,7 +38,8 @@ struct ChatView: View {
                     onBackTap: { onBack?() },
                     onHistoryTap: { showHistory.toggle() },
                     onNewChatTap: { viewModel.startNewChat() },
-                    onChartTap: { showChart.toggle() }
+                    onChartTap: { showChart.toggle() },
+                    onProfileSwitcherTap: { showProfileSwitcher = true }  // NEW
                 )
                 
                 // Messages
@@ -68,6 +71,7 @@ struct ChatView: View {
                 }
             }
         }
+        .navigationBarHidden(true)
         .sheet(isPresented: $showHistory) {
             ChatHistorySidebar(viewModel: viewModel) {
                 showHistory = false
@@ -95,6 +99,9 @@ struct ChatView: View {
         }
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
+        }
+        .sheet(isPresented: $showProfileSwitcher) {
+            ProfileSwitcherSheet()
         }
         .onChange(of: initialQuestion) { oldValue, newValue in
             // When we receive an initial question, send it immediately
@@ -150,27 +157,16 @@ struct ChatView: View {
     
     // MARK: - Sign Out and Re-auth (for guest → sign in flow)
     private func signOutAndReauth() {
-        // Clear all guest data so user starts fresh with Apple Sign-In
+        // PHASE 12: DO NOT clear guest data here!
+        // We want to preserve guest birth data so performSignIn can carry it forward.
+        // Just set isAuthenticated = false to trigger navigation to AuthView.
+        // performSignIn will capture guestBirthData and save it to the new registered user.
         
-        // 1. Clear auth state
-        isGuest = false
+        // Only clear auth flag to show AuthView
         isAuthenticated = false
-        hasBirthData = false
-        
-        // 2. Clear UserDefaults
-        let keysToRemove = [
-            "userEmail", "userName", "quotaUsed", "userBirthData",
-            "hasBirthData", "userGender", "birthTimeUnknown", "isGuest"
-        ]
-        keysToRemove.forEach { UserDefaults.standard.removeObject(forKey: $0) }
         UserDefaults.standard.set(false, forKey: "isAuthenticated")
         
-        // 3. Clear keychain
-        let keychain = KeychainService.shared
-        keychain.delete(forKey: KeychainService.Keys.userId)
-        keychain.delete(forKey: KeychainService.Keys.authToken)
-        
-        print("[SignOut] Guest data cleared for fresh sign-in")
+        print("[SignOut] Navigating to Auth (guest data preserved for carry-forward)")
     }
     
     // MARK: - Messages View (Optimized for smooth scrolling)
@@ -322,92 +318,97 @@ struct ChatHistorySidebar: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                CosmicBackgroundView().ignoresSafeArea()
                 
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        // Group threads by date
-                        let grouped = viewModel.dataManager.fetchThreadsGroupedByDate(for: viewModel.currentSessionId)
-                        
-                        ForEach(grouped, id: \.0) { group in
-                            Section(header: 
-                                HStack {
-                                    Text(group.0)
-                                        .font(AppTheme.Fonts.caption())
-                                        .foregroundColor(AppTheme.Colors.textSecondary)
-                                        .textCase(.uppercase)
-                                    Spacer()
-                                }
-                                .padding(.horizontal, 20)
-                                .padding(.top, 20)
-                                .padding(.bottom, 8)
-                            ) {
-                                ForEach(group.1, id: \.id) { thread in
-                                    HistoryRow(
-                                        thread: thread,
-                                        isSelected: thread.id == viewModel.currentThreadId,
-                                        onTap: {
-                                            viewModel.loadThread(thread)
-                                            onDismiss()
-                                        },
-                                        onDelete: {
-                                            viewModel.deleteThread(thread)
-                                        },
-                                        onPin: {
-                                            viewModel.togglePinThread(thread)
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                        
-                        if grouped.isEmpty {
-                            VStack(spacing: 16) {
-                                Image(systemName: "bubble.left.and.bubble.right")
-                                    .font(AppTheme.Fonts.display(size: 48))
-                                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
-                                
-                                Text("no_chat_history".localized)
-                                    .font(AppTheme.Fonts.body(size: 16))
-                                    .foregroundColor(AppTheme.Colors.textSecondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 80)
-                        }
-                    }
-                }
+                historyList
             }
             .navigationTitle("Chat History")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
-            .toolbarBackground(AppTheme.Colors.mainBackground, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 #if os(iOS)
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Close") { onDismiss() }
-                        .foregroundColor(AppTheme.Colors.gold)
+                    Button(action: { viewModel.startNewChat(); onDismiss() }) {
+                        Image(systemName: "square.and.pencil")
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { viewModel.startNewChat(); onDismiss() }) {
-                        Image(systemName: "square.and.pencil")
-                            .foregroundColor(AppTheme.Colors.gold)
-                    }
+                    Button("Done") { onDismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
                 #else
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { onDismiss() }
-                        .foregroundColor(AppTheme.Colors.gold)
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(action: { viewModel.startNewChat(); onDismiss() }) {
+                     Button(action: { viewModel.startNewChat(); onDismiss() }) {
                         Image(systemName: "square.and.pencil")
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { onDismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
+                }
                 #endif
+            }
+        }
+    }
+    
+    // MARK: - History List with Swipe Actions
+    private var historyList: some View {
+        // Fetch chat threads for user filtered by active profile
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
+        let grouped = viewModel.dataManager.fetchChatThreadsGroupedByDate(for: userEmail, profileId: activeProfileId)
+        
+        return Group {
+            if grouped.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "bubble.left.and.bubble.right")
+                        .font(AppTheme.Fonts.display(size: 48))
+                        .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
+                    
+                    Text("no_chat_history".localized)
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 80)
+            } else {
+                List {
+                    ForEach(grouped, id: \.0) { group in
+                        Section(header:
+                            Text(group.0)
+                                .font(AppTheme.Fonts.caption())
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .textCase(.uppercase)
+                        ) {
+                            ForEach(group.1, id: \.id) { thread in
+                                HistoryRow(
+                                    thread: thread,
+                                    isSelected: thread.id == viewModel.currentThreadId,
+                                    onTap: {
+                                        viewModel.loadThread(thread)
+                                        onDismiss()
+                                    },
+                                    onDelete: {
+                                        viewModel.deleteThread(thread)
+                                    },
+                                    onPin: {
+                                        viewModel.togglePinThread(thread)
+                                    }
+                                )
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+                            }
+                        }
+                    }
+                }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
             }
         }
     }
@@ -458,6 +459,20 @@ struct HistoryRow: View {
             )
         }
         .buttonStyle(.plain)
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
+            .tint(AppTheme.Colors.error)
+            
+            Button(action: onPin) {
+                Label(
+                    thread.isPinned ? "Unpin" : "Pin",
+                    systemImage: thread.isPinned ? "pin.slash" : "pin"
+                )
+            }
+            .tint(AppTheme.Colors.gold)
+        }
         .contextMenu {
             Button(action: onPin) {
                 Label(

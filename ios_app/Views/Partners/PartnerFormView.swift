@@ -7,8 +7,8 @@ enum PartnerFormMode {
     
     var title: String {
         switch self {
-        case .add: return "Add Partner"
-        case .edit: return "Edit Partner"
+        case .add: return "Add Profile"
+        case .edit: return "Edit Profile"
         }
     }
     
@@ -24,13 +24,14 @@ enum PartnerFormMode {
 /// Follows Soul of the App theme with cosmic aesthetics
 struct PartnerFormView: View {
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var isNameFocused: Bool
     
     let mode: PartnerFormMode
     let onSave: (PartnerProfile) -> Void
     
     // Form fields
     @State private var name: String = ""
-    @State private var gender: String = "female"
+    @State private var gender: String = ""
     @State private var dateOfBirth: Date = Calendar.current.date(byAdding: .year, value: -25, to: Date()) ?? Date()
     @State private var timeOfBirth: Date = Date()
     @State private var birthTimeUnknown: Bool = false
@@ -40,11 +41,20 @@ struct PartnerFormView: View {
     
     // UI state
     @State private var showLocationSearch = false
+    @State private var showGenderSheet = false
+    @State private var showDatePicker = false
+    @State private var showTimePicker = false
     @State private var isSaving = false
+    
+    // Selection state (for placeholders)
+    @State private var isDateSelected = false
+    @State private var isTimeSelected = false
     
     // Validation
     private var isValid: Bool {
-        !name.trimmingCharacters(in: .whitespaces).isEmpty
+        !name.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !gender.isEmpty &&
+        isDateSelected
     }
     
     init(mode: PartnerFormMode, onSave: @escaping (PartnerProfile) -> Void) {
@@ -52,86 +62,121 @@ struct PartnerFormView: View {
         self.onSave = onSave
     }
     
+    // Formatted helpers
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMM yyyy"
+        return formatter.string(from: dateOfBirth)
+    }
+    
+    private var formattedTime: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: timeOfBirth)
+    }
+    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 // Background
-                AppTheme.Colors.mainBackground
+                CosmicBackgroundView()
                     .ignoresSafeArea()
                 
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
-                        // Name field
-                        fieldCard(title: "Name", required: true) {
-                            TextField("Enter partner name", text: $name)
-                                .font(AppTheme.Fonts.body(size: 16))
-                                .foregroundColor(AppTheme.Colors.textPrimary)
-                                .autocorrectionDisabled()
-                        }
+                        // Name field uses PremiumInputField
+                        PremiumInputField(
+                            label: "Name",
+                            icon: "person.circle",
+                            placeholder: "Enter profile name",
+                            text: $name,
+                            isFocused: $isNameFocused
+                        )
                         
-                        // Gender selection
-                        fieldCard(title: "Gender", required: true) {
-                            HStack(spacing: 12) {
-                                genderButton("male", symbol: "♂", label: "Male")
-                                genderButton("female", symbol: "♀", label: "Female")
-                            }
+                        // Gender
+                        PremiumSelectionRow(
+                            icon: "person",
+                            title: "Gender",
+                            value: gender.isEmpty ? "Select Gender" : gender.capitalized,
+                            isPlaceholder: gender.isEmpty
+                        ) {
+                            isNameFocused = false
+                            showGenderSheet = true
                         }
                         
                         // Date of Birth
-                        fieldCard(title: "Date of Birth", required: true) {
-                            DatePicker(
-                                "",
-                                selection: $dateOfBirth,
-                                in: ...Date(),
-                                displayedComponents: .date
-                            )
-                            .datePickerStyle(.compact)
-                            .labelsHidden()
-                            .tint(AppTheme.Colors.gold)
+                        PremiumSelectionRow(
+                            icon: "calendar",
+                            title: "Date of Birth",
+                            value: isDateSelected ? formattedDate : "Select Date",
+                            isPlaceholder: !isDateSelected
+                        ) {
+                            isNameFocused = false
+                            showDatePicker = true
                         }
                         
-                        // Time of Birth
-                        fieldCard(title: "Time of Birth", required: false) {
-                            VStack(spacing: 12) {
+                        // Time of Birth Section
+                        VStack(spacing: 12) {
+                            PremiumSelectionRow(
+                                icon: "clock",
+                                title: "Time of Birth",
+                                value: isTimeSelected ? formattedTime : "Select Time",
+                                isDisabled: birthTimeUnknown,
+                                isPlaceholder: !isTimeSelected && !birthTimeUnknown
+                            ) {
+                                isNameFocused = false
                                 if !birthTimeUnknown {
-                                    DatePicker(
-                                        "",
-                                        selection: $timeOfBirth,
-                                        displayedComponents: .hourAndMinute
-                                    )
-                                    .datePickerStyle(.compact)
-                                    .labelsHidden()
-                                    .tint(AppTheme.Colors.gold)
+                                    showTimePicker = true
                                 }
-                                
-                                Toggle(isOn: $birthTimeUnknown) {
-                                    Text("Time is unknown")
+                            }
+                            
+                            // Time unknown toggle
+                            Button(action: {
+                                HapticManager.shared.play(.light)
+                                withAnimation { birthTimeUnknown.toggle() }
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: birthTimeUnknown ? "checkmark.square.fill" : "square")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(birthTimeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                    
+                                    Text("I don't know the birth time")
                                         .font(AppTheme.Fonts.body(size: 14))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
+                                    
+                                    Spacer()
                                 }
-                                .tint(AppTheme.Colors.gold)
+                                .padding(.leading, 4)
+                            }
+                            
+                            if birthTimeUnknown {
+                                Text("Note: Analysis accuracy may be reduced without an exact birth time.")
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                                    .foregroundColor(AppTheme.Colors.warning)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading, 4)
                             }
                         }
                         
                         // City of Birth
-                        fieldCard(title: "City of Birth", required: false) {
-                            Button(action: {
-                                HapticManager.shared.play(.light)
-                                showLocationSearch = true
-                            }) {
-                                HStack {
-                                    Text(cityOfBirth.isEmpty ? "Search city..." : cityOfBirth)
-                                        .font(AppTheme.Fonts.body(size: 16))
-                                        .foregroundColor(cityOfBirth.isEmpty ? AppTheme.Colors.textSecondary : AppTheme.Colors.textPrimary)
-                                        .lineLimit(1)
-                                    
-                                    Spacer()
-                                    
-                                    Image(systemName: "location.magnifyingglass")
-                                        .foregroundStyle(AppTheme.Colors.premiumGradient)
-                                }
-                            }
+                        PremiumSelectionRow(
+                            icon: "location",
+                            title: "Place of Birth",
+                            value: cityOfBirth.isEmpty ? "Select City" : cityOfBirth,
+                            isPlaceholder: cityOfBirth.isEmpty
+                        ) {
+                            isNameFocused = false
+                            showLocationSearch = true
                         }
+                        
+                        Spacer(minLength: 20)
+                        
+                        // Save Button
+                        ShimmerButton(title: "Save Profile", icon: "checkmark") {
+                            savePartner()
+                        }
+                        .disabled(!isValid || isSaving)
+                        .opacity(isValid ? 1 : 0.6)
                         
                         Spacer(minLength: 40)
                     }
@@ -141,6 +186,7 @@ struct PartnerFormView: View {
             }
             .navigationTitle(mode.title)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -148,15 +194,6 @@ struct PartnerFormView: View {
                         dismiss()
                     }
                     .foregroundColor(AppTheme.Colors.textSecondary)
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        savePartner()
-                    }
-                    .font(.headline)
-                    .foregroundColor(isValid ? AppTheme.Colors.gold : Color.gray)
-                    .disabled(!isValid || isSaving)
                 }
             }
             .sheet(isPresented: $showLocationSearch) {
@@ -167,69 +204,42 @@ struct PartnerFormView: View {
                     placeId: .constant(nil)
                 )
             }
+            .sheet(isPresented: $showDatePicker, onDismiss: {
+                isDateSelected = true
+                HapticManager.shared.play(.light)
+            }) {
+                DatePickerSheet(
+                    title: "Date of Birth",
+                    selection: $dateOfBirth,
+                    components: .date
+                )
+            }
+            .sheet(isPresented: $showTimePicker, onDismiss: {
+                isTimeSelected = true
+                HapticManager.shared.play(.light)
+            }) {
+                DatePickerSheet(
+                    title: "Time of Birth",
+                    selection: $timeOfBirth,
+                    components: .hourAndMinute
+                )
+            }
+            .sheet(isPresented: $showGenderSheet) {
+                PremiumSelectionSheet(
+                    title: "Select Gender",
+                    selectedValue: $gender,
+                    options: [
+                        ("male", "Male"),
+                        ("female", "Female"),
+                        ("non-binary", "Non-binary"),
+                        ("prefer_not_to_say", "Prefer not to say")
+                    ],
+                    onDismiss: { showGenderSheet = false }
+                )
+            }
             .onAppear {
                 loadExistingData()
             }
-        }
-    }
-    
-    // MARK: - Field Card
-    
-    private func fieldCard<Content: View>(title: String, required: Bool, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
-                Text(title)
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                
-                if required {
-                    Text("*")
-                        .foregroundColor(AppTheme.Colors.gold)
-                }
-            }
-            
-            content()
-                .padding(16)
-                .background(AppTheme.Colors.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(AppTheme.Styles.goldBorder.stroke, lineWidth: 0.5)
-                )
-                .cornerRadius(12)
-        }
-    }
-    
-    // MARK: - Gender Button
-    
-    private func genderButton(_ value: String, symbol: String, label: String) -> some View {
-        Button(action: {
-            HapticManager.shared.play(.light)
-            withAnimation(.interpolatingSpring(stiffness: 100, damping: 10)) {
-                gender = value
-            }
-        }) {
-            HStack(spacing: 8) {
-                Text(symbol)
-                    .font(.system(size: 18))
-                Text(label)
-                    .font(AppTheme.Fonts.body(size: 15))
-            }
-            .foregroundColor(gender == value ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(
-                gender == value
-                    ? AnyView(AppTheme.Colors.premiumGradient)
-                    : AnyView(AppTheme.Colors.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(
-                        gender == value ? Color.clear : AppTheme.Styles.goldBorder.stroke,
-                        lineWidth: 0.5
-                    )
-            )
-            .cornerRadius(10)
         }
     }
     
@@ -250,6 +260,7 @@ struct PartnerFormView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         if let date = formatter.date(from: partner.dateOfBirth) {
             dateOfBirth = date
+            isDateSelected = true
         }
         
         // Parse time of birth
@@ -258,6 +269,7 @@ struct PartnerFormView: View {
             timeFormatter.dateFormat = "HH:mm"
             if let time = timeFormatter.date(from: timeString) {
                 timeOfBirth = time
+                isTimeSelected = true
             }
         }
     }

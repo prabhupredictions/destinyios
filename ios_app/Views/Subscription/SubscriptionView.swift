@@ -49,14 +49,12 @@ struct SubscriptionView: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 #if os(iOS)
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(AppTheme.Fonts.title(size: 18))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                    }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
                 #endif
             }
@@ -378,7 +376,7 @@ struct FeatureItemRow: View {
     
     /// Check if feature is "coming soon"
     private var isComingSoon: Bool {
-        feature.featureId == "alerts" || feature.featureId == "multiple_profiles"
+        feature.featureId == "alerts" || feature.featureId == "multiple_profile_match"
     }
     
     var body: some View {

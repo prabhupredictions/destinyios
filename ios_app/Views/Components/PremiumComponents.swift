@@ -97,9 +97,9 @@ struct ShimmerButton: View {
                             .offset(x: shimmerPhase * (geo.size.width + 100) - geo.size.width * 0.5)
                     }
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: AppTheme.Colors.gold.opacity(0.4), radius: 15, y: 6)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: AppTheme.Colors.gold.opacity(0.4), radius: 15, y: 6)
         }
         .onAppear {
             startShimmer()

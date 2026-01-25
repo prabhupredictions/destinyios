@@ -18,47 +18,9 @@ struct ChartComparisonSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Premium Deep Space Nebula Background (Consistent with PlanetaryPositionsSheet)
-                GeometryReader { geo in
-                    ZStack {
-                        // Deep Base
-                        Color(red: 0.05, green: 0.07, blue: 0.15).ignoresSafeArea()
-                        
-                        // Central Blue Glow
-                        RadialGradient(
-                            colors: [
-                                Color(red: 0.12, green: 0.16, blue: 0.28).opacity(0.8),
-                                .clear
-                            ],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: max(geo.size.width, geo.size.height) * 0.8
-                        )
-                        
-                        // Top-Left Gold Nebula Glow
-                        RadialGradient(
-                            colors: [
-                                Color(red: 0.85, green: 0.65, blue: 0.2).opacity(0.08),
-                                .clear
-                            ],
-                            center: .topLeading,
-                            startRadius: 0,
-                            endRadius: 300
-                        )
-                        
-                        // Bottom-Right Purple/Deep Nebula
-                        RadialGradient(
-                            colors: [
-                                Color(red: 0.3, green: 0.1, blue: 0.4).opacity(0.15),
-                                .clear
-                            ],
-                            center: .bottomTrailing,
-                            startRadius: 0,
-                            endRadius: 400
-                        )
-                    }
-                }
-                .ignoresSafeArea()
+                // Premium Cosmic Background
+                CosmicBackgroundView()
+                    .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
                     // Tab selector
@@ -86,12 +48,6 @@ struct ChartComparisonSheet: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.white)
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(action: { chartStyle = "south" }) {
                             Label("South Indian", systemImage: chartStyle == "south" ? "checkmark" : "")
@@ -103,6 +59,10 @@ struct ChartComparisonSheet: View {
                         Image(systemName: "slider.horizontal.3")
                             .foregroundColor(AppTheme.Colors.gold)
                     }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                     Button("Done") { dismiss() }
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
             }
         }
@@ -135,7 +95,7 @@ struct ChartComparisonSheet: View {
         }) {
             Text(title)
                 .font(.system(size: 14, weight: selectedTab == index ? .semibold : .medium))
-                .foregroundColor(selectedTab == index ? Color("NavyPrimary") : .white.opacity(0.8))
+                .foregroundColor(selectedTab == index ? AppTheme.Colors.textOnGold : .white.opacity(0.8))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .background(
@@ -238,7 +198,7 @@ struct ChartComparisonSheet: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Planet Details")
                         .font(AppTheme.Fonts.title(size: 12))
-                        .foregroundColor(Color("GoldAccent").opacity(0.9))
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.9))
                         .padding(.horizontal, 4)
                     
                     PlanetCardsGrid(chartData: chartData, chartType: chartType)

@@ -184,7 +184,7 @@ struct MessageBubble: View {
             // Inline rating (only for substantial AI messages)
             if !isWelcomeMessage && message.content.count > 50 {
                 InlineMessageRating(
-                    messageId: message.id,
+                    message: message,
                     query: userQuery.isEmpty ? "General question" : userQuery,
                     responseText: String(message.content.prefix(500)),
                     predictionId: message.traceId

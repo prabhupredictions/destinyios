@@ -10,6 +10,11 @@ struct MainTabView: View {
     @State private var pendingMatchItem: CompatibilityHistoryItem? = nil
     @State private var showMatchResult = false  // Track if match result is showing
     @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
+    @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
+    
+    /// Reactive guest user check - uses @AppStorage for automatic UI updates
+    @AppStorage("isGuest") private var isGuestUser = false
+
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -27,8 +32,13 @@ struct MainTabView: View {
                             selectedTab = 1 // Navigate to chat
                         },
                         onMatchHistorySelected: { matchItem in
-                            pendingMatchItem = matchItem
-                            selectedTab = 2 // Navigate to match
+                            // Guest cannot view match history - show sign in
+                            if isGuestUser {
+                                showGuestSignInSheet = true
+                            } else {
+                                pendingMatchItem = matchItem
+                                selectedTab = 2 // Navigate to match
+                            }
                         }
                     )
                 case 1:
@@ -42,14 +52,23 @@ struct MainTabView: View {
                         initialThreadId: pendingThreadId
                     )
                 case 2:
-                    CompatibilityView(
-                        initialMatchItem: pendingMatchItem,
-                        onShowResultChange: { isShowing in
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                showMatchResult = isShowing
+                    // Guest users cannot access Match tab - show sign-in prompt
+                    if isGuestUser {
+                        GuestSignInPromptView(
+                            message: "sign_in_to_check_compatibility".localized,
+                            onBack: { selectedTab = 0 }
+                        )
+                    } else {
+                        CompatibilityView(
+                            initialMatchItem: pendingMatchItem,
+                            onShowResultChange: { isShowing in
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    showMatchResult = isShowing
+                                }
                             }
-                        }
-                    )
+                        )
+                        .id(ProfileContextManager.shared.activeProfileId) // Force recreation on profile switch
+                    }
                 default:
                     HomeView(onQuestionSelected: { _ in })
                 }
@@ -66,6 +85,11 @@ struct MainTabView: View {
         .ignoresSafeArea(.keyboard)
         .animation(.easeInOut(duration: 0.25), value: selectedTab)
         .animation(.easeInOut(duration: 0.25), value: showMatchResult)
+        // Clear pending match state when switching profiles
+        .onChange(of: ProfileContextManager.shared.activeProfileId) { _, _ in
+            pendingMatchItem = nil
+            showMatchResult = false
+        }
         .sheet(isPresented: $showAskSheet) {
             AskDestinyQuestionsSheet(
                 suggestedQuestions: homeViewModel.suggestedQuestions,
@@ -120,8 +144,7 @@ struct CustomTabBar: View {
             TabBarItem(
                 icon: "heart.fill",
                 title: "match".localized,
-                isSelected: selectedTab == 2,
-                accentColor: Color(red: 0.91, green: 0.71, blue: 0.72)
+                isSelected: selectedTab == 2
             ) {
                 withAnimation(.spring(response: 0.3)) {
                     selectedTab = 2
@@ -180,7 +203,7 @@ struct TabBarItem: View {
                 Text(title)
                     .font(AppTheme.Fonts.caption(size: 11))
             }
-            .foregroundColor(isSelected ? (accentColor ?? AppTheme.Colors.gold) : AppTheme.Colors.tabInactive)
+            .tabItemStyle(isSelected: isSelected)
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
@@ -232,7 +255,7 @@ struct AskTabButton: View {
                 
                 Text("ask".localized)
                     .font(AppTheme.Fonts.caption(size: 11))
-                    .foregroundColor(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.tabInactive)
+                    .foregroundColor(isSelected ? AppTheme.Colors.textPrimary : AppTheme.Colors.gold)
                     .offset(y: -10) // Adjusted for smaller FAB
             }
         }
@@ -244,4 +267,27 @@ struct AskTabButton: View {
 // MARK: - Preview
 #Preview {
     MainTabView()
+}
+
+// MARK: - Extensions
+extension View {
+    /// Applies a radiant gold gradient mask if unselected, otherwise solid color
+    @ViewBuilder
+    func tabItemStyle(isSelected: Bool) -> some View {
+        if isSelected {
+            self.foregroundColor(AppTheme.Colors.textPrimary)
+        } else {
+            self.overlay(
+                LinearGradient(
+                    colors: [
+                        AppTheme.Colors.goldChampagne,
+                        AppTheme.Colors.gold
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .mask(self)
+        }
+    }
 }

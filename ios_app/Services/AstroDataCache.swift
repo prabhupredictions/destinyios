@@ -2,18 +2,21 @@ import Foundation
 import CryptoKit
 
 /// Caches static astrological data locally to avoid redundant API calls.
-/// All keys include userEmail to prevent data mixing between users.
-/// - Full chart: Cached forever (keyed by email + birth data hash)
-/// - Dasha: Cached per year (keyed by email + birth hash + year)
-/// - Transits: Cached per year (keyed by email + birth hash + year)
+/// All keys include userEmail + profileId to prevent data mixing between profiles.
+/// - Full chart: Cached forever (keyed by email + profileId + birth data hash)
+/// - Dasha: Cached per year (keyed by email + profileId + birth hash + year)
+/// - Transits: Cached per year (keyed by email + profileId + birth hash + year)
 class AstroDataCache {
     static let shared = AstroDataCache()
     
-    private let fullChartPrefix = "astro_chart_"
-    private let dashaPrefix = "astro_dasha_"
-    private let transitsPrefix = "astro_transits_"
+    private let fullChartPrefix = "astro_chart"
+    private let dashaPrefix = "astro_dasha"
+    private let transitsPrefix = "astro_transits"
     
     private init() {}
+    
+    /// Profile context for scoped keys
+    private var profileContext: ProfileContextManager { .shared }
     
     /// Get current user's email for cache keys
     private var currentUserEmail: String {
@@ -42,11 +45,10 @@ class AstroDataCache {
         return combined.hashValue.description
     }
     
-    // MARK: - Full Chart Cache (Forever, per user)
+    // MARK: - Full Chart Cache (Forever, per profile)
     
     func getFullChart(birthHash: String) -> UserAstroDataResponse? {
-        let email = currentUserEmail
-        let key = "\(fullChartPrefix)\(email)_\(birthHash)"
+        let key = profileContext.profileScopedKey("\(fullChartPrefix)_\(birthHash)")
         
         guard let data = UserDefaults.standard.data(forKey: key) else {
             return nil
@@ -54,7 +56,7 @@ class AstroDataCache {
         
         do {
             let response = try JSONDecoder().decode(UserAstroDataResponse.self, from: data)
-            print("[AstroDataCache] Full chart cache hit for \(email)")
+            print("[AstroDataCache] Full chart cache hit for profile \(profileContext.activeProfileId)")
             return response
         } catch {
             print("[AstroDataCache] Failed to decode full chart: \(error)")
@@ -63,23 +65,21 @@ class AstroDataCache {
     }
     
     func setFullChart(_ response: UserAstroDataResponse, birthHash: String) {
-        let email = currentUserEmail
-        let key = "\(fullChartPrefix)\(email)_\(birthHash)"
+        let key = profileContext.profileScopedKey("\(fullChartPrefix)_\(birthHash)")
         
         do {
             let data = try JSONEncoder().encode(response)
             UserDefaults.standard.set(data, forKey: key)
-            print("[AstroDataCache] Cached full chart for \(email)")
+            print("[AstroDataCache] Cached full chart for profile \(profileContext.activeProfileId)")
         } catch {
             print("[AstroDataCache] Failed to encode full chart: \(error)")
         }
     }
     
-    // MARK: - Dasha Cache (Per Year, per user)
+    // MARK: - Dasha Cache (Per Year, per profile)
     
     func getDasha(birthHash: String, year: Int) -> DashaResponse? {
-        let email = currentUserEmail
-        let key = "\(dashaPrefix)\(email)_\(birthHash)_\(year)"
+        let key = profileContext.profileScopedKey("\(dashaPrefix)_\(birthHash)_\(year)")
         
         guard let data = UserDefaults.standard.data(forKey: key) else {
             return nil
@@ -87,7 +87,7 @@ class AstroDataCache {
         
         do {
             let response = try JSONDecoder().decode(DashaResponse.self, from: data)
-            print("[AstroDataCache] Dasha cache hit for \(email), year \(year)")
+            print("[AstroDataCache] Dasha cache hit for profile \(profileContext.activeProfileId), year \(year)")
             return response
         } catch {
             print("[AstroDataCache] Failed to decode dasha: \(error)")
@@ -96,23 +96,21 @@ class AstroDataCache {
     }
     
     func setDasha(_ response: DashaResponse, birthHash: String, year: Int) {
-        let email = currentUserEmail
-        let key = "\(dashaPrefix)\(email)_\(birthHash)_\(year)"
+        let key = profileContext.profileScopedKey("\(dashaPrefix)_\(birthHash)_\(year)")
         
         do {
             let data = try JSONEncoder().encode(response)
             UserDefaults.standard.set(data, forKey: key)
-            print("[AstroDataCache] Cached dasha for \(email), year \(year)")
+            print("[AstroDataCache] Cached dasha for profile \(profileContext.activeProfileId), year \(year)")
         } catch {
             print("[AstroDataCache] Failed to encode dasha: \(error)")
         }
     }
     
-    // MARK: - Transits Cache (Per Year, per user)
+    // MARK: - Transits Cache (Per Year, per profile)
     
     func getTransits(birthHash: String, year: Int) -> TransitResponse? {
-        let email = currentUserEmail
-        let key = "\(transitsPrefix)\(email)_\(birthHash)_\(year)"
+        let key = profileContext.profileScopedKey("\(transitsPrefix)_\(birthHash)_\(year)")
         
         guard let data = UserDefaults.standard.data(forKey: key) else {
             return nil
@@ -120,7 +118,7 @@ class AstroDataCache {
         
         do {
             let response = try JSONDecoder().decode(TransitResponse.self, from: data)
-            print("[AstroDataCache] Transits cache hit for \(email), year \(year)")
+            print("[AstroDataCache] Transits cache hit for profile \(profileContext.activeProfileId), year \(year)")
             return response
         } catch {
             print("[AstroDataCache] Failed to decode transits: \(error)")
@@ -129,13 +127,12 @@ class AstroDataCache {
     }
     
     func setTransits(_ response: TransitResponse, birthHash: String, year: Int) {
-        let email = currentUserEmail
-        let key = "\(transitsPrefix)\(email)_\(birthHash)_\(year)"
+        let key = profileContext.profileScopedKey("\(transitsPrefix)_\(birthHash)_\(year)")
         
         do {
             let data = try JSONEncoder().encode(response)
             UserDefaults.standard.set(data, forKey: key)
-            print("[AstroDataCache] Cached transits for \(email), year \(year)")
+            print("[AstroDataCache] Cached transits for profile \(profileContext.activeProfileId), year \(year)")
         } catch {
             print("[AstroDataCache] Failed to encode transits: \(error)")
         }
