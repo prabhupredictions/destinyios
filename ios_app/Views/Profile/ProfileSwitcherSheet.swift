@@ -259,6 +259,11 @@ struct ProfileSwitcherSheet: View {
             await MainActor.run {
                 PartnerProfileService.shared.savePartnersLocally(profiles, context: modelContext)
                 serverProfiles = profiles
+                
+                // Refresh active profile after loading from server
+                // This ensures activeProfile is set on fresh installs where no cache exists
+                profileContext.loadActiveProfile(context: modelContext)
+                
                 print("[ProfileSwitcher] Loaded \(profiles.count) profiles from server")
             }
             
