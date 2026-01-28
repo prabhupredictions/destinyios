@@ -157,59 +157,62 @@
 > `requires_quota = FALSE` means the feature can be accessed without consuming quota limits (e.g., viewing history).
 > Access can still be restricted per plan via `plan_entitlements.is_enabled`.
 
-**Sample Data (Currently Implemented Features):**
+### 4.2 Marketing Features (Paywall Display)
 
-| feature_id | display_name | category | requires_quota | icon_name |
-|-----------|-------------|----------|----------------|----------|
-| `chat` | AI Chat Predictions | core | ✓ TRUE | `message.fill` |
-| `compatibility` | Kundali Matching | core | ✓ TRUE | `heart.fill` |
-| `history` | Chat & Match History | core | ✗ FALSE | `clock.arrow.circlepath` |
+| Feature | free | core | plus |
+|---------|------|------|------|
+| **personalized_transit** | ❌ | ✅ "Daily transit insights..." | ✅ "Daily transit insights..." |
+| **early_access** | ❌ | ✅ "Try new features first" | ✅ "Try new features first" |
+| **alerts** | ❌ | ❌ | ✅ "(coming soon)" |
 
 ---
 
-## Table 3: `plan_entitlements` (NEW)
+## 5. Key Code References
 
-**Purpose:** Junction table defining which features are available in which plans with what limits.
+### Backend
+- [migrations.py](file:///Users/i074917/Documents/destiny_ai_astrology/astrology_api/astroapi-v2/app/core/shared_services/subscription/migrations.py) - Plan/Feature/Entitlement seeding
+- [quota_service.py](file:///Users/i074917/Documents/destiny_ai_astrology/astrology_api/astroapi-v2/app/core/shared_services/subscription/quota_service.py) - Quota enforcement logic
+- [subscription_router.py](file:///Users/i074917/Documents/destiny_ai_astrology/astrology_api/astroapi-v2/app/core/api/subscription_router.py) - REST API endpoints
 
-| Column | Type | Description | Example |
-|--------|------|-------------|---------|
-| `id` | INT | **PK** Auto-increment ID | `1`, `2`, `3` |
-| `plan_id` | VARCHAR(50) | **FK** → subscription_plans | `"core"` |
-| `feature_id` | VARCHAR(50) | **FK** → features | `"chat"` |
-| `is_enabled` | BOOLEAN | Is feature enabled for this plan? | `TRUE` |
-| `daily_limit` | INT | Daily limit for this feature (-1 = unlimited, 0 = N/A) | `50` |
-| `overall_limit` | INT | Total limit for this feature (-1 = unlimited, 0 = N/A) | `100` |
-| **UNIQUE** | | `(plan_id, feature_id)` | |
+### iOS
+- [SubscriptionManager.swift](file:///Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/SubscriptionManager.swift) - StoreKit 2 integration
+- [QuotaManager.swift](file:///Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Services/QuotaManager.swift) - Backend sync
+- [SubscriptionView.swift](file:///Users/i074917/Documents/destiny_ai_astrology/ios_app/ios_app/Views/Subscription/SubscriptionView.swift) - Paywall UI
 
-> [!NOTE]
-> For features with `requires_quota = FALSE` (like history), limits are ignored but `is_enabled` still controls access.
+---
 
-**Complete Feature Access Matrix (Per User Requirements):**
+## 6. How Features Appear in Paywall
 
-| plan_id | feature | enabled | daily | overall | daily_resets | overall_resets |
-|---------|---------|---------|-------|---------|--------------|----------------|
-| **free_guest** | `chat` | ✓ | -1 | 3 | - | ❌ Never |
-| **free_guest** | `compatibility` | ✓ | -1 | 3 | - | ❌ Never |
-| **free_guest** | `history` | ✓ | -1 | -1 | - | - |
-| **free_registered** | `chat` | ✓ | -1 | 10 | - | ❌ Never |
-| **free_registered** | `compatibility` | ✓ | -1 | 10 | - | ❌ Never |
-| **free_registered** | `history` | ✓ | -1 | -1 | - | - |
-| **core** | `chat` | ✓ | 50 | 100 | ✓ Midnight | 🔄 Renewal |
-| **core** | `compatibility` | ✓ | 50 | 1 | ✓ Midnight | 🔄 Renewal |
-| **core** | `history` | ✓ | -1 | -1 | - | - |
-| **advanced** | `chat` | ✓ | 50 | 100 | ✓ Midnight | 🔄 Renewal |
-| **advanced** | `compatibility` | ✓ | 50 | 100 | ✓ Midnight | 🔄 Renewal |
-| **advanced** | `history` | ✓ | -1 | -1 | - | - |
-| **premium** | `chat` | ✓ | 100 | -1 | ✓ Midnight | - |
-| **premium** | `compatibility` | ✓ | 100 | -1 | ✓ Midnight | - |
-| **premium** | `history` | ✓ | -1 | -1 | - | - |
+Features show in the paywall **only if they have `marketing_text`** in their entitlement.
 
-> [!IMPORTANT]
-> **Reset Behavior:**
-> - **Free plans:** No daily limit (`-1`), overall limit never resets
-> - **Paid plans:** Daily limit resets at midnight, overall limit resets on subscription renewal
-> - **History:** No limits (`-1` = unlimited), no quota consumed
-> - `-1` = Unlimited (no limit)
+```python
+# migrations.py - Feature that WILL show in paywall
+{"plan_id": "core", "feature_id": "ai_questions", 
+ "marketing_text": "Ask unlimited personal questions...",  # ← Shown
+ ...}
+
+# Feature that will NOT show in paywall  
+{"plan_id": "free_guest", "feature_id": "ai_questions", 
+ "marketing_text": None,  # ← Hidden
+ ...}
+```
+
+For "(coming soon)" features, use `display_name_override`:
+
+```python
+{"plan_id": "plus", "feature_id": "alerts", 
+ "marketing_text": "Get notified on days that matter...",
+ "display_name_override": "Custom Astrological Alerts (coming soon)",  # ← Shows in UI
+ ...}
+```
+
+iOS checks dynamically:
+```swift
+private var isComingSoon: Bool {
+    feature.displayName.lowercased().contains("coming soon")
+}
+```
+
 
 ---
 

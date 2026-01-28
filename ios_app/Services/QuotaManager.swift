@@ -252,12 +252,17 @@ class QuotaManager: ObservableObject {
     
     // MARK: - Feature Access
     
-    /// Check if user can access a feature
-    func canAccessFeature(_ feature: FeatureID, email: String) async throws -> FeatureAccessResponse {
+    /// Check if user can access a feature N times
+    /// - Parameters:
+    ///   - feature: The feature to check
+    ///   - email: User email
+    ///   - count: Number of usages to check (for multi-partner, pass partners.count)
+    func canAccessFeature(_ feature: FeatureID, email: String, count: Int = 1) async throws -> FeatureAccessResponse {
         var components = URLComponents(string: APIConfig.baseURL + "/subscription/can-access")!
         components.queryItems = [
             URLQueryItem(name: "email", value: email),
-            URLQueryItem(name: "feature", value: feature.rawValue)
+            URLQueryItem(name: "feature", value: feature.rawValue),
+            URLQueryItem(name: "count", value: String(count))
         ]
         
         var request = URLRequest(url: components.url!)

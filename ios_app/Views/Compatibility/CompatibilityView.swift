@@ -751,13 +751,18 @@ struct CompatibilityView: View {
     private func analyzeAction() {
         Task {
             let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-            let isMultiPartner = viewModel.partners.count > 1
+            let partnerCount = viewModel.partners.count
             
-            // Check correct feature: multi_profile_match for "Compare All", compatibility for single
-            let featureToCheck: FeatureID = isMultiPartner ? .profiles : .compatibility
+            // Check quota upfront for ALL partners (count-based check)
+            // Single partner = count=1, multi-partner = count=N
+            // This ensures user sees upgrade prompt before starting if not enough quota
             
             do {
-                let accessResponse = try await QuotaManager.shared.canAccessFeature(featureToCheck, email: email)
+                let accessResponse = try await QuotaManager.shared.canAccessFeature(
+                    .compatibility,
+                    email: email,
+                    count: partnerCount  // Check if N usages are available
+                )
                 if accessResponse.canAccess {
                     // Save partners if requested (fire and forget)
                     if savePartnerForFuture {
@@ -765,12 +770,12 @@ struct CompatibilityView: View {
                     }
                     
                     // Multi-partner vs Single-partner flow
-                    if isMultiPartner {
+                    if partnerCount > 1 {
                         await viewModel.analyzeAllPartners()
                     } else {
                         await viewModel.analyzeMatch()
                     }
-                    // Quota is now recorded server-side by /compatibility/analyze endpoint
+                    // Quota is recorded server-side per API call (each partner = 1 usage)
                 } else {
                     await MainActor.run {
                         // Professional Quota UI - Daily=banner, Overall/Feature=sheet

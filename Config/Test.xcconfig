@@ -1,7 +1,7 @@
 // Test/Staging Configuration
 // Used for TestFlight builds that connect to test API
 
-API_BASE_URL = https:/$()/astroapi-test-dsqvza5jza-el.a.run.app
+API_BASE_URL = https://astroapi-test-dsqvza5jza-el.a.run.app
 API_KEY = astro_live_destinyai_production_key_2024
 ENVIRONMENT = test
 

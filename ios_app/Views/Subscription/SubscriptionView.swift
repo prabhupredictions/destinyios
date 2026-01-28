@@ -374,9 +374,9 @@ struct PlanCardWithFeatures: View {
 struct FeatureItemRow: View {
     let feature: PlanEntitlement
     
-    /// Check if feature is "coming soon"
+    /// Check if feature is "coming soon" (based on display_name_override from backend)
     private var isComingSoon: Bool {
-        feature.featureId == "alerts" || feature.featureId == "multiple_profile_match"
+        feature.displayName.lowercased().contains("coming soon")
     }
     
     var body: some View {
