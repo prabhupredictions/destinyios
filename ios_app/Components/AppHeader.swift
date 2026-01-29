@@ -107,35 +107,30 @@ struct ChatHeader: View {
     var onNewChatTap: (() -> Void)? = nil
     var onChartTap: (() -> Void)? = nil
     var onProfileTap: (() -> Void)? = nil
-    var onProfileSwitcherTap: (() -> Void)? = nil  // NEW: Switch profile
     
     // Profile Context
     private let profileContext = ProfileContextManager.shared
     
     var body: some View {
         VStack(spacing: 4) {
-            // Profile Context Indicator (appears when viewing as another profile)
+            // Profile Context Indicator (non-tappable, shows who we're viewing)
+            // Note: Switching is only allowed from Home screen
             if !profileContext.isUsingSelf {
-                Button(action: { onProfileSwitcherTap?() }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "person.crop.circle.badge.checkmark")
-                            .font(.caption)
-                        
-                        Text("Viewing as \(profileContext.activeProfileName)")
-                            .font(AppTheme.Fonts.caption())
-                        
-                        Image(systemName: "chevron.down")
-                            .font(.caption2)
-                    }
-                    .foregroundColor(AppTheme.Colors.gold)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(AppTheme.Colors.gold.opacity(0.15))
-                            .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
-                    )
+                HStack(spacing: 6) {
+                    Image(systemName: "person.crop.circle.badge.checkmark")
+                        .font(.caption)
+                    
+                    Text("Viewing as \(profileContext.activeProfileName)")
+                        .font(AppTheme.Fonts.caption())
                 }
+                .foregroundColor(AppTheme.Colors.gold)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(AppTheme.Colors.gold.opacity(0.15))
+                        .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                )
             }
             
             // Main Header Row

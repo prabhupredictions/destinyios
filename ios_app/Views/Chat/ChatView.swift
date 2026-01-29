@@ -17,7 +17,6 @@ struct ChatView: View {
     @State private var showChart = false
     @State private var showQuotaExhausted = false
     @State private var showSubscription = false
-    @State private var showProfileSwitcher = false  // NEW: Profile switcher
     @State private var hasHandledInitialQuestion = false
     @State private var hasHandledInitialThread = false
     
@@ -38,8 +37,7 @@ struct ChatView: View {
                     onBackTap: { onBack?() },
                     onHistoryTap: { showHistory.toggle() },
                     onNewChatTap: { viewModel.startNewChat() },
-                    onChartTap: { showChart.toggle() },
-                    onProfileSwitcherTap: { showProfileSwitcher = true }  // NEW
+                    onChartTap: { showChart.toggle() }
                 )
                 
                 // Messages
@@ -99,9 +97,6 @@ struct ChatView: View {
         }
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
-        }
-        .sheet(isPresented: $showProfileSwitcher) {
-            ProfileSwitcherSheet()
         }
         .onChange(of: initialQuestion) { oldValue, newValue in
             // When we receive an initial question, send it immediately
