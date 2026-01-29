@@ -10,3 +10,5 @@ CODE_SIGN_STYLE = Manual
 CODE_SIGN_IDENTITY = Apple Distribution
 DEVELOPMENT_TEAM = GTP5DH5548
 PROVISIONING_PROFILE_SPECIFIER = match AppStore com.destinyai.astrology
+
+// Build trigger: 2026-01-29T16:13:51+05:30
