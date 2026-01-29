@@ -17,6 +17,7 @@ struct CompatibilityView: View {
     @State private var showGirlDatePicker = false
     @State private var showGirlTimePicker = false
     @State private var showGenderSheet = false
+    @State private var showHistorySheet = false  // History access from input screen
     
     // Quota and subscription UI state
     // Quota and subscription UI state
@@ -194,6 +195,12 @@ struct CompatibilityView: View {
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
         }
+        .sheet(isPresented: $showHistorySheet) {
+            CompatibilityHistorySheet { selectedItem in
+                showHistorySheet = false
+                viewModel.loadFromHistory(selectedItem)
+            }
+        }
         .sheet(isPresented: $showGenderSheet) {
             PremiumSelectionSheet(
                 title: "gender_identity".localized,
@@ -279,7 +286,12 @@ struct CompatibilityView: View {
     // MARK: - Form View (Compact Single-Screen Design)
     private var compatibilityForm: some View {
         VStack(spacing: 0) {
-            // Header with gold interlocking rings icon
+            // Header with History and Reset buttons (consistent with other screens)
+            MatchInputHeader(
+                onHistoryTap: { showHistorySheet = true },
+                onNewMatchTap: { viewModel.reset() }
+            )
+            
             // Header with gold interlocking rings icon (BirthDataView Style)
             VStack(spacing: 12) { // Reduced spacing (was 16)
                 // Compact Icon with Pulsing Glow

@@ -181,6 +181,80 @@ struct ChatHeader: View {
     }
 }
 
+// MARK: - Match Input Header (for Compatibility input screen - with history, logo)
+struct MatchInputHeader: View {
+    var onHistoryTap: (() -> Void)? = nil
+    var onNewMatchTap: (() -> Void)? = nil
+    
+    // Profile Context
+    private let profileContext = ProfileContextManager.shared
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            // Profile Context Indicator (non-tappable, shows who we're viewing)
+            // Note: Switching is only allowed from Home screen
+            if !profileContext.isUsingSelf {
+                HStack(spacing: 6) {
+                    Image(systemName: "person.crop.circle.badge.checkmark")
+                        .font(.caption)
+                    
+                    Text("Viewing as \(profileContext.activeProfileName)")
+                        .font(AppTheme.Fonts.caption())
+                }
+                .foregroundColor(AppTheme.Colors.gold)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(AppTheme.Colors.gold.opacity(0.15))
+                        .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                )
+            }
+            
+            // Main Header Row
+            HStack(spacing: 12) {
+                // History button
+                Button(action: { onHistoryTap?() }) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.clear)
+                            .frame(width: 44, height: 44)
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                        
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                }
+                
+                Spacer()
+                
+                // Logo
+                LogoView()
+                
+                Spacer()
+                
+                // New match button (clears form)
+                Button(action: { onNewMatchTap?() }) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.clear)
+                            .frame(width: 44, height: 44)
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                        
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.clear)
+    }
+}
+
 // MARK: - Match Result Header (with back, history, charts, new match buttons)
 struct MatchResultHeader: View {
     var boyName: String
