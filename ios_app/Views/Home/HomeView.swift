@@ -247,30 +247,6 @@ struct HomeView: View {
                 
                 // Right Side Buttons
                 HStack(spacing: 12) {
-                    // Profile Switcher Button (if profiles available)
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        // GUEST RULE: Guests must sign in first, not upgrade
-                        if isGuestUser {
-                            showGuestSignInSheet = true
-                        } else if quotaManager.hasFeature(.switchProfile) {
-                            showProfileSwitcher = true
-                        } else {
-                            showUpgradePrompt = true
-                        }
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.clear) // Transparent
-                                .frame(width: 44, height: 44)
-                                .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
-                            
-                            Image(systemName: "person.2.fill")
-                                .font(AppTheme.Fonts.body(size: 16))
-                                .foregroundColor(AppTheme.Colors.gold)
-                        }
-                    }
-                    
                     // Sound Toggle
                     if AppTheme.Features.showSoundToggle {
                         Button(action: {
