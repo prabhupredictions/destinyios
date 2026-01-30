@@ -507,11 +507,20 @@ struct HomeView: View {
             // Horizontal Scrolling Celestial Orbs (filtered)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 0) { // Edge-to-edge orbs
+                    // Calculate dynamic size for 3.5 items visible
+                    let screenWidth = UIScreen.main.bounds.width
+                    // Total width available minus padding (if any significant padding exists, but here we want edge-to-edge calculation)
+                    // We target 3.5 items visible. Item width = orbSize * 1.4
+                    // So visibleWidth = 3.5 * (orbSize * 1.4)
+                    // orbSize = visibleWidth / (3.5 * 1.4)
+                    let dynamicSize = screenWidth / (3.5 * 1.4)
+                    
                     ForEach(filteredAreas, id: \.area) { item in
                         CelestialOrbView(
                             icon: iconName(for: item.area),
                             title: item.area,
-                            status: item.status.status
+                            status: item.status.status,
+                            size: dynamicSize
                         ) {
                             HapticManager.shared.play(.light)
                             onQuestionSelected?("Tell me about \(item.area)")

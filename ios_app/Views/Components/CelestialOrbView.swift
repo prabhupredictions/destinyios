@@ -6,10 +6,11 @@ struct CelestialOrbView: View {
     let icon: String
     let title: String
     let status: String // "Good", "Steady", "Caution"
+    var size: CGFloat = 75 // Default size, can be overridden
     let action: () -> Void
     
-    // Size - Compact for premium density (Instagram story style ~75-80pt)
-    private let orbSize: CGFloat = 75
+    // Size - Compact for premium density
+    private var orbSize: CGFloat { size }
     
     var body: some View {
         Button(action: action) {
