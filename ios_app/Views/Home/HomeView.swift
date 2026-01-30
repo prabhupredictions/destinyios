@@ -353,7 +353,7 @@ struct HomeView: View {
                 }
             }
             .frame(width: 60, height: 60) // Slightly smaller orb
-            .offset(x: -16, y: 16)
+            .offset(x: -8, y: 8) // Moved to top corner to avoid text overlap
         }
         // Background container
         .background(
