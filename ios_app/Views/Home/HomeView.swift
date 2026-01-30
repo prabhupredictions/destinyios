@@ -294,7 +294,7 @@ struct HomeView: View {
         ZStack(alignment: .topTrailing) {
             // Card Content
             VStack(alignment: .leading, spacing: 8) {
-                // Title
+                // Title - needs extra padding to clear orb
                 Text("Today's Cosmic Vibe")
                     .font(.system(size: 20, weight: .semibold, design: .serif))
                     .foregroundStyle(
@@ -305,8 +305,9 @@ struct HomeView: View {
                         )
                     )
                     .shadow(color: Color.black.opacity(0.5), radius: 1, x: 0, y: 1)
+                    .padding(.trailing, 48) // Just enough to clear the orb
                 
-                // Body Text (full width, flows naturally)
+                // Body Text - minimal padding, flows naturally below orb
                 Text(viewModel.dailyInsight.isEmpty ? "With Mercury and Venus active in the dasha, communication and relationships will play a significant role today. Focus on maintaining harmony..." : viewModel.dailyInsight)
                     .font(AppTheme.Fonts.body(size: 13))
                     .foregroundColor(Color.white.opacity(0.95))
@@ -314,9 +315,9 @@ struct HomeView: View {
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.trailing, 20) // Minimal buffer around orb area
             }
             .padding(24)
-            .padding(.trailing, 70) // Cushion for orb to prevent overlap
             
             // Floating Orb (overlayed, doesn't affect text flow)
             ZStack {
