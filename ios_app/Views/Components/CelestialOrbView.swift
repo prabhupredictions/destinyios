@@ -8,8 +8,8 @@ struct CelestialOrbView: View {
     let status: String // "Good", "Steady", "Caution"
     let action: () -> Void
     
-    // Size - Compact for premium density
-    private let orbSize: CGFloat = 80
+    // Size - Compact for premium density (Instagram story style ~75-80pt)
+    private let orbSize: CGFloat = 75
     
     var body: some View {
         Button(action: action) {
@@ -30,8 +30,9 @@ struct CelestialOrbView: View {
                                 endRadius: orbSize * 0.7
                             )
                         )
+                        // Tighter glow frame to prevent excessive whitespace
                         .frame(width: orbSize * 1.4, height: orbSize * 1.4)
-                        .blur(radius: 15)
+                        .blur(radius: 12)
                     
                     // 2. Glass Sphere Base (Seamless Edge)
                     Circle()
@@ -100,7 +101,7 @@ struct CelestialOrbView: View {
                     
                     // 6. Icon
                     Image(systemName: icon)
-                        .font(.system(size: 26, weight: .light))
+                        .font(.system(size: 24, weight: .light))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
@@ -110,7 +111,8 @@ struct CelestialOrbView: View {
                         )
                         .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 8)
                 }
-                .frame(width: orbSize * 1.6, height: orbSize * 1.6)
+                // Tighter frame to show more items (scroll hint)
+                .frame(width: orbSize * 1.4, height: orbSize * 1.4)
                 
                 // Title Below Orb (HIG Compliant)
                 Text(title.localized)
