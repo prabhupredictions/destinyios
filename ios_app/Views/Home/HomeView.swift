@@ -305,7 +305,6 @@ struct HomeView: View {
                         )
                     )
                     .shadow(color: Color.black.opacity(0.5), radius: 1, x: 0, y: 1)
-                    .padding(.trailing, 60) // Prevent overlap with orb
                 
                 // Body Text (full width, flows naturally)
                 Text(viewModel.dailyInsight.isEmpty ? "With Mercury and Venus active in the dasha, communication and relationships will play a significant role today. Focus on maintaining harmony..." : viewModel.dailyInsight)
@@ -317,6 +316,7 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(24)
+            .padding(.trailing, 70) // Cushion for orb to prevent overlap
             
             // Floating Orb (overlayed, doesn't affect text flow)
             ZStack {
@@ -353,7 +353,7 @@ struct HomeView: View {
                 }
             }
             .frame(width: 60, height: 60) // Slightly smaller orb
-            .offset(x: 0, y: 0) // Absolute corner placement
+            .offset(x: -12, y: 12) // Balanced corner placement
         }
         // Background container
         .background(
