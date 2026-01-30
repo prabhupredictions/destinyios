@@ -242,6 +242,49 @@ final class CompatibilityHistoryService {
         }
     }
     
+    /// Persist items to a specific profile's storage key (used during sync)
+    private func persist(_ items: [CompatibilityHistoryItem], toProfileKey profileKey: String) {
+        do {
+            let data = try JSONEncoder().encode(items)
+            UserDefaults.standard.set(data, forKey: profileKey)
+        } catch {
+            print("[CompatibilityHistoryService] Failed to encode history for \(profileKey): \(error)")
+        }
+    }
+    
+    /// Load items from a specific profile's storage key
+    private func loadAll(fromProfileKey profileKey: String) -> [CompatibilityHistoryItem] {
+        guard let data = UserDefaults.standard.data(forKey: profileKey) else {
+            return []
+        }
+        do {
+            return try JSONDecoder().decode([CompatibilityHistoryItem].self, from: data)
+        } catch {
+            return []
+        }
+    }
+    
+    /// Save item to a specific profile's storage (used during sync)
+    private func save(_ item: CompatibilityHistoryItem, toProfileId profileId: String, userEmail: String) {
+        let profileKey = "\(Self.storageKeyPrefix)_\(userEmail)_\(profileId)"
+        var items = loadAll(fromProfileKey: profileKey)
+        
+        // Check for duplicate
+        if let existingIndex = items.firstIndex(where: { $0.sessionId == item.sessionId }) {
+            items[existingIndex] = item
+        } else {
+            items.insert(item, at: 0)
+        }
+        
+        // Limit to maxItems
+        if items.count > Self.maxItems {
+            items = Array(items.prefix(Self.maxItems))
+        }
+        
+        persist(items, toProfileKey: profileKey)
+        print("[CompatibilityHistoryService] Saved item \(item.sessionId) to profile \(profileId)")
+    }
+    
     // MARK: - Sync from Server
     /// Syncs compatibility history from backend chat-history (for recovery after iOS clear)
     /// NOTE: Clears existing local history first to prevent duplicates from ID mismatch
@@ -281,11 +324,13 @@ final class CompatibilityHistoryService {
                 let title: String?
                 let preview: String?
                 let primaryArea: String?
+                let profileId: String?
                 let createdAt: String
                 
                 enum CodingKeys: String, CodingKey {
                     case id, title, preview
                     case primaryArea = "primary_area"
+                    case profileId = "profile_id"
                     case createdAt = "created_at"
                 }
             }
@@ -493,8 +538,10 @@ final class CompatibilityHistoryService {
                         partnerIndex: partnerIndex
                     )
                     
-                    save(item)
-                    print("[CompatibilityHistoryService] Restored full history: \(thread.id)")
+                    // Save to the correct profile's storage based on server profile_id
+                    let targetProfileId = thread.profileId ?? "self"
+                    save(item, toProfileId: targetProfileId, userEmail: userEmail)
+                    print("[CompatibilityHistoryService] Restored full history: \(thread.id) to profile: \(targetProfileId)")
                     
                 } catch {
                     print("[CompatibilityHistoryService] Failed to parse thread \(thread.id): \(error)")
