@@ -23,7 +23,10 @@ final class MotionManager: ObservableObject {
     }
     
     func start() {
-        guard motionManager.isDeviceMotionAvailable else { return }
+        // Disabled per user request (reduced motion)
+        // guard motionManager.isDeviceMotionAvailable else { return }
+        return;
+
         
         motionManager.deviceMotionUpdateInterval = 1.0 / 60.0
         motionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
