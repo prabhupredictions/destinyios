@@ -31,6 +31,23 @@ struct HomeView: View {
         return email.isEmpty || email.contains("guest") || email.hasSuffix("@daa.com") || email.hasSuffix("@gen.com")
     }
     
+    /// User initials for profile avatar (e.g., "PK" for "Prabhu Kushwaha", "P" for "Prabhu")
+    private var userInitials: String {
+        let name = profileContext.activeProfileName
+        let words = name.split(separator: " ")
+        if words.isEmpty {
+            return "?"
+        } else if words.count == 1 {
+            // Single name: show first letter
+            return String(words[0].prefix(1)).uppercased()
+        } else {
+            // Multiple words: show first letter of first two words
+            let first = String(words[0].prefix(1)).uppercased()
+            let second = String(words[1].prefix(1)).uppercased()
+            return first + second
+        }
+    }
+    
     // Menu Sheet States
     @State private var showHistorySheet = false
     @State private var selectedFilter: String = "All" // Filter State
@@ -274,13 +291,13 @@ struct HomeView: View {
                     }) {
                         ZStack {
                             Circle()
-                                .fill(Color.clear) // Transparent
+                                .fill(AppTheme.Colors.gold) // Filled gold background
                                 .frame(width: 44, height: 44)
-                                .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                             
-                            Image(systemName: "person.fill")
-                                .font(AppTheme.Fonts.body(size: 18))
-                                .foregroundColor(AppTheme.Colors.gold)
+                            // User initials
+                            Text(userInitials)
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.2)) // Dark text on gold
                         }
                     }
                 }
