@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "火星在D10（十分盘）中位置良好";
 "exception_mars_good_d60" = "火星在D60（六十分盘）中位置良好";
 "exception_ruchaka_yoga" = "存在鲁恰卡大人物瑜伽";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "火星有方向力（Digbala）";
+"exception_mars_strong_vimsopaka" = "火星有强大的Vimsopaka Bala";
+"exception_chandra_mangala_yoga" = "存在月火财富瑜伽（Chandra Mangala Yoga）";
+"exception_mars_good_d24" = "火星在D24（Chaturvimsamsa）中位置良好";
+"exception_moon_strong" = "星盘中月亮很强";
 
 // MARK: - Mars Position UI Labels (10) - Chinese
 "mars_position" = "火星位置";

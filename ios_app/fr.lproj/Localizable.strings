@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "Mars bien placé dans le thème D10 (Dasamsa)";
 "exception_mars_good_d60" = "Mars bien placé dans le thème D60 (Shashtiamsa)";
 "exception_ruchaka_yoga" = "Yoga Ruchaka Mahapurusha présent";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "Mars a Digbala (force directionnelle)";
+"exception_mars_strong_vimsopaka" = "Mars a un Vimsopaka Bala fort";
+"exception_chandra_mangala_yoga" = "Chandra Mangala Yoga (yoga de prospérité Mars-Lune) présent";
+"exception_mars_good_d24" = "Mars bien placé dans le thème D24 (Chaturvimsamsa)";
+"exception_moon_strong" = "Lune forte dans le thème";
 
 // MARK: - Mars Position UI Labels (10) - French
 "mars_position" = "Position de Mars";

@@ -17,6 +17,34 @@ struct DoshaDescriptions {
         return ("exception_" + key).localized
     }
     
+    /// Transform text containing snake_case exception keys to human-readable localized text
+    /// Replaces keys like "mars_strong_ashtakavarga" with "Mars has strong Ashtakavarga points"
+    static func localizeExceptionKeys(in text: String) -> String {
+        var result = text
+        
+        // Pattern matches mars_*, moon_*, and chandra_* exception keys
+        let exceptionPattern = #"(mars_[a-z0-9_]+|moon_strong|chandra_mangala_yoga)"#
+        
+        if let regex = try? NSRegularExpression(pattern: exceptionPattern, options: []) {
+            let range = NSRange(text.startIndex..., in: text)
+            let matches = regex.matches(in: text, options: [], range: range)
+            
+            // Process matches in reverse order to maintain string indices
+            for match in matches.reversed() {
+                if let matchRange = Range(match.range, in: text) {
+                    let key = String(text[matchRange])
+                    let localized = exception(key)
+                    // Only replace if localization exists (not returning the key itself)
+                    if !localized.contains(key) && !localized.hasPrefix("exception_") {
+                        result = result.replacingCharacters(in: matchRange, with: localized)
+                    }
+                }
+            }
+        }
+        
+        return result
+    }
+    
     // MARK: - Intensity Factor Descriptions
     
     /// Get localized description for an intensity factor key

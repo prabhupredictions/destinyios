@@ -397,6 +397,9 @@
 "exception_mars_good_d60" = "मंगल D60 (षष्ट्यांश) चार्ट में अच्छी स्थिति में है";
 "exception_ruchaka_yoga" = "रुचक महापुरुष योग मौजूद है";
 "exception_mars_has_digbala" = "मंगल में दिग्बल (दिशात्मक शक्ति) है";
+"exception_mars_strong_vimsopaka" = "मंगल का विंशोपक बल मजबूत है";
+"exception_chandra_mangala_yoga" = "चंद्र मंगल योग (धन योग) मौजूद है";
+"exception_mars_good_d24" = "मंगल D24 (चतुर्विंशांश) चार्ट में अच्छी स्थिति में है";
 "exception_moon_strong" = "चंद्रमा कुंडली में बलवान है";
 
 // MARK: - Mars Position UI Labels (10)

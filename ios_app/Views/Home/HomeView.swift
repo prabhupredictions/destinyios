@@ -56,6 +56,9 @@ struct HomeView: View {
     // Life Area Popup State
     @State private var selectedLifeArea: LifeAreaItem? = nil
     
+    // Yoga Detail Popup State (presented at ZStack level to avoid clipping)
+    @State private var selectedYogaForPopup: YogaDetail? = nil
+    
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -165,6 +168,66 @@ struct HomeView: View {
                     },
                     onDismiss: {
                         selectedLifeArea = nil
+                    }
+                )
+                .transition(.opacity)
+            }
+            
+            // Yoga Detail Popup Overlay (presented at ZStack level to avoid ScrollView clipping)
+            if let yoga = selectedYogaForPopup {
+                YogaDetailPopup(
+                    yoga: yoga,
+                    onAskMore: {
+                        // Build rich LLM context
+                        let statusText = yoga.status == "A" ? "Active" : (yoga.status == "R" ? "Reduced" : "Cancelled")
+                        let typeText = yoga.isDosha ? "dosha (negative combination)" : "yoga (positive combination)"
+                        
+                        var contextParts: [String] = [
+                            "I have \(yoga.displayName) in my birth chart.",
+                            "",
+                            "Details:",
+                            "- Type: \(typeText)",
+                            "- Category: \(yoga.category ?? "Unknown")",
+                            "- Status: \(statusText)",
+                            "- Strength: \(Int(yoga.strength * 100))%",
+                            "- Planets Involved: \(yoga.planets)",
+                            "- Houses Involved: \(yoga.houses)"
+                        ]
+                        
+                        if let formation = yoga.formation, !formation.isEmpty {
+                            contextParts.append("- Formation: \(formation)")
+                        }
+                        
+                        if let reason = yoga.reason, !reason.isEmpty, yoga.status != "A" {
+                            // Transform exception keys to human-readable text
+                            let localizedReason = DoshaDescriptions.localizeExceptionKeys(in: reason)
+                            contextParts.append("- \(yoga.status == "R" ? "Reduction" : "Cancellation") Reason: \(localizedReason)")
+                        }
+                        
+                        contextParts.append("")
+                        contextParts.append("Please explain:")
+                        contextParts.append("1. What this \(yoga.isDosha ? "dosha" : "yoga") means for my life")
+                        
+                        if yoga.status == "A" {
+                            if yoga.isDosha {
+                                contextParts.append("2. What challenges it may bring and any remedies")
+                            } else {
+                                contextParts.append("2. How to maximize its benefits")
+                            }
+                        } else {
+                            contextParts.append("2. Why it is \(statusText.lowercased()) and what this means")
+                            contextParts.append("3. Any remedies or actions I can take")
+                        }
+                        
+                        let contextualQuestion = contextParts.joined(separator: "\n")
+                        
+                        selectedYogaForPopup = nil
+                        onQuestionSelected?(contextualQuestion)
+                    },
+                    onDismiss: {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedYogaForPopup = nil
+                        }
                     }
                 )
                 .transition(.opacity)
@@ -638,7 +701,15 @@ struct HomeView: View {
     
     // I. Yoga Highlights
     private var yogaHighlightsSection: some View {
-        YogaHighlightCard(yogas: viewModel.yogaCombinations)
+        YogaHighlightCard(
+            yogas: viewModel.yogaCombinations,
+            onQuestionSelected: onQuestionSelected,
+            onYogaTapped: { yoga in
+                withAnimation(.spring(response: 0.35)) {
+                    selectedYogaForPopup = yoga
+                }
+            }
+        )
     }
     
     // J. Dasha Widget

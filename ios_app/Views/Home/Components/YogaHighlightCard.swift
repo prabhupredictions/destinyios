@@ -2,84 +2,156 @@ import SwiftUI
 
 struct YogaHighlightCard: View {
     let yogas: [YogaDetail]
+    var onQuestionSelected: ((String) -> Void)?
+    var onYogaTapped: ((YogaDetail) -> Void)?  // Callback to show popup at parent level
     
     @State private var selectedFilter: FilterType = .all
     
     enum FilterType: String, CaseIterable {
         case all = "All"
-        case good = "Good"
-        case caution = "Caution"
+        case wealth = "Wealth"
+        case career = "Career"
+        case love = "Relationship"
+        case health = "Health"
+        case family = "Family"
+        case education = "Education"
+        case spiritual = "Spiritual"
+        case foundation = "Basic Foundation"
+        case personality = "Personality"
+        case special = "Special"
+        
+        var displayName: String {
+            switch self {
+            case .love: return "Love"
+            case .foundation: return "Foundation"
+            default: return self.rawValue
+            }
+        }
+        
+        // All possible backend values that match this filter
+        var matchingCategories: [String] {
+            switch self {
+            case .all: return []
+            case .wealth: return ["Wealth", "wealth", "finance", "Finance", "WL"]
+            case .career: return ["Career", "career", "CR"]
+            case .love: return ["Relationship", "relationship", "RL"]
+            case .health: return ["Health", "health", "HL"]
+            case .family: return ["Family", "family", "FM"]
+            case .education: return ["Education", "education", "ED"]
+            case .spiritual: return ["Spiritual", "spiritual", "SR"]
+            case .foundation: return ["Basic Foundation", "basic_foundation", "BF"]
+            case .personality: return ["Personality", "personality", "PE"]
+            case .special: return ["Special", "special", "SP"]
+            }
+        }
+    }
+    
+    // All filters in display order
+    private var allFilters: [FilterType] {
+        FilterType.allCases
     }
     
     var filteredYogas: [YogaDetail] {
-        switch selectedFilter {
-        case .all:
+        if selectedFilter == .all {
             return yogas
-        case .good:
-            return yogas.filter { !$0.isDosha }
-        case .caution:
-            return yogas.filter { $0.isDosha }
+        }
+        return yogas.filter { yoga in
+            guard let category = yoga.category else { return false }
+            return selectedFilter.matchingCategories.contains(category)
+        }
+    }
+    
+    // Filter button helper
+    @ViewBuilder
+    private func filterButton(for filter: FilterType) -> some View {
+        Button(action: {
+            HapticManager.shared.play(.light)
+            withAnimation(.smooth) {
+                selectedFilter = filter
+            }
+        }) {
+            Text(filter.displayName)
+                .font(AppTheme.Fonts.caption(size: 11))
+                .fontWeight(selectedFilter == filter ? .semibold : .regular)
+                .foregroundColor(selectedFilter == filter ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(selectedFilter == filter ? AppTheme.Colors.gold.opacity(0.1) : Color.clear)
+                        .overlay(
+                            Capsule()
+                                .strokeBorder(
+                                    selectedFilter == filter ? AppTheme.Colors.gold.opacity(0.5) : AppTheme.Colors.textSecondary.opacity(0.2),
+                                    lineWidth: 1
+                                )
+                        )
+                )
         }
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            
-            // Header & Filter
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Positive & Negative Combinations")
-                    .font(AppTheme.Fonts.premiumDisplay(size: 18))
-                    .goldGradient()
+        ZStack {
+            VStack(alignment: .leading, spacing: 12) {
                 
-                // Filter Tabs
-                HStack(spacing: 8) {
-                    ForEach(FilterType.allCases, id: \.self) { filter in
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            withAnimation(.smooth) {
-                                selectedFilter = filter
+                // Header & Filter
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Positive & Negative Combinations")
+                        .font(AppTheme.Fonts.premiumDisplay(size: 18))
+                        .goldGradient()
+                    
+                    // Filter Tabs - Single Horizontal Scroll with scroll hint
+                    ZStack(alignment: .trailing) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(allFilters, id: \.self) { filter in
+                                    filterButton(for: filter)
+                                }
+                                // Extra padding at end to prevent last item hiding under fade
+                                Spacer().frame(width: 24)
                             }
-                        }) {
-                            Text(filter.rawValue)
-                                .font(AppTheme.Fonts.caption(size: 13))
-                                .fontWeight(selectedFilter == filter ? .semibold : .regular)
-                                .foregroundColor(selectedFilter == filter ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(
-                                    Capsule()
-                                        .fill(selectedFilter == filter ? AppTheme.Colors.gold.opacity(0.15) : Color.clear)
-                                        .overlay(
-                                            Capsule()
-                                                .strokeBorder(
-                                                    selectedFilter == filter ? AppTheme.Colors.gold.opacity(0.5) : AppTheme.Colors.separator,
-                                                    lineWidth: 1
-                                                )
-                                        )
-                                )
                         }
+                        
+                        // Right edge fade gradient to hint more content
+                        HStack(spacing: 4) {
+                            LinearGradient(
+                                colors: [.clear, AppTheme.Colors.mainBackground],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                            .frame(width: 40)
+                            
+                            // Small arrow hint
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                        }
+                        .allowsHitTesting(false) // Don't block scroll gestures
                     }
                 }
-            }
-            .padding(.horizontal, 12) // Align with other headers which use 12 padding
-            
-            // Content
-            if filteredYogas.isEmpty {
-                Text("No combinations found for this category.")
-                    .font(AppTheme.Fonts.caption(size: 14))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 20)
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(filteredYogas, id: \.name) { yoga in
-                            PremiumYogaCard(yoga: yoga)
+                .padding(.horizontal, 12)
+                
+                // Content
+                if filteredYogas.isEmpty {
+                    Text("No combinations found for this category.")
+                        .font(AppTheme.Fonts.caption(size: 14))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 20)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(filteredYogas, id: \.name) { yoga in
+                                PremiumYogaCard(yoga: yoga)
+                                    .onTapGesture {
+                                        HapticManager.shared.play(.light)
+                                        onYogaTapped?(yoga)
+                                    }
+                            }
                         }
+                        .padding(.horizontal, 12)
                     }
-                    .padding(.horizontal, 12) // Internal spacing
                 }
-                .padding(.horizontal, -12) // Extend to screen edges (matches Transit section)
             }
         }
     }
@@ -152,7 +224,7 @@ struct PremiumYogaCard: View {
             }
             
             // Yoga Name (Limit 2 lines)
-            Text(yoga.name)
+            Text(yoga.displayName)
                 .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(Color.white)
                 .lineLimit(2)
@@ -208,16 +280,7 @@ struct PremiumYogaCard: View {
         .frame(width: 170, height: 160) // Increased height to fit Houses
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.12, green: 0.12, blue: 0.14),
-                            Color(red: 0.08, green: 0.08, blue: 0.10)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
+                .fill(AppTheme.Colors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)

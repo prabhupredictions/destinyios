@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "Marte bien ubicado en la carta D10 (Dasamsa)";
 "exception_mars_good_d60" = "Marte bien ubicado en la carta D60 (Shashtiamsa)";
 "exception_ruchaka_yoga" = "Yoga Ruchaka Mahapurusha presente";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "Marte tiene Digbala (fuerza direccional)";
+"exception_mars_strong_vimsopaka" = "Marte tiene fuerte Vimsopaka Bala";
+"exception_chandra_mangala_yoga" = "Chandra Mangala Yoga (yoga de prosperidad Marte-Luna) presente";
+"exception_mars_good_d24" = "Marte bien ubicado en carta D24 (Chaturvimsamsa)";
+"exception_moon_strong" = "Luna fuerte en la carta";
 
 // MARK: - Mars Position UI Labels (10) - Spanish
 "mars_position" = "Posición de Marte";

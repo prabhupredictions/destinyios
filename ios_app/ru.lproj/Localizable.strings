@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "Марс хорошо расположен в карте D10 (Дашамша)";
 "exception_mars_good_d60" = "Марс хорошо расположен в карте D60 (Шаштьямша)";
 "exception_ruchaka_yoga" = "Присутствует йога Ручака Махапуруша";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "Марс имеет Дигбалу (направленную силу)";
+"exception_mars_strong_vimsopaka" = "Марс имеет сильную Вимшопака Балу";
+"exception_chandra_mangala_yoga" = "Чандра Мангала Йога (йога процветания Марса-Луны) присутствует";
+"exception_mars_good_d24" = "Марс хорошо расположен в карте D24 (Чатурвимшамша)";
+"exception_moon_strong" = "Сильная Луна в карте";
 
 // MARK: - Mars Position UI Labels (10) - Russian
 "mars_position" = "Положение Марса";

@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "Marte bem posicionado no mapa D10 (Dasamsa)";
 "exception_mars_good_d60" = "Marte bem posicionado no mapa D60 (Shashtiamsa)";
 "exception_ruchaka_yoga" = "Yoga Ruchaka Mahapurusha presente";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "Marte tem Digbala (força direcional)";
+"exception_mars_strong_vimsopaka" = "Marte tem forte Vimsopaka Bala";
+"exception_chandra_mangala_yoga" = "Chandra Mangala Yoga (yoga da prosperidade Marte-Lua) presente";
+"exception_mars_good_d24" = "Marte bem posicionado no mapa D24 (Chaturvimsamsa)";
+"exception_moon_strong" = "Lua forte no mapa";
 
 // MARK: - Mars Position UI Labels (10) - Portuguese
 "mars_position" = "Posição de Marte";

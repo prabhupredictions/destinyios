@@ -175,7 +175,21 @@ class StreamingPredictionService {
             return .done(totalSteps: json["total_steps"] as? Int ?? 0)
             
         case "error":
-            return .error(message: json["error"] as? String ?? "Unknown error")
+            // Backend sends 'error' for exceptions, but 'message' for quota errors
+            let errorMsg = json["error"] as? String ?? json["message"] as? String ?? "Unknown error"
+            
+            // If quota error with reason, create user-friendly message
+            if let reason = json["reason"] as? String {
+                switch reason {
+                case "daily_limit_reached":
+                    return .error(message: "Daily limit reached. Try again tomorrow.")
+                case "overall_limit_reached":
+                    return .error(message: "Free limit reached. Upgrade for unlimited access.")
+                default:
+                    return .error(message: errorMsg)
+                }
+            }
+            return .error(message: errorMsg)
             
         default:
             return nil

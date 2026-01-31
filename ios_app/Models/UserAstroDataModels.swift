@@ -266,10 +266,27 @@ struct YogaDetail: Codable {
     let status: String
     let strength: Double
     let isDosha: Bool
+    let category: String? // Added for filtering
+    let formation: String? // How the yoga is formed
+    let reason: String? // Why cancelled/reduced (if applicable)
     
     enum CodingKeys: String, CodingKey {
-        case name, planets, houses, status, strength
+        case name, planets, houses, status, strength, category, formation, reason
         case isDosha = "is_dosha"
+    }
+    
+    // Helper to clean name (removes suffix numbers/ID)
+    var displayName: String {
+        // 1. If contains "Yoga" or "Dosha", truncate everything after it
+        if let range = name.range(of: "Yoga", options: .caseInsensitive) {
+            return String(name[..<range.upperBound])
+        }
+        if let range = name.range(of: "Dosha", options: .caseInsensitive) {
+            return String(name[..<range.upperBound])
+        }
+        
+        // 2. Fallback: Remove trailing numbers/parens
+        return name.replacingOccurrences(of: "\\s*\\(?\\d+\\)?\\s*$", with: "", options: .regularExpression)
     }
 }
 

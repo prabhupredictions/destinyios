@@ -9,7 +9,9 @@ import CryptoKit
 class AstroDataCache {
     static let shared = AstroDataCache()
     
-    private let fullChartPrefix = "astro_chart"
+    // Version bump to invalidate old cache when model changes
+    // v2: Added formation and reason fields to YogaDetail
+    private let fullChartPrefix = "astro_chart_v2"
     private let dashaPrefix = "astro_dasha"
     private let transitsPrefix = "astro_transits"
     

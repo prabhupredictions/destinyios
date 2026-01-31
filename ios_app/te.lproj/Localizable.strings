@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "D10 (దశాంశ) చార్ట్‌లో కుజుడు మంచి స్థితిలో";
 "exception_mars_good_d60" = "D60 (షష్ట్యాంశ) చార్ట్‌లో కుజుడు మంచి స్థితిలో";
 "exception_ruchaka_yoga" = "రుచక మహాపురుష యోగం ఉంది";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "అంగారకుడికి దిగ్బలం (దిశా బలం) ఉంది";
+"exception_mars_strong_vimsopaka" = "అంగారకుడికి బలమైన విమ్శోపక బాల ఉంది";
+"exception_chandra_mangala_yoga" = "చంద్ర మంగళ యోగం (అంగారక-చంద్ర సంపద యోగం) ఉంది";
+"exception_mars_good_d24" = "D24 (చతుర్వింశాంశ) చార్టులో అంగారకుడి స్థానం మంచిది";
+"exception_moon_strong" = "జాతకంలో చంద్రుడు బలంగా ఉన్నాడు";
 
 // MARK: - Mars Position UI Labels (10) - Telugu
 "mars_position" = "కుజుడి స్థానం";

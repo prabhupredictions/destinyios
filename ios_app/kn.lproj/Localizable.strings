@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "D10 (ದಶಾಂಶ) ಚಾರ್ಟ್‌ನಲ್ಲಿ ಕುಜ ಉತ್ತಮ ಸ್ಥಾನದಲ್ಲಿ";
 "exception_mars_good_d60" = "D60 (ಷಷ್ಟ್ಯಾಂಶ) ಚಾರ್ಟ್‌ನಲ್ಲಿ ಕುಜ ಉತ್ತಮ ಸ್ಥಾನದಲ್ಲಿ";
 "exception_ruchaka_yoga" = "ರುಚಕ ಮಹಾಪುರುಷ ಯೋಗ ಇದೆ";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "ಮಂಗಳನಿಗೆ ದಿಗ್ಬಲ (ದಿಶಾ ಬಲ) ಇದೆ";
+"exception_mars_strong_vimsopaka" = "ಮಂಗಳನಿಗೆ ಬಲವಾದ ವಿಂಶೋಪಕ ಬಲ ಇದೆ";
+"exception_chandra_mangala_yoga" = "ಚಂದ್ರ ಮಂಗಳ ಯೋಗ (ಮಂಗಳ-ಚಂದ್ರ ಸಂಪತ್ತು ಯೋಗ) ಇದೆ";
+"exception_mars_good_d24" = "D24 (ಚತುರ್ವಿಂಶಾಂಶ) ಚಾರ್ಟ್‌ನಲ್ಲಿ ಮಂಗಳನ ಸ್ಥಾನ ಉತ್ತಮ";
+"exception_moon_strong" = "ಕುಂಡಲಿಯಲ್ಲಿ ಚಂದ್ರ ಬಲವಾಗಿದ್ದಾನೆ";
 
 // MARK: - Mars Position UI Labels (10) - Kannada
 "mars_position" = "ಕುಜ ಸ್ಥಾನ";

@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "D10（ダシャムシャ）チャートで火星が良好な位置にあります";
 "exception_mars_good_d60" = "D60（シャシュティアムシャ）チャートで火星が良好な位置にあります";
 "exception_ruchaka_yoga" = "ルチャカ・マハプルシャ・ヨガがあります";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "火星にディグバラ（方向の強さ）がある";
+"exception_mars_strong_vimsopaka" = "火星のヴィムショパカ・バラが強い";
+"exception_chandra_mangala_yoga" = "チャンドラ・マンガラ・ヨガ（火星-月の富のヨガ）がある";
+"exception_mars_good_d24" = "D24（チャトゥルヴィムシャムシャ）チャートで火星が良好な位置にある";
+"exception_moon_strong" = "チャートで月が強い";
 
 // MARK: - Mars Position UI Labels (10) - Japanese
 "mars_position" = "火星の位置";

@@ -375,8 +375,11 @@
 "exception_mars_good_d10" = "D10 (ദശാംശ) ചാർട്ടിൽ ചൊവ്വ നല്ല സ്ഥാനത്ത്";
 "exception_mars_good_d60" = "D60 (ഷഷ്ട്യാംശ) ചാർട്ടിൽ ചൊവ്വ നല്ല സ്ഥാനത്ത്";
 "exception_ruchaka_yoga" = "രുചക മഹാപുരുഷ യോഗം ഉണ്ട്";
-"exception_mars_has_digbala" = "Mars has Digbala (directional strength)";
-"exception_moon_strong" = "Moon is strong in the chart";
+"exception_mars_has_digbala" = "ചൊവ്വയ്ക്ക് ദിഗ്ബലം (ദിശാ ബലം) ഉണ്ട്";
+"exception_mars_strong_vimsopaka" = "ചൊവ്വയ്ക്ക് ശക്തമായ വിംശോപക ബാല ഉണ്ട്";
+"exception_chandra_mangala_yoga" = "ചന്ദ്ര മംഗള യോഗം (ചൊവ്വ-ചന്ദ്ര സമ്പത്ത് യോഗം) ഉണ്ട്";
+"exception_mars_good_d24" = "D24 (ചതുർവിംശാംശം) ചാർട്ടിൽ ചൊവ്വ നല്ല സ്ഥാനത്താണ്";
+"exception_moon_strong" = "ജാതകത്തിൽ ചന്ദ്രൻ ശക്തനാണ്";
 
 // MARK: - Mars Position UI Labels (10) - Malayalam
 "mars_position" = "ചൊവ്വയുടെ സ്ഥാനം";

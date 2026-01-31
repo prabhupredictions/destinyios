@@ -376,6 +376,9 @@
 "exception_mars_good_d60" = "D60 (ஷஷ்டியாம்சம்) சார்ட்டில் செவ்வாய் நல்ல நிலையில்";
 "exception_ruchaka_yoga" = "ருசக மகாபுருஷ யோகம் உள்ளது";
 "exception_mars_has_digbala" = "செவ்வாய்க்கு திக்பலம் (திசை பலம்) உள்ளது";
+"exception_mars_strong_vimsopaka" = "செவ்வாய்க்கு வலுவான விம்சோபக பலம் உள்ளது";
+"exception_chandra_mangala_yoga" = "சந்திர மங்கள யோகம் (செவ்வாய்-சந்திர செல்வ யோகம்) உள்ளது";
+"exception_mars_good_d24" = "D24 (சதுர்விம்சாம்சம்) சார்ட்டில் செவ்வாய் நல்ல நிலையில் உள்ளது";
 "exception_moon_strong" = "சந்திரன் ஜாதகத்தில் பலமாக உள்ளது";
 
 // MARK: - Mars Position UI Labels (10) - Tamil
