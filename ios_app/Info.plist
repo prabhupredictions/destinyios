@@ -32,6 +32,9 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>PlayfairDisplay-Regular.ttf</string>
+		<string>canela_light.otf</string>
+		<string>canela_roman.otf</string>
+		<string>canela_bold.otf</string>
 	</array>
 </dict>
 </plist>

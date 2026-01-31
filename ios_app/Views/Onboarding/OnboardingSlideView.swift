@@ -71,50 +71,48 @@ struct OnboardingSlideView: View {
             }
             .premiumInertia(intensity: 15)
         } else {
-            // Other slides: Scrollable content
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 8) {
-                    Spacer(minLength: AppTheme.Onboarding.contentTopPadding)
+            // Other slides: Static centered layout
+            VStack(spacing: 8) {
+                Spacer()
+                
+                // Floating Icon with glow and 3D tilt
+                FloatingIcon {
+                    iconContent
+                }
+                .tilt3D(intensity: 45)
+                .frame(height: AppTheme.Onboarding.iconContainerSize)
+                
+                // Title section with gold gradient
+                VStack(spacing: AppTheme.Onboarding.titleToSubtitleSpacing) {
+                    Text(slide.title)
+                        .font(AppTheme.Fonts.premiumDisplay(size: AppTheme.Onboarding.titleSize))
+                        .goldGradient()
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
                     
-                    // Floating Icon with glow and 3D tilt
-                    FloatingIcon {
-                        iconContent
-                    }
-                    .tilt3D(intensity: 45)
-                    .frame(height: AppTheme.Onboarding.iconContainerSize)
-                    
-                    // Title section with gold gradient
-                    VStack(spacing: AppTheme.Onboarding.titleToSubtitleSpacing) {
-                        Text(slide.title)
-                            .font(AppTheme.Fonts.premiumDisplay(size: AppTheme.Onboarding.titleSize))
-                            .goldGradient()
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(4)
-                        
-                        if let subtitle = slide.subtitle {
-                            Text(subtitle)
-                                .font(AppTheme.Fonts.title(size: AppTheme.Onboarding.subtitleSize))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                                .multilineTextAlignment(.center)
-                        }
-                    }
-                    .padding(.horizontal, 32)
-                    
-                    // Description
-                    if !slide.description.isEmpty {
-                        Text(slide.description)
-                            .font(AppTheme.Fonts.body(size: AppTheme.Onboarding.descriptionSize))
+                    if let subtitle = slide.subtitle {
+                        Text(subtitle)
+                            .font(AppTheme.Fonts.title(size: AppTheme.Onboarding.subtitleSize))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .multilineTextAlignment(.center)
-                            .lineSpacing(8)
-                            .padding(.horizontal, 36)
-                            .padding(.top, AppTheme.Onboarding.titleToBodySpacing)
                     }
-                    
-                    Spacer(minLength: 60)
                 }
-                .premiumInertia(intensity: 15)
+                .padding(.horizontal, 32)
+                
+                // Description
+                if !slide.description.isEmpty {
+                    Text(slide.description)
+                        .font(AppTheme.Fonts.body(size: AppTheme.Onboarding.descriptionSize))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(8)
+                        .padding(.horizontal, 36)
+                        .padding(.top, AppTheme.Onboarding.titleToBodySpacing)
+                }
+                
+                Spacer()
             }
+            .premiumInertia(intensity: 15)
         }
     }
     
