@@ -354,21 +354,27 @@ struct AppTheme {
         static let parallaxIntensity: CGFloat = 0.3
         static let fadeThreshold: CGFloat = 0.7
         
-        // Icon Container
-        static let iconContainerSize: CGFloat = 140
-        static let iconSize: CGFloat = 100
-        static let iconGlowRadius: CGFloat = 30
-        static let iconGlowOpacity: Double = 0.4
+        // Icon Container (Standardized for visual consistency)
+        static let iconContainerSize: CGFloat = 120  // Reduced for tighter layout
+        static let iconSize: CGFloat = 88  // Standard icon size
+        static let personalizationIconScale: CGFloat = 1.3  // Constellation icon needs larger display
+        static let iconGlowRadius: CGFloat = 25
+        static let iconGlowOpacity: Double = 0.35
         
-        // Typography
+        // Typography (Optimized for premium feel)
         static let titleSize: CGFloat = 30
         static let subtitleSize: CGFloat = 17
-        static let descriptionSize: CGFloat = 16
+        static let descriptionSize: CGFloat = 17
         
-        // Spacing
-        static let contentTopPadding: CGFloat = 60
-        static let iconToTitleSpacing: CGFloat = 36
-        static let titleToDescriptionSpacing: CGFloat = 16
+        // Spacing (Tighter, professional hierarchy)
+        static let contentTopPadding: CGFloat = 60  // Reduced for better balance
+        static let iconToTitleSpacing: CGFloat = 12  // TIGHT: Icon and title feel unified
+        static let titleToSubtitleSpacing: CGFloat = 6  // Tight coupling
+        static let titleToBodySpacing: CGFloat = 20  // Clear separation for body text
+        static let titleToDescriptionSpacing: CGFloat = 12
+        static let statsCardTopSpacing: CGFloat = 20  // Consistent stats card positioning
+        static let featureItemSpacing: CGFloat = 4  // Minimal list: very tight
+        static let featureIconToTextSpacing: CGFloat = 14  // Icon-text in features
     }
     
     // MARK: - Cosmic Gradients

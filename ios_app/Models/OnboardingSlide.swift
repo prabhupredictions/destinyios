@@ -58,22 +58,22 @@ struct OnboardingFeature: Identifiable {
         OnboardingFeature(
             icon: "bubble.left.and.bubble.right.fill",
             title: "Ask anything",
-            description: "Get real-time astrology insights tailored to your question"
+            description: "Real-time astrology insights for your questions"
         ),
         OnboardingFeature(
             icon: "checkmark.seal.fill",
             title: "Higher accuracy",
-            description: "Get hyper-personalized insights that improve with your feedback"
+            description: "Personalized insights that improve over time"
         ),
         OnboardingFeature(
             icon: "heart.fill",
             title: "Compatibility matching",
-            description: "Compare two birth charts (horoscope match) to understand relationship dynamics, and ask anything about the relationship"
+            description: "Compare birth charts and explore relationships"
         ),
         OnboardingFeature(
             icon: "clock.arrow.circlepath",
             title: "Chat history",
-            description: "Revisit past chats anytime and resume where you left off"
+            description: "Resume past conversations anytime"
         )
     ]
 }

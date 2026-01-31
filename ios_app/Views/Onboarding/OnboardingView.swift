@@ -88,7 +88,7 @@ struct OnboardingView: View {
     
     // MARK: - Bottom Section
     private var bottomSection: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 16) {
             // Page indicators
             HStack(spacing: 10) {
                 ForEach(0..<slides.count, id: \.self) { index in
@@ -118,7 +118,7 @@ struct OnboardingView: View {
                 .padding(.horizontal, 24)
             }
         }
-        .padding(.bottom, 40)
+        .padding(.bottom, 30)
     }
     
     // MARK: - Navigation
