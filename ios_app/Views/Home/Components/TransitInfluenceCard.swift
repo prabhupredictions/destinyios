@@ -126,7 +126,7 @@ struct TransitInfluenceCard: View {
     }
 }
 
-/// Compact Transit Orb (like CelestialOrbView for life areas)
+/// Compact Transit Orb (Divine Gold Edition)
 struct TransitOrbView: View {
     let transit: TransitInfluence
     
@@ -134,94 +134,77 @@ struct TransitOrbView: View {
         VStack(spacing: 8) { // iOS HIG: 8pt grid
             // Planet Orb
             ZStack {
-                // Glow background
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [planetGlowColor.opacity(0.4), planetGlowColor.opacity(0.1)],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 30
-                        )
+                // Planet Image Asset (Premium AI Generated)
+                Image(planetImageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 60, height: 60)
+                    // Dynamic premium shadow that pulses with the float
+                    .shadow(
+                        color: AppTheme.Colors.gold.opacity(isHovering ? 0.4 : 0.2),
+                        radius: isHovering ? 8 : 4,
+                        x: 0,
+                        y: isHovering ? 5 : 2
                     )
-                    .frame(width: 56, height: 56)
-                
-                // Icon
-                Image(systemName: planetSymbol)
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color.white, planetGlowColor],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .shadow(color: planetGlowColor.opacity(0.8), radius: 6)
+                    // Gentle floating movement
+                    .offset(y: isHovering ? -3 : 3)
             }
             .overlay(alignment: .bottomTrailing) {
-                // Status Dot
+                // Status Dot (Keeping this functional element)
                 Circle()
                     .fill(badgeColor)
-                    .frame(width: 10, height: 10)
+                    .frame(width: 12, height: 12)
                     .overlay(
                         Circle()
-                            .strokeBorder(Color.black, lineWidth: 1.5)
+                            .strokeBorder(Color(red: 0.1, green: 0.1, blue: 0.15), lineWidth: 2)
                     )
-                    .offset(x: 4, y: 4)
+                    .offset(x: 2, y: 2)
             }
             
             // Planet Name
             Text(transit.planet)
-                .font(AppTheme.Fonts.caption(size: 10))
+                .font(AppTheme.Fonts.caption(size: 11))
                 .fontWeight(.semibold)
-                .foregroundColor(.white)
+                .foregroundColor(AppTheme.Colors.gold)
             
             // Sign (Full Name)
             Text(fullSignName)
-                .font(AppTheme.Fonts.caption(size: 9))
+                .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
-        .frame(width: 75) // Slightly wider to fit full sign names
+        .frame(width: 80) // Slightly wider for elegance
+        .onAppear {
+            // Random delay for organic feel
+            let randomDelay = Double.random(in: 0...2.0)
+            withAnimation(
+                .easeInOut(duration: 2.5)
+                .repeatForever(autoreverses: true)
+                .delay(randomDelay)
+            ) {
+                isHovering = true
+            }
+        }
     }
+    
+    @State private var isHovering = false
     
     // MARK: - Computed Properties
     
-    var planetSymbol: String {
-        switch transit.planet.lowercased() {
-        case "sun": return "sun.max.fill"
-        case "moon": return "moon.fill"
-        case "mars": return "flame.fill"
-        case "mercury": return "sparkle"
-        case "jupiter": return "globe"
-        case "venus": return "heart.fill"
-        case "saturn": return "circle.hexagongrid.fill"
-        case "rahu": return "arrow.up.circle.fill"
-        case "ketu": return "arrow.down.circle.fill"
-        default: return "star.fill"
-        }
+    var planetImageName: String {
+        let name = transit.planet.lowercased().trimmingCharacters(in: .whitespaces)
+        return "planet_\(name)"
     }
     
-    var planetGlowColor: Color {
-        switch transit.planet.lowercased() {
-        case "sun": return Color.orange
-        case "moon": return Color.white
-        case "mars": return Color.red
-        case "mercury": return Color.green
-        case "jupiter": return Color.yellow
-        case "venus": return Color.pink
-        case "saturn": return Color.blue
-        case "rahu": return Color.purple
-        case "ketu": return Color.gray
-        default: return AppTheme.Colors.gold
-        }
-    }
+    // Note: planetSymbol and planetGlowColor removed as we actully use assets now
+    
+    // Note: planetGlowColor removed as we are unifying to Gold theme
     
     var badgeColor: Color {
         switch transit.badgeType.lowercased() {
-        case "positive": return Color.green
-        case "caution": return Color.orange
-        case "warning": return Color.red
-        case "neutral": return Color.gray
+        case "positive": return AppTheme.Colors.success
+        case "caution": return AppTheme.Colors.error
+        case "warning": return AppTheme.Colors.error
+        case "neutral": return AppTheme.Colors.textSecondary
         default: return AppTheme.Colors.gold
         }
     }

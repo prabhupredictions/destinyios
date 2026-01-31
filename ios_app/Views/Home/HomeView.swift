@@ -53,6 +53,9 @@ struct HomeView: View {
     @State private var selectedFilter: String = "All" // Filter State
     private let filterOptions = ["All", "Good", "Steady", "Caution"]
     
+    // Life Area Popup State
+    @State private var selectedLifeArea: LifeAreaItem? = nil
+    
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -148,6 +151,24 @@ struct HomeView: View {
                 }
             }
             .opacity(contentOpacity)
+            // Life Area Brief Popup Overlay
+            if let selected = selectedLifeArea {
+                LifeAreaBriefPopup(
+                    area: selected.area,
+                    status: selected.status.status,
+                    brief: selected.status.brief,
+                    iconName: iconName(for: selected.area),
+                    onAskMore: {
+                        let contextualQuestion = "You predicted: '\(selected.status.brief)' for my \(selected.area) today. Can you provide more detailed insights and guidance?"
+                        selectedLifeArea = nil
+                        onQuestionSelected?(contextualQuestion)
+                    },
+                    onDismiss: {
+                        selectedLifeArea = nil
+                    }
+                )
+                .transition(.opacity)
+            }
         }
         .navigationBarHidden(true)
         .task {
@@ -541,7 +562,9 @@ struct HomeView: View {
                             size: dynamicSize
                         ) {
                             HapticManager.shared.play(.light)
-                            onQuestionSelected?("Tell me about \(item.area)")
+                            withAnimation(.spring(response: 0.4)) {
+                                selectedLifeArea = item
+                            }
                         }
                     }
                 }

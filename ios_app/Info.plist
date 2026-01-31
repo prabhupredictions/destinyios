@@ -4,6 +4,10 @@
 <dict>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+    <key>CFBundleDisplayName</key>
+    <string>Destiny AI Astrology</string>
+    <key>UIUserInterfaceStyle</key>
+    <string>Dark</string>
     <key>GIDClientID</key>
     <string>668639087682-pgt066dmusjrpqthgb6ci5tq1pv3cs25.apps.googleusercontent.com</string>
     <key>CFBundleURLTypes</key>
