@@ -5,6 +5,7 @@ import SwiftUI
 /// Theme matches AuthView for visual consistency
 struct GuestSignInPromptView: View {
     let message: String
+    var provider: String? = nil  // "apple" or "google" - when set, only show that provider's button
     var onBack: (() -> Void)? = nil
     
     // Use @State viewModel like AuthView does (own instance, not injected)
@@ -151,26 +152,30 @@ struct GuestSignInPromptView: View {
     // MARK: - Auth Buttons (Matching AuthView)
     private var authButtonsSection: some View {
         VStack(spacing: 14) {
-            // Apple Sign In (Gold Slab - Primary)
-            AuthButton(
-                icon: "apple.logo",
-                iconImage: nil,
-                title: "Continue with Apple",
-                style: .goldSlab,
-                iconScale: 1.15
-            ) {
-                signInWithApple()
+            // Show Apple button only if provider is nil or "apple"
+            if provider == nil || provider == "apple" {
+                AuthButton(
+                    icon: "apple.logo",
+                    iconImage: nil,
+                    title: "Continue with Apple",
+                    style: provider == "apple" ? .goldSlab : (provider == nil ? .goldSlab : .glassSlab),
+                    iconScale: 1.15
+                ) {
+                    signInWithApple()
+                }
             }
             
-            // Google Sign In (Glass Slab - Secondary)
-            AuthButton(
-                icon: nil,
-                iconImage: "google_logo",
-                title: "Continue with Google",
-                style: .glassSlab,
-                iconScale: 1.0
-            ) {
-                signInWithGoogle()
+            // Show Google button only if provider is nil or "google"
+            if provider == nil || provider == "google" {
+                AuthButton(
+                    icon: nil,
+                    iconImage: "google_logo",
+                    title: "Continue with Google",
+                    style: provider == "google" ? .goldSlab : .glassSlab,
+                    iconScale: 1.0
+                ) {
+                    signInWithGoogle()
+                }
             }
             
             // Error message

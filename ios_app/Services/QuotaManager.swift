@@ -8,12 +8,63 @@ import SwiftData
 /// The user should be prompted to sign in to their registered account instead
 struct ArchivedGuestError: Error, LocalizedError {
     let upgradedToEmail: String?
+    let provider: String?  // "apple" or "google" - the provider used when upgrading
     
     var errorDescription: String? {
         if let email = upgradedToEmail {
             return "This account was upgraded to \(email). Please sign in."
         }
         return "You already have a registered account. Please sign in."
+    }
+}
+
+/// Thrown when a guest's birth data matches an existing registered user
+/// The user should be prompted to sign in with their registered account instead
+struct RegisteredUserConflictError: Error, LocalizedError {
+    let maskedEmail: String?
+    let provider: String?  // 'apple', 'google', or 'email'
+    
+    var errorDescription: String? {
+        // Show friendly message based on provider - don't confuse users with relay emails
+        switch provider {
+        case "apple":
+            return "An account already exists with your birth data. Please sign in with Apple to continue."
+        case "google":
+            if let email = maskedEmail {
+                return "An account already exists with your birth data. Please sign in with Google (\(email))."
+            }
+            return "An account already exists with your birth data. Please sign in with Google."
+        default:
+            if let email = maskedEmail {
+                return "An account already exists with your birth data. Please sign in with \(email)."
+            }
+            return "An account already exists with your birth data. Please sign in."
+        }
+    }
+}
+
+/// Thrown when trying to save birth data that already belongs to another registered user
+/// Used during guest upgrade when their birth data matches another registered user
+struct BirthDataTakenError: Error, LocalizedError {
+    let existingEmail: String?
+    let provider: String?  // 'apple', 'google', or 'email'
+    
+    var errorDescription: String? {
+        // Show friendly message based on provider - don't confuse users with relay emails
+        switch provider {
+        case "apple":
+            return "Your birth data is already linked to your Apple account. Please sign in with Apple to continue."
+        case "google":
+            if let email = existingEmail {
+                return "Your birth data is already linked to \(email). Please sign in with Google."
+            }
+            return "Your birth data is already linked to your Google account. Please sign in with Google."
+        default:
+            if let email = existingEmail {
+                return "Your birth data is already linked to \(email). Please sign in with that account to continue."
+            }
+            return "Your birth data is already linked to a registered account. Please sign in to continue."
+        }
     }
 }
 
@@ -372,16 +423,30 @@ class QuotaManager: ObservableObject {
             throw URLError(.badServerResponse)
         }
         
-        // Handle 409 Conflict - guest was already upgraded to registered account
+        // Handle 409 Conflict - either archived guest or birth data matches registered user
         if httpResponse.statusCode == 409 {
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let detail = json["detail"] as? [String: Any],
-               let error = detail["error"] as? String,
-               error == "archived_guest" {
-                let upgradedTo = detail["upgraded_to_email"] as? String
-                print("[QuotaManager] 🔔 Archived guest detected! Upgraded to: \(upgradedTo ?? "unknown")")
-                throw ArchivedGuestError(upgradedToEmail: upgradedTo)
+               let error = detail["error"] as? String {
+                
+                // Case 1: Archived guest - account was upgraded to registered
+                if error == "archived_guest" {
+                    let upgradedTo = detail["upgraded_to_email"] as? String
+                    let provider = detail["provider"] as? String
+                    print("[QuotaManager] 🔔 Archived guest detected! Upgraded to: \(upgradedTo ?? "unknown") (provider: \(provider ?? "unknown"))")
+                    throw ArchivedGuestError(upgradedToEmail: upgradedTo, provider: provider)
+                }
+                
+                // Case 2: Guest birth data matches existing registered user
+                if error == "registered_user_conflict" {
+                    let maskedEmail = detail["masked_email"] as? String
+                    let provider = detail["provider"] as? String
+                    print("[QuotaManager] 🔔 Guest conflict! Birth data belongs to: \(maskedEmail ?? "unknown") (provider: \(provider ?? "unknown"))")
+                    throw RegisteredUserConflictError(maskedEmail: maskedEmail, provider: provider)
+                }
             }
+            // Unknown 409 error - throw generic
+            throw URLError(.badServerResponse)
         }
         
         guard httpResponse.statusCode == 200 else {

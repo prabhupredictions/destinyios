@@ -151,6 +151,7 @@ struct BirthDataView: View {
             // Guest tried to use birth data that belongs to a registered user
             GuestSignInPromptView(
                 message: viewModel.errorMessage ?? "This birth data is already registered. Please sign in to continue.",
+                provider: viewModel.birthDataTakenProvider,
                 onBack: { showSignInPrompt = false }
             )
         }
@@ -160,6 +161,13 @@ struct BirthDataView: View {
                 savedBirthData = nil
                 // Show sign-in prompt
                 showSignInPrompt = true
+            }
+        }
+        .onChange(of: showSignInPrompt) { oldValue, newValue in
+            // When sign-in sheet closes, reload user info to get the new email
+            if oldValue && !newValue {
+                print("[BirthDataView] Sign-in sheet closed, reloading user info...")
+                viewModel.reloadUserInfo()
             }
         }
     }
@@ -304,21 +312,26 @@ struct BirthDataView: View {
             SoundManager.shared.playButtonTap()
             
             if viewModel.save() {
-                // Register with backend subscription service
+                // Register with backend subscription service FIRST
+                // Wait for result before proceeding to avoid race condition
                 Task {
-                    await registerWithBackend()
+                    let shouldProceed = await registerWithBackend()
+                    
+                    if shouldProceed {
+                        // Only proceed if registration succeeded (no conflict)
+                        await MainActor.run {
+                            // Create birth data for prefetch
+                            savedBirthData = BirthData(
+                                dob: viewModel.formattedDOB,
+                                time: viewModel.formattedTOB,
+                                latitude: viewModel.latitude,
+                                longitude: viewModel.longitude,
+                                cityOfBirth: viewModel.cityOfBirth
+                            )
+                            print("[DEBUG] BirthData saved, triggering ProfileSetupLoadingView via item binding")
+                        }
+                    }
                 }
-                
-                // Create birth data for prefetch
-                savedBirthData = BirthData(
-                    dob: viewModel.formattedDOB,
-                    time: viewModel.formattedTOB,
-                    latitude: viewModel.latitude,
-                    longitude: viewModel.longitude,
-                    cityOfBirth: viewModel.cityOfBirth
-                )
-                
-                print("[DEBUG] BirthData saved, triggering ProfileSetupLoadingView via item binding")
             }
         }
         .disabled(!viewModel.isValid)
@@ -327,18 +340,19 @@ struct BirthDataView: View {
     }
     
     // MARK: - Backend Registration
-    private func registerWithBackend() async {
+    /// Returns true if registration AND profile sync succeeded, false if conflict error occurred
+    private func registerWithBackend() async -> Bool {
         guard let userEmail = UserDefaults.standard.string(forKey: "userEmail"),
               !userEmail.isEmpty else {
-            return
+            return true // Let it proceed if no email (shouldn't happen)
         }
         
         let isGuest = UserDefaults.standard.bool(forKey: "isGuest")
         
+        // Step 1: Register user with subscription service
         do {
-            // Register user with subscription service
             // Backend assigns plan based on isGeneratedEmail flag:
-            // - isGeneratedEmail=true -> free_guest plan
+            // - isGeneratedEmail=true -> free_guest plan (also checks birth data conflict)
             // - isGeneratedEmail=false -> free_registered plan
             try await QuotaManager.shared.registerUser(
                 email: userEmail,
@@ -347,15 +361,138 @@ struct BirthDataView: View {
             print("✅ Registered user with backend: \(userEmail), isGuest: \(isGuest)")
         } catch let error as ArchivedGuestError {
             // Guest already upgraded to registered - show sign-in prompt
-            print("🔔 Archived guest detected! Upgraded to: \(error.upgradedToEmail ?? "unknown")")
+            print("🔔 Archived guest detected! Upgraded to: \(error.upgradedToEmail ?? "unknown") (provider: \(error.provider ?? "unknown"))")
             await MainActor.run {
+                viewModel.birthDataTakenProvider = error.provider
                 viewModel.errorMessage = error.localizedDescription
-                // Cancel the ProfileSetupLoadingView
-                savedBirthData = nil
+                showSignInPrompt = true
             }
+            return false // Don't proceed - conflict detected
+        } catch let error as RegisteredUserConflictError {
+            // Guest's birth data matches a registered user - show sign-in prompt
+            print("🔔 Guest conflict! Birth data belongs to: \(error.maskedEmail ?? "unknown") (provider: \(error.provider ?? "unknown"))")
+            await MainActor.run {
+                viewModel.birthDataTakenEmail = error.maskedEmail
+                viewModel.birthDataTakenProvider = error.provider
+                viewModel.errorMessage = error.localizedDescription
+                showSignInPrompt = true
+            }
+            return false // Don't proceed - conflict detected
         } catch {
             print("❌ Failed to register with backend: \(error)")
+            // Continue to profile sync anyway
+        }
+        
+        // Step 2: Sync profile with birth data - this checks for birth_data_taken (registered users)
+        // For registered users, the /register endpoint won't catch birth data conflicts
+        // because they register with Apple/Google email first, then save birth data
+        do {
+            let syncResult = await syncProfile(userEmail: userEmail, isGuest: isGuest)
+            
+            if case .conflict(let maskedEmail, let provider) = syncResult {
+                // Birth data belongs to another registered user
+                print("🔔 Birth data conflict detected during profile sync! (provider: \(provider ?? "unknown"))")
+                await MainActor.run {
+                    viewModel.birthDataTakenEmail = maskedEmail
+                    viewModel.birthDataTakenProvider = provider
+                    // Show friendly message based on provider
+                    switch provider {
+                    case "apple":
+                        viewModel.errorMessage = "Your birth data is already linked to your Apple account. Please sign in with Apple."
+                    case "google":
+                        if let email = maskedEmail {
+                            viewModel.errorMessage = "Your birth data is already linked to \(email). Please sign in with Google."
+                        } else {
+                            viewModel.errorMessage = "Your birth data is already linked to your Google account. Please sign in with Google."
+                        }
+                    default:
+                        viewModel.errorMessage = "Your birth data is already linked to \(maskedEmail ?? "a registered account"). Please sign in with that account."
+                    }
+                    showSignInPrompt = true
+                }
+                return false // Don't proceed - conflict detected
+            }
+        } catch {
+            print("❌ Failed to sync profile: \(error)")
             // Continue anyway - local data is saved
+        }
+        
+        return true // Success - proceed to next screen
+    }
+    
+    /// Profile sync result
+    private enum ProfileSyncResult {
+        case success
+        case conflict(maskedEmail: String?, provider: String?)
+        case error
+    }
+    
+    /// Sync profile to server and check for birth data conflicts
+    private func syncProfile(userEmail: String, isGuest: Bool) async -> ProfileSyncResult {
+        let storedUserName = UserDefaults.standard.string(forKey: "userName") ?? ""
+        let appleUserId = UserDefaults.standard.string(forKey: "appleUserID")
+        let googleUserId = UserDefaults.standard.string(forKey: "googleUserID")
+        
+        var profileRequest: [String: Any] = [
+            "email": userEmail,
+            "user_name": storedUserName,
+            "user_type": isGuest ? "guest" : "registered",
+            "is_generated_email": isGuest,
+            "birth_profile": [
+                "date_of_birth": viewModel.formattedDOB,
+                "time_of_birth": viewModel.formattedTOB,
+                "city_of_birth": viewModel.cityOfBirth,
+                "latitude": viewModel.latitude,
+                "longitude": viewModel.longitude,
+                "gender": viewModel.gender.isEmpty ? nil : viewModel.gender,
+                "birth_time_unknown": viewModel.timeUnknown
+            ] as [String: Any?]
+        ]
+        
+        // Add Apple/Google IDs for proper user lookup (email might be placeholder)
+        if let appleId = appleUserId, !appleId.isEmpty {
+            profileRequest["apple_id"] = appleId
+        }
+        if let googleId = googleUserId, !googleId.isEmpty {
+            profileRequest["google_id"] = googleId
+        }
+        
+        guard let url = URL(string: "\(APIConfig.baseURL)/subscription/profile") else {
+            return .error
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: profileRequest)
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("[ProfileSync] Server response: \(httpResponse.statusCode)")
+                
+                // Handle 409 Conflict - birth data already belongs to another registered user
+                if httpResponse.statusCode == 409 {
+                    if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let detail = json["detail"] as? [String: Any] {
+                        let existingEmail = detail["existing_email"] as? String
+                        let provider = detail["provider"] as? String
+                        return .conflict(maskedEmail: existingEmail, provider: provider)
+                    }
+                    return .conflict(maskedEmail: nil, provider: nil)
+                }
+                
+                if httpResponse.statusCode == 200 {
+                    print("✅ Profile synced successfully")
+                    return .success
+                }
+            }
+            return .error
+        } catch {
+            print("❌ Profile sync error: \(error)")
+            return .error
         }
     }
 }

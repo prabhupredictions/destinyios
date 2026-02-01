@@ -271,11 +271,12 @@ class ProfileService {
         // Handle 409 Conflict - birth data already taken
         if httpResponse.statusCode == 409 {
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let detail = json["detail"] as? [String: Any],
-               let existingEmail = detail["existing_email"] as? String {
-                throw ProfileError.birthDataTaken(existingEmail: existingEmail)
+               let detail = json["detail"] as? [String: Any] {
+                let existingEmail = detail["existing_email"] as? String
+                let provider = detail["provider"] as? String
+                throw ProfileError.birthDataTaken(existingEmail: existingEmail, provider: provider)
             }
-            throw ProfileError.birthDataTaken(existingEmail: nil)
+            throw ProfileError.birthDataTaken(existingEmail: nil, provider: nil)
         }
         
         guard httpResponse.statusCode == 200 else {
@@ -328,13 +329,14 @@ class ProfileService {
         
         // Handle 409 Conflict - birth data already taken by another registered user
         if httpResponse.statusCode == 409 {
-            // Try to parse the existing_email from response
+            // Try to parse the existing_email and provider from response
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let detail = json["detail"] as? [String: Any],
-               let existingEmail = detail["existing_email"] as? String {
-                throw ProfileError.birthDataTaken(existingEmail: existingEmail)
+               let detail = json["detail"] as? [String: Any] {
+                let existingEmail = detail["existing_email"] as? String
+                let provider = detail["provider"] as? String
+                throw ProfileError.birthDataTaken(existingEmail: existingEmail, provider: provider)
             }
-            throw ProfileError.birthDataTaken(existingEmail: nil)
+            throw ProfileError.birthDataTaken(existingEmail: nil, provider: nil)
         }
         
         guard httpResponse.statusCode == 200 else {
@@ -499,7 +501,7 @@ enum ProfileError: Error, LocalizedError {
     case invalidResponse
     case serverError(statusCode: Int)
     case decodingError
-    case birthDataTaken(existingEmail: String?)  // Birth data belongs to another registered user
+    case birthDataTaken(existingEmail: String?, provider: String?)  // Birth data belongs to another registered user
     
     var errorDescription: String? {
         switch self {
@@ -507,11 +509,19 @@ enum ProfileError: Error, LocalizedError {
         case .invalidResponse: return "Invalid server response"
         case .serverError(let code): return "Server error: \(code)"
         case .decodingError: return "Failed to decode response"
-        case .birthDataTaken(let email):
-            if let email = email {
-                return "This birth data is already registered. Please sign in as \(email)"
+        case .birthDataTaken(let email, let provider):
+            // Show friendly message based on provider
+            switch provider {
+            case "apple":
+                return "This birth data is linked to your Apple account. Please sign in with Apple."
+            case "google":
+                if let email = email {
+                    return "This birth data is linked to \(email). Please sign in with Google."
+                }
+                return "This birth data is linked to your Google account. Please sign in with Google."
+            default:
+                return "This birth data is already registered. Please sign in."
             }
-            return "This birth data is already registered. Please sign in."
         }
     }
 }

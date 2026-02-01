@@ -228,14 +228,15 @@ class AuthViewModel {
                     print("🔄 [AuthViewModel] Carrying forward guest birth data to registered user...")
                     
                     let userName = user.name ?? guestUserName ?? "User"
-                    let saveSuccess = await saveGuestBirthDataForRegisteredUser(
-                        email: actualEmail,
-                        userName: userName,
-                        birthData: guestData,
-                        gender: guestGender
-                    )
                     
-                    if saveSuccess {
+                    do {
+                        try await saveGuestBirthDataForRegisteredUser(
+                            email: actualEmail,
+                            userName: userName,
+                            birthData: guestData,
+                            gender: guestGender
+                        )
+                        
                         profileHasBirthData = true
                         print("✅ [AuthViewModel] Guest birth data saved to registered user. Migration happened on backend.")
                         
@@ -246,8 +247,20 @@ class AuthViewModel {
                         await ChatHistorySyncService.shared.syncFromServer(userEmail: actualEmail, dataManager: DataManager.shared)
                         await CompatibilityHistoryService.shared.syncFromServer(userEmail: actualEmail)
                         print("✅ [AuthViewModel] Post-migration history sync complete")
-                    } else {
-                        print("⚠️ [AuthViewModel] Failed to save guest birth data. User will need to re-enter.")
+                        
+                    } catch let error as ProfileError {
+                        if case .birthDataTaken(let existingEmail, let provider) = error {
+                            // Birth data belongs to another registered user - block sign-in
+                            print("🚫 [AuthViewModel] Guest birth data conflict: \(existingEmail ?? "unknown")")
+                            throw BirthDataTakenError(existingEmail: existingEmail, provider: provider)
+                        } else {
+                            // Other profile errors - continue without birth data
+                            print("⚠️ [AuthViewModel] Profile error: \(error). User will need to re-enter birth data.")
+                        }
+                        
+                    } catch {
+                        // Other errors - continue without birth data, user will need to re-enter
+                        print("⚠️ [AuthViewModel] Failed to save guest birth data: \(error). User will need to re-enter.")
                     }
                 }
                 
@@ -287,9 +300,10 @@ class AuthViewModel {
                 }
                 
                 // Call registerUser with a placeholder email - backend will find by ID and return stored email
+                // NOTE: isGeneratedEmail must be FALSE because Apple/Google Sign-In = registered user
                 let registerResponse = try? await ProfileService.shared.registerUser(
                     email: "lookup-by-id@placeholder.local",
-                    isGeneratedEmail: true,
+                    isGeneratedEmail: false,  // Apple/Google users are REGISTERED, not guests!
                     appleId: appleId,
                     googleId: googleId
                 )
@@ -319,10 +333,69 @@ class AuthViewModel {
                         print("✅ [AuthViewModel] handleAuthSuccess completed. isAuthenticated=\(isAuthenticated)")
                     }
                 } else {
-                    // No existing user found by ID - this is a new user without email
-                    print("⚠️ [AuthViewModel] No existing user found by ID, proceeding as new user")
+                    // New user created with placeholder email (Apple Hide My Email on reinstall)
+                    // CRITICAL: Use registerResponse.userEmail, NOT user.email (which may be nil)
+                    let effectiveEmail = registerResponse?.userEmail ?? user.email ?? "lookup-by-id@placeholder.local"
+                    print("⚠️ [AuthViewModel] New user created with email: \(effectiveEmail)")
+                    
+                    // Check if this is a guest upgrade scenario
+                    let isGuestUpgrade = guestBirthData != nil
+                    
+                    // Fetch profile from server to check if birth data exists there
+                    // Skip background sync during guest→registered upgrade (we'll sync after migration)
+                    var profileHasBirthData = await fetchAndRestoreProfile(email: effectiveEmail, skipSync: isGuestUpgrade)
+                    print("📊 [AuthViewModel] fetchAndRestoreProfile (new user) returned: \(profileHasBirthData)")
+                    
+                    // PHASE 12: Guest birth data carry-forward for Apple Hide My Email flow
+                    // If registered user has no birth data BUT guest had birth data, save it now
+                    if !profileHasBirthData, let guestData = guestBirthData {
+                        print("🔄 [AuthViewModel] Carrying forward guest birth data to Apple Hide My Email user...")
+                        
+                        let userName = user.name ?? guestUserName ?? "User"
+                        
+                        do {
+                            try await saveGuestBirthDataForRegisteredUser(
+                                email: effectiveEmail,
+                                userName: userName,
+                                birthData: guestData,
+                                gender: guestGender
+                            )
+                            
+                            profileHasBirthData = true
+                            print("✅ [AuthViewModel] Guest birth data saved to Apple Hide My Email user. Migration happened on backend.")
+                            
+                            // Sync history AFTER migration completes on backend
+                            print("🔄 [AuthViewModel] Syncing migrated history from server...")
+                            await ChatHistorySyncService.shared.syncFromServer(userEmail: effectiveEmail, dataManager: DataManager.shared)
+                            await CompatibilityHistoryService.shared.syncFromServer(userEmail: effectiveEmail)
+                            print("✅ [AuthViewModel] Post-migration history sync complete")
+                            
+                        } catch {
+                            print("❌ [AuthViewModel] Failed to save guest birth data: \(error)")
+                            // Continue anyway - user will see birth data form
+                        }
+                    }
+                    
                     await MainActor.run {
-                        handleAuthSuccess(user: user, isGuest: false)
+                        if profileHasBirthData {
+                            UserDefaults.standard.set(true, forKey: "hasBirthData")
+                            print("✅ [AuthViewModel] hasBirthData set to TRUE on MainActor")
+                        } else {
+                            // Server has no birth data for this user
+                            // Clear any stale local cache to force birth data form
+                            UserDefaults.standard.set(false, forKey: "hasBirthData")
+                            UserDefaults.standard.removeObject(forKey: "userBirthData")
+                            print("⚠️ [AuthViewModel] New user has NO birth data - will show birth data form")
+                        }
+                        
+                        // Create modified user with effective email for handleAuthSuccess
+                        let userWithEmail = User(
+                            id: user.id,
+                            email: effectiveEmail,
+                            name: user.name,
+                            provider: user.provider
+                        )
+                        handleAuthSuccess(user: userWithEmail, isGuest: false, skipHydration: !profileHasBirthData)
                         UserDefaults.standard.synchronize()  // Force immediate persistence
                     }
                 }
@@ -339,7 +412,7 @@ class AuthViewModel {
         }
     }
     
-    private func handleAuthSuccess(user: User, isGuest: Bool) {
+    private func handleAuthSuccess(user: User, isGuest: Bool, skipHydration: Bool = false) {
         self.isAuthenticated = true
         self.isGuest = isGuest
         self.userEmail = user.email
@@ -362,7 +435,10 @@ class AuthViewModel {
             let quotaKey = StorageKeys.userKey(for: StorageKeys.quotaUsed, email: email)
             let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: email)
             
-            if UserDefaults.standard.bool(forKey: hasDataKey),
+            // CRITICAL: Only hydrate from local cache if server confirmed birth data exists
+            // skipHydration=true when server has NO birth data (avoids using stale cache)
+            if !skipHydration,
+               UserDefaults.standard.bool(forKey: hasDataKey),
                let data = UserDefaults.standard.data(forKey: dataKey) {
                 
                 // Copy to Session (Global) keys for UI
@@ -373,6 +449,8 @@ class AuthViewModel {
                 if let gender = UserDefaults.standard.string(forKey: genderKey) {
                     UserDefaults.standard.set(gender, forKey: "userGender")
                 }
+            } else if skipHydration {
+                print("[AuthViewModel] Skipping local cache hydration - server has no birth data for: \(email)")
             }
             
             // Restore Quota
@@ -382,6 +460,23 @@ class AuthViewModel {
         }
         if let name = user.name {
             UserDefaults.standard.set(name, forKey: "userName")
+        }
+        
+        // CRITICAL: Store provider-specific IDs for profile sync lookup
+        // BirthDataView.syncProfile() needs these to send to backend for user identification
+        if user.provider == "google" {
+            UserDefaults.standard.set(user.id, forKey: "googleUserID")
+            // Clear Apple ID to avoid confusion
+            UserDefaults.standard.removeObject(forKey: "appleUserID")
+        } else if user.provider == "apple" {
+            // Apple ID is already stored in AppleAuthService, but ensure it's set
+            UserDefaults.standard.set(user.id, forKey: "appleUserID")
+            // Clear Google ID to avoid confusion
+            UserDefaults.standard.removeObject(forKey: "googleUserID")
+        } else {
+            // Guest - clear both
+            UserDefaults.standard.removeObject(forKey: "appleUserID")
+            UserDefaults.standard.removeObject(forKey: "googleUserID")
         }
         
         // Note: Profile fetch is now done in performSignIn BEFORE calling this method
@@ -443,66 +538,61 @@ class AuthViewModel {
     
     /// PHASE 12: Save guest birth data for the newly registered user
     /// This triggers backend migration (guest history → registered user)
+    /// Throws BirthDataTakenError if birth data belongs to another registered user
     private func saveGuestBirthDataForRegisteredUser(
         email: String,
         userName: String,
         birthData: BirthData,
         gender: String
-    ) async -> Bool {
-        do {
-            let response = try await ProfileService.shared.saveProfile(
+    ) async throws {
+        let response = try await ProfileService.shared.saveProfile(
+            email: email,
+            userName: userName,
+            birthData: birthData,
+            isGuest: false,
+            gender: gender
+        )
+        
+        if let response = response {
+            print("✅ [AuthViewModel] Profile saved for \(response.userEmail)")
+            
+            // Store birth data locally for session
+            if let encoded = try? JSONEncoder().encode(birthData) {
+                UserDefaults.standard.set(encoded, forKey: "userBirthData")
+                
+                // Also store in user-scoped keys
+                let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData, email: email)
+                let hasDataKey = StorageKeys.userKey(for: StorageKeys.hasBirthData, email: email)
+                UserDefaults.standard.set(encoded, forKey: dataKey)
+                UserDefaults.standard.set(true, forKey: hasDataKey)
+            }
+            
+            // Store gender in user-scoped key for registered user
+            if !gender.isEmpty {
+                let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: email)
+                UserDefaults.standard.set(gender, forKey: genderKey)
+                print("✅ [AuthViewModel] Gender '\(gender)' saved for \(email)")
+            }
+            
+            // Create self partner profile for Switch Profile feature
+            // This makes the upgraded user work exactly like a normal registered user
+            print("👤 [AuthViewModel] Creating self partner profile...")
+            await ProfileService.shared.createSelfPartnerProfile(
                 email: email,
                 userName: userName,
-                birthData: birthData,
-                isGuest: false,
-                gender: gender
-            )
-            
-            if let response = response {
-                print("✅ [AuthViewModel] Profile saved for \(response.userEmail)")
-                
-                // Store birth data locally for session
-                if let encoded = try? JSONEncoder().encode(birthData) {
-                    UserDefaults.standard.set(encoded, forKey: "userBirthData")
-                    
-                    // Also store in user-scoped keys
-                    let dataKey = StorageKeys.userKey(for: StorageKeys.userBirthData, email: email)
-                    let hasDataKey = StorageKeys.userKey(for: StorageKeys.hasBirthData, email: email)
-                    UserDefaults.standard.set(encoded, forKey: dataKey)
-                    UserDefaults.standard.set(true, forKey: hasDataKey)
-                }
-                
-                // Store gender in user-scoped key for registered user
-                if !gender.isEmpty {
-                    let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: email)
-                    UserDefaults.standard.set(gender, forKey: genderKey)
-                    print("✅ [AuthViewModel] Gender '\(gender)' saved for \(email)")
-                }
-                
-                // Create self partner profile for Switch Profile feature
-                // This makes the upgraded user work exactly like a normal registered user
-                print("👤 [AuthViewModel] Creating self partner profile...")
-                await ProfileService.shared.createSelfPartnerProfile(
-                    email: email,
-                    userName: userName,
-                    birthProfile: ProfileService.BirthProfileResponse(
-                        dateOfBirth: birthData.dob,
-                        timeOfBirth: birthData.time,
-                        cityOfBirth: birthData.cityOfBirth ?? "",
-                        latitude: birthData.latitude,
-                        longitude: birthData.longitude,
-                        gender: gender.isEmpty ? nil : gender,
-                        birthTimeUnknown: false
-                    )
+                birthProfile: ProfileService.BirthProfileResponse(
+                    dateOfBirth: birthData.dob,
+                    timeOfBirth: birthData.time,
+                    cityOfBirth: birthData.cityOfBirth ?? "",
+                    latitude: birthData.latitude,
+                    longitude: birthData.longitude,
+                    gender: gender.isEmpty ? nil : gender,
+                    birthTimeUnknown: false
                 )
-                print("✅ [AuthViewModel] Self partner profile created")
-                
-                return true
-            }
-            return false
-        } catch {
-            print("❌ [AuthViewModel] Failed to save guest birth data: \(error)")
-            return false
+            )
+            print("✅ [AuthViewModel] Self partner profile created")
+        } else {
+            throw NSError(domain: "AuthViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to save profile"])
         }
     }
 }

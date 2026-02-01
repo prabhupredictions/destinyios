@@ -25,6 +25,7 @@ class BirthDataViewModel {
     var errorMessage: String?
     var showLocationSearch = false
     var birthDataTakenEmail: String? = nil  // Set when guest tries to use registered user's birth data
+    var birthDataTakenProvider: String? = nil  // "apple" or "google" - the provider of the conflicting account
     
     // MARK: - Dependencies
     private let dataManager: DataManager
@@ -34,7 +35,7 @@ class BirthDataViewModel {
     // MARK: - Init
     init(dataManager: DataManager? = nil) {
         self.dataManager = dataManager ?? DataManager.shared
-        loadUserInfo()
+        reloadUserInfo()
     }
     
     // MARK: - Computed Properties
@@ -96,7 +97,9 @@ class BirthDataViewModel {
     }
     
     // MARK: - Load User Info
-    private func loadUserInfo() {
+    /// Reload user email and guest status from UserDefaults.
+    /// IMPORTANT: Call this after sign-in completes to refresh cached values.
+    func reloadUserInfo() {
         userEmail = UserDefaults.standard.string(forKey: "userEmail")
         isGuest = UserDefaults.standard.bool(forKey: "isGuest")
         
@@ -247,21 +250,9 @@ class BirthDataViewModel {
                 UserDefaults.standard.set(email, forKey: "userEmail")
             }
             
-            // Sync to server profile and check for conflicts
-            // This Task checks if birth data belongs to a registered user
-            Task {
-                let result = await syncToServerProfileAsync(email: email)
-                if case .birthDataTaken(let existingEmail) = result {
-                    // Guest trying to use registered user's birth data
-                    // Set this to trigger sign-in prompt in the view
-                    self.birthDataTakenEmail = existingEmail
-                    if let existingEmail = existingEmail {
-                        self.errorMessage = "This birth data is already registered. Please sign in as \(existingEmail)"
-                    } else {
-                        self.errorMessage = "This birth data is already registered. Please sign in."
-                    }
-                }
-            }
+            // NOTE: Server profile sync is now handled by BirthDataView.registerWithBackend()
+            // which properly awaits the result and blocks on birth data conflicts.
+            // We removed the duplicate sync here to prevent race conditions.
             
             // Sync chat history from server (restore any past conversations)
             // Works for both guests and registered users
@@ -301,7 +292,7 @@ class BirthDataViewModel {
     /// Result of server profile sync
     enum SyncResult {
         case success
-        case birthDataTaken(existingEmail: String?)
+        case birthDataTaken(existingEmail: String?, provider: String?)
         case error(String)
     }
     
@@ -342,11 +333,12 @@ class BirthDataViewModel {
                 // Handle 409 Conflict - birth data already belongs to registered user
                 if httpResponse.statusCode == 409 {
                     if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                       let detail = json["detail"] as? [String: Any],
-                       let existingEmail = detail["existing_email"] as? String {
-                        return .birthDataTaken(existingEmail: existingEmail)
+                       let detail = json["detail"] as? [String: Any] {
+                        let existingEmail = detail["existing_email"] as? String
+                        let provider = detail["provider"] as? String
+                        return .birthDataTaken(existingEmail: existingEmail, provider: provider)
                     }
-                    return .birthDataTaken(existingEmail: nil)
+                    return .birthDataTaken(existingEmail: nil, provider: nil)
                 }
                 
                 if httpResponse.statusCode == 200 {
