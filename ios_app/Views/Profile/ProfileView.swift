@@ -23,6 +23,9 @@ struct ProfileView: View {
     @State private var showSubscription = false
     @State private var showSignOutAlert = false
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for subscription
+    @State private var showProfileSwitcher = false  // Switch Birth Chart sheet
+    @State private var showUpgradePrompt = false  // Upgrade prompt for Switch Profile feature
+    @State private var showGuestSignInForSwitch = false  // Guest sign-in prompt for Switch Profile
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -94,6 +97,19 @@ struct ProfileView: View {
                 GuestSignInPromptView(
                     message: "sign_in_to_view_plans".localized,
                     onBack: { showGuestSignInSheet = false }
+                )
+                .environment(authViewModel)
+            }
+            .sheet(isPresented: $showProfileSwitcher) {
+                ProfileSwitcherSheet()
+            }
+            .sheet(isPresented: $showUpgradePrompt) {
+                SubscriptionView()
+            }
+            .sheet(isPresented: $showGuestSignInForSwitch) {
+                GuestSignInPromptView(
+                    message: "sign_in_to_switch_profiles".localized,
+                    onBack: { showGuestSignInForSwitch = false }
                 )
                 .environment(authViewModel)
             }
@@ -179,6 +195,25 @@ struct ProfileView: View {
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
+                
+                // Switch Birth Chart - moved from HomeView header
+                PremiumListItem(
+                    title: "Switch Birth Chart",
+                    subtitle: ProfileContextManager.shared.isUsingSelf 
+                        ? "Viewing as \(ProfileContextManager.shared.activeProfileName)" 
+                        : "Using \(ProfileContextManager.shared.activeProfileName)'s chart",
+                    icon: "arrow.triangle.2.circlepath",
+                    action: {
+                        // GUEST RULE: Guests must sign in first
+                        if isGuestUser {
+                            showGuestSignInForSwitch = true
+                        } else if quotaManager.hasFeature(.switchProfile) {
+                            showProfileSwitcher = true
+                        } else {
+                            showUpgradePrompt = true
+                        }
+                    }
+                )
             }
         }
     }

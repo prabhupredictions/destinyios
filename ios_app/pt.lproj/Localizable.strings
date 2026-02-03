@@ -414,3 +414,27 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "Perfil Protegido";
+"primary_badge" = "Principal";
+"active_badge" = "Ativo";
+"used_badge" = "Usado";
+"why_cant_edit" = "Por que não posso editar?";
+"delete" = "Excluir";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "Seu perfil de conta principal não pode ser modificado. Para atualizar seus dados de nascimento, entre em contato com support@destinyaiastrology.com.";
+"profile_delete_blocked_main_user" = "Seu perfil de conta principal não pode ser excluído. Para assistência, entre em contato com support@destinyaiastrology.com.";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "Este mapa natal está atualmente ativo. Mude para outro perfil primeiro, ou entre em contato com support@destinyaiastrology.com.";
+"profile_delete_blocked_active" = "Este mapa natal está atualmente ativo. Mude para outro perfil primeiro, ou entre em contato com support@destinyaiastrology.com.";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "Este mapa natal foi usado para leituras e não pode ser modificado. Para assistência, entre em contato com support@destinyaiastrology.com.";
+"profile_delete_blocked_used" = "Este mapa natal foi usado para leituras e não pode ser excluído. Para assistência, entre em contato com support@destinyaiastrology.com.";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "Já existe um mapa natal com detalhes similares. Cada pessoa só pode ter um mapa. Para assistência, entre em contato com support@destinyaiastrology.com.";
+

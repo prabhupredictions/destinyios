@@ -414,3 +414,27 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "档案受保护";
+"primary_badge" = "主要";
+"active_badge" = "活跃";
+"used_badge" = "已使用";
+"why_cant_edit" = "为什么无法编辑？";
+"delete" = "删除";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "您的主账户档案无法修改。如需更新出生信息，请联系 support@destinyaiastrology.com。";
+"profile_delete_blocked_main_user" = "您的主账户档案无法删除。如需帮助，请联系 support@destinyaiastrology.com。";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "此出生图表当前处于活跃状态。请先切换到其他档案，或联系 support@destinyaiastrology.com。";
+"profile_delete_blocked_active" = "此出生图表当前处于活跃状态。请先切换到其他档案，或联系 support@destinyaiastrology.com。";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "此出生图表已用于解读，无法修改。如需帮助，请联系 support@destinyaiastrology.com。";
+"profile_delete_blocked_used" = "此出生图表已用于解读，无法删除。如需帮助，请联系 support@destinyaiastrology.com。";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "已存在相似信息的出生图表。每人只能有一个图表。如需帮助，请联系 support@destinyaiastrology.com。";
+

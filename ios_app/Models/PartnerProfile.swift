@@ -27,6 +27,7 @@ final class PartnerProfile: Identifiable {
     // Switch Profile feature
     var isSelf: Bool                // True if this is the account owner's profile
     var isActive: Bool              // True if this is the currently active context
+    var firstSwitchedAt: Date?      // Set when profile is first switched to (marks as "used")
     
     init(
         id: String = UUID().uuidString,
@@ -46,7 +47,8 @@ final class PartnerProfile: Identifiable {
         isSynced: Bool = false,
         serverSyncedAt: Date? = nil,
         isSelf: Bool = false,
-        isActive: Bool = false
+        isActive: Bool = false,
+        firstSwitchedAt: Date? = nil
     ) {
         self.id = id
         self.name = name
@@ -66,6 +68,7 @@ final class PartnerProfile: Identifiable {
         self.serverSyncedAt = serverSyncedAt
         self.isSelf = isSelf
         self.isActive = isActive
+        self.firstSwitchedAt = firstSwitchedAt
     }
     
     // MARK: - Helpers
@@ -118,6 +121,7 @@ struct PartnerProfileResponse: Codable {
     let lastMatchedAt: String?
     let isSelf: Bool?
     let isActive: Bool?
+    let firstSwitchedAt: String?
     
     enum CodingKeys: String, CodingKey {
         case id, name, gender, latitude, longitude, timezone
@@ -131,12 +135,25 @@ struct PartnerProfileResponse: Codable {
         case lastMatchedAt = "last_matched_at"
         case isSelf = "is_self"
         case isActive = "is_active"
+        case firstSwitchedAt = "first_switched_at"
     }
     
     /// Convert to SwiftData model
     func toPartnerProfile() -> PartnerProfile {
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        // ISO8601 with fractional seconds and timezone
+        let iso8601Formatter = ISO8601DateFormatter()
+        iso8601Formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        // Fallback: DateFormatter for dates without timezone (server format)
+        let fallbackFormatter = DateFormatter()
+        fallbackFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        fallbackFormatter.timeZone = TimeZone(identifier: "UTC")
+        
+        // Helper to parse date with fallback
+        func parseDate(_ string: String?) -> Date? {
+            guard let string = string else { return nil }
+            return iso8601Formatter.date(from: string) ?? fallbackFormatter.date(from: string)
+        }
         
         return PartnerProfile(
             id: id,
@@ -150,13 +167,14 @@ struct PartnerProfileResponse: Codable {
             timezone: timezone,
             birthTimeUnknown: birthTimeUnknown,
             consentGiven: consentGiven,
-            createdAt: dateFormatter.date(from: createdAt) ?? Date(),
-            updatedAt: dateFormatter.date(from: updatedAt) ?? Date(),
-            lastMatchedAt: lastMatchedAt.flatMap { dateFormatter.date(from: $0) },
+            createdAt: parseDate(createdAt) ?? Date(),
+            updatedAt: parseDate(updatedAt) ?? Date(),
+            lastMatchedAt: parseDate(lastMatchedAt),
             isSynced: true,
             serverSyncedAt: Date(),
             isSelf: isSelf ?? false,
-            isActive: isActive ?? false
+            isActive: isActive ?? false,
+            firstSwitchedAt: parseDate(firstSwitchedAt)
         )
     }
 }

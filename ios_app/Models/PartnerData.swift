@@ -16,6 +16,7 @@ struct PartnerData: Identifiable, Codable, Hashable {
     var longitude: Double
     var placeId: String
     var timeUnknown: Bool
+    var savedProfileId: String?  // ID of saved PartnerProfile if loaded from picker
     
     init(
         id: UUID = UUID(),
@@ -29,7 +30,8 @@ struct PartnerData: Identifiable, Codable, Hashable {
         latitude: Double = 0,
         longitude: Double = 0,
         placeId: String = "",
-        timeUnknown: Bool = false
+        timeUnknown: Bool = false,
+        savedProfileId: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -43,6 +45,7 @@ struct PartnerData: Identifiable, Codable, Hashable {
         self.longitude = longitude
         self.placeId = placeId
         self.timeUnknown = timeUnknown
+        self.savedProfileId = savedProfileId
     }
     
     // MARK: - Formatted Display

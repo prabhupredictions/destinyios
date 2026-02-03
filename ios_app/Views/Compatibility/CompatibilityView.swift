@@ -215,9 +215,15 @@ struct CompatibilityView: View {
             )
         }
         .sheet(isPresented: $showPartnerPicker) {
+            // Compute IDs to exclude: active profile + partners already selected in other tabs
+            let activeProfileId = ProfileContextManager.shared.activeProfileId
+            let selectedProfileIds = Set(viewModel.partners.compactMap { $0.savedProfileId })
+            let excludeIds = selectedProfileIds.union([activeProfileId])
+            
             PartnerPickerSheet(
                 isPresented: $showPartnerPicker,
-                gender: nil  // Show all partners, let user pick
+                gender: nil,  // Show all partners, let user pick
+                excludeIds: excludeIds
             ) { partner in
                 // Fill form with selected partner data
                 viewModel.girlName = partner.name
@@ -226,6 +232,9 @@ struct CompatibilityView: View {
                 viewModel.girlLatitude = partner.latitude ?? 0
                 viewModel.girlLongitude = partner.longitude ?? 0
                 viewModel.partnerTimeUnknown = partner.birthTimeUnknown
+                
+                // Store the saved profile ID for filtering
+                viewModel.currentPartner.savedProfileId = partner.id
                 
                 // Parse and set date
                 let dateFormatter = DateFormatter()
@@ -353,16 +362,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.gold)
                                 .textCase(.uppercase)
                             Spacer()
-                            
-                            if AppTheme.Features.allowMatchScreenUserEdit {
-                                Button(action: {
-                                    HapticManager.shared.play(.light)
-                                }) {
-                                    Text("Change")
-                                        .font(AppTheme.Fonts.caption(size: 11))
-                                        .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
-                                }
-                            }
+                            // Change button removed as requested
                         }
                         
                         // User Summary (Compact)

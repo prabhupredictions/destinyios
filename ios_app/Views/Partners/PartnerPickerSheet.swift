@@ -9,6 +9,7 @@ struct PartnerPickerSheet: View {
     
     @Binding var isPresented: Bool
     let gender: String? // nil = all, "male", "female"
+    let excludeIds: Set<String> // IDs to exclude (already selected partners + active profile)
     let onSelect: (PartnerProfile) -> Void
     
     @State private var viewModel = PartnerProfileViewModel()
@@ -20,9 +21,22 @@ struct PartnerPickerSheet: View {
     private var filteredPartners: [PartnerProfile] {
         var result = viewModel.partners
         
-        // Exclude the active profile (can't match with yourself)
+        // Exclude specified IDs (active profile + already selected partners)
+        // Handle "self" special case: if "self" is excluded, filter out any profile where isSelf == true
+        let shouldExcludeSelf = excludeIds.contains("self")
+        
+        result = result.filter { partner in
+            if shouldExcludeSelf && partner.isSelf { return false }
+            return !excludeIds.contains(partner.id)
+        }
+        
+        // Also exclude the active profile as a fallback (redundant but safe)
         let activeProfileId = ProfileContextManager.shared.activeProfileId
-        result = result.filter { $0.id != activeProfileId }
+        if activeProfileId == "self" {
+            result = result.filter { !$0.isSelf }
+        } else {
+            result = result.filter { $0.id != activeProfileId }
+        }
         
         // Filter by gender if specified
         if let gender = gender {
@@ -299,7 +313,8 @@ struct PartnerPickerSheet: View {
 #Preview {
     PartnerPickerSheet(
         isPresented: .constant(true),
-        gender: nil
+        gender: nil,
+        excludeIds: []
     ) { partner in
         print("Selected: \(partner.name)")
     }

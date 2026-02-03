@@ -414,3 +414,28 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "சுயவிவரம் பாதுகாக்கப்பட்டது";
+"primary_badge" = "முதன்மை";
+"active_badge" = "செயலில்";
+"used_badge" = "பயன்படுத்தப்பட்டது";
+"used_badge" = "பயன்படுத்தப்பட்டது";
+"why_cant_edit" = "ஏன் திருத்த முடியவில்லை?";
+"delete" = "நீக்கு";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "உங்கள் முதன்மை கணக்கு சுயவிவரத்தை மாற்ற முடியாது. உங்கள் பிறப்பு விவரங்களை புதுப்பிக்க, support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
+"profile_delete_blocked_main_user" = "உங்கள் முதன்மை கணக்கு சுயவிவரத்தை நீக்க முடியாது. உதவிக்கு, support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "இந்த ஜாதக அட்டவணை தற்போது செயலில் உள்ளது. முதலில் வேறு சுயவிவரத்திற்கு மாறவும், அல்லது support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
+"profile_delete_blocked_active" = "இந்த ஜாதக அட்டவணை தற்போது செயலில் உள்ளது. முதலில் வேறு சுயவிவரத்திற்கு மாறவும், அல்லது support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "இந்த ஜாதக அட்டவணை வாசிப்புகளுக்கு பயன்படுத்தப்பட்டது, மாற்ற முடியாது. உதவிக்கு, support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
+"profile_delete_blocked_used" = "இந்த ஜாதக அட்டவணை வாசிப்புகளுக்கு பயன்படுத்தப்பட்டது, நீக்க முடியாது. உதவிக்கு, support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "இதே போன்ற விவரங்களுடன் ஜாதக அட்டவணை ஏற்கனவே உள்ளது. ஒவ்வொரு நபருக்கும் ஒரே ஒரு அட்டவணை இருக்க முடியும். உதவிக்கு, support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
+

@@ -213,4 +213,75 @@ class PartnerProfileViewModel {
     private func getCurrentUserEmail() -> String? {
         UserDefaults.standard.string(forKey: "userEmail")
     }
+    
+    // MARK: - Protection Checks
+    
+    /// Reasons why a profile cannot be modified
+    enum ProfileProtectionReason {
+        case mainUser       // is_self = true
+        case activeChart    // is_active = true
+        case usedProfile    // first_switched_at != nil (server-side check)
+        
+        var editMessage: String {
+            switch self {
+            case .mainUser:
+                return "profile_edit_blocked_main_user".localized
+            case .activeChart:
+                return "profile_edit_blocked_active".localized
+            case .usedProfile:
+                return "profile_edit_blocked_used".localized
+            }
+        }
+        
+        var deleteMessage: String {
+            switch self {
+            case .mainUser:
+                return "profile_delete_blocked_main_user".localized
+            case .activeChart:
+                return "profile_delete_blocked_active".localized
+            case .usedProfile:
+                return "profile_delete_blocked_used".localized
+            }
+        }
+    }
+    
+    /// Check if a profile can be edited (client-side validation)
+    func canEditProfile(_ profile: PartnerProfile) -> (allowed: Bool, reason: ProfileProtectionReason?) {
+        if profile.isSelf {
+            return (false, .mainUser)
+        }
+        if profile.isActive {
+            return (false, .activeChart)
+        }
+        // Note: usedProfile check is server-side (first_switched_at)
+        return (true, nil)
+    }
+    
+    /// Check if a profile can be deleted (client-side validation)
+    func canDeleteProfile(_ profile: PartnerProfile) -> (allowed: Bool, reason: ProfileProtectionReason?) {
+        // Same logic as edit
+        return canEditProfile(profile)
+    }
+    
+    /// Map API error codes to localized messages
+    static func localizedMessageForAPIError(_ detail: String, action: String) -> String {
+        switch detail {
+        case "PROTECTED_MAIN_USER":
+            return action == "edit" 
+                ? "profile_edit_blocked_main_user".localized 
+                : "profile_delete_blocked_main_user".localized
+        case "PROTECTED_ACTIVE_CHART":
+            return action == "edit"
+                ? "profile_edit_blocked_active".localized
+                : "profile_delete_blocked_active".localized
+        case "PROTECTED_USED_PROFILE":
+            return action == "edit"
+                ? "profile_edit_blocked_used".localized
+                : "profile_delete_blocked_used".localized
+        case "DUPLICATE_BIRTH_PROFILE":
+            return "profile_add_blocked_duplicate".localized
+        default:
+            return detail
+        }
+    }
 }

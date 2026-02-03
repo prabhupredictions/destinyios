@@ -414,3 +414,27 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "Profil protégé";
+"primary_badge" = "Principal";
+"active_badge" = "Actif";
+"used_badge" = "Utilisé";
+"why_cant_edit" = "Pourquoi je ne peux pas modifier?";
+"delete" = "Supprimer";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "Votre profil de compte principal ne peut pas être modifié. Pour mettre à jour vos données de naissance, contactez support@destinyaiastrology.com.";
+"profile_delete_blocked_main_user" = "Votre profil de compte principal ne peut pas être supprimé. Pour assistance, contactez support@destinyaiastrology.com.";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "Ce thème natal est actuellement actif. Passez d'abord à un autre profil, ou contactez support@destinyaiastrology.com.";
+"profile_delete_blocked_active" = "Ce thème natal est actuellement actif. Passez d'abord à un autre profil, ou contactez support@destinyaiastrology.com.";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "Ce thème natal a été utilisé pour des lectures et ne peut pas être modifié. Pour assistance, contactez support@destinyaiastrology.com.";
+"profile_delete_blocked_used" = "Ce thème natal a été utilisé pour des lectures et ne peut pas être supprimé. Pour assistance, contactez support@destinyaiastrology.com.";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "Un thème natal avec des détails similaires existe déjà. Chaque personne ne peut avoir qu'un seul thème. Pour assistance, contactez support@destinyaiastrology.com.";
+

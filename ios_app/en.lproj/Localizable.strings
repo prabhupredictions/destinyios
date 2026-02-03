@@ -500,3 +500,27 @@
 // MARK: - Match History
 "no_match_history" = "No matches yet";
 "no_match_history_desc" = "Calculate compatibility with partners to build your history";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "Profile Protected";
+"primary_badge" = "Primary";
+"active_badge" = "Active";
+"used_badge" = "Used";
+"why_cant_edit" = "Why can't I edit?";
+"delete" = "Delete";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "Your primary account profile cannot be modified. To update your birth details, please contact support@destinyaiastrology.com.";
+"profile_delete_blocked_main_user" = "Your primary account profile cannot be deleted. For assistance, please contact support@destinyaiastrology.com.";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "This birth chart is currently active. Please switch to a different profile first, or contact support@destinyaiastrology.com for assistance.";
+"profile_delete_blocked_active" = "This birth chart is currently active. Please switch to a different profile first, or contact support@destinyaiastrology.com for assistance.";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "This birth chart has been used for readings and cannot be modified. For assistance, contact support@destinyaiastrology.com.";
+"profile_delete_blocked_used" = "This birth chart has been used for readings and cannot be deleted. For assistance, contact support@destinyaiastrology.com.";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "A birth chart with similar details already exists. Each person can only have one chart. For assistance, contact support@destinyaiastrology.com.";
+

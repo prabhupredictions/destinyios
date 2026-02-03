@@ -263,6 +263,31 @@ struct PartnerCardView: View {
     let onDelete: () -> Void
     
     @State private var showMenu = false
+    @State private var showProtectionAlert = false
+    @State private var protectionMessage = ""
+    
+    /// Check if this profile is protected from modification
+    private var isProtected: Bool {
+        partner.isSelf || partner.isActive || partner.firstSwitchedAt != nil
+    }
+    
+    /// Protection badge to show on card
+    @ViewBuilder
+    private var protectionBadge: some View {
+        if partner.isSelf {
+            Label("primary_badge".localized, systemImage: "checkmark.shield.fill")
+                .font(.caption2)
+                .foregroundColor(.green)
+        } else if partner.isActive {
+            Label("active_badge".localized, systemImage: "star.fill")
+                .font(.caption2)
+                .foregroundColor(.orange)
+        } else if partner.firstSwitchedAt != nil {
+            Label("used_badge".localized, systemImage: "clock.arrow.circlepath")
+                .font(.caption2)
+                .foregroundColor(.blue)
+        }
+    }
     
     var body: some View {
         HStack(spacing: 16) {
@@ -280,9 +305,14 @@ struct PartnerCardView: View {
             
             // Info
             VStack(alignment: .leading, spacing: 4) {
-                Text(partner.name)
-                    .font(AppTheme.Fonts.title(size: 16))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
+                HStack(spacing: 8) {
+                    Text(partner.name)
+                        .font(AppTheme.Fonts.title(size: 16))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    
+                    // Protection badge
+                    protectionBadge
+                }
                 
                 HStack(spacing: 6) {
                     Text(partner.genderSymbol)
@@ -313,12 +343,28 @@ struct PartnerCardView: View {
             
             // Menu button
             Menu {
-                Button(action: onTap) {
-                    Label("Edit", systemImage: "pencil")
-                }
-                
-                Button(role: .destructive, action: onDelete) {
-                    Label("Delete", systemImage: "trash")
+                if !isProtected {
+                    Button(action: onTap) {
+                        Label("edit".localized, systemImage: "pencil")
+                    }
+                    
+                    Button(role: .destructive, action: onDelete) {
+                        Label("delete".localized, systemImage: "trash")
+                    }
+                } else {
+                    // Show info button for protected profiles
+                    Button(action: {
+                        if partner.isSelf {
+                            protectionMessage = "profile_edit_blocked_main_user".localized
+                        } else if partner.isActive {
+                            protectionMessage = "profile_edit_blocked_active".localized
+                        } else if partner.firstSwitchedAt != nil {
+                            protectionMessage = "profile_edit_blocked_used".localized
+                        }
+                        showProtectionAlert = true
+                    }) {
+                        Label("why_cant_edit".localized, systemImage: "questionmark.circle")
+                    }
                 }
             } label: {
                 Image(systemName: "ellipsis")
@@ -335,10 +381,27 @@ struct PartnerCardView: View {
         )
         .cornerRadius(16)
         .onTapGesture {
-            onTap()
+            if !isProtected {
+                onTap()
+            } else {
+                if partner.isSelf {
+                    protectionMessage = "profile_edit_blocked_main_user".localized
+                } else if partner.isActive {
+                    protectionMessage = "profile_edit_blocked_active".localized
+                } else if partner.firstSwitchedAt != nil {
+                    protectionMessage = "profile_edit_blocked_used".localized
+                }
+                showProtectionAlert = true
+            }
+        }
+        .alert("profile_protected_title".localized, isPresented: $showProtectionAlert) {
+            Button("ok".localized, role: .cancel) {}
+        } message: {
+            Text(protectionMessage)
         }
     }
 }
+
 
 // MARK: - Preview
 

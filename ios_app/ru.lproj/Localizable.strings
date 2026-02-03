@@ -414,3 +414,27 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "Профиль защищён";
+"primary_badge" = "Основной";
+"active_badge" = "Активный";
+"used_badge" = "Использован";
+"why_cant_edit" = "Почему нельзя редактировать?";
+"delete" = "Удалить";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "Ваш основной профиль не может быть изменён. Чтобы обновить данные о рождении, обратитесь на support@destinyaiastrology.com.";
+"profile_delete_blocked_main_user" = "Ваш основной профиль не может быть удалён. За помощью обратитесь на support@destinyaiastrology.com.";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "Эта карта рождения сейчас активна. Сначала переключитесь на другой профиль или обратитесь на support@destinyaiastrology.com.";
+"profile_delete_blocked_active" = "Эта карта рождения сейчас активна. Сначала переключитесь на другой профиль или обратитесь на support@destinyaiastrology.com.";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "Эта карта рождения использовалась для чтений и не может быть изменена. За помощью обратитесь на support@destinyaiastrology.com.";
+"profile_delete_blocked_used" = "Эта карта рождения использовалась для чтений и не может быть удалена. За помощью обратитесь на support@destinyaiastrology.com.";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "Карта рождения с похожими данными уже существует. У каждого человека может быть только одна карта. За помощью обратитесь на support@destinyaiastrology.com.";
+

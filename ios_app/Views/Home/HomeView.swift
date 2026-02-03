@@ -280,42 +280,8 @@ struct HomeView: View {
     
     // MARK: - Components
     
-    // A. 3D Gold Header
     private var headerSection: some View {
         VStack(spacing: 0) {
-            // Profile Context Indicator (always visible - shows active profile)
-            Button(action: {
-                HapticManager.shared.play(.light)
-                // GUEST RULE: Guests must sign in first, not upgrade
-                if isGuestUser {
-                    showGuestSignInSheet = true
-                } else if quotaManager.hasFeature(.switchProfile) {
-                    showProfileSwitcher = true
-                } else {
-                    showUpgradePrompt = true
-                }
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: profileContext.isUsingSelf ? "person.crop.circle" : "person.crop.circle.badge.checkmark")
-                        .font(.caption)
-                    
-                    Text(profileContext.isUsingSelf ? profileContext.activeProfileName : "Viewing as \(profileContext.activeProfileName)")
-                        .font(AppTheme.Fonts.caption())
-                    
-                    Image(systemName: "chevron.down")
-                        .font(.caption2)
-                }
-                .foregroundColor(AppTheme.Colors.gold)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(AppTheme.Colors.gold.opacity(0.15))
-                        .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
-                )
-            }
-            .padding(.bottom, 8)
-            
             HStack {
                 // History Button (Left)
                 Button(action: {

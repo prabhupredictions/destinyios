@@ -435,3 +435,28 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "प्रोफाइल सुरक्षित";
+"primary_badge" = "प्राथमिक";
+"active_badge" = "सक्रिय";
+"used_badge" = "उपयोग किया गया";
+"used_badge" = "उपयोग किया गया";
+"why_cant_edit" = "मैं संपादित क्यों नहीं कर सकता?";
+"delete" = "हटाएं";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "आपकी प्राथमिक खाता प्रोफाइल संशोधित नहीं की जा सकती। अपना जन्म विवरण अपडेट करने के लिए, कृपया support@destinyaiastrology.com से संपर्क करें।";
+"profile_delete_blocked_main_user" = "आपकी प्राथमिक खाता प्रोफाइल हटाई नहीं जा सकती। सहायता के लिए, कृपया support@destinyaiastrology.com से संपर्क करें।";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "यह जन्म चार्ट वर्तमान में सक्रिय है। कृपया पहले किसी अन्य प्रोफाइल पर स्विच करें, या सहायता के लिए support@destinyaiastrology.com से संपर्क करें।";
+"profile_delete_blocked_active" = "यह जन्म चार्ट वर्तमान में सक्रिय है। कृपया पहले किसी अन्य प्रोफाइल पर स्विच करें, या सहायता के लिए support@destinyaiastrology.com से संपर्क करें।";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "इस जन्म चार्ट का उपयोग रीडिंग के लिए किया गया है और इसे संशोधित नहीं किया जा सकता। सहायता के लिए, support@destinyaiastrology.com से संपर्क करें।";
+"profile_delete_blocked_used" = "इस जन्म चार्ट का उपयोग रीडिंग के लिए किया गया है और इसे हटाया नहीं जा सकता। सहायता के लिए, support@destinyaiastrology.com से संपर्क करें।";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "समान विवरण वाला जन्म चार्ट पहले से मौजूद है। प्रत्येक व्यक्ति के लिए केवल एक चार्ट हो सकता है। सहायता के लिए, support@destinyaiastrology.com से संपर्क करें।";
+

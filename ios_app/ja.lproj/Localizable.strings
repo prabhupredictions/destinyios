@@ -414,3 +414,27 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "プロフィール保護";
+"primary_badge" = "プライマリ";
+"active_badge" = "アクティブ";
+"used_badge" = "使用済み";
+"why_cant_edit" = "編集できないのはなぜ？";
+"delete" = "削除";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "プライマリアカウントのプロフィールは変更できません。出生情報を更新するには、support@destinyaiastrology.com にお問い合わせください。";
+"profile_delete_blocked_main_user" = "プライマリアカウントのプロフィールは削除できません。サポートが必要な場合は、support@destinyaiastrology.com にお問い合わせください。";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "この出生チャートは現在アクティブです。先に別のプロフィールに切り替えるか、support@destinyaiastrology.com にお問い合わせください。";
+"profile_delete_blocked_active" = "この出生チャートは現在アクティブです。先に別のプロフィールに切り替えるか、support@destinyaiastrology.com にお問い合わせください。";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "この出生チャートはリーディングに使用されたため、変更できません。サポートについては、support@destinyaiastrology.com にお問い合わせください。";
+"profile_delete_blocked_used" = "この出生チャートはリーディングに使用されたため、削除できません。サポートについては、support@destinyaiastrology.com にお問い合わせください。";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "同様の詳細を持つ出生チャートが既に存在します。各人につきチャートは1つのみです。サポートについては、support@destinyaiastrology.com にお問い合わせください。";
+

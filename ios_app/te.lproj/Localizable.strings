@@ -414,3 +414,28 @@
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+
+// MARK: - Birth Chart Protection
+"profile_protected_title" = "ప్రొఫైల్ రక్షించబడింది";
+"primary_badge" = "ప్రాథమిక";
+"active_badge" = "సక్రియం";
+"used_badge" = "ఉపయోగించబడింది";
+"used_badge" = "ఉపయోగించబడింది";
+"why_cant_edit" = "నేను ఎందుకు సవరించలేను?";
+"delete" = "తొలగించు";
+
+// Protection Messages - Main User
+"profile_edit_blocked_main_user" = "మీ ప్రాథమిక ఖాతా ప్రొఫైల్‌ను మార్చడం సాధ్యం కాదు. మీ జన్మ వివరాలను నవీకరించడానికి, దయచేసి support@destinyaiastrology.com ను సంప్రదించండి.";
+"profile_delete_blocked_main_user" = "మీ ప్రాథమిక ఖాతా ప్రొఫైల్‌ను తొలగించడం సాధ్యం కాదు. సహాయం కోసం, దయచేసి support@destinyaiastrology.com ను సంప్రదించండి.";
+
+// Protection Messages - Active Chart
+"profile_edit_blocked_active" = "ఈ జన్మ చార్ట్ ప్రస్తుతం సక్రియంగా ఉంది. దయచేసి మొదట వేరే ప్రొఫైల్‌కు మారండి, లేదా support@destinyaiastrology.com ను సంప్రదించండి.";
+"profile_delete_blocked_active" = "ఈ జన్మ చార్ట్ ప్రస్తుతం సక్రియంగా ఉంది. దయచేసి మొదట వేరే ప్రొఫైల్‌కు మారండి, లేదా support@destinyaiastrology.com ను సంప్రదించండి.";
+
+// Protection Messages - Used Profile
+"profile_edit_blocked_used" = "ఈ జన్మ చార్ట్ రీడింగ్‌ల కోసం ఉపయోగించబడింది మరియు మార్చడం సాధ్యం కాదు. సహాయం కోసం, support@destinyaiastrology.com ను సంప్రదించండి.";
+"profile_delete_blocked_used" = "ఈ జన్మ చార్ట్ రీడింగ్‌ల కోసం ఉపయోగించబడింది మరియు తొలగించడం సాధ్యం కాదు. సహాయం కోసం, support@destinyaiastrology.com ను సంప్రదించండి.";
+
+// Protection Messages - Duplicate
+"profile_add_blocked_duplicate" = "ఇలాంటి వివరాలతో జన్మ చార్ట్ ఇప్పటికే ఉంది. ప్రతి వ్యక్తికి ఒక చార్ట్ మాత్రమే ఉంటుంది. సహాయం కోసం, support@destinyaiastrology.com ను సంప్రదించండి.";
+
