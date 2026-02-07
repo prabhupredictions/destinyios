@@ -63,6 +63,9 @@ struct HomeView: View {
     @State private var showNotificationInbox = false
     @ObservedObject private var notificationService = NotificationInboxService.shared
     
+    // Environment for detecting app foreground/background
+    @Environment(\.scenePhase) private var scenePhase
+    
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -254,6 +257,14 @@ struct HomeView: View {
             Task {
                 await viewModel.loadHomeData()
                 await notificationService.fetchUnreadCount()
+            }
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            // Auto-refresh badge when app comes to foreground
+            if newPhase == .active {
+                Task {
+                    await notificationService.fetchUnreadCount()
+                }
             }
         }
         .sheet(isPresented: $showNotificationInbox) {
