@@ -59,6 +59,10 @@ struct HomeView: View {
     // Yoga Detail Popup State (presented at ZStack level to avoid clipping)
     @State private var selectedYogaForPopup: YogaDetail? = nil
     
+    // Notification Inbox State
+    @State private var showNotificationInbox = false
+    @ObservedObject private var notificationService = NotificationInboxService.shared
+    
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -236,16 +240,24 @@ struct HomeView: View {
         .navigationBarHidden(true)
         .task {
             await viewModel.loadHomeData()
+            await notificationService.fetchUnreadCount()
         }
         .onAppear {
             startEntranceAnimation()
+            
+            // Request push notification permission
+            PushNotificationService.shared.requestPermission()
         }
         .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
             // Reload home data when profile switches
             // Uses profile-scoped cache, so API only called once/day per profile
             Task {
                 await viewModel.loadHomeData()
+                await notificationService.fetchUnreadCount()
             }
+        }
+        .sheet(isPresented: $showNotificationInbox) {
+            NotificationInboxView()
         }
         .sheet(isPresented: $showProfile) {
             ProfileView()
@@ -282,27 +294,8 @@ struct HomeView: View {
     
     private var headerSection: some View {
         VStack(spacing: 0) {
-            HStack {
-                // History Button (Left)
-                Button(action: {
-                    HapticManager.shared.play(.light)
-                    showHistorySheet = true
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.clear) // Transparent
-                            .frame(width: 44, height: 44)
-                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
-                        
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(AppTheme.Fonts.title(size: 18))
-                            .foregroundColor(AppTheme.Colors.gold)
-                    }
-                }
-                
-                Spacer()
-                
-                // "Destiny" Logo (always shown)
+            ZStack {
+                // Center: "Destiny" Logo (always perfectly centered)
                 Image("destiny_home")
                     .resizable()
                     .scaledToFit()
@@ -310,44 +303,95 @@ struct HomeView: View {
                     .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 10, x: 0, y: 5)
                     .premiumInertia(intensity: 15)
                 
-                Spacer()
-                
-                // Right Side Buttons
-                HStack(spacing: 12) {
-                    // Sound Toggle
-                    if AppTheme.Features.showSoundToggle {
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            soundManager.toggleSound()
-                        }) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.clear) // Transparent
-                                    .frame(width: 44, height: 44)
-                                    .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
-                                
-                                Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                                    .font(AppTheme.Fonts.body(size: 16))
-                                    .foregroundColor(AppTheme.Colors.gold)
-                                    .contentTransition(.symbolEffect(.replace))
-                            }
-                        }
-                    }
-                    
-                    // Profile Button
+                // Left/Right buttons use HStack with Spacer
+                HStack {
+                    // History Button (Left)
                     Button(action: {
                         HapticManager.shared.play(.light)
-                        showProfile = true
+                        showHistorySheet = true
                     }) {
                         ZStack {
                             Circle()
-                                .fill(AppTheme.Colors.gold) // Filled gold background
+                                .fill(Color.clear)
                                 .frame(width: 44, height: 44)
+                                .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
                             
-                            // User initials
-                            Text(userInitials)
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.2)) // Dark text on gold
+                            Image(systemName: "clock.arrow.circlepath")
+                                .font(AppTheme.Fonts.title(size: 18))
+                                .foregroundColor(AppTheme.Colors.gold)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // Right Side Buttons
+                    HStack(spacing: 12) {
+                        // Notification Bell
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            showNotificationInbox = true
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.clear)
+                                    .frame(width: 44, height: 44)
+                                    .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                                
+                                Image(systemName: notificationService.unreadCount > 0 ? "bell.badge.fill" : "bell.fill")
+                                    .font(AppTheme.Fonts.body(size: 16))
+                                    .foregroundColor(AppTheme.Colors.gold)
+                            }
+                            .overlay(
+                                // Badge
+                                Group {
+                                    if notificationService.unreadCount > 0 {
+                                        Text(notificationService.unreadCount > 99 ? "99+" : "\(notificationService.unreadCount)")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 5)
+                                            .padding(.vertical, 2)
+                                            .background(AppTheme.Colors.error)
+                                            .clipShape(Capsule())
+                                            .offset(x: 12, y: -12)
+                                    }
+                                }
+                            )
+                        }
+                        
+                        // Sound Toggle
+                        if AppTheme.Features.showSoundToggle {
+                            Button(action: {
+                                HapticManager.shared.play(.light)
+                                soundManager.toggleSound()
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.clear)
+                                        .frame(width: 44, height: 44)
+                                        .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                                    
+                                    Image(systemName: soundManager.isSoundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                                        .font(AppTheme.Fonts.body(size: 16))
+                                        .foregroundColor(AppTheme.Colors.gold)
+                                        .contentTransition(.symbolEffect(.replace))
+                                }
+                            }
+                        }
+                        
+                        // Profile Button
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            showProfile = true
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(AppTheme.Colors.gold)
+                                    .frame(width: 44, height: 44)
+                                
+                                Text(userInitials)
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.2))
+                            }
                         }
                     }
                 }

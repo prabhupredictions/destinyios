@@ -9,9 +9,11 @@ import SwiftUI
 #if canImport(GoogleSignIn)
 import GoogleSignIn
 #endif
+import UserNotifications
 
 @main
 struct ios_appApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     init() {
         // Configure Google Sign-In on app launch
@@ -34,6 +36,49 @@ struct ios_appApp: App {
                     GIDSignIn.sharedInstance.handle(url)
                     #endif
                 }
+        }
+    }
+}
+
+// MARK: - App Delegate
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        
+        // Set notification center delegate for foreground notifications
+        UNUserNotificationCenter.current().delegate = self
+        
+        return true
+    }
+    
+    func application(_ application: UIApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // Forward token to our push notification service for backend registration
+        PushNotificationService.shared.handleDeviceToken(deviceToken)
+    }
+    
+    func application(_ application: UIApplication,
+                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("❌ Failed to register for remote notifications: \(error)")
+    }
+    
+    // Handle foreground notifications - show banner even when app is open
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        return [.banner, .badge, .sound]
+    }
+    
+    // Handle notification tap - navigate to relevant content
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse) async {
+        let userInfo = response.notification.request.content.userInfo
+        print("🔔 Notification tapped: \(userInfo)")
+        
+        // Post notification for navigation (deep linking)
+        if let eventType = userInfo["type"] as? String {
+             print("➡️ Navigating to event: \(eventType)")
+             // Deep linking can be implemented here via NotificationCenter.default.post()
         }
     }
 }
