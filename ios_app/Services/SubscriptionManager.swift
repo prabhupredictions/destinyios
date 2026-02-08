@@ -211,10 +211,9 @@ class SubscriptionManager: ObservableObject {
         }
         
         do {
-            guard let jwsRepresentation = transaction.jwsRepresentation else {
-                print("No JWS representation available")
-                return
-            }
+            // jwsRepresentation is a native property of Transaction (StoreKit 2)
+            // It contains the actual JWS signed payload for server verification
+            let jws = transaction.jwsRepresentation
             
             let url = URL(string: APIConfig.baseURL + "/subscription/verify")!
             var request = URLRequest(url: url)
@@ -223,7 +222,7 @@ class SubscriptionManager: ObservableObject {
             request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
             
             let body: [String: Any] = [
-                "signed_transaction": jwsRepresentation,
+                "signed_transaction": jws,
                 "user_email": email,
                 "platform": "apple",
                 "environment": transaction.subscriptionEnvironment.rawValue
@@ -273,16 +272,21 @@ enum SubscriptionError: Error, LocalizedError {
 // MARK: - Transaction Extension
 
 extension Transaction {
-    var jwsRepresentation: String? {
-        return String(self.originalID)
-    }
+    // Note: jwsRepresentation is a native property of Transaction in StoreKit 2
+    // Do NOT override it - it provides the actual JWS signed payload
     
     var subscriptionEnvironment: SubscriptionEnvironmentType {
-        #if DEBUG
-        return .sandbox
-        #else
-        return .production
-        #endif
+        // Use environment property from Transaction
+        switch self.environment {
+        case .sandbox:
+            return .sandbox
+        case .production:
+            return .production
+        case .xcode:
+            return .sandbox  // Xcode environment maps to sandbox
+        @unknown default:
+            return .production
+        }
     }
 }
 
