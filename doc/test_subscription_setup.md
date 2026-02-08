@@ -66,5 +66,22 @@ To test purchases without real money:
 7.  Verify purchase works and unlocks features.
 
 ## 6. Troubleshooting
+*   **"Missing Metadata"**: You must add at least one **Localization** (Name/Description) and a **Review Screenshot** (any screenshot of the app) to clear this warning. The product status should update to "Ready to Submit".
 *   **"Product not found"**: Ensure Product IDs match exactly and status is "Ready to Submit" (yellow dot is fine for sandbox).
 *   **"Purchase Failed"**: Check if your Agreements are active.
+
+## 7. Configure Webhooks (Server Notifications)
+To receive real-time updates for subscriptions (renewals, expirations, refunds), you must configure **App Store Server Notifications V2**.
+
+1.  Go to **[App Store Connect](https://appstoreconnect.apple.com) > My Apps > Destiny AI**.
+2.  In the sidebar, select **App Information** (under General).
+3.  Scroll down to **App Store Server Notifications**.
+4.  Click **Set Up URL** (or Edit) for **Production Server URL**.
+    *   **URL**: `https://astroapi-prod-dsqvza5jza-el.a.run.app/subscription/webhook/apple`
+    *   **Version**: Select **Version 2 Notification**.
+5.  Click **Set Up URL** (or Edit) for **Sandbox Server URL**.
+    *   **URL**: `https://astroapi-test-dsqvza5jza-el.a.run.app/subscription/webhook/apple`
+    *   **Version**: Select **Version 2 Notification**.
+6.  Click **Save**.
+
+> **Note**: You can test these URLs using the "Test" button in App Store Connect to send a dummy notification. Check your backend logs to verify receipt.
