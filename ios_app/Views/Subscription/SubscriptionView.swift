@@ -105,7 +105,9 @@ struct SubscriptionView: View {
                     isPurchasing: isPurchasing && purchasingPlanId == plan.planId,
                     isPlus: plan.planId == "plus",
                     corePlan: corePlan,
-                    userCurrentPlanId: userCurrentPlanId
+                    userCurrentPlanId: userCurrentPlanId,
+                    pendingUpgradePlanId: subscriptionManager.pendingUpgradePlanId,
+                    pendingUpgradeDate: subscriptionManager.pendingUpgradeEffectiveDate
                 ) {
                     Task {
                         await purchaseSubscription(planId: plan.planId)
@@ -227,6 +229,8 @@ struct PlanCardWithFeatures: View {
     let isPlus: Bool
     let corePlan: PlanInfo?
     let userCurrentPlanId: String  // User's current plan for dynamic button text
+    let pendingUpgradePlanId: String?  // If non-nil, user has scheduled upgrade to this plan
+    let pendingUpgradeDate: Date?  // When the upgrade takes effect
     let onPurchase: () -> Void
     
     /// Features to display - DYNAMIC based on marketing_text from database
@@ -275,6 +279,20 @@ struct PlanCardWithFeatures: View {
         plan.planId == userCurrentPlanId
     }
     
+    /// Check if user has a pending upgrade TO this plan
+    private var isPendingUpgrade: Bool {
+        pendingUpgradePlanId == plan.planId
+    }
+    
+    /// Format pending upgrade date
+    private var pendingUpgradeDateText: String? {
+        guard let date = pendingUpgradeDate else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Header: Plan Name + Price + Current Plan Badge
@@ -299,6 +317,23 @@ struct PlanCardWithFeatures: View {
                             .background(
                                 Capsule()
                                     .fill(AppTheme.Colors.gold)
+                            )
+                        }
+                        
+                        // Pending upgrade badge (when user scheduled upgrade to this plan)
+                        if isPendingUpgrade && !isCurrentPlan {
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock.fill")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("Scheduled")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                            }
+                            .foregroundColor(AppTheme.Colors.mainBackground)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.orange)
                             )
                         }
                     }
@@ -369,8 +404,16 @@ struct PlanCardWithFeatures: View {
                         .stroke(isCurrentPlan ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
                 )
             }
-            .disabled(isPurchasing || isCurrentPlan)
+            .disabled(isPurchasing || isCurrentPlan || isPendingUpgrade)
             .padding(.top, 8)
+            
+            // Show pending upgrade effective date below button
+            if isPendingUpgrade, let dateText = pendingUpgradeDateText {
+                Text("Starts \(dateText)")
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(Color.orange)
+                    .frame(maxWidth: .infinity)
+            }
         }
         .padding(20)
         .background(
@@ -392,6 +435,10 @@ struct PlanCardWithFeatures: View {
     
     /// Dynamic button text based on user's current plan
     private var buttonText: String {
+        // Pending upgrade takes priority
+        if isPendingUpgrade {
+            return "Upgrade Scheduled ✓"
+        }
         if isCurrentPlan {
             return "Current Plan"
         }

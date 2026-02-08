@@ -33,6 +33,18 @@ struct ProfileView: View {
         userEmail.isEmpty || userEmail.contains("guest") || userEmail.hasSuffix("@daa.com") || userEmail.hasSuffix("@gen.com")
     }
     
+    /// Text for pending upgrade display (e.g., "Upgrading to Plus on Feb 15, 2026")
+    private var pendingUpgradeDisplayText: String? {
+        guard let pendingPlanId = subscriptionManager.pendingUpgradePlanId,
+              let pendingDate = subscriptionManager.pendingUpgradeEffectiveDate else {
+            return nil
+        }
+        let planName = pendingPlanId == "plus" ? "Plus" : "Core"
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return "Upgrading to \(planName) on \(formatter.string(from: pendingDate))"
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -331,7 +343,12 @@ struct ProfileView: View {
                                 .font(AppTheme.Fonts.title(size: 18))
                                 .foregroundColor(.white)
                             
-                            if let expiryText = quotaManager.subscriptionExpiryDisplayText {
+                            // Show pending upgrade info if scheduled
+                            if let pendingText = pendingUpgradeDisplayText {
+                                Text(pendingText)
+                                    .font(AppTheme.Fonts.body(size: 12))
+                                    .foregroundColor(Color.orange)
+                            } else if let expiryText = quotaManager.subscriptionExpiryDisplayText {
                                 Text(expiryText)
                                     .font(AppTheme.Fonts.body(size: 13))
                                     .foregroundColor(.white.opacity(0.8))

@@ -14,6 +14,10 @@ class SubscriptionManager: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     
+    // Pending upgrade tracking (when user upgrades Core→Plus, effective next billing)
+    @Published private(set) var pendingUpgradeProductId: String?
+    @Published private(set) var pendingUpgradeEffectiveDate: Date?
+    
     // MARK: - Product IDs (Configure in App Store Connect)
     
     /// Core plan
@@ -204,6 +208,53 @@ class SubscriptionManager: ObservableObject {
         
         purchasedProductIDs = purchased
         UserDefaults.standard.set(!purchased.isEmpty, forKey: "isPremium")
+        
+        // Check for pending upgrades
+        await checkPendingUpgrade()
+    }
+    
+    /// Check for pending subscription upgrades (e.g., Core→Plus scheduled for next billing)
+    /// Uses StoreKit 2's Product.SubscriptionInfo to detect autoRenewPreference changes
+    func checkPendingUpgrade() async {
+        // Reset pending state
+        pendingUpgradeProductId = nil
+        pendingUpgradeEffectiveDate = nil
+        
+        // Get current subscription status for each product
+        for product in products {
+            guard let subscription = product.subscription else { continue }
+            
+            // Get subscription status
+            guard let statuses = try? await subscription.status else { continue }
+            
+            for status in statuses {
+                // Only check verified statuses
+                guard case .verified(let renewalInfo) = status.renewalInfo,
+                      case .verified(let transaction) = status.transaction else { continue }
+                
+                // Check if auto-renew product differs from current product
+                if let autoRenewProductId = renewalInfo.autoRenewPreference,
+                   autoRenewProductId != transaction.productID {
+                    // User has scheduled a change - this is a pending upgrade/downgrade
+                    self.pendingUpgradeProductId = autoRenewProductId
+                    
+                    // Effective date is the current subscription's expiration
+                    self.pendingUpgradeEffectiveDate = transaction.expirationDate
+                    
+                    print("📅 Pending upgrade detected: \(transaction.productID) → \(autoRenewProductId)")
+                    print("   Effective: \(transaction.expirationDate?.description ?? "unknown")")
+                    return
+                }
+            }
+        }
+    }
+    
+    /// Get pending upgrade plan ID (extracted from product ID)
+    var pendingUpgradePlanId: String? {
+        guard let productId = pendingUpgradeProductId else { return nil }
+        if productId.contains(".core.") { return "core" }
+        if productId.contains(".plus.") { return "plus" }
+        return nil
     }
     
     // MARK: - Backend Verification
