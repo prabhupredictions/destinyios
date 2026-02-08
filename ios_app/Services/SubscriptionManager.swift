@@ -91,8 +91,10 @@ class SubscriptionManager: ObservableObject {
             
             switch result {
             case .success(let verification):
+                // Extract JWS from VerificationResult BEFORE extracting Transaction
+                let jws = verification.jwsRepresentation
                 let transaction = try checkVerified(verification)
-                await verifyWithBackend(transaction: transaction)
+                await verifyWithBackend(jws: jws, transaction: transaction)
                 await transaction.finish()
                 await updatePurchasedProducts()
                 
@@ -158,8 +160,10 @@ class SubscriptionManager: ObservableObject {
         Task.detached { [weak self] in
             for await result in Transaction.updates {
                 do {
+                    // Extract JWS from VerificationResult BEFORE extracting Transaction
+                    let jws = result.jwsRepresentation
                     let transaction = try Self.checkVerifiedStatic(result)
-                    await self?.verifyWithBackend(transaction: transaction)
+                    await self?.verifyWithBackend(jws: jws, transaction: transaction)
                     await transaction.finish()
                     await self?.updatePurchasedProducts()
                 } catch {
@@ -204,16 +208,15 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Backend Verification
     
-    private func verifyWithBackend(transaction: Transaction) async {
+    private func verifyWithBackend(jws: String, transaction: Transaction) async {
         guard let email = getCurrentUserEmail() else {
             print("No user email for backend verification")
             return
         }
         
         do {
-            // jwsRepresentation is a native property of Transaction (StoreKit 2)
+            // JWS is extracted from VerificationResult.jwsRepresentation
             // It contains the actual JWS signed payload for server verification
-            let jws = transaction.jwsRepresentation
             
             let url = URL(string: APIConfig.baseURL + "/subscription/verify")!
             var request = URLRequest(url: url)
@@ -277,15 +280,11 @@ extension Transaction {
     
     var subscriptionEnvironment: SubscriptionEnvironmentType {
         // Use environment property from Transaction
-        switch self.environment {
-        case .sandbox:
+        // Map to sandbox for any non-production environment
+        if case .production = self.environment {
+            return .production
+        } else {
             return .sandbox
-        case .production:
-            return .production
-        case .xcode:
-            return .sandbox  // Xcode environment maps to sandbox
-        @unknown default:
-            return .production
         }
     }
 }
