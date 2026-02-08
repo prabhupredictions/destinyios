@@ -535,15 +535,35 @@ class QuotaManager: ObservableObject {
     // MARK: - Subscription Display Helpers
     
     /// Parse subscription expiry date from ISO8601 string
+    /// Parse subscription expiry date from ISO8601 string
     var subscriptionExpiresAt: Date? {
         guard let expiryString = subscriptionExpiresAtString else { return nil }
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        // 1. Try ISO8601DateFormatter (expects 'Z' or timezone)
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = isoFormatter.date(from: expiryString) {
+            return date
+        }
+        
+        isoFormatter.formatOptions = [.withInternetDateTime]
+        if let date = isoFormatter.date(from: expiryString) {
+            return date
+        }
+        
+        // 2. Fallback to DateFormatter for naive strings (Python's isoformat() without tz)
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        // Try with fractional seconds
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
         if let date = formatter.date(from: expiryString) {
             return date
         }
+        
         // Try without fractional seconds
-        formatter.formatOptions = [.withInternetDateTime]
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         return formatter.date(from: expiryString)
     }
     
