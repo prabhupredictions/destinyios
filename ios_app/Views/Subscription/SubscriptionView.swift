@@ -270,14 +270,38 @@ struct PlanCardWithFeatures: View {
         }
     }
     
+    /// Check if this plan is the user's current plan
+    private var isCurrentPlan: Bool {
+        plan.planId == userCurrentPlanId
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header: Plan Name + Price
+            // Header: Plan Name + Price + Current Plan Badge
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.displayName)
-                        .font(AppTheme.Fonts.title(size: 24))
-                        .foregroundColor(AppTheme.Colors.gold)
+                    HStack(spacing: 8) {
+                        Text(plan.displayName)
+                            .font(AppTheme.Fonts.title(size: 24))
+                            .foregroundColor(AppTheme.Colors.gold)
+                        
+                        // Current Plan badge
+                        if isCurrentPlan {
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("Current")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                            }
+                            .foregroundColor(AppTheme.Colors.mainBackground)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(AppTheme.Colors.gold)
+                            )
+                        }
+                    }
                     
                     if let desc = plan.description {
                         Text(desc)
@@ -328,16 +352,24 @@ struct PlanCardWithFeatures: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.mainBackground))
                     }
+                    if isCurrentPlan {
+                        Image(systemName: "checkmark")
+                            .font(AppTheme.Fonts.title(size: 14))
+                    }
                     Text(isPurchasing ? "Processing..." : buttonText)
                         .font(AppTheme.Fonts.title(size: 16))
                 }
-                .foregroundColor(AppTheme.Colors.mainBackground)
+                .foregroundColor(isCurrentPlan ? AppTheme.Colors.textSecondary : AppTheme.Colors.mainBackground)
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
-                .background(AppTheme.Colors.gold)
+                .background(isCurrentPlan ? AppTheme.Colors.cardBackground : AppTheme.Colors.gold)
                 .cornerRadius(25)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 25)
+                        .stroke(isCurrentPlan ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
+                )
             }
-            .disabled(isPurchasing)
+            .disabled(isPurchasing || isCurrentPlan)
             .padding(.top, 8)
         }
         .padding(20)
@@ -347,7 +379,7 @@ struct PlanCardWithFeatures: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                .stroke(isCurrentPlan ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.3), lineWidth: isCurrentPlan ? 2 : 1)
         )
     }
     
@@ -360,6 +392,9 @@ struct PlanCardWithFeatures: View {
     
     /// Dynamic button text based on user's current plan
     private var buttonText: String {
+        if isCurrentPlan {
+            return "Current Plan"
+        }
         if isPlus {
             // Plus card: "Choose Plus" for free users, "Upgrade to Plus" for Core users
             return userCurrentPlanId == "core" ? "Upgrade to Plus" : "Choose Plus"
