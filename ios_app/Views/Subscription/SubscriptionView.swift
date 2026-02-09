@@ -13,6 +13,7 @@ struct SubscriptionView: View {
     @State private var errorMessage = ""
     @State private var plans: [PlanInfo] = []
     @State private var isLoading = true
+    @State private var isRefreshing = false  // For manual refresh button
     @State private var showDestinyMatchingInfo = false
     
     var body: some View {
@@ -52,6 +53,21 @@ struct SubscriptionView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 #if os(iOS)
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        Task { await refreshStatus() }
+                    } label: {
+                        if isRefreshing {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundColor(AppTheme.Colors.gold)
+                        }
+                    }
+                    .disabled(isRefreshing)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
@@ -88,6 +104,24 @@ struct SubscriptionView: View {
                 isLoading = false
             }
         }
+    }
+    
+    // MARK: - Refresh Status
+    /// Manually refresh subscription status from StoreKit
+    private func refreshStatus() async {
+        isRefreshing = true
+        
+        // Sync with App Store to get latest entitlements
+        try? await AppStore.sync()
+        
+        // Update purchased products and check for pending upgrades
+        await subscriptionManager.updatePurchasedProducts()
+        
+        // Small delay to ensure UI updates
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        
+        isRefreshing = false
+        print("🔄 [SubscriptionView] Manual refresh completed")
     }
     
     // MARK: - Plan Cards Section
