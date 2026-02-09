@@ -102,6 +102,13 @@ class SubscriptionManager: ObservableObject {
                 await transaction.finish()
                 await updatePurchasedProducts()
                 
+                // Delayed re-check for pending upgrades (StoreKit status may not update immediately)
+                Task {
+                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
+                    await self.checkPendingUpgrade()
+                    print("🔄 [purchase] Delayed pending upgrade check completed")
+                }
+                
                 isLoading = false
                 return true
                 
