@@ -216,21 +216,42 @@ class SubscriptionManager: ObservableObject {
     /// Check for pending subscription upgrades (e.g., Core→Plus scheduled for next billing)
     /// Uses StoreKit 2's Product.SubscriptionInfo to detect autoRenewPreference changes
     func checkPendingUpgrade() async {
+        print("🔍 [checkPendingUpgrade] Starting check...")
+        
         // Reset pending state
         pendingUpgradeProductId = nil
         pendingUpgradeEffectiveDate = nil
         
         // Get current subscription status for each product
         for product in products {
-            guard let subscription = product.subscription else { continue }
+            guard let subscription = product.subscription else { 
+                print("🔍 [checkPendingUpgrade] Product \(product.id) has no subscription")
+                continue 
+            }
+            
+            print("🔍 [checkPendingUpgrade] Checking product: \(product.id)")
             
             // Get subscription status
-            guard let statuses = try? await subscription.status else { continue }
+            guard let statuses = try? await subscription.status else { 
+                print("🔍 [checkPendingUpgrade] No status for \(product.id)")
+                continue 
+            }
             
-            for status in statuses {
+            print("🔍 [checkPendingUpgrade] Found \(statuses.count) status(es) for \(product.id)")
+            
+            for (index, status) in statuses.enumerated() {
+                print("🔍 [checkPendingUpgrade] Status[\(index)] state: \(status.state)")
+                
                 // Only check verified statuses
                 guard case .verified(let renewalInfo) = status.renewalInfo,
-                      case .verified(let transaction) = status.transaction else { continue }
+                      case .verified(let transaction) = status.transaction else { 
+                    print("🔍 [checkPendingUpgrade] Status[\(index)] verification failed")
+                    continue 
+                }
+                
+                print("🔍 [checkPendingUpgrade] Current productID: \(transaction.productID)")
+                print("🔍 [checkPendingUpgrade] autoRenewPreference: \(renewalInfo.autoRenewPreference ?? "nil")")
+                print("🔍 [checkPendingUpgrade] willAutoRenew: \(renewalInfo.willAutoRenew)")
                 
                 // Check if auto-renew product differs from current product
                 if let autoRenewProductId = renewalInfo.autoRenewPreference,
@@ -247,6 +268,7 @@ class SubscriptionManager: ObservableObject {
                 }
             }
         }
+        print("🔍 [checkPendingUpgrade] No pending upgrade found")
     }
     
     /// Get pending upgrade plan ID (extracted from product ID)
