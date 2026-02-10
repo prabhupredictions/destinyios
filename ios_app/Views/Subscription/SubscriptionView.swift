@@ -11,6 +11,8 @@ struct SubscriptionView: View {
     @State private var purchasingPlanId: String?
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var showSuccess = false
+    @State private var successPlanName = ""  // For success popup
     @State private var plans: [PlanInfo] = []
     @State private var isLoading = true
     @State private var isRefreshing = false  // For manual refresh button
@@ -81,6 +83,13 @@ struct SubscriptionView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage)
+            }
+            .alert("Welcome to \(successPlanName)! 🎉", isPresented: $showSuccess) {
+                Button("Let's Go!") {
+                    dismiss()
+                }
+            } message: {
+                Text("Your subscription is now active. Enjoy your premium features!")
             }
             .task {
                 await loadPlans()
@@ -230,7 +239,6 @@ struct SubscriptionView: View {
         .padding(.top, 12)
     }
     
-    // MARK: - Purchase Action
     private func purchaseSubscription(planId: String) async {
         guard let product = subscriptionManager.monthlyProduct(for: planId) else {
             errorMessage = "Product not available. Please try again later."
@@ -247,7 +255,9 @@ struct SubscriptionView: View {
             purchasingPlanId = nil
             
             if success {
-                dismiss()
+                // Show success popup before dismissing
+                successPlanName = plans.first(where: { $0.planId == planId })?.displayName ?? planId.capitalized
+                showSuccess = true
             }
         } catch {
             isPurchasing = false
