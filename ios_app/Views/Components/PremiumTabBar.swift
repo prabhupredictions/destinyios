@@ -38,6 +38,7 @@ struct PremiumTabBar: View {
                         }
                     }
                     .buttonStyle(ScaleButtonStyle())
+                    .accessibilityAddTraits(selectedTab == tab ? .isSelected : [])
                 }
             }
             .padding(.horizontal, 20)

@@ -497,6 +497,7 @@ struct CompatibilityView: View {
                             )
                     }
                     .disabled(!canAddMore)
+                    .accessibilityLabel("Add partner")
                     
                     Spacer()
                     
@@ -512,6 +513,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                                 .padding(6)
                         }
+                        .accessibilityLabel("Remove partner")
                     }
                 }
                 .padding(.bottom, 4)
@@ -541,6 +543,7 @@ struct CompatibilityView: View {
                             .font(.system(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
                     }
+                    .accessibilityLabel("Search saved partners")
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 11)
@@ -579,6 +582,7 @@ struct CompatibilityView: View {
                     )
                 }
                 .frame(width: 140)
+                .accessibilityLabel(viewModel.partnerGender.isEmpty ? "Select gender" : "Gender: \(viewModel.partnerGender)")
             }
             
             // Date & Time Row
@@ -604,6 +608,7 @@ struct CompatibilityView: View {
                             .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                     )
                 }
+                .accessibilityLabel(viewModel.currentPartner.birthDateSet ? "Date of birth: \(viewModel.formattedGirlDob)" : "Select date of birth")
                 
                 // Time Button
                 Button(action: { 
@@ -632,6 +637,7 @@ struct CompatibilityView: View {
                 }
                 .frame(width: 140)
                 .disabled(viewModel.partnerTimeUnknown)
+                .accessibilityLabel(viewModel.partnerTimeUnknown ? "Time of birth: unknown" : (viewModel.currentPartner.birthTimeSet ? "Time of birth: \(viewModel.formattedGirlTime)" : "Select time of birth"))
             }
             
             // Place Button (full width) - Moved UP for better vertical flow
@@ -658,6 +664,7 @@ struct CompatibilityView: View {
                         .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                 )
             }
+            .accessibilityLabel(viewModel.girlCity.isEmpty ? "Select birth city" : "Birth city: \(viewModel.girlCity)")
             
             // Time Unknown & Save Row (Moved to Bottom)
             VStack(alignment: .leading, spacing: 4) {
@@ -676,6 +683,8 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
+                    .accessibilityLabel("Birth time unknown")
+                    .accessibilityAddTraits(viewModel.partnerTimeUnknown ? .isSelected : [])
                     
                     // Save Partner Toggle
                     Button(action: {
@@ -691,6 +700,8 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
+                    .accessibilityLabel("Save partner for future")
+                    .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     
                     Spacer()
                 }

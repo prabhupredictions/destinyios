@@ -78,6 +78,7 @@ struct ProfileSwitcherSheet: View {
                                         .background(Color.white.opacity(0.1))
                                         .clipShape(Circle())
                                 }
+                                .accessibilityLabel("Close")
                             }
                         }
                         .padding(.horizontal)
@@ -353,6 +354,8 @@ private struct ActiveProfileCard: View {
         .background(AppTheme.Colors.cardBackground)
         .cornerRadius(16)
         .padding(.horizontal)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Active profile: \(profile.name)\(profile.isSelf ? ", you" : "")")
     }
 }
 
@@ -414,6 +417,8 @@ struct ProfileRow: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Switch to \(profile.name)\(profile.isSelf ? ", your profile" : "")")
+        .accessibilityHint("Double tap to switch")
     }
 }
 

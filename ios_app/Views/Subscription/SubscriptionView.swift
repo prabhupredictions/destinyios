@@ -69,6 +69,7 @@ struct SubscriptionView: View {
                         }
                     }
                     .disabled(isRefreshing)
+                    .accessibilityLabel("Refresh subscription status")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }

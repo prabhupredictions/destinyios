@@ -51,6 +51,7 @@ struct NotificationInboxView: View {
                     .background(AppTheme.Colors.cardBackground)
                     .clipShape(Circle())
             }
+            .accessibilityLabel("Close")
             
             Spacer()
             
@@ -81,6 +82,7 @@ struct NotificationInboxView: View {
                     .clipShape(Circle())
             }
             .disabled(service.unreadCount == 0)
+            .accessibilityLabel("Mark all as read")
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
@@ -212,6 +214,8 @@ struct NotificationRow: View {
                         .stroke(notification.read ? Color.clear : AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(notification.displayTitle), \(notification.displayBody), \(notification.timeAgo)\(notification.read ? "" : ", unread")")
     }
 }
 

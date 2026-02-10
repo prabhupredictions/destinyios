@@ -200,6 +200,14 @@ struct ChatView: View {
                 // Scroll when loading starts or ends
                 scrollToBottom(proxy)
             }
+            .onChange(of: isInputFocused) { _, focused in
+                // Scroll to bottom when keyboard appears so latest messages are visible
+                if focused {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        scrollToBottom(proxy)
+                    }
+                }
+            }
         }
     }
     

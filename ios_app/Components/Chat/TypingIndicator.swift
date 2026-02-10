@@ -28,6 +28,8 @@ struct TypingIndicator: View {
             
             Spacer()
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Destiny is thinking")
         .onAppear {
             startAnimation()
         }

@@ -332,6 +332,7 @@ struct HomeView: View {
                                 .foregroundColor(AppTheme.Colors.gold)
                         }
                     }
+                    .accessibilityLabel("History")
                     
                     Spacer()
                     
@@ -364,10 +365,12 @@ struct HomeView: View {
                                             .background(AppTheme.Colors.error)
                                             .clipShape(Capsule())
                                             .offset(x: 12, y: -12)
+                                            .accessibilityHidden(true)
                                     }
                                 }
                             )
                         }
+                        .accessibilityLabel(notificationService.unreadCount > 0 ? "Notifications, \(notificationService.unreadCount) unread" : "Notifications")
                         
                         // Sound Toggle
                         if AppTheme.Features.showSoundToggle {
@@ -387,6 +390,8 @@ struct HomeView: View {
                                         .contentTransition(.symbolEffect(.replace))
                                 }
                             }
+                            .accessibilityLabel(soundManager.isSoundEnabled ? "Sound on" : "Sound off")
+                            .accessibilityHint("Double tap to toggle sound")
                         }
                         
                         // Profile Button
@@ -404,6 +409,7 @@ struct HomeView: View {
                                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.2))
                             }
                         }
+                        .accessibilityLabel("Profile, \(profileContext.activeProfileName)")
                     }
                 }
             }
@@ -528,6 +534,7 @@ struct HomeView: View {
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.4))
                 .offset(x: 110, y: 50)
         }
+        .accessibilityHidden(true)
     }
     
     // Helper to get zodiac symbol and full name
@@ -591,6 +598,7 @@ struct HomeView: View {
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityAddTraits(.isHeader)
             
             // Filter Tabs (Compact)
             HStack(spacing: 8) {
@@ -667,6 +675,7 @@ struct HomeView: View {
             Text("What's in my mind?")
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
+                .accessibilityAddTraits(.isHeader)
             
             // Quick Questions (Compact List)
             let questions = viewModel.suggestedQuestions.isEmpty ?

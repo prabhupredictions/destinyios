@@ -401,6 +401,7 @@ struct AskDestinySheet: View {
                     .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
             }
             .disabled(!canSend)
+            .accessibilityLabel("Send question")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -414,6 +415,7 @@ struct AskDestinySheet: View {
                     alignment: .top
                 )
         )
+        .accessibilityHidden(true)
     }
     
     private var canSend: Bool {

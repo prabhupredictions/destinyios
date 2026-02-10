@@ -125,6 +125,8 @@ struct CelestialOrbView: View {
             }
         }
         .buttonStyle(ScaleButtonStyle())
+        .accessibilityLabel("\(title): \(status)")
+        .accessibilityHint("Double tap for details")
     }
     
     // Status Color

@@ -45,6 +45,8 @@ struct MessageBubble: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(isUser ? "You said: \(message.content)" : "Destiny said: \(displayContent)")
     }
     
     // MARK: - Message Content
@@ -235,6 +237,7 @@ struct AvatarView: View {
                 .font(.system(size: size * 0.45, weight: .medium, design: .serif))
                 .foregroundColor(AppTheme.Colors.mainBackground)
         }
+        .accessibilityHidden(true)
     }
 }
 

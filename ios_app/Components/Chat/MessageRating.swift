@@ -40,6 +40,7 @@ struct MessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
+                        .accessibilityLabel("\(star) of 5 stars")
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -182,6 +183,7 @@ struct InlineMessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
+                        .accessibilityLabel("\(star) of 5 stars")
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -260,6 +262,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .up ? .green : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Rate helpful")
             
             Button {
                 selected = .down
@@ -270,6 +273,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .down ? .orange : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Rate unhelpful")
         }
     }
 }

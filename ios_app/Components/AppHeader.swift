@@ -29,6 +29,7 @@ struct AppHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 44, height: 44)
                 }
+                .accessibilityLabel("Menu")
             } else {
                 Spacer()
                     .frame(width: 44)
@@ -74,6 +75,7 @@ struct AppHeader: View {
                             .frame(width: 44, height: 44)
                     }
                 }
+                .accessibilityLabel("Profile")
             } else {
                 Spacer()
                     .frame(width: 44)
@@ -95,6 +97,8 @@ struct LogoView: View {
             .resizable()
             .scaledToFit()
             .frame(height: 32) // Standard height across all screens
+            .accessibilityLabel("Destiny AI Astrology")
+            .accessibilityAddTraits(.isHeader)
             // If the logo is black text, we invert it for dark mode or specific tint
             // .colorInvert() // Only if the asset is black-on-transparent
     }
@@ -142,14 +146,16 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 44, height: 44)
                 }
+                .accessibilityLabel("Back")
                 
                 // History button
                 Button(action: { onHistoryTap?() }) {
                     Image(systemName: "clock.arrow.circlepath")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
+                        .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
+                .accessibilityLabel("Chat history")
                 
                 Spacer()
                 
@@ -162,9 +168,10 @@ struct ChatHeader: View {
                 Button(action: { onChartTap?() }) {
                     Image(systemName: "globe.asia.australia")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
+                        .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
+                .accessibilityLabel("Birth chart")
                 
                 // New chat button
                 Button(action: { onNewChatTap?() }) {
@@ -173,6 +180,7 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
+                .accessibilityLabel("New conversation")
             }
         }
         .padding(.horizontal, 12)
@@ -226,6 +234,7 @@ struct MatchInputHeader: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
+                .accessibilityLabel("Match history")
                 
                 Spacer()
                 
@@ -247,6 +256,7 @@ struct MatchInputHeader: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
+                .accessibilityLabel("Reset form")
             }
         }
         .padding(.horizontal, 12)
@@ -279,14 +289,16 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 44, height: 44)
             }
+            .accessibilityLabel("Back")
             
             // History button
             Button(action: { onHistoryTap?() }) {
                 Image(systemName: "clock.arrow.circlepath")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
+                    .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
+            .accessibilityLabel("Match history")
             
             Spacer()
             
@@ -316,9 +328,10 @@ struct MatchResultHeader: View {
             Button(action: { onChartTap?() }) {
                 Image(systemName: "globe.asia.australia")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.gold) // Standardizing to Gold
+                    .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
+            .accessibilityLabel("Birth charts")
             
             // New match button
             Button(action: { onNewMatchTap?() }) {
@@ -327,6 +340,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
+            .accessibilityLabel("New analysis")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)

@@ -41,6 +41,7 @@ struct MainTabView: View {
                             }
                         }
                     )
+                    .ignoresSafeArea(.keyboard)
                 case 1:
                     ChatView(
                         onBack: { 
@@ -58,6 +59,7 @@ struct MainTabView: View {
                             message: "sign_in_to_check_compatibility".localized,
                             onBack: { selectedTab = 0 }
                         )
+                        .ignoresSafeArea(.keyboard)
                     } else {
                         CompatibilityView(
                             initialMatchItem: pendingMatchItem,
@@ -68,9 +70,11 @@ struct MainTabView: View {
                             }
                         )
                         .id(ProfileContextManager.shared.activeProfileId) // Force recreation on profile switch
+                        .ignoresSafeArea(.keyboard)
                     }
                 default:
                     HomeView(onQuestionSelected: { _ in })
+                        .ignoresSafeArea(.keyboard)
                 }
             }
             
@@ -82,7 +86,8 @@ struct MainTabView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .ignoresSafeArea(.keyboard)
+        // Note: .ignoresSafeArea(.keyboard) removed from here
+        // Applied per-tab instead so ChatView gets proper keyboard avoidance
         .animation(.easeInOut(duration: 0.25), value: selectedTab)
         .animation(.easeInOut(duration: 0.25), value: showMatchResult)
         // Clear pending match state when switching profiles
@@ -207,6 +212,8 @@ struct TabBarItem: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -261,6 +268,8 @@ struct AskTabButton: View {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
+        .accessibilityLabel("ask".localized)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
