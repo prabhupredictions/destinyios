@@ -79,12 +79,12 @@ enum AnalysisStep: Int, CaseIterable {
     
     var title: String {
         switch self {
-        case .calculatingCharts: return "Calculating Planetary Positions"
-        case .ashtakootMatching: return "Ashtakoot Guna Matching"
-        case .mangalDosha: return "Analyzing Mangal Dosha"
+        case .calculatingCharts: return "Mapping Birth Charts"
+        case .ashtakootMatching: return "Matching Cosmic Compatibility"
+        case .mangalDosha: return "Checking Mangal Harmony"
         case .collectingYogas: return "Evaluating Yogas & Doshas"
-        case .generatingAnalysis: return "Generating AI Analysis"
-        case .complete: return "Analysis Complete"
+        case .generatingAnalysis: return "Crafting Your Reading"
+        case .complete: return "Your Reading is Ready ✨"
         }
     }
     

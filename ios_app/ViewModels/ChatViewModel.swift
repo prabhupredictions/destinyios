@@ -257,7 +257,7 @@ class ChatViewModel {
                     self.thinkingSteps.append(ThinkingStep(step: step, type: .thought, display: display, content: content))
                     
                 case .action(let step, let tool, _):
-                    let toolDisplay = "🔧 Using \(self.formatToolName(tool))..."
+                    let toolDisplay = self.friendlyToolName(tool)
                     self.thinkingSteps.append(ThinkingStep(step: step, type: .action, display: toolDisplay, content: nil))
                     
                 case .observation(let step, let display):
@@ -325,9 +325,26 @@ class ChatViewModel {
         thinkingSteps = []
     }
     
-    // Format tool names for display
-    private func formatToolName(_ tool: String) -> String {
-        tool.replacingOccurrences(of: "_", with: " ").capitalized
+    // Format tool names for display — user-friendly cosmic text
+    private func friendlyToolName(_ tool: String) -> String {
+        let toolNames: [String: String] = [
+            "planets_data": "🪐 Mapping your planetary positions...",
+            "houses": "🏛️ Analyzing your house placements...",
+            "dignity": "👑 Checking planetary dignities...",
+            "functional": "⚖️ Evaluating benefic & malefic influences...",
+            "shadbala": "💪 Measuring planetary strengths...",
+            "avasthas": "🌙 Reading planetary states...",
+            "ashtakavarga": "📊 Calculating transit strengths...",
+            "dasha": "⏳ Tracing your planetary periods...",
+            "transits": "🌠 Scanning upcoming cosmic movements...",
+            "divisional": "🔍 Examining divisional charts...",
+            "nakshatra": "⭐ Reading your birth star influences...",
+            "yoga_dosha": "🧿 Detecting yogas and doshas...",
+            "mangal_dosha": "♂️ Checking Mangal Dosha...",
+            "kala_sarpa": "🐍 Analyzing Kala Sarpa influence...",
+            "bhavat_bhavam": "🔗 Exploring house connections..."
+        ]
+        return toolNames[tool] ?? "🔮 Analyzing your chart..."
     }
     
     // MARK: - Word-by-Word Streaming
