@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 /// Main tab view with custom floating tab bar
 struct MainTabView: View {
@@ -11,6 +12,7 @@ struct MainTabView: View {
     @State private var showMatchResult = false  // Track if match result is showing
     @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
+    @State private var isKeyboardVisible = false  // Track keyboard for tab bar hiding
     
     /// Reactive guest user check - uses @AppStorage for automatic UI updates
     @AppStorage("isGuest") private var isGuestUser = false
@@ -78,8 +80,8 @@ struct MainTabView: View {
                 }
             }
             
-            // Custom Tab Bar - Hidden on Chat screen and Match Result screen
-            if selectedTab != 1 && !showMatchResult {
+            // Custom Tab Bar - Hidden on Chat screen, Match Result screen, and when keyboard is visible
+            if selectedTab != 1 && !showMatchResult && !isKeyboardVisible {
                 CustomTabBar(selectedTab: $selectedTab, showAskSheet: $showAskSheet)
                     // No horizontal padding for full width
                     .padding(.bottom, 0) // Docked to bottom
@@ -90,6 +92,13 @@ struct MainTabView: View {
         // Applied per-tab instead so ChatView gets proper keyboard avoidance
         .animation(.easeInOut(duration: 0.25), value: selectedTab)
         .animation(.easeInOut(duration: 0.25), value: showMatchResult)
+        .animation(.easeInOut(duration: 0.2), value: isKeyboardVisible)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            isKeyboardVisible = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            isKeyboardVisible = false
+        }
         // Clear pending match state when switching profiles
         .onChange(of: ProfileContextManager.shared.activeProfileId) { _, _ in
             pendingMatchItem = nil
