@@ -14,6 +14,10 @@ class SubscriptionManager: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     
+    // Pending upgrade tracking (when user upgrades Core→Plus, effective next billing)
+    @Published private(set) var pendingUpgradeProductId: String?
+    @Published private(set) var pendingUpgradeEffectiveDate: Date?
+    
     // MARK: - Product IDs (Configure in App Store Connect)
     
     /// Core plan
@@ -91,10 +95,19 @@ class SubscriptionManager: ObservableObject {
             
             switch result {
             case .success(let verification):
+                // Extract JWS from VerificationResult BEFORE extracting Transaction
+                let jws = verification.jwsRepresentation
                 let transaction = try checkVerified(verification)
-                await verifyWithBackend(transaction: transaction)
+                await verifyWithBackend(jws: jws, transaction: transaction)
                 await transaction.finish()
                 await updatePurchasedProducts()
+                
+                // Delayed re-check for pending upgrades (StoreKit status may not update immediately)
+                Task {
+                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
+                    await self.checkPendingUpgrade()
+                    print("🔄 [purchase] Delayed pending upgrade check completed")
+                }
                 
                 isLoading = false
                 return true
@@ -158,8 +171,10 @@ class SubscriptionManager: ObservableObject {
         Task.detached { [weak self] in
             for await result in Transaction.updates {
                 do {
+                    // Extract JWS from VerificationResult BEFORE extracting Transaction
+                    let jws = result.jwsRepresentation
                     let transaction = try Self.checkVerifiedStatic(result)
-                    await self?.verifyWithBackend(transaction: transaction)
+                    await self?.verifyWithBackend(jws: jws, transaction: transaction)
                     await transaction.finish()
                     await self?.updatePurchasedProducts()
                 } catch {
@@ -200,21 +215,88 @@ class SubscriptionManager: ObservableObject {
         
         purchasedProductIDs = purchased
         UserDefaults.standard.set(!purchased.isEmpty, forKey: "isPremium")
+        
+        // Check for pending upgrades
+        await checkPendingUpgrade()
+    }
+    
+    /// Check for pending subscription upgrades (e.g., Core→Plus scheduled for next billing)
+    /// Uses StoreKit 2's Product.SubscriptionInfo to detect autoRenewPreference changes
+    func checkPendingUpgrade() async {
+        print("🔍 [checkPendingUpgrade] Starting check...")
+        
+        // Reset pending state
+        pendingUpgradeProductId = nil
+        pendingUpgradeEffectiveDate = nil
+        
+        // Get current subscription status for each product
+        for product in products {
+            guard let subscription = product.subscription else { 
+                print("🔍 [checkPendingUpgrade] Product \(product.id) has no subscription")
+                continue 
+            }
+            
+            print("🔍 [checkPendingUpgrade] Checking product: \(product.id)")
+            
+            // Get subscription status
+            guard let statuses = try? await subscription.status else { 
+                print("🔍 [checkPendingUpgrade] No status for \(product.id)")
+                continue 
+            }
+            
+            print("🔍 [checkPendingUpgrade] Found \(statuses.count) status(es) for \(product.id)")
+            
+            for (index, status) in statuses.enumerated() {
+                print("🔍 [checkPendingUpgrade] Status[\(index)] state: \(status.state)")
+                
+                // Only check verified statuses
+                guard case .verified(let renewalInfo) = status.renewalInfo,
+                      case .verified(let transaction) = status.transaction else { 
+                    print("🔍 [checkPendingUpgrade] Status[\(index)] verification failed")
+                    continue 
+                }
+                
+                print("🔍 [checkPendingUpgrade] Current productID: \(transaction.productID)")
+                print("🔍 [checkPendingUpgrade] autoRenewPreference: \(renewalInfo.autoRenewPreference ?? "nil")")
+                print("🔍 [checkPendingUpgrade] willAutoRenew: \(renewalInfo.willAutoRenew)")
+                
+                // Check if auto-renew product differs from current product
+                if let autoRenewProductId = renewalInfo.autoRenewPreference,
+                   autoRenewProductId != transaction.productID {
+                    // User has scheduled a change - this is a pending upgrade/downgrade
+                    self.pendingUpgradeProductId = autoRenewProductId
+                    
+                    // Effective date is the current subscription's expiration
+                    self.pendingUpgradeEffectiveDate = transaction.expirationDate
+                    
+                    print("📅 Pending upgrade detected: \(transaction.productID) → \(autoRenewProductId)")
+                    print("   Effective: \(transaction.expirationDate?.description ?? "unknown")")
+                    return
+                }
+            }
+        }
+        print("🔍 [checkPendingUpgrade] No pending upgrade found")
+    }
+    
+    /// Get pending upgrade plan ID (extracted from product ID)
+    var pendingUpgradePlanId: String? {
+        guard let productId = pendingUpgradeProductId else { return nil }
+        if productId.contains(".core.") { return "core" }
+        if productId.contains(".plus.") { return "plus" }
+        return nil
     }
     
     // MARK: - Backend Verification
     
-    private func verifyWithBackend(transaction: Transaction) async {
+    private func verifyWithBackend(jws: String, transaction: Transaction) async {
         guard let email = getCurrentUserEmail() else {
             print("No user email for backend verification")
             return
         }
         
         do {
-            guard let jwsRepresentation = transaction.jwsRepresentation else {
-                print("No JWS representation available")
-                return
-            }
+            // JWS is extracted from VerificationResult.jwsRepresentation
+            // It contains the actual JWS signed payload for server verification
             
             let url = URL(string: APIConfig.baseURL + "/subscription/verify")!
             var request = URLRequest(url: url)
@@ -223,7 +305,7 @@ class SubscriptionManager: ObservableObject {
             request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
             
             let body: [String: Any] = [
-                "signed_transaction": jwsRepresentation,
+                "signed_transaction": jws,
                 "user_email": email,
                 "platform": "apple",
                 "environment": transaction.subscriptionEnvironment.rawValue
@@ -273,16 +355,17 @@ enum SubscriptionError: Error, LocalizedError {
 // MARK: - Transaction Extension
 
 extension Transaction {
-    var jwsRepresentation: String? {
-        return String(self.originalID)
-    }
+    // Note: jwsRepresentation is a native property of Transaction in StoreKit 2
+    // Do NOT override it - it provides the actual JWS signed payload
     
     var subscriptionEnvironment: SubscriptionEnvironmentType {
-        #if DEBUG
-        return .sandbox
-        #else
-        return .production
-        #endif
+        // Use environment property from Transaction
+        // Map to sandbox for any non-production environment
+        if case .production = self.environment {
+            return .production
+        } else {
+            return .sandbox
+        }
     }
 }
 

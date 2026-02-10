@@ -13,6 +13,7 @@ struct SubscriptionView: View {
     @State private var errorMessage = ""
     @State private var plans: [PlanInfo] = []
     @State private var isLoading = true
+    @State private var isRefreshing = false  // For manual refresh button
     @State private var showDestinyMatchingInfo = false
     
     var body: some View {
@@ -52,6 +53,21 @@ struct SubscriptionView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 #if os(iOS)
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        Task { await refreshStatus() }
+                    } label: {
+                        if isRefreshing {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundColor(AppTheme.Colors.gold)
+                        }
+                    }
+                    .disabled(isRefreshing)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
@@ -90,6 +106,24 @@ struct SubscriptionView: View {
         }
     }
     
+    // MARK: - Refresh Status
+    /// Manually refresh subscription status from StoreKit
+    private func refreshStatus() async {
+        isRefreshing = true
+        
+        // Sync with App Store to get latest entitlements
+        try? await AppStore.sync()
+        
+        // Update purchased products and check for pending upgrades
+        await subscriptionManager.updatePurchasedProducts()
+        
+        // Small delay to ensure UI updates
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        
+        isRefreshing = false
+        print("🔄 [SubscriptionView] Manual refresh completed")
+    }
+    
     // MARK: - Plan Cards Section
     private var planCardsSection: some View {
         VStack(spacing: 16) {
@@ -105,7 +139,9 @@ struct SubscriptionView: View {
                     isPurchasing: isPurchasing && purchasingPlanId == plan.planId,
                     isPlus: plan.planId == "plus",
                     corePlan: corePlan,
-                    userCurrentPlanId: userCurrentPlanId
+                    userCurrentPlanId: userCurrentPlanId,
+                    pendingUpgradePlanId: subscriptionManager.pendingUpgradePlanId,
+                    pendingUpgradeDate: subscriptionManager.pendingUpgradeEffectiveDate
                 ) {
                     Task {
                         await purchaseSubscription(planId: plan.planId)
@@ -227,6 +263,8 @@ struct PlanCardWithFeatures: View {
     let isPlus: Bool
     let corePlan: PlanInfo?
     let userCurrentPlanId: String  // User's current plan for dynamic button text
+    let pendingUpgradePlanId: String?  // If non-nil, user has scheduled upgrade to this plan
+    let pendingUpgradeDate: Date?  // When the upgrade takes effect
     let onPurchase: () -> Void
     
     /// Features to display - DYNAMIC based on marketing_text from database
@@ -270,14 +308,69 @@ struct PlanCardWithFeatures: View {
         }
     }
     
+    /// Check if this plan is the user's current plan
+    private var isCurrentPlan: Bool {
+        plan.planId == userCurrentPlanId
+    }
+    
+    /// Check if user has a pending upgrade TO this plan
+    private var isPendingUpgrade: Bool {
+        pendingUpgradePlanId == plan.planId
+    }
+    
+    /// Format pending upgrade date
+    private var pendingUpgradeDateText: String? {
+        guard let date = pendingUpgradeDate else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header: Plan Name + Price
+            // Header: Plan Name + Price + Current Plan Badge
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.displayName)
-                        .font(AppTheme.Fonts.title(size: 24))
-                        .foregroundColor(AppTheme.Colors.gold)
+                    HStack(spacing: 8) {
+                        Text(plan.displayName)
+                            .font(AppTheme.Fonts.title(size: 24))
+                            .foregroundColor(AppTheme.Colors.gold)
+                        
+                        // Current Plan badge
+                        if isCurrentPlan {
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("Current")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                            }
+                            .foregroundColor(AppTheme.Colors.mainBackground)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(AppTheme.Colors.gold)
+                            )
+                        }
+                        
+                        // Pending upgrade badge (when user scheduled upgrade to this plan)
+                        if isPendingUpgrade && !isCurrentPlan {
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock.fill")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("Scheduled")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                            }
+                            .foregroundColor(AppTheme.Colors.mainBackground)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.orange)
+                            )
+                        }
+                    }
                     
                     if let desc = plan.description {
                         Text(desc)
@@ -328,17 +421,33 @@ struct PlanCardWithFeatures: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.mainBackground))
                     }
+                    if isCurrentPlan {
+                        Image(systemName: "checkmark")
+                            .font(AppTheme.Fonts.title(size: 14))
+                    }
                     Text(isPurchasing ? "Processing..." : buttonText)
                         .font(AppTheme.Fonts.title(size: 16))
                 }
-                .foregroundColor(AppTheme.Colors.mainBackground)
+                .foregroundColor(isCurrentPlan ? AppTheme.Colors.textSecondary : AppTheme.Colors.mainBackground)
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
-                .background(AppTheme.Colors.gold)
+                .background(isCurrentPlan ? AppTheme.Colors.cardBackground : AppTheme.Colors.gold)
                 .cornerRadius(25)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 25)
+                        .stroke(isCurrentPlan ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
+                )
             }
-            .disabled(isPurchasing)
+            .disabled(isPurchasing || isCurrentPlan || isPendingUpgrade)
             .padding(.top, 8)
+            
+            // Show pending upgrade effective date below button
+            if isPendingUpgrade, let dateText = pendingUpgradeDateText {
+                Text("Starts \(dateText)")
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(Color.orange)
+                    .frame(maxWidth: .infinity)
+            }
         }
         .padding(20)
         .background(
@@ -347,7 +456,7 @@ struct PlanCardWithFeatures: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                .stroke(isCurrentPlan ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.3), lineWidth: isCurrentPlan ? 2 : 1)
         )
     }
     
@@ -360,6 +469,13 @@ struct PlanCardWithFeatures: View {
     
     /// Dynamic button text based on user's current plan
     private var buttonText: String {
+        // Pending upgrade takes priority
+        if isPendingUpgrade {
+            return "Upgrade Scheduled ✓"
+        }
+        if isCurrentPlan {
+            return "Current Plan"
+        }
         if isPlus {
             // Plus card: "Choose Plus" for free users, "Upgrade to Plus" for Core users
             return userCurrentPlanId == "core" ? "Upgrade to Plus" : "Choose Plus"

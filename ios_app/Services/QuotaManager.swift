@@ -289,6 +289,8 @@ class QuotaManager: ObservableObject {
     @Published private(set) var availableFeatures: [String] = []
     @Published private(set) var totalQuestionsAsked: Int = 0
     @Published private(set) var availablePlans: [PlanInfo] = []
+    @Published private(set) var subscriptionStatus: String?
+    @Published private(set) var subscriptionExpiresAtString: String?
     
     /// Current plan ID (convenience accessor for dynamic button text)
     var currentPlanId: String? {
@@ -482,9 +484,13 @@ class QuotaManager: ObservableObject {
         isPremium = status.isPremium
         availableFeatures = status.features
         totalQuestionsAsked = status.totalQuestionsAsked
+        subscriptionStatus = status.subscriptionStatus
+        subscriptionExpiresAtString = status.subscriptionExpiresAt
         
         UserDefaults.standard.set(status.isPremium, forKey: "isPremium")
         UserDefaults.standard.set(status.planId, forKey: "currentPlanId")
+        UserDefaults.standard.set(status.subscriptionStatus, forKey: "subscriptionStatus")
+        UserDefaults.standard.set(status.subscriptionExpiresAt, forKey: "subscriptionExpiresAt")
         
         if let profile = dataManager.getCurrentUserProfile() {
             profile.totalQuestionsAsked = status.totalQuestionsAsked
@@ -494,9 +500,15 @@ class QuotaManager: ObservableObject {
     
     // MARK: - Convenience
     
-    /// Display name for current plan
+    /// Display name for current plan (shows "Free Plan" for free tiers)
     var planDisplayName: String {
-        currentPlan?.displayName ?? "Free"
+        if let plan = currentPlan {
+            if plan.isFree {
+                return "Free Plan"
+            }
+            return plan.displayName
+        }
+        return "Free Plan"
     }
     
     /// Check if user can upgrade
@@ -518,6 +530,65 @@ class QuotaManager: ObservableObject {
     /// Check if user has access to a specific feature (cached)
     func hasFeature(_ feature: FeatureID) -> Bool {
         isPremium || availableFeatures.contains(feature.rawValue)
+    }
+    
+    // MARK: - Subscription Display Helpers
+    
+    /// Parse subscription expiry date from ISO8601 string
+    /// Parse subscription expiry date from ISO8601 string
+    var subscriptionExpiresAt: Date? {
+        guard let expiryString = subscriptionExpiresAtString else { return nil }
+        
+        // 1. Try ISO8601DateFormatter (expects 'Z' or timezone)
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = isoFormatter.date(from: expiryString) {
+            return date
+        }
+        
+        isoFormatter.formatOptions = [.withInternetDateTime]
+        if let date = isoFormatter.date(from: expiryString) {
+            return date
+        }
+        
+        // 2. Fallback to DateFormatter for naive strings (Python's isoformat() without tz)
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        
+        // Try with fractional seconds
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        if let date = formatter.date(from: expiryString) {
+            return date
+        }
+        
+        // Try without fractional seconds
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        return formatter.date(from: expiryString)
+    }
+    
+    /// User-friendly expiry text: "Expires Feb 28, 2026" or "Renews Feb 28, 2026"
+    var subscriptionExpiryDisplayText: String? {
+        guard let expiryDate = subscriptionExpiresAt else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        
+        // For active subscriptions, say "Renews" since auto-renewal is on by default
+        // For cancelled/expired, say "Expires"
+        let prefix = (subscriptionStatus == "active") ? "Renews" : "Expires"
+        return "\(prefix) \(formatter.string(from: expiryDate))"
+    }
+    
+    /// Subscription status display: "Active", "Expired", "Grace Period"
+    var subscriptionStatusDisplayText: String {
+        switch subscriptionStatus {
+        case "active": return "Active"
+        case "expired": return "Expired"
+        case "grace_period": return "Grace Period"
+        case "cancelled": return "Cancelled"
+        default: return ""
+        }
     }
     
     // MARK: - Profile Management

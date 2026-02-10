@@ -65,20 +65,28 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     // Handle foreground notifications - show banner even when app is open
     func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        return [.banner, .badge, .sound]
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .badge, .sound])
     }
     
     // Handle notification tap - navigate to relevant content
     func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                didReceive response: UNNotificationResponse) async {
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         print("🔔 Notification tapped: \(userInfo)")
         
         // Post notification for navigation (deep linking)
         if let eventType = userInfo["type"] as? String {
              print("➡️ Navigating to event: \(eventType)")
-             // Deep linking can be implemented here via NotificationCenter.default.post()
         }
+        completionHandler()
     }
 }
+// Build trigger - 2026-02-07T08:58:23Z
+// Build trigger - 2026-02-07T10:47:14Z
+
+// Trigger rebuild: 20260207212846
+
+// Prod Sync: 20260207222132

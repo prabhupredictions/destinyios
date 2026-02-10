@@ -33,6 +33,18 @@ struct ProfileView: View {
         userEmail.isEmpty || userEmail.contains("guest") || userEmail.hasSuffix("@daa.com") || userEmail.hasSuffix("@gen.com")
     }
     
+    /// Text for pending upgrade display (e.g., "Upgrading to Plus on Feb 15, 2026")
+    private var pendingUpgradeDisplayText: String? {
+        guard let pendingPlanId = subscriptionManager.pendingUpgradePlanId,
+              let pendingDate = subscriptionManager.pendingUpgradeEffectiveDate else {
+            return nil
+        }
+        let planName = pendingPlanId == "plus" ? "Plus" : "Core"
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return "Upgrading to \(planName) on \(formatter.string(from: pendingDate))"
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -144,23 +156,21 @@ struct ProfileView: View {
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                     
-                    // Premium badge if subscribed
-                    if quotaManager.isPremium {
-                        HStack(spacing: 4) {
-                            Image(systemName: "crown.fill")
-                                .font(AppTheme.Fonts.caption(size: 10))
-                            Text("Premium")
-                                .font(AppTheme.Fonts.title(size: 11))
-                        }
-                        .foregroundColor(AppTheme.Colors.mainBackground)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(
-                            Capsule()
-                                .fill(AppTheme.Colors.gold)
-                        )
-                        .padding(.top, 4)
+                    // Plan badge - always show (Free Plan or Premium)
+                    HStack(spacing: 4) {
+                        Image(systemName: quotaManager.isPremium ? "crown.fill" : "star.fill")
+                            .font(AppTheme.Fonts.caption(size: 10))
+                        Text(quotaManager.planDisplayName)
+                            .font(AppTheme.Fonts.title(size: 11))
                     }
+                    .foregroundColor(quotaManager.isPremium ? AppTheme.Colors.mainBackground : AppTheme.Colors.gold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(
+                        Capsule()
+                            .fill(quotaManager.isPremium ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.2))
+                    )
+                    .padding(.top, 4)
                 }
                 
                 Spacer()
@@ -255,6 +265,19 @@ struct ProfileView: View {
     
     // MARK: - Subscription Section
     private var subscriptionSection: some View {
+        Group {
+            if quotaManager.isPremium {
+                // Paid user: Show current plan details
+                paidSubscriptionCard
+            } else {
+                // Free user: Show upgrade CTA
+                freeUpgradeCard
+            }
+        }
+    }
+    
+    /// Card for free users showing upgrade CTA
+    private var freeUpgradeCard: some View {
         Button(action: { 
             // Guest users must sign in first to view plans
             if isGuestUser {
@@ -277,11 +300,11 @@ struct ProfileView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(quotaManager.isPremium ? "Manage Subscription" : "Upgrade to Premium")
+                        Text("Upgrade to Premium")
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(.white)
                         
-                        Text(quotaManager.isPremium ? "View details" : "Unlock unlimited insights")
+                        Text("Unlock unlimited insights")
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -295,6 +318,82 @@ struct ProfileView: View {
             }
         }
         .buttonStyle(ScaleButtonStyle())
+    }
+    
+    /// Card for paid users showing current plan and manage option
+    private var paidSubscriptionCard: some View {
+        VStack(spacing: 12) {
+            // Current plan card
+            PremiumCard(style: .hero) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 14) {
+                        // Premium icon
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "crown.fill")
+                                .font(AppTheme.Fonts.title(size: 18))
+                                .foregroundColor(.white)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(quotaManager.planDisplayName)
+                                .font(AppTheme.Fonts.title(size: 18))
+                                .foregroundColor(.white)
+                            
+                            // Show pending upgrade info if scheduled
+                            if let pendingText = pendingUpgradeDisplayText {
+                                Text(pendingText)
+                                    .font(AppTheme.Fonts.body(size: 12))
+                                    .foregroundColor(Color.orange)
+                            } else if let expiryText = quotaManager.subscriptionExpiryDisplayText {
+                                Text(expiryText)
+                                    .font(AppTheme.Fonts.body(size: 13))
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        // Active badge
+                        Text(quotaManager.subscriptionStatusDisplayText)
+                            .font(AppTheme.Fonts.caption(size: 11))
+                            .foregroundColor(AppTheme.Colors.mainBackground)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white.opacity(0.9))
+                            )
+                    }
+                }
+            }
+            
+            // Manage subscription button - opens App Store subscriptions
+            Button(action: {
+                // Open Apple's subscription management page
+                if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
+                    openURL(url)
+                }
+            }) {
+                HStack {
+                    Image(systemName: "gear")
+                        .font(AppTheme.Fonts.body(size: 14))
+                    Text("Manage Subscription")
+                        .font(AppTheme.Fonts.body(size: 15))
+                }
+                .foregroundColor(AppTheme.Colors.gold)
+            }
+            
+            // View plans button
+            Button(action: { showSubscription = true }) {
+                Text("View All Plans")
+                    .font(AppTheme.Fonts.body(size: 14))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+            }
+        }
     }
     
     // MARK: - Support Section
