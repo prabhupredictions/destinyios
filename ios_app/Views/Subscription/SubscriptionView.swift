@@ -16,6 +16,8 @@ struct SubscriptionView: View {
     @State private var isRefreshing = false  // For manual refresh button
     @State private var showDestinyMatchingInfo = false
     
+    // Trigger build bump: 2026-02-10-10-20
+    
     var body: some View {
         NavigationStack {
             ScrollView {
