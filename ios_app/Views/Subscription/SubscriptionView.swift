@@ -38,6 +38,9 @@ struct SubscriptionView: View {
                         // Collapsible "What is Destiny Matching™?"
                         destinyMatchingSection
                         
+                        // Apple ID info
+                        appleAccountNote
+                        
                         // Restore purchases
                         restoreButton
                         
@@ -239,6 +242,20 @@ struct SubscriptionView: View {
         .padding(.top, 12)
     }
     
+    // MARK: - Apple Account Note
+    private var appleAccountNote: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "apple.logo")
+                .font(.system(size: 12))
+            Text("Purchases are billed through your Apple ID. Manage in Settings → Apple ID → Subscriptions.")
+                .font(AppTheme.Fonts.caption(size: 11))
+        }
+        .foregroundColor(AppTheme.Colors.textTertiary)
+        .padding(.horizontal, 16)
+        .padding(.top, 4)
+    }
+    
+    // MARK: - Purchase Action
     private func purchaseSubscription(planId: String) async {
         guard let product = subscriptionManager.monthlyProduct(for: planId) else {
             errorMessage = "Product not available. Please try again later."

@@ -110,6 +110,13 @@ class SubscriptionManager: ObservableObject {
                 }
                 
                 isLoading = false
+                
+                // Log transaction details for debugging
+                print("✅ [Purchase] Completed: \(product.id), env: \(transaction.environment)")
+                if let expires = transaction.expirationDate {
+                    print("   Expires: \(expires)")
+                }
+                
                 return true
                 
             case .userCancelled:
@@ -174,6 +181,17 @@ class SubscriptionManager: ObservableObject {
                     // Extract JWS from VerificationResult BEFORE extracting Transaction
                     let jws = result.jwsRepresentation
                     let transaction = try Self.checkVerifiedStatic(result)
+                    
+                    // Skip expired transactions to prevent stale sandbox renewals
+                    // from overwriting the user's plan
+                    if let expiresDate = transaction.expirationDate,
+                       expiresDate < Date() {
+                        print("⏭️ [TransactionListener] Skipping expired transaction: \(transaction.productID), expired: \(expiresDate)")
+                        await transaction.finish()
+                        continue
+                    }
+                    
+                    print("📥 [TransactionListener] Processing transaction: \(transaction.productID), env: \(transaction.environment)")
                     await self?.verifyWithBackend(jws: jws, transaction: transaction)
                     await transaction.finish()
                     await self?.updatePurchasedProducts()
