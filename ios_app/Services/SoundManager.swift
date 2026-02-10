@@ -37,7 +37,21 @@ class SoundManager: ObservableObject {
         updateAmbientState()
     }
     
+    /// Configures the audio session to allow mixing with other apps (Spotify, etc.)
+    private func configureAudioSession() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            print("SoundManager: Failed to configure audio session: \(error)")
+        }
+    }
+    
     private func setupEngine() {
+        // Configure audio session FIRST — .ambient category allows mixing with other apps
+        configureAudioSession()
+        
         // Attach nodes
         engine.attach(playerNode)
         engine.attach(ambientNode)
