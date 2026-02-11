@@ -26,6 +26,7 @@ struct ProfileView: View {
     @State private var showProfileSwitcher = false  // Switch Birth Chart sheet
     @State private var showUpgradePrompt = false  // Upgrade prompt for Switch Profile feature
     @State private var showGuestSignInForSwitch = false  // Guest sign-in prompt for Switch Profile
+    @State private var showNotificationPreferences = false  // Notification preferences sheet
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -124,6 +125,9 @@ struct ProfileView: View {
                     onBack: { showGuestSignInForSwitch = false }
                 )
                 .environment(authViewModel)
+            }
+            .sheet(isPresented: $showNotificationPreferences) {
+                NotificationPreferencesSheet(userEmail: userEmail)
             }
             .preferredColorScheme(.dark)
         }
@@ -258,6 +262,20 @@ struct ProfileView: View {
                     subtitle: chartStyle == "north" ? "North Indian" : "South Indian",
                     icon: "square.grid.3x3.fill",
                     action: { showChartStylePicker = true }
+                )
+                
+                // Notification Preferences (Plus-only)
+                PremiumListItem(
+                    title: "Notification Preferences",
+                    subtitle: quotaManager.hasFeature(.alerts) ? "Customize your alerts" : "Plus plan feature",
+                    icon: "bell.badge.fill",
+                    action: {
+                        if quotaManager.hasFeature(.alerts) {
+                            showNotificationPreferences = true
+                        } else {
+                            showUpgradePrompt = true
+                        }
+                    }
                 )
             }
         }
