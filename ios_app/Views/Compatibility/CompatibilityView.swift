@@ -4,6 +4,7 @@ import SwiftUI
 struct CompatibilityView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = CompatibilityViewModel()
+    @ObservedObject private var quotaManager = QuotaManager.shared
     @State private var selectedTab = 0 // 0 = Boy, 1 = Girl
     @State private var showBoyLocationSearch = false
     @State private var showGirlLocationSearch = false
@@ -476,28 +477,44 @@ struct CompatibilityView: View {
                         }
                     }
                     
-                    // Add button (max 3 partners)
+                    // Add button (Plus-only, max 3 partners)
                     let maxPartners = 3
-                    let canAddMore = viewModel.partners.count < maxPartners
+                    let isPlus = quotaManager.isPlus
+                    let canAddMore = isPlus && viewModel.partners.count < maxPartners
                     
                     Button(action: { 
+                        if !isPlus {
+                            // Non-Plus: show subscription paywall
+                            showSubscription = true
+                            return
+                        }
                         guard canAddMore else { return }
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             viewModel.addPartner() 
                         }
                     }) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 11, weight: .medium))
-                            .padding(6)
-                            .foregroundColor(canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [3]))
-                                    .foregroundColor(canAddMore ? AppTheme.Colors.gold.opacity(0.4) : AppTheme.Colors.textTertiary.opacity(0.3))
-                            )
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: isPlus ? "plus" : "plus")
+                                .font(.system(size: 11, weight: .medium))
+                                .padding(6)
+                                .foregroundColor(isPlus ? (canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary) : AppTheme.Colors.textTertiary)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [3]))
+                                        .foregroundColor(isPlus ? (canAddMore ? AppTheme.Colors.gold.opacity(0.4) : AppTheme.Colors.textTertiary.opacity(0.3)) : AppTheme.Colors.gold.opacity(0.3))
+                                )
+                            
+                            // Crown badge for non-Plus users
+                            if !isPlus {
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 7))
+                                    .foregroundColor(AppTheme.Colors.gold)
+                                    .offset(x: 3, y: -3)
+                            }
+                        }
                     }
-                    .disabled(!canAddMore)
-                    .accessibilityLabel("Add partner")
+                    .disabled(isPlus && !canAddMore)  // Only disable at max for Plus users; non-Plus always tappable (opens paywall)
+                    .accessibilityLabel(isPlus ? "Add partner" : "Upgrade to Plus to add multiple partners")
                     
                     Spacer()
                     

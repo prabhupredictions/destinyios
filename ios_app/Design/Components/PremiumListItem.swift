@@ -12,14 +12,16 @@ struct PremiumListItem<Content: View>: View {
     let subtitle: String?
     let icon: String?
     let showChevron: Bool
+    let isPremiumFeature: Bool  // Shows gold crown badge for Plus-only features
     let trailingContent: Content?
     let action: (() -> Void)?
     
-    init(title: String, subtitle: String? = nil, icon: String? = nil, showChevron: Bool = true, action: (() -> Void)? = nil, @ViewBuilder trailing: () -> Content = { EmptyView() }) {
+    init(title: String, subtitle: String? = nil, icon: String? = nil, showChevron: Bool = true, isPremiumFeature: Bool = false, action: (() -> Void)? = nil, @ViewBuilder trailing: () -> Content = { EmptyView() }) {
         self.title = title
         self.subtitle = subtitle
         self.icon = icon
         self.showChevron = showChevron
+        self.isPremiumFeature = isPremiumFeature
         self.action = action
         self.trailingContent = trailing()
     }
@@ -72,6 +74,23 @@ struct PremiumListItem<Content: View>: View {
             
             if let trailingContent = trailingContent {
                 trailingContent
+            }
+            
+            // Premium badge for Plus-only features
+            if isPremiumFeature {
+                HStack(spacing: 3) {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 10))
+                    Text("Plus")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                }
+                .foregroundColor(AppTheme.Colors.gold)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(
+                    Capsule()
+                        .fill(AppTheme.Colors.gold.opacity(0.15))
+                )
             }
             
             if showChevron {

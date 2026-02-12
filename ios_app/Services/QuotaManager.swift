@@ -527,6 +527,11 @@ class QuotaManager: ObservableObject {
         currentPlan?.planId == "free_guest"
     }
     
+    /// Check if user is on Plus plan (for Plus-exclusive features like multi-partner matching)
+    var isPlus: Bool {
+        currentPlan?.planId == "plus"
+    }
+    
     /// Check if user has access to a specific feature (cached)
     func hasFeature(_ feature: FeatureID) -> Bool {
         isPremium || availableFeatures.contains(feature.rawValue)
