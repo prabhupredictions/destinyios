@@ -6,7 +6,10 @@ struct NotificationInboxView: View {
     
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var service = NotificationInboxService.shared
+    @StateObject private var quotaManager = QuotaManager.shared
     @State private var selectedNotification: NotificationItem? = nil
+    @State private var showNotificationPreferences = false
+    @State private var showUpgradePrompt = false
     
     var body: some View {
         NavigationView {
@@ -17,6 +20,9 @@ struct NotificationInboxView: View {
                 VStack(spacing: 0) {
                     // Header
                     headerView
+                    
+                    // Personalize alerts button
+                    personalizeAlertsButton
                     
                     // Content
                     if service.isLoading && service.notifications.isEmpty {
@@ -35,6 +41,14 @@ struct NotificationInboxView: View {
             }
             .sheet(item: $selectedNotification) { notification in
                 NotificationDetailSheet(notification: notification)
+            }
+            .sheet(isPresented: $showNotificationPreferences) {
+                if let email = DataManager.shared.getCurrentUserProfile()?.email {
+                    NotificationPreferencesSheet(userEmail: email)
+                }
+            }
+            .sheet(isPresented: $showUpgradePrompt) {
+                SubscriptionView()
             }
         }
     }
@@ -86,6 +100,44 @@ struct NotificationInboxView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
+    }
+    
+    // MARK: - Personalize Alerts Button
+    private var personalizeAlertsButton: some View {
+        Button {
+            if quotaManager.hasFeature(.alerts) {
+                showNotificationPreferences = true
+            } else {
+                showUpgradePrompt = true
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "bell.badge")
+                    .font(.system(size: 15, weight: .semibold))
+                
+                Text("Personalize alerts")
+                    .font(.system(size: 16, weight: .semibold))
+                
+                if !quotaManager.hasFeature(.alerts) {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 12))
+                }
+            }
+            .foregroundColor(AppTheme.Colors.mainBackground)
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+            .background(
+                LinearGradient(
+                    colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.85)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(14)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 4)
+        .padding(.bottom, 8)
     }
     
     // MARK: - Notification List
