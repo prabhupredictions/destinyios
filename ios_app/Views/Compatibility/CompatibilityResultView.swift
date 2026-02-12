@@ -101,7 +101,9 @@ struct CompatibilityResultView: View {
                                         showAvatars: false
                                     )
                                 )
-                            }
+                            },
+                            boyName: boyName,
+                            girlName: girlName
                         )
                         .padding(.bottom, 0) // Removed extra padding to close gap
                         
@@ -201,7 +203,13 @@ struct CompatibilityResultView: View {
         }
         // Sheets
         .sheet(isPresented: $showFullReport) {
-            FullReportSheet(result: result, boyName: boyName, girlName: girlName)
+            FullReportSheet(
+                result: result,
+                boyName: boyName,
+                girlName: girlName,
+                boyDob: boyDob,
+                girlDob: girlDob
+            )
         }
         .sheet(isPresented: $showAskDestiny) {
             AskDestinySheet(result: result, boyName: boyName, girlName: girlName)

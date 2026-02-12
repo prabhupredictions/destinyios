@@ -1,24 +1,69 @@
 import SwiftUI
 
-// MARK: - Full Report Sheet
+// MARK: - Full Report Sheet (Premium Branded Report)
 struct FullReportSheet: View {
     let result: CompatibilityResult
     let boyName: String
     let girlName: String
+    let boyDob: String?
+    let girlDob: String?
     @Environment(\.dismiss) private var dismiss
+    @State private var isGeneratingPDF = false
+    @State private var showShareOptions = false
+    
+    // Parse summary into sections by ### headers
+    private var sections: [(emoji: String, title: String, content: String)] {
+        parseSections(from: result.summary)
+    }
+    
+    private var ratingText: String {
+        let pct = result.percentage * 100
+        if pct >= 90 { return "Excellent" }
+        else if pct >= 75 { return "Very Good" }
+        else if pct >= 60 { return "Good" }
+        else if pct >= 50 { return "Average" }
+        else { return "Needs Attention" }
+    }
+    
+    private var starCount: Int {
+        let pct = result.percentage * 100
+        if pct >= 90 { return 5 }
+        else if pct >= 75 { return 4 }
+        else if pct >= 60 { return 3 }
+        else if pct >= 50 { return 2 }
+        else { return 1 }
+    }
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    headerSection
-                    kutasList
-                    summarySection
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        // 1. Action Bar
+                        actionBar
+                        
+                        // 2. Branded Header
+                        brandedHeader
+                        
+                        // 3. Section Cards (parsed from LLM output)
+                        if sections.isEmpty {
+                            // Fallback: render full summary as markdown
+                            sectionCard(emoji: "📋", title: "Analysis", content: result.summary)
+                        } else {
+                            ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
+                                sectionCard(emoji: section.emoji, title: section.title, content: section.content)
+                            }
+                        }
+                        
+                        // 4. AI Disclaimer Footer
+                        disclaimerFooter
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 32)
                 }
-                .padding(14)
             }
-            .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
-            .navigationTitle("Full Compatibility Report")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -30,83 +75,579 @@ struct FullReportSheet: View {
                 }
             }
         }
+        .confirmationDialog("Share Report", isPresented: $showShareOptions) {
+            Button("Share as PDF") {
+                generateAndSharePDF()
+            }
+            Button("Share Score Card") {
+                shareScoreCard()
+            }
+            Button("Cancel", role: .cancel) {}
+        }
     }
     
-    private var headerSection: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(boyName) & \(girlName)")
-                    .font(AppTheme.Fonts.title(size: 14))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                
-                Text("\(result.totalScore)/\(result.maxScore) points")
+    // MARK: - Action Bar
+    
+    private var actionBar: some View {
+        HStack(spacing: 12) {
+            // Download PDF Button
+            Button {
+                generateAndSharePDF()
+            } label: {
+                HStack(spacing: 6) {
+                    if isGeneratingPDF {
+                        ProgressView()
+                            .tint(AppTheme.Colors.gold)
+                            .scaleEffect(0.7)
+                    } else {
+                        Image(systemName: "arrow.down.doc.fill")
+                    }
+                    Text("Download PDF")
+                        .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
+                }
+                .foregroundColor(AppTheme.Colors.mainBackground)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.8)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                )
+            }
+            .disabled(isGeneratingPDF)
+            
+            // Share Button
+            Button {
+                showShareOptions = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "square.and.arrow.up")
+                    Text("Share")
+                        .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
+                }
+                .foregroundColor(AppTheme.Colors.gold)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
+                )
+            }
+            
+            Spacer()
+        }
+        .padding(.top, 8)
+    }
+    
+    // MARK: - Branded Header
+    
+    private var brandedHeader: some View {
+        VStack(spacing: 16) {
+            // Logo
+            Image("logo_gold")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 44)
+            
+            Text("DESTINY AI ASTROLOGY")
+                .font(.system(size: 10, weight: .medium, design: .serif))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+                .tracking(4)
+            
+            // Gold divider
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppTheme.Colors.gold.opacity(0),
+                            AppTheme.Colors.gold.opacity(0.5),
+                            AppTheme.Colors.gold.opacity(0)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(height: 1)
+                .padding(.horizontal, 40)
+            
+            // Names
+            Text("\(boyName) & \(girlName)")
+                .font(.system(size: 22, weight: .bold, design: .serif))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            // Date info
+            if let bDob = boyDob, let gDob = girlDob {
+                Text("Born: \(bDob) · \(gDob)")
                     .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
-            Spacer()
-            Text("\(Int(result.percentage * 100))%")
-                .font(AppTheme.Fonts.title(size: 22))
-                .foregroundColor(result.percentage >= 0.75 ? AppTheme.Colors.success : AppTheme.Colors.gold)
+            
+            // Score Ring
+            ZStack {
+                Circle()
+                    .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 3)
+                    .frame(width: 100, height: 100)
+                
+                Circle()
+                    .trim(from: 0, to: result.percentage)
+                    .stroke(
+                        LinearGradient(
+                            colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.7)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                    )
+                    .frame(width: 100, height: 100)
+                    .rotationEffect(.degrees(-90))
+                
+                VStack(spacing: 2) {
+                    Text("\(result.totalScore)")
+                        .font(.system(size: 28, weight: .bold, design: .serif))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    Text("/ \(result.maxScore)")
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+            }
+            .padding(.top, 4)
+            
+            // Star rating
+            HStack(spacing: 4) {
+                ForEach(0..<5) { index in
+                    Image(systemName: index < starCount ? "star.fill" : "star")
+                        .font(.system(size: 14))
+                        .foregroundColor(AppTheme.Colors.gold)
+                }
+            }
+            
+            Text(ratingText.uppercased())
+                .font(.system(size: 13, weight: .semibold, design: .serif))
+                .foregroundColor(AppTheme.Colors.gold)
+                .tracking(3)
+            
+            // Report date
+            Text("Report generated: \(formattedDate)")
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
+                .padding(.top, 4)
         }
-        .padding(12)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+        .padding(.horizontal, 16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(AppTheme.Colors.cardBackground)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.Colors.gold.opacity(0.3)))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    AppTheme.Colors.gold.opacity(0.3),
+                                    AppTheme.Colors.gold.opacity(0.1),
+                                    AppTheme.Colors.gold.opacity(0.3)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
         )
     }
     
-    private var kutasList: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(result.kutas) { kuta in
-                HStack {
-                    Text(kuta.name)
-                        .font(AppTheme.Fonts.body(size: 12))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                    Spacer()
-                    Text("\(kuta.points)/\(kuta.maxPoints)")
-                        .font(AppTheme.Fonts.body(size: 12).weight(.bold))
-                        .foregroundColor(kutaColor(kuta.percentage))
-                }
-                Divider().background(AppTheme.Colors.gold.opacity(0.1))
+    // MARK: - Section Card
+    
+    private func sectionCard(emoji: String, title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Section header
+            HStack(spacing: 8) {
+                Text(emoji)
+                    .font(.system(size: 18))
+                
+                Text(title.uppercased())
+                    .font(.system(size: 13, weight: .bold, design: .serif))
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .tracking(1.5)
+                
+                Spacer()
             }
+            
+            // Gold underline
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [AppTheme.Colors.gold.opacity(0.4), AppTheme.Colors.gold.opacity(0)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(height: 1)
+            
+            // Markdown content — replace generic "Boy"/"Girl" with actual names
+            MarkdownTextView(
+                content: replaceGenericLabels(in: content),
+                textColor: AppTheme.Colors.textPrimary,
+                fontSize: 14
+            )
         }
-        .padding(12)
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(AppTheme.Colors.cardBackground)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.Colors.gold.opacity(0.15)))
+            RoundedRectangle(cornerRadius: 14)
+                .fill(AppTheme.Colors.cardBackground.opacity(0.8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(AppTheme.Colors.gold.opacity(0.12), lineWidth: 1)
+                )
         )
     }
-     
-    private var summarySection: some View {
-        Group {
-            if !result.summary.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Summary")
-                        .font(AppTheme.Fonts.caption(size: 12).weight(.semibold))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                    
-                    Text(result.summary)
-                        .font(AppTheme.Fonts.body(size: 13))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .lineSpacing(4)
+    
+    // MARK: - AI Disclaimer Footer
+    
+    private var disclaimerFooter: some View {
+        VStack(spacing: 12) {
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppTheme.Colors.gold.opacity(0),
+                            AppTheme.Colors.gold.opacity(0.3),
+                            AppTheme.Colors.gold.opacity(0)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(height: 1)
+            
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 11))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+                Text("AI-Generated Analysis")
+                    .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+            }
+            
+            Text("This report was generated using AI-powered Vedic astrology analysis based on BPHS (Brihat Parashara Hora Shastra) principles. Results are for informational and entertainment purposes only. Marriage decisions should consider multiple factors beyond astrological compatibility. Consult a qualified astrologer for personalized guidance.")
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
+                .lineSpacing(3)
+                .multilineTextAlignment(.center)
+            
+            Text("© 2026 Destiny AI Astrology · destinyaiastrology.com")
+                .font(AppTheme.Fonts.caption(size: 9))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
+                .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+    }
+    
+    // MARK: - Section Parser
+    
+    /// Parse LLM summary into sections by ### emoji TITLE headers
+    private func parseSections(from summary: String) -> [(emoji: String, title: String, content: String)] {
+        guard !summary.isEmpty else { return [] }
+        
+        var result: [(emoji: String, title: String, content: String)] = []
+        let lines = summary.components(separatedBy: "\n")
+        
+        var currentEmoji = ""
+        var currentTitle = ""
+        var currentContent: [String] = []
+        var inSection = false
+        
+        for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            
+            // Check if this is a section header (### emoji TITLE)
+            if trimmed.hasPrefix("### ") {
+                // Save previous section
+                if inSection && !currentTitle.isEmpty {
+                    let content = currentContent.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !content.isEmpty {
+                        result.append((emoji: currentEmoji, title: currentTitle, content: content))
+                    }
                 }
-                .padding(12)
+                
+                // Parse new section header
+                let headerText = String(trimmed.dropFirst(4))
+                let parsed = extractEmojiAndTitle(from: headerText)
+                currentEmoji = parsed.emoji
+                currentTitle = parsed.title
+                currentContent = []
+                inSection = true
+            } else if trimmed == "---" {
+                // Skip dividers (they mark section boundaries)
+                continue
+            } else if inSection {
+                currentContent.append(line)
+            }
+        }
+        
+        // Save last section
+        if inSection && !currentTitle.isEmpty {
+            let content = currentContent.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+            if !content.isEmpty {
+                result.append((emoji: currentEmoji, title: currentTitle, content: content))
+            }
+        }
+        
+        return result
+    }
+    
+    /// Extract emoji and title from header like "🎯 COMPATIBILITY VERDICT"
+    private func extractEmojiAndTitle(from text: String) -> (emoji: String, title: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        
+        // Check if first character is an emoji
+        if let first = trimmed.unicodeScalars.first,
+           first.properties.isEmoji && first.value > 0x238 {
+            // Find where the emoji ends
+            let firstChar = String(trimmed.prefix(1))
+            // Some emojis are multi-scalar
+            var emojiEnd = trimmed.index(trimmed.startIndex, offsetBy: 1)
+            // Walk forward while still in emoji territory
+            while emojiEnd < trimmed.endIndex {
+                let scalar = trimmed.unicodeScalars[trimmed.unicodeScalars.index(trimmed.unicodeScalars.startIndex, offsetBy: trimmed.distance(from: trimmed.startIndex, to: emojiEnd))]
+                if scalar.properties.isEmoji || scalar.value == 0xFE0F || scalar.value == 0x200D {
+                    emojiEnd = trimmed.index(after: emojiEnd)
+                } else {
+                    break
+                }
+            }
+            let emoji = String(trimmed[trimmed.startIndex..<emojiEnd])
+            let title = String(trimmed[emojiEnd...]).trimmingCharacters(in: .whitespaces)
+            return (emoji: emoji, title: title)
+        }
+        
+        return (emoji: "📋", title: trimmed)
+    }
+    
+    // MARK: - Date Formatting
+    
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter.string(from: Date())
+    }
+    
+    // MARK: - Name Substitution
+    
+    /// Replace generic "Boy"/"Girl" labels from LLM output with actual partner names
+    private func replaceGenericLabels(in text: String) -> String {
+        var result = text
+        
+        // Replace common patterns where LLM uses "Boy" and "Girl"
+        // Order matters: longer patterns first to avoid partial replacement
+        let boyPatterns: [(String, String)] = [
+            ("**Boy's ", "**\(boyName)'s "),
+            ("**Boy (", "**\(boyName) ("),
+            ("**Boy:**", "**\(boyName):**"),
+            ("**Boy:", "**\(boyName):"),
+            ("Boy's Key", "\(boyName)'s Key"),
+            ("Boy's Yogas", "\(boyName)'s Yogas"),
+            ("Boy's Dasha", "\(boyName)'s Dasha"),
+            ("Boy (Lagna", "\(boyName) (Lagna"),
+            ("Boy:", "\(boyName):"),
+            ("Boy's ", "\(boyName)'s "),
+        ]
+        
+        let girlPatterns: [(String, String)] = [
+            ("**Girl's ", "**\(girlName)'s "),
+            ("**Girl (", "**\(girlName) ("),
+            ("**Girl:**", "**\(girlName):**"),
+            ("**Girl:", "**\(girlName):"),
+            ("Girl's Key", "\(girlName)'s Key"),
+            ("Girl's Yogas", "\(girlName)'s Yogas"),
+            ("Girl's Dasha", "\(girlName)'s Dasha"),
+            ("Girl (Lagna", "\(girlName) (Lagna"),
+            ("Girl:", "\(girlName):"),
+            ("Girl's ", "\(girlName)'s "),
+        ]
+        
+        for (pattern, replacement) in boyPatterns {
+            result = result.replacingOccurrences(of: pattern, with: replacement)
+        }
+        for (pattern, replacement) in girlPatterns {
+            result = result.replacingOccurrences(of: pattern, with: replacement)
+        }
+        
+        return result
+    }
+    
+    // MARK: - PDF & Share Actions
+    
+    private func generateAndSharePDF() {
+        isGeneratingPDF = true
+        
+        Task { @MainActor in
+            // Create a report view for PDF rendering
+            let pdfView = PremiumReportPDFView(
+                result: result,
+                boyName: boyName,
+                girlName: girlName,
+                boyDob: boyDob,
+                girlDob: girlDob,
+                sections: sections,
+                ratingText: ratingText,
+                starCount: starCount,
+                formattedDate: formattedDate
+            )
+            
+            let fileName = "Destiny_AI_\(boyName)_\(girlName)_Compatibility"
+            
+            if let pdfURL = ReportShareService.shared.generateMultiPagePDF(
+                from: pdfView,
+                width: 390,
+                fileName: fileName
+            ) {
+                ReportShareService.shared.sharePDF(url: pdfURL)
+            }
+            
+            isGeneratingPDF = false
+        }
+    }
+    
+    private func shareScoreCard() {
+        Task { @MainActor in
+            let cardView = ShareCardView(
+                boyName: boyName,
+                girlName: girlName,
+                totalScore: result.totalScore,
+                maxScore: result.maxScore,
+                percentage: result.percentage
+            )
+            
+            if let image = ReportShareService.shared.generateShareImage(from: cardView) {
+                let shareText = "✨ \(boyName) & \(girlName) — Cosmic Score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
+                ReportShareService.shared.shareImage(image, text: shareText)
+            }
+        }
+    }
+}
+
+// MARK: - PDF Render View (Static version for ImageRenderer)
+/// A non-interactive version of the report optimized for PDF generation
+private struct PremiumReportPDFView: View {
+    let result: CompatibilityResult
+    let boyName: String
+    let girlName: String
+    let boyDob: String?
+    let girlDob: String?
+    let sections: [(emoji: String, title: String, content: String)]
+    let ratingText: String
+    let starCount: Int
+    let formattedDate: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Header
+            VStack(spacing: 12) {
+                Text("DESTINY AI ASTROLOGY")
+                    .font(.system(size: 14, weight: .medium, design: .serif))
+                    .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    .tracking(4)
+                
+                Text("COMPATIBILITY REPORT")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.6))
+                    .tracking(3)
+                
+                Text("\(boyName) & \(girlName)")
+                    .font(.system(size: 22, weight: .bold, design: .serif))
+                    .foregroundColor(.white)
+                
+                if let bDob = boyDob, let gDob = girlDob {
+                    Text("Born: \(bDob) · \(gDob)")
+                        .font(.system(size: 11))
+                        .foregroundColor(.white.opacity(0.5))
+                }
+                
+                Text("\(result.totalScore)/\(result.maxScore) • \(Int(result.percentage * 100))% • \(ratingText)")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                
+                HStack(spacing: 3) {
+                    ForEach(0..<5) { index in
+                        Image(systemName: index < starCount ? "star.fill" : "star")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    }
+                }
+                
+                Rectangle()
+                    .fill(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.3))
+                    .frame(height: 1)
+                    .padding(.horizontal, 40)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            
+            // Sections
+            ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("\(section.emoji) \(section.title)")
+                        .font(.system(size: 14, weight: .bold, design: .serif))
+                        .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    
+                    Rectangle()
+                        .fill(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.2))
+                        .frame(height: 1)
+                    
+                    MarkdownTextView(
+                        content: section.content,
+                        textColor: .white.opacity(0.9),
+                        fontSize: 12
+                    )
+                }
+                .padding(14)
                 .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(AppTheme.Colors.cardBackground)
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.Colors.gold.opacity(0.15)))
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.white.opacity(0.05))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.15), lineWidth: 0.5)
+                        )
                 )
             }
+            
+            // Disclaimer
+            VStack(spacing: 8) {
+                Rectangle()
+                    .fill(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.2))
+                    .frame(height: 1)
+                    .padding(.horizontal, 40)
+                
+                Text("⚠️ AI-GENERATED ANALYSIS")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.5))
+                
+                Text("This report was generated using AI-powered Vedic astrology analysis based on BPHS principles. Results are for informational and entertainment purposes only.")
+                    .font(.system(size: 8))
+                    .foregroundColor(.white.opacity(0.3))
+                    .multilineTextAlignment(.center)
+                
+                Text("© 2026 Destiny AI Astrology · destinyaiastrology.com")
+                    .font(.system(size: 8))
+                    .foregroundColor(.white.opacity(0.25))
+                
+                Text("Generated: \(formattedDate)")
+                    .font(.system(size: 7))
+                    .foregroundColor(.white.opacity(0.2))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
         }
-    }
-    
-    private func kutaColor(_ pct: Double) -> Color {
-        if pct >= 0.75 { return AppTheme.Colors.success }
-        else if pct >= 0.50 { return AppTheme.Colors.gold }
-        else if pct >= 0.25 { return .orange }
-        else { return AppTheme.Colors.error }
+        .padding(20)
+        .background(Color(red: 0.04, green: 0.06, blue: 0.10)) // #0B0F19
     }
 }
 

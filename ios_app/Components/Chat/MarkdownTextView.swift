@@ -2,8 +2,8 @@ import SwiftUI
 
 // MARK: - MarkdownTextView
 /// A reusable SwiftUI view that renders markdown-formatted text
-/// Handles: Headers, Bold, Italic, Code, Lists, Links, Blockquotes
-/// Optimized for performance - no regex in parsing
+/// Handles: Headers, Bold, Italic, Code, Lists, Links, Blockquotes, Tables, Dividers
+/// v2 — Fixed: table rendering, divider handling, paragraph merging, inline parse hangs
 struct MarkdownTextView: View {
     let content: String
     var textColor: Color = AppTheme.Colors.textPrimary
@@ -22,7 +22,7 @@ struct MarkdownTextView: View {
                 blocks = parseBlocks()
             }
         }
-        .onChange(of: content) { newValue in
+        .onChange(of: content) { _, _ in
             blocks = parseBlocks()
         }
     }
@@ -36,6 +36,8 @@ struct MarkdownTextView: View {
         case numberedList(items: [String])
         case codeBlock(code: String)
         case blockquote(text: String)
+        case table(headers: [String], rows: [[String]])
+        case divider
     }
     
     // MARK: - Block Parser (No Regex - Performance Optimized)
@@ -55,6 +57,13 @@ struct MarkdownTextView: View {
                 continue
             }
             
+            // Horizontal rule (--- or *** or ___) — must check BEFORE bullet list
+            if isDivider(trimmed) {
+                blocks.append(.divider)
+                i += 1
+                continue
+            }
+            
             // Code block (``` ... ```)
             if trimmed.hasPrefix("```") {
                 var codeLines: [String] = []
@@ -64,7 +73,7 @@ struct MarkdownTextView: View {
                     i += 1
                 }
                 blocks.append(.codeBlock(code: codeLines.joined(separator: "\n")))
-                i += 1
+                if i < lines.count { i += 1 } // skip closing ```
                 continue
             }
             
@@ -72,6 +81,15 @@ struct MarkdownTextView: View {
             if let headerMatch = parseHeader(trimmed) {
                 blocks.append(headerMatch)
                 i += 1
+                continue
+            }
+            
+            // Table detection: line contains | and next line is separator (|---|)
+            if trimmed.contains("|") && isTableStart(lines: lines, at: i) {
+                let tableBlock = parseTable(lines: lines, at: &i)
+                if let table = tableBlock {
+                    blocks.append(table)
+                }
                 continue
             }
             
@@ -131,15 +149,26 @@ struct MarkdownTextView: View {
                 continue
             }
             
-            // Regular paragraph - collect consecutive lines
+            // Regular paragraph — each line with **bold:** prefix treated as standalone
             var paragraphLines: [String] = []
             while i < lines.count {
                 let pLine = lines[i].trimmingCharacters(in: .whitespaces)
-                if pLine.isEmpty || pLine.hasPrefix("#") || pLine.hasPrefix("-") || 
-                   pLine.hasPrefix("* ") || pLine.hasPrefix(">") || pLine.hasPrefix("```") ||
-                   isNumberedListItem(pLine) {
+                if pLine.isEmpty || pLine.hasPrefix("#") || pLine.hasPrefix("> ") || pLine.hasPrefix("```") ||
+                   isNumberedListItem(pLine) || isDivider(pLine) ||
+                   (pLine.contains("|") && i + 1 < lines.count && isTableSeparator(lines[i + 1].trimmingCharacters(in: .whitespaces))) {
                     break
                 }
+                // Bullet check (but not --- which is already caught by isDivider)
+                if pLine.hasPrefix("- ") || pLine.hasPrefix("* ") || pLine.hasPrefix("• ") {
+                    break
+                }
+                
+                // If this line starts with **bold:** or **bold** and previous lines exist,
+                // treat it as a new paragraph to preserve line breaks
+                if paragraphLines.count > 0 && pLine.hasPrefix("**") {
+                    break
+                }
+                
                 paragraphLines.append(pLine)
                 i += 1
             }
@@ -150,6 +179,77 @@ struct MarkdownTextView: View {
         
         return blocks
     }
+    
+    // MARK: - Divider Detection
+    
+    private func isDivider(_ line: String) -> Bool {
+        let stripped = line.replacingOccurrences(of: " ", with: "")
+        // ---  ***  ___  (3 or more of the same character)
+        if stripped.count >= 3 {
+            if stripped.allSatisfy({ $0 == "-" }) { return true }
+            if stripped.allSatisfy({ $0 == "*" }) { return true }
+            if stripped.allSatisfy({ $0 == "_" }) { return true }
+        }
+        return false
+    }
+    
+    // MARK: - Table Parsing
+    
+    private func isTableSeparator(_ line: String) -> Bool {
+        // A table separator line looks like: |---|---|---| or |:---:|:---|
+        let stripped = line.replacingOccurrences(of: " ", with: "")
+        return stripped.contains("|") && stripped.contains("-") &&
+               stripped.replacingOccurrences(of: "|", with: "")
+                       .replacingOccurrences(of: "-", with: "")
+                       .replacingOccurrences(of: ":", with: "")
+                       .isEmpty
+    }
+    
+    private func isTableStart(lines: [String], at index: Int) -> Bool {
+        guard index + 1 < lines.count else { return false }
+        let nextLine = lines[index + 1].trimmingCharacters(in: .whitespaces)
+        return isTableSeparator(nextLine)
+    }
+    
+    private func parseTableRow(_ line: String) -> [String] {
+        var trimmed = line.trimmingCharacters(in: .whitespaces)
+        // Remove leading/trailing pipes
+        if trimmed.hasPrefix("|") { trimmed = String(trimmed.dropFirst()) }
+        if trimmed.hasSuffix("|") { trimmed = String(trimmed.dropLast()) }
+        return trimmed.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+    
+    private func parseTable(lines: [String], at index: inout Int) -> MarkdownBlock? {
+        // Line 1: headers
+        let headers = parseTableRow(lines[index])
+        index += 1
+        
+        // Line 2: separator (skip)
+        if index < lines.count {
+            index += 1
+        }
+        
+        // Remaining lines: data rows
+        var rows: [[String]] = []
+        while index < lines.count {
+            let rowLine = lines[index].trimmingCharacters(in: .whitespaces)
+            if rowLine.isEmpty || !rowLine.contains("|") {
+                break
+            }
+            // Don't consume lines that look like next section's table header
+            if index + 1 < lines.count && isTableSeparator(lines[index + 1].trimmingCharacters(in: .whitespaces)) {
+                break
+            }
+            let cells = parseTableRow(rowLine)
+            rows.append(cells)
+            index += 1
+        }
+        
+        guard !headers.isEmpty else { return nil }
+        return .table(headers: headers, rows: rows)
+    }
+    
+    // MARK: - Numbered List Helpers
     
     // Check if line starts with number followed by dot and space (e.g., "1. ", "10. ")
     private func isNumberedListItem(_ line: String) -> Bool {
@@ -253,8 +353,97 @@ struct MarkdownTextView: View {
                     .italic()
             }
             .padding(.vertical, 4)
+            
+        case .table(let headers, let rows):
+            renderTable(headers: headers, rows: rows)
+            
+        case .divider:
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppTheme.Colors.gold.opacity(0),
+                            AppTheme.Colors.gold.opacity(0.4),
+                            AppTheme.Colors.gold.opacity(0)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(height: 1)
+                .padding(.vertical, 8)
         }
     }
+    
+    // MARK: - Table Renderer
+    
+    private func renderTable(headers: [String], rows: [[String]]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header row
+            HStack(spacing: 0) {
+                ForEach(Array(headers.enumerated()), id: \.offset) { index, header in
+                    Text(stripMarkdownBold(header))
+                        .font(AppTheme.Fonts.caption(size: fontSize - 2).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                    
+                    if index < headers.count - 1 {
+                        Rectangle()
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
+                            .frame(width: 1)
+                    }
+                }
+            }
+            .background(AppTheme.Colors.gold.opacity(0.08))
+            
+            // Separator
+            Rectangle()
+                .fill(AppTheme.Colors.gold.opacity(0.2))
+                .frame(height: 1)
+            
+            // Data rows
+            ForEach(Array(rows.enumerated()), id: \.offset) { rowIdx, row in
+                HStack(spacing: 0) {
+                    ForEach(Array(row.enumerated()), id: \.offset) { colIdx, cell in
+                        Text(stripMarkdownBold(cell))
+                            .font(AppTheme.Fonts.body(size: fontSize - 2))
+                            .foregroundColor(textColor)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                        
+                        if colIdx < row.count - 1 {
+                            Rectangle()
+                                .fill(AppTheme.Colors.gold.opacity(0.1))
+                                .frame(width: 1)
+                        }
+                    }
+                }
+                .background(rowIdx % 2 == 0 ? Color.clear : AppTheme.Colors.gold.opacity(0.03))
+                
+                // Row separator
+                if rowIdx < rows.count - 1 {
+                    Rectangle()
+                        .fill(AppTheme.Colors.gold.opacity(0.08))
+                        .frame(height: 1)
+                }
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
+        )
+    }
+    
+    /// Strip ** bold ** markers from table cell text for plain rendering
+    private func stripMarkdownBold(_ text: String) -> String {
+        text.replacingOccurrences(of: "**", with: "")
+    }
+    
+    // MARK: - Header Renderer
     
     private func renderHeader(level: Int, text: String) -> some View {
         let cleanText = text.replacingOccurrences(of: ":", with: "").trimmingCharacters(in: .whitespaces)
@@ -289,8 +478,11 @@ struct MarkdownTextView: View {
     
     @ViewBuilder
     private func renderInlineMarkdown(_ text: String) -> some View {
+        // Sanitize: remove pipe chars that cause AttributedString parser to hang
+        let sanitized = sanitizeForInlineParsing(text)
+        
         if let attrString = try? AttributedString(
-            markdown: text,
+            markdown: sanitized,
             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
         ) {
             Text(attrString)
@@ -299,11 +491,34 @@ struct MarkdownTextView: View {
                 .lineSpacing(4)
                 .textSelection(.enabled)
         } else {
-            Text(text)
+            // Fallback: strip markdown markers and render as plain text
+            Text(stripMarkdownBold(sanitized))
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
                 .lineSpacing(4)
         }
+    }
+    
+    /// Sanitize text for safe inline markdown parsing.
+    /// Removes/escapes characters that cause AttributedString to hang or fail.
+    private func sanitizeForInlineParsing(_ text: String) -> String {
+        var result = text
+        
+        // Pipe characters from table remnants cause hangs — escape them
+        result = result.replacingOccurrences(of: "|", with: "·")
+        
+        // Unclosed bold/italic markers cause hangs — close them
+        let boldCount = result.components(separatedBy: "**").count - 1
+        if boldCount % 2 != 0 {
+            result += "**"
+        }
+        let italicSingles = result.components(separatedBy: "*").count - 1 - (boldCount / 2 * 2 + boldCount % 2)
+        // Simplified: if odd number of non-bold * marks, close
+        if italicSingles > 0 && italicSingles % 2 != 0 {
+            result += "*"
+        }
+        
+        return result
     }
 }
 
@@ -312,32 +527,46 @@ struct MarkdownTextView: View {
 #Preview("Full Markdown") {
     ScrollView {
         MarkdownTextView(content: """
-        ### VERDICT:
-        **Likely** (Medium Probability)
+        ### 🎯 COMPATIBILITY VERDICT
         
-        ### TIMING:
-        The most auspicious time is between **June 2026 and August 2026**.
+        **Score:** 27.5/36 Ashtakoot | **Mangal Status:** Compatible (Cancelled)
+        **Overall Rating:** ⭐⭐⭐⭐⭐ Very Good
         
-        ### RATIONALE:
-        Here are the key factors:
+        **One-Line Verdict:** The compatibility is strong with excellent Ashtakoot scores and mitigated Mangal Dosha.
         
-        - Mercury is well-placed in the 7th house
-        - Jupiter's transit enhances prospects
-        - Venus adds positive energy
+        ---
         
-        > Note: This is based on your birth chart analysis.
+        ### 📊 ASHTAKOOT ANALYSIS
         
-        1. Check your compatibility
-        2. Consult with family
-        3. Plan accordingly
+        **Total Score: 27.5/36 (Very Good)**
         
-        ```
-        Dasha Period: Venus-Moon-Jupiter
-        ```
+        | Koota | Score | Analysis |
+        |-------|-------|----------|
+        | Nadi | 8/8 | Perfect match |
+        | Bhakoot | 7/7 | Excellent emotional bonding |
+        | Gana | 6/6 | Great temperament compatibility |
+        | Varna | 0/1 | Minor work style difference |
+        
+        ---
+        
+        ### 🌟 KEY STRENGTHS
+        
+        1. Excellent Nadi compatibility ensures progeny health
+        2. Strong Bhakoot for emotional bonding
+        3. Mangal Dosha mutually cancelled
+        
+        ---
+        
+        ### ⚠️ KEY CHALLENGES
+        
+        - Varna mismatch may cause minor friction
+        - Maitri score is moderate
+        
+        > Note: Consult a qualified astrologer for personalized guidance.
         """)
         .padding()
     }
-    .background(Color(red: 0.96, green: 0.95, blue: 0.98))
+    .background(AppTheme.Colors.mainBackground)
 }
 
 // MARK: - Typing Indicator
