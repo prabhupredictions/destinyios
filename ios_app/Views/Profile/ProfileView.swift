@@ -207,13 +207,13 @@ struct ProfileView: View {
                 // Manage Birth Charts (Plus-only)
                 PremiumListItem(
                     title: "Manage Birth Charts",
-                    subtitle: quotaManager.isPlus ? "Manage birth charts" : "Plus plan feature",
+                    subtitle: quotaManager.hasFeature(.maintainProfile) ? "Manage birth charts" : "Plus plan feature",
                     icon: "person.2.fill",
-                    isPremiumFeature: !quotaManager.isPlus,
+                    isPremiumFeature: !quotaManager.hasFeature(.maintainProfile),
                     action: {
                         if isGuestUser {
                             showGuestSignInForSwitch = true
-                        } else if quotaManager.isPlus {
+                        } else if quotaManager.hasFeature(.maintainProfile) {
                             showPartnerManager = true
                         } else {
                             showUpgradePrompt = true
@@ -224,18 +224,18 @@ struct ProfileView: View {
                 // Switch Birth Chart - moved from HomeView header
                 PremiumListItem(
                     title: "Switch Birth Chart",
-                    subtitle: quotaManager.isPlus
+                    subtitle: quotaManager.hasFeature(.switchProfile)
                         ? (ProfileContextManager.shared.isUsingSelf 
                             ? "Viewing as \(ProfileContextManager.shared.activeProfileName)" 
                             : "Using \(ProfileContextManager.shared.activeProfileName)'s chart")
                         : "Plus plan feature",
                     icon: "arrow.triangle.2.circlepath",
-                    isPremiumFeature: !quotaManager.isPlus,
+                    isPremiumFeature: !quotaManager.hasFeature(.switchProfile),
                     action: {
                         // GUEST RULE: Guests must sign in first
                         if isGuestUser {
                             showGuestSignInForSwitch = true
-                        } else if quotaManager.isPlus {
+                        } else if quotaManager.hasFeature(.switchProfile) {
                             showProfileSwitcher = true
                         } else {
                             showUpgradePrompt = true
@@ -281,11 +281,11 @@ struct ProfileView: View {
                 // Notification Preferences (Plus-only)
                 PremiumListItem(
                     title: "Notification Preferences",
-                    subtitle: quotaManager.isPlus ? "Customize your alerts" : "Plus plan feature",
+                    subtitle: quotaManager.hasFeature(.alerts) ? "Customize your alerts" : "Plus plan feature",
                     icon: "bell.badge.fill",
-                    isPremiumFeature: !quotaManager.isPlus,
+                    isPremiumFeature: !quotaManager.hasFeature(.alerts),
                     action: {
-                        if quotaManager.isPlus {
+                        if quotaManager.hasFeature(.alerts) {
                             showNotificationPreferences = true
                         } else {
                             showUpgradePrompt = true

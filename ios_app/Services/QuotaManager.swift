@@ -519,7 +519,7 @@ class QuotaManager: ObservableObject {
     /// Simple sync check for UI - uses cached features list
     /// For authoritative check, use `canAsk(feature:email:)` async method
     var canAsk: Bool {
-        isPremium || availableFeatures.contains(FeatureID.aiQuestions.rawValue)
+        availableFeatures.contains(FeatureID.aiQuestions.rawValue)
     }
     
     /// Check if current user is a guest (based on cached plan)
@@ -532,9 +532,9 @@ class QuotaManager: ObservableObject {
         currentPlan?.planId == "plus"
     }
     
-    /// Check if user has access to a specific feature (cached)
+    /// Check if user has access to a specific feature based on plan entitlements (cached)
     func hasFeature(_ feature: FeatureID) -> Bool {
-        isPremium || availableFeatures.contains(feature.rawValue)
+        availableFeatures.contains(feature.rawValue)
     }
     
     // MARK: - Subscription Display Helpers
