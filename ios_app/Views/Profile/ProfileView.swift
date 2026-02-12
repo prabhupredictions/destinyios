@@ -281,11 +281,11 @@ struct ProfileView: View {
                 // Notification Preferences (Plus-only)
                 PremiumListItem(
                     title: "Notification Preferences",
-                    subtitle: quotaManager.hasFeature(.alerts) ? "Customize your alerts" : "Plus plan feature",
+                    subtitle: quotaManager.isPlus ? "Customize your alerts" : "Plus plan feature",
                     icon: "bell.badge.fill",
-                    isPremiumFeature: !quotaManager.hasFeature(.alerts),
+                    isPremiumFeature: !quotaManager.isPlus,
                     action: {
-                        if quotaManager.hasFeature(.alerts) {
+                        if quotaManager.isPlus {
                             showNotificationPreferences = true
                         } else {
                             showUpgradePrompt = true
