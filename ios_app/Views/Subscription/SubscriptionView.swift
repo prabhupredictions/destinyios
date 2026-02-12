@@ -102,21 +102,30 @@ struct SubscriptionView: View {
     
     // MARK: - Load Plans from Backend
     private func loadPlans() async {
-        isLoading = true
+        // Step 1: Immediately show cached plans (no spinner, no flicker)
+        let cachedPlans = quotaManager.paidPlans
+            .sorted { ($0.priceMonthly ?? 0) < ($1.priceMonthly ?? 0) }
+        
+        if !cachedPlans.isEmpty {
+            plans = cachedPlans
+            isLoading = false
+            print("⚡ [SubscriptionView] Showing \(cachedPlans.count) cached plans instantly")
+        }
+        
+        // Step 2: Background refresh from server (updates silently)
         do {
             var fetchedPlans = try await quotaManager.fetchPlans()
-            // Filter to show only paid plans (core, plus)
             fetchedPlans = fetchedPlans.filter { !$0.isFree && $0.planId != "free_guest" && $0.planId != "free_registered" }
-            // Sort by price (cheapest first)
             fetchedPlans.sort { ($0.priceMonthly ?? 0) < ($1.priceMonthly ?? 0) }
             await MainActor.run {
                 plans = fetchedPlans
                 isLoading = false
             }
         } catch {
-            print("Failed to load plans: \(error)")
-            await MainActor.run {
-                isLoading = false
+            print("Failed to refresh plans: \(error)")
+            // If we have cached plans, just keep showing those (no error state)
+            if plans.isEmpty {
+                await MainActor.run { isLoading = false }
             }
         }
     }

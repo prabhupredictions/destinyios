@@ -206,12 +206,7 @@ class ChatViewModel {
             print("Quota check failed: \(error)")
         }
         
-        // Record question usage in backend (async)
-        // Note: usage is recorded *after* checks pass, but ideally should be *after* successful response?
-        // Current logic: record *attempt*.
-        Task {
-            await recordQuotaUsage()
-        }
+        // Usage is recorded server-side by /predict endpoint via check_and_reserve()
         
         isLoading = true
         isStreaming = true
@@ -457,15 +452,6 @@ class ChatViewModel {
         addWelcomeMessage()
     }
     
-    // MARK: - Quota Management
-    private func recordQuotaUsage() async {
-        // Quota is now recorded server-side by /predict endpoint
-        // Just update local cache for UI display
-        var used = UserDefaults.standard.integer(forKey: "quotaUsed")
-        used += 1
-        UserDefaults.standard.set(used, forKey: "quotaUsed")
-        print("✅ Quota recorded server-side for: \(userEmail)")
-    }
     
     var canSend: Bool {
         !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming

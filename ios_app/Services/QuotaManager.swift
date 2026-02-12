@@ -297,10 +297,30 @@ class QuotaManager: ObservableObject {
         currentPlan?.planId ?? UserDefaults.standard.string(forKey: "currentPlanId")
     }
     
+    private static let cachedPlansKey = "cachedAvailablePlans"
     private let dataManager: DataManager
     
     init(dataManager: DataManager? = nil) {
         self.dataManager = dataManager ?? DataManager.shared
+        // Load cached plans immediately so paywall has data on first render
+        loadCachedPlans()
+    }
+    
+    /// Load plans from UserDefaults cache (synchronous, called on init)
+    private func loadCachedPlans() {
+        guard let data = UserDefaults.standard.data(forKey: Self.cachedPlansKey) else { return }
+        if let cached = try? JSONDecoder().decode([PlanInfo].self, from: data) {
+            availablePlans = cached
+            print("📦 [QuotaManager] Loaded \(cached.count) cached plans")
+        }
+    }
+    
+    /// Persist plans to UserDefaults cache
+    private func cachePlans(_ plans: [PlanInfo]) {
+        if let data = try? JSONEncoder().encode(plans) {
+            UserDefaults.standard.set(data, forKey: Self.cachedPlansKey)
+            print("💾 [QuotaManager] Cached \(plans.count) plans")
+        }
     }
     
     // MARK: - Feature Access
@@ -394,6 +414,7 @@ class QuotaManager: ObservableObject {
         
         let plans = try JSONDecoder().decode([PlanInfo].self, from: data)
         availablePlans = plans
+        cachePlans(plans)  // Persist for instant paywall rendering
         return plans
     }
     
@@ -457,6 +478,9 @@ class QuotaManager: ObservableObject {
         
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
         updateFromStatus(status)
+        
+        // Pre-fetch plans to keep cache fresh (fire-and-forget)
+        Task { try? await fetchPlans() }
     }
     
     /// Sync status from server
@@ -476,6 +500,9 @@ class QuotaManager: ObservableObject {
         
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
         updateFromStatus(status)
+        
+        // Pre-fetch plans to keep cache fresh (fire-and-forget)
+        Task { try? await fetchPlans() }
     }
     
     /// Update local state from server status
