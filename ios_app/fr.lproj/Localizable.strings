@@ -438,3 +438,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "Un thème natal avec des détails similaires existe déjà. Chaque personne ne peut avoir qu'un seul thème. Pour assistance, contactez support@destinyaiastrology.com.";
 
+
+"syncing_cosmic_data" = "Chargement des insights du jour…";

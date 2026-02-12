@@ -438,3 +438,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "Карта рождения с похожими данными уже существует. У каждого человека может быть только одна карта. За помощью обратитесь на support@destinyaiastrology.com.";
 
+
+"syncing_cosmic_data" = "Загрузка сегодняшних инсайтов…";

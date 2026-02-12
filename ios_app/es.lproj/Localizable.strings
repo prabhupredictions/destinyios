@@ -438,3 +438,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "Ya existe una carta natal con detalles similares. Cada persona solo puede tener una carta. Para asistencia, contacta a support@destinyaiastrology.com.";
 
+
+"syncing_cosmic_data" = "Cargando insights de hoy…";

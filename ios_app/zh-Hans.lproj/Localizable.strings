@@ -438,3 +438,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "已存在相似信息的出生图表。每人只能有一个图表。如需帮助，请联系 support@destinyaiastrology.com。";
 
+
+"syncing_cosmic_data" = "正在加载今天的见解…";

@@ -438,3 +438,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "Já existe um mapa natal com detalhes similares. Cada pessoa só pode ter um mapa. Para assistência, entre em contato com support@destinyaiastrology.com.";
 
+
+"syncing_cosmic_data" = "Carregando insights de hoje…";
