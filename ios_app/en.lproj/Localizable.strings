@@ -484,7 +484,7 @@
 "compare_all" = "Compare All";
 "remove_partner" = "Remove Partner";
 
-"syncing_cosmic_data" = "Syncing cosmic data...";
+"syncing_cosmic_data" = "Loading today’s insights…";
 "restoring_your_insights" = "Restoring your insights";
 
 // MARK: - Guest Sign-In Prompts

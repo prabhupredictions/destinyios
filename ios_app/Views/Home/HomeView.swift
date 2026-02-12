@@ -104,10 +104,6 @@ struct HomeView: View {
                                     Text("syncing_cosmic_data".localized)
                                         .font(AppTheme.Fonts.title(size: 18))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
-                                    
-                                    Text("restoring_your_insights".localized)
-                                        .font(AppTheme.Fonts.body(size: 14))
-                                        .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
                                 
                                 ProgressView()
