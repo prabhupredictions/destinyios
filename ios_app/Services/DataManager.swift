@@ -240,23 +240,35 @@ final class DataManager {
     
     /// Fire-and-forget server-side thread deletion
     private func deleteThreadFromServer(threadId: String) {
-        guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else { return }
+        guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else {
+            print("[DataManager] ⚠️ No userEmail — skipping server delete for \(threadId)")
+            return
+        }
         
         Task {
             let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
-            guard let url = URL(string: urlString) else { return }
+            print("[DataManager] DELETE → \(urlString)")
+            guard let url = URL(string: urlString) else {
+                print("[DataManager] ⚠️ Invalid URL for delete: \(urlString)")
+                return
+            }
             
             var request = URLRequest(url: url)
             request.httpMethod = "DELETE"
             request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
             
             do {
-                let (_, response) = try await URLSession.shared.data(for: request)
+                let (data, response) = try await URLSession.shared.data(for: request)
                 if let httpResponse = response as? HTTPURLResponse {
-                    print("[DataManager] Server delete thread \(threadId): HTTP \(httpResponse.statusCode)")
+                    if httpResponse.statusCode == 200 {
+                        print("[DataManager] ✅ Server delete thread \(threadId): HTTP 200")
+                    } else {
+                        let body = String(data: data, encoding: .utf8) ?? ""
+                        print("[DataManager] ⚠️ Server delete thread \(threadId): HTTP \(httpResponse.statusCode) — \(body)")
+                    }
                 }
             } catch {
-                print("[DataManager] Failed to delete server thread \(threadId): \(error)")
+                print("[DataManager] ❌ Failed to delete server thread \(threadId): \(error)")
             }
         }
     }

@@ -221,7 +221,7 @@ final class CompatibilityHistoryService {
     /// Uses direct URLSession (not ChatHistoryService) to avoid response-parsing failures.
     private func deleteFromServer(sessionIds: [String]) {
         guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else {
-            print("[CompatibilityHistoryService] No user email — skipping server delete")
+            print("[CompatibilityHistoryService] ⚠️ No user email — skipping server delete")
             return
         }
         
@@ -229,8 +229,9 @@ final class CompatibilityHistoryService {
             let threadId = sessionId  // Already has compat_ prefix
             Task {
                 let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
+                print("[CompatibilityHistoryService] DELETE → \(urlString)")
                 guard let url = URL(string: urlString) else {
-                    print("[CompatibilityHistoryService] Invalid delete URL for \(threadId)")
+                    print("[CompatibilityHistoryService] ⚠️ Invalid delete URL: \(urlString)")
                     return
                 }
                 
@@ -239,12 +240,17 @@ final class CompatibilityHistoryService {
                 request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
                 
                 do {
-                    let (_, response) = try await URLSession.shared.data(for: request)
+                    let (data, response) = try await URLSession.shared.data(for: request)
                     if let httpResponse = response as? HTTPURLResponse {
-                        print("[CompatibilityHistoryService] Server delete \(threadId): HTTP \(httpResponse.statusCode)")
+                        if httpResponse.statusCode == 200 {
+                            print("[CompatibilityHistoryService] ✅ Server delete \(threadId): HTTP 200")
+                        } else {
+                            let body = String(data: data, encoding: .utf8) ?? ""
+                            print("[CompatibilityHistoryService] ⚠️ Server delete \(threadId): HTTP \(httpResponse.statusCode) — \(body)")
+                        }
                     }
                 } catch {
-                    print("[CompatibilityHistoryService] Failed to delete server thread \(threadId): \(error)")
+                    print("[CompatibilityHistoryService] ❌ Failed to delete server thread \(threadId): \(error)")
                 }
             }
         }
