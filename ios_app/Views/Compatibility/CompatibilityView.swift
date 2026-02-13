@@ -198,6 +198,31 @@ struct CompatibilityView: View {
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
         }
+        // "Loaded from history" toast when cached match is used
+        .overlay(alignment: .top) {
+            if viewModel.historyLoadedToast {
+                HStack(spacing: 8) {
+                    Image(systemName: "clock.arrow.circlepath")
+                    Text("Loaded from history")
+                }
+                .font(AppTheme.Fonts.body(size: 14))
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(Color.purple.opacity(0.85))
+                )
+                .padding(.top, 60)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        withAnimation { viewModel.historyLoadedToast = false }
+                    }
+                }
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: viewModel.historyLoadedToast)
         .sheet(isPresented: $showHistorySheet) {
             CompatibilityHistorySheet(
                 onSelect: { selectedItem in

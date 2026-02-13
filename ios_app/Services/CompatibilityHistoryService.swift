@@ -98,16 +98,35 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Save
-    /// Saves a new history item for current user. If session already exists, updates it.
+    /// Saves a new history item for current user.
+    /// If the same person pair (by DOB+time) already exists, UPSERTS: updates timestamp, score, result, merges chat.
+    /// If session already exists, updates it.
     func save(_ item: CompatibilityHistoryItem) {
         var items = loadAll()
         
-        // Check for duplicate
+        // 1. Check for same sessionId (exact re-save)
         if let existingIndex = items.firstIndex(where: { $0.sessionId == item.sessionId }) {
-            // Update existing
             items[existingIndex] = item
-        } else {
-            // Insert at beginning (most recent)
+        }
+        // 2. Check for same person pair (upsert — prevents duplicate rows for same couple)
+        else if let existingIndex = findExistingMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime ?? "", girlDob: item.girlDob, girlTime: item.girlTime ?? "") {
+            // Update existing entry: refresh timestamp, score, result; merge chat messages
+            var existing = items[existingIndex]
+            existing.timestamp = item.timestamp
+            existing.totalScore = item.totalScore
+            existing.maxScore = item.maxScore
+            existing.result = item.result
+            // Merge chat messages: keep existing + add new unique ones
+            let existingMsgIds = Set(existing.chatMessages.map { "\($0.isUser)_\($0.content)" })
+            let newMsgs = item.chatMessages.filter { !existingMsgIds.contains("\($0.isUser)_\($0.content)") }
+            existing.chatMessages.append(contentsOf: newMsgs)
+            items[existingIndex] = existing
+            // Move to front (most recent)
+            let updated = items.remove(at: existingIndex)
+            items.insert(updated, at: 0)
+        }
+        // 3. Brand new pair — insert at beginning
+        else {
             items.insert(item, at: 0)
         }
         
@@ -117,6 +136,30 @@ final class CompatibilityHistoryService {
         }
         
         persist(items)
+    }
+    
+    // MARK: - Find Existing Match (pair-symmetric)
+    /// Checks if a match with the same person pair exists, checking BOTH orderings (A,B) and (B,A).
+    /// Returns the matching history item if found.
+    func findExistingMatch(boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> CompatibilityHistoryItem? {
+        let items = loadAll()
+        guard let index = findExistingMatchIndex(in: items, boyDob: boyDob, boyTime: boyTime, girlDob: girlDob, girlTime: girlTime) else {
+            return nil
+        }
+        return items[index]
+    }
+    
+    /// Internal: finds the index of an existing match by pair (symmetric check).
+    private func findExistingMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
+        return items.firstIndex { existing in
+            // Forward: same order
+            let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
+                           existing.girlDob == girlDob && existing.girlTime == girlTime
+            // Reverse: swapped roles
+            let reverse = existing.boyDob == girlDob && existing.boyTime == girlTime &&
+                           existing.girlDob == boyDob && existing.girlTime == boyTime
+            return forward || reverse
+        }
     }
     
     // MARK: - Update Chat Messages
@@ -184,53 +227,7 @@ final class CompatibilityHistoryService {
     func get(sessionId: String) -> CompatibilityHistoryItem? {
         loadAll().first { $0.sessionId == sessionId }
     }
-    
-    // MARK: - Find Existing Match
-    /// Finds an existing match by boy and girl DOB + Time (to avoid re-triggering LLM for same pair)
-    /// Same person = same DOB + same birth time
-    /// - Parameters:
-    ///   - boyDob: Boy's date of birth in "yyyy-MM-dd" format
-    ///   - boyTime: Boy's birth time in "HH:mm:ss" format
-    ///   - girlDob: Girl's date of birth in "yyyy-MM-dd" format
-    ///   - girlTime: Girl's birth time in "HH:mm:ss" format
-    /// - Returns: Existing history item if found, nil otherwise
-    func findExistingMatch(boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> CompatibilityHistoryItem? {
-        let items = loadAll()
-        // Match on DOB + Time for accurate rematch detection
-        // Same person = same DOB + same birth time
-        return items.first { item in
-            // DOB must match
-            guard item.boyDob == boyDob && item.girlDob == girlDob else { return false }
-            
-            // Time must match (if stored)
-            // For legacy items without time, match by DOB only
-            if let storedBoyTime = item.boyTime, let storedGirlTime = item.girlTime {
-                return storedBoyTime == boyTime && storedGirlTime == girlTime
-            }
-            
-            // Legacy item without time - match by DOB only
-            return true
-        }
-    }
-    
-    /// Finds existing match by Date objects (convenience method)
-    /// Uses both date and time components for matching
-    func findExistingMatch(boyDob: Date, boyTime: Date, girlDob: Date, girlTime: Date) -> CompatibilityHistoryItem? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        let timeFormatter = DateFormatter()
-        timeFormatter.locale = Locale(identifier: "en_US_POSIX")
-        timeFormatter.dateFormat = "HH:mm:ss"
-        
-        let boyDobStr = dateFormatter.string(from: boyDob)
-        let boyTimeStr = timeFormatter.string(from: boyTime)
-        let girlDobStr = dateFormatter.string(from: girlDob)
-        let girlTimeStr = timeFormatter.string(from: girlTime)
-        
-        return findExistingMatch(boyDob: boyDobStr, boyTime: boyTimeStr, girlDob: girlDobStr, girlTime: girlTimeStr)
-    }
+
     
     // MARK: - Private Helpers
     private func persist(_ items: [CompatibilityHistoryItem]) {

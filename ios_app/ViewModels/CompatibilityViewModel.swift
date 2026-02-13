@@ -84,6 +84,7 @@ class CompatibilityViewModel {
     var errorMessage: String?
     var result: CompatibilityResult?
     var sessionId: String? // For follow-up queries
+    var historyLoadedToast = false // Shows brief "Loaded from history" indicator
     
     // Streaming progress state
     var currentStep: AnalysisStep = .calculatingCharts
@@ -407,16 +408,23 @@ class CompatibilityViewModel {
         }
         
         // STEP 1: Check local cache/history BEFORE calling API (FREE if found)
-        // This avoids re-triggering LLM for same match pair - usage count only for NEW matches
+        // This avoids re-triggering LLM for same match pair — usage count only for NEW matches
+        let dobFmt = DateFormatter()
+        dobFmt.dateFormat = "dd/MM/yyyy"
+        let timeFmt = DateFormatter()
+        timeFmt.locale = Locale(identifier: "en_US_POSIX")
+        timeFmt.dateFormat = "HH:mm:ss"
+        
         if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
-            boyDob: boyBirthDate,
-            boyTime: boyBirthTime,
-            girlDob: girlBirthDate,
-            girlTime: girlBirthTime
+            boyDob: dobFmt.string(from: boyBirthDate),
+            boyTime: timeFmt.string(from: boyBirthTime),
+            girlDob: dobFmt.string(from: girlBirthDate),
+            girlTime: timeFmt.string(from: girlBirthTime)
         ) {
-            print("[CompatibilityViewModel] Found existing match in cache - loading FREE (no LLM call)")
+            print("[CompatibilityViewModel] Found existing match in local history — loading FREE (no API call)")
             await MainActor.run {
                 loadFromHistory(existingMatch)
+                historyLoadedToast = true
             }
             return
         }
@@ -611,11 +619,17 @@ class CompatibilityViewModel {
             }
             
             // Check if this partner match already exists in cache (FREE if found)
+            let partnerDobFmt = DateFormatter()
+            partnerDobFmt.dateFormat = "dd/MM/yyyy"
+            let partnerTimeFmt = DateFormatter()
+            partnerTimeFmt.locale = Locale(identifier: "en_US_POSIX")
+            partnerTimeFmt.dateFormat = "HH:mm:ss"
+            
             if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
-                boyDob: boyBirthDate,
-                boyTime: boyBirthTime,
-                girlDob: partner.birthDate,
-                girlTime: partner.birthTime
+                boyDob: partnerDobFmt.string(from: boyBirthDate),
+                boyTime: partnerTimeFmt.string(from: boyBirthTime),
+                girlDob: partnerDobFmt.string(from: partner.birthDate),
+                girlTime: partnerTimeFmt.string(from: partner.birthTime)
             ),
             let cachedCompatibilityResult = existingMatch.result {
                 print("[Multi-Partner] Found existing match for \(partner.name) in cache - loading FREE")

@@ -10,7 +10,7 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
     }
     
     let sessionId: String
-    let timestamp: Date
+    var timestamp: Date
     
     // Multi-Partner Grouping (Optional - nil for legacy single-partner matches)
     let comparisonGroupId: String?
@@ -27,11 +27,11 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
     let girlCity: String
     
     // Score
-    let totalScore: Int
-    let maxScore: Int
+    var totalScore: Int
+    var maxScore: Int
     
     // Full result for restore
-    let result: CompatibilityResult?
+    var result: CompatibilityResult?
     
     // Chat messages from Ask Destiny
     var chatMessages: [CompatChatMessageData]
