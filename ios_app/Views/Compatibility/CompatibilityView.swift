@@ -199,10 +199,16 @@ struct CompatibilityView: View {
             SubscriptionView()
         }
         .sheet(isPresented: $showHistorySheet) {
-            CompatibilityHistorySheet { selectedItem in
-                showHistorySheet = false
-                viewModel.loadFromHistory(selectedItem)
-            }
+            CompatibilityHistorySheet(
+                onSelect: { selectedItem in
+                    showHistorySheet = false
+                    viewModel.loadFromHistory(selectedItem)
+                },
+                onGroupSelect: { selectedGroup in
+                    showHistorySheet = false
+                    viewModel.loadFromHistoryGroup(selectedGroup)
+                }
+            )
         }
         .sheet(isPresented: $showGenderSheet) {
             PremiumSelectionSheet(
