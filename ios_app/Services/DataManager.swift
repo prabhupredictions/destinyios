@@ -224,14 +224,41 @@ final class DataManager {
         try? context.save()
     }
     
-    /// Delete a thread and its messages
+    /// Delete a thread and its messages (local + server)
     func deleteThread(_ thread: LocalChatThread) {
-        let messages = fetchMessages(for: thread.id)
+        let threadId = thread.id
+        let messages = fetchMessages(for: threadId)
         for message in messages {
             context.delete(message)
         }
         context.delete(thread)
         try? context.save()
+        
+        // Also delete from server so it doesn't re-sync on login
+        deleteThreadFromServer(threadId: threadId)
+    }
+    
+    /// Fire-and-forget server-side thread deletion
+    private func deleteThreadFromServer(threadId: String) {
+        guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else { return }
+        
+        Task {
+            let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
+            guard let url = URL(string: urlString) else { return }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            
+            do {
+                let (_, response) = try await URLSession.shared.data(for: request)
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("[DataManager] Server delete thread \(threadId): HTTP \(httpResponse.statusCode)")
+                }
+            } catch {
+                print("[DataManager] Failed to delete server thread \(threadId): \(error)")
+            }
+        }
     }
     
     /// Delete ALL threads and messages for a user email
