@@ -31,9 +31,11 @@ struct CompatibilityView: View {
     
     // External callbacks/props
     var initialMatchItem: CompatibilityHistoryItem? = nil
+    var initialMatchGroup: ComparisonGroup? = nil
     var onShowResultChange: ((Bool) -> Void)? = nil
     
     @State private var hasHandledInitialMatch = false
+    @State private var hasHandledInitialGroup = false
     
     var body: some View {
         ZStack {
@@ -271,6 +273,17 @@ struct CompatibilityView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     viewModel.loadFromHistory(item)
                 }
+            }
+            if let group = initialMatchGroup, !hasHandledInitialGroup {
+                hasHandledInitialGroup = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    viewModel.loadFromHistoryGroup(group)
+                }
+            }
+        }
+        .onChange(of: initialMatchGroup) { oldValue, newValue in
+            if let group = newValue {
+                viewModel.loadFromHistoryGroup(group)
             }
         }
         .onChange(of: ProfileContextManager.shared.activeProfileId) { oldProfileId, newProfileId in

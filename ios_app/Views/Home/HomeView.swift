@@ -7,6 +7,7 @@ struct HomeView: View {
     var onQuestionSelected: ((String) -> Void)? = nil
     var onChatHistorySelected: ((String) -> Void)? = nil
     var onMatchHistorySelected: ((CompatibilityHistoryItem) -> Void)? = nil
+    var onMatchGroupHistorySelected: ((ComparisonGroup) -> Void)? = nil
     
     // MARK: - State
     @State private var viewModel = HomeViewModel()
@@ -272,7 +273,8 @@ struct HomeView: View {
         .sheet(isPresented: $showHistorySheet) {
             HistoryView(
                 onChatSelected: onChatHistorySelected,
-                onMatchSelected: onMatchHistorySelected
+                onMatchSelected: onMatchHistorySelected,
+                onMatchGroupSelected: onMatchGroupHistorySelected
             )
         }
         .sheet(isPresented: $showProfileSwitcher) {

@@ -99,7 +99,10 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
 
 // MARK: - Comparison Group
 /// Represents a group of related compatibility matches (1 user vs N partners)
-struct ComparisonGroup: Identifiable {
+struct ComparisonGroup: Identifiable, Equatable {
+    static func == (lhs: ComparisonGroup, rhs: ComparisonGroup) -> Bool {
+        lhs.id == rhs.id
+    }
     let id: String  // groupId
     let timestamp: Date
     let userName: String

@@ -768,6 +768,43 @@ class CompatibilityViewModel {
         }
     }
     
+    /// Load state from a history group (multi-partner comparison)
+    /// Reconstructs ComparisonResult array from the group's items and shows ComparisonOverviewView
+    func loadFromHistoryGroup(_ group: ComparisonGroup) {
+        // Set the user (boy) name from the group
+        boyName = group.userName
+        
+        // Convert each history item in the group to a ComparisonResult
+        var results: [ComparisonResult] = []
+        for item in group.items {
+            guard let savedResult = item.result else { continue }
+            
+            // Reconstruct PartnerData from history item
+            let partner = PartnerData(
+                name: item.girlName,
+                city: item.girlCity
+            )
+            
+            let compResult = ComparisonResult(
+                partner: partner,
+                result: savedResult
+            )
+            results.append(compResult)
+        }
+        
+        // Populate comparison results and show overview
+        if results.count > 1 {
+            comparisonResults = results
+            showComparisonOverview = true
+            showResult = false
+        } else if let single = results.first {
+            // Fallback for single item in group (shouldn't happen, but safe)
+            result = single.result
+            girlName = single.partner.name
+            showResult = true
+        }
+    }
+    
     /// Map SSE step name to AnalysisStep enum
     private func updateStep(_ stepName: String) {
         // Backend sends: calculate_charts, ashtakoot, mangal_compat, yoga_kalsarpa, formatting, llm

@@ -5,6 +5,7 @@ struct HistoryView: View {
 // MARK: - Callbacks
     var onChatSelected: ((String) -> Void)? = nil
     var onMatchSelected: ((CompatibilityHistoryItem) -> Void)? = nil
+    var onMatchGroupSelected: ((ComparisonGroup) -> Void)? = nil
     
     // MARK: - State
     @State private var viewModel = HistoryViewModel()
@@ -117,6 +118,8 @@ struct HistoryView: View {
                 onChatSelected?(thread.id)
             case .match(let matchItem):
                 onMatchSelected?(matchItem)
+            case .matchGroup(let group):
+                onMatchGroupSelected?(group)
             }
         }
     }
@@ -186,6 +189,9 @@ struct HistoryRowView: View {
         switch item {
         case .chat(let thread): return thread.title
         case .match(let match): return match.displayTitle
+        case .matchGroup(let group):
+            let partnerNames = group.items.map { $0.girlName }
+            return "\(group.userName) + \(partnerNames.joined(separator: ", "))"
         }
     }
     
@@ -193,6 +199,8 @@ struct HistoryRowView: View {
         switch item {
         case .chat(let thread): return thread.preview
         case .match(_): return "compatibility_match_subtitle".localized
+        case .matchGroup(let group):
+            return "Multi-match · \(group.items.count) partners compared"
         }
     }
     
@@ -202,6 +210,8 @@ struct HistoryRowView: View {
             return iconForArea(thread.primaryArea ?? "general")
         case .match:
             return "heart.fill"
+        case .matchGroup:
+            return "person.3.fill"
         }
     }
     
@@ -209,6 +219,7 @@ struct HistoryRowView: View {
         switch item {
         case .chat: return AppTheme.Colors.gold
         case .match: return Color(red: 0.96, green: 0.52, blue: 0.65) // Rose Gold equivalent
+        case .matchGroup: return Color(red: 0.75, green: 0.55, blue: 0.95) // Purple for groups
         }
     }
     
@@ -262,6 +273,26 @@ struct HistoryRowView: View {
                         .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                 }
+            }
+        case .matchGroup(let group):
+            // Display best score and partner count for groups
+            VStack(alignment: .trailing, spacing: 2) {
+                // Best score in the group
+                let bestItem = group.items.max(by: { $0.totalScore < $1.totalScore })
+                if let best = bestItem {
+                    Text("Best: \(best.totalScore)/\(best.maxScore)")
+                        .font(AppTheme.Fonts.title(size: 13))
+                        .foregroundColor(matchScoreColor(best.scorePercentage / 100))
+                }
+                
+                // Partner count badge
+                HStack(spacing: 3) {
+                    Image(systemName: "person.2.fill")
+                        .font(AppTheme.Fonts.caption(size: 9))
+                    Text("\(group.items.count)")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                }
+                .foregroundColor(Color(red: 0.75, green: 0.55, blue: 0.95))
             }
         }
     }

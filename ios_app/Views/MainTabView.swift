@@ -9,6 +9,7 @@ struct MainTabView: View {
     @State private var pendingQuestion: String? = nil
     @State private var pendingThreadId: String? = nil
     @State private var pendingMatchItem: CompatibilityHistoryItem? = nil
+    @State private var pendingMatchGroup: ComparisonGroup? = nil
     @State private var showMatchResult = false  // Track if match result is showing
     @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
@@ -39,6 +40,16 @@ struct MainTabView: View {
                                 showGuestSignInSheet = true
                             } else {
                                 pendingMatchItem = matchItem
+                                pendingMatchGroup = nil  // Clear any pending group
+                                selectedTab = 2 // Navigate to match
+                            }
+                        },
+                        onMatchGroupHistorySelected: { group in
+                            if isGuestUser {
+                                showGuestSignInSheet = true
+                            } else {
+                                pendingMatchGroup = group
+                                pendingMatchItem = nil  // Clear any pending single item
                                 selectedTab = 2 // Navigate to match
                             }
                         }
@@ -65,6 +76,7 @@ struct MainTabView: View {
                     } else {
                         CompatibilityView(
                             initialMatchItem: pendingMatchItem,
+                            initialMatchGroup: pendingMatchGroup,
                             onShowResultChange: { isShowing in
                                 withAnimation(.easeInOut(duration: 0.25)) {
                                     showMatchResult = isShowing
@@ -102,6 +114,7 @@ struct MainTabView: View {
         // Clear pending match state when switching profiles
         .onChange(of: ProfileContextManager.shared.activeProfileId) { _, _ in
             pendingMatchItem = nil
+            pendingMatchGroup = nil
             showMatchResult = false
         }
         .sheet(isPresented: $showAskSheet) {

@@ -5,11 +5,13 @@ import SwiftUI
 enum UnifiedHistoryItem: Identifiable {
     case chat(LocalChatThread)
     case match(CompatibilityHistoryItem)
+    case matchGroup(ComparisonGroup)
     
     var id: String {
         switch self {
         case .chat(let thread): return "chat_\(thread.id)"
         case .match(let item): return "match_\(item.sessionId)"
+        case .matchGroup(let group): return "group_\(group.id)"
         }
     }
     
@@ -17,6 +19,7 @@ enum UnifiedHistoryItem: Identifiable {
         switch self {
         case .chat(let thread): return thread.updatedAt
         case .match(let item): return item.timestamp
+        case .matchGroup(let group): return group.timestamp
         }
     }
 }
@@ -109,9 +112,9 @@ class HistoryViewModel {
             }
         }
         
-        // 2. Fetch Local Match History (these have full CompatibilityResult for proper navigation)
-        let localMatches = CompatibilityHistoryService.shared.loadAll()
-        let localMatchSessionIds = Set(localMatches.map { $0.sessionId })
+        // 2. Fetch Local Match History GROUPED (multi-partner support)
+        let localGroups = CompatibilityHistoryService.shared.loadGroups()
+        let localMatchSessionIds = Set(localGroups.flatMap { $0.items.map { $0.sessionId } })
         
         // 3. For compat_sess_ threads, PREFER local match items (they have full results + proper navigation)
         // Remove server chat items that have a matching local match item
@@ -133,8 +136,17 @@ class HistoryViewModel {
             return true
         }
         
-        // 4. All local matches are included (no filtering against server threads anymore)
-        let matchItems = localMatches.map { UnifiedHistoryItem.match($0) }
+        // 4. Convert groups to UnifiedHistoryItems
+        // Single-item groups → .match (unchanged behavior)
+        // Multi-item groups → .matchGroup (new grouped entry)
+        var matchItems: [UnifiedHistoryItem] = []
+        for group in localGroups {
+            if group.items.count > 1 {
+                matchItems.append(.matchGroup(group))
+            } else if let singleItem = group.items.first {
+                matchItems.append(.match(singleItem))
+            }
+        }
         
         print("[HistoryViewModel] Chat items: \(filteredChatItems.count), Local match items: \(matchItems.count)")
         
@@ -156,6 +168,8 @@ class HistoryViewModel {
                 dataManager.deleteThread(thread)
             case .match(let matchItem):
                 CompatibilityHistoryService.shared.delete(sessionId: matchItem.sessionId)
+            case .matchGroup(let group):
+                CompatibilityHistoryService.shared.deleteGroup(groupId: group.id)
             }
         }
         
