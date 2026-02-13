@@ -104,8 +104,9 @@ final class CompatibilityHistoryService {
     
     // MARK: - Save
     /// Saves a new history item for current user.
-    /// If the same person pair (by DOB+time) already exists, UPSERTS: updates timestamp, score, result, merges chat.
+    /// If the same person pair (by DOB+time) already exists as an UNGROUPED item, UPSERTS.
     /// If session already exists, updates it.
+    /// Multi-partner group items are NEVER upserted — each group member is a distinct analysis.
     func save(_ item: CompatibilityHistoryItem) {
         var items = loadAll()
         
@@ -113,14 +114,17 @@ final class CompatibilityHistoryService {
         if let existingIndex = items.firstIndex(where: { $0.sessionId == item.sessionId }) {
             items[existingIndex] = item
         }
-        // 2. Check for same person pair (upsert — prevents duplicate rows for same couple)
-        else if let existingIndex = findExistingMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime ?? "", girlDob: item.girlDob, girlTime: item.girlTime ?? "") {
+        // 2. For UNGROUPED items only: check for same person pair (upsert — prevents duplicate rows for same couple)
+        //    Skip this check if the new item belongs to a comparison group
+        else if item.comparisonGroupId == nil,
+                let existingIndex = findExistingMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime ?? "", girlDob: item.girlDob, girlTime: item.girlTime ?? "") {
             // Update existing entry: refresh timestamp, score, result; merge chat messages
             var existing = items[existingIndex]
             existing.timestamp = item.timestamp
             existing.totalScore = item.totalScore
             existing.maxScore = item.maxScore
             existing.result = item.result
+            // Preserve existing grouping fields — do NOT overwrite comparisonGroupId/partnerIndex
             // Merge chat messages: keep existing + add new unique ones
             let existingMsgIds = Set(existing.chatMessages.map { "\($0.isUser)_\($0.content)" })
             let newMsgs = item.chatMessages.filter { !existingMsgIds.contains("\($0.isUser)_\($0.content)") }
@@ -154,9 +158,13 @@ final class CompatibilityHistoryService {
         return items[index]
     }
     
-    /// Internal: finds the index of an existing match by pair (symmetric check).
+    /// Internal: finds the index of an existing UNGROUPED match by pair (symmetric check).
+    /// Items that belong to a comparison group are EXCLUDED — each group member is treated as a distinct analysis.
     private func findExistingMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
         return items.firstIndex { existing in
+            // Skip items that belong to a comparison group — never upsert group members
+            guard existing.comparisonGroupId == nil else { return false }
+            
             // Forward: same order
             let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
                            existing.girlDob == girlDob && existing.girlTime == girlTime
@@ -209,21 +217,32 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Server-Side Delete
-    /// Deletes compatibility threads from the server so they don't re-sync on login
+    /// Deletes compatibility threads from the server so they don't re-sync on login.
+    /// Uses direct URLSession (not ChatHistoryService) to avoid response-parsing failures.
     private func deleteFromServer(sessionIds: [String]) {
         guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else {
             print("[CompatibilityHistoryService] No user email — skipping server delete")
             return
         }
         
-        let service = ChatHistoryService()
         for sessionId in sessionIds {
-            // The server thread_id is the sessionId itself (already has compat_ prefix)
-            let threadId = sessionId
+            let threadId = sessionId  // Already has compat_ prefix
             Task {
+                let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
+                guard let url = URL(string: urlString) else {
+                    print("[CompatibilityHistoryService] Invalid delete URL for \(threadId)")
+                    return
+                }
+                
+                var request = URLRequest(url: url)
+                request.httpMethod = "DELETE"
+                request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+                
                 do {
-                    try await service.deleteThread(userID: email, threadID: threadId)
-                    print("[CompatibilityHistoryService] Deleted server thread: \(threadId)")
+                    let (_, response) = try await URLSession.shared.data(for: request)
+                    if let httpResponse = response as? HTTPURLResponse {
+                        print("[CompatibilityHistoryService] Server delete \(threadId): HTTP \(httpResponse.statusCode)")
+                    }
                 } catch {
                     print("[CompatibilityHistoryService] Failed to delete server thread \(threadId): \(error)")
                 }
