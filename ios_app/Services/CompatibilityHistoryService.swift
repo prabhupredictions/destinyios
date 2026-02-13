@@ -90,11 +90,16 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Delete Group
-    /// Deletes all items in a comparison group
+    /// Deletes all items in a comparison group (local + server)
     func deleteGroup(groupId: String) {
-        var items = loadAll()
-        items.removeAll { $0.comparisonGroupId == groupId || $0.sessionId == groupId }
-        persist(items)
+        let items = loadAll()
+        let toDelete = items.filter { $0.comparisonGroupId == groupId || $0.sessionId == groupId }
+        var remaining = items
+        remaining.removeAll { $0.comparisonGroupId == groupId || $0.sessionId == groupId }
+        persist(remaining)
+        
+        // Delete from server (fire and forget)
+        deleteFromServer(sessionIds: toDelete.map { $0.sessionId })
     }
     
     // MARK: - Save
@@ -182,19 +187,48 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Delete Single
-    /// Deletes a single history item by session ID
+    /// Deletes a single history item by session ID (local + server)
     func delete(sessionId: String) {
         var items = loadAll()
         items.removeAll { $0.sessionId == sessionId }
         persist(items)
+        
+        // Delete from server (fire and forget)
+        deleteFromServer(sessionIds: [sessionId])
     }
     
     // MARK: - Delete Multiple
-    /// Deletes multiple history items by session IDs
+    /// Deletes multiple history items by session IDs (local + server)
     func delete(sessionIds: Set<String>) {
         var items = loadAll()
         items.removeAll { sessionIds.contains($0.sessionId) }
         persist(items)
+        
+        // Delete from server (fire and forget)
+        deleteFromServer(sessionIds: Array(sessionIds))
+    }
+    
+    // MARK: - Server-Side Delete
+    /// Deletes compatibility threads from the server so they don't re-sync on login
+    private func deleteFromServer(sessionIds: [String]) {
+        guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else {
+            print("[CompatibilityHistoryService] No user email — skipping server delete")
+            return
+        }
+        
+        let service = ChatHistoryService()
+        for sessionId in sessionIds {
+            // The server thread_id is the sessionId itself (already has compat_ prefix)
+            let threadId = sessionId
+            Task {
+                do {
+                    try await service.deleteThread(userID: email, threadID: threadId)
+                    print("[CompatibilityHistoryService] Deleted server thread: \(threadId)")
+                } catch {
+                    print("[CompatibilityHistoryService] Failed to delete server thread \(threadId): \(error)")
+                }
+            }
+        }
     }
     
     // MARK: - Clear All
