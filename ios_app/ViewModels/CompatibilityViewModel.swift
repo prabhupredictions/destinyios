@@ -410,7 +410,8 @@ class CompatibilityViewModel {
         // STEP 1: Check local cache/history BEFORE calling API (FREE if found)
         // This avoids re-triggering LLM for same match pair — usage count only for NEW matches
         let dobFmt = DateFormatter()
-        dobFmt.dateFormat = "dd/MM/yyyy"
+        dobFmt.locale = Locale(identifier: "en_US_POSIX")
+        dobFmt.dateFormat = "yyyy-MM-dd"
         let timeFmt = DateFormatter()
         timeFmt.locale = Locale(identifier: "en_US_POSIX")
         timeFmt.dateFormat = "HH:mm:ss"
@@ -620,7 +621,8 @@ class CompatibilityViewModel {
             
             // Check if this partner match already exists in cache (FREE if found)
             let partnerDobFmt = DateFormatter()
-            partnerDobFmt.dateFormat = "dd/MM/yyyy"
+            partnerDobFmt.locale = Locale(identifier: "en_US_POSIX")
+            partnerDobFmt.dateFormat = "yyyy-MM-dd"
             let partnerTimeFmt = DateFormatter()
             partnerTimeFmt.locale = Locale(identifier: "en_US_POSIX")
             partnerTimeFmt.dateFormat = "HH:mm:ss"
@@ -640,6 +642,9 @@ class CompatibilityViewModel {
                         result: cachedCompatibilityResult
                     )
                     comparisonResults.append(cachedResult)
+                    
+                    // Save cached match as a group member so the group is complete in history
+                    saveToHistory(result: cachedCompatibilityResult, groupId: currentComparisonGroupId, partnerIndex: index)
                 }
                 continue  // Skip API call for this partner
             }
@@ -728,7 +733,14 @@ class CompatibilityViewModel {
         // Use compat_ prefix to match backend thread_id format
         let storageSessionId = sid.hasPrefix("compat_") ? sid : "compat_\(sid)"
         
-        // Format times for storage (HH:mm:ss format for backend compatibility)
+        // Format dates for storage (yyyy-MM-dd — matches API/server format)
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let boyDobStr = dateFormatter.string(from: boyBirthDate)
+        let girlDobStr = dateFormatter.string(from: girlBirthDate)
+        
+        // Format times for storage (HH:mm:ss format)
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US_POSIX")
         timeFormatter.dateFormat = "HH:mm:ss"
@@ -739,17 +751,17 @@ class CompatibilityViewModel {
             sessionId: storageSessionId,
             timestamp: Date(),
             boyName: boyName,
-            boyDob: formattedBoyDob,
+            boyDob: boyDobStr,
             boyTime: boyTimeStr,
             boyCity: boyCity,
             girlName: girlName,
-            girlDob: formattedGirlDob,
+            girlDob: girlDobStr,
             girlTime: girlTimeStr,
             girlCity: girlCity,
             totalScore: result.totalScore,
             maxScore: result.maxScore,
             result: result,
-            chatMessages: [], // Chat starts empty
+            chatMessages: [],
             comparisonGroupId: groupId,
             partnerIndex: partnerIndex
         )

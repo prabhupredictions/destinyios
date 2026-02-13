@@ -106,7 +106,7 @@ final class CompatibilityHistoryService {
     /// Saves a new history item for current user.
     /// If the same person pair (by DOB+time) already exists as an UNGROUPED item, UPSERTS.
     /// If session already exists, updates it.
-    /// Multi-partner group items are NEVER upserted — each group member is a distinct analysis.
+    /// Group items (comparisonGroupId != nil) are always inserted as new entries.
     func save(_ item: CompatibilityHistoryItem) {
         var items = loadAll()
         
@@ -114,17 +114,16 @@ final class CompatibilityHistoryService {
         if let existingIndex = items.firstIndex(where: { $0.sessionId == item.sessionId }) {
             items[existingIndex] = item
         }
-        // 2. For UNGROUPED items only: check for same person pair (upsert — prevents duplicate rows for same couple)
-        //    Skip this check if the new item belongs to a comparison group
+        // 2. For UNGROUPED items only: upsert by person pair (prevents duplicate rows for same couple)
+        //    Group items skip this — each group member is a distinct entry
         else if item.comparisonGroupId == nil,
-                let existingIndex = findExistingMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime ?? "", girlDob: item.girlDob, girlTime: item.girlTime ?? "") {
+                let existingIndex = findUngroupedMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime, girlDob: item.girlDob, girlTime: item.girlTime) {
             // Update existing entry: refresh timestamp, score, result; merge chat messages
             var existing = items[existingIndex]
             existing.timestamp = item.timestamp
             existing.totalScore = item.totalScore
             existing.maxScore = item.maxScore
             existing.result = item.result
-            // Preserve existing grouping fields — do NOT overwrite comparisonGroupId/partnerIndex
             // Merge chat messages: keep existing + add new unique ones
             let existingMsgIds = Set(existing.chatMessages.map { "\($0.isUser)_\($0.content)" })
             let newMsgs = item.chatMessages.filter { !existingMsgIds.contains("\($0.isUser)_\($0.content)") }
@@ -134,7 +133,7 @@ final class CompatibilityHistoryService {
             let updated = items.remove(at: existingIndex)
             items.insert(updated, at: 0)
         }
-        // 3. Brand new pair — insert at beginning
+        // 3. Brand new pair or group member — insert at beginning
         else {
             items.insert(item, at: 0)
         }
@@ -148,27 +147,37 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Find Existing Match (pair-symmetric)
-    /// Checks if a match with the same person pair exists, checking BOTH orderings (A,B) and (B,A).
-    /// Returns the matching history item if found.
+    /// Checks if a match with the same person pair exists in ANY item (grouped or ungrouped),
+    /// checking BOTH orderings (A,B) and (B,A). Returns the most recent matching item.
     func findExistingMatch(boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> CompatibilityHistoryItem? {
         let items = loadAll()
-        guard let index = findExistingMatchIndex(in: items, boyDob: boyDob, boyTime: boyTime, girlDob: girlDob, girlTime: girlTime) else {
+        guard let index = findMatchIndex(in: items, boyDob: boyDob, boyTime: boyTime, girlDob: girlDob, girlTime: girlTime) else {
             return nil
         }
         return items[index]
     }
     
-    /// Internal: finds the index of an existing UNGROUPED match by pair (symmetric check).
-    /// Items that belong to a comparison group are EXCLUDED — each group member is treated as a distinct analysis.
-    private func findExistingMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
+    /// Finds the index of ANY matching item by person pair (symmetric check).
+    /// Searches ALL items — grouped and ungrouped — for cache purposes.
+    private func findMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
         return items.firstIndex { existing in
-            // Skip items that belong to a comparison group — never upsert group members
-            guard existing.comparisonGroupId == nil else { return false }
-            
             // Forward: same order
             let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
                            existing.girlDob == girlDob && existing.girlTime == girlTime
             // Reverse: swapped roles
+            let reverse = existing.boyDob == girlDob && existing.boyTime == girlTime &&
+                           existing.girlDob == boyDob && existing.girlTime == boyTime
+            return forward || reverse
+        }
+    }
+    
+    /// Finds index of an UNGROUPED match only — used by save() to upsert standalone items
+    /// without corrupting group entries.
+    private func findUngroupedMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
+        return items.firstIndex { existing in
+            guard existing.comparisonGroupId == nil else { return false }
+            let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
+                           existing.girlDob == girlDob && existing.girlTime == girlTime
             let reverse = existing.boyDob == girlDob && existing.boyTime == girlTime &&
                            existing.girlDob == boyDob && existing.girlTime == boyTime
             return forward || reverse
@@ -461,8 +470,8 @@ final class CompatibilityHistoryService {
                     var girlName = "Partner"
                     var boyDob = ""
                     var girlDob = ""
-                    var boyTime: String? = nil
-                    var girlTime: String? = nil
+                    var boyTime = "12:00:00"
+                    var girlTime = "12:00:00"
                     var boyCity = ""
                     var girlCity = ""
                     var totalScore = 0
