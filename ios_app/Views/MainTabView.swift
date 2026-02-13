@@ -111,6 +111,14 @@ struct MainTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
             isKeyboardVisible = false
         }
+        // Clear pending match state when navigating away from Match tab
+        .onChange(of: selectedTab) { oldTab, newTab in
+            if oldTab == 2 && newTab != 2 {
+                pendingMatchItem = nil
+                pendingMatchGroup = nil
+                showMatchResult = false
+            }
+        }
         // Clear pending match state when switching profiles
         .onChange(of: ProfileContextManager.shared.activeProfileId) { _, _ in
             pendingMatchItem = nil
