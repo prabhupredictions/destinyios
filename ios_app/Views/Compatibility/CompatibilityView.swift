@@ -272,6 +272,7 @@ struct CompatibilityView: View {
                 
                 // Parse and set date
                 let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 if let date = dateFormatter.date(from: partner.dateOfBirth) {
                     viewModel.girlBirthDate = date
@@ -280,6 +281,7 @@ struct CompatibilityView: View {
                 // Parse and set time if available
                 if let timeString = partner.timeOfBirth {
                     let timeFormatter = DateFormatter()
+                    timeFormatter.locale = Locale(identifier: "en_US_POSIX")
                     timeFormatter.dateFormat = "HH:mm"
                     if let time = timeFormatter.date(from: timeString) {
                         viewModel.girlBirthTime = time

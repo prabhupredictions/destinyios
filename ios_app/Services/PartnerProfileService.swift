@@ -79,6 +79,10 @@ class PartnerProfileService {
             throw PartnerProfileError.invalidResponse
         }
         
+        if httpResponse.statusCode == 409 {
+            throw PartnerProfileError.duplicateProfile
+        }
+        
         guard httpResponse.statusCode == 200 else {
             throw PartnerProfileError.serverError(statusCode: httpResponse.statusCode)
         }
@@ -245,6 +249,7 @@ enum PartnerProfileError: Error, LocalizedError {
     case serverError(statusCode: Int)
     case decodingError
     case notFound
+    case duplicateProfile
     
     var errorDescription: String? {
         switch self {
@@ -253,6 +258,7 @@ enum PartnerProfileError: Error, LocalizedError {
         case .serverError(let code): return "Server error: \(code)"
         case .decodingError: return "Failed to decode response"
         case .notFound: return "Partner not found"
+        case .duplicateProfile: return "A profile with this birth data already exists."
         }
     }
 }

@@ -129,9 +129,21 @@ struct HistoryView: View {
             case .chat(let thread):
                 onChatSelected?(thread.id)
             case .match(let matchItem):
-                onMatchSelected?(matchItem)
+                // Load full data on-demand (lightweight items have result stripped)
+                let fullItem = CompatibilityHistoryService.shared.get(sessionId: matchItem.sessionId) ?? matchItem
+                onMatchSelected?(fullItem)
             case .matchGroup(let group):
-                onMatchGroupSelected?(group)
+                // Load full data for each item in the group
+                let fullItems = group.items.compactMap { lite in
+                    CompatibilityHistoryService.shared.get(sessionId: lite.sessionId) ?? lite
+                }
+                let fullGroup = ComparisonGroup(
+                    id: group.id,
+                    timestamp: group.timestamp,
+                    userName: group.userName,
+                    items: fullItems
+                )
+                onMatchGroupSelected?(fullGroup)
             }
         }
     }

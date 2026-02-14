@@ -133,13 +133,13 @@ class CompatibilityViewModel {
     // MARK: - Formatted Date Strings
     var formattedBoyDob: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.dateStyle = .medium
         return formatter.string(from: boyBirthDate)
     }
     
     var formattedGirlDob: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.dateStyle = .medium
         return formatter.string(from: girlBirthDate)
     }
     
@@ -177,6 +177,7 @@ class CompatibilityViewModel {
             
             // Parse date
             let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
             dateFormatter.dateFormat = "yyyy-MM-dd"
             if let date = dateFormatter.date(from: profileBirthData.dob) {
                 boyBirthDate = date
@@ -326,6 +327,7 @@ class CompatibilityViewModel {
         
         // Parse date
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd"
         if let date = dateFormatter.date(from: partner.dateOfBirth) {
             partnerData.birthDate = date

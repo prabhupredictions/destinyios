@@ -76,10 +76,12 @@ final class PartnerProfile: Identifiable {
     /// Format date of birth for display
     var formattedDateOfBirth: String {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
         if let date = formatter.date(from: dateOfBirth) {
-            formatter.dateFormat = "dd MMM yyyy"
-            return formatter.string(from: date)
+            let displayFormatter = DateFormatter()
+            displayFormatter.dateStyle = .medium
+            return displayFormatter.string(from: date)
         }
         return dateOfBirth
     }
