@@ -12,6 +12,9 @@ struct CompatibilityView: View {
     @State private var showPartnerPicker = false
     @State private var savePartnerForFuture = false
     
+    // Focus State for Name Field
+    @FocusState private var isNameFocused: Bool
+    
     // Picker States
     @State private var showBoyDatePicker = false
     @State private var showBoyTimePicker = false
@@ -598,10 +601,14 @@ struct CompatibilityView: View {
                         TextField("", text: $viewModel.girlName)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(AppTheme.Colors.textPrimary)
+                            .focused($isNameFocused)
                     }
                     
                     // Search icon to open saved partners
-                    Button(action: { showPartnerPicker = true }) {
+                    Button(action: { 
+                        isNameFocused = false
+                        showPartnerPicker = true 
+                    }) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
@@ -620,6 +627,7 @@ struct CompatibilityView: View {
                 // Gender Selection (Compact Button triggering Sheet)
                 Button(action: { 
                     HapticManager.shared.play(.light)
+                    isNameFocused = false
                     showGenderSheet = true 
                 }) {
                     HStack(spacing: 6) {
@@ -651,7 +659,10 @@ struct CompatibilityView: View {
             // Date & Time Row
             HStack(spacing: 10) {
                 // Date Button
-                Button(action: { showGirlDatePicker = true }) {
+                Button(action: { 
+                    isNameFocused = false
+                    showGirlDatePicker = true 
+                }) {
                     HStack(spacing: 6) {
                         Image(systemName: "calendar")
                             .font(.system(size: 12))
@@ -676,6 +687,7 @@ struct CompatibilityView: View {
                 // Time Button
                 Button(action: { 
                     if !viewModel.partnerTimeUnknown {
+                        isNameFocused = false
                         showGirlTimePicker = true 
                     }
                 }) {
@@ -704,7 +716,10 @@ struct CompatibilityView: View {
             }
             
             // Place Button (full width) - Moved UP for better vertical flow
-            Button(action: { showGirlLocationSearch = true }) {
+            Button(action: { 
+                isNameFocused = false
+                showGirlLocationSearch = true 
+            }) {
                 HStack(spacing: 6) {
                     Image(systemName: "location")
                         .font(.system(size: 12))
@@ -735,6 +750,7 @@ struct CompatibilityView: View {
                     // Time Unknown Toggle
                     Button(action: {
                         HapticManager.shared.play(.light)
+                        isNameFocused = false
                         withAnimation { viewModel.partnerTimeUnknown.toggle() }
                     }) {
                         HStack(spacing: 6) {

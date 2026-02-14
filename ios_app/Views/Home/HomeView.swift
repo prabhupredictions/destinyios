@@ -166,7 +166,7 @@ struct HomeView: View {
                     brief: selected.status.brief,
                     iconName: iconName(for: selected.area),
                     onAskMore: {
-                        let contextualQuestion = "You predicted: '\(selected.status.brief)' for my \(selected.area) today. Can you provide more detailed insights and guidance?"
+                        let contextualQuestion = "Today's forecast mentions: '\(selected.status.brief)' for my \(selected.area). Can you elaborate on what this means for me?"
                         selectedLifeArea = nil
                         onQuestionSelected?(contextualQuestion)
                     },

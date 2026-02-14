@@ -9,8 +9,8 @@ struct CompatibilityStreamingView: View {
     
     var body: some View {
         ZStack {
-            // Blurred background
-            Color.black.opacity(0.6)
+            // Dark overlay
+            Color.black.opacity(0.7)
                 .ignoresSafeArea()
             
             // Main content card
@@ -19,11 +19,11 @@ struct CompatibilityStreamingView: View {
                 HStack {
                     Image(systemName: "sparkles")
                         .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundColor(Color("GoldAccent"))
+                        .foregroundColor(AppTheme.Colors.gold)
                     
                     Text("analyzing_match".localized)
                         .font(AppTheme.Fonts.title(size: 17))
-                        .foregroundColor(Color("NavyPrimary"))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     Spacer()
                 }
@@ -32,6 +32,7 @@ struct CompatibilityStreamingView: View {
                 .padding(.bottom, 16)
                 
                 Divider()
+                    .background(AppTheme.Colors.gold.opacity(0.3))
                     .padding(.horizontal, 16)
                 
                 // Steps list
@@ -58,8 +59,12 @@ struct CompatibilityStreamingView: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.15), radius: 30, y: 10)
+                    .fill(AppTheme.Colors.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(AppTheme.Colors.goldDim.opacity(0.3), lineWidth: 1)
+                    )
+                    .shadow(color: AppTheme.Colors.gold.opacity(0.2), radius: 20)
             )
             .padding(.horizontal, 24)
         }
@@ -125,15 +130,15 @@ struct StepRowView: View {
                 if isCompleted {
                     Image(systemName: "checkmark")
                         .font(AppTheme.Fonts.title(size: 14))
-                        .foregroundColor(.green)
+                        .foregroundColor(AppTheme.Colors.success)
                 } else if isActive {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("GoldAccent")))
+                        .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
                         .scaleEffect(0.7)
                 } else {
                     Image(systemName: step.icon)
                         .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(Color("NavyPrimary").opacity(0.3))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                 }
             }
             
@@ -146,7 +151,7 @@ struct StepRowView: View {
                 if isActive {
                     Text("processing".localized)
                         .font(AppTheme.Fonts.caption(size: 11))
-                        .foregroundColor(Color("GoldAccent"))
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
             }
             
@@ -156,25 +161,25 @@ struct StepRowView: View {
             if isCompleted {
                 Text("✓")
                     .font(AppTheme.Fonts.title(size: 12))
-                    .foregroundColor(.green)
+                    .foregroundColor(AppTheme.Colors.success)
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
-        .background(isActive ? Color("GoldAccent").opacity(0.05) : Color.clear)
+        .background(isActive ? AppTheme.Colors.gold.opacity(0.1) : Color.clear)
         .animation(.easeInOut(duration: 0.3), value: isActive)
     }
     
     private var statusColor: Color {
-        if isCompleted { return .green }
-        if isActive { return Color("GoldAccent") }
-        return Color("NavyPrimary").opacity(0.1)
+        if isCompleted { return AppTheme.Colors.success }
+        if isActive { return AppTheme.Colors.gold }
+        return AppTheme.Colors.textTertiary
     }
     
     private var textColor: Color {
-        if isCompleted { return Color("NavyPrimary") }
-        if isActive { return Color("NavyPrimary") }
-        return Color("NavyPrimary").opacity(0.4)
+        if isCompleted { return AppTheme.Colors.textPrimary }
+        if isActive { return AppTheme.Colors.textPrimary }
+        return AppTheme.Colors.textTertiary
     }
 }
 
@@ -189,22 +194,22 @@ struct StreamingTextView: View {
             HStack(spacing: 6) {
                 Image(systemName: "brain.head.profile")
                     .font(AppTheme.Fonts.caption(size: 12))
-                    .foregroundColor(Color("GoldAccent"))
+                    .foregroundColor(AppTheme.Colors.gold)
                 
                 Text("AI Analysis")
                     .font(AppTheme.Fonts.title(size: 11))
-                    .foregroundColor(Color("GoldAccent"))
+                    .foregroundColor(AppTheme.Colors.gold)
             }
             
             HStack(alignment: .bottom, spacing: 0) {
                 Text(text)
                     .font(AppTheme.Fonts.body(size: 13))
-                    .foregroundColor(Color("NavyPrimary"))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
                     .lineSpacing(4)
                 
                 // Blinking cursor
                 Rectangle()
-                    .fill(Color("GoldAccent"))
+                    .fill(AppTheme.Colors.gold)
                     .frame(width: 2, height: 14)
                     .opacity(cursorVisible ? 1 : 0)
                     .animation(.easeInOut(duration: 0.5).repeatForever(), value: cursorVisible)
@@ -214,10 +219,10 @@ struct StreamingTextView: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.98, green: 0.98, blue: 0.99))
+                .fill(AppTheme.Colors.inputBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color("GoldAccent").opacity(0.2), lineWidth: 1)
+                        .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                 )
         )
     }

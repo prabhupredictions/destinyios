@@ -99,9 +99,10 @@ struct ChatView: View {
             SubscriptionView()
         }
         .onChange(of: initialQuestion) { oldValue, newValue in
-            // When we receive an initial question, send it immediately
-            if let question = newValue, !question.isEmpty, !hasHandledInitialQuestion {
+            // Every new question from Home always starts a fresh chat
+            if let question = newValue, !question.isEmpty, question != oldValue {
                 hasHandledInitialQuestion = true
+                viewModel.startNewChat()
                 viewModel.inputText = question
                 Task {
                     await viewModel.sendMessage()
@@ -123,9 +124,10 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            // Handle initial question on first appear
+            // Handle initial question on first appear — always in a NEW chat
             if let question = initialQuestion, !question.isEmpty, !hasHandledInitialQuestion {
                 hasHandledInitialQuestion = true
+                viewModel.startNewChat()
                 viewModel.inputText = question
                 Task {
                     await viewModel.sendMessage()
