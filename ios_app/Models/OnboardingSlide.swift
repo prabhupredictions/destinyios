@@ -68,12 +68,17 @@ struct OnboardingFeature: Identifiable {
         OnboardingFeature(
             icon: "heart.fill",
             title: "Compatibility matching",
-            description: "Compare birth charts and explore relationships"
+            description: "Match birth charts with a partner to explore relationship and marriage potential"
         ),
         OnboardingFeature(
             icon: "clock.arrow.circlepath",
             title: "Chat history",
             description: "Resume past conversations anytime"
+        ),
+        OnboardingFeature(
+            icon: "bell.fill",
+            title: "Custom astrological alerts",
+            description: "Get notified on favorable days based on your chart and preferences"
         )
     ]
 }
