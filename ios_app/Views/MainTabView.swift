@@ -63,7 +63,8 @@ struct MainTabView: View {
                             pendingThreadId = nil
                         },
                         initialQuestion: pendingQuestion,
-                        initialThreadId: pendingThreadId
+                        initialThreadId: pendingThreadId,
+                        starterQuestions: homeViewModel.suggestedQuestions
                     )
                 case 2:
                     // Guest users cannot access Match tab - show sign-in prompt

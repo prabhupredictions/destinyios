@@ -167,7 +167,7 @@
 "select_time" = "Select Time";
 "select_gender" = "Select Gender";
 "partner_birth_time_unknown" = "I don't know partner's birth time";
-"birth_time_warning" = "Note: Results may be less accurate without exact birth time";
+"birth_time_warning" = "Without an exact birth time, the quality of insights may be affected";
 
 // MARK: - Auth & Legal
 "or" = "or";

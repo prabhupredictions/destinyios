@@ -9,8 +9,8 @@ class ChatViewModel {
     var messages: [LocalChatMessage] = []
     var isLoading = false
     var isStreaming = false
-    var streamingContent = ""  // For typewriter effect on final answer
-    var thinkingSteps: [ThinkingStep] = []  // Claude-like thinking display
+    var streamingContent = ""
+    var thinkingSteps: [ThinkingStep] = []
     var errorMessage: String?
     var inputText = ""
     var chatHistory: [LocalChatThread] = []
@@ -18,14 +18,12 @@ class ChatViewModel {
     var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     var showQuotaSheet = false
     var quotaDetails: String?
+    var typewriterMessageId: String?  // Message currently being typewritten
     
     // Current session/thread
     var currentSessionId: String = ""
     var currentThreadId: String = ""
     var userEmail: String = ""
-    
-    // MARK: - Streaming State
-    private var streamingMessageId: String?
     
     // MARK: - Dependencies
     private let predictionService: PredictionServiceProtocol
@@ -130,7 +128,7 @@ class ChatViewModel {
         dataManager.saveMessage(welcome)
     }
     
-    // MARK: - Send Message with SSE Streaming
+    // MARK: - Send Message (Non-Streaming — matches compat chat pattern)
     func sendMessage() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
@@ -138,13 +136,9 @@ class ChatViewModel {
         // Clear input and reset state immediately
         inputText = ""
         errorMessage = nil
-        thinkingSteps = []  // Reset thinking steps
-        streamingContent = ""  // Reset so typing indicator shows
+        suggestedQuestions = []
         
-        // Add user message
-        // Check quota before proceeding
         let currentEmail = userEmail
-        
         
         // Add user message immediately for responsiveness
         let userMessage = LocalChatMessage(
@@ -156,14 +150,12 @@ class ChatViewModel {
         dataManager.saveMessage(userMessage)
         
         isLoading = true
-        isStreaming = true
         
         // Verify quota with backend
         do {
             let accessResponse = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: currentEmail)
             if !accessResponse.canAccess {
                 isLoading = false
-                isStreaming = false
                 
                 // Remove message
                 if let idx = messages.lastIndex(where: { $0.id == userMessage.id }) {
@@ -171,11 +163,7 @@ class ChatViewModel {
                     dataManager.deleteMessage(userMessage)
                 }
                 
-                // Detailed Error Handling - Professional Quota UI
-                // Daily limit: Red banner only (temporary)
-                // Overall limit / Feature not available: Bottom sheet only (upgrade prompt)
                 if accessResponse.reason == "daily_limit_reached" {
-                    // DAILY LIMIT: Show red banner only, no sheet
                     if let resetAtStr = accessResponse.resetAt,
                        let date = ISO8601DateFormatter().date(from: resetAtStr) {
                         let timeFormatter = DateFormatter()
@@ -185,18 +173,14 @@ class ChatViewModel {
                     } else {
                         errorMessage = "Daily limit reached. Resets tomorrow."
                     }
-                    // No sheet for daily limit - just banner
                 } else if accessResponse.reason == "overall_limit_reached" {
-                    // OVERALL LIMIT: Show bottom sheet only, no banner
                     if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
-                        // Guest users should only see Sign In option (no subscribe)
                         quotaDetails = "sign_in_to_continue_asking".localized
                     } else {
                         quotaDetails = "You've reached your free limit. Subscribe for unlimited access."
                     }
                     showQuotaSheet = true
                 } else {
-                    // FEATURE NOT AVAILABLE: Show bottom sheet only
                     quotaDetails = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
                     showQuotaSheet = true
                 }
@@ -206,30 +190,12 @@ class ChatViewModel {
             print("Quota check failed: \(error)")
         }
         
-        // Usage is recorded server-side by /predict endpoint via check_and_reserve()
-        
-        isLoading = true
-        isStreaming = true
-        
         // Get birth data
         guard let birthData = loadBirthData() else {
             errorMessage = "Please complete your birth data first"
             isLoading = false
-            isStreaming = false
             return
         }
-        
-        // Create streaming placeholder
-        let streamingId = UUID().uuidString
-        let placeholderMessage = LocalChatMessage(
-            id: streamingId,
-            threadId: currentThreadId,
-            role: .assistant,
-            content: "",
-            isStreaming: true
-        )
-        messages.append(placeholderMessage)
-        streamingMessageId = streamingId
         
         let request = PredictionRequest(
             query: query,
@@ -239,85 +205,32 @@ class ChatViewModel {
             userEmail: userEmail
         )
         
-        var finalAnswer = ""
-        var response: PredictionResponse?
-        
-        // Use SSE streaming for real-time progress
+        // Non-streaming API call (server records quota + chat history)
         do {
-            try await StreamingPredictionService.shared.predictStream(request: request) { [weak self] event in
-                guard let self = self else { return }
-                
-                switch event {
-                case .thought(let step, let content, let display):
-                    self.thinkingSteps.append(ThinkingStep(step: step, type: .thought, display: display, content: content))
-                    
-                case .action(let step, let tool, _):
-                    let toolDisplay = self.friendlyToolName(tool)
-                    self.thinkingSteps.append(ThinkingStep(step: step, type: .action, display: toolDisplay, content: nil))
-                    
-                case .observation(let step, let display):
-                    self.thinkingSteps.append(ThinkingStep(step: step, type: .observation, display: display, content: nil))
-                    
-                case .finalAnswer(let content):
-                    finalAnswer = content
-                    self.isLoading = false
-                    
-                case .answer(let resp):
-                    response = resp
-                    
-                case .done:
-                    break
-                    
-                case .error(let message):
-                    self.errorMessage = message
-                }
-            }
+            let resp = try await predictionService.predict(request: request)
             
-            // Stream complete - typewriter the answer
-            if let index = messages.firstIndex(where: { $0.id == streamingId }) {
-                messages[index].area = response?.lifeArea ?? ""
-                messages[index].confidence = response?.confidenceLabel ?? ""
-                messages[index].executionTimeMs = response?.executionTimeMs ?? 0
-                messages[index].traceId = response?.predictionId  // Link for rating sync
-                
-                await streamWords(finalAnswer, messageId: streamingId)
-                
-                messages[index].content = finalAnswer
-                messages[index].isStreaming = false
-                dataManager.saveMessage(messages[index])
-            }
+            // Add AI message with full content
+            let aiMessage = LocalChatMessage(
+                threadId: currentThreadId,
+                role: .assistant,
+                content: resp.answer,
+                area: resp.lifeArea,
+                confidence: resp.confidenceLabel,
+                traceId: resp.predictionId,
+                executionTimeMs: resp.executionTimeMs
+            )
+            typewriterMessageId = aiMessage.id  // Trigger typewriter in MessageBubble
+            messages.append(aiMessage)
+            dataManager.saveMessage(aiMessage)
             
-            suggestedQuestions = response?.followUpSuggestions ?? []
+            suggestedQuestions = resp.followUpSuggestions
             
         } catch {
-            // Fallback to non-streaming API
-            print("[SSE] Fallback: \(error)")
-            thinkingSteps = []
-            
-            do {
-                let resp = try await predictionService.predict(request: request)
-                
-                if let index = messages.firstIndex(where: { $0.id == streamingId }) {
-                    messages[index].area = resp.lifeArea
-                    messages[index].confidence = resp.confidenceLabel
-                    messages[index].executionTimeMs = resp.executionTimeMs
-                    messages[index].traceId = resp.predictionId  // Link for rating sync
-                    await streamWords(resp.answer, messageId: streamingId)
-                    messages[index].content = resp.answer
-                    messages[index].isStreaming = false
-                    dataManager.saveMessage(messages[index])
-                }
-                suggestedQuestions = resp.followUpSuggestions
-            } catch {
-                messages.removeAll { $0.id == streamingId }
-                errorMessage = "Failed to get response. Please try again."
-            }
+            print("[Predict] Error: \(error)")
+            errorMessage = "Failed to get response. Please try again."
         }
         
-        isStreaming = false
         isLoading = false
-        streamingMessageId = nil
-        thinkingSteps = []
     }
     
     // Format tool names for display — user-friendly cosmic text
@@ -454,7 +367,7 @@ class ChatViewModel {
     
     
     var canSend: Bool {
-        !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming
+        !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading
     }
     
     /// Check if user can ask another question (uses server-synced state)

@@ -768,7 +768,7 @@ struct CompatibilityView: View {
                 }
                 
                 if viewModel.partnerTimeUnknown {
-                    Text("Note: Analysis accuracy may be reduced without an exact birth time.")
+                    Text("birth_time_warning".localized)
                         .font(AppTheme.Fonts.caption(size: 11))
                         .foregroundColor(AppTheme.Colors.warning)
                         .fixedSize(horizontal: false, vertical: true)

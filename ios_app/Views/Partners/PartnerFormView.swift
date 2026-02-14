@@ -140,7 +140,7 @@ struct PartnerFormView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(birthTimeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                     
-                                    Text("I don't know the birth time")
+                                    Text("partner_birth_time_unknown".localized)
                                         .font(AppTheme.Fonts.body(size: 14))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
                                     
@@ -150,7 +150,7 @@ struct PartnerFormView: View {
                             }
                             
                             if birthTimeUnknown {
-                                Text("Note: Analysis accuracy may be reduced without an exact birth time.")
+                                Text("birth_time_warning".localized)
                                     .font(AppTheme.Fonts.caption(size: 11))
                                     .foregroundColor(AppTheme.Colors.warning)
                                     .frame(maxWidth: .infinity, alignment: .leading)

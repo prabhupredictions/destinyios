@@ -222,84 +222,119 @@ struct BirthDataView: View {
                 isFocused: $isNameFocused
             )
             
-            // Date of Birth
-                PremiumSelectionRow(
-                    icon: "calendar",
-                    title: "date_of_birth".localized,
-                    value: viewModel.formattedDate,
-                    isPlaceholder: !viewModel.isDateSelected
-                ) {
+            // Date & Time Row (Compact)
+            HStack(spacing: 12) {
+                // Date Button
+                Button(action: {
                     isNameFocused = false
                     showDatePicker = true
-                }
-                
-                // Time of Birth
-                VStack(spacing: 12) {
-                    PremiumSelectionRow(
-                        icon: "clock",
-                        title: "time_of_birth".localized,
-                        value: viewModel.formattedTime,
-                        isDisabled: viewModel.timeUnknown,
-                        isPlaceholder: !viewModel.isTimeSelected && !viewModel.timeUnknown
-                    ) {
-                        isNameFocused = false
-                        hideKeyboard()
-                        if !viewModel.timeUnknown {
-                            showTimePicker = true
-                        }
-                    }
-                    
-                    // Time unknown toggle
-                    HStack {
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                viewModel.timeUnknown.toggle()
-                            }
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: viewModel.timeUnknown ? "checkmark.square.fill" : "square")
-                                    .font(AppTheme.Fonts.title(size: 18))
-                                    .foregroundColor(viewModel.timeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                                
-                                Text("i_dont_know_birth_time".localized)
-                                    .font(AppTheme.Fonts.body(size: 13))
-                                    .foregroundColor(AppTheme.Colors.textSecondary)
-                            }
-                        }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 14))
+                            .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
+                        Text(viewModel.isDateSelected ? viewModel.formattedDate : "select_date".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(viewModel.isDateSelected ? AppTheme.Colors.textPrimary : AppTheme.Colors.textTertiary)
+                            .lineLimit(1)
                         Spacer()
                     }
-                    .padding(.leading, 4)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 12)
+                    .background(AppTheme.Colors.inputBackground)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                    )
                 }
                 
-                // Place of Birth (with location search)
-                PremiumSelectionRow(
-                    icon: "location",
-                    title: "place_of_birth".localized,
-                    value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth,
-                    isPlaceholder: viewModel.cityOfBirth.isEmpty
-                ) {
+                // Time Button
+                Button(action: {
                     isNameFocused = false
-                    showLocationSearch = true
+                    hideKeyboard()
+                    if !viewModel.timeUnknown {
+                        showTimePicker = true
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock")
+                            .font(.system(size: 14))
+                            .foregroundColor(viewModel.timeUnknown ? AppTheme.Colors.textTertiary : AppTheme.Colors.gold.opacity(0.8))
+                        Text(viewModel.timeUnknown ? "birth_time_unknown".localized : (viewModel.isTimeSelected ? viewModel.formattedTime : "select_time".localized))
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor((viewModel.timeUnknown || !viewModel.isTimeSelected) ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 12)
+                    .background(AppTheme.Colors.inputBackground.opacity(viewModel.timeUnknown ? 0.5 : 1))
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                    )
+                }
+                .disabled(viewModel.timeUnknown)
+            }
+            
+            // Time Unknown Toggle
+            VStack(alignment: .leading, spacing: 6) {
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        viewModel.timeUnknown.toggle()
+                    }
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: viewModel.timeUnknown ? "checkmark.square.fill" : "square")
+                            .font(AppTheme.Fonts.title(size: 18))
+                            .foregroundColor(viewModel.timeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                        
+                        Text("i_dont_know_birth_time".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                    }
                 }
                 
-                // Gender Identity (Mandatory)
-                // Gender Identity (Mandatory)
-                PremiumSelectionRow(
-                    icon: "person",
-                    title: "gender_identity".localized,
-                    value: viewModel.gender.isEmpty ? "select_gender".localized : (
-                        // Map value to localized label
-                        ["male": "male".localized, 
-                         "female": "female".localized, 
-                         "non-binary": "non_binary".localized, 
-                         "prefer_not_to_say": "prefer_not_to_say".localized][viewModel.gender] ?? viewModel.gender
-                    ),
-                    isPlaceholder: viewModel.gender.isEmpty
-                ) {
-                   isNameFocused = false
-                   showGenderSheet = true
+                if viewModel.timeUnknown {
+                    Text("birth_time_warning".localized)
+                        .font(AppTheme.Fonts.caption(size: 12))
+                        .foregroundColor(AppTheme.Colors.warning)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.leading, 26) // Align with text
                 }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Place of Birth (with location search)
+            PremiumSelectionRow(
+                icon: "location",
+                title: "place_of_birth".localized,
+                value: viewModel.cityOfBirth.isEmpty ? "select_birth_city".localized : viewModel.cityOfBirth,
+                isPlaceholder: viewModel.cityOfBirth.isEmpty
+            ) {
+                isNameFocused = false
+                showLocationSearch = true
+            }
+            
+            // Gender Identity (Mandatory)
+            PremiumSelectionRow(
+                icon: "person",
+                title: "gender_identity".localized,
+                value: viewModel.gender.isEmpty ? "select_gender".localized : (
+                    // Map value to localized label
+                    ["male": "male".localized, 
+                     "female": "female".localized, 
+                     "non-binary": "non_binary".localized, 
+                     "prefer_not_to_say": "prefer_not_to_say".localized][viewModel.gender] ?? viewModel.gender
+                ),
+                isPlaceholder: viewModel.gender.isEmpty
+            ) {
+               isNameFocused = false
+               showGenderSheet = true
+            }
         }
     }
     
