@@ -164,7 +164,7 @@ struct StatsCard: View {
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(AppTheme.Colors.premiumGradient)
                     
-                    Text("2.2M+")
+                    Text("2.5M+")
                         .font(AppTheme.Fonts.premiumDisplay(size: 40))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }

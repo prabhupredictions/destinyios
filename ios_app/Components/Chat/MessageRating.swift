@@ -40,6 +40,7 @@ struct MessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
+                        .accessibilityLabel("\(star) of 5 stars")
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -89,8 +90,7 @@ struct MessageRating: View {
     // MARK: - Actions
     private func selectRating(_ rating: Int) {
         // Haptic feedback
-        let impact = UIImpactFeedbackGenerator(style: .light)
-        impact.impactOccurred()
+        HapticManager.shared.play(.light)
         
         selectedRating = rating
         submitRating(rating)
@@ -114,8 +114,7 @@ struct MessageRating: View {
                     hasSubmitted = true
                     
                     // Success haptic
-                    let notification = UINotificationFeedbackGenerator()
-                    notification.notificationOccurred(.success)
+                    HapticManager.shared.notify(.success)
                 }
             } catch {
                 print("❌ Failed to submit rating: \(error)")
@@ -182,6 +181,7 @@ struct InlineMessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
+                        .accessibilityLabel("\(star) of 5 stars")
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -198,8 +198,7 @@ struct InlineMessageRating: View {
     }
     
     private func selectRating(_ rating: Int) {
-        let impact = UIImpactFeedbackGenerator(style: .light)
-        impact.impactOccurred()
+        HapticManager.shared.play(.light)
         
         selectedRating = rating
         submitRating(rating)
@@ -225,8 +224,7 @@ struct InlineMessageRating: View {
                     // Persist locally immediately
                     message.rating = rating
                     
-                    let notification = UINotificationFeedbackGenerator()
-                    notification.notificationOccurred(.success)
+                    HapticManager.shared.notify(.success)
                 }
             } catch {
                 print("❌ Failed to submit rating: \(error)")
@@ -260,6 +258,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .up ? .green : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Rate helpful")
             
             Button {
                 selected = .down
@@ -270,6 +269,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .down ? .orange : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Rate unhelpful")
         }
     }
 }

@@ -156,6 +156,10 @@ struct AnyCodable: Codable, Sendable {
             try container.encode(stringValue)
         } else if let boolValue = value as? Bool {
             try container.encode(boolValue)
+        } else if let arrayValue = value as? [Any] {
+            try container.encode(arrayValue.map { AnyCodable($0) })
+        } else if let dictValue = value as? [String: Any] {
+            try container.encode(dictValue.mapValues { AnyCodable($0) })
         } else {
             try container.encodeNil()
         }

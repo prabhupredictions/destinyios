@@ -244,8 +244,7 @@ class AuthViewModel {
                         // Local guest history was cleared before sign-in
                         // This sync fetches the migrated threads with correct IDs
                         print("🔄 [AuthViewModel] Syncing migrated history from server...")
-                        await ChatHistorySyncService.shared.syncFromServer(userEmail: actualEmail, dataManager: DataManager.shared)
-                        await CompatibilityHistoryService.shared.syncFromServer(userEmail: actualEmail)
+                        await LoginSyncCoordinator.shared.syncAll(userEmail: actualEmail, dataManager: DataManager.shared)
                         print("✅ [AuthViewModel] Post-migration history sync complete")
                         
                     } catch let error as ProfileError {
@@ -366,8 +365,7 @@ class AuthViewModel {
                             
                             // Sync history AFTER migration completes on backend
                             print("🔄 [AuthViewModel] Syncing migrated history from server...")
-                            await ChatHistorySyncService.shared.syncFromServer(userEmail: effectiveEmail, dataManager: DataManager.shared)
-                            await CompatibilityHistoryService.shared.syncFromServer(userEmail: effectiveEmail)
+                            await LoginSyncCoordinator.shared.syncAll(userEmail: effectiveEmail, dataManager: DataManager.shared)
                             print("✅ [AuthViewModel] Post-migration history sync complete")
                             
                         } catch {
@@ -514,12 +512,10 @@ class AuthViewModel {
                 // Skip during guest→registered upgrade - caller will sync after migration
                 if !skipSync {
                     Task {
-                        // Sync history in background
-                        await ChatHistorySyncService.shared.syncFromServer(userEmail: email, dataManager: DataManager.shared)
-                        await CompatibilityHistoryService.shared.syncFromServer(userEmail: email)
-                        
-                        // Sync Quota/Plan Status (Pre-fetch to prevent Subscription screen flicker)
-                        try? await QuotaManager.shared.syncStatus(email: email)
+                        // Coordinated sync: single thread list fetch shared by chat + compat sync
+                        async let historySync: () = LoginSyncCoordinator.shared.syncAll(userEmail: email, dataManager: DataManager.shared)
+                        async let quotaSync: () = { try? await QuotaManager.shared.syncStatus(email: email, force: true) }()
+                        _ = await (historySync, quotaSync)
                     }
                 } else {
                     print("⏭️ [AuthViewModel] Skipping background sync (will sync after migration)")

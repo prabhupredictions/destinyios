@@ -2,13 +2,15 @@ import SwiftUI
 
 // MARK: - Compatibility History Sheet
 /// Shows list of past compatibility matches with swipe-to-delete
+/// Supports both single matches and multi-partner groups
 struct CompatibilityHistorySheet: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var historyItems: [CompatibilityHistoryItem] = []
-    @State private var itemToDelete: CompatibilityHistoryItem?
+    @State private var groups: [ComparisonGroup] = []
+    @State private var groupToDelete: ComparisonGroup?
     @State private var showDeleteConfirmation = false
     
     var onSelect: ((CompatibilityHistoryItem) -> Void)?
+    var onGroupSelect: ((ComparisonGroup) -> Void)?
     
     var body: some View {
         NavigationStack {
@@ -17,7 +19,7 @@ struct CompatibilityHistorySheet: View {
                 CosmicBackgroundView()
                     .ignoresSafeArea()
                 
-                if historyItems.isEmpty {
+                if groups.isEmpty {
                     emptyState
                 } else {
                     historyList
@@ -35,13 +37,13 @@ struct CompatibilityHistorySheet: View {
             .alert("delete_match".localized, isPresented: $showDeleteConfirmation) {
                 Button("cancel".localized, role: .cancel) {}
                 Button("delete".localized, role: .destructive) {
-                    if let item = itemToDelete {
-                        deleteItem(item)
+                    if let group = groupToDelete {
+                        deleteGroup(group)
                     }
                 }
             } message: {
-                if let item = itemToDelete {
-                    Text("delete_match_confirmation".localized + " \(item.displayTitle)?")
+                if let group = groupToDelete {
+                    Text("delete_match_confirmation".localized + " \(group.displayTitle)?")
                 }
             }
         }
@@ -73,22 +75,42 @@ struct CompatibilityHistorySheet: View {
     // MARK: - History List
     private var historyList: some View {
         List {
-            ForEach(historyItems) { item in
-                HistoryItemRow(
-                    item: item,
-                    onTap: {
-                        onSelect?(item)
-                        dismiss()
+            ForEach(groups) { group in
+                if group.items.count > 1 {
+                    // Multi-partner group row
+                    GroupHistoryRow(
+                        group: group,
+                        onTap: {
+                            selectFullGroup(group)
+                        }
+                    )
+                    .listRowBackground(AppTheme.Colors.cardBackground)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            groupToDelete = group
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("delete".localized, systemImage: "trash")
+                        }
                     }
-                )
-                .listRowBackground(AppTheme.Colors.cardBackground)
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                        itemToDelete = item
-                        showDeleteConfirmation = true
-                    } label: {
-                        Label("delete".localized, systemImage: "trash")
+                } else if let item = group.items.first {
+                    // Single match row (unchanged behavior)
+                    HistoryItemRow(
+                        item: item,
+                        onTap: {
+                            selectFullItem(item)
+                        }
+                    )
+                    .listRowBackground(AppTheme.Colors.cardBackground)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            groupToDelete = group
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("delete".localized, systemImage: "trash")
+                        }
                     }
                 }
             }
@@ -99,15 +121,106 @@ struct CompatibilityHistorySheet: View {
     
     // MARK: - Actions
     private func loadHistory() {
-        historyItems = CompatibilityHistoryService.shared.loadAll()
+        groups = CompatibilityHistoryService.shared.loadGroups(lightweight: true)
     }
     
-    private func deleteItem(_ item: CompatibilityHistoryItem) {
+    /// Load full data for a single item on-demand (result + chatMessages)
+    private func selectFullItem(_ lightweightItem: CompatibilityHistoryItem) {
+        if let fullItem = CompatibilityHistoryService.shared.get(sessionId: lightweightItem.sessionId) {
+            onSelect?(fullItem)
+        } else {
+            onSelect?(lightweightItem)
+        }
+        dismiss()
+    }
+    
+    /// Load full data for a group on-demand
+    private func selectFullGroup(_ lightweightGroup: ComparisonGroup) {
+        let fullItems = lightweightGroup.items.compactMap { lite in
+            CompatibilityHistoryService.shared.get(sessionId: lite.sessionId) ?? lite
+        }
+        let fullGroup = ComparisonGroup(
+            id: lightweightGroup.id,
+            timestamp: lightweightGroup.timestamp,
+            userName: lightweightGroup.userName,
+            items: fullItems
+        )
+        onGroupSelect?(fullGroup)
+        dismiss()
+    }
+    
+    private func deleteGroup(_ group: ComparisonGroup) {
         withAnimation {
-            CompatibilityHistoryService.shared.delete(sessionId: item.sessionId)
-            historyItems.removeAll { $0.sessionId == item.sessionId }
+            CompatibilityHistoryService.shared.deleteGroup(groupId: group.id)
+            groups.removeAll { $0.id == group.id }
         }
         HapticManager.shared.play(.heavy)
+    }
+}
+
+// MARK: - Group History Row (multi-partner)
+struct GroupHistoryRow: View {
+    let group: ComparisonGroup
+    let onTap: () -> Void
+    
+    private let accentPurple = Color(red: 0.75, green: 0.55, blue: 0.95)
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 14) {
+                // Group icon badge
+                ZStack {
+                    Circle()
+                        .fill(accentPurple.opacity(0.15))
+                        .frame(width: 50, height: 50)
+                    
+                    VStack(spacing: 0) {
+                        Image(systemName: "person.3.fill")
+                            .font(AppTheme.Fonts.title(size: 16))
+                            .foregroundColor(accentPurple)
+                        Text("\(group.items.count)")
+                            .font(AppTheme.Fonts.caption(size: 10))
+                            .foregroundColor(accentPurple)
+                    }
+                }
+                
+                // Details
+                VStack(alignment: .leading, spacing: 4) {
+                    // Title: "UserName + Partner1, Partner2"
+                    let partnerNames = group.items.map { $0.girlName }
+                    Text("\(group.userName) + \(partnerNames.joined(separator: ", "))")
+                        .font(AppTheme.Fonts.title(size: 15))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .lineLimit(1)
+                    
+                    HStack(spacing: 8) {
+                        Text(group.displayDate)
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                        
+                        // Best score indicator
+                        if let best = group.bestMatch {
+                            HStack(spacing: 3) {
+                                Image(systemName: "star.fill")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("Best: \(best.totalScore)/\(best.maxScore)")
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                            }
+                            .foregroundColor(accentPurple)
+                        }
+                    }
+                }
+                
+                Spacer()
+                
+                // Chevron
+                Image(systemName: "chevron.right")
+                    .font(AppTheme.Fonts.title(size: 14))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
+            }
+            .padding(.vertical, 8)
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

@@ -439,3 +439,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "ಇದೇ ರೀತಿಯ ವಿವರಗಳೊಂದಿಗೆ ಜನ್ಮ ಚಾರ್ಟ್ ಈಗಾಗಲೇ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ. ಪ್ರತಿ ವ್ಯಕ್ತಿಗೆ ಒಂದೇ ಚಾರ್ಟ್ ಇರಬಹುದು. ಸಹಾಯಕ್ಕಾಗಿ, support@destinyaiastrology.com ಅನ್ನು ಸಂಪರ್ಕಿಸಿ.";
 
+
+"syncing_cosmic_data" = "ಇಂದಿನ ಒಳನೋಟಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…";

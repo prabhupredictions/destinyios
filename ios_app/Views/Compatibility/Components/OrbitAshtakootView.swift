@@ -3,6 +3,8 @@ import SwiftUI
 struct OrbitAshtakootView: View {
     let kutas: [KutaDetail]
     let centerView: () -> AnyView // Closure to render the central gauge
+    var boyName: String = "Boy"
+    var girlName: String = "Girl"
     
     @State private var selectedKuta: AshtakootData?
     
@@ -115,7 +117,7 @@ struct OrbitAshtakootView: View {
                     
                     // Description
                     if !kuta.description.isEmpty {
-                        Text(kuta.description)
+                        Text(replaceNames(in: kuta.description))
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .multilineTextAlignment(.leading)
@@ -178,6 +180,17 @@ struct OrbitAshtakootView: View {
     
     private func format(_ value: Double) -> String {
         return value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
+    }
+    
+    /// Replace generic "Boy"/"Girl" with actual partner names
+    private func replaceNames(in text: String) -> String {
+        text
+            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
+            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
+            .replacingOccurrences(of: "Boy's", with: "\(boyName)'s")
+            .replacingOccurrences(of: "Girl's", with: "\(girlName)'s")
+            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
+            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
     }
 }
 

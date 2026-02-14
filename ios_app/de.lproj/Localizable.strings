@@ -438,3 +438,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "Ein Geburtshoroskop mit ähnlichen Details existiert bereits. Jede Person kann nur ein Horoskop haben. Für Hilfe kontaktieren Sie support@destinyaiastrology.com.";
 
+
+"syncing_cosmic_data" = "Lade heutige Erkenntnisse…";

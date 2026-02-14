@@ -10,28 +10,28 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
     }
     
     let sessionId: String
-    let timestamp: Date
+    var timestamp: Date
     
-    // Multi-Partner Grouping (Optional - nil for legacy single-partner matches)
+    // Multi-Partner Grouping (nil for single-partner matches)
     let comparisonGroupId: String?
     let partnerIndex: Int?  // Order within group (0 = first partner)
     
-    // Partner details
+    // Partner details (DOB in yyyy-MM-dd, time in HH:mm:ss — matches API format)
     let boyName: String
     let boyDob: String
-    let boyTime: String?  // Birth time in "HH:mm:ss" format (optional for legacy items)
+    let boyTime: String
     let boyCity: String
     let girlName: String
     let girlDob: String
-    let girlTime: String?  // Birth time in "HH:mm:ss" format (optional for legacy items)
+    let girlTime: String
     let girlCity: String
     
     // Score
-    let totalScore: Int
-    let maxScore: Int
+    var totalScore: Int
+    var maxScore: Int
     
     // Full result for restore
-    let result: CompatibilityResult?
+    var result: CompatibilityResult?
     
     // Chat messages from Ask Destiny
     var chatMessages: [CompatChatMessageData]
@@ -59,17 +59,16 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
         comparisonGroupId != nil
     }
     
-    // MARK: - Legacy Initializer (backward compatible)
     init(
         sessionId: String,
         timestamp: Date,
         boyName: String,
         boyDob: String,
-        boyTime: String? = nil,
+        boyTime: String,
         boyCity: String,
         girlName: String,
         girlDob: String,
-        girlTime: String? = nil,
+        girlTime: String,
         girlCity: String,
         totalScore: Int,
         maxScore: Int,
@@ -99,7 +98,10 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
 
 // MARK: - Comparison Group
 /// Represents a group of related compatibility matches (1 user vs N partners)
-struct ComparisonGroup: Identifiable {
+struct ComparisonGroup: Identifiable, Equatable {
+    static func == (lhs: ComparisonGroup, rhs: ComparisonGroup) -> Bool {
+        lhs.id == rhs.id
+    }
     let id: String  // groupId
     let timestamp: Date
     let userName: String

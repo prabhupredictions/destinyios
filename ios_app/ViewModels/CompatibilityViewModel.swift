@@ -84,6 +84,7 @@ class CompatibilityViewModel {
     var errorMessage: String?
     var result: CompatibilityResult?
     var sessionId: String? // For follow-up queries
+    var historyLoadedToast = false // Shows brief "Loaded from history" indicator
     
     // Streaming progress state
     var currentStep: AnalysisStep = .calculatingCharts
@@ -132,13 +133,13 @@ class CompatibilityViewModel {
     // MARK: - Formatted Date Strings
     var formattedBoyDob: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.dateStyle = .medium
         return formatter.string(from: boyBirthDate)
     }
     
     var formattedGirlDob: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.dateStyle = .medium
         return formatter.string(from: girlBirthDate)
     }
     
@@ -176,6 +177,7 @@ class CompatibilityViewModel {
             
             // Parse date
             let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
             dateFormatter.dateFormat = "yyyy-MM-dd"
             if let date = dateFormatter.date(from: profileBirthData.dob) {
                 boyBirthDate = date
@@ -325,6 +327,7 @@ class CompatibilityViewModel {
         
         // Parse date
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd"
         if let date = dateFormatter.date(from: partner.dateOfBirth) {
             partnerData.birthDate = date
@@ -407,16 +410,24 @@ class CompatibilityViewModel {
         }
         
         // STEP 1: Check local cache/history BEFORE calling API (FREE if found)
-        // This avoids re-triggering LLM for same match pair - usage count only for NEW matches
+        // This avoids re-triggering LLM for same match pair — usage count only for NEW matches
+        let dobFmt = DateFormatter()
+        dobFmt.locale = Locale(identifier: "en_US_POSIX")
+        dobFmt.dateFormat = "yyyy-MM-dd"
+        let timeFmt = DateFormatter()
+        timeFmt.locale = Locale(identifier: "en_US_POSIX")
+        timeFmt.dateFormat = "HH:mm:ss"
+        
         if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
-            boyDob: boyBirthDate,
-            boyTime: boyBirthTime,
-            girlDob: girlBirthDate,
-            girlTime: girlBirthTime
+            boyDob: dobFmt.string(from: boyBirthDate),
+            boyTime: timeFmt.string(from: boyBirthTime),
+            girlDob: dobFmt.string(from: girlBirthDate),
+            girlTime: timeFmt.string(from: girlBirthTime)
         ) {
-            print("[CompatibilityViewModel] Found existing match in cache - loading FREE (no LLM call)")
+            print("[CompatibilityViewModel] Found existing match in local history — loading FREE (no API call)")
             await MainActor.run {
                 loadFromHistory(existingMatch)
+                historyLoadedToast = true
             }
             return
         }
@@ -611,11 +622,18 @@ class CompatibilityViewModel {
             }
             
             // Check if this partner match already exists in cache (FREE if found)
+            let partnerDobFmt = DateFormatter()
+            partnerDobFmt.locale = Locale(identifier: "en_US_POSIX")
+            partnerDobFmt.dateFormat = "yyyy-MM-dd"
+            let partnerTimeFmt = DateFormatter()
+            partnerTimeFmt.locale = Locale(identifier: "en_US_POSIX")
+            partnerTimeFmt.dateFormat = "HH:mm:ss"
+            
             if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
-                boyDob: boyBirthDate,
-                boyTime: boyBirthTime,
-                girlDob: partner.birthDate,
-                girlTime: partner.birthTime
+                boyDob: partnerDobFmt.string(from: boyBirthDate),
+                boyTime: partnerTimeFmt.string(from: boyBirthTime),
+                girlDob: partnerDobFmt.string(from: partner.birthDate),
+                girlTime: partnerTimeFmt.string(from: partner.birthTime)
             ),
             let cachedCompatibilityResult = existingMatch.result {
                 print("[Multi-Partner] Found existing match for \(partner.name) in cache - loading FREE")
@@ -626,6 +644,9 @@ class CompatibilityViewModel {
                         result: cachedCompatibilityResult
                     )
                     comparisonResults.append(cachedResult)
+                    
+                    // Save cached match as a group member so the group is complete in history
+                    saveToHistory(result: cachedCompatibilityResult, groupId: currentComparisonGroupId, partnerIndex: index)
                 }
                 continue  // Skip API call for this partner
             }
@@ -714,7 +735,14 @@ class CompatibilityViewModel {
         // Use compat_ prefix to match backend thread_id format
         let storageSessionId = sid.hasPrefix("compat_") ? sid : "compat_\(sid)"
         
-        // Format times for storage (HH:mm:ss format for backend compatibility)
+        // Format dates for storage (yyyy-MM-dd — matches API/server format)
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let boyDobStr = dateFormatter.string(from: boyBirthDate)
+        let girlDobStr = dateFormatter.string(from: girlBirthDate)
+        
+        // Format times for storage (HH:mm:ss format)
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US_POSIX")
         timeFormatter.dateFormat = "HH:mm:ss"
@@ -725,17 +753,17 @@ class CompatibilityViewModel {
             sessionId: storageSessionId,
             timestamp: Date(),
             boyName: boyName,
-            boyDob: formattedBoyDob,
+            boyDob: boyDobStr,
             boyTime: boyTimeStr,
             boyCity: boyCity,
             girlName: girlName,
-            girlDob: formattedGirlDob,
+            girlDob: girlDobStr,
             girlTime: girlTimeStr,
             girlCity: girlCity,
             totalScore: result.totalScore,
             maxScore: result.maxScore,
             result: result,
-            chatMessages: [], // Chat starts empty
+            chatMessages: [],
             comparisonGroupId: groupId,
             partnerIndex: partnerIndex
         )
@@ -765,6 +793,43 @@ class CompatibilityViewModel {
         if let savedResult = item.result {
             self.result = savedResult
             self.showResult = true
+        }
+    }
+    
+    /// Load state from a history group (multi-partner comparison)
+    /// Reconstructs ComparisonResult array from the group's items and shows ComparisonOverviewView
+    func loadFromHistoryGroup(_ group: ComparisonGroup) {
+        // Set the user (boy) name from the group
+        boyName = group.userName
+        
+        // Convert each history item in the group to a ComparisonResult
+        var results: [ComparisonResult] = []
+        for item in group.items {
+            guard let savedResult = item.result else { continue }
+            
+            // Reconstruct PartnerData from history item
+            let partner = PartnerData(
+                name: item.girlName,
+                city: item.girlCity
+            )
+            
+            let compResult = ComparisonResult(
+                partner: partner,
+                result: savedResult
+            )
+            results.append(compResult)
+        }
+        
+        // Populate comparison results and show overview
+        if results.count > 1 {
+            comparisonResults = results
+            showComparisonOverview = true
+            showResult = false
+        } else if let single = results.first {
+            // Fallback for single item in group (shouldn't happen, but safe)
+            result = single.result
+            girlName = single.partner.name
+            showResult = true
         }
     }
     

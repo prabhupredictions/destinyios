@@ -163,18 +163,23 @@ class ChatHistorySyncService {
     /// Fetches ALL threads for the user email (not filtered by profile) for client-side filtering
     /// NOTE: Clears existing local threads first to prevent duplicates from ID mismatch
     func syncFromServer(userEmail: String, dataManager: DataManager) async {
-        print("[ChatHistorySync] Starting full sync for \(userEmail)")
+        // Fetch thread list and delegate to shared implementation
+        do {
+            let threads = try await fetchThreads(userEmail: userEmail, profileId: nil)
+            await syncFromServer(userEmail: userEmail, threads: threads, dataManager: dataManager)
+        } catch {
+            print("[ChatHistorySync] Error fetching threads: \(error)")
+        }
+    }
+    
+    /// Sync from pre-fetched thread list (used by LoginSyncCoordinator to avoid duplicate API call)
+    func syncFromServer(userEmail: String, threads: [ThreadResponse], dataManager: DataManager) async {
+        print("[ChatHistorySync] Starting sync for \(userEmail) with \(threads.count) pre-fetched threads")
         
         do {
             // 0. CRITICAL: Clear existing local threads for this user to prevent duplicates
-            // Local messages have client-generated UUIDs, server has server-generated UUIDs
-            // Deduplication by ID fails when IDs don't match, causing duplicates
             dataManager.deleteAllThreads(for: userEmail)
             print("[ChatHistorySync] Cleared local threads for \(userEmail) before sync")
-            
-            // 1. Fetch ALL threads for user (no profile filter - client-side filtering)
-            let threads = try await fetchThreads(userEmail: userEmail, profileId: nil)
-            print("[ChatHistorySync] Found \(threads.count) total threads for \(userEmail)")
             
             // 2. For each thread, fetch messages and save locally
             for thread in threads {

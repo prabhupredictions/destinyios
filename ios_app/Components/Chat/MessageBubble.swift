@@ -6,13 +6,23 @@ struct MessageBubble: View {
     var userQuery: String = ""
     var streamingContent: String? = nil
     var thinkingSteps: [ThinkingStep] = []  // For streaming progress
+    var enableTypewriter: Bool = false
+    var onTypewriterFinished: (() -> Void)? = nil
+    
+    // Local typewriter state (only this bubble re-renders, no parent jitter)
+    @State private var revealedContent: String = ""
+    @State private var typewriterFinished = false
+    @State private var typewriterTimer: Timer?
     
     private var isUser: Bool {
         message.messageRole == .user
     }
     
     private var displayContent: String {
-        streamingContent ?? message.content
+        if enableTypewriter && !typewriterFinished {
+            return revealedContent
+        }
+        return streamingContent ?? message.content
     }
     
     private var isWelcomeMessage: Bool {
@@ -34,8 +44,8 @@ struct MessageBubble: View {
                 // Message content
                 messageContent
                 
-                // Metadata row with inline rating (timestamp + time + rating stars)
-                if !isUser && !message.isStreaming {
+                // Metadata row with inline rating — hidden during typewriter
+                if !isUser && !message.isStreaming && (!enableTypewriter || typewriterFinished) {
                     metadataRowWithRating
                 }
             }
@@ -45,6 +55,50 @@ struct MessageBubble: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(isUser ? "You said: \(message.content)" : "Destiny said: \(displayContent)")
+        .onAppear {
+            if enableTypewriter {
+                startTypewriter()
+            }
+        }
+        .onDisappear {
+            typewriterTimer?.invalidate()
+            typewriterTimer = nil
+        }
+    }
+    
+    // MARK: - Typewriter Effect (local @State, no parent re-renders)
+    private func startTypewriter() {
+        let fullText = message.content
+        let words = fullText.components(separatedBy: " ")
+        guard !words.isEmpty else {
+            typewriterFinished = true
+            return
+        }
+        
+        var wordIndex = 0
+        revealedContent = ""
+        
+        // Reveal 3 words every 60ms (~50 words/sec for smooth fast reveal)
+        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.06, repeats: true) { timer in
+            let batchEnd = min(wordIndex + 3, words.count)
+            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
+            
+            if revealedContent.isEmpty {
+                revealedContent = batch
+            } else {
+                revealedContent += " " + batch
+            }
+            
+            wordIndex = batchEnd
+            
+            if wordIndex >= words.count {
+                timer.invalidate()
+                typewriterFinished = true
+                onTypewriterFinished?()
+            }
+        }
     }
     
     // MARK: - Message Content
@@ -93,10 +147,26 @@ struct MessageBubble: View {
         )
     }
     
-    // MARK: - Streaming Progress View (Claude-style collapsible)
+    // MARK: - Streaming Progress View (Thinking... pill, matches compat chat style)
     @ViewBuilder
     private var streamingProgressView: some View {
-        CollapsibleProgressView(thinkingSteps: thinkingSteps)
+        HStack(spacing: 10) {
+            AnimatedDots()
+            
+            Text("Thinking...")
+                .font(AppTheme.Fonts.body(size: 14))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(AppTheme.Colors.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+        )
     }
     
     // Fallback parser for **bold** syntax
@@ -235,6 +305,7 @@ struct AvatarView: View {
                 .font(.system(size: size * 0.45, weight: .medium, design: .serif))
                 .foregroundColor(AppTheme.Colors.mainBackground)
         }
+        .accessibilityHidden(true)
     }
 }
 

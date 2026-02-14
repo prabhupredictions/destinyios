@@ -71,6 +71,7 @@ struct CosmicBackgroundView: View {
                 .motionParallax(intensity: 0.5)
             }
         }
+        .accessibilityHidden(true)
         .onAppear {
             startAnimations()
         }

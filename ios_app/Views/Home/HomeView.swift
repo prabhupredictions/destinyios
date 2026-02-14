@@ -7,6 +7,7 @@ struct HomeView: View {
     var onQuestionSelected: ((String) -> Void)? = nil
     var onChatHistorySelected: ((String) -> Void)? = nil
     var onMatchHistorySelected: ((CompatibilityHistoryItem) -> Void)? = nil
+    var onMatchGroupHistorySelected: ((ComparisonGroup) -> Void)? = nil
     
     // MARK: - State
     @State private var viewModel = HomeViewModel()
@@ -104,10 +105,6 @@ struct HomeView: View {
                                     Text("syncing_cosmic_data".localized)
                                         .font(AppTheme.Fonts.title(size: 18))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
-                                    
-                                    Text("restoring_your_insights".localized)
-                                        .font(AppTheme.Fonts.body(size: 14))
-                                        .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
                                 
                                 ProgressView()
@@ -169,7 +166,7 @@ struct HomeView: View {
                     brief: selected.status.brief,
                     iconName: iconName(for: selected.area),
                     onAskMore: {
-                        let contextualQuestion = "You predicted: '\(selected.status.brief)' for my \(selected.area) today. Can you provide more detailed insights and guidance?"
+                        let contextualQuestion = "Today's forecast mentions: '\(selected.status.brief)' for my \(selected.area). Can you elaborate on what this means for me?"
                         selectedLifeArea = nil
                         onQuestionSelected?(contextualQuestion)
                     },
@@ -242,6 +239,7 @@ struct HomeView: View {
         }
         .navigationBarHidden(true)
         .task {
+            // Single entry point for initial data load (runs once when view appears)
             await viewModel.loadHomeData()
             await notificationService.fetchUnreadCount()
         }
@@ -260,8 +258,8 @@ struct HomeView: View {
             }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
-            // Auto-refresh badge when app comes to foreground
-            if newPhase == .active {
+            // Refresh notification badge when app returns to foreground
+            if newPhase == .active && oldPhase == .background {
                 Task {
                     await notificationService.fetchUnreadCount()
                 }
@@ -276,7 +274,8 @@ struct HomeView: View {
         .sheet(isPresented: $showHistorySheet) {
             HistoryView(
                 onChatSelected: onChatHistorySelected,
-                onMatchSelected: onMatchHistorySelected
+                onMatchSelected: onMatchHistorySelected,
+                onMatchGroupSelected: onMatchGroupHistorySelected
             )
         }
         .sheet(isPresented: $showProfileSwitcher) {
@@ -332,6 +331,7 @@ struct HomeView: View {
                                 .foregroundColor(AppTheme.Colors.gold)
                         }
                     }
+                    .accessibilityLabel("History")
                     
                     Spacer()
                     
@@ -364,10 +364,12 @@ struct HomeView: View {
                                             .background(AppTheme.Colors.error)
                                             .clipShape(Capsule())
                                             .offset(x: 12, y: -12)
+                                            .accessibilityHidden(true)
                                     }
                                 }
                             )
                         }
+                        .accessibilityLabel(notificationService.unreadCount > 0 ? "Notifications, \(notificationService.unreadCount) unread" : "Notifications")
                         
                         // Sound Toggle
                         if AppTheme.Features.showSoundToggle {
@@ -387,6 +389,8 @@ struct HomeView: View {
                                         .contentTransition(.symbolEffect(.replace))
                                 }
                             }
+                            .accessibilityLabel(soundManager.isSoundEnabled ? "Sound on" : "Sound off")
+                            .accessibilityHint("Double tap to toggle sound")
                         }
                         
                         // Profile Button
@@ -404,6 +408,7 @@ struct HomeView: View {
                                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.2))
                             }
                         }
+                        .accessibilityLabel("Profile, \(profileContext.activeProfileName)")
                     }
                 }
             }
@@ -528,6 +533,7 @@ struct HomeView: View {
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.4))
                 .offset(x: 110, y: 50)
         }
+        .accessibilityHidden(true)
     }
     
     // Helper to get zodiac symbol and full name
@@ -591,6 +597,7 @@ struct HomeView: View {
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityAddTraits(.isHeader)
             
             // Filter Tabs (Compact)
             HStack(spacing: 8) {
@@ -667,6 +674,7 @@ struct HomeView: View {
             Text("What's in my mind?")
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
+                .accessibilityAddTraits(.isHeader)
             
             // Quick Questions (Compact List)
             let questions = viewModel.suggestedQuestions.isEmpty ?

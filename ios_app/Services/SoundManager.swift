@@ -4,20 +4,27 @@ import Combine
 
 /// Centralized manager for Programmatic Sound Effects (Sensory Delight)
 /// Generates "astrological" sine-wave chimes programmatically using AVAudioEngine
+///
+/// IMPORTANT: Audio engine is lazily initialized only when sound is enabled,
+/// to avoid interrupting other apps' audio (Spotify, podcasts, etc.)
 class SoundManager: ObservableObject {
     static let shared = SoundManager()
     
-    // Audio Engine Components
-    private let engine = AVAudioEngine()
-    private let playerNode = AVAudioPlayerNode() // Foreground sounds (UI)
-    private let ambientNode = AVAudioPlayerNode() // Background healing drone
-    private let mixer: AVAudioMixerNode
+    // Audio Engine Components (lazily created)
+    private var engine: AVAudioEngine?
+    private var playerNode: AVAudioPlayerNode?
+    private var ambientNode: AVAudioPlayerNode?
     
     // Persistent User Preference
     @Published var isSoundEnabled: Bool {
         didSet {
             UserDefaults.standard.set(isSoundEnabled, forKey: "isSoundEnabled")
-            updateAmbientState()
+            if isSoundEnabled {
+                ensureEngineRunning()
+                startAmbientDrone()
+            } else {
+                tearDownEngine()
+            }
         }
     }
     
@@ -27,63 +34,120 @@ class SoundManager: ObservableObject {
     private var successBuffer: AVAudioPCMBuffer?
     private var healingDroneBuffer: AVAudioPCMBuffer?
     
+    /// Whether the engine has been set up at least once
+    private var isEngineSetUp = false
+    
     private init() {
         self.isSoundEnabled = UserDefaults.standard.object(forKey: "isSoundEnabled") as? Bool ?? false
-        mixer = engine.mainMixerNode
-        setupEngine()
-        prepareBuffers()
         
-        // Start healing frequencies automatically if sound is enabled
-        updateAmbientState()
+        // Only start engine if sound is already enabled
+        if isSoundEnabled {
+            ensureEngineRunning()
+            startAmbientDrone()
+        }
+        // If sound is off (default), do NOT touch the audio session at all
     }
     
-    private func setupEngine() {
-        // Attach nodes
-        engine.attach(playerNode)
-        engine.attach(ambientNode)
+    // MARK: - Engine Lifecycle
+    
+    /// Lazily creates and starts the audio engine only when needed
+    private func ensureEngineRunning() {
+        if let engine = engine, engine.isRunning { return }
         
-        // Connect taking mixer's native format
-        let format = mixer.outputFormat(forBus: 0)
-        engine.connect(playerNode, to: mixer, format: format)
-        engine.connect(ambientNode, to: mixer, format: format)
-        
-        // Configure Volume
-        // Foreground sounds regular volume
-        playerNode.volume = 1.0 
-        
-        // Ambient Drone: Subliminal Volume (User shouldn't "hear" it, just "feel" it)
-        // Extremely low volume for subconscious effect
-        ambientNode.volume = 0.03
-        
-        do {
-            try engine.start()
-        } catch {
-            print("SoundManager: Failed to start engine: \(error)")
+        if !isEngineSetUp {
+            setupEngine()
+        } else if let engine = engine, !engine.isRunning {
+            // Re-activate session and restart
+            configureAudioSession()
+            do { try engine.start() } catch {
+                print("SoundManager: Failed to restart engine: \(error)")
+            }
         }
     }
     
-    private func updateAmbientState() {
-        if isSoundEnabled {
-            if !ambientNode.isPlaying {
-                // Ensure engine is running
-                if !engine.isRunning { try? engine.start() }
-                
-                // Infinite Loop for Healing Drone
-                if let drone = healingDroneBuffer {
-                    ambientNode.scheduleBuffer(drone, at: nil, options: .loops, completionHandler: nil)
-                    ambientNode.play()
-                }
+    /// Configures the audio session to allow mixing with other apps (Spotify, etc.)
+    private func configureAudioSession() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            print("SoundManager: Failed to configure audio session: \(error)")
+        }
+    }
+    
+    /// Deactivates the audio session so other apps can resume playback
+    private func deactivateAudioSession() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            // Expected to fail if another audio route is active; safe to ignore
+            print("SoundManager: Audio session deactivation note: \(error)")
+        }
+    }
+    
+    private func setupEngine() {
+        // Configure audio session FIRST — .ambient category allows mixing with other apps
+        configureAudioSession()
+        
+        let newEngine = AVAudioEngine()
+        let newPlayerNode = AVAudioPlayerNode()
+        let newAmbientNode = AVAudioPlayerNode()
+        
+        // Attach nodes
+        newEngine.attach(newPlayerNode)
+        newEngine.attach(newAmbientNode)
+        
+        // Connect taking mixer's native format
+        let mixer = newEngine.mainMixerNode
+        let format = mixer.outputFormat(forBus: 0)
+        newEngine.connect(newPlayerNode, to: mixer, format: format)
+        newEngine.connect(newAmbientNode, to: mixer, format: format)
+        
+        // Configure Volume
+        newPlayerNode.volume = 1.0
+        newAmbientNode.volume = 0.03 // Subliminal
+        
+        do {
+            try newEngine.start()
+        } catch {
+            print("SoundManager: Failed to start engine: \(error)")
+        }
+        
+        self.engine = newEngine
+        self.playerNode = newPlayerNode
+        self.ambientNode = newAmbientNode
+        self.isEngineSetUp = true
+        
+        // Prepare buffers using this engine's format
+        prepareBuffers(format: format)
+    }
+    
+    /// Fully stops the engine and deactivates the audio session
+    /// so other apps (Spotify, etc.) are never interrupted
+    private func tearDownEngine() {
+        ambientNode?.stop()
+        playerNode?.stop()
+        engine?.stop()
+        deactivateAudioSession()
+    }
+    
+    private func startAmbientDrone() {
+        guard let ambientNode = ambientNode, let engine = engine else { return }
+        if !ambientNode.isPlaying {
+            if !engine.isRunning { try? engine.start() }
+            if let drone = healingDroneBuffer {
+                ambientNode.scheduleBuffer(drone, at: nil, options: .loops, completionHandler: nil)
+                ambientNode.play()
             }
-        } else {
-            ambientNode.stop()
         }
     }
     
     // MARK: - Procedural Sound Generation (The "Wow" Factor)
     
     /// Pre-calculates audio buffers for low-latency playback
-    private func prepareBuffers() {
-        let format = mixer.outputFormat(forBus: 0)
+    private func prepareBuffers(format: AVAudioFormat) {
         
         // 1. Interaction Tap: "Cloud Touch"
         // Base: 432Hz (Healing)
@@ -279,7 +343,7 @@ class SoundManager: ObservableObject {
         if isSoundEnabled {
             playButtonTap()
         }
-        // updateAmbientState() called via didSet
+        // tearDownEngine() / ensureEngineRunning() called via didSet
     }
     
     func playButtonTap() { play(tapBuffer) }
@@ -293,6 +357,8 @@ class SoundManager: ObservableObject {
     
     private func play(_ buffer: AVAudioPCMBuffer?) {
         guard isSoundEnabled, let buffer = buffer else { return }
+        ensureEngineRunning()
+        guard let engine = engine, let playerNode = playerNode else { return }
         if !engine.isRunning { try? engine.start() }
         playerNode.stop()
         playerNode.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)

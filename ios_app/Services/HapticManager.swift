@@ -7,6 +7,10 @@ import CoreHaptics
 class HapticManager {
     static let shared = HapticManager()
     
+    /// Master switch to enable/disable ALL haptics app-wide.
+    /// Set to `false` to silence all vibrations and haptic feedback.
+    var isEnabled: Bool = false
+    
     // Core Haptics Engine
     private var engine: CHHapticEngine?
     private var supportsHaptics: Bool = false
@@ -43,6 +47,7 @@ class HapticManager {
     /// Simulates a living "Heartbeat" (Lub-Dub)
     /// Used during AI processing or deep analysis
     func playHeartbeat() {
+        guard isEnabled else { return }
         guard supportsHaptics, let engine = engine else {
             notify(.warning) // Fallback
             return
@@ -70,6 +75,7 @@ class HapticManager {
     /// Simulates a "Golden Shimmer" or "Purr"
     /// High frequency, continuous vibration. Used for success/unlocking.
     func playShimmer() {
+        guard isEnabled else { return }
         guard supportsHaptics, let engine = engine else {
             notify(.success)
             return
@@ -91,6 +97,7 @@ class HapticManager {
     /// Simulates "Heavy Impact" (Gold Tablet drop)
     /// Strong, low-end thud.
     func playHeavyImpact() {
+        guard isEnabled else { return }
         guard supportsHaptics, let engine = engine else {
             play(.heavy)
             return
@@ -111,18 +118,21 @@ class HapticManager {
     // MARK: - Legacy / Standard Feedback (UIKit)
     
     func play(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        guard isEnabled else { return }
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.prepare()
         generator.impactOccurred()
     }
     
     func notify(_ type: UINotificationFeedbackGenerator.FeedbackType) {
+        guard isEnabled else { return }
         let generator = UINotificationFeedbackGenerator()
         generator.prepare()
         generator.notificationOccurred(type)
     }
     
     func selection() {
+        guard isEnabled else { return }
         let generator = UISelectionFeedbackGenerator()
         generator.prepare()
         generator.selectionChanged()

@@ -4,3 +4,9 @@
 API_BASE_URL = http:/$()/127.0.0.1:8000
 API_KEY = astro_live_e7-TG6TTi14WaYxIwiyxes-aGdhlUrQ8gVUIj5STVnE
 ENVIRONMENT = local
+
+// ----- Server-side keys (for reference only, NOT used by iOS) -----
+// OpenAI API Key (stored in llm_providers table in server DB)
+// OPENAI_API_KEY = sk-placeholder
+// Telegram Bot Token (stored in server .env BOT_TOKEN)
+// BOT_TOKEN = placeholder

@@ -7,7 +7,7 @@ final class CompatibilityHistoryService {
     
     // MARK: - Constants
     private static let storageKeyPrefix = "compatibility_history"
-    private static let maxItems = 10
+    private static let maxItems = 50
     
     // MARK: - Singleton
     static let shared = CompatibilityHistoryService()
@@ -44,9 +44,20 @@ final class CompatibilityHistoryService {
     
     // MARK: - Load Groups (Multi-Partner Support)
     /// Loads history items grouped by comparisonGroupId
+    /// - Parameter lightweight: If true, strips heavy `result` and `chatMessages` fields for list display
     /// Returns: Array of ComparisonGroup for grouped items + ungrouped single items
-    func loadGroups() -> [ComparisonGroup] {
-        let allItems = loadAll()
+    func loadGroups(lightweight: Bool = false) -> [ComparisonGroup] {
+        var allItems = loadAll()
+        
+        // Strip heavy fields for list display (saves memory when only showing names/scores)
+        if lightweight {
+            allItems = allItems.map { item in
+                var lite = item
+                lite.result = nil
+                lite.chatMessages = []
+                return lite
+            }
+        }
         var groups: [String: [CompatibilityHistoryItem]] = [:]
         var ungroupedItems: [CompatibilityHistoryItem] = []
         
@@ -90,24 +101,51 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Delete Group
-    /// Deletes all items in a comparison group
+    /// Deletes all items in a comparison group (local + server)
     func deleteGroup(groupId: String) {
-        var items = loadAll()
-        items.removeAll { $0.comparisonGroupId == groupId || $0.sessionId == groupId }
-        persist(items)
+        let items = loadAll()
+        let toDelete = items.filter { $0.comparisonGroupId == groupId || $0.sessionId == groupId }
+        var remaining = items
+        remaining.removeAll { $0.comparisonGroupId == groupId || $0.sessionId == groupId }
+        persist(remaining)
+        
+        // Delete from server (fire and forget)
+        deleteFromServer(sessionIds: toDelete.map { $0.sessionId })
     }
     
     // MARK: - Save
-    /// Saves a new history item for current user. If session already exists, updates it.
+    /// Saves a new history item for current user.
+    /// If the same person pair (by DOB+time) already exists as an UNGROUPED item, UPSERTS.
+    /// If session already exists, updates it.
+    /// Group items (comparisonGroupId != nil) are always inserted as new entries.
     func save(_ item: CompatibilityHistoryItem) {
         var items = loadAll()
         
-        // Check for duplicate
+        // 1. Check for same sessionId (exact re-save)
         if let existingIndex = items.firstIndex(where: { $0.sessionId == item.sessionId }) {
-            // Update existing
             items[existingIndex] = item
-        } else {
-            // Insert at beginning (most recent)
+        }
+        // 2. For UNGROUPED items only: upsert by person pair (prevents duplicate rows for same couple)
+        //    Group items skip this — each group member is a distinct entry
+        else if item.comparisonGroupId == nil,
+                let existingIndex = findUngroupedMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime, girlDob: item.girlDob, girlTime: item.girlTime) {
+            // Update existing entry: refresh timestamp, score, result; merge chat messages
+            var existing = items[existingIndex]
+            existing.timestamp = item.timestamp
+            existing.totalScore = item.totalScore
+            existing.maxScore = item.maxScore
+            existing.result = item.result
+            // Merge chat messages: keep existing + add new unique ones
+            let existingMsgIds = Set(existing.chatMessages.map { "\($0.isUser)_\($0.content)" })
+            let newMsgs = item.chatMessages.filter { !existingMsgIds.contains("\($0.isUser)_\($0.content)") }
+            existing.chatMessages.append(contentsOf: newMsgs)
+            items[existingIndex] = existing
+            // Move to front (most recent)
+            let updated = items.remove(at: existingIndex)
+            items.insert(updated, at: 0)
+        }
+        // 3. Brand new pair or group member — insert at beginning
+        else {
             items.insert(item, at: 0)
         }
         
@@ -117,6 +155,44 @@ final class CompatibilityHistoryService {
         }
         
         persist(items)
+    }
+    
+    // MARK: - Find Existing Match (pair-symmetric)
+    /// Checks if a match with the same person pair exists in ANY item (grouped or ungrouped),
+    /// checking BOTH orderings (A,B) and (B,A). Returns the most recent matching item.
+    func findExistingMatch(boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> CompatibilityHistoryItem? {
+        let items = loadAll()
+        guard let index = findMatchIndex(in: items, boyDob: boyDob, boyTime: boyTime, girlDob: girlDob, girlTime: girlTime) else {
+            return nil
+        }
+        return items[index]
+    }
+    
+    /// Finds the index of ANY matching item by person pair (symmetric check).
+    /// Searches ALL items — grouped and ungrouped — for cache purposes.
+    private func findMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
+        return items.firstIndex { existing in
+            // Forward: same order
+            let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
+                           existing.girlDob == girlDob && existing.girlTime == girlTime
+            // Reverse: swapped roles
+            let reverse = existing.boyDob == girlDob && existing.boyTime == girlTime &&
+                           existing.girlDob == boyDob && existing.girlTime == boyTime
+            return forward || reverse
+        }
+    }
+    
+    /// Finds index of an UNGROUPED match only — used by save() to upsert standalone items
+    /// without corrupting group entries.
+    private func findUngroupedMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
+        return items.firstIndex { existing in
+            guard existing.comparisonGroupId == nil else { return false }
+            let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
+                           existing.girlDob == girlDob && existing.girlTime == girlTime
+            let reverse = existing.boyDob == girlDob && existing.boyTime == girlTime &&
+                           existing.girlDob == boyDob && existing.girlTime == boyTime
+            return forward || reverse
+        }
     }
     
     // MARK: - Update Chat Messages
@@ -139,19 +215,65 @@ final class CompatibilityHistoryService {
     }
     
     // MARK: - Delete Single
-    /// Deletes a single history item by session ID
+    /// Deletes a single history item by session ID (local + server)
     func delete(sessionId: String) {
         var items = loadAll()
         items.removeAll { $0.sessionId == sessionId }
         persist(items)
+        
+        // Delete from server (fire and forget)
+        deleteFromServer(sessionIds: [sessionId])
     }
     
     // MARK: - Delete Multiple
-    /// Deletes multiple history items by session IDs
+    /// Deletes multiple history items by session IDs (local + server)
     func delete(sessionIds: Set<String>) {
         var items = loadAll()
         items.removeAll { sessionIds.contains($0.sessionId) }
         persist(items)
+        
+        // Delete from server (fire and forget)
+        deleteFromServer(sessionIds: Array(sessionIds))
+    }
+    
+    // MARK: - Server-Side Delete
+    /// Deletes compatibility threads from the server so they don't re-sync on login.
+    /// Uses direct URLSession (not ChatHistoryService) to avoid response-parsing failures.
+    private func deleteFromServer(sessionIds: [String]) {
+        guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else {
+            print("[CompatibilityHistoryService] ⚠️ No user email — skipping server delete")
+            return
+        }
+        
+        for sessionId in sessionIds {
+            let threadId = sessionId  // Already has compat_ prefix
+            Task {
+                let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
+                print("[CompatibilityHistoryService] DELETE → \(urlString)")
+                guard let url = URL(string: urlString) else {
+                    print("[CompatibilityHistoryService] ⚠️ Invalid delete URL: \(urlString)")
+                    return
+                }
+                
+                var request = URLRequest(url: url)
+                request.httpMethod = "DELETE"
+                request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+                
+                do {
+                    let (data, response) = try await URLSession.shared.data(for: request)
+                    if let httpResponse = response as? HTTPURLResponse {
+                        if httpResponse.statusCode == 200 {
+                            print("[CompatibilityHistoryService] ✅ Server delete \(threadId): HTTP 200")
+                        } else {
+                            let body = String(data: data, encoding: .utf8) ?? ""
+                            print("[CompatibilityHistoryService] ⚠️ Server delete \(threadId): HTTP \(httpResponse.statusCode) — \(body)")
+                        }
+                    }
+                } catch {
+                    print("[CompatibilityHistoryService] ❌ Failed to delete server thread \(threadId): \(error)")
+                }
+            }
+        }
     }
     
     // MARK: - Clear All
@@ -184,53 +306,7 @@ final class CompatibilityHistoryService {
     func get(sessionId: String) -> CompatibilityHistoryItem? {
         loadAll().first { $0.sessionId == sessionId }
     }
-    
-    // MARK: - Find Existing Match
-    /// Finds an existing match by boy and girl DOB + Time (to avoid re-triggering LLM for same pair)
-    /// Same person = same DOB + same birth time
-    /// - Parameters:
-    ///   - boyDob: Boy's date of birth in "yyyy-MM-dd" format
-    ///   - boyTime: Boy's birth time in "HH:mm:ss" format
-    ///   - girlDob: Girl's date of birth in "yyyy-MM-dd" format
-    ///   - girlTime: Girl's birth time in "HH:mm:ss" format
-    /// - Returns: Existing history item if found, nil otherwise
-    func findExistingMatch(boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> CompatibilityHistoryItem? {
-        let items = loadAll()
-        // Match on DOB + Time for accurate rematch detection
-        // Same person = same DOB + same birth time
-        return items.first { item in
-            // DOB must match
-            guard item.boyDob == boyDob && item.girlDob == girlDob else { return false }
-            
-            // Time must match (if stored)
-            // For legacy items without time, match by DOB only
-            if let storedBoyTime = item.boyTime, let storedGirlTime = item.girlTime {
-                return storedBoyTime == boyTime && storedGirlTime == girlTime
-            }
-            
-            // Legacy item without time - match by DOB only
-            return true
-        }
-    }
-    
-    /// Finds existing match by Date objects (convenience method)
-    /// Uses both date and time components for matching
-    func findExistingMatch(boyDob: Date, boyTime: Date, girlDob: Date, girlTime: Date) -> CompatibilityHistoryItem? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        let timeFormatter = DateFormatter()
-        timeFormatter.locale = Locale(identifier: "en_US_POSIX")
-        timeFormatter.dateFormat = "HH:mm:ss"
-        
-        let boyDobStr = dateFormatter.string(from: boyDob)
-        let boyTimeStr = timeFormatter.string(from: boyTime)
-        let girlDobStr = dateFormatter.string(from: girlDob)
-        let girlTimeStr = timeFormatter.string(from: girlTime)
-        
-        return findExistingMatch(boyDob: boyDobStr, boyTime: boyTimeStr, girlDob: girlDobStr, girlTime: girlTimeStr)
-    }
+
     
     // MARK: - Private Helpers
     private func persist(_ items: [CompatibilityHistoryItem]) {
@@ -405,8 +481,8 @@ final class CompatibilityHistoryService {
                     var girlName = "Partner"
                     var boyDob = ""
                     var girlDob = ""
-                    var boyTime: String? = nil
-                    var girlTime: String? = nil
+                    var boyTime = "12:00:00"
+                    var girlTime = "12:00:00"
                     var boyCity = ""
                     var girlCity = ""
                     var totalScore = 0
@@ -553,5 +629,191 @@ final class CompatibilityHistoryService {
         } catch {
             print("[CompatibilityHistoryService] Sync error: \(error)")
         }
+    }
+    
+    /// Sync from pre-fetched compat thread IDs (used by LoginSyncCoordinator to avoid duplicate thread list fetch)
+    func syncCompatThreads(userEmail: String, compatThreadIds: [String]) async {
+        print("[CompatibilityHistoryService] Starting coordinated sync for \(userEmail) with \(compatThreadIds.count) compat threads")
+        
+        // Clear existing local history to prevent duplicates
+        clearAll(forUser: userEmail)
+        
+        for threadId in compatThreadIds {
+            // Skip if already exists locally
+            if get(sessionId: threadId) != nil { continue }
+            
+            // Fetch thread detail (same logic as syncFromServer)
+            let threadDetailURL = URL(string: "\(APIConfig.baseURL)/chat-history/threads/\(userEmail)/\(threadId)")
+            guard let detailURL = threadDetailURL else { continue }
+            
+            var detailRequest = URLRequest(url: detailURL)
+            detailRequest.httpMethod = "GET"
+            detailRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            
+            do {
+                let (detailData, detailResponse) = try await URLSession.shared.data(for: detailRequest)
+                
+                guard let httpDetailResponse = detailResponse as? HTTPURLResponse,
+                      httpDetailResponse.statusCode == 200 else {
+                    print("[CompatibilityHistoryService] Failed to fetch details for \(threadId)")
+                    continue
+                }
+                
+                struct MessageItem: Codable {
+                    let id: String?
+                    let role: String
+                    let content: String
+                    let createdAt: String?
+                    let isReport: Bool?
+                    
+                    enum CodingKeys: String, CodingKey {
+                        case id, role, content
+                        case createdAt = "created_at"
+                        case isReport = "is_report"
+                    }
+                }
+                
+                struct ThreadDetailResponse: Codable {
+                    let id: String
+                    let title: String?
+                    let metadata: CompatibilityResponse?
+                    let messages: [MessageItem]?
+                    let createdAt: String?
+                    let updatedAt: String?
+                    let profileId: String?
+                    
+                    enum CodingKeys: String, CodingKey {
+                        case id, title, metadata, messages
+                        case createdAt = "created_at"
+                        case updatedAt = "updated_at"
+                        case profileId = "profile_id"
+                    }
+                }
+                
+                let threadDetail = try JSONDecoder().decode(ThreadDetailResponse.self, from: detailData)
+                
+                // Extract data from metadata (same logic as syncFromServer)
+                var boyName = "Partner"
+                var girlName = "Partner"
+                var boyDob = ""
+                var girlDob = ""
+                var boyTime = "12:00:00"
+                var girlTime = "12:00:00"
+                var boyCity = ""
+                var girlCity = ""
+                var totalScore = 0
+                var kutas: [KutaDetail] = []
+                var result: CompatibilityResult? = nil
+                
+                if let metadata = threadDetail.metadata {
+                    if let title = threadDetail.title, title.contains("&") {
+                        let parts = title.replacingOccurrences(of: "Match: ", with: "").components(separatedBy: " & ")
+                        if parts.count == 2 {
+                            boyName = parts[0]
+                            girlName = parts[1]
+                        }
+                    }
+                    
+                    if let analysisData = metadata.analysisData {
+                        if let boyDetails = analysisData.boy?.details {
+                            boyDob = boyDetails.dob
+                            boyTime = boyDetails.time
+                            boyCity = boyDetails.place
+                        }
+                        if let girlDetails = analysisData.girl?.details {
+                            girlDob = girlDetails.dob
+                            girlTime = girlDetails.time
+                            girlCity = girlDetails.place
+                        }
+                        if let ashtakoot = analysisData.joint?.ashtakootMatching,
+                           let scoreValue = ashtakoot["total_score"]?.value {
+                            if let scoreInt = scoreValue as? Int {
+                                totalScore = scoreInt
+                            } else if let scoreDouble = scoreValue as? Double {
+                                totalScore = Int(scoreDouble)
+                            }
+                        }
+                        
+                        if let ashtakoot = analysisData.joint?.ashtakootMatching {
+                            if let gunaScores = ashtakoot["guna_scores"]?.value as? [String: Any] {
+                                let kutaNames: [(String, String, Int)] = [
+                                    ("varna", "Varna", 1), ("vashya", "Vashya", 2),
+                                    ("tara", "Tara", 3), ("yoni", "Yoni", 4),
+                                    ("maitri", "Maitri", 5), ("gana", "Gana", 6),
+                                    ("bhakoot", "Bhakoot", 7), ("nadi", "Nadi", 8)
+                                ]
+                                
+                                for (key, name, maxPoints) in kutaNames {
+                                    if let kutaData = gunaScores[key] as? [String: Any] {
+                                        let scoreVal: Int
+                                        if let s = kutaData["score"] as? Int { scoreVal = s }
+                                        else if let s = kutaData["score"] as? Double { scoreVal = Int(s) }
+                                        else { scoreVal = 0 }
+                                        let desc = kutaData["description"] as? String ?? ""
+                                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: scoreVal, description: desc))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    result = CompatibilityResult(
+                        totalScore: totalScore,
+                        maxScore: 36,
+                        kutas: kutas,
+                        summary: metadata.llmAnalysis ?? "",
+                        recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
+                        analysisData: metadata.analysisData,
+                        sessionId: metadata.sessionId
+                    )
+                }
+                
+                var restoredMessages: [CompatChatMessageData] = []
+                if let backendMessages = threadDetail.messages {
+                    for msg in backendMessages {
+                        if msg.isReport == true { continue }
+                        let chatMsg = CompatChatMessageData(
+                            id: UUID().uuidString,
+                            content: msg.content,
+                            isUser: msg.role == "user",
+                            timestamp: ISO8601DateFormatter().date(from: msg.createdAt ?? "") ?? Date(),
+                            type: msg.role == "user" ? "user" : "ai"
+                        )
+                        restoredMessages.append(chatMsg)
+                    }
+                }
+                
+                let comparisonGroupId = threadDetail.metadata?.comparisonGroupId
+                let partnerIndex = threadDetail.metadata?.partnerIndex
+                
+                let item = CompatibilityHistoryItem(
+                    sessionId: threadId,
+                    timestamp: ISO8601DateFormatter().date(from: threadDetail.createdAt ?? "") ?? Date(),
+                    boyName: boyName,
+                    boyDob: boyDob,
+                    boyTime: boyTime,
+                    boyCity: boyCity,
+                    girlName: girlName,
+                    girlDob: girlDob,
+                    girlTime: girlTime,
+                    girlCity: girlCity,
+                    totalScore: totalScore,
+                    maxScore: 36,
+                    result: result,
+                    chatMessages: restoredMessages,
+                    comparisonGroupId: comparisonGroupId,
+                    partnerIndex: partnerIndex
+                )
+                
+                let targetProfileId = threadDetail.profileId ?? "self"
+                save(item, toProfileId: targetProfileId, userEmail: userEmail)
+                print("[CompatibilityHistoryService] Restored: \(threadId) to profile: \(targetProfileId)")
+                
+            } catch {
+                print("[CompatibilityHistoryService] Failed to parse thread \(threadId): \(error)")
+            }
+        }
+        
+        print("[CompatibilityHistoryService] Coordinated sync complete")
     }
 }

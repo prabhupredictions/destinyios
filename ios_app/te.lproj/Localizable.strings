@@ -439,3 +439,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "ఇలాంటి వివరాలతో జన్మ చార్ట్ ఇప్పటికే ఉంది. ప్రతి వ్యక్తికి ఒక చార్ట్ మాత్రమే ఉంటుంది. సహాయం కోసం, support@destinyaiastrology.com ను సంప్రదించండి.";
 
+
+"syncing_cosmic_data" = "నేటి అంతర్దృష్టులను లోడ్ చేస్తోంది…";

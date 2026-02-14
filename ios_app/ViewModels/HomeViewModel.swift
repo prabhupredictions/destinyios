@@ -101,6 +101,12 @@ class HomeViewModel {
     
     // MARK: - Load Home Data
     func loadHomeData() async {
+        // Prevent concurrent calls (e.g., .task + profile switch firing close together)
+        guard !isLoading else {
+            print("[HomeViewModel] loadHomeData already in progress — skipping")
+            return
+        }
+        
         await MainActor.run {
             isLoading = true
             errorMessage = nil

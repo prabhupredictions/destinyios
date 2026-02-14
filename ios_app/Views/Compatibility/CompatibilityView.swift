@@ -4,12 +4,16 @@ import SwiftUI
 struct CompatibilityView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = CompatibilityViewModel()
+    @ObservedObject private var quotaManager = QuotaManager.shared
     @State private var selectedTab = 0 // 0 = Boy, 1 = Girl
     @State private var showBoyLocationSearch = false
     @State private var showGirlLocationSearch = false
     @State private var showChartsSheet = false
     @State private var showPartnerPicker = false
     @State private var savePartnerForFuture = false
+    
+    // Focus State for Name Field
+    @FocusState private var isNameFocused: Bool
     
     // Picker States
     @State private var showBoyDatePicker = false
@@ -30,9 +34,11 @@ struct CompatibilityView: View {
     
     // External callbacks/props
     var initialMatchItem: CompatibilityHistoryItem? = nil
+    var initialMatchGroup: ComparisonGroup? = nil
     var onShowResultChange: ((Bool) -> Void)? = nil
     
     @State private var hasHandledInitialMatch = false
+    @State private var hasHandledInitialGroup = false
     
     var body: some View {
         ZStack {
@@ -195,11 +201,42 @@ struct CompatibilityView: View {
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
         }
-        .sheet(isPresented: $showHistorySheet) {
-            CompatibilityHistorySheet { selectedItem in
-                showHistorySheet = false
-                viewModel.loadFromHistory(selectedItem)
+        // "Loaded from history" toast when cached match is used
+        .overlay(alignment: .top) {
+            if viewModel.historyLoadedToast {
+                HStack(spacing: 8) {
+                    Image(systemName: "clock.arrow.circlepath")
+                    Text("Loaded from history")
+                }
+                .font(AppTheme.Fonts.body(size: 14))
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(Color.purple.opacity(0.85))
+                )
+                .padding(.top, 60)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        withAnimation { viewModel.historyLoadedToast = false }
+                    }
+                }
             }
+        }
+        .animation(.easeInOut(duration: 0.3), value: viewModel.historyLoadedToast)
+        .sheet(isPresented: $showHistorySheet) {
+            CompatibilityHistorySheet(
+                onSelect: { selectedItem in
+                    showHistorySheet = false
+                    viewModel.loadFromHistory(selectedItem)
+                },
+                onGroupSelect: { selectedGroup in
+                    showHistorySheet = false
+                    viewModel.loadFromHistoryGroup(selectedGroup)
+                }
+            )
         }
         .sheet(isPresented: $showGenderSheet) {
             PremiumSelectionSheet(
@@ -238,6 +275,7 @@ struct CompatibilityView: View {
                 
                 // Parse and set date
                 let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 if let date = dateFormatter.date(from: partner.dateOfBirth) {
                     viewModel.girlBirthDate = date
@@ -246,6 +284,7 @@ struct CompatibilityView: View {
                 // Parse and set time if available
                 if let timeString = partner.timeOfBirth {
                     let timeFormatter = DateFormatter()
+                    timeFormatter.locale = Locale(identifier: "en_US_POSIX")
                     timeFormatter.dateFormat = "HH:mm"
                     if let time = timeFormatter.date(from: timeString) {
                         viewModel.girlBirthTime = time
@@ -270,6 +309,17 @@ struct CompatibilityView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     viewModel.loadFromHistory(item)
                 }
+            }
+            if let group = initialMatchGroup, !hasHandledInitialGroup {
+                hasHandledInitialGroup = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    viewModel.loadFromHistoryGroup(group)
+                }
+            }
+        }
+        .onChange(of: initialMatchGroup) { oldValue, newValue in
+            if let group = newValue {
+                viewModel.loadFromHistoryGroup(group)
             }
         }
         .onChange(of: ProfileContextManager.shared.activeProfileId) { oldProfileId, newProfileId in
@@ -476,27 +526,44 @@ struct CompatibilityView: View {
                         }
                     }
                     
-                    // Add button (max 3 partners)
+                    // Add button (Plus-only, max 3 partners)
                     let maxPartners = 3
-                    let canAddMore = viewModel.partners.count < maxPartners
+                    let isPlus = quotaManager.isPlus
+                    let canAddMore = isPlus && viewModel.partners.count < maxPartners
                     
                     Button(action: { 
+                        if !isPlus {
+                            // Non-Plus: show subscription paywall
+                            showSubscription = true
+                            return
+                        }
                         guard canAddMore else { return }
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             viewModel.addPartner() 
                         }
                     }) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 11, weight: .medium))
-                            .padding(6)
-                            .foregroundColor(canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [3]))
-                                    .foregroundColor(canAddMore ? AppTheme.Colors.gold.opacity(0.4) : AppTheme.Colors.textTertiary.opacity(0.3))
-                            )
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: isPlus ? "plus" : "plus")
+                                .font(.system(size: 11, weight: .medium))
+                                .padding(6)
+                                .foregroundColor(isPlus ? (canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary) : AppTheme.Colors.textTertiary)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [3]))
+                                        .foregroundColor(isPlus ? (canAddMore ? AppTheme.Colors.gold.opacity(0.4) : AppTheme.Colors.textTertiary.opacity(0.3)) : AppTheme.Colors.gold.opacity(0.3))
+                                )
+                            
+                            // Crown badge for non-Plus users
+                            if !isPlus {
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 7))
+                                    .foregroundColor(AppTheme.Colors.gold)
+                                    .offset(x: 3, y: -3)
+                            }
+                        }
                     }
-                    .disabled(!canAddMore)
+                    .disabled(isPlus && !canAddMore)  // Only disable at max for Plus users; non-Plus always tappable (opens paywall)
+                    .accessibilityLabel(isPlus ? "Add partner" : "Upgrade to Plus to add multiple partners")
                     
                     Spacer()
                     
@@ -512,6 +579,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                                 .padding(6)
                         }
+                        .accessibilityLabel("Remove partner")
                     }
                 }
                 .padding(.bottom, 4)
@@ -533,14 +601,19 @@ struct CompatibilityView: View {
                         TextField("", text: $viewModel.girlName)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(AppTheme.Colors.textPrimary)
+                            .focused($isNameFocused)
                     }
                     
                     // Search icon to open saved partners
-                    Button(action: { showPartnerPicker = true }) {
+                    Button(action: { 
+                        isNameFocused = false
+                        showPartnerPicker = true 
+                    }) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
                     }
+                    .accessibilityLabel("Search saved partners")
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 11)
@@ -554,6 +627,7 @@ struct CompatibilityView: View {
                 // Gender Selection (Compact Button triggering Sheet)
                 Button(action: { 
                     HapticManager.shared.play(.light)
+                    isNameFocused = false
                     showGenderSheet = true 
                 }) {
                     HStack(spacing: 6) {
@@ -579,12 +653,16 @@ struct CompatibilityView: View {
                     )
                 }
                 .frame(width: 140)
+                .accessibilityLabel(viewModel.partnerGender.isEmpty ? "Select gender" : "Gender: \(viewModel.partnerGender)")
             }
             
             // Date & Time Row
             HStack(spacing: 10) {
                 // Date Button
-                Button(action: { showGirlDatePicker = true }) {
+                Button(action: { 
+                    isNameFocused = false
+                    showGirlDatePicker = true 
+                }) {
                     HStack(spacing: 6) {
                         Image(systemName: "calendar")
                             .font(.system(size: 12))
@@ -604,10 +682,12 @@ struct CompatibilityView: View {
                             .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                     )
                 }
+                .accessibilityLabel(viewModel.currentPartner.birthDateSet ? "Date of birth: \(viewModel.formattedGirlDob)" : "Select date of birth")
                 
                 // Time Button
                 Button(action: { 
                     if !viewModel.partnerTimeUnknown {
+                        isNameFocused = false
                         showGirlTimePicker = true 
                     }
                 }) {
@@ -632,10 +712,14 @@ struct CompatibilityView: View {
                 }
                 .frame(width: 140)
                 .disabled(viewModel.partnerTimeUnknown)
+                .accessibilityLabel(viewModel.partnerTimeUnknown ? "Time of birth: unknown" : (viewModel.currentPartner.birthTimeSet ? "Time of birth: \(viewModel.formattedGirlTime)" : "Select time of birth"))
             }
             
             // Place Button (full width) - Moved UP for better vertical flow
-            Button(action: { showGirlLocationSearch = true }) {
+            Button(action: { 
+                isNameFocused = false
+                showGirlLocationSearch = true 
+            }) {
                 HStack(spacing: 6) {
                     Image(systemName: "location")
                         .font(.system(size: 12))
@@ -658,6 +742,7 @@ struct CompatibilityView: View {
                         .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                 )
             }
+            .accessibilityLabel(viewModel.girlCity.isEmpty ? "Select birth city" : "Birth city: \(viewModel.girlCity)")
             
             // Time Unknown & Save Row (Moved to Bottom)
             VStack(alignment: .leading, spacing: 4) {
@@ -665,6 +750,7 @@ struct CompatibilityView: View {
                     // Time Unknown Toggle
                     Button(action: {
                         HapticManager.shared.play(.light)
+                        isNameFocused = false
                         withAnimation { viewModel.partnerTimeUnknown.toggle() }
                     }) {
                         HStack(spacing: 6) {
@@ -676,6 +762,8 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
+                    .accessibilityLabel("Birth time unknown")
+                    .accessibilityAddTraits(viewModel.partnerTimeUnknown ? .isSelected : [])
                     
                     // Save Partner Toggle
                     Button(action: {
@@ -691,12 +779,14 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
+                    .accessibilityLabel("Save partner for future")
+                    .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     
                     Spacer()
                 }
                 
                 if viewModel.partnerTimeUnknown {
-                    Text("Note: Analysis accuracy may be reduced without an exact birth time.")
+                    Text("birth_time_warning".localized)
                         .font(AppTheme.Fonts.caption(size: 11))
                         .foregroundColor(AppTheme.Colors.warning)
                         .fixedSize(horizontal: false, vertical: true)

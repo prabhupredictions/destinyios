@@ -11,6 +11,9 @@ struct ChatView: View {
     // Initial thread ID passed from History
     var initialThreadId: String? = nil
     
+    // Starter questions from HomeViewModel ("What's in my mind?")
+    var starterQuestions: [String] = []
+    
     @State private var viewModel = ChatViewModel()
     @FocusState private var isInputFocused: Bool
     @State private var showHistory = false
@@ -19,6 +22,7 @@ struct ChatView: View {
     @State private var showSubscription = false
     @State private var hasHandledInitialQuestion = false
     @State private var hasHandledInitialThread = false
+    @State private var chatTransitionOpacity: Double = 1.0
     
     // For sign out flow
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -36,21 +40,17 @@ struct ChatView: View {
                 ChatHeader(
                     onBackTap: { onBack?() },
                     onHistoryTap: { showHistory.toggle() },
-                    onNewChatTap: { viewModel.startNewChat() },
+                    onNewChatTap: { startNewChatWithTransition() },
                     onChartTap: { showChart.toggle() }
                 )
                 
                 // Messages
                 messagesView
+                    .opacity(chatTransitionOpacity)
                 
                 // Error message
                 if let error = viewModel.errorMessage {
                     errorBanner(error)
-                }
-                
-                // Suggested follow-up questions (after last response)
-                if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading {
-                    suggestedQuestionsView
                 }
                 
                 // Input bar
@@ -99,9 +99,10 @@ struct ChatView: View {
             SubscriptionView()
         }
         .onChange(of: initialQuestion) { oldValue, newValue in
-            // When we receive an initial question, send it immediately
-            if let question = newValue, !question.isEmpty, !hasHandledInitialQuestion {
+            // Every new question from Home always starts a fresh chat
+            if let question = newValue, !question.isEmpty, question != oldValue {
                 hasHandledInitialQuestion = true
+                viewModel.startNewChat()
                 viewModel.inputText = question
                 Task {
                     await viewModel.sendMessage()
@@ -123,9 +124,10 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            // Handle initial question on first appear
+            // Handle initial question on first appear — always in a NEW chat
             if let question = initialQuestion, !question.isEmpty, !hasHandledInitialQuestion {
                 hasHandledInitialQuestion = true
+                viewModel.startNewChat()
                 viewModel.inputText = question
                 Task {
                     await viewModel.sendMessage()
@@ -164,43 +166,238 @@ struct ChatView: View {
         print("[SignOut] Navigating to Auth (guest data preserved for carry-forward)")
     }
     
-    // MARK: - Messages View (Optimized for smooth scrolling)
+    // MARK: - New Chat Transition (ChatGPT-like)
+    private func startNewChatWithTransition() {
+        HapticManager.shared.play(.medium)
+        isInputFocused = false
+        
+        // Fade out current messages
+        withAnimation(.easeOut(duration: 0.2)) {
+            chatTransitionOpacity = 0.0
+        }
+        
+        // After fade-out completes, create new chat and fade back in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            viewModel.startNewChat()
+            withAnimation(.easeIn(duration: 0.25)) {
+                chatTransitionOpacity = 1.0
+            }
+        }
+    }
+    
+    // MARK: - Starter Questions ("What's in my mind?" from Home)
+    private static let fallbackQuestions = [
+        "When will I get married?",
+        "Best career direction?",
+        "Financial outlook?",
+        "Health check"
+    ]
+    
+    private var activeStarterQuestions: [String] {
+        let questions = starterQuestions.isEmpty ? Self.fallbackQuestions : Array(starterQuestions.prefix(4))
+        return questions
+    }
+    
+    private var isNewChat: Bool {
+        let nonStreamingMessages = viewModel.messages.filter { !$0.isStreaming }
+        return nonStreamingMessages.count <= 1
+    }
+    
+    private var starterQuestionsView: some View {
+        VStack(spacing: 16) {
+            Spacer()
+            
+            // Sparkle icon (matches compat chat welcomeView)
+            ZStack {
+                Circle()
+                    .fill(AppTheme.Colors.gold.opacity(0.1))
+                    .frame(width: 72, height: 72)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 32))
+                    .foregroundColor(AppTheme.Colors.gold)
+            }
+            
+            // Title
+            Text("Ask Destiny")
+                .font(AppTheme.Fonts.title(size: 20))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            // Subtitle
+            Text("Your personal astrology guide. Ask about your day, relationships, career, or path ahead.")
+                .font(AppTheme.Fonts.body(size: 14))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+            
+            // Pill questions
+            VStack(spacing: 10) {
+                ForEach(activeStarterQuestions, id: \.self) { question in
+                    Button(action: {
+                        HapticManager.shared.play(.light)
+                        viewModel.inputText = question
+                        if viewModel.canAskQuestion {
+                            Task { await viewModel.sendMessage() }
+                        } else {
+                            showQuotaExhausted = true
+                        }
+                    }) {
+                        Text(question)
+                            .font(AppTheme.Fonts.caption(size: 13))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(AppTheme.Colors.gold.opacity(0.1))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.top, 8)
+            
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(24)
+    }
+    
+    // MARK: - Inline Suggested Questions (horizontal scrollable pills)
+    private var inlineSuggestedQuestionsView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("suggested_questions".localized)
+                .font(AppTheme.Fonts.caption())
+                .foregroundColor(AppTheme.Colors.textSecondary)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(viewModel.suggestedQuestions, id: \.self) { question in
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            viewModel.inputText = question
+                            viewModel.suggestedQuestions = []
+                            if viewModel.canAskQuestion {
+                                Task { await viewModel.sendMessage() }
+                            } else {
+                                showQuotaExhausted = true
+                            }
+                        }) {
+                            Text(question)
+                                .font(AppTheme.Fonts.body(size: 13))
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .fill(AppTheme.Colors.gold.opacity(0.1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 18)
+                                                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(.top, 4)
+    }
+    
+    // MARK: - Messages View (matches compat chat scroll pattern exactly)
     private var messagesView: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: 16) {
-                    // Show all messages including streaming ones
-                    ForEach(viewModel.messages.filter { 
-                        !$0.content.isEmpty || 
-                        $0.isStreaming  // Show streaming placeholder for loading state
-                    }) { message in
-                        MessageBubble(
-                            message: message,
-                            userQuery: getUserQuery(for: message),
-                            streamingContent: message.isStreaming ? viewModel.streamingContent : nil,
-                            thinkingSteps: message.isStreaming ? viewModel.thinkingSteps : []
-                        )
-                        .id(message.id)
+                if isNewChat && !viewModel.isLoading {
+                    starterQuestionsView
+                } else {
+                    LazyVStack(spacing: 16) {
+                        ForEach(viewModel.messages.filter { !$0.content.isEmpty }) { message in
+                            MessageBubble(
+                                message: message,
+                                userQuery: getUserQuery(for: message),
+                                streamingContent: nil,
+                                thinkingSteps: [],
+                                enableTypewriter: message.id == viewModel.typewriterMessageId,
+                                onTypewriterFinished: {
+                                    viewModel.typewriterMessageId = nil
+                                }
+                            )
+                            .id(message.id)
+                        }
+                        
+                        // Loading indicator (matches compat chat's CompatTypingIndicator)
+                        if viewModel.isLoading {
+                            thinkingIndicator
+                                .id("loading")
+                        }
+                        
+                        // Inline suggested questions — only after typewriter finishes
+                        if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && viewModel.typewriterMessageId == nil {
+                            inlineSuggestedQuestionsView
+                        }
                     }
-                    
-                    // Bottom anchor for reliable scrolling
-                    Color.clear
-                        .frame(height: 1)
-                        .id("bottomAnchor")
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 16)
                 }
-                .padding(.horizontal, 12) // Optimized per HIG
-                .padding(.vertical, 16)
+                
+                Color.clear
+                    .frame(height: 1)
+                    .id("bottomAnchor")
             }
-            .defaultScrollAnchor(.bottom)  // iOS 17+ - start at bottom
+            .defaultScrollAnchor(.bottom)
             .scrollDismissesKeyboard(.interactively)
+            // Scroll when a new message is added (user msg or AI response)
             .onChange(of: viewModel.messages.count) { _, _ in
-                scrollToBottom(proxy)
+                withAnimation {
+                    proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                }
             }
-            .onChange(of: viewModel.isLoading) { oldValue, newValue in
-                // Scroll when loading starts or ends
-                scrollToBottom(proxy)
+            // Scroll when loading starts (show thinking indicator)
+            .onChange(of: viewModel.isLoading) { _, isLoading in
+                withAnimation {
+                    if isLoading {
+                        proxy.scrollTo("loading", anchor: .bottom)
+                    }
+                }
+            }
+            // Scroll when keyboard appears
+            .onChange(of: isInputFocused) { _, focused in
+                if focused {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation {
+                            proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                        }
+                    }
+                }
             }
         }
+    }
+    
+    // MARK: - Thinking Indicator (lean pill, reuses AnimatedDots from MessageBubble)
+    private var thinkingIndicator: some View {
+        HStack(spacing: 10) {
+            AnimatedDots()
+            
+            Text("Thinking...")
+                .font(AppTheme.Fonts.body(size: 14))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(AppTheme.Colors.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     // Pre-compute user query outside of ForEach body
@@ -214,21 +411,6 @@ struct ChatView: View {
         return findPreviousUserQuery(before: index)
     }
     
-    private func scrollToBottom(_ proxy: ScrollViewProxy) {
-        // Scroll to last visible content, not invisible anchor
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                // If loading, scroll to typing indicator
-                if viewModel.isLoading {
-                    proxy.scrollTo("typing", anchor: .bottom)
-                } 
-                // Otherwise scroll to last message
-                else if let lastMessage = viewModel.messages.last(where: { !$0.content.isEmpty }) {
-                    proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                }
-            }
-        }
-    }
     
     /// Find the user's question that precedes an AI message (for feedback)
     private func findPreviousUserQuery(before index: Int) -> String {
@@ -259,56 +441,19 @@ struct ChatView: View {
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
     
-    // MARK: - Suggested Questions
-    private var suggestedQuestionsView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("suggested_questions".localized)
-                .font(AppTheme.Fonts.caption())
-                .foregroundColor(AppTheme.Colors.textSecondary)
-                .padding(.horizontal, 16)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(viewModel.suggestedQuestions, id: \.self) { question in
-                        Button(action: {
-                            // Clear suggestions and send as new message
-                            viewModel.inputText = question
-                            viewModel.suggestedQuestions = []
-                            if viewModel.canAskQuestion {
-                                Task { await viewModel.sendMessage() }
-                            } else {
-                                showQuotaExhausted = true
-                            }
-                        }) {
-                            Text(question)
-                                .font(AppTheme.Fonts.body(size: 13))
-                                .foregroundColor(AppTheme.Colors.textPrimary)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 18)
-                                        .fill(AppTheme.Colors.cardBackground)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 18)
-                                        .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding(.horizontal, 16)
-            }
-        }
-        .padding(.vertical, 8)
-        .background(AppTheme.Colors.mainBackground)
-    }
 }
 
 // MARK: - Chat History Sidebar
 struct ChatHistorySidebar: View {
     let viewModel: ChatViewModel
     let onDismiss: () -> Void
+    
+    // Pagination state
+    @State private var loadedThreads: [LocalChatThread] = []
+    @State private var hasMore = false
+    @State private var isLoadingMore = false
+    private let pageSize = 20
+    @State private var currentOffset = 0
     
     var body: some View {
         NavigationStack {
@@ -349,15 +494,68 @@ struct ChatHistorySidebar: View {
                 }
                 #endif
             }
+            .onAppear {
+                loadFirstPage()
+            }
+        }
+    }
+    
+    // MARK: - Pagination
+    private func loadFirstPage() {
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
+        let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: 0)
+        loadedThreads = result.threads
+        hasMore = result.hasMore
+        currentOffset = result.threads.count
+    }
+    
+    private func loadMore() {
+        guard hasMore, !isLoadingMore else { return }
+        isLoadingMore = true
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
+        let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: currentOffset)
+        loadedThreads.append(contentsOf: result.threads)
+        hasMore = result.hasMore
+        currentOffset += result.threads.count
+        isLoadingMore = false
+    }
+    
+    // MARK: - Group threads by date (operates on loaded page only)
+    private var groupedThreads: [(String, [LocalChatThread])] {
+        let calendar = Calendar.current
+        let now = Date()
+        var grouped: [String: [LocalChatThread]] = [:]
+        
+        for thread in loadedThreads {
+            let key: String
+            if calendar.isDateInToday(thread.updatedAt) {
+                key = "Today"
+            } else if calendar.isDateInYesterday(thread.updatedAt) {
+                key = "Yesterday"
+            } else if let daysAgo = calendar.dateComponents([.day], from: thread.updatedAt, to: now).day, daysAgo < 7 {
+                key = "Last 7 Days"
+            } else if let daysAgo = calendar.dateComponents([.day], from: thread.updatedAt, to: now).day, daysAgo < 30 {
+                key = "Last 30 Days"
+            } else {
+                key = "Older"
+            }
+            grouped[key, default: []].append(thread)
+        }
+        
+        let order = ["Today", "Yesterday", "Last 7 Days", "Last 30 Days", "Older"]
+        return order.compactMap { key in
+            if let threads = grouped[key], !threads.isEmpty {
+                return (key, threads)
+            }
+            return nil
         }
     }
     
     // MARK: - History List with Swipe Actions
     private var historyList: some View {
-        // Fetch chat threads for user filtered by active profile
-        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        let activeProfileId = ProfileContextManager.shared.activeProfileId
-        let grouped = viewModel.dataManager.fetchChatThreadsGroupedByDate(for: userEmail, profileId: activeProfileId)
+        let grouped = groupedThreads
         
         return Group {
             if grouped.isEmpty {
@@ -391,6 +589,7 @@ struct ChatHistorySidebar: View {
                                     },
                                     onDelete: {
                                         viewModel.deleteThread(thread)
+                                        loadedThreads.removeAll { $0.id == thread.id }
                                     },
                                     onPin: {
                                         viewModel.togglePinThread(thread)
@@ -398,8 +597,25 @@ struct ChatHistorySidebar: View {
                                 )
                                 .listRowBackground(Color.clear)
                                 .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+                                .onAppear {
+                                    // Load more when near the end
+                                    if thread.id == loadedThreads.last?.id {
+                                        loadMore()
+                                    }
+                                }
                             }
                         }
+                    }
+                    
+                    // Loading more indicator
+                    if isLoadingMore {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                                .tint(AppTheme.Colors.gold)
+                            Spacer()
+                        }
+                        .listRowBackground(Color.clear)
                     }
                 }
                 .listStyle(.plain)

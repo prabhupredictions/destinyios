@@ -439,3 +439,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "இதே போன்ற விவரங்களுடன் ஜாதக அட்டவணை ஏற்கனவே உள்ளது. ஒவ்வொரு நபருக்கும் ஒரே ஒரு அட்டவணை இருக்க முடியும். உதவிக்கு, support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
 
+
+"syncing_cosmic_data" = "இன்றைய தகவல்களை ஏற்றுகிறது…";

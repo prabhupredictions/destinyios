@@ -104,6 +104,40 @@ final class DataManager {
         return threads
     }
     
+    /// Paginated fetch of threads for a user — for History screen infinite scroll
+    /// Returns up to `limit` threads starting from `offset`, sorted by updatedAt desc (pinned first)
+    func fetchThreadsPaginated(for userEmail: String, profileId: String? = nil, limit: Int = 20, offset: Int = 0, includeArchived: Bool = false) -> [LocalChatThread] {
+        // Reuse existing full-fetch + filter (SwiftData predicates can't handle profileId "self" legacy logic)
+        // Then apply limit/offset on the filtered result
+        let all = fetchAllThreads(for: userEmail, profileId: profileId, includeArchived: includeArchived)
+        guard offset < all.count else { return [] }
+        let end = min(offset + limit, all.count)
+        return Array(all[offset..<end])
+    }
+    
+    /// Count total threads for a user (for pagination metadata)
+    func countThreads(for userEmail: String, profileId: String? = nil, includeArchived: Bool = false) -> Int {
+        return fetchAllThreads(for: userEmail, profileId: profileId, includeArchived: includeArchived).count
+    }
+    
+    /// Paginated fetch of chat-only threads (excludes compatibility threads) — for Chat History sidebar
+    func fetchChatThreadsPaginated(for userEmail: String, profileId: String? = nil, limit: Int = 20, offset: Int = 0) -> (threads: [LocalChatThread], hasMore: Bool) {
+        let allThreads = fetchAllThreads(for: userEmail, profileId: profileId)
+        
+        // Filter out compatibility-related threads
+        let chatThreads = allThreads.filter { thread in
+            let id = thread.id.lowercased()
+            let isCompat = id.hasPrefix("compat_") || id.hasPrefix("conv_")
+            let hasUserInteraction = thread.messageCount > 0
+            return !isCompat && hasUserInteraction
+        }
+        
+        guard offset < chatThreads.count else { return ([], false) }
+        let end = min(offset + limit, chatThreads.count)
+        let page = Array(chatThreads[offset..<end])
+        return (page, end < chatThreads.count)
+    }
+    
     /// Fetch all threads for a user (by email) - for History screen
     /// If profileId is provided, only threads for that profile are returned
     func fetchAllThreads(for userEmail: String, profileId: String? = nil, includeArchived: Bool = false) -> [LocalChatThread] {
@@ -224,14 +258,53 @@ final class DataManager {
         try? context.save()
     }
     
-    /// Delete a thread and its messages
+    /// Delete a thread and its messages (local + server)
     func deleteThread(_ thread: LocalChatThread) {
-        let messages = fetchMessages(for: thread.id)
+        let threadId = thread.id
+        let messages = fetchMessages(for: threadId)
         for message in messages {
             context.delete(message)
         }
         context.delete(thread)
         try? context.save()
+        
+        // Also delete from server so it doesn't re-sync on login
+        deleteThreadFromServer(threadId: threadId)
+    }
+    
+    /// Fire-and-forget server-side thread deletion
+    private func deleteThreadFromServer(threadId: String) {
+        guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else {
+            print("[DataManager] ⚠️ No userEmail — skipping server delete for \(threadId)")
+            return
+        }
+        
+        Task {
+            let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
+            print("[DataManager] DELETE → \(urlString)")
+            guard let url = URL(string: urlString) else {
+                print("[DataManager] ⚠️ Invalid URL for delete: \(urlString)")
+                return
+            }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode == 200 {
+                        print("[DataManager] ✅ Server delete thread \(threadId): HTTP 200")
+                    } else {
+                        let body = String(data: data, encoding: .utf8) ?? ""
+                        print("[DataManager] ⚠️ Server delete thread \(threadId): HTTP \(httpResponse.statusCode) — \(body)")
+                    }
+                }
+            } catch {
+                print("[DataManager] ❌ Failed to delete server thread \(threadId): \(error)")
+            }
+        }
     }
     
     /// Delete ALL threads and messages for a user email

@@ -95,8 +95,7 @@ struct LanguageSettingsSheet: View {
         UserDefaults.standard.synchronize()
         
         // Haptic feedback
-        let impact = UIImpactFeedbackGenerator(style: .medium)
-        impact.impactOccurred()
+        HapticManager.shared.play(.medium)
     }
 }
 

@@ -93,6 +93,7 @@ struct OrbitalBackground: View {
             }
         }
         .ignoresSafeArea()
+        .accessibilityHidden(true)
     }
 }
 

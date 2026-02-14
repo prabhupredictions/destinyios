@@ -26,6 +26,8 @@ struct ProfileView: View {
     @State private var showProfileSwitcher = false  // Switch Birth Chart sheet
     @State private var showUpgradePrompt = false  // Upgrade prompt for Switch Profile feature
     @State private var showGuestSignInForSwitch = false  // Guest sign-in prompt for Switch Profile
+    @State private var showNotificationPreferences = false  // Notification preferences sheet
+    @State private var showPartnerManager = false  // Partner manager sheet (Plus-only)
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -125,6 +127,14 @@ struct ProfileView: View {
                 )
                 .environment(authViewModel)
             }
+            .sheet(isPresented: $showNotificationPreferences) {
+                NotificationPreferencesSheet(userEmail: userEmail)
+            }
+            .sheet(isPresented: $showPartnerManager) {
+                NavigationStack {
+                    PartnerManagerView()
+                }
+            }
             .preferredColorScheme(.dark)
         }
     }
@@ -194,25 +204,33 @@ struct ProfileView: View {
                     action: { showBirthDetails = true }
                 )
                 
-                NavigationLink {
-                    PartnerManagerView()
-                } label: {
-                    PremiumListItem<EmptyView>(
-                        title: "Manage Birth Charts",
-                        subtitle: "Manage birth charts",
-                        icon: "person.2.fill",
-                        showChevron: true
-                    )
-                }
-                .buttonStyle(PlainButtonStyle())
+                // Manage Birth Charts (Plus-only)
+                PremiumListItem(
+                    title: "Manage Birth Charts",
+                    subtitle: quotaManager.hasFeature(.maintainProfile) ? "Manage birth charts" : "Plus plan feature",
+                    icon: "person.2.fill",
+                    isPremiumFeature: !quotaManager.hasFeature(.maintainProfile),
+                    action: {
+                        if isGuestUser {
+                            showGuestSignInForSwitch = true
+                        } else if quotaManager.hasFeature(.maintainProfile) {
+                            showPartnerManager = true
+                        } else {
+                            showUpgradePrompt = true
+                        }
+                    }
+                )
                 
                 // Switch Birth Chart - moved from HomeView header
                 PremiumListItem(
                     title: "Switch Birth Chart",
-                    subtitle: ProfileContextManager.shared.isUsingSelf 
-                        ? "Viewing as \(ProfileContextManager.shared.activeProfileName)" 
-                        : "Using \(ProfileContextManager.shared.activeProfileName)'s chart",
+                    subtitle: quotaManager.hasFeature(.switchProfile)
+                        ? (ProfileContextManager.shared.isUsingSelf 
+                            ? "Viewing as \(ProfileContextManager.shared.activeProfileName)" 
+                            : "Using \(ProfileContextManager.shared.activeProfileName)'s chart")
+                        : "Plus plan feature",
                     icon: "arrow.triangle.2.circlepath",
+                    isPremiumFeature: !quotaManager.hasFeature(.switchProfile),
                     action: {
                         // GUEST RULE: Guests must sign in first
                         if isGuestUser {
@@ -258,6 +276,21 @@ struct ProfileView: View {
                     subtitle: chartStyle == "north" ? "North Indian" : "South Indian",
                     icon: "square.grid.3x3.fill",
                     action: { showChartStylePicker = true }
+                )
+                
+                // Notification Preferences (Plus-only)
+                PremiumListItem(
+                    title: "Notification Preferences",
+                    subtitle: quotaManager.hasFeature(.alerts) ? "Customize your alerts" : "Plus plan feature",
+                    icon: "bell.badge.fill",
+                    isPremiumFeature: !quotaManager.hasFeature(.alerts),
+                    action: {
+                        if quotaManager.hasFeature(.alerts) {
+                            showNotificationPreferences = true
+                        } else {
+                            showUpgradePrompt = true
+                        }
+                    }
                 )
             }
         }

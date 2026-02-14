@@ -438,3 +438,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "同様の詳細を持つ出生チャートが既に存在します。各人につきチャートは1つのみです。サポートについては、support@destinyaiastrology.com にお問い合わせください。";
 
+
+"syncing_cosmic_data" = "今日のインサイトを読み込んでいます…";

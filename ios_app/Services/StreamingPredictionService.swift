@@ -60,6 +60,7 @@ class StreamingPredictionService {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 60
         config.timeoutIntervalForResource = 120
+        config.waitsForConnectivity = true
         let session = URLSession(configuration: config)
         
         // Use bytes for SSE streaming

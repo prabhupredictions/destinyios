@@ -439,3 +439,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "സമാന വിവരങ്ങളുള്ള ജനന ചാർട്ട് ഇതിനകം നിലവിലുണ്ട്. ഓരോ വ്യക്തിക്കും ഒരു ചാർട്ട് മാത്രമേ ഉണ്ടാകൂ. സഹായത്തിന്, support@destinyaiastrology.com എന്നതിൽ ബന്ധപ്പെടുക.";
 
+
+"syncing_cosmic_data" = "ഇന്നത്തെ ഉൾക്കാഴ്ചകൾ ലോഡ് ചെയ്യുന്നു…";

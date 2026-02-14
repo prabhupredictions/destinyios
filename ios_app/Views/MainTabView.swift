@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 /// Main tab view with custom floating tab bar
 struct MainTabView: View {
@@ -8,9 +9,11 @@ struct MainTabView: View {
     @State private var pendingQuestion: String? = nil
     @State private var pendingThreadId: String? = nil
     @State private var pendingMatchItem: CompatibilityHistoryItem? = nil
+    @State private var pendingMatchGroup: ComparisonGroup? = nil
     @State private var showMatchResult = false  // Track if match result is showing
     @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
+    @State private var isKeyboardVisible = false  // Track keyboard for tab bar hiding
     
     /// Reactive guest user check - uses @AppStorage for automatic UI updates
     @AppStorage("isGuest") private var isGuestUser = false
@@ -37,10 +40,21 @@ struct MainTabView: View {
                                 showGuestSignInSheet = true
                             } else {
                                 pendingMatchItem = matchItem
+                                pendingMatchGroup = nil  // Clear any pending group
+                                selectedTab = 2 // Navigate to match
+                            }
+                        },
+                        onMatchGroupHistorySelected: { group in
+                            if isGuestUser {
+                                showGuestSignInSheet = true
+                            } else {
+                                pendingMatchGroup = group
+                                pendingMatchItem = nil  // Clear any pending single item
                                 selectedTab = 2 // Navigate to match
                             }
                         }
                     )
+                    .ignoresSafeArea(.keyboard)
                 case 1:
                     ChatView(
                         onBack: { 
@@ -49,7 +63,8 @@ struct MainTabView: View {
                             pendingThreadId = nil
                         },
                         initialQuestion: pendingQuestion,
-                        initialThreadId: pendingThreadId
+                        initialThreadId: pendingThreadId,
+                        starterQuestions: homeViewModel.suggestedQuestions
                     )
                 case 2:
                     // Guest users cannot access Match tab - show sign-in prompt
@@ -58,9 +73,11 @@ struct MainTabView: View {
                             message: "sign_in_to_check_compatibility".localized,
                             onBack: { selectedTab = 0 }
                         )
+                        .ignoresSafeArea(.keyboard)
                     } else {
                         CompatibilityView(
                             initialMatchItem: pendingMatchItem,
+                            initialMatchGroup: pendingMatchGroup,
                             onShowResultChange: { isShowing in
                                 withAnimation(.easeInOut(duration: 0.25)) {
                                     showMatchResult = isShowing
@@ -68,26 +85,45 @@ struct MainTabView: View {
                             }
                         )
                         .id(ProfileContextManager.shared.activeProfileId) // Force recreation on profile switch
+                        .ignoresSafeArea(.keyboard)
                     }
                 default:
                     HomeView(onQuestionSelected: { _ in })
+                        .ignoresSafeArea(.keyboard)
                 }
             }
             
-            // Custom Tab Bar - Hidden on Chat screen and Match Result screen
-            if selectedTab != 1 && !showMatchResult {
+            // Custom Tab Bar - Hidden on Chat screen, Match Result screen, and when keyboard is visible
+            if selectedTab != 1 && !showMatchResult && !isKeyboardVisible {
                 CustomTabBar(selectedTab: $selectedTab, showAskSheet: $showAskSheet)
                     // No horizontal padding for full width
                     .padding(.bottom, 0) // Docked to bottom
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .ignoresSafeArea(.keyboard)
+        // Note: .ignoresSafeArea(.keyboard) removed from here
+        // Applied per-tab instead so ChatView gets proper keyboard avoidance
         .animation(.easeInOut(duration: 0.25), value: selectedTab)
         .animation(.easeInOut(duration: 0.25), value: showMatchResult)
+        .animation(.easeInOut(duration: 0.2), value: isKeyboardVisible)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            isKeyboardVisible = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            isKeyboardVisible = false
+        }
+        // Clear pending match state when navigating away from Match tab
+        .onChange(of: selectedTab) { oldTab, newTab in
+            if oldTab == 2 && newTab != 2 {
+                pendingMatchItem = nil
+                pendingMatchGroup = nil
+                showMatchResult = false
+            }
+        }
         // Clear pending match state when switching profiles
         .onChange(of: ProfileContextManager.shared.activeProfileId) { _, _ in
             pendingMatchItem = nil
+            pendingMatchGroup = nil
             showMatchResult = false
         }
         .sheet(isPresented: $showAskSheet) {
@@ -207,6 +243,8 @@ struct TabBarItem: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -261,6 +299,8 @@ struct AskTabButton: View {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
+        .accessibilityLabel("ask".localized)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

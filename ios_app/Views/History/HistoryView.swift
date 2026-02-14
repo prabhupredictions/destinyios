@@ -5,6 +5,7 @@ struct HistoryView: View {
 // MARK: - Callbacks
     var onChatSelected: ((String) -> Void)? = nil
     var onMatchSelected: ((CompatibilityHistoryItem) -> Void)? = nil
+    var onMatchGroupSelected: ((ComparisonGroup) -> Void)? = nil
     
     // MARK: - State
     @State private var viewModel = HistoryViewModel()
@@ -85,9 +86,21 @@ struct HistoryView: View {
                                 HistoryRowView(item: item) {
                                     handleSelection(item)
                                 }
+                                .onAppear {
+                                    Task {
+                                        await viewModel.loadMoreIfNeeded(currentItem: item)
+                                    }
+                                }
                             }
                         }
                     }
+                }
+                
+                // Loading more indicator
+                if viewModel.isLoadingMore {
+                    ProgressView()
+                        .tint(AppTheme.Colors.gold)
+                        .padding(.vertical, 16)
                 }
             }
             .padding(16)
@@ -116,7 +129,21 @@ struct HistoryView: View {
             case .chat(let thread):
                 onChatSelected?(thread.id)
             case .match(let matchItem):
-                onMatchSelected?(matchItem)
+                // Load full data on-demand (lightweight items have result stripped)
+                let fullItem = CompatibilityHistoryService.shared.get(sessionId: matchItem.sessionId) ?? matchItem
+                onMatchSelected?(fullItem)
+            case .matchGroup(let group):
+                // Load full data for each item in the group
+                let fullItems = group.items.compactMap { lite in
+                    CompatibilityHistoryService.shared.get(sessionId: lite.sessionId) ?? lite
+                }
+                let fullGroup = ComparisonGroup(
+                    id: group.id,
+                    timestamp: group.timestamp,
+                    userName: group.userName,
+                    items: fullItems
+                )
+                onMatchGroupSelected?(fullGroup)
             }
         }
     }
@@ -186,6 +213,9 @@ struct HistoryRowView: View {
         switch item {
         case .chat(let thread): return thread.title
         case .match(let match): return match.displayTitle
+        case .matchGroup(let group):
+            let partnerNames = group.items.map { $0.girlName }
+            return "\(group.userName) + \(partnerNames.joined(separator: ", "))"
         }
     }
     
@@ -193,6 +223,8 @@ struct HistoryRowView: View {
         switch item {
         case .chat(let thread): return thread.preview
         case .match(_): return "compatibility_match_subtitle".localized
+        case .matchGroup(let group):
+            return "Multi-match · \(group.items.count) partners compared"
         }
     }
     
@@ -202,6 +234,8 @@ struct HistoryRowView: View {
             return iconForArea(thread.primaryArea ?? "general")
         case .match:
             return "heart.fill"
+        case .matchGroup:
+            return "person.3.fill"
         }
     }
     
@@ -209,6 +243,7 @@ struct HistoryRowView: View {
         switch item {
         case .chat: return AppTheme.Colors.gold
         case .match: return Color(red: 0.96, green: 0.52, blue: 0.65) // Rose Gold equivalent
+        case .matchGroup: return Color(red: 0.75, green: 0.55, blue: 0.95) // Purple for groups
         }
     }
     
@@ -262,6 +297,26 @@ struct HistoryRowView: View {
                         .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                 }
+            }
+        case .matchGroup(let group):
+            // Display best score and partner count for groups
+            VStack(alignment: .trailing, spacing: 2) {
+                // Best score in the group
+                let bestItem = group.items.max(by: { $0.totalScore < $1.totalScore })
+                if let best = bestItem {
+                    Text("Best: \(best.totalScore)/\(best.maxScore)")
+                        .font(AppTheme.Fonts.title(size: 13))
+                        .foregroundColor(matchScoreColor(best.scorePercentage / 100))
+                }
+                
+                // Partner count badge
+                HStack(spacing: 3) {
+                    Image(systemName: "person.2.fill")
+                        .font(AppTheme.Fonts.caption(size: 9))
+                    Text("\(group.items.count)")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                }
+                .foregroundColor(Color(red: 0.75, green: 0.55, blue: 0.95))
             }
         }
     }

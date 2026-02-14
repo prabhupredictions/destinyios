@@ -54,7 +54,8 @@ struct PartnerFormView: View {
     private var isValid: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
         !gender.isEmpty &&
-        isDateSelected
+        isDateSelected &&
+        (isTimeSelected || birthTimeUnknown)
     }
     
     init(mode: PartnerFormMode, onSave: @escaping (PartnerProfile) -> Void) {
@@ -65,7 +66,7 @@ struct PartnerFormView: View {
     // Formatted helpers
     private var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMM yyyy"
+        formatter.dateStyle = .medium
         return formatter.string(from: dateOfBirth)
     }
     
@@ -140,7 +141,7 @@ struct PartnerFormView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(birthTimeUnknown ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                     
-                                    Text("I don't know the birth time")
+                                    Text("partner_birth_time_unknown".localized)
                                         .font(AppTheme.Fonts.body(size: 14))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
                                     
@@ -150,7 +151,7 @@ struct PartnerFormView: View {
                             }
                             
                             if birthTimeUnknown {
-                                Text("Note: Analysis accuracy may be reduced without an exact birth time.")
+                                Text("birth_time_warning".localized)
                                     .font(AppTheme.Fonts.caption(size: 11))
                                     .foregroundColor(AppTheme.Colors.warning)
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -257,6 +258,7 @@ struct PartnerFormView: View {
         
         // Parse date of birth
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
         if let date = formatter.date(from: partner.dateOfBirth) {
             dateOfBirth = date
@@ -266,6 +268,7 @@ struct PartnerFormView: View {
         // Parse time of birth
         if let timeString = partner.timeOfBirth {
             let timeFormatter = DateFormatter()
+            timeFormatter.locale = Locale(identifier: "en_US_POSIX")
             timeFormatter.dateFormat = "HH:mm"
             if let time = timeFormatter.date(from: timeString) {
                 timeOfBirth = time
@@ -282,11 +285,13 @@ struct PartnerFormView: View {
         
         // Format date
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: dateOfBirth)
         
         // Format time
         let timeFormatter = DateFormatter()
+        timeFormatter.locale = Locale(identifier: "en_US_POSIX")
         timeFormatter.dateFormat = "HH:mm"
         let timeString = birthTimeUnknown ? nil : timeFormatter.string(from: timeOfBirth)
         

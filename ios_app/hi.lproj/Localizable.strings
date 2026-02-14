@@ -460,3 +460,5 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "समान विवरण वाला जन्म चार्ट पहले से मौजूद है। प्रत्येक व्यक्ति के लिए केवल एक चार्ट हो सकता है। सहायता के लिए, support@destinyaiastrology.com से संपर्क करें।";
 
+
+"syncing_cosmic_data" = "आज के इनसाइट्स लोड हो रहे हैं…";

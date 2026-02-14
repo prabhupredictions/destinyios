@@ -45,7 +45,7 @@ struct APIConfig {
         }
         switch AppEnvironment.current {
         case .local:
-            return "astro_ios_G5iY3-1Z7ymE46hYwKTbK1bSz2x5Vn4BeymPOvyy3ic"
+            return "astro_live_e7-TG6TTi14WaYxIwiyxes-aGdhlUrQ8gVUIj5STVnE"
         case .test, .production:
             return "astro_live_destinyai_production_key_2024"
         }

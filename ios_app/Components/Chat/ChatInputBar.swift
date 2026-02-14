@@ -68,14 +68,12 @@ struct ChatInputBar: View {
                 }
             }
             .disabled(!canSend)
+            .accessibilityLabel("Send message")
             .animation(.spring(response: 0.3), value: canSend)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(
-            AppTheme.Colors.mainBackground
-                .ignoresSafeArea(edges: .bottom)
-        )
+        .background(AppTheme.Colors.mainBackground)
     }
 }
 
