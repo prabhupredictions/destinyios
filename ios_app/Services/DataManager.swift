@@ -104,6 +104,40 @@ final class DataManager {
         return threads
     }
     
+    /// Paginated fetch of threads for a user — for History screen infinite scroll
+    /// Returns up to `limit` threads starting from `offset`, sorted by updatedAt desc (pinned first)
+    func fetchThreadsPaginated(for userEmail: String, profileId: String? = nil, limit: Int = 20, offset: Int = 0, includeArchived: Bool = false) -> [LocalChatThread] {
+        // Reuse existing full-fetch + filter (SwiftData predicates can't handle profileId "self" legacy logic)
+        // Then apply limit/offset on the filtered result
+        let all = fetchAllThreads(for: userEmail, profileId: profileId, includeArchived: includeArchived)
+        guard offset < all.count else { return [] }
+        let end = min(offset + limit, all.count)
+        return Array(all[offset..<end])
+    }
+    
+    /// Count total threads for a user (for pagination metadata)
+    func countThreads(for userEmail: String, profileId: String? = nil, includeArchived: Bool = false) -> Int {
+        return fetchAllThreads(for: userEmail, profileId: profileId, includeArchived: includeArchived).count
+    }
+    
+    /// Paginated fetch of chat-only threads (excludes compatibility threads) — for Chat History sidebar
+    func fetchChatThreadsPaginated(for userEmail: String, profileId: String? = nil, limit: Int = 20, offset: Int = 0) -> (threads: [LocalChatThread], hasMore: Bool) {
+        let allThreads = fetchAllThreads(for: userEmail, profileId: profileId)
+        
+        // Filter out compatibility-related threads
+        let chatThreads = allThreads.filter { thread in
+            let id = thread.id.lowercased()
+            let isCompat = id.hasPrefix("compat_") || id.hasPrefix("conv_")
+            let hasUserInteraction = thread.messageCount > 0
+            return !isCompat && hasUserInteraction
+        }
+        
+        guard offset < chatThreads.count else { return ([], false) }
+        let end = min(offset + limit, chatThreads.count)
+        let page = Array(chatThreads[offset..<end])
+        return (page, end < chatThreads.count)
+    }
+    
     /// Fetch all threads for a user (by email) - for History screen
     /// If profileId is provided, only threads for that profile are returned
     func fetchAllThreads(for userEmail: String, profileId: String? = nil, includeArchived: Bool = false) -> [LocalChatThread] {

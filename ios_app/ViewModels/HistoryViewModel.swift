@@ -31,7 +31,17 @@ class HistoryViewModel {
     // MARK: - State
     var items: [UnifiedHistoryItem] = []
     var isLoading = false
+    var isLoadingMore = false
+    var hasMoreChats = false
     var errorMessage: String?
+    
+    // Pagination
+    private let pageSize = 20
+    private var chatOffset = 0
+    private var loadedMatchItems: [UnifiedHistoryItem] = []
+    
+    // Pre-computed grouped items (avoids O(n) recomputation per render)
+    var groupedItems: [Date: [UnifiedHistoryItem]] = [:]
     
     // Dependencies
     private let dataManager: DataManager
@@ -42,119 +52,152 @@ class HistoryViewModel {
         self.dataManager = dataManager ?? DataManager.shared
     }
     
-    // MARK: - Grouped Items by Date
-    var groupedItems: [Date: [UnifiedHistoryItem]] {
+    // MARK: - Recompute Grouped Items
+    private func recomputeGroupedItems() {
         let calendar = Calendar.current
         var groups: [Date: [UnifiedHistoryItem]] = [:]
         
         for item in items {
             let startOfDay = calendar.startOfDay(for: item.date)
-            if groups[startOfDay] == nil {
-                groups[startOfDay] = []
-            }
-            groups[startOfDay]?.append(item)
+            groups[startOfDay, default: []].append(item)
         }
         
-        return groups
+        groupedItems = groups
     }
     
-    // MARK: - Load History
+    // MARK: - Load History (First Page)
     func loadHistory() async {
         isLoading = true
         errorMessage = nil
+        chatOffset = 0
+        items = []
+        loadedMatchItems = []
         
-        // 1. Fetch Chat Threads
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         let activeProfileId = ProfileContextManager.shared.activeProfileId
         
-        print("[HistoryViewModel] Loading history for profileId: \(activeProfileId)")
+        print("[HistoryViewModel] Loading history page 1 for profileId: \(activeProfileId)")
         
-        // Fetch threads filtered by profile (Switch Profile feature)
-        let allThreads = dataManager.fetchAllThreads(for: userEmail, profileId: activeProfileId)
+        // 1. Fetch first page of chat threads
+        let chatPage = fetchChatItemsPage(userEmail: userEmail, profileId: activeProfileId, offset: 0)
+        chatOffset = chatPage.items.count
+        hasMoreChats = chatPage.hasMore
         
-        // Separate regular chat threads from compatibility threads
+        // 2. Fetch ALL local match history (small set, currently max 50)
+        let localGroups = CompatibilityHistoryService.shared.loadGroups(lightweight: true)
+        let localMatchSessionIds = Set(localGroups.flatMap { $0.items.map { $0.sessionId } })
+        
+        // 3. Filter out chat items that duplicate local matches
+        let filteredChatItems = deduplicateChatItems(chatPage.items, localMatchSessionIds: localMatchSessionIds)
+        
+        // 4. Convert groups to UnifiedHistoryItems
+        loadedMatchItems = convertGroupsToItems(localGroups)
+        
+        print("[HistoryViewModel] Chat items: \(filteredChatItems.count), Local match items: \(loadedMatchItems.count), hasMore: \(hasMoreChats)")
+        
+        // 5. Merge and Sort (Newest first)
+        self.items = (filteredChatItems + loadedMatchItems).sorted { $0.date > $1.date }
+        recomputeGroupedItems()
+        
+        isLoading = false
+    }
+    
+    // MARK: - Load More (Next Page)
+    func loadMoreIfNeeded(currentItem: UnifiedHistoryItem) async {
+        // Trigger when user scrolls to last 3 items
+        guard hasMoreChats, !isLoadingMore else { return }
+        let thresholdIndex = max(items.count - 3, 0)
+        guard let itemIndex = items.firstIndex(where: { $0.id == currentItem.id }),
+              itemIndex >= thresholdIndex else { return }
+        
+        isLoadingMore = true
+        
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
+        let localMatchSessionIds = Set(loadedMatchItems.compactMap { item -> String? in
+            switch item {
+            case .match(let m): return m.sessionId
+            case .matchGroup(let g): return g.id
+            default: return nil
+            }
+        })
+        
+        print("[HistoryViewModel] Loading more chats from offset \(chatOffset)")
+        
+        let chatPage = fetchChatItemsPage(userEmail: userEmail, profileId: activeProfileId, offset: chatOffset)
+        let filteredNewItems = deduplicateChatItems(chatPage.items, localMatchSessionIds: localMatchSessionIds)
+        
+        chatOffset += chatPage.items.count
+        hasMoreChats = chatPage.hasMore
+        
+        // Append new items and re-sort
+        self.items = (self.items + filteredNewItems).sorted { $0.date > $1.date }
+        recomputeGroupedItems()
+        
+        isLoadingMore = false
+        print("[HistoryViewModel] Loaded \(filteredNewItems.count) more items, total: \(items.count), hasMore: \(hasMoreChats)")
+    }
+    
+    // MARK: - Private Helpers
+    
+    /// Fetch one page of chat thread items with filtering logic
+    private func fetchChatItemsPage(userEmail: String, profileId: String?, offset: Int) -> (items: [UnifiedHistoryItem], hasMore: Bool) {
+        let threads = dataManager.fetchThreadsPaginated(for: userEmail, profileId: profileId, limit: pageSize, offset: offset)
+        let totalCount = dataManager.countThreads(for: userEmail, profileId: profileId)
+        let hasMore = (offset + threads.count) < totalCount
+        
         var chatItems: [UnifiedHistoryItem] = []
-        var compatThreadIds: Set<String> = []
         
-        for thread in allThreads where thread.messageCount > 0 {
+        for thread in threads where thread.messageCount > 0 {
             let id = thread.id.lowercased()
             let title = thread.title.lowercased()
             
-            // DEBUG: Log all threads
-            print("[HistoryViewModel] Thread: '\(thread.title)' | id: \(thread.id.prefix(30)) | area: \(thread.primaryArea ?? "nil")")
-            
-            // Detect compatibility-related threads
-            let isCompatSession = id.hasPrefix("compat_sess_")  // Main match result
-            let isCompatFollowUp = id.hasPrefix("compat_") && !isCompatSession  // e.g., compat_followup_, compat_conv_
-            let isConvPrefix = id.hasPrefix("conv_")  // Follow-up conversation
+            let isCompatSession = id.hasPrefix("compat_sess_")
+            let isCompatFollowUp = id.hasPrefix("compat_") && !isCompatSession
+            let isConvPrefix = id.hasPrefix("conv_")
             let isCompatArea = thread.primaryArea?.lowercased() == "compatibility"
             let hasCompatInAreas = thread.areasDiscussed.contains { $0.lowercased() == "compatibility" }
             let isMainMatch = title.hasPrefix("match:")
             
-            // Track all compatibility-related thread IDs to avoid duplicates with local matches
-            if isCompatSession || isCompatFollowUp || isConvPrefix {
-                compatThreadIds.insert(thread.id)
-            }
-            
-            // Decision logic:
-            // INCLUDE: Main match results (compat_sess_* with "Match:" title), regular general chats
-            // EXCLUDE: Compatibility follow-ups (compat_* but not compat_sess_, conv_*, compatArea without Match:)
-            let isExcludedCompatFollowUp = (isCompatFollowUp || isConvPrefix) ||  // ID-based follow-up
-                                           (isCompatArea && !isMainMatch && !isCompatSession) ||  // Area-based follow-up
-                                           (hasCompatInAreas && !isMainMatch && !isCompatSession)  // AreasDiscussed-based
-            
-            print("[HistoryViewModel]   isCompatSession:\(isCompatSession) isMainMatch:\(isMainMatch) isExcluded:\(isExcludedCompatFollowUp)")
+            let isExcludedCompatFollowUp = (isCompatFollowUp || isConvPrefix) ||
+                                           (isCompatArea && !isMainMatch && !isCompatSession) ||
+                                           (hasCompatInAreas && !isMainMatch && !isCompatSession)
             
             if !isExcludedCompatFollowUp {
                 chatItems.append(.chat(thread))
-            } else {
-                print("[HistoryViewModel] Excluding compat follow-up: '\(thread.title)'")
             }
         }
         
-        // 2. Fetch Local Match History GROUPED (multi-partner support)
-        let localGroups = CompatibilityHistoryService.shared.loadGroups()
-        let localMatchSessionIds = Set(localGroups.flatMap { $0.items.map { $0.sessionId } })
-        
-        // 3. For compat_sess_ threads, PREFER local match items (they have full results + proper navigation)
-        // Remove server chat items that have a matching local match item
-        let filteredChatItems = chatItems.filter { item in
+        return (chatItems, hasMore)
+    }
+    
+    /// Remove chat items that duplicate local match items
+    private func deduplicateChatItems(_ chatItems: [UnifiedHistoryItem], localMatchSessionIds: Set<String>) -> [UnifiedHistoryItem] {
+        return chatItems.filter { item in
             if case .chat(let thread) = item {
-                // If this is a compat session AND we have a local match with the same sessionId,
-                // use the local match instead (it has full CompatibilityResult data)
                 if thread.id.lowercased().hasPrefix("compat_sess_") {
-                    let hasLocalMatch = localMatchSessionIds.contains(thread.id) || 
+                    let hasLocalMatch = localMatchSessionIds.contains(thread.id) ||
                                         localMatchSessionIds.contains("compat_\(thread.id)") ||
                                         localMatchSessionIds.contains(thread.id.replacingOccurrences(of: "compat_", with: ""))
-                    if hasLocalMatch {
-                        print("[HistoryViewModel] Preferring local match over server thread: \(thread.id)")
-                        return false  // Use local match instead
-                    }
+                    if hasLocalMatch { return false }
                 }
                 return true
             }
             return true
         }
-        
-        // 4. Convert groups to UnifiedHistoryItems
-        // Single-item groups → .match (unchanged behavior)
-        // Multi-item groups → .matchGroup (new grouped entry)
+    }
+    
+    /// Convert ComparisonGroups to UnifiedHistoryItems
+    private func convertGroupsToItems(_ groups: [ComparisonGroup]) -> [UnifiedHistoryItem] {
         var matchItems: [UnifiedHistoryItem] = []
-        for group in localGroups {
+        for group in groups {
             if group.items.count > 1 {
                 matchItems.append(.matchGroup(group))
             } else if let singleItem = group.items.first {
                 matchItems.append(.match(singleItem))
             }
         }
-        
-        print("[HistoryViewModel] Chat items: \(filteredChatItems.count), Local match items: \(matchItems.count)")
-        
-        // 5. Merge and Sort (Newest first)
-        let allItems = filteredChatItems + matchItems
-        self.items = allItems.sorted { $0.date > $1.date }
-        
-        isLoading = false
+        return matchItems
     }
     
     // MARK: - Delete Logic
@@ -173,8 +216,14 @@ class HistoryViewModel {
             }
         }
         
-        // Reload to refresh UI and master list
-        await loadHistory()
+        // Remove deleted items locally and recompute groups
+        let deletedIds = Set(indexSet.compactMap { index -> String? in
+            guard index < itemsForDate.count else { return nil }
+            return itemsForDate[index].id
+        })
+        items.removeAll { deletedIds.contains($0.id) }
+        loadedMatchItems.removeAll { deletedIds.contains($0.id) }
+        recomputeGroupedItems()
     }
     
     // MARK: - Format Section Date

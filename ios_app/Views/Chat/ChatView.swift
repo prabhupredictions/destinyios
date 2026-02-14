@@ -318,6 +318,13 @@ struct ChatHistorySidebar: View {
     let viewModel: ChatViewModel
     let onDismiss: () -> Void
     
+    // Pagination state
+    @State private var loadedThreads: [LocalChatThread] = []
+    @State private var hasMore = false
+    @State private var isLoadingMore = false
+    private let pageSize = 20
+    @State private var currentOffset = 0
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -357,15 +364,68 @@ struct ChatHistorySidebar: View {
                 }
                 #endif
             }
+            .onAppear {
+                loadFirstPage()
+            }
+        }
+    }
+    
+    // MARK: - Pagination
+    private func loadFirstPage() {
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
+        let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: 0)
+        loadedThreads = result.threads
+        hasMore = result.hasMore
+        currentOffset = result.threads.count
+    }
+    
+    private func loadMore() {
+        guard hasMore, !isLoadingMore else { return }
+        isLoadingMore = true
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let activeProfileId = ProfileContextManager.shared.activeProfileId
+        let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: currentOffset)
+        loadedThreads.append(contentsOf: result.threads)
+        hasMore = result.hasMore
+        currentOffset += result.threads.count
+        isLoadingMore = false
+    }
+    
+    // MARK: - Group threads by date (operates on loaded page only)
+    private var groupedThreads: [(String, [LocalChatThread])] {
+        let calendar = Calendar.current
+        let now = Date()
+        var grouped: [String: [LocalChatThread]] = [:]
+        
+        for thread in loadedThreads {
+            let key: String
+            if calendar.isDateInToday(thread.updatedAt) {
+                key = "Today"
+            } else if calendar.isDateInYesterday(thread.updatedAt) {
+                key = "Yesterday"
+            } else if let daysAgo = calendar.dateComponents([.day], from: thread.updatedAt, to: now).day, daysAgo < 7 {
+                key = "Last 7 Days"
+            } else if let daysAgo = calendar.dateComponents([.day], from: thread.updatedAt, to: now).day, daysAgo < 30 {
+                key = "Last 30 Days"
+            } else {
+                key = "Older"
+            }
+            grouped[key, default: []].append(thread)
+        }
+        
+        let order = ["Today", "Yesterday", "Last 7 Days", "Last 30 Days", "Older"]
+        return order.compactMap { key in
+            if let threads = grouped[key], !threads.isEmpty {
+                return (key, threads)
+            }
+            return nil
         }
     }
     
     // MARK: - History List with Swipe Actions
     private var historyList: some View {
-        // Fetch chat threads for user filtered by active profile
-        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        let activeProfileId = ProfileContextManager.shared.activeProfileId
-        let grouped = viewModel.dataManager.fetchChatThreadsGroupedByDate(for: userEmail, profileId: activeProfileId)
+        let grouped = groupedThreads
         
         return Group {
             if grouped.isEmpty {
@@ -399,6 +459,7 @@ struct ChatHistorySidebar: View {
                                     },
                                     onDelete: {
                                         viewModel.deleteThread(thread)
+                                        loadedThreads.removeAll { $0.id == thread.id }
                                     },
                                     onPin: {
                                         viewModel.togglePinThread(thread)
@@ -406,8 +467,25 @@ struct ChatHistorySidebar: View {
                                 )
                                 .listRowBackground(Color.clear)
                                 .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+                                .onAppear {
+                                    // Load more when near the end
+                                    if thread.id == loadedThreads.last?.id {
+                                        loadMore()
+                                    }
+                                }
                             }
                         }
+                    }
+                    
+                    // Loading more indicator
+                    if isLoadingMore {
+                        HStack {
+                            Spacer()
+                            ProgressView()
+                                .tint(AppTheme.Colors.gold)
+                            Spacer()
+                        }
+                        .listRowBackground(Color.clear)
                     }
                 }
                 .listStyle(.plain)

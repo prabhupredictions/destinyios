@@ -7,7 +7,7 @@ final class CompatibilityHistoryService {
     
     // MARK: - Constants
     private static let storageKeyPrefix = "compatibility_history"
-    private static let maxItems = 10
+    private static let maxItems = 50
     
     // MARK: - Singleton
     static let shared = CompatibilityHistoryService()
@@ -44,9 +44,20 @@ final class CompatibilityHistoryService {
     
     // MARK: - Load Groups (Multi-Partner Support)
     /// Loads history items grouped by comparisonGroupId
+    /// - Parameter lightweight: If true, strips heavy `result` and `chatMessages` fields for list display
     /// Returns: Array of ComparisonGroup for grouped items + ungrouped single items
-    func loadGroups() -> [ComparisonGroup] {
-        let allItems = loadAll()
+    func loadGroups(lightweight: Bool = false) -> [ComparisonGroup] {
+        var allItems = loadAll()
+        
+        // Strip heavy fields for list display (saves memory when only showing names/scores)
+        if lightweight {
+            allItems = allItems.map { item in
+                var lite = item
+                lite.result = nil
+                lite.chatMessages = []
+                return lite
+            }
+        }
         var groups: [String: [CompatibilityHistoryItem]] = [:]
         var ungroupedItems: [CompatibilityHistoryItem] = []
         
@@ -618,5 +629,191 @@ final class CompatibilityHistoryService {
         } catch {
             print("[CompatibilityHistoryService] Sync error: \(error)")
         }
+    }
+    
+    /// Sync from pre-fetched compat thread IDs (used by LoginSyncCoordinator to avoid duplicate thread list fetch)
+    func syncCompatThreads(userEmail: String, compatThreadIds: [String]) async {
+        print("[CompatibilityHistoryService] Starting coordinated sync for \(userEmail) with \(compatThreadIds.count) compat threads")
+        
+        // Clear existing local history to prevent duplicates
+        clearAll(forUser: userEmail)
+        
+        for threadId in compatThreadIds {
+            // Skip if already exists locally
+            if get(sessionId: threadId) != nil { continue }
+            
+            // Fetch thread detail (same logic as syncFromServer)
+            let threadDetailURL = URL(string: "\(APIConfig.baseURL)/chat-history/threads/\(userEmail)/\(threadId)")
+            guard let detailURL = threadDetailURL else { continue }
+            
+            var detailRequest = URLRequest(url: detailURL)
+            detailRequest.httpMethod = "GET"
+            detailRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            
+            do {
+                let (detailData, detailResponse) = try await URLSession.shared.data(for: detailRequest)
+                
+                guard let httpDetailResponse = detailResponse as? HTTPURLResponse,
+                      httpDetailResponse.statusCode == 200 else {
+                    print("[CompatibilityHistoryService] Failed to fetch details for \(threadId)")
+                    continue
+                }
+                
+                struct MessageItem: Codable {
+                    let id: String?
+                    let role: String
+                    let content: String
+                    let createdAt: String?
+                    let isReport: Bool?
+                    
+                    enum CodingKeys: String, CodingKey {
+                        case id, role, content
+                        case createdAt = "created_at"
+                        case isReport = "is_report"
+                    }
+                }
+                
+                struct ThreadDetailResponse: Codable {
+                    let id: String
+                    let title: String?
+                    let metadata: CompatibilityResponse?
+                    let messages: [MessageItem]?
+                    let createdAt: String?
+                    let updatedAt: String?
+                    let profileId: String?
+                    
+                    enum CodingKeys: String, CodingKey {
+                        case id, title, metadata, messages
+                        case createdAt = "created_at"
+                        case updatedAt = "updated_at"
+                        case profileId = "profile_id"
+                    }
+                }
+                
+                let threadDetail = try JSONDecoder().decode(ThreadDetailResponse.self, from: detailData)
+                
+                // Extract data from metadata (same logic as syncFromServer)
+                var boyName = "Partner"
+                var girlName = "Partner"
+                var boyDob = ""
+                var girlDob = ""
+                var boyTime = "12:00:00"
+                var girlTime = "12:00:00"
+                var boyCity = ""
+                var girlCity = ""
+                var totalScore = 0
+                var kutas: [KutaDetail] = []
+                var result: CompatibilityResult? = nil
+                
+                if let metadata = threadDetail.metadata {
+                    if let title = threadDetail.title, title.contains("&") {
+                        let parts = title.replacingOccurrences(of: "Match: ", with: "").components(separatedBy: " & ")
+                        if parts.count == 2 {
+                            boyName = parts[0]
+                            girlName = parts[1]
+                        }
+                    }
+                    
+                    if let analysisData = metadata.analysisData {
+                        if let boyDetails = analysisData.boy?.details {
+                            boyDob = boyDetails.dob
+                            boyTime = boyDetails.time
+                            boyCity = boyDetails.place
+                        }
+                        if let girlDetails = analysisData.girl?.details {
+                            girlDob = girlDetails.dob
+                            girlTime = girlDetails.time
+                            girlCity = girlDetails.place
+                        }
+                        if let ashtakoot = analysisData.joint?.ashtakootMatching,
+                           let scoreValue = ashtakoot["total_score"]?.value {
+                            if let scoreInt = scoreValue as? Int {
+                                totalScore = scoreInt
+                            } else if let scoreDouble = scoreValue as? Double {
+                                totalScore = Int(scoreDouble)
+                            }
+                        }
+                        
+                        if let ashtakoot = analysisData.joint?.ashtakootMatching {
+                            if let gunaScores = ashtakoot["guna_scores"]?.value as? [String: Any] {
+                                let kutaNames: [(String, String, Int)] = [
+                                    ("varna", "Varna", 1), ("vashya", "Vashya", 2),
+                                    ("tara", "Tara", 3), ("yoni", "Yoni", 4),
+                                    ("maitri", "Maitri", 5), ("gana", "Gana", 6),
+                                    ("bhakoot", "Bhakoot", 7), ("nadi", "Nadi", 8)
+                                ]
+                                
+                                for (key, name, maxPoints) in kutaNames {
+                                    if let kutaData = gunaScores[key] as? [String: Any] {
+                                        let scoreVal: Int
+                                        if let s = kutaData["score"] as? Int { scoreVal = s }
+                                        else if let s = kutaData["score"] as? Double { scoreVal = Int(s) }
+                                        else { scoreVal = 0 }
+                                        let desc = kutaData["description"] as? String ?? ""
+                                        kutas.append(KutaDetail(name: name, maxPoints: maxPoints, points: scoreVal, description: desc))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    result = CompatibilityResult(
+                        totalScore: totalScore,
+                        maxScore: 36,
+                        kutas: kutas,
+                        summary: metadata.llmAnalysis ?? "",
+                        recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
+                        analysisData: metadata.analysisData,
+                        sessionId: metadata.sessionId
+                    )
+                }
+                
+                var restoredMessages: [CompatChatMessageData] = []
+                if let backendMessages = threadDetail.messages {
+                    for msg in backendMessages {
+                        if msg.isReport == true { continue }
+                        let chatMsg = CompatChatMessageData(
+                            id: UUID().uuidString,
+                            content: msg.content,
+                            isUser: msg.role == "user",
+                            timestamp: ISO8601DateFormatter().date(from: msg.createdAt ?? "") ?? Date(),
+                            type: msg.role == "user" ? "user" : "ai"
+                        )
+                        restoredMessages.append(chatMsg)
+                    }
+                }
+                
+                let comparisonGroupId = threadDetail.metadata?.comparisonGroupId
+                let partnerIndex = threadDetail.metadata?.partnerIndex
+                
+                let item = CompatibilityHistoryItem(
+                    sessionId: threadId,
+                    timestamp: ISO8601DateFormatter().date(from: threadDetail.createdAt ?? "") ?? Date(),
+                    boyName: boyName,
+                    boyDob: boyDob,
+                    boyTime: boyTime,
+                    boyCity: boyCity,
+                    girlName: girlName,
+                    girlDob: girlDob,
+                    girlTime: girlTime,
+                    girlCity: girlCity,
+                    totalScore: totalScore,
+                    maxScore: 36,
+                    result: result,
+                    chatMessages: restoredMessages,
+                    comparisonGroupId: comparisonGroupId,
+                    partnerIndex: partnerIndex
+                )
+                
+                let targetProfileId = threadDetail.profileId ?? "self"
+                save(item, toProfileId: targetProfileId, userEmail: userEmail)
+                print("[CompatibilityHistoryService] Restored: \(threadId) to profile: \(targetProfileId)")
+                
+            } catch {
+                print("[CompatibilityHistoryService] Failed to parse thread \(threadId): \(error)")
+            }
+        }
+        
+        print("[CompatibilityHistoryService] Coordinated sync complete")
     }
 }

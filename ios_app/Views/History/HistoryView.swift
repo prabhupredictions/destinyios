@@ -86,9 +86,21 @@ struct HistoryView: View {
                                 HistoryRowView(item: item) {
                                     handleSelection(item)
                                 }
+                                .onAppear {
+                                    Task {
+                                        await viewModel.loadMoreIfNeeded(currentItem: item)
+                                    }
+                                }
                             }
                         }
                     }
+                }
+                
+                // Loading more indicator
+                if viewModel.isLoadingMore {
+                    ProgressView()
+                        .tint(AppTheme.Colors.gold)
+                        .padding(.vertical, 16)
                 }
             }
             .padding(16)

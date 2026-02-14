@@ -81,8 +81,7 @@ struct CompatibilityHistorySheet: View {
                     GroupHistoryRow(
                         group: group,
                         onTap: {
-                            onGroupSelect?(group)
-                            dismiss()
+                            selectFullGroup(group)
                         }
                     )
                     .listRowBackground(AppTheme.Colors.cardBackground)
@@ -100,8 +99,7 @@ struct CompatibilityHistorySheet: View {
                     HistoryItemRow(
                         item: item,
                         onTap: {
-                            onSelect?(item)
-                            dismiss()
+                            selectFullItem(item)
                         }
                     )
                     .listRowBackground(AppTheme.Colors.cardBackground)
@@ -123,7 +121,32 @@ struct CompatibilityHistorySheet: View {
     
     // MARK: - Actions
     private func loadHistory() {
-        groups = CompatibilityHistoryService.shared.loadGroups()
+        groups = CompatibilityHistoryService.shared.loadGroups(lightweight: true)
+    }
+    
+    /// Load full data for a single item on-demand (result + chatMessages)
+    private func selectFullItem(_ lightweightItem: CompatibilityHistoryItem) {
+        if let fullItem = CompatibilityHistoryService.shared.get(sessionId: lightweightItem.sessionId) {
+            onSelect?(fullItem)
+        } else {
+            onSelect?(lightweightItem)
+        }
+        dismiss()
+    }
+    
+    /// Load full data for a group on-demand
+    private func selectFullGroup(_ lightweightGroup: ComparisonGroup) {
+        let fullItems = lightweightGroup.items.compactMap { lite in
+            CompatibilityHistoryService.shared.get(sessionId: lite.sessionId) ?? lite
+        }
+        let fullGroup = ComparisonGroup(
+            id: lightweightGroup.id,
+            timestamp: lightweightGroup.timestamp,
+            userName: lightweightGroup.userName,
+            items: fullItems
+        )
+        onGroupSelect?(fullGroup)
+        dismiss()
     }
     
     private func deleteGroup(_ group: ComparisonGroup) {

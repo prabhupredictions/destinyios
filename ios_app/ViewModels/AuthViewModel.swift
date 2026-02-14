@@ -244,9 +244,7 @@ class AuthViewModel {
                         // Local guest history was cleared before sign-in
                         // This sync fetches the migrated threads with correct IDs
                         print("🔄 [AuthViewModel] Syncing migrated history from server...")
-                        async let chatSync: () = ChatHistorySyncService.shared.syncFromServer(userEmail: actualEmail, dataManager: DataManager.shared)
-                        async let compatSync: () = CompatibilityHistoryService.shared.syncFromServer(userEmail: actualEmail)
-                        _ = await (chatSync, compatSync)
+                        await LoginSyncCoordinator.shared.syncAll(userEmail: actualEmail, dataManager: DataManager.shared)
                         print("✅ [AuthViewModel] Post-migration history sync complete")
                         
                     } catch let error as ProfileError {
@@ -367,9 +365,7 @@ class AuthViewModel {
                             
                             // Sync history AFTER migration completes on backend
                             print("🔄 [AuthViewModel] Syncing migrated history from server...")
-                            async let chatSync: () = ChatHistorySyncService.shared.syncFromServer(userEmail: effectiveEmail, dataManager: DataManager.shared)
-                            async let compatSync: () = CompatibilityHistoryService.shared.syncFromServer(userEmail: effectiveEmail)
-                            _ = await (chatSync, compatSync)
+                            await LoginSyncCoordinator.shared.syncAll(userEmail: effectiveEmail, dataManager: DataManager.shared)
                             print("✅ [AuthViewModel] Post-migration history sync complete")
                             
                         } catch {
@@ -516,11 +512,10 @@ class AuthViewModel {
                 // Skip during guest→registered upgrade - caller will sync after migration
                 if !skipSync {
                     Task {
-                        // Sync history in background (run concurrently for faster login)
-                        async let chatSync: () = ChatHistorySyncService.shared.syncFromServer(userEmail: email, dataManager: DataManager.shared)
-                        async let compatSync: () = CompatibilityHistoryService.shared.syncFromServer(userEmail: email)
+                        // Coordinated sync: single thread list fetch shared by chat + compat sync
+                        async let historySync: () = LoginSyncCoordinator.shared.syncAll(userEmail: email, dataManager: DataManager.shared)
                         async let quotaSync: () = { try? await QuotaManager.shared.syncStatus(email: email, force: true) }()
-                        _ = await (chatSync, compatSync, quotaSync)
+                        _ = await (historySync, quotaSync)
                     }
                 } else {
                     print("⏭️ [AuthViewModel] Skipping background sync (will sync after migration)")
