@@ -43,6 +43,10 @@ struct ios_appApp: App {
 // MARK: - App Delegate
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
+    /// App-level background task that keeps ALL in-flight work alive when app enters background.
+    /// iOS grants ~30 seconds of extra execution time so network requests can complete.
+    private var appBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
+    
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         
@@ -50,6 +54,28 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = self
         
         return true
+    }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        // Start a background task to keep all in-flight network requests alive
+        appBackgroundTaskID = application.beginBackgroundTask(withName: "app-global-background") {
+            // Expiration handler
+            print("[AppDelegate] ⚠️ Global background task expiring")
+            if self.appBackgroundTaskID != .invalid {
+                application.endBackgroundTask(self.appBackgroundTaskID)
+                self.appBackgroundTaskID = .invalid
+            }
+        }
+        print("[AppDelegate] 📱 App entered background — background task started (remaining: \(String(format: "%.0f", application.backgroundTimeRemaining))s)")
+    }
+    
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        // End the global background task when app returns
+        if appBackgroundTaskID != .invalid {
+            application.endBackgroundTask(appBackgroundTaskID)
+            appBackgroundTaskID = .invalid
+            print("[AppDelegate] ✅ App returned to foreground — background task ended")
+        }
     }
     
     func application(_ application: UIApplication,

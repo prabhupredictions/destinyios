@@ -13,6 +13,7 @@ final class CompatibilityService: CompatibilityServiceProtocol {
         config.timeoutIntervalForRequest = 120
         config.timeoutIntervalForResource = 300
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.waitsForConnectivity = true
         self.streamSession = URLSession(configuration: config)
     }
     

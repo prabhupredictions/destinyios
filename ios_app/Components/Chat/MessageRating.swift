@@ -90,8 +90,7 @@ struct MessageRating: View {
     // MARK: - Actions
     private func selectRating(_ rating: Int) {
         // Haptic feedback
-        let impact = UIImpactFeedbackGenerator(style: .light)
-        impact.impactOccurred()
+        HapticManager.shared.play(.light)
         
         selectedRating = rating
         submitRating(rating)
@@ -115,8 +114,7 @@ struct MessageRating: View {
                     hasSubmitted = true
                     
                     // Success haptic
-                    let notification = UINotificationFeedbackGenerator()
-                    notification.notificationOccurred(.success)
+                    HapticManager.shared.notify(.success)
                 }
             } catch {
                 print("❌ Failed to submit rating: \(error)")
@@ -200,8 +198,7 @@ struct InlineMessageRating: View {
     }
     
     private func selectRating(_ rating: Int) {
-        let impact = UIImpactFeedbackGenerator(style: .light)
-        impact.impactOccurred()
+        HapticManager.shared.play(.light)
         
         selectedRating = rating
         submitRating(rating)
@@ -227,8 +224,7 @@ struct InlineMessageRating: View {
                     // Persist locally immediately
                     message.rating = rating
                     
-                    let notification = UINotificationFeedbackGenerator()
-                    notification.notificationOccurred(.success)
+                    HapticManager.shared.notify(.success)
                 }
             } catch {
                 print("❌ Failed to submit rating: \(error)")

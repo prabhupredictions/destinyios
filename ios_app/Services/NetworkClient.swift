@@ -9,7 +9,12 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
     
     // MARK: - Init
     init(
-        session: URLSessionProtocol = URLSession.shared,
+        session: URLSessionProtocol = {
+            let config = URLSessionConfiguration.default
+            config.waitsForConnectivity = true
+            config.timeoutIntervalForResource = 120
+            return URLSession(configuration: config)
+        }(),
         baseURL: String = APIConfig.baseURL,
         apiKey: String = APIConfig.apiKey
     ) {

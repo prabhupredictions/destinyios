@@ -43,8 +43,7 @@ struct MagicTabbar: View {
                 proxy.scrollTo(tile.id, anchor: .center)
             }
             // Haptic feedback
-            let impact = UIImpactFeedbackGenerator(style: .light)
-            impact.impactOccurred()
+            HapticManager.shared.play(.light)
         } label: {
             VStack(spacing: 4) {
                 // Icon - Glowing when selected
@@ -147,8 +146,7 @@ struct ProfileSwitcher: View {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 selectedIndex = index
             }
-            let impact = UIImpactFeedbackGenerator(style: .medium)
-            impact.impactOccurred()
+            HapticManager.shared.play(.medium)
         } label: {
             Text(name)
                 .font(AppTheme.Fonts.caption(size: 13).weight(isSelected ? .bold : .medium))
