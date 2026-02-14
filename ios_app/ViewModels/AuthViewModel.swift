@@ -202,12 +202,21 @@ class AuthViewModel {
                 
                 // Register user with platform identity for linking
                 // The response contains the ACTUAL stored email (may differ if found by ID)
-                let registerResponse = try? await ProfileService.shared.registerUser(
-                    email: email,
-                    isGeneratedEmail: false,
-                    appleId: appleId,
-                    googleId: googleId
-                )
+                // NOTE: accountDeleted must propagate to block sign-in; other errors are non-fatal
+                let registerResponse: ProfileService.RegisterResponse?
+                do {
+                    registerResponse = try await ProfileService.shared.registerUser(
+                        email: email,
+                        isGeneratedEmail: false,
+                        appleId: appleId,
+                        googleId: googleId
+                    )
+                } catch let error as ProfileError where error.isAccountDeleted {
+                    throw error  // Block sign-in for deleted accounts
+                } catch {
+                    print("⚠️ [AuthViewModel] registerUser failed (non-fatal): \(error)")
+                    registerResponse = nil
+                }
                 
                 print("📥 [AuthViewModel] registerUser response:")
                 print("   - userEmail: \(registerResponse?.userEmail ?? "nil")")
@@ -300,12 +309,21 @@ class AuthViewModel {
                 
                 // Call registerUser with a placeholder email - backend will find by ID and return stored email
                 // NOTE: isGeneratedEmail must be FALSE because Apple/Google Sign-In = registered user
-                let registerResponse = try? await ProfileService.shared.registerUser(
-                    email: "lookup-by-id@placeholder.local",
-                    isGeneratedEmail: false,  // Apple/Google users are REGISTERED, not guests!
-                    appleId: appleId,
-                    googleId: googleId
-                )
+                // NOTE: accountDeleted must propagate to block sign-in; other errors are non-fatal
+                let registerResponse: ProfileService.RegisterResponse?
+                do {
+                    registerResponse = try await ProfileService.shared.registerUser(
+                        email: "lookup-by-id@placeholder.local",
+                        isGeneratedEmail: false,  // Apple/Google users are REGISTERED, not guests!
+                        appleId: appleId,
+                        googleId: googleId
+                    )
+                } catch let error as ProfileError where error.isAccountDeleted {
+                    throw error  // Block sign-in for deleted accounts
+                } catch {
+                    print("⚠️ [AuthViewModel] registerUser (ID lookup) failed (non-fatal): \(error)")
+                    registerResponse = nil
+                }
                 
                 print("📥 [AuthViewModel] registerUser (ID lookup) response:")
                 print("   - userEmail: \(registerResponse?.userEmail ?? "nil")")
@@ -397,6 +415,11 @@ class AuthViewModel {
                         UserDefaults.standard.synchronize()  // Force immediate persistence
                     }
                 }
+            }
+        } catch let error as ProfileError where error.isAccountDeleted {
+            print("🚫 [AuthViewModel] Account deleted — blocking sign-in: \(error)")
+            await MainActor.run {
+                errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support."
             }
         } catch {
             print("❌ [AuthViewModel] Sign in error: \(error)")

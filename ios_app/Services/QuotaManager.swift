@@ -43,6 +43,16 @@ struct RegisteredUserConflictError: Error, LocalizedError {
     }
 }
 
+/// Thrown when a soft-deleted account tries to sign in or register
+/// The user must be informed that the account is permanently deactivated
+struct AccountDeletedError: Error, LocalizedError {
+    let message: String
+    
+    var errorDescription: String? {
+        return message
+    }
+}
+
 /// Thrown when trying to save birth data that already belongs to another registered user
 /// Used during guest upgrade when their birth data matches another registered user
 struct BirthDataTakenError: Error, LocalizedError {
@@ -475,6 +485,18 @@ class QuotaManager: ObservableObject {
             }
             // Unknown 409 error - throw generic
             throw URLError(.badServerResponse)
+        }
+        
+        // Handle 403 Forbidden - account was soft-deleted
+        if httpResponse.statusCode == 403 {
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               let error = detail["error"] as? String,
+               error == "account_deleted" {
+                let message = detail["message"] as? String ?? "This account has been deleted."
+                print("[QuotaManager] 🚫 Account deleted: \(message)")
+                throw AccountDeletedError(message: message)
+            }
         }
         
         guard httpResponse.statusCode == 200 else {

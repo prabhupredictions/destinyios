@@ -413,6 +413,13 @@ struct BirthDataView: View {
                 showSignInPrompt = true
             }
             return false // Don't proceed - conflict detected
+        } catch let error as AccountDeletedError {
+            // Account was soft-deleted — block all access
+            print("🚫 Account deleted: \(error.message)")
+            await MainActor.run {
+                viewModel.errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support."
+            }
+            return false // Don't proceed - account deleted
         } catch {
             print("❌ Failed to register with backend: \(error)")
             // Continue to profile sync anyway
