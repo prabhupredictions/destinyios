@@ -141,7 +141,7 @@
 
 // MARK: - Chat
 "suggested_questions" = "Suggested questions";
-"no_chat_history" = "No chat history yet";
+"no_chat_history" = "Your conversations will appear here";
 
 // MARK: - History
 "no_conversations" = "No conversations yet";
@@ -498,7 +498,7 @@
 "back" = "Back";
 
 // MARK: - Match History
-"no_match_history" = "No matches yet";
+"no_match_history" = "Your match history will appear here";
 "no_match_history_desc" = "Calculate compatibility with partners to build your history";
 
 // MARK: - Birth Chart Protection

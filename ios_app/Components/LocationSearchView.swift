@@ -158,10 +158,7 @@ struct LocationSearchView: View {
                             
                             Spacer()
                             
-                            // Source indicator
-                            Text(result.source == .apple ? "🍎" : "G")
-                                .font(AppTheme.Fonts.caption(size: 10))
-                                .foregroundColor(AppTheme.Colors.textTertiary)
+
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 14)
