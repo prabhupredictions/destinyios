@@ -14,6 +14,7 @@ import UserNotifications
 @main
 struct ios_appApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         // Configure Google Sign-In on app launch
@@ -37,15 +38,47 @@ struct ios_appApp: App {
                     #endif
                 }
         }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            switch newPhase {
+            case .background:
+                BackgroundTaskHelper.shared.beginTask()
+            case .active:
+                BackgroundTaskHelper.shared.endTask()
+            default:
+                break
+            }
+        }
+    }
+}
+
+// MARK: - Background Task Helper
+/// Keeps all in-flight network requests alive when the app enters background.
+/// iOS grants ~30 seconds of extra execution time before suspending.
+final class BackgroundTaskHelper {
+    static let shared = BackgroundTaskHelper()
+    private var taskID: UIBackgroundTaskIdentifier = .invalid
+    
+    func beginTask() {
+        guard taskID == .invalid else { return } // Already running
+        taskID = UIApplication.shared.beginBackgroundTask(withName: "app-keep-alive") { [weak self] in
+            // Expiration handler — iOS is about to suspend, clean up
+            print("[Background] ⚠️ Background time expiring")
+            self?.endTask()
+        }
+        let remaining = UIApplication.shared.backgroundTimeRemaining
+        print("[Background] 📱 App entered background — task started (remaining: \(String(format: "%.0f", remaining))s)")
+    }
+    
+    func endTask() {
+        guard taskID != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(taskID)
+        taskID = .invalid
+        print("[Background] ✅ Background task ended")
     }
 }
 
 // MARK: - App Delegate
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-    
-    /// App-level background task that keeps ALL in-flight work alive when app enters background.
-    /// iOS grants ~30 seconds of extra execution time so network requests can complete.
-    private var appBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
     
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -54,28 +87,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = self
         
         return true
-    }
-    
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        // Start a background task to keep all in-flight network requests alive
-        appBackgroundTaskID = application.beginBackgroundTask(withName: "app-global-background") {
-            // Expiration handler
-            print("[AppDelegate] ⚠️ Global background task expiring")
-            if self.appBackgroundTaskID != .invalid {
-                application.endBackgroundTask(self.appBackgroundTaskID)
-                self.appBackgroundTaskID = .invalid
-            }
-        }
-        print("[AppDelegate] 📱 App entered background — background task started (remaining: \(String(format: "%.0f", application.backgroundTimeRemaining))s)")
-    }
-    
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        // End the global background task when app returns
-        if appBackgroundTaskID != .invalid {
-            application.endBackgroundTask(appBackgroundTaskID)
-            appBackgroundTaskID = .invalid
-            print("[AppDelegate] ✅ App returned to foreground — background task ended")
-        }
     }
     
     func application(_ application: UIApplication,
