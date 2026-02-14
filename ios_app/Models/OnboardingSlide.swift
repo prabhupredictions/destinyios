@@ -14,7 +14,7 @@ struct OnboardingSlide: Identifiable, Sendable {
     static let slides: [OnboardingSlide] = [
         OnboardingSlide(
             icon: "chatgpt",
-            title: "Trusted by 140K+ users",
+            title: "Trusted by 150K+ users",
             subtitle: "on the ChatGPT Store",
             description: "",
             showStats: true,
