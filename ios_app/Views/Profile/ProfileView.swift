@@ -28,6 +28,9 @@ struct ProfileView: View {
     @State private var showGuestSignInForSwitch = false  // Guest sign-in prompt for Switch Profile
     @State private var showNotificationPreferences = false  // Notification preferences sheet
     @State private var showPartnerManager = false  // Partner manager sheet (Plus-only)
+    @State private var showDeleteAccountSheet = false  // Delete account confirmation
+    @State private var isDeletingAccount = false
+    @State private var deleteErrorMessage: String? = nil
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -77,6 +80,11 @@ struct ProfileView: View {
                         
                         // MARK: - Sign Out
                         signOutSection
+                        
+                        // MARK: - Delete Account (registered users only)
+                        if !isGuestUser {
+                            deleteAccountSection
+                        }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
@@ -134,6 +142,16 @@ struct ProfileView: View {
                 NavigationStack {
                     PartnerManagerView()
                 }
+            }
+            .sheet(isPresented: $showDeleteAccountSheet) {
+                DeleteAccountSheet(
+                    isDeleting: $isDeletingAccount,
+                    errorMessage: $deleteErrorMessage,
+                    hasActiveSubscription: hasActivePaidSubscription,
+                    onConfirmDelete: {
+                        performAccountDeletion()
+                    }
+                )
             }
             .preferredColorScheme(.dark)
         }
@@ -526,6 +544,59 @@ struct ProfileView: View {
             }
         } message: {
             Text(isGuest ? "sign_out_guest_message".localized : "sign_out_message".localized)
+        }
+    }
+    
+    // MARK: - Delete Account Section
+    private var deleteAccountSection: some View {
+        Button(action: {
+            deleteErrorMessage = nil
+            showDeleteAccountSheet = true
+        }) {
+            Text("Delete Account")
+                .font(AppTheme.Fonts.title(size: 16))
+                .foregroundColor(AppTheme.Colors.error.opacity(0.7))
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.clear)
+        }
+        .buttonStyle(ScaleButtonStyle())
+        .padding(.top, -12)
+    }
+    
+    /// Whether the user has an active paid subscription (must cancel before deleting)
+    private var hasActivePaidSubscription: Bool {
+        quotaManager.isPremium && subscriptionManager.hasActiveSubscription
+    }
+    
+    /// Perform the account deletion API call, then sign out locally
+    private func performAccountDeletion() {
+        isDeletingAccount = true
+        deleteErrorMessage = nil
+        
+        Task {
+            do {
+                try await ProfileService.shared.deleteAccount(email: userEmail)
+                
+                // Success — close sheet, sign out, and dismiss profile
+                await MainActor.run {
+                    isDeletingAccount = false
+                    showDeleteAccountSheet = false
+                }
+                
+                // Small delay for sheet dismissal animation
+                try? await Task.sleep(nanoseconds: 400_000_000)
+                
+                await authViewModel.signOutAsync()
+                await MainActor.run {
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    isDeletingAccount = false
+                    deleteErrorMessage = error.localizedDescription
+                }
+            }
         }
     }
     
