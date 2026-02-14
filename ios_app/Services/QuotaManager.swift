@@ -300,6 +300,11 @@ class QuotaManager: ObservableObject {
     private static let cachedPlansKey = "cachedAvailablePlans"
     private let dataManager: DataManager
     
+    /// Last time syncStatus was called (for TTL-based short-circuit)
+    private var lastSyncTime: Date?
+    /// Minimum interval between syncStatus calls (5 minutes)
+    private let syncCooldown: TimeInterval = 300
+    
     init(dataManager: DataManager? = nil) {
         self.dataManager = dataManager ?? DataManager.shared
         // Load cached plans immediately so paywall has data on first render
@@ -478,13 +483,23 @@ class QuotaManager: ObservableObject {
         
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
         updateFromStatus(status)
+        lastSyncTime = Date() // Prevent immediate redundant syncStatus call
         
         // Pre-fetch plans to keep cache fresh (fire-and-forget)
         Task { try? await fetchPlans() }
     }
     
     /// Sync status from server
-    func syncStatus(email: String) async throws {
+    /// - Parameters:
+    ///   - email: User email
+    ///   - force: If true, bypass cooldown (used after purchase/upgrade)
+    func syncStatus(email: String, force: Bool = false) async throws {
+        // Short-circuit if synced recently (prevents redundant calls on tab switch, pull-to-refresh)
+        if !force, let lastSync = lastSyncTime, Date().timeIntervalSince(lastSync) < syncCooldown {
+            print("[QuotaManager] syncStatus skipped — last sync \(Int(Date().timeIntervalSince(lastSync)))s ago")
+            return
+        }
+        
         var components = URLComponents(string: APIConfig.baseURL + "/subscription/status")!
         components.queryItems = [URLQueryItem(name: "email", value: email)]
         
@@ -500,6 +515,7 @@ class QuotaManager: ObservableObject {
         
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
         updateFromStatus(status)
+        lastSyncTime = Date()
         
         // Pre-fetch plans to keep cache fresh (fire-and-forget)
         Task { try? await fetchPlans() }

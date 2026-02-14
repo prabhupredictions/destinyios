@@ -335,8 +335,8 @@ class SubscriptionManager: ObservableObject {
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 {
                     print("✅ Backend verification successful for \(email)")
-                    // Sync quota status after successful verification
-                    try? await QuotaManager.shared.syncStatus(email: email)
+                    // Sync quota status after successful verification (force bypass cooldown)
+                    try? await QuotaManager.shared.syncStatus(email: email, force: true)
                 } else {
                     print("❌ Backend verification failed: HTTP \(httpResponse.statusCode)")
                 }

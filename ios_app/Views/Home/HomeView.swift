@@ -239,6 +239,7 @@ struct HomeView: View {
         }
         .navigationBarHidden(true)
         .task {
+            // Single entry point for initial data load (runs once when view appears)
             await viewModel.loadHomeData()
             await notificationService.fetchUnreadCount()
         }
@@ -257,8 +258,8 @@ struct HomeView: View {
             }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
-            // Auto-refresh badge when app comes to foreground
-            if newPhase == .active {
+            // Refresh notification badge when app returns to foreground
+            if newPhase == .active && oldPhase == .background {
                 Task {
                     await notificationService.fetchUnreadCount()
                 }
