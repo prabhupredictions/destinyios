@@ -102,7 +102,7 @@
 // MARK: - Compatibility/Match
 "compatibility" = "Compatibility";
 "partner_details" = "Partner details";
-"your_details" = "Your Details";
+"your_details" = "Your details";
 "loaded_from_profile" = "Loaded from profile";
 "or_enter_manually" = "or enter manually";
 "calculate_match" = "Calculate Match";

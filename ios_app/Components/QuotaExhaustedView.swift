@@ -81,7 +81,14 @@ struct QuotaExhaustedView: View {
     }
     
     private var displayMessage: String {
-        quotaError?.displayMessage ?? customMessage ?? "Upgrade to keep going and unlock unlimited access"
+        if let msg = quotaError?.displayMessage {
+            return msg
+        }
+        if let custom = customMessage {
+            return custom
+        }
+        // Different message for guests vs registered users
+        return showSignIn ? "Create an account to keep going and save your progress." : "Upgrade to keep going and unlock unlimited access"
     }
     
     private var upgradeText: String {
@@ -113,7 +120,7 @@ struct QuotaExhaustedView: View {
             }
             
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 28) {
+                VStack(spacing: 20) {
                     // Header illustration - different for fair use violation
                     ZStack {
                         Circle()
@@ -133,11 +140,11 @@ struct QuotaExhaustedView: View {
                             .font(.system(size: 48))
                             .foregroundColor(showContactSupport ? .red : AppTheme.Colors.gold)
                     }
-                    .padding(.top, 24)
+                    .padding(.top, 12)
                     
-                    // Title - different for fair use
-                    VStack(spacing: 12) {
-                        Text(showContactSupport ? "Usage Restricted" : "You've reached your limit")
+                    // Title - different for fair use and guest
+                    VStack(spacing: 8) {
+                        Text(showContactSupport ? "Usage Restricted" : (showSignIn ? "Sign up to continue!" : "You've reached your limit"))
                             .font(AppTheme.Fonts.title(size: 24))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .multilineTextAlignment(.center)
@@ -149,16 +156,26 @@ struct QuotaExhaustedView: View {
                             .padding(.horizontal, 20)
                     }
                     
-                    // Benefits - hide for fair use violation
+                    // Benefits - different for guests vs paid users
                     if !showContactSupport {
-                        VStack(alignment: .leading, spacing: 16) {
-                            benefitRow(icon: "infinity", text: "Unlimited questions")
-                            benefitRow(icon: "heart.fill", text: "Unlimited Destiny Matching™")
-                            benefitRow(icon: "person.3.fill", text: "Multiple birth charts/profiles")
-                            benefitRow(icon: "sparkles", text: "Daily personalized insights")
+                        VStack(alignment: .leading, spacing: 12) {
+                            if showSignIn {
+                                // Guest-specific benefits (sign-up)
+                                benefitRow(icon: "bubble.left.and.bubble.right.fill", text: "Ask more questions")
+                                benefitRow(icon: "person.circle.fill", text: "Save your birth chart")
+                                benefitRow(icon: "sparkles", text: "Get daily insights")
+                                benefitRow(icon: "heart.fill", text: "Unlock Destiny Matching™ (compatibility matching)")
+                                benefitRow(icon: "arrow.turn.down.right", text: "Ask follow-up questions after your match report")
+                            } else {
+                                // Paid user benefits (subscription)
+                                benefitRow(icon: "infinity", text: "Unlimited questions")
+                                benefitRow(icon: "heart.fill", text: "Unlimited Destiny Matching™")
+                                benefitRow(icon: "person.3.fill", text: "Multiple birth charts/profiles")
+                                benefitRow(icon: "sparkles", text: "Daily personalized insights")
+                            }
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 20)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(AppTheme.Colors.cardBackground)
@@ -208,7 +225,7 @@ struct QuotaExhaustedView: View {
                             }
                         }
                         
-                        // Sign in button (for guests only)
+                        // Sign up button (for guests only)
                         if showSignIn && !showContactSupport {
                             Button(action: { 
                                 onSignIn?()
@@ -217,7 +234,7 @@ struct QuotaExhaustedView: View {
                                 HStack(spacing: 10) {
                                     Image(systemName: "person.fill")
                                         .font(.system(size: 16))
-                                    Text("Sign In for More")
+                                    Text("Sign up")
                                         .font(AppTheme.Fonts.title(size: 17))
                                 }
                                 .foregroundColor(AppTheme.Colors.gold)
@@ -239,8 +256,9 @@ struct QuotaExhaustedView: View {
                         .padding(.top, 8)
                     }
                     .padding(.horizontal, 24)
+                    .padding(.bottom, 20)
                     
-                    Spacer(minLength: 40)
+                    Spacer(minLength: 20)
                 }
             }
         }

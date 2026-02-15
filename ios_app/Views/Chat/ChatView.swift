@@ -92,7 +92,7 @@ struct ChatView: View {
                     }
                 }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
         }
         .sheet(isPresented: $showSubscription) {

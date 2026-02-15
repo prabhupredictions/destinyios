@@ -195,7 +195,7 @@ struct CompatibilityView: View {
                     }
                 }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
         }
         .sheet(isPresented: $showSubscription) {
@@ -415,7 +415,7 @@ struct CompatibilityView: View {
                             Text("your_details".localized)
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.gold)
-                                .textCase(.uppercase)
+
                             Spacer()
                             // Change button removed as requested
                         }
