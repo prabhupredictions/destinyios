@@ -182,23 +182,27 @@ struct ProfileView: View {
                         Text(userEmail)
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                     
-                    // Plan badge - always show (Free Plan or Premium)
-                    HStack(spacing: 4) {
-                        Image(systemName: quotaManager.isPremium ? "crown.fill" : "star.fill")
-                            .font(AppTheme.Fonts.caption(size: 10))
-                        Text(quotaManager.planDisplayName)
-                            .font(AppTheme.Fonts.title(size: 11))
+                    // Plan badge - Only show for free users (Premium users have the large card below)
+                    if !quotaManager.isPremium {
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(AppTheme.Fonts.caption(size: 10))
+                            Text(quotaManager.planDisplayName)
+                                .font(AppTheme.Fonts.title(size: 11))
+                        }
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(AppTheme.Colors.gold.opacity(0.2))
+                        )
+                        .padding(.top, 4)
                     }
-                    .foregroundColor(quotaManager.isPremium ? AppTheme.Colors.mainBackground : AppTheme.Colors.gold)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(
-                        Capsule()
-                            .fill(quotaManager.isPremium ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.2))
-                    )
-                    .padding(.top, 4)
                 }
                 
                 Spacer()

@@ -587,9 +587,10 @@ class QuotaManager: ObservableObject {
         availableFeatures.contains(FeatureID.aiQuestions.rawValue)
     }
     
-    /// Check if current user is a guest (based on cached plan)
-    var isGuest: Bool {
-        currentPlan?.planId == "free_guest"
+    /// Check if user is on a free plan (free_guest or free_registered)
+    var isFreePlan: Bool {
+        let planId = currentPlan?.planId ?? ""
+        return planId == "free_guest" || planId == "free_registered"
     }
     
     /// Check if user is on Plus plan (for Plus-exclusive features like multi-partner matching)
@@ -644,9 +645,18 @@ class QuotaManager: ObservableObject {
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         
-        // For active subscriptions, say "Renews" since auto-renewal is on by default
-        // For cancelled/expired, say "Expires"
-        let prefix = (subscriptionStatus == "active") ? "Renews" : "Expires"
+        // For active subscriptions, say "Renews on"
+        // For cancelled subscriptions (in grace period), say "Ends on"
+        // For others, "Expires on"
+        let prefix: String
+        if subscriptionStatus == "active" {
+            prefix = "Renews on"
+        } else if subscriptionStatus == "cancelled" || subscriptionStatus == "grace_period" {
+            prefix = "Ends on"
+        } else {
+            prefix = "Expires on"
+        }
+        
         return "\(prefix) \(formatter.string(from: expiryDate))"
     }
     
