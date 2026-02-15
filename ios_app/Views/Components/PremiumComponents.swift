@@ -95,12 +95,15 @@ struct ShimmerButton: View {
                             .frame(width: geo.size.width * 0.4) // 40% of button width
                             .rotationEffect(.degrees(15))
                             .offset(x: shimmerPhase * (geo.size.width + 100) - geo.size.width * 0.5)
+                            .allowsHitTesting(false)
                     }
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .shadow(color: AppTheme.Colors.gold.opacity(0.4), radius: 15, y: 6)
             )
         }
+        .contentShape(Rectangle())
+        .buttonStyle(ScaleButtonStyle())
         .onAppear {
             startShimmer()
         }

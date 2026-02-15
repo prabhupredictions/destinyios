@@ -40,11 +40,19 @@ class BirthDataViewModel {
     
     // MARK: - Computed Properties
     
+    var isUnder13: Bool {
+        guard isDateSelected else { return false }
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: dateOfBirth, to: Date())
+        return (ageComponents.year ?? 0) < 13
+    }
+    
     var isValid: Bool {
         !userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !cityOfBirth.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         latitude != 0 && longitude != 0 &&
         isDateSelected &&
+        !isUnder13 &&
         (isTimeSelected || timeUnknown) &&
         !gender.isEmpty  // Gender is mandatory
     }

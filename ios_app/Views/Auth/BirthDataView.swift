@@ -5,6 +5,7 @@ struct BirthDataView: View {
     // MARK: - State
     @State private var viewModel = BirthDataViewModel()
     @AppStorage("hasBirthData") private var hasBirthData = false
+    @AppStorage("isAuthenticated") private var isAuthenticated = false
     
     // Animation states
     @State private var contentOpacity: Double = 0
@@ -58,8 +59,35 @@ struct BirthDataView: View {
                     }
                     .opacity(contentOpacity)
                     
-                    // Sound Toggle - Fixed, Transparent, Floating
-                    if AppTheme.Features.showSoundToggle {
+                    // Top bar: Back button (left) + Sound toggle (right)
+                    HStack {
+                        // Back button for guests to return to sign-up
+                        if UserDefaults.standard.bool(forKey: "isGuest") {
+                            Button(action: {
+                                HapticManager.shared.play(.light)
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    isAuthenticated = false
+                                }
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 14, weight: .medium))
+                                    Text("Sign up")
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                }
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .padding(8)
+                                .background(Color.white.opacity(0.1))
+                                .clipShape(Capsule())
+                            }
+                            .padding(.leading, AppTheme.BirthData.soundToggleTrailingPadding)
+                            .padding(.top, AppTheme.BirthData.soundToggleTopPadding)
+                        }
+                        
+                        Spacer()
+                        
+                        // Sound Toggle - Fixed, Transparent, Floating
+                        if AppTheme.Features.showSoundToggle {
                         Button(action: {
                             HapticManager.shared.play(.light)
                             SoundManager.shared.toggleSound()
@@ -171,6 +199,7 @@ struct BirthDataView: View {
             }
         }
     }
+    }
     
     // MARK: - Header (Compact, consistent with Auth screen)
     private var headerSection: some View {
@@ -277,6 +306,15 @@ struct BirthDataView: View {
                     )
                 }
                 .disabled(viewModel.timeUnknown)
+            }
+            
+            // Age validation message
+            if viewModel.isUnder13 {
+                Text("You must be at least 13 years old to create an account")
+                    .font(AppTheme.Fonts.caption(size: 13))
+                    .foregroundColor(AppTheme.Colors.error)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 4)
             }
             
             // Time Unknown Toggle
