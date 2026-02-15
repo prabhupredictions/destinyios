@@ -231,7 +231,8 @@ struct ProfileView: View {
                     title: "Manage Birth Charts",
                     subtitle: quotaManager.hasFeature(.maintainProfile) ? "Manage birth charts" : "Plus plan feature",
                     icon: "person.2.fill",
-                    isPremiumFeature: !quotaManager.hasFeature(.maintainProfile),
+                    isPremiumFeature: true,
+                    premiumBadgeText: "Core",
                     action: {
                         if isGuestUser {
                             showGuestSignInForSwitch = true
@@ -252,7 +253,7 @@ struct ProfileView: View {
                             : "Using \(ProfileContextManager.shared.activeProfileName)'s chart")
                         : "Plus plan feature",
                     icon: "arrow.triangle.2.circlepath",
-                    isPremiumFeature: !quotaManager.hasFeature(.switchProfile),
+                    isPremiumFeature: true,
                     action: {
                         // GUEST RULE: Guests must sign in first
                         if isGuestUser {
@@ -305,7 +306,7 @@ struct ProfileView: View {
                     title: "Notification Preferences",
                     subtitle: quotaManager.hasFeature(.alerts) ? "Customize your alerts" : "Plus plan feature",
                     icon: "bell.badge.fill",
-                    isPremiumFeature: !quotaManager.hasFeature(.alerts),
+                    isPremiumFeature: true,
                     action: {
                         if quotaManager.hasFeature(.alerts) {
                             showNotificationPreferences = true
@@ -384,6 +385,11 @@ struct ProfileView: View {
                     HStack(spacing: 14) {
                         // Premium icon
                         ZStack {
+                            // Dark backdrop for contrast against any background
+                            Circle()
+                                .fill(AppTheme.Colors.mainBackground.opacity(0.3))
+                                .frame(width: 44, height: 44)
+                            
                             Circle()
                                 .fill(Color.white.opacity(0.2))
                                 .frame(width: 40, height: 40)
@@ -391,6 +397,7 @@ struct ProfileView: View {
                             Image(systemName: "crown.fill")
                                 .font(AppTheme.Fonts.title(size: 18))
                                 .foregroundColor(.white)
+                                .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
                         }
                         
                         VStack(alignment: .leading, spacing: 2) {
