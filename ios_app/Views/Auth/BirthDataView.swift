@@ -409,7 +409,6 @@ struct BirthDataView: View {
         }
         .disabled(!viewModel.isValid)
         .opacity(viewModel.isValid ? 1 : 0.5)
-        .bioRhythm(bpm: 60, intensity: 1.02, active: viewModel.isValid) // Subtle pulse when valid
     }
     
     // MARK: - Backend Registration
