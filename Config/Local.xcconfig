@@ -10,3 +10,7 @@ ENVIRONMENT = local
 // OPENAI_API_KEY = sk-placeholder
 // Telegram Bot Token (stored in server .env BOT_TOKEN)
 // BOT_TOKEN = placeholder
+
+// App Name Settings
+INFOPLIST_KEY_CFBundleDisplayName = Destiny
+INFOPLIST_KEY_CFBundleName = Destiny
