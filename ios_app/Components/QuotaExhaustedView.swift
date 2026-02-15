@@ -81,11 +81,11 @@ struct QuotaExhaustedView: View {
     }
     
     private var displayMessage: String {
-        quotaError?.displayMessage ?? customMessage ?? "To continue exploring your cosmic path, choose an option below"
+        quotaError?.displayMessage ?? customMessage ?? "Upgrade to keep going and unlock unlimited access"
     }
     
     private var upgradeText: String {
-        quotaError?.upgradeButtonText ?? "Upgrade to Premium"
+        quotaError?.upgradeButtonText ?? "Choose a plan"
     }
     
     var body: some View {
@@ -137,7 +137,7 @@ struct QuotaExhaustedView: View {
                     
                     // Title - different for fair use
                     VStack(spacing: 12) {
-                        Text(showContactSupport ? "Usage Restricted" : "You've Unlocked Great Insights!")
+                        Text(showContactSupport ? "Usage Restricted" : "You've reached your limit")
                             .font(AppTheme.Fonts.title(size: 24))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .multilineTextAlignment(.center)
@@ -154,8 +154,8 @@ struct QuotaExhaustedView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             benefitRow(icon: "infinity", text: "Unlimited questions")
                             benefitRow(icon: "heart.fill", text: "Unlimited Destiny Matching™")
-                            benefitRow(icon: "person.3.fill", text: "Multiple profiles")
-                            benefitRow(icon: "sparkles", text: "Early access to new features")
+                            benefitRow(icon: "person.3.fill", text: "Multiple birth charts/profiles")
+                            benefitRow(icon: "sparkles", text: "Daily personalized insights")
                         }
                         .padding(.horizontal, 24)
                         .padding(.vertical, 20)
@@ -232,7 +232,7 @@ struct QuotaExhaustedView: View {
                         
                         // Maybe later
                         Button(action: { dismiss() }) {
-                            Text("Maybe Later")
+                            Text("Not now")
                                 .font(AppTheme.Fonts.body(size: 15))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
