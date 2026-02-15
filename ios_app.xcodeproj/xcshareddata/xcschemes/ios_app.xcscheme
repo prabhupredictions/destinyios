@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E442EF2F2EF2B99600146A8B"
-               BuildableName = "ios_app.app"
+               BuildableName = "Destiny.app"
                BlueprintName = "ios_app"
                ReferencedContainer = "container:ios_app.xcodeproj">
             </BuildableReference>
@@ -41,7 +41,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E442EF402EF2B99C00146A8B"
-               BuildableName = "ios_appTests.xctest"
+               BuildableName = "Destiny.xctest"
                BlueprintName = "ios_appTests"
                ReferencedContainer = "container:ios_app.xcodeproj">
             </BuildableReference>
@@ -52,7 +52,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E442EF4A2EF2B99C00146A8B"
-               BuildableName = "ios_appUITests.xctest"
+               BuildableName = "Destiny.xctest"
                BlueprintName = "ios_appUITests"
                ReferencedContainer = "container:ios_app.xcodeproj">
             </BuildableReference>
@@ -74,7 +74,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E442EF2F2EF2B99600146A8B"
-            BuildableName = "ios_app.app"
+            BuildableName = "Destiny.app"
             BlueprintName = "ios_app"
             ReferencedContainer = "container:ios_app.xcodeproj">
          </BuildableReference>
@@ -91,7 +91,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E442EF2F2EF2B99600146A8B"
-            BuildableName = "ios_app.app"
+            BuildableName = "Destiny.app"
             BlueprintName = "ios_app"
             ReferencedContainer = "container:ios_app.xcodeproj">
          </BuildableReference>
