@@ -101,7 +101,7 @@
 
 // MARK: - Compatibility/Match
 "compatibility" = "Compatibility";
-"partner_details" = "Partner Details";
+"partner_details" = "Partner details";
 "your_details" = "Your Details";
 "loaded_from_profile" = "Loaded from profile";
 "or_enter_manually" = "or enter manually";
@@ -127,7 +127,7 @@
 // MARK: - Birth Data Entry
 "create_birth_chart" = "Create your birth chart";
 "enter_details_desc" = "Enter your birth details to generate your\nchart and personalize your insights";
-"enter_details_desc_compatibility" = "Enter partner details to calculate compatibility\nand unlock your cosmic synergy";
+"enter_details_desc_compatibility" = "Enter partner details to explore relationship and marriage compatibility";
 
 // MARK: - Subscription
 "unlock_premium" = "Unlock Destiny Premium";
@@ -166,7 +166,7 @@
 "select_date" = "Select Date";
 "select_time" = "Select Time";
 "select_gender" = "Select Gender";
-"partner_birth_time_unknown" = "I don't know partner's birth time";
+"partner_birth_time_unknown" = "Birth time unknown";
 "birth_time_warning" = "Without an exact birth time, the quality of insights may be affected";
 
 // MARK: - Auth & Legal
@@ -476,6 +476,7 @@
 "no_saved_partners" = "No Saved Partners";
 "save_partner_description" = "Save partner profiles for quick matching";
 "save_for_future" = "Save for future matching";
+"save_birth_chart" = "Save birth chart";
 
 // MARK: - Multi-Partner Comparison
 "comparison_results" = "Comparison Results";

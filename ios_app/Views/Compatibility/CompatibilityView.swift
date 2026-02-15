@@ -316,6 +316,11 @@ struct CompatibilityView: View {
                     viewModel.loadFromHistoryGroup(group)
                 }
             }
+            
+            // Pre-check "Save birth chart" for paid users (hide + unchecked for free users)
+            if !quotaManager.isFreePlan {
+                savePartnerForFuture = true
+            }
         }
         .onChange(of: initialMatchGroup) { oldValue, newValue in
             if let group = newValue {
@@ -454,7 +459,6 @@ struct CompatibilityView: View {
                             Text("partner_details".localized)
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.gold)
-                                .textCase(.uppercase)
                         }
                         
                         // Compact Manual Entry Section (with search in name field)
@@ -765,22 +769,24 @@ struct CompatibilityView: View {
                     .accessibilityLabel("Birth time unknown")
                     .accessibilityAddTraits(viewModel.partnerTimeUnknown ? .isSelected : [])
                     
-                    // Save Partner Toggle
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        withAnimation { savePartnerForFuture.toggle() }
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: savePartnerForFuture ? "checkmark.square.fill" : "square")
-                                .font(.system(size: 14))
-                                .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                            Text("save".localized)
-                                .font(AppTheme.Fonts.caption(size: 11))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
+                    // Save Partner Toggle (hidden for free plan users)
+                    if !quotaManager.isFreePlan {
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            withAnimation { savePartnerForFuture.toggle() }
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: savePartnerForFuture ? "checkmark.square.fill" : "square")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                Text("save_birth_chart".localized)
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                            }
                         }
+                        .accessibilityLabel("Save partner for future")
+                        .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     }
-                    .accessibilityLabel("Save partner for future")
-                    .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     
                     Spacer()
                 }

@@ -13,15 +13,17 @@ struct PremiumListItem<Content: View>: View {
     let icon: String?
     let showChevron: Bool
     let isPremiumFeature: Bool  // Shows gold crown badge for Plus-only features
+    let premiumBadgeText: String  // Customizable badge text (e.g., "Plus", "Core")
     let trailingContent: Content?
     let action: (() -> Void)?
     
-    init(title: String, subtitle: String? = nil, icon: String? = nil, showChevron: Bool = true, isPremiumFeature: Bool = false, action: (() -> Void)? = nil, @ViewBuilder trailing: () -> Content = { EmptyView() }) {
+    init(title: String, subtitle: String? = nil, icon: String? = nil, showChevron: Bool = true, isPremiumFeature: Bool = false, premiumBadgeText: String = "Plus", action: (() -> Void)? = nil, @ViewBuilder trailing: () -> Content = { EmptyView() }) {
         self.title = title
         self.subtitle = subtitle
         self.icon = icon
         self.showChevron = showChevron
         self.isPremiumFeature = isPremiumFeature
+        self.premiumBadgeText = premiumBadgeText
         self.action = action
         self.trailingContent = trailing()
     }
@@ -81,7 +83,7 @@ struct PremiumListItem<Content: View>: View {
                 HStack(spacing: 3) {
                     Image(systemName: "crown.fill")
                         .font(.system(size: 10))
-                    Text("Plus")
+                    Text(premiumBadgeText)
                         .font(AppTheme.Fonts.caption(size: 10))
                 }
                 .foregroundColor(AppTheme.Colors.gold)

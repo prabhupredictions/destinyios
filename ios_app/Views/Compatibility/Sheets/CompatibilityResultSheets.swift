@@ -326,7 +326,7 @@ struct FullReportSheet: View {
                 .frame(height: 1)
             
             HStack(spacing: 6) {
-                Image(systemName: "exclamationmark.triangle.fill")
+                Image(systemName: "info.circle.fill")
                     .font(.system(size: 11))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                 Text("AI-Generated Analysis")
@@ -334,7 +334,7 @@ struct FullReportSheet: View {
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             }
             
-            Text("This report was generated using AI-powered Vedic astrology analysis based on BPHS (Brihat Parashara Hora Shastra) principles. Results are for informational and entertainment purposes only. Marriage decisions should consider multiple factors beyond astrological compatibility. Consult a qualified astrologer for personalized guidance.")
+            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
                 .lineSpacing(3)
@@ -626,11 +626,11 @@ private struct PremiumReportPDFView: View {
                     .frame(height: 1)
                     .padding(.horizontal, 40)
                 
-                Text("⚠️ AI-GENERATED ANALYSIS")
+                Text("ⓘ AI-Generated Analysis")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.5))
                 
-                Text("This report was generated using AI-powered Vedic astrology analysis based on BPHS principles. Results are for informational and entertainment purposes only.")
+                Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.3))
                     .multilineTextAlignment(.center)
