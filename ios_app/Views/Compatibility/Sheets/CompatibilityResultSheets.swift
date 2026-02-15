@@ -263,12 +263,31 @@ struct FullReportSheet: View {
     
     // MARK: - Section Card
     
+    // SF Symbol mapping for section emojis
+    private func sfSymbol(for emoji: String) -> String? {
+        switch emoji {
+        case "🎯": return "target"                    // COMPATIBILITY VERDICT
+        case "🌟", "⭐": return "star.fill"          // KEY STRENGTHS
+        case "ⓘ", "ℹ️": return "info.circle.fill"    // KEY CHALLENGES
+        case "🔮": return "wand.and.stars"          // FINAL RECOMMENDATION
+        case "📋": return "doc.text"                // Default/Analysis
+        default: return nil
+        }
+    }
+    
     private func sectionCard(emoji: String, title: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             // Section header
             HStack(spacing: 8) {
-                Text(emoji)
-                    .font(.system(size: 18))
+                // Use SF Symbol if mapped, otherwise use emoji
+                if let symbolName = sfSymbol(for: emoji) {
+                    Image(systemName: symbolName)
+                        .font(.system(size: 16))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                } else {
+                    Text(emoji)
+                        .font(.system(size: 18))
+                }
                 
                 Text(title.uppercased())
                     .font(.system(size: 13, weight: .bold, design: .serif))
@@ -406,25 +425,28 @@ struct FullReportSheet: View {
     private func extractEmojiAndTitle(from text: String) -> (emoji: String, title: String) {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         
-        // Check if first character is an emoji
-        if let first = trimmed.unicodeScalars.first,
-           first.properties.isEmoji && first.value > 0x238 {
-            // Find where the emoji ends
-            let firstChar = String(trimmed.prefix(1))
-            // Some emojis are multi-scalar
-            var emojiEnd = trimmed.index(trimmed.startIndex, offsetBy: 1)
-            // Walk forward while still in emoji territory
-            while emojiEnd < trimmed.endIndex {
-                let scalar = trimmed.unicodeScalars[trimmed.unicodeScalars.index(trimmed.unicodeScalars.startIndex, offsetBy: trimmed.distance(from: trimmed.startIndex, to: emojiEnd))]
-                if scalar.properties.isEmoji || scalar.value == 0xFE0F || scalar.value == 0x200D {
-                    emojiEnd = trimmed.index(after: emojiEnd)
-                } else {
-                    break
+        // Handle special case for circled characters (ⓘ, ⓒ, etc.) that don't have isEmoji property
+        if let first = trimmed.unicodeScalars.first {
+            let firstScalar = first.value
+            // Check for circled letters (ⓘ = U+24D8, etc.)
+            if (firstScalar >= 0x24B6 && firstScalar <= 0x24E9) || // Circled Latin
+               (firstScalar >= 0x24EA && firstScalar <= 0x24FF) || // Circled numbers
+               (first.properties.isEmoji && firstScalar > 0x238) {
+                var emojiEnd = trimmed.index(trimmed.startIndex, offsetBy: 1)
+                // Walk forward while still in emoji territory (for multi-scalar emojis)
+                while emojiEnd < trimmed.endIndex {
+                    let scalarIndex = trimmed.unicodeScalars.index(trimmed.unicodeScalars.startIndex, offsetBy: trimmed.distance(from: trimmed.startIndex, to: emojiEnd))
+                    let scalar = trimmed.unicodeScalars[scalarIndex]
+                    if scalar.properties.isEmoji || scalar.value == 0xFE0F || scalar.value == 0x200D {
+                        emojiEnd = trimmed.index(after: emojiEnd)
+                    } else {
+                        break
+                    }
                 }
+                let emoji = String(trimmed[trimmed.startIndex..<emojiEnd])
+                let title = String(trimmed[emojiEnd...]).trimmingCharacters(in: .whitespaces)
+                return (emoji: emoji, title: title)
             }
-            let emoji = String(trimmed[trimmed.startIndex..<emojiEnd])
-            let title = String(trimmed[emojiEnd...]).trimmingCharacters(in: .whitespaces)
-            return (emoji: emoji, title: title)
         }
         
         return (emoji: "📋", title: trimmed)
@@ -547,6 +569,18 @@ private struct PremiumReportPDFView: View {
     let starCount: Int
     let formattedDate: String
     
+    // SF Symbol mapping for section emojis (duplicated here since this is a separate struct)
+    private func sfSymbol(for emoji: String) -> String? {
+        switch emoji {
+        case "🎯": return "target"                    // COMPATIBILITY VERDICT
+        case "🌟", "⭐": return "star.fill"          // KEY STRENGTHS
+        case "ⓘ", "ℹ️": return "info.circle.fill"    // KEY CHALLENGES
+        case "🔮": return "wand.and.stars"          // FINAL RECOMMENDATION
+        case "📋": return "doc.text"                // Default/Analysis
+        default: return nil
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
@@ -594,9 +628,21 @@ private struct PremiumReportPDFView: View {
             // Sections
             ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("\(section.emoji) \(section.title)")
-                        .font(.system(size: 14, weight: .bold, design: .serif))
-                        .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    HStack(spacing: 6) {
+                        // Use SF Symbol for emoji in PDF
+                        if let symbolName = sfSymbol(for: section.emoji) {
+                            Image(systemName: symbolName)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                        } else {
+                            Text(section.emoji)
+                                .font(.system(size: 14))
+                        }
+                        
+                        Text(section.title)
+                            .font(.system(size: 14, weight: .bold, design: .serif))
+                            .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    }
                     
                     Rectangle()
                         .fill(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.2))
