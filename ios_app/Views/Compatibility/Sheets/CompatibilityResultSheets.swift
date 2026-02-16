@@ -549,7 +549,7 @@ struct FullReportSheet: View {
             )
             
             if let image = ReportShareService.shared.generateShareImage(from: cardView) {
-                let shareText = "✨ \(boyName) & \(girlName) — Cosmic Score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
+                let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
                 ReportShareService.shared.shareImage(image, text: shareText)
             }
         }

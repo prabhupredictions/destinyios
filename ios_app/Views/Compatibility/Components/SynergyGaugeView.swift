@@ -66,12 +66,19 @@ struct SynergyGaugeView: View {
                         .font(AppTheme.Fonts.body(size: size * 0.08).weight(.medium))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                     
-                    Text("Cosmic Score")
-                        .font(AppTheme.Fonts.caption(size: size * 0.06))
-                        .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
-                        .textCase(.uppercase)
-                        .tracking(2)
-                        .padding(.top, 4)
+                    VStack(spacing: 0) {
+                        Text("Compatibility")
+                            .font(AppTheme.Fonts.caption(size: size * 0.05))
+                            .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+                            .textCase(.uppercase)
+                            .tracking(1)
+                        Text("Score")
+                            .font(AppTheme.Fonts.caption(size: size * 0.05))
+                            .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+                            .textCase(.uppercase)
+                            .tracking(1)
+                    }
+                    .padding(.top, 4)
                 }
                 
                 // Partner Names removed (Moved to Header)

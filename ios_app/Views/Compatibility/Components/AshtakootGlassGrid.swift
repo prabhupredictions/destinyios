@@ -41,7 +41,7 @@ struct AshtakootGlassGrid: View {
         "tara": ("Destiny", "star.fill"),
         "yoni": ("Intimacy", "flame.fill"),
         "maitri": ("Friendship", "person.2.fill"),
-        "gana": ("Temperament", "masks.rectangle.fill"),
+        "gana": ("Temperament", "theatermasks.fill"),
         "bhakoot": ("Love", "heart.circle.fill"),
         "nadi": ("Health", "waveform.path.ecg")
     ]

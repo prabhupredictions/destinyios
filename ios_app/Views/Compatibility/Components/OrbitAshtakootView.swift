@@ -13,9 +13,9 @@ struct OrbitAshtakootView: View {
         "varna": ("Work", "briefcase.fill"),
         "vashya": ("Dominance", "bolt.heart.fill"),
         "tara": ("Destiny", "star.fill"),
-        "yoni": ("Sex", "flame.fill"),
+        "yoni": ("Intimacy", "flame.fill"),
         "maitri": ("Friendship", "person.2.fill"),
-        "gana": ("Temper", "theatermasks.fill"),
+        "gana": ("Temperament", "theatermasks.fill"),
         "bhakoot": ("Love", "heart.circle.fill"),
         "nadi": ("Health", "waveform.path.ecg")
     ]
@@ -117,7 +117,7 @@ struct OrbitAshtakootView: View {
                     
                     // Description
                     if !kuta.description.isEmpty {
-                        Text(replaceNames(in: kuta.description))
+                        Text(replaceNames(in: enhanceDescription(kuta.description, for: kuta.key)))
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .multilineTextAlignment(.leading)
@@ -180,6 +180,88 @@ struct OrbitAshtakootView: View {
     
     private func format(_ value: Double) -> String {
         return value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
+    }
+    
+    /// Enhance description with astrological context and score-based interpretation
+    private func enhanceDescription(_ desc: String, for key: String) -> String {
+        // Find the matching kuta to get score information
+        guard let kuta = orbitItems.first(where: { $0.key == key }) else {
+            return desc
+        }
+        
+        let statusColor = kuta.statusColor
+        
+        // Determine compatibility level based on score
+        let compatibilityLevel: String
+        if statusColor == .green {
+            compatibilityLevel = "excellent compatibility"
+        } else if statusColor == .yellow {
+            compatibilityLevel = "moderate compatibility"
+        } else {
+            compatibilityLevel = "challenging area that requires understanding and effort"
+        }
+        
+        // Clean up API description if present (replace lord mentions, remove trailing punctuation)
+        let cleanedDesc = desc
+            .replacingOccurrences(
+                of: "(\\w+) lord: (\\w+)",
+                with: "$1's ruling planet $2",
+                options: .regularExpression
+            )
+            .trimmingCharacters(in: .punctuationCharacters.union(.whitespaces))
+        
+        // Build comprehensive description based on kuta type
+        var result = ""
+        
+        switch key {
+        case "varna":
+            result = "Work compatibility is determined using Varna Ashtakoot property which focuses on the Varna categories of both partners (Brahmin, Kshatriya, Vaishya, Shudra);"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        case "vashya":
+            result = "Dominance compatibility is determined using Vashya Ashtakoot property which focuses on the Vashya groups of both partners (Manava, Vanachara, Keeta...);"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        case "tara":
+            result = "Destiny alignment is determined using Tara Ashtakoot property which focuses on the birth stars (Nakshatras) and Tara groups of both partners (Janma, Sampat, Vipat...);"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        case "yoni":
+            result = "Physical and intimate compatibility is determined using Yoni Ashtakoot property which focuses on the animal symbols (Yoni types) of both partners (Aswa, Vanara, Sarpa...);"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        case "maitri":
+            result = "Friendship and mental compatibility is determined using Maitri Ashtakoot property which focuses on the ruling sign lords (Moon sign lords) of both partners;"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        case "gana":
+            result = "Temperament compatibility is determined using Gana Ashtakoot property which focuses on the temperament categories (Deva, Manushya, Rakshasa) of both partners;"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        case "bhakoot":
+            result = "Emotional bonding and love compatibility is determined using Bhakoot Ashtakoot property which focuses on the Moon sign positions (Rashis) of both partners;"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        case "nadi":
+            result = "Health and genetic compatibility is determined using Nadi Ashtakoot property which focuses on the Nadi types (Aadi, Madhya, Antya) of both partners;"
+            if !cleanedDesc.isEmpty {
+                result += " \(cleanedDesc)"
+            }
+        default:
+            result = desc
+        }
+        
+        // Add score-based interpretation
+        result += " — Score: \(Int(kuta.score))/\(Int(kuta.maxScore)) — This indicates \(compatibilityLevel)."
+        
+        return result
     }
     
     /// Replace generic "Boy"/"Girl" with actual partner names

@@ -43,7 +43,7 @@ struct TopicListView: View {
                         }
                     } header: {
                         sectionHeader(
-                            title: "Active Forces",
+                            title: "Active factors",
                             icon: "sparkles",
                             count: activeItems.count,
                             color: tile.accentColor
@@ -64,8 +64,8 @@ struct TopicListView: View {
                         }
                     } header: {
                         sectionHeader(
-                            title: "Blocked Potential",
-                            icon: "lock.fill",
+                            title: "Inactive factors",
+                            icon: "circle.slash",
                             count: blockedItems.count,
                             color: AppTheme.Colors.textTertiary
                         )
@@ -92,11 +92,12 @@ struct TopicListView: View {
                 .shadow(color: tile.accentColor.opacity(0.6), radius: 20, x: 0, y: 0)
                 .padding(.bottom, 8)
             
-            // Title - Elegant & Clean
-            Text("\(personName)'s \(tile.displayTitle)")
-                .font(.system(size: 24, weight: .bold, design: .serif)) // Serif for premium feel
+            // Title - Elegant & Clean, Centered
+            Text(tile.displayTitle)
+                .font(.system(size: 24, weight: .bold, design: .serif))
                 .foregroundColor(.white)
                 .shadow(radius: 2)
+                .multilineTextAlignment(.center)
             
             // Subtitle/Context (Optional, can be stats)
             HStack(spacing: 12) {
@@ -107,7 +108,7 @@ struct TopicListView: View {
                         .fill(Color.white.opacity(0.3))
                         .frame(width: 4, height: 4)
                     
-                    statusText(label: "Blocked", count: blockedItems.count, color: AppTheme.Colors.textTertiary)
+                    statusText(label: "Inactive", count: blockedItems.count, color: AppTheme.Colors.textTertiary)
                 }
             }
             .padding(.top, 4)
@@ -291,7 +292,7 @@ struct ActiveYogaCard: View {
     
     private var statusInfo: (String, Color) {
         switch item.status.uppercased() {
-        case "A": return ("ACTIVE", AppTheme.Colors.success)
+        case "A": return ("Active", AppTheme.Colors.success)
         case "R": return ("REDUCED", AppTheme.Colors.gold)
         default: return (item.status, AppTheme.Colors.textTertiary)
         }
@@ -378,12 +379,12 @@ struct BlockedYogaCard: View {
             // Header
             Button(action: onTap) {
                 HStack(spacing: 12) {
-                    // Locked Icon
+                    // Disabled Icon
                     ZStack {
                         Circle()
                             .fill(AppTheme.Colors.inputBackground)
                             .frame(width: 32, height: 32)
-                        Image(systemName: "lock.fill")
+                        Image(systemName: "circle.slash")
                             .font(.system(size: 14))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
@@ -403,8 +404,8 @@ struct BlockedYogaCard: View {
                     
                     Spacer()
                     
-                    // Blocked Badge
-                    Text("BLOCKED")
+                    // Inactive Badge
+                    Text("Inactive")
                         .font(AppTheme.Fonts.caption(size: 10).weight(.bold))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                         .padding(.horizontal, 10)
@@ -437,7 +438,7 @@ struct BlockedYogaCard: View {
                                 Image(systemName: "xmark.circle.fill")
                                     .font(.system(size: 12))
                                     .foregroundColor(AppTheme.Colors.error.opacity(0.8))
-                                Text("Why Blocked")
+                                Text("Why Inactive")
                                     .font(AppTheme.Fonts.caption(size: 11).weight(.medium))
                                     .foregroundColor(AppTheme.Colors.error.opacity(0.8))
                             }

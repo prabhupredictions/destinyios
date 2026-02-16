@@ -36,6 +36,33 @@ struct CompatibilityResultView: View {
         Dictionary<String, Double>(uniqueKeysWithValues: result.kutas.map { ($0.name.lowercased(), Double($0.points)) })
     }
     
+    // Kalsarpa Dosha Status
+    private var kalsarpaStatusText: String {
+        let boyPresent = result.analysisData?.boy?.raw?.kalaSarpa?.present ?? false
+        let girlPresent = result.analysisData?.girl?.raw?.kalaSarpa?.present ?? false
+        
+        if !boyPresent && !girlPresent {
+            return "Clear"
+        } else if boyPresent && girlPresent {
+            return "Both Present"
+        } else {
+            return "Moderate"
+        }
+    }
+    
+    private var kalsarpaStatusColor: Color {
+        let boyPresent = result.analysisData?.boy?.raw?.kalaSarpa?.present ?? false
+        let girlPresent = result.analysisData?.girl?.raw?.kalaSarpa?.present ?? false
+        
+        if !boyPresent && !girlPresent {
+            return AppTheme.Colors.success
+        } else if boyPresent && girlPresent {
+            return .orange
+        } else {
+            return .yellow
+        }
+    }
+    
     init(
         result: CompatibilityResult,
         boyName: String,
@@ -119,7 +146,7 @@ struct CompatibilityResultView: View {
                                     mangalDoshaDestination
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Mangal Dosha (Mars Compatibility)",
+                                        title: "Mangal Dosha (Manglik/Kuja)",
                                         icon: "flame.fill",
                                         statusText: result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String ?? "View",
                                         statusColor: (result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String)?.lowercased() == "excellent" ? AppTheme.Colors.success : .orange
@@ -137,10 +164,10 @@ struct CompatibilityResultView: View {
                                     )
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Kalsarpa Dosha (Serpent Curse)",
+                                        title: "Kaal Sarp Dosha (Kalasarpa)",
                                         icon: "tornado",
-                                        statusText: "View",
-                                        statusColor: AppTheme.Colors.gold
+                                        statusText: kalsarpaStatusText,
+                                        statusColor: kalsarpaStatusColor
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
@@ -158,7 +185,7 @@ struct CompatibilityResultView: View {
                                         title: "Additional Yogas",
                                         icon: "sparkles",
                                         statusText: "View All",
-                                        statusColor: AppTheme.Colors.success
+                                        statusColor: AppTheme.Colors.textSecondary
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
