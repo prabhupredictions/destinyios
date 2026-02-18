@@ -287,16 +287,17 @@ struct ChatView: View {
                             }
                         }) {
                             Text(question)
-                                .font(AppTheme.Fonts.body(size: 13))
+                                .font(.system(size: 11, weight: .medium))
                                 .foregroundColor(AppTheme.Colors.gold)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
+                                .lineLimit(1)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 18)
+                                    Capsule()
                                         .fill(AppTheme.Colors.gold.opacity(0.1))
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 18)
-                                                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                                            Capsule()
+                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
                                         )
                                 )
                         }
@@ -339,6 +340,8 @@ struct ChatView: View {
                         // Inline suggested questions — only after typewriter finishes
                         if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && viewModel.typewriterMessageId == nil {
                             inlineSuggestedQuestionsView
+                                .id("suggestions")
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
                         }
                     }
                     .padding(.horizontal, 12)
@@ -353,8 +356,10 @@ struct ChatView: View {
             .scrollDismissesKeyboard(.interactively)
             // Scroll when a new message is added (user msg or AI response)
             .onChange(of: viewModel.messages.count) { _, _ in
-                withAnimation {
-                    proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                    }
                 }
             }
             // Scroll when loading starts (show thinking indicator)
@@ -362,6 +367,26 @@ struct ChatView: View {
                 withAnimation {
                     if isLoading {
                         proxy.scrollTo("loading", anchor: .bottom)
+                    }
+                }
+            }
+            // Scroll smoothly when suggested questions appear
+            .onChange(of: viewModel.suggestedQuestions) { _, newQuestions in
+                if !newQuestions.isEmpty && viewModel.typewriterMessageId == nil {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo("suggestions", anchor: .bottom)
+                        }
+                    }
+                }
+            }
+            // Scroll when typewriter finishes (suggestions may already be loaded)
+            .onChange(of: viewModel.typewriterMessageId) { _, newId in
+                if newId == nil && !viewModel.suggestedQuestions.isEmpty {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo("suggestions", anchor: .bottom)
+                        }
                     }
                 }
             }

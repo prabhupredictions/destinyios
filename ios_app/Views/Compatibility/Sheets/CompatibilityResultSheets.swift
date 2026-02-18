@@ -748,6 +748,7 @@ struct AskDestinySheet: View {
     @State private var showQuotaSheet: Bool = false
     @State private var quotaMessage: String = ""
     @State private var showSubscription: Bool = false
+    @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -782,13 +783,14 @@ struct AskDestinySheet: View {
                     .padding(.vertical, 12)
                     
                     // Messages List
+                    GeometryReader { scrollGeo in
                     ScrollViewReader { proxy in
                         ScrollView {
                             LazyVStack(spacing: 16) {
-                                // Welcome message
+                                // Welcome message — vertically centered
                                 if messages.isEmpty && !isLoading {
                                     welcomeView
-                                        .padding(.top, 20)
+                                        .frame(minHeight: scrollGeo.size.height - 32)
                                 }
                                 
                                 ForEach(messages) { message in
@@ -801,6 +803,13 @@ struct AskDestinySheet: View {
                                     CompatTypingIndicator()
                                         .id("loading")
                                 }
+                                
+                                // Inline suggested follow-up questions
+                                if !suggestedQuestions.isEmpty && !isLoading {
+                                    inlineSuggestedQuestionsView
+                                        .id("suggestions")
+                                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                                }
                             }
                             .padding(.horizontal, 12)  // Match ChatView padding
                             .padding(.vertical, 16)
@@ -808,9 +817,11 @@ struct AskDestinySheet: View {
                         .defaultScrollAnchor(.bottom)
                         .scrollDismissesKeyboard(.interactively)
                         .onChange(of: messages.count) { _, _ in
-                            withAnimation {
-                                if let lastId = messages.last?.id {
-                                    proxy.scrollTo(lastId, anchor: .bottom)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                withAnimation(.easeOut(duration: 0.25)) {
+                                    if let lastId = messages.last?.id {
+                                        proxy.scrollTo(lastId, anchor: .bottom)
+                                    }
                                 }
                             }
                         }
@@ -821,7 +832,18 @@ struct AskDestinySheet: View {
                                 }
                             }
                         }
+                        // Scroll smoothly when suggested questions appear
+                        .onChange(of: suggestedQuestions) { _, newQuestions in
+                            if !newQuestions.isEmpty {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        proxy.scrollTo("suggestions", anchor: .bottom)
+                                    }
+                                }
+                            }
+                        }
                     }
+                    } // GeometryReader
                     
                     // Error Banner
                     if let error = errorMessage {
@@ -966,13 +988,13 @@ struct AskDestinySheet: View {
             
             // Quick Questions
             VStack(spacing: 8) {
-                quickQuestionButton("What are the main challenges?")
-                quickQuestionButton("How can they improve communication?")
-                quickQuestionButton("What about \(boyName)'s career?")
+                quickQuestionButton("Key strengths of this match?")
+                quickQuestionButton("Key challenges of this match?")
+                quickQuestionButton("Best timing for relationship harmony?")
             }
             .padding(.top, 8)
         }
-        .padding(24)
+        .padding(.horizontal, 24)
     }
     
     private func quickQuestionButton(_ text: String) -> some View {
@@ -994,6 +1016,45 @@ struct AskDestinySheet: View {
                         )
                 )
         }
+    }
+    
+    // MARK: - Inline Suggested Questions (horizontal scrollable pills)
+    private var inlineSuggestedQuestionsView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Suggested questions")
+                .font(AppTheme.Fonts.caption())
+                .foregroundColor(AppTheme.Colors.textSecondary)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(suggestedQuestions, id: \.self) { question in
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            inputText = question
+                            suggestedQuestions = []
+                            Task { await sendMessage() }
+                        }) {
+                            Text(question)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .lineLimit(1)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule()
+                                        .fill(AppTheme.Colors.gold.opacity(0.1))
+                                        .overlay(
+                                            Capsule()
+                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
+                                        )
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(.top, 4)
     }
     
     // MARK: - Input Bar
@@ -1052,6 +1113,7 @@ struct AskDestinySheet: View {
         
         inputText = ""
         errorMessage = nil
+        suggestedQuestions = []  // Clear previous suggestions
         
         // Add user message
         let userMessage = CompatChatMessage(content: query, isUser: true, type: .user)
@@ -1103,6 +1165,11 @@ struct AskDestinySheet: View {
                 let aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
                 messages.append(aiMessage)
                 saveMessagesToHistory()  // Persist messages
+                
+                // Set follow-up suggestions from API
+                if let followUps = response.followUpSuggestions, !followUps.isEmpty {
+                    suggestedQuestions = followUps
+                }
             } else if let message = response.message {
                 // Info/error message
                 let aiMessage = CompatChatMessage(content: message, isUser: false, type: .info)
@@ -1181,6 +1248,11 @@ struct AskDestinySheet: View {
             let aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
             messages.append(aiMessage)
             saveMessagesToHistory()  // Persist messages
+            
+            // Set follow-up suggestions from predict API
+            if !predictResponse.followUpSuggestions.isEmpty {
+                suggestedQuestions = predictResponse.followUpSuggestions
+            }
             
         } catch let error as NetworkError {
             // Remove redirect message
