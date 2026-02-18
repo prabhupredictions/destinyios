@@ -224,7 +224,7 @@ struct PremiumYogaCard: View {
             }
             
             // Yoga Name (Limit 2 lines)
-            Text(yoga.displayName)
+            Text(yoga.localizedName)
                 .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(Color.white)
                 .lineLimit(2)

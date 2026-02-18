@@ -323,13 +323,13 @@ struct CancelledAnalysisView: View {
                 
                 Group {
                     if reason.contains("Mutual") || reason.contains("mutual") {
-                         Text("Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.")
+                         Text("mangal_mutual_cancellation".localized)
                             .font(AppTheme.Fonts.body(size: 15))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     } else if (boyData?.exceptionDescriptions.count ?? 0) > 0 || (girlData?.exceptionDescriptions.count ?? 0) > 0 {
                         VStack(alignment: .leading, spacing: 8) {
                             if let boy = boyData, !boy.exceptionDescriptions.isEmpty {
-                                Text("\(boyName)'s exceptions:")
+                                Text(String(format: "mangal_exceptions_title".localized, boyName))
                                     .font(AppTheme.Fonts.caption(size: 13).bold())
                                     .foregroundColor(AppTheme.Colors.textSecondary)
                                 ForEach(boy.exceptionDescriptions, id: \.self) { desc in
@@ -346,7 +346,7 @@ struct CancelledAnalysisView: View {
                                 if (boyData?.exceptionDescriptions.count ?? 0) > 0 {
                                     Divider().padding(.vertical, 4)
                                 }
-                                Text("\(girlName)'s exceptions:")
+                                Text(String(format: "mangal_exceptions_title".localized, girlName))
                                     .font(AppTheme.Fonts.caption(size: 13).bold())
                                     .foregroundColor(AppTheme.Colors.textSecondary)
                                 ForEach(girl.exceptionDescriptions, id: \.self) { desc in

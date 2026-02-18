@@ -14,6 +14,7 @@ struct ProfileView: View {
     @AppStorage("userEmail") private var userEmail: String = ""
     @AppStorage("chartStyle") private var chartStyle: String = "north"
     @AppStorage("isGuest") private var isGuest: Bool = false
+    @AppStorage("appLanguageCode") private var appLanguageCode: String = "en"
     
     // Navigation states for settings sheets
     @State private var showBirthDetails = false
@@ -622,13 +623,12 @@ struct ProfileView: View {
     }
     
     private var currentLanguageDisplay: String {
-        let code = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
         let languageNames: [String: String] = [
             "en": "English", "hi": "हिंदी", "ta": "தமிழ்", "te": "తెలుగు",
             "kn": "ಕನ್ನಡ", "ml": "മലയാളം", "es": "Español", "pt": "Português",
             "de": "Deutsch", "fr": "Français", "zh-Hans": "中文", "ja": "日本語", "ru": "Русский"
         ]
-        return languageNames[code] ?? "English"
+        return languageNames[appLanguageCode] ?? "English"
     }
     
     private var appVersion: String {

@@ -252,23 +252,27 @@ struct YogaDoshaData: Codable {
 struct YogaItem: Codable, Identifiable {
     var id: String { name }
     let name: String
+    let yogaKey: String?  // Machine-readable key for localization (e.g. "gajakesari_yoga")
     let status: String  // A = Active, R = Reduced, C = Cancelled
     let strengthValue: AnyCodable?  // API sends String like "R" or Double
     let category: String?
     let planets: String?
     let houses: String?
     let formation: String?
+    let outcome: String?  // Professional description of yoga/dosha effect
     let reason: String?  // Cancellation/reduction reason from API
     let isDosha: Bool?   // Explicit backend flag
     
     enum CodingKeys: String, CodingKey {
         case name
+        case yogaKey = "yoga_key"
         case status
         case strengthValue = "strength"
         case category
         case planets
         case houses
         case formation
+        case outcome
         case reason
         case isDosha = "is_dosha"
     }
@@ -276,12 +280,19 @@ struct YogaItem: Codable, Identifiable {
     /// Clean display name - strips numbers/parentheses after Yoga/Dosha
     /// e.g., "Grihanasa Yoga (192)" → "Grihanasa Yoga"
     /// e.g., "Bhagya Yoga 241" → "Bhagya Yoga"
+    /// e.g., "kala_sarpa" → "Kala Sarpa"
     var displayName: String {
         // Find "Yoga" or "Dosha" and truncate after it
         if let yogaRange = name.range(of: "Yoga", options: .caseInsensitive) {
             return String(name[..<yogaRange.upperBound])
         } else if let doshaRange = name.range(of: "Dosha", options: .caseInsensitive) {
             return String(name[..<doshaRange.upperBound])
+        }
+        // Handle snake_case names (e.g., "kala_sarpa" → "Kala Sarpa")
+        if name.contains("_") {
+            return name.split(separator: "_")
+                .map { $0.prefix(1).uppercased() + $0.dropFirst() }
+                .joined(separator: " ")
         }
         // Fallback: strip trailing numbers/parentheses
         return name.replacingOccurrences(of: "\\s*[\\(\\d\\)]+$", with: "", options: .regularExpression)
@@ -358,6 +369,33 @@ struct YogaItem: Codable, Identifiable {
     /// Is this a yoga (positive) or dosha (negative)?
     var isYoga: Bool {
         return true // Set by parent context
+    }
+    
+    // MARK: - Localized Content (uses yogaKey to lookup from Localizable.strings)
+    
+    /// Localized yoga name - looks up using yoga_key from Localizable.strings
+    var localizedName: String {
+        guard let key = yogaKey, !key.isEmpty else { return displayName }
+        let lookupKey = "yoga_name_\(key)"
+        let localized = lookupKey.localized
+        // If localization returns the key itself, fallback to displayName
+        return localized == lookupKey ? displayName : localized
+    }
+    
+    /// Localized outcome description - from Localizable.strings or API fallback
+    var localizedOutcome: String? {
+        guard let key = yogaKey, !key.isEmpty else { return outcome }
+        let lookupKey = "yoga_outcome_\(key)"
+        let localized = lookupKey.localized
+        return localized == lookupKey ? outcome : localized
+    }
+    
+    /// Localized formation description - from Localizable.strings or API fallback
+    var localizedFormation: String? {
+        guard let key = yogaKey, !key.isEmpty else { return formation }
+        let lookupKey = "yoga_formation_\(key)"
+        let localized = lookupKey.localized
+        return localized == lookupKey ? formation : localized
     }
 }
 

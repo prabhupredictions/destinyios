@@ -41,11 +41,11 @@ struct FullReportSheet: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        // 1. Action Bar
-                        actionBar
-                        
-                        // 2. Branded Header
+                        // 1. Branded Header (Score Card)
                         brandedHeader
+                        
+                        // 2. Save to Files row
+                        actionBar
                         
                         // 3. Section Cards (parsed from LLM output)
                         if sections.isEmpty {
@@ -68,79 +68,115 @@ struct FullReportSheet: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .font(AppTheme.Fonts.title(size: 17))
-                        .foregroundColor(AppTheme.Colors.gold)
+                    Button {
+                        presentNativeShareSheet()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 18))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
                 }
             }
-        }
-        .confirmationDialog("Share Report", isPresented: $showShareOptions) {
-            Button("Share as PDF") {
-                generateAndSharePDF()
-            }
-            Button("Share Score Card") {
-                shareScoreCard()
-            }
-            Button("Cancel", role: .cancel) {}
         }
     }
     
-    // MARK: - Action Bar
+    // MARK: - Native Share Sheet
+    
+    private func presentNativeShareSheet() {
+        Task { @MainActor in
+            // Generate PDF
+            let pdfView = PremiumReportPDFView(
+                result: result,
+                boyName: boyName,
+                girlName: girlName,
+                boyDob: boyDob,
+                girlDob: girlDob,
+                sections: sections,
+                ratingText: ratingText,
+                starCount: starCount,
+                formattedDate: formattedDate
+            )
+            
+            let fileName = "Destiny_AI_\(boyName)_\(girlName)_Compatibility"
+            let pdfURL = ReportShareService.shared.generateMultiPagePDF(
+                from: pdfView,
+                width: 390,
+                fileName: fileName
+            )
+            
+            // Generate Score Card Image
+            let cardView = ShareCardView(
+                boyName: boyName,
+                girlName: girlName,
+                totalScore: result.totalScore,
+                maxScore: result.maxScore,
+                percentage: result.percentage
+            )
+            let shareImage = ReportShareService.shared.generateShareImage(from: cardView)
+            
+            // Prepare share items
+            var shareItems: [Any] = []
+            
+            // Add share text
+            let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
+            shareItems.append(shareText)
+            
+            // Add image if available
+            if let image = shareImage {
+                shareItems.append(image)
+            }
+            
+            // Add PDF if available
+            if let url = pdfURL {
+                shareItems.append(url)
+            }
+            
+            // Present native share sheet
+            ReportShareService.shared.presentShareSheet(items: shareItems)
+        }
+    }
+    
+    // MARK: - Action Bar (Save to Files row style)
     
     private var actionBar: some View {
-        HStack(spacing: 12) {
-            // Download PDF Button
-            Button {
-                generateAndSharePDF()
-            } label: {
-                HStack(spacing: 6) {
-                    if isGeneratingPDF {
-                        ProgressView()
-                            .tint(AppTheme.Colors.gold)
-                            .scaleEffect(0.7)
-                    } else {
-                        Image(systemName: "arrow.down.doc.fill")
-                    }
-                    Text("Download PDF")
-                        .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
-                }
-                .foregroundColor(AppTheme.Colors.mainBackground)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.8)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                )
+        Button {
+            generateAndSharePDF()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "arrow.down.doc.fill")
+                    .font(.system(size: 18))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                
+                Text("Save to Files")
+                    .font(AppTheme.Fonts.body(size: 16))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
-            .disabled(isGeneratingPDF)
-            
-            // Share Button
-            Button {
-                showShareOptions = true
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "square.and.arrow.up")
-                    Text("Share")
-                        .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
-                }
-                .foregroundColor(AppTheme.Colors.gold)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
-                )
-            }
-            
-            Spacer()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(AppTheme.Colors.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
+                    )
+            )
         }
+        .disabled(isGeneratingPDF)
         .padding(.top, 8)
     }
     

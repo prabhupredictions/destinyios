@@ -34,9 +34,9 @@
 		E401A9F92F0CD75E00D75125 /* Local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Local.xcconfig; sourceTree = "<group>"; };
 		E401A9FB2F0CD77E00D75125 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		E401A9FD2F0CD79100D75125 /* Test.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Test.xcconfig; sourceTree = "<group>"; };
-		E442EF302EF2B99700146A8B /* ios_app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios_app.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E442EF412EF2B99C00146A8B /* ios_appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E442EF302EF2B99700146A8B /* Destiny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Destiny.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E442EF412EF2B99C00146A8B /* Destiny.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Destiny.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E442EF4B2EF2B99C00146A8B /* Destiny.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Destiny.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E444AD8C2EFCD75F00782341 /* ios_app.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ios_app.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -115,9 +115,9 @@
 		E442EF312EF2B99700146A8B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E442EF302EF2B99700146A8B /* ios_app.app */,
-				E442EF412EF2B99C00146A8B /* ios_appTests.xctest */,
-				E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */,
+				E442EF302EF2B99700146A8B /* Destiny.app */,
+				E442EF412EF2B99C00146A8B /* Destiny.xctest */,
+				E442EF4B2EF2B99C00146A8B /* Destiny.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,7 +152,7 @@
 				E49FB9182F17ACAA00123405 /* GoogleSignIn */,
 			);
 			productName = ios_app;
-			productReference = E442EF302EF2B99700146A8B /* ios_app.app */;
+			productReference = E442EF302EF2B99700146A8B /* Destiny.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E442EF402EF2B99C00146A8B /* ios_appTests */ = {
@@ -175,7 +175,7 @@
 			packageProductDependencies = (
 			);
 			productName = ios_appTests;
-			productReference = E442EF412EF2B99C00146A8B /* ios_appTests.xctest */;
+			productReference = E442EF412EF2B99C00146A8B /* Destiny.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		E442EF4A2EF2B99C00146A8B /* ios_appUITests */ = {
@@ -198,7 +198,7 @@
 			packageProductDependencies = (
 			);
 			productName = ios_appUITests;
-			productReference = E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */;
+			productReference = E442EF4B2EF2B99C00146A8B /* Destiny.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */

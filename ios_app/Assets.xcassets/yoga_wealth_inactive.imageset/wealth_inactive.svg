@@ -1,0 +1,18 @@
+<svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wealthGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6B6B6B"/><stop offset="100%" stop-color="#4A4A4A"/>
+    </linearGradient>
+  </defs>
+  <path d="M14 18 L24 6 L34 18 L24 42 Z" stroke="url(#wealthGrad)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+  <path d="M14 18 L24 24 L34 18" stroke="url(#wealthGrad)" stroke-width="1" fill="none" opacity="0.5" stroke-linejoin="round"/>
+  <path d="M24 6 L24 24" stroke="url(#wealthGrad)" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <path d="M24 24 L24 42" stroke="url(#wealthGrad)" stroke-width="0.8" opacity="0.4" stroke-linecap="round"/>
+  <path d="M19 12 L14 18" stroke="url(#wealthGrad)" stroke-width="0.7" opacity="0.3"/>
+  <path d="M29 12 L34 18" stroke="url(#wealthGrad)" stroke-width="0.7" opacity="0.3"/>
+  <line x1="8" y1="10" x2="8" y2="14" stroke="url(#wealthGrad)" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <line x1="6" y1="12" x2="10" y2="12" stroke="url(#wealthGrad)" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <line x1="38" y1="8" x2="38" y2="11" stroke="url(#wealthGrad)" stroke-width="0.7" opacity="0.25" stroke-linecap="round"/>
+  <line x1="36.5" y1="9.5" x2="39.5" y2="9.5" stroke="url(#wealthGrad)" stroke-width="0.7" opacity="0.25" stroke-linecap="round"/>
+  <circle cx="40" cy="16" r="0.7" fill="url(#wealthGrad)" opacity="0.2"/>
+</svg>

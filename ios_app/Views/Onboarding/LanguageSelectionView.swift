@@ -279,6 +279,9 @@ struct LanguageSelectionView: View {
         UserDefaults.standard.set([code], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
         
+        // Post notification for language change
+        NotificationCenter.default.post(name: .appLanguageChanged, object: code)
+        
         // Success haptic
         // Success haptic
         HapticManager.shared.premiumSuccess()

@@ -32,7 +32,7 @@ enum DestinyTileType: String, CaseIterable, Identifiable {
         }
     }
     
-    /// Icon for the tile
+    /// Icon for the tile (emoji fallback)
     var icon: String {
         switch self {
         case .wealth: return "💰"
@@ -42,6 +42,32 @@ enum DestinyTileType: String, CaseIterable, Identifiable {
         case .wisdom: return "🧠"
         case .health: return "🛡️"
         case .dosha: return "⚠️"
+        }
+    }
+    
+    /// Active icon image name (SVG)
+    var activeIconImage: String {
+        switch self {
+        case .wealth: return "yoga_wealth_icon"
+        case .career: return "yoga_career_icon"
+        case .love: return "yoga_love_icon"
+        case .family: return "yoga_family_icon"
+        case .wisdom: return "yoga_wisdom_icon"
+        case .health: return "yoga_health_icon"
+        case .dosha: return "yoga_challenges_icon"
+        }
+    }
+    
+    /// Inactive icon image name (SVG)
+    var inactiveIconImage: String {
+        switch self {
+        case .wealth: return "yoga_wealth_inactive"
+        case .career: return "yoga_career_inactive"
+        case .love: return "yoga_love_inactive"
+        case .family: return "yoga_family_inactive"
+        case .wisdom: return "yoga_wisdom_inactive"
+        case .health: return "yoga_health_inactive"
+        case .dosha: return "yoga_challenges_inactive"
         }
     }
     

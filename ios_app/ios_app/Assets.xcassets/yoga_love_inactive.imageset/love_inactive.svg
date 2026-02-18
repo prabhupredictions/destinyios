@@ -1,0 +1,18 @@
+<svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="loveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6B6B6B"/><stop offset="100%" stop-color="#4A4A4A"/>
+    </linearGradient>
+  </defs>
+  <path d="M6 34 Q8 28 14 24 Q18 22 20 18" stroke="url(#loveGrad)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M20 18 Q21 15 22 14" stroke="url(#loveGrad)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M20 18 Q22 16 23 16" stroke="url(#loveGrad)" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <path d="M42 34 Q40 28 34 24 Q30 22 28 18" stroke="url(#loveGrad)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M28 18 Q27 15 26 14" stroke="url(#loveGrad)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M28 18 Q26 16 25 16" stroke="url(#loveGrad)" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <circle cx="24" cy="13" r="1.5" fill="url(#loveGrad)" opacity="0.5"/>
+  <line x1="24" y1="9" x2="24" y2="11" stroke="url(#loveGrad)" stroke-width="0.7" opacity="0.35" stroke-linecap="round"/>
+  <line x1="21" y1="11" x2="22" y2="12.5" stroke="url(#loveGrad)" stroke-width="0.7" opacity="0.3" stroke-linecap="round"/>
+  <line x1="27" y1="11" x2="26" y2="12.5" stroke="url(#loveGrad)" stroke-width="0.7" opacity="0.3" stroke-linecap="round"/>
+  <path d="M22.5 8 Q22.5 6.5 24 7.5 Q25.5 6.5 25.5 8 Q25.5 9.5 24 10.5 Q22.5 9.5 22.5 8 Z" stroke="url(#loveGrad)" stroke-width="0.7" fill="url(#loveGrad)" opacity="0.3"/>
+</svg>

@@ -236,7 +236,6 @@
 "moderate" = "Moderate";
 "needs_care" = "Needs Care";
 
-// Mangal Dosha
 "mangal_dosha_status" = "Mangal Dosha Status";
 "no_dosha" = "No Dosha";
 "has_dosha" = "Has Dosha";
@@ -271,7 +270,6 @@
 "additional_yoga" = "Additional Yoga & Dosha";
 "additional_yoga_desc" = "Other auspicious combinations";
 
-// MARK: - Mangal Dosha Exceptions
 "exception_mars_in_own_sign" = "Mars is in its own sign (Aries or Scorpio)";
 "exception_mars_exalted" = "Mars is exalted in Capricorn";
 "exception_mars_in_upachaya" = "Mars is in growth houses (3, 6, 10, 11)";
@@ -346,7 +344,6 @@
 "reduced" = "Reduced";
 "cancelled" = "Cancelled";
 
-// MARK: - Dosha UI Labels
 "mangal_dosha_analysis" = "Mangal Dosha Analysis";
 "kalsarpa_analysis" = "Kalsarpa Dosha Analysis";
 "yogas_analysis" = "Yogas & Doshas";
@@ -421,7 +418,6 @@
 "final_score" = "Final Score";
 "explanation_label" = "Calculation Details";
 
-// MARK: - Combined Mangal Dosha Analysis
 "combined" = "Combined";
 "synastry_aspects" = "Synastry Aspects";
 "beneficial" = "Beneficial";
@@ -525,3 +521,1450 @@
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "A birth chart with similar details already exists. Each person can only have one chart. For assistance, contact support@destinyaiastrology.com.";
 
+// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+
+"yoga_why_reduced" = "Why Reduced";
+"yoga_why_inactive" = "Why Inactive";
+"yoga_status_active" = "Active";
+"yoga_status_reduced" = "Reduced";
+"yoga_status_cancelled" = "Cancelled";
+"yoga_type_yoga" = "Yoga";
+"yoga_type_dosha" = "Dosha";
+"yoga_no_combinations" = "No combinations found for this category.";
+"yoga_no_data" = "No yoga data available";
+"yoga_positive_negative" = "Positive & Negative Combinations";
+
+"yoga_category_basic_foundation" = "Basic Foundation";
+"yoga_category_personality" = "Personality";
+"yoga_category_wealth" = "Wealth";
+"yoga_category_career" = "Career";
+"yoga_category_relationship" = "Relationship";
+"yoga_category_education" = "Education";
+"yoga_category_health" = "Health";
+"yoga_category_family" = "Family";
+"yoga_category_spiritual" = "Spiritual";
+"yoga_category_special" = "Special";
+
+// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// [+] Bhratrumoola Dhanaprapti (136)
+// [+] Bhratrumoola Dhanaprapti (137)
+// [+] Ayatna Griha Prapta (189)
+// [+] Ayatna Griha Prapta (190)
+// [+] Yukthi Samanwithavagmi (154)
+// [+] Yukthi Samanwithavagmi (155)
+// Total yoga entries: 284
+
+// MARK: - Kala Sarpa/Amrita Variants
+// [−] Kala Sarpa Dosha
+// Additional Kala Sarpa variants
+// [+] Bandhu Pujya 194
+"kalsarpa_divine_protection_title" = "Divine Protection";
+"kalsarpa_divine_protection_message" = "Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.";
+"kalsarpa_relationship_benefits" = "Relationship Benefits";
+"kalsarpa_emotional_harmony" = "Emotional Harmony";
+"kalsarpa_smooth_progression" = "Smooth Progression";
+"kalsarpa_positive_energy" = "Positive Energy";
+"kalsarpa_has_dosha" = "Has Dosha";
+"kalsarpa_protected" = "Protected";
+"kalsarpa_analysis_title" = "%@'s Analysis";
+"kalsarpa_mutual_kalsarpa" = "Mutual Kalsarpa";
+"kalsarpa_dosha_samya" = "Dosha Samya Detected";
+"kalsarpa_mutual_message" = "Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.";
+"kalsarpa_remedies_for" = "Remedies for %@";
+
+"mangal_mutual_cancellation" = "Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.";
+"mangal_exceptions_title" = "%@'s exceptions:";
+
+// MARK: - Yoga Catalog (278 Yogas - Auto-generated from yoga_catalog.json)
+
+// [+] Adhi Yoga
+"yoga_name_adhi_yoga" = "Adhi Yoga";
+"yoga_outcome_adhi_yoga" = "Confers leadership, royal comforts, political success, and widespread respect.";
+"yoga_formation_adhi_yoga" = "Benefics (Jupiter, Venus, Mercury) in the 6th, 7th, and 8th from Moon.";
+
+// [+] Amala Yoga
+"yoga_name_amala_yoga" = "Amala Yoga";
+"yoga_outcome_amala_yoga" = "Bestows unblemished reputation and ethical prosperity through virtuous deeds.";
+"yoga_formation_amala_yoga" = "Natural benefic in 10th from Lagna or Moon.";
+
+// [+] Amaranantha Dhana Yoga
+"yoga_name_amaranantha_dhana_yoga" = "Amaranantha Dhana Yoga";
+"yoga_outcome_amaranantha_dhana_yoga" = "Grants perpetual, undiminishing wealth maintained across generations.";
+"yoga_formation_amaranantha_dhana_yoga" = "Strong unafflicted 2nd and 11th lords in mutual support.";
+
+// [+] Amsavatara Yoga
+"yoga_name_amsavatara_yoga" = "Amsavatara Yoga";
+"yoga_outcome_amsavatara_yoga" = "Divine incarnation qualities; the individual carries a special spiritual mission or purpose.";
+"yoga_formation_amsavatara_yoga" = "Venus in Kendra from Lagna lord, Jupiter in Trikona.";
+
+// [−] Anapathya Yoga
+"yoga_name_anapathya_yoga" = "Anapathya Yoga";
+"yoga_outcome_anapathya_yoga" = "Complete absence of progeny; adoption or spiritual sublimation of parental instincts.";
+"yoga_formation_anapathya_yoga" = "5th lord, Jupiter, and 5th house all severely afflicted.";
+
+// [+] Anapha Yoga
+"yoga_name_anapha_yoga" = "Anapha Yoga";
+"yoga_outcome_anapha_yoga" = "Bestows good physique, strong character, and comfortable lifestyle free from major adversity.";
+"yoga_formation_anapha_yoga" = "Planet (excl. Sun/Rahu/Ketu) in 12th house from Moon.";
+
+// [−] Andha Yoga
+"yoga_name_andha_yoga" = "Andha Yoga";
+"yoga_outcome_andha_yoga" = "Serious eye-related health concerns; early and regular intervention critical.";
+"yoga_formation_andha_yoga" = "Luminaries and 2nd/12th houses severely afflicted (var. 3).";
+
+// [−] Andha Yoga (288)
+"yoga_name_andha_yoga_288" = "Andha Yoga (288)";
+"yoga_outcome_andha_yoga_288" = "Significant vision challenges; prioritize eye health and preventive measures.";
+"yoga_formation_andha_yoga_288" = "Sun/Moon afflicted by malefics in 6th/8th/12th (var. 1).";
+
+// [−] Andha Yoga (289)
+"yoga_name_andha_yoga_289" = "Andha Yoga (289)";
+"yoga_outcome_andha_yoga_289" = "Vulnerability to progressive vision loss; ophthalmological care recommended.";
+"yoga_formation_andha_yoga_289" = "Venus and 2nd lord weakened with malefic aspects (var. 2).";
+
+// [−] Angaheena Yoga
+"yoga_name_angaheena_yoga" = "Angaheena Yoga";
+"yoga_outcome_angaheena_yoga" = "Physical challenges or disability; overcoming bodily limitations requires determination.";
+"yoga_formation_angaheena_yoga" = "Malefics in Lagna with Lagna lord afflicted in Dusthana.";
+
+// [+] Annadana Yoga
+"yoga_name_annadana_yoga" = "Annadana Yoga";
+"yoga_outcome_annadana_yoga" = "Generous food donor; the individual feeds others and is known for charitable hospitality.";
+"yoga_formation_annadana_yoga" = "2nd lord in Kendra/Trikona with Jupiter's aspect.";
+
+// [+] Anthya Vayasi Dhana Yoga
+"yoga_name_anthya_vayasi_dhana_yoga" = "Anthya Vayasi Dhana Yoga";
+"yoga_outcome_anthya_vayasi_dhana_yoga" = "Indicates prosperity in later life (55+ years); retirement brings comfort.";
+"yoga_formation_anthya_vayasi_dhana_yoga" = "Wealth significators activate during later Dasha periods.";
+
+// [−] Apakeerti Yoga
+"yoga_name_apakeerti_yoga" = "Apakeerti Yoga";
+"yoga_outcome_apakeerti_yoga" = "Indicates risk of notoriety or damaged reputation; mindful conduct is essential.";
+"yoga_formation_apakeerti_yoga" = "Malefic influences on Lagna and 10th house.";
+
+// [−] Aputra Yoga
+"yoga_name_aputra_yoga" = "Aputra Yoga";
+"yoga_outcome_aputra_yoga" = "Childlessness or extreme difficulty in having progeny; remedial measures advised.";
+"yoga_formation_aputra_yoga" = "5th lord and Jupiter severely afflicted in Dusthana.";
+
+// [−] Asatyavadi Yoga
+"yoga_name_asatyavadi_yoga" = "Asatyavadi Yoga";
+"yoga_outcome_asatyavadi_yoga" = "Tendency toward untruthfulness or exaggeration; conscious honesty practice needed.";
+"yoga_formation_asatyavadi_yoga" = "Mercury afflicted with malefics in 2nd house.";
+
+// [+] Ayatna Griha Prapta (189)
+"yoga_name_ayatna_griha_prapta_yoga_189" = "Ayatna Griha Prapta (189)";
+"yoga_outcome_ayatna_griha_prapta_yoga_189" = "Property acquisition without effort — through inheritance, gifts, or fortunate deals.";
+"yoga_formation_ayatna_griha_prapta_yoga_189" = "4th lord well-placed with benefic aspects (var. 1).";
+
+// [+] Ayatna Griha Prapta (190)
+"yoga_name_ayatna_griha_prapta_yoga_190" = "Ayatna Griha Prapta (190)";
+"yoga_outcome_ayatna_griha_prapta_yoga_190" = "Effortless acquisition of homes and real estate through favorable circumstances.";
+"yoga_formation_ayatna_griha_prapta_yoga_190" = "Benefic influence on 4th house from strong planets (var. 2).";
+
+// [+] Ayatnadhanalabha Yoga
+"yoga_name_ayatnadhanalabha_yoga" = "Ayatnadhanalabha Yoga";
+"yoga_outcome_ayatnadhanalabha_yoga" = "Bestows effortless wealth — windfall, inheritance, or fortunate opportunities.";
+"yoga_formation_ayatnadhanalabha_yoga" = "2nd lord in 11th or vice versa, with Jupiter/Venus aspects.";
+
+// [+] Bahu Stree Yoga
+"yoga_name_bahu_stree_yoga" = "Bahu Stree Yoga";
+"yoga_outcome_bahu_stree_yoga" = "Multiple significant relationships or strong attraction from opposite sex; magnetic romantic presence.";
+"yoga_formation_bahu_stree_yoga" = "Lagna lord and 7th lord in conjunction or mutual aspect.";
+
+// [+] Bahudravyarjana Yoga
+"yoga_name_bahudravyarjana_yoga" = "Bahudravyarjana Yoga";
+"yoga_outcome_bahudravyarjana_yoga" = "Ensures acquisition of diverse assets and wealth from multiple sources throughout life.";
+"yoga_formation_bahudravyarjana_yoga" = "Multiple wealth-significators in strong mutual positions.";
+
+// [+] Bahuputra Yoga (220)
+"yoga_name_bahuputra_yoga_220" = "Bahuputra Yoga (220)";
+"yoga_outcome_bahuputra_yoga_220" = "Blessed with many children who bring joy and family continuity.";
+"yoga_formation_bahuputra_yoga_220" = "5th lord strong in Kendra/Trikona with Jupiter's aspect (var. 1).";
+
+// [+] Bahuputra Yoga (221)
+"yoga_name_bahuputra_yoga_221" = "Bahuputra Yoga (221)";
+"yoga_outcome_bahuputra_yoga_221" = "Multiple progeny with good health and character; family grows.";
+"yoga_formation_bahuputra_yoga_221" = "Jupiter and 5th lord in mutual support with benefic connections (var. 2).";
+
+// [+] Balya Dhana Yoga
+"yoga_name_balya_dhana_yoga" = "Balya Dhana Yoga";
+"yoga_outcome_balya_dhana_yoga" = "Grants early financial advantage through family wealth or inheritance.";
+"yoga_formation_balya_dhana_yoga" = "Wealth significators active from birth through early Dasha.";
+
+// [−] Bandhana Yoga
+"yoga_name_bandhana_yoga" = "Bandhana Yoga";
+"yoga_outcome_bandhana_yoga" = "Risk of confinement, imprisonment, or involuntary restriction of freedom.";
+"yoga_formation_bandhana_yoga" = "Lagna lord and 6th lord connected with Saturn/Rahu.";
+
+// [+] Bandhu Pujya Yoga (193)
+"yoga_name_bandhu_pujya_yoga_193" = "Bandhu Pujya Yoga (193)";
+"yoga_outcome_bandhu_pujya_yoga_193" = "Grants respect and affection from family and relatives; individual is a family anchor.";
+"yoga_formation_bandhu_pujya_yoga_193" = "4th lord in benefic position with benefic aspects and Mercury in Lagna.";
+
+// [+] Bandhu Pujya Yoga (194)
+"yoga_name_bandhu_pujya_yoga_194" = "Bandhu Pujya Yoga (194)";
+"yoga_outcome_bandhu_pujya_yoga_194" = "Strengthens family bonds and brings honor through kinship and trusted counsel.";
+"yoga_formation_bandhu_pujya_yoga_194" = "Jupiter connected to 4th house through aspect or occupation.";
+
+// [−] Bandhubhisthyaktha Yoga
+"yoga_name_bandhubhisthyaktha_yoga" = "Bandhubhisthyaktha Yoga";
+"yoga_outcome_bandhubhisthyaktha_yoga" = "Indicates estrangement from relatives and potential family conflicts or isolation.";
+"yoga_formation_bandhubhisthyaktha_yoga" = "Malefic affliction to 4th house and lord with no benefic support.";
+
+// [+] Bhadra Yoga
+"yoga_name_bhadra_yoga" = "Bhadra Yoga";
+"yoga_outcome_bhadra_yoga" = "Bestows sharp intellect, eloquent speech, business acumen, and excellence in analytical professions.";
+"yoga_formation_bhadra_yoga" = "Mercury in a Kendra (1/4/7/10) in own sign (Gemini/Virgo) or exaltation (Virgo).";
+
+// [+] Bhaga Chumbana Yoga
+"yoga_name_bhaga_chumbana_yoga" = "Bhaga Chumbana Yoga";
+"yoga_outcome_bhaga_chumbana_yoga" = "Intense, passionate romantic life with heightened physical magnetism and intimate fulfillment.";
+"yoga_formation_bhaga_chumbana_yoga" = "Venus and 7th lord in specific combinations indicating physical attraction.";
+
+// [+] Bhagya Yoga
+"yoga_name_bhagya_yoga" = "Bhagya Yoga";
+"yoga_outcome_bhagya_yoga" = "Exceptional fortune, luck, and divine grace; blessed with timely opportunities.";
+"yoga_formation_bhagya_yoga" = "9th lord strong in Kendra/Trikona with benefic influences.";
+
+// [+] Bharathi Yoga
+"yoga_name_bharathi_yoga" = "Bharathi Yoga";
+"yoga_outcome_bharathi_yoga" = "Grants exceptional scholarship, eloquence, fame in learning, and mastery of arts and sciences.";
+"yoga_formation_bharathi_yoga" = "Navamsa lord of 2nd/5th/11th lord is exalted and conjoined with 9th lord.";
+
+// [−] Bharyasahavyabhicharya Yoga
+"yoga_name_bharyasahavyabhicharya_yoga" = "Bharyasahavyabhicharya Yoga";
+"yoga_outcome_bharyasahavyabhicharya_yoga" = "Trust issues in marriage; transparency and emotional connection should be prioritized.";
+"yoga_formation_bharyasahavyabhicharya_yoga" = "Venus and 7th house afflictions indicating infidelity.";
+
+// [+] Bhaskara Yoga
+"yoga_name_bhaskara_yoga" = "Bhaskara Yoga";
+"yoga_outcome_bhaskara_yoga" = "Solar-like brilliance in learning; illuminates others through teaching.";
+"yoga_formation_bhaskara_yoga" = "Mercury in 2nd from Sun, Moon in 11th, Jupiter in Trikona from Mercury.";
+
+// [+] Bheri Yoga
+"yoga_name_bheri_yoga" = "Bheri Yoga";
+"yoga_outcome_bheri_yoga" = "Drum-like fame; prosperity, courage, enduring reputation, and royal status.";
+"yoga_formation_bheri_yoga" = "Venus, Jupiter, and Lagna lord in mutual Kendras from 9th lord.";
+
+// [+] Bhojana Soukhya Yoga
+"yoga_name_bhojana_soukhya_yoga" = "Bhojana Soukhya Yoga";
+"yoga_outcome_bhojana_soukhya_yoga" = "Enjoys fine food, culinary pleasures, and a comfortable dining lifestyle.";
+"yoga_formation_bhojana_soukhya_yoga" = "2nd lord strong with benefic aspects on the 2nd house.";
+
+// [+] Bhratrumoola Dhanaprapti (136)
+"yoga_name_bhratrumoola_dhanaprapti_yoga_136" = "Bhratrumoola Dhanaprapti (136)";
+"yoga_outcome_bhratrumoola_dhanaprapti_yoga_136" = "Wealth through siblings, courage, or communication; siblings aid prosperity.";
+"yoga_formation_bhratrumoola_dhanaprapti_yoga_136" = "3rd lord connected to 2nd and 11th houses (var. 1).";
+
+// [+] Bhratrumoola Dhanaprapti (137)
+"yoga_name_bhratrumoola_dhanaprapti_yoga_137" = "Bhratrumoola Dhanaprapti (137)";
+"yoga_outcome_bhratrumoola_dhanaprapti_yoga_137" = "Financial gains through sibling partnerships or collaborative ventures.";
+"yoga_formation_bhratrumoola_dhanaprapti_yoga_137" = "3rd lord connected to 2nd and 11th houses (var. 2).";
+
+// [−] Bhratrusapa Sutakshaya Yoga
+"yoga_name_bhratrusapa_sutakshaya_yoga" = "Bhratrusapa Sutakshaya Yoga";
+"yoga_outcome_bhratrusapa_sutakshaya_yoga" = "Sibling's curse affecting progeny; unresolved fraternal karma impacts children.";
+"yoga_formation_bhratrusapa_sutakshaya_yoga" = "Mars afflicted with 5th lord in malefic combinations.";
+
+// [+] Brahma Yoga
+"yoga_name_brahma_yoga" = "Brahma Yoga";
+"yoga_outcome_brahma_yoga" = "Grants profound wisdom, scholarly pursuits, and divine protection in knowledge-based professions.";
+"yoga_formation_brahma_yoga" = "Benefics in Kendras from 5th and 11th lords with specific requirements.";
+
+// [−] Buddhi Jada Yoga
+"yoga_name_buddhi_jada_yoga" = "Buddhi Jada Yoga";
+"yoga_outcome_buddhi_jada_yoga" = "Slow learning or intellectual dullness; extra effort needed to grasp complex concepts.";
+"yoga_formation_buddhi_jada_yoga" = "Saturn afflicting Mercury and 5th house, no benefic relief.";
+
+// [+] Buddhimaturya Yoga
+"yoga_name_buddhimaturya_yoga" = "Buddhimaturya Yoga";
+"yoga_outcome_buddhimaturya_yoga" = "Mature intellect beyond one's years; wisdom, analytical depth, and scholarly temperament.";
+"yoga_formation_buddhimaturya_yoga" = "Mercury and Jupiter in mutual Kendra, 5th lord strong.";
+
+// [+] Budha Aditya Yoga
+"yoga_name_budha_aditya_yoga" = "Budha Aditya Yoga";
+"yoga_outcome_budha_aditya_yoga" = "Intellectual brilliance combined with leadership; brilliant communicator with executive ability.";
+"yoga_formation_budha_aditya_yoga" = "Mercury conjoined with Sun in same house.";
+
+// [+] Budha Yoga
+"yoga_name_budha_yoga" = "Budha Yoga";
+"yoga_outcome_budha_yoga" = "Mercurial intelligence — quick wit, mathematical skill, and commercial proficiency.";
+"yoga_formation_budha_yoga" = "Mercury strong in Kendra with benefic aspects connected to 5th.";
+
+// [+] Chandika Yoga
+"yoga_name_chandika_yoga" = "Chandika Yoga";
+"yoga_outcome_chandika_yoga" = "Fierce determination and divine protection in leadership roles.";
+"yoga_formation_chandika_yoga" = "Lagna lord exalted aspecting Moon, Jupiter in Kendra.";
+
+// [−] Chandra Mangala Yoga
+"yoga_name_chandra_mangala_yoga" = "Chandra Mangala Yoga";
+"yoga_outcome_chandra_mangala_yoga" = "Creates emotional intensity and impulsive tendencies. May bring gains through unconventional means but causes relationship friction.";
+"yoga_formation_chandra_mangala_yoga" = "Moon and Mars in conjunction (same house).";
+
+// [+] Chapa Yoga
+"yoga_name_chapa_yoga" = "Chapa Yoga";
+"yoga_outcome_chapa_yoga" = "Confers royal comforts, prosperity, truthful courage, and dignified social position.";
+"yoga_formation_chapa_yoga" = "Lagna lord exalted, 4th and 10th lords in mutual exchange.";
+
+// [+] Chatussagara Yoga
+"yoga_name_chatussagara_yoga" = "Chatussagara Yoga";
+"yoga_outcome_chatussagara_yoga" = "Grants fame, prosperity, and an influential life known across regions.";
+"yoga_formation_chatussagara_yoga" = "All four Kendra houses (1/4/7/10) occupied by planets.";
+
+// [−] Daridra Yoga
+"yoga_name_daridra_yoga" = "Daridra Yoga";
+"yoga_outcome_daridra_yoga" = "Periods of financial hardship; careful planning and remedial measures advisable.";
+"yoga_formation_daridra_yoga" = "2nd and 11th lords in 6th/8th/12th houses.";
+
+// [−] Daridra Yoga (144)
+"yoga_name_daridra_yoga_144" = "Daridra Yoga (144)";
+"yoga_outcome_daridra_yoga_144" = "Financial drain through partnerships, legal issues, or overexpenditure.";
+"yoga_formation_daridra_yoga_144" = "Lagna-12th lord exchange with 7th lord aspects.";
+
+// [−] Daridra Yoga (145)
+"yoga_name_daridra_yoga_145" = "Daridra Yoga (145)";
+"yoga_outcome_daridra_yoga_145" = "Income instability and difficulty saving wealth.";
+"yoga_formation_daridra_yoga_145" = "Malefic combinations on 2nd and 11th houses (var. 2).";
+
+// [−] Daridra Yoga (146)
+"yoga_name_daridra_yoga_146" = "Daridra Yoga (146)";
+"yoga_outcome_daridra_yoga_146" = "Poverty through wasteful spending or unfortunate financial decisions.";
+"yoga_formation_daridra_yoga_146" = "Malefic combinations on 2nd and 11th houses (var. 3).";
+
+// [−] Daridra Yoga (147)
+"yoga_name_daridra_yoga_147" = "Daridra Yoga (147)";
+"yoga_outcome_daridra_yoga_147" = "Financial struggles due to family obligations or inherited debts.";
+"yoga_formation_daridra_yoga_147" = "Malefic combinations on 2nd and 11th houses (var. 4).";
+
+// [−] Daridra Yoga (148)
+"yoga_name_daridra_yoga_148" = "Daridra Yoga (148)";
+"yoga_outcome_daridra_yoga_148" = "Loss of wealth through enemies, litigation, or health expenses.";
+"yoga_formation_daridra_yoga_148" = "Malefic combinations on 2nd and 11th houses (var. 5).";
+
+// [−] Daridra Yoga (149)
+"yoga_name_daridra_yoga_149" = "Daridra Yoga (149)";
+"yoga_outcome_daridra_yoga_149" = "Difficulty maintaining stable employment or consistent income.";
+"yoga_formation_daridra_yoga_149" = "Malefic combinations on 2nd and 11th houses (var. 6).";
+
+// [−] Daridra Yoga (150)
+"yoga_name_daridra_yoga_150" = "Daridra Yoga (150)";
+"yoga_outcome_daridra_yoga_150" = "Poverty due to lack of initiative or motivation in financial matters.";
+"yoga_formation_daridra_yoga_150" = "Malefic combinations on 2nd and 11th houses (var. 7).";
+
+// [−] Daridra Yoga (151)
+"yoga_name_daridra_yoga_151" = "Daridra Yoga (151)";
+"yoga_outcome_daridra_yoga_151" = "Financial losses through speculation or risky ventures.";
+"yoga_formation_daridra_yoga_151" = "Malefic combinations on 2nd and 11th houses (var. 8).";
+
+// [−] Daridra Yoga (152)
+"yoga_name_daridra_yoga_152" = "Daridra Yoga (152)";
+"yoga_outcome_daridra_yoga_152" = "Chronic financial challenges requiring disciplined money management.";
+"yoga_formation_daridra_yoga_152" = "Malefic combinations on 2nd and 11th houses (var. 9).";
+
+// [−] Daridra Yoga (153)
+"yoga_name_daridra_yoga_153" = "Daridra Yoga (153)";
+"yoga_outcome_daridra_yoga_153" = "Financial ruin through external circumstances beyond personal control.";
+"yoga_formation_daridra_yoga_153" = "Malefic combinations on 2nd and 11th houses (var. 10).";
+
+// [+] Dattaputra Yoga (222)
+"yoga_name_dattaputra_yoga_222" = "Dattaputra Yoga (222)";
+"yoga_outcome_dattaputra_yoga_222" = "Happiness through adopted children or non-biological heirs.";
+"yoga_formation_dattaputra_yoga_222" = "5th lord connected to 8th/12th with Saturn's involvement (var. 1).";
+
+// [+] Dattaputra Yoga (223)
+"yoga_name_dattaputra_yoga_223" = "Dattaputra Yoga (223)";
+"yoga_outcome_dattaputra_yoga_223" = "Family expansion through adoption; adopted child brings fulfillment.";
+"yoga_formation_dattaputra_yoga_223" = "Specific 5th house configurations indicating adoption (var. 2).";
+
+// [−] Dehakashta Yoga
+"yoga_name_dehakashta_yoga" = "Dehakashta Yoga";
+"yoga_outcome_dehakashta_yoga" = "Chronic bodily discomfort, physical suffering, or persistent health complaints.";
+"yoga_formation_dehakashta_yoga" = "Lagna lord in Dusthana with malefic aspects, no benefic relief.";
+
+// [+] Dehapushti Yoga
+"yoga_name_dehapushti_yoga" = "Dehapushti Yoga";
+"yoga_outcome_dehapushti_yoga" = "Well-developed physique, exceptional stamina, and physical vitality.";
+"yoga_formation_dehapushti_yoga" = "Mars and Lagna lord strong with Jupiter's aspect.";
+
+// [+] Dehasthoulya Yoga
+"yoga_name_dehasthoulya_yoga" = "Dehasthoulya Yoga";
+"yoga_outcome_dehasthoulya_yoga" = "Robust body, healthy appetite, and strong digestive system.";
+"yoga_formation_dehasthoulya_yoga" = "Jupiter and Moon in positions indicating well-nourished constitution.";
+
+// [+] Devendra Yoga
+"yoga_name_devendra_yoga" = "Devendra Yoga";
+"yoga_outcome_devendra_yoga" = "Divine favor and lordship; treated like royalty with benevolent authority.";
+"yoga_formation_devendra_yoga" = "Lagna lord in 9th, 9th lord in Kendra, aspected by benefics.";
+
+// [+] Dhana Yoga (118)
+"yoga_name_dhana_yoga_118" = "Dhana Yoga (118)";
+"yoga_outcome_dhana_yoga_118" = "Ensures steady income and wealth accumulation through professional channels.";
+"yoga_formation_dhana_yoga_118" = "2nd and 11th lords in mutual Kendra or Trikona positions.";
+
+// [+] Dhana Yoga (119)
+"yoga_name_dhana_yoga_119" = "Dhana Yoga (119)";
+"yoga_outcome_dhana_yoga_119" = "Grants personal wealth through individual effort and enterprise.";
+"yoga_formation_dhana_yoga_119" = "Lagna lord connected with 2nd and 11th lords via conjunction or aspect.";
+
+// [+] Dhana Yoga (120)
+"yoga_name_dhana_yoga_120" = "Dhana Yoga (120)";
+"yoga_outcome_dhana_yoga_120" = "Bestows fortune through speculation, inheritance, or past-life merit.";
+"yoga_formation_dhana_yoga_120" = "5th and 9th lords connected with 2nd and 11th lords.";
+
+// [+] Dhana Yoga (121)
+"yoga_name_dhana_yoga_121" = "Dhana Yoga (121)";
+"yoga_outcome_dhana_yoga_121" = "Creates consistent wealth flow from multiple sources throughout life.";
+"yoga_formation_dhana_yoga_121" = "Benefics in 2nd and 11th houses with strong dignity.";
+
+// [+] Dhana Yoga (122)
+"yoga_name_dhana_yoga_122" = "Dhana Yoga (122)";
+"yoga_outcome_dhana_yoga_122" = "Amplifies earning potential and substantial asset accumulation.";
+"yoga_formation_dhana_yoga_122" = "2nd lord exalted or in own sign, connected to 11th house.";
+
+// [+] Dhana Yoga (123)
+"yoga_name_dhana_yoga_123" = "Dhana Yoga (123)";
+"yoga_outcome_dhana_yoga_123" = "Ensures gains from professional networks, associations, and social connections.";
+"yoga_formation_dhana_yoga_123" = "11th lord in Kendra or Trikona with benefic aspects.";
+
+// [+] Dhana Yoga (124)
+"yoga_name_dhana_yoga_124" = "Dhana Yoga (124)";
+"yoga_outcome_dhana_yoga_124" = "Grants wealth through paternal lineage, luck, and righteous earnings.";
+"yoga_formation_dhana_yoga_124" = "9th and Lagna lords in mutual connection with 2nd house support.";
+
+// [+] Dhana Yoga (125)
+"yoga_name_dhana_yoga_125" = "Dhana Yoga (125)";
+"yoga_outcome_dhana_yoga_125" = "Creates exceptional capacity for wealth generation and financial management.";
+"yoga_formation_dhana_yoga_125" = "Strong 2nd and 11th houses with lords in dignified positions.";
+
+// [+] Dhana Yoga (126)
+"yoga_name_dhana_yoga_126" = "Dhana Yoga (126)";
+"yoga_outcome_dhana_yoga_126" = "Bestows wealth through intelligence, speculation, and creative ventures.";
+"yoga_formation_dhana_yoga_126" = "2nd, 5th, and 11th lords interconnected via aspect or conjunction.";
+
+// [+] Dhana Yoga (127)
+"yoga_name_dhana_yoga_127" = "Dhana Yoga (127)";
+"yoga_outcome_dhana_yoga_127" = "Grants wealth on ethical foundations; prosperity through righteous means.";
+"yoga_formation_dhana_yoga_127" = "Jupiter aspecting or conjoining 2nd and 11th lords.";
+
+// [+] Dhana Yoga (128)
+"yoga_name_dhana_yoga_128" = "Dhana Yoga (128)";
+"yoga_outcome_dhana_yoga_128" = "Brings wealth through luxury, arts, entertainment, or beauty industries.";
+"yoga_formation_dhana_yoga_128" = "Venus connected to 2nd and 11th houses with strong dignity.";
+
+// [−] Dhatrutwa Yoga
+"yoga_name_dhatrutwa_yoga" = "Dhatrutwa Yoga";
+"yoga_outcome_dhatrutwa_yoga" = "Indicates challenges in nurturing relationships and expressing familial affection.";
+"yoga_formation_dhatrutwa_yoga" = "Specific planetary afflictions to Lagna lord and 4th house.";
+
+// [+] Dhurdhura Yoga
+"yoga_name_dhurdhura_yoga" = "Dhurdhura Yoga";
+"yoga_outcome_dhurdhura_yoga" = "Grants generous disposition, wealth, conveyances, and philanthropic nature.";
+"yoga_formation_dhurdhura_yoga" = "Planets (excl. Sun/Rahu/Ketu) in both 2nd and 12th from Moon.";
+
+// [−] Dur Yoga
+"yoga_name_dur_yoga" = "Dur Yoga";
+"yoga_outcome_dur_yoga" = "Career-related financial difficulties; effort fails to convert to proportional income.";
+"yoga_formation_dur_yoga" = "10th lord in 6th/8th/12th without cancellation.";
+
+// [−] Durmarana Yoga
+"yoga_name_durmarana_yoga" = "Durmarana Yoga";
+"yoga_outcome_durmarana_yoga" = "Indicates unnatural or difficult end of life; spiritual practices provide protection.";
+"yoga_formation_durmarana_yoga" = "Multiple malefics in Kendras/Marakas with no benefic intervention.";
+
+// [−] Durmukha Yoga (168)
+"yoga_name_durmukha_yoga_168" = "Durmukha Yoga (168)";
+"yoga_outcome_durmukha_yoga_168" = "Unattractive facial features or dental issues; cosmetic and health care advisable.";
+"yoga_formation_durmukha_yoga_168" = "Malefics in 2nd house afflicting facial appearance (var. 1).";
+
+// [−] Durmukha Yoga (169)
+"yoga_name_durmukha_yoga_169" = "Durmukha Yoga (169)";
+"yoga_outcome_durmukha_yoga_169" = "Unpleasant appearance or chronic facial health issues.";
+"yoga_formation_durmukha_yoga_169" = "Moon and 2nd lord afflicted by malefics (var. 2).";
+
+// [+] Ekaputra Yoga
+"yoga_name_ekaputra_yoga" = "Ekaputra Yoga";
+"yoga_outcome_ekaputra_yoga" = "One child who is exceptionally devoted and successful; quality over quantity.";
+"yoga_formation_ekaputra_yoga" = "5th lord in specific limited configurations.";
+
+// [+] Gaja Yoga
+"yoga_name_gaja_yoga" = "Gaja Yoga";
+"yoga_outcome_gaja_yoga" = "Immense prosperity, philanthropy, and dignified, elephant-like authority.";
+"yoga_formation_gaja_yoga" = "Strong 9th and 10th lords with benefic aspects.";
+
+// [+] Gajakesari Yoga
+"yoga_name_gajakesari_yoga" = "Gajakesari Yoga";
+"yoga_outcome_gajakesari_yoga" = "Confers intelligence, eloquence, lasting reputation, and virtuous, wealthy character.";
+"yoga_formation_gajakesari_yoga" = "Jupiter in a Kendra (1/4/7/10) from Moon.";
+
+// [−] Galakarna Yoga
+"yoga_name_galakarna_yoga" = "Galakarna Yoga";
+"yoga_outcome_galakarna_yoga" = "Hearing impairment or ear-related health problems; auditory care needed.";
+"yoga_formation_galakarna_yoga" = "Malefics in 3rd and 11th houses afflicting Mercury.";
+
+// [+] Gandharva Yoga
+"yoga_name_gandharva_yoga" = "Gandharva Yoga";
+"yoga_outcome_gandharva_yoga" = "Celestial artistic talent; excellence in music, dance, performing arts, and creative expression.";
+"yoga_formation_gandharva_yoga" = "10th lord in Kama Trikona with Venus strong and Moon in Trikona.";
+
+// [+] Garuda Yoga
+"yoga_name_garuda_yoga" = "Garuda Yoga";
+"yoga_outcome_garuda_yoga" = "Eagle-like vision; destroys adversaries and rises above competition.";
+"yoga_formation_garuda_yoga" = "Moon strong with Jupiter and 9th lord benefic aspects.";
+
+// [+] Gauri Yoga
+"yoga_name_gauri_yoga" = "Gauri Yoga";
+"yoga_outcome_gauri_yoga" = "Bestows beauty, virtue, refined character, maternal grace, and domestic happiness.";
+"yoga_formation_gauri_yoga" = "9th lord and Moon in own/exalted signs in Kendra/Trikona; or Navamsa lord of 10th lord exalted in 10th with Lagna lord.";
+
+// [+] Go Yoga
+"yoga_name_go_yoga" = "Go Yoga";
+"yoga_outcome_go_yoga" = "Prosperity through agriculture, land, or nurturing enterprises.";
+"yoga_formation_go_yoga" = "Jupiter in Trikona, Lagna lord in benefic Navamsa.";
+
+// [−] Gohanta Yoga
+"yoga_name_gohanta_yoga" = "Gohanta Yoga";
+"yoga_outcome_gohanta_yoga" = "Cruel tendencies toward animals; karmic consequences from violent actions against creatures.";
+"yoga_formation_gohanta_yoga" = "Mars and Rahu afflicting specific houses with no benefic protection.";
+
+// [+] Gola Yoga
+"yoga_name_gola_yoga" = "Gola Yoga";
+"yoga_outcome_gola_yoga" = "Spiritual wholeness and cosmic understanding; the individual perceives universal truths.";
+"yoga_formation_gola_yoga" = "Specific planetary configuration creating spherical completeness.";
+
+// [−] Grihanasa Yoga (191)
+"yoga_name_grihanasa_yoga_191" = "Grihanasa Yoga (191)";
+"yoga_outcome_grihanasa_yoga_191" = "Loss of property through unfortunate events or legal disputes.";
+"yoga_formation_grihanasa_yoga_191" = "4th lord afflicted by malefics in Dusthana (var. 1).";
+
+// [−] Grihanasa Yoga (192)
+"yoga_name_grihanasa_yoga_192" = "Grihanasa Yoga (192)";
+"yoga_outcome_grihanasa_yoga_192" = "Destruction or forced sale of property; housing instability.";
+"yoga_formation_grihanasa_yoga_192" = "Malefics in 4th house, 4th lord weakened (var. 2).";
+
+// [−] Guhyaroga Yoga
+"yoga_name_guhyaroga_yoga" = "Guhyaroga Yoga";
+"yoga_outcome_guhyaroga_yoga" = "Susceptibility to private health issues affecting intimate life; preventive care advised.";
+"yoga_formation_guhyaroga_yoga" = "Malefic affliction to Venus, 7th and 8th houses.";
+
+// [+] Hamsa Yoga
+"yoga_name_hamsa_yoga" = "Hamsa Yoga";
+"yoga_outcome_hamsa_yoga" = "Bestows exceptional wisdom, moral integrity, spiritual inclinations, and a respected position in society.";
+"yoga_formation_hamsa_yoga" = "Jupiter in a Kendra (1/4/7/10) in own sign (Sagittarius/Pisces) or exaltation (Cancer).";
+
+// [+] Harihara Brahma Yoga
+"yoga_name_harihara_brahma_yoga" = "Harihara Brahma Yoga";
+"yoga_outcome_harihara_brahma_yoga" = "Supreme divine blessing of the Holy Trinity; exceptional spiritual authority and cosmic connection.";
+"yoga_formation_harihara_brahma_yoga" = "Benefics in specific houses from 2nd and 12th lords, or from 7th/Lagna lords.";
+
+// [+] Harsha Yoga
+"yoga_name_harsha_yoga" = "Harsha Yoga";
+"yoga_outcome_harsha_yoga" = "Transforms adversity into advantage; overcomes enemies and emerges stronger.";
+"yoga_formation_harsha_yoga" = "6th lord in 6th, 8th, or 12th house (Dusthana in Dusthana).";
+
+// [+] Indra Yoga
+"yoga_name_indra_yoga" = "Indra Yoga";
+"yoga_outcome_indra_yoga" = "Indra-like power; commands armies, organizations, or large enterprises.";
+"yoga_formation_indra_yoga" = "5th and 11th lords in mutual Kendras with benefic Mars.";
+
+// [−] Jada Yoga
+"yoga_name_jada_yoga" = "Jada Yoga";
+"yoga_outcome_jada_yoga" = "Mental lethargy, dullness, or depressive tendencies; active lifestyle and stimulation help.";
+"yoga_formation_jada_yoga" = "Moon aspected by Saturn with no benefic influence.";
+
+// [−] Jananatpurvam Pitru Marana Yoga
+"yoga_name_jananatpurvam_pitru_marana_yoga" = "Jananatpurvam Pitru Marana Yoga";
+"yoga_outcome_jananatpurvam_pitru_marana_yoga" = "Early loss of paternal influence; individual must develop self-reliance from a young age.";
+"yoga_formation_jananatpurvam_pitru_marana_yoga" = "Specific Sun afflictions indicating early paternal loss.";
+
+// [−] Jara Yoga
+"yoga_name_jara_yoga" = "Jara Yoga";
+"yoga_outcome_jara_yoga" = "Premature aging, old-age hardships, or decline in vitality in later years.";
+"yoga_formation_jara_yoga" = "Lagna lord and 7th lord afflicted with Saturn's influence.";
+
+// [−] Jarajaputra Yoga
+"yoga_name_jarajaputra_yoga" = "Jarajaputra Yoga";
+"yoga_outcome_jarajaputra_yoga" = "Children born very late in life; delayed parenthood with associated challenges.";
+"yoga_formation_jarajaputra_yoga" = "5th lord connected to Saturn with late-activation Dasha.";
+
+// [+] Jaya Yoga
+"yoga_name_jaya_yoga" = "Jaya Yoga";
+"yoga_outcome_jaya_yoga" = "Victory over competitors; triumphs in competitive and legal matters.";
+"yoga_formation_jaya_yoga" = "6th lord debilitated, Lagna lord strong.";
+
+// [+] Kahala Yoga
+"yoga_name_kahala_yoga" = "Kahala Yoga";
+"yoga_outcome_kahala_yoga" = "Bold determination and authority through sheer willpower.";
+"yoga_formation_kahala_yoga" = "4th lord and Jupiter in mutual Kendras, Lagna lord strong.";
+
+// [+] Kalanidhi Yoga
+"yoga_name_kalanidhi_yoga" = "Kalanidhi Yoga";
+"yoga_outcome_kalanidhi_yoga" = "Treasure of arts and learning; mastery in fine arts, music, and cultural accomplishments.";
+"yoga_formation_kalanidhi_yoga" = "Jupiter in 2nd or 5th aspected by Mercury and Venus.";
+
+// [+] Kalanirdesat Putra Yoga (227)
+"yoga_name_kalanirdesat_putra_yoga_227" = "Kalanirdesat Putra Yoga (227)";
+"yoga_outcome_kalanirdesat_putra_yoga_227" = "Children arrive at a specific, astrologically favorable time period.";
+"yoga_formation_kalanirdesat_putra_yoga_227" = "5th lord activated in specific Dasha timing (var. 1).";
+
+// [+] Kalanirdesat Putra Yoga (228)
+"yoga_name_kalanirdesat_putra_yoga_228" = "Kalanirdesat Putra Yoga (228)";
+"yoga_outcome_kalanirdesat_putra_yoga_228" = "Timing of childbirth linked to planetary periods; children during favorable dashas.";
+"yoga_formation_kalanirdesat_putra_yoga_228" = "5th lord activated in specific Dasha timing (var. 2).";
+
+// [−] Kalanirdesat Putranasa Yoga (229)
+"yoga_name_kalanirdesat_putranasa_yoga_229" = "Kalanirdesat Putranasa Yoga (229)";
+"yoga_outcome_kalanirdesat_putranasa_yoga_229" = "Loss of child during specific adverse planetary period.";
+"yoga_formation_kalanirdesat_putranasa_yoga_229" = "5th lord afflicted during specific malefic Dasha (var. 1).";
+
+// [−] Kalanirdesat Putranasa Yoga (230)
+"yoga_name_kalanirdesat_putranasa_yoga_230" = "Kalanirdesat Putranasa Yoga (230)";
+"yoga_outcome_kalanirdesat_putranasa_yoga_230" = "Child-related sorrow linked to timing of malefic planetary periods.";
+"yoga_formation_kalanirdesat_putranasa_yoga_230" = "5th lord afflicted during specific malefic Dasha (var. 2).";
+
+// [+] Kalatramooladhana Yoga
+"yoga_name_kalatramooladhana_yoga" = "Kalatramooladhana Yoga";
+"yoga_outcome_kalatramooladhana_yoga" = "Wealth through marriage, business partnerships, or spouse's earnings.";
+"yoga_formation_kalatramooladhana_yoga" = "7th lord connected to 2nd and 11th houses.";
+
+// [−] Kalatrashanda Yoga
+"yoga_name_kalatrashanda_yoga" = "Kalatrashanda Yoga";
+"yoga_outcome_kalatrashanda_yoga" = "Sexual dysfunction or reproductive challenges; medical consultation recommended.";
+"yoga_formation_kalatrashanda_yoga" = "Venus severely afflicted with 7th lord in debilitation.";
+
+// [−] Kapata Yoga (202)
+"yoga_name_kapata_yoga_202" = "Kapata Yoga (202)";
+"yoga_outcome_kapata_yoga_202" = "Suggests inclination toward cunning behavior; cultivating transparency is advised.";
+"yoga_formation_kapata_yoga_202" = "Specific malefic combinations indicating deceptive tendencies (var. 1).";
+
+// [−] Kapata Yoga (203)
+"yoga_name_kapata_yoga_203" = "Kapata Yoga (203)";
+"yoga_outcome_kapata_yoga_203" = "Indicates potential for manipulative behavior; moral discipline can mitigate this.";
+"yoga_formation_kapata_yoga_203" = "Specific malefic combinations indicating deceptive tendencies (var. 2).";
+
+// [−] Kapata Yoga (204)
+"yoga_name_kapata_yoga_204" = "Kapata Yoga (204)";
+"yoga_outcome_kapata_yoga_204" = "Suggests propensity for duplicity; integrity practices and self-awareness recommended.";
+"yoga_formation_kapata_yoga_204" = "Specific malefic combinations indicating deceptive tendencies (var. 3).";
+
+// [−] Karascheda Yoga
+"yoga_name_karascheda_yoga" = "Karascheda Yoga";
+"yoga_outcome_karascheda_yoga" = "Risk of hand/arm injuries or surgical procedures involving limbs.";
+"yoga_formation_karascheda_yoga" = "Mars and Saturn afflicting 3rd house and Lagna severely.";
+
+// [−] Kemadruma Yoga
+"yoga_name_kemadruma_yoga" = "Kemadruma Yoga";
+"yoga_outcome_kemadruma_yoga" = "Indicates emotional loneliness, financial fluctuations, and struggles despite inherent capabilities.";
+"yoga_formation_kemadruma_yoga" = "No planets in 2nd or 12th from Moon (Moon isolated).";
+
+// [−] Khalawata Yoga
+"yoga_name_khalawata_yoga" = "Khalawata Yoga";
+"yoga_outcome_khalawata_yoga" = "Suggests harsh or uncultured demeanor; refinement in social interactions needed.";
+"yoga_formation_khalawata_yoga" = "Lagna lord functionally malefic with Saturn's aspect or conjunction.";
+
+// [−] Krisanga Yoga
+"yoga_name_krisanga_yoga" = "Krisanga Yoga";
+"yoga_outcome_krisanga_yoga" = "Thin, emaciated physique; difficulty gaining weight or maintaining vitality.";
+"yoga_formation_krisanga_yoga" = "Saturn afflicting Lagna and Moon with no Jupiter aspect.";
+
+// [−] Kshayaroga Yoga
+"yoga_name_kshayaroga_yoga" = "Kshayaroga Yoga";
+"yoga_outcome_kshayaroga_yoga" = "Susceptibility to wasting diseases or consumption; respiratory health monitoring advised.";
+"yoga_formation_kshayaroga_yoga" = "Malefics in Lagna/6th with Moon and Mercury weakened.";
+
+// [+] Kurma Yoga
+"yoga_name_kurma_yoga" = "Kurma Yoga";
+"yoga_outcome_kurma_yoga" = "Tortoise-like patience and enduring wisdom; famous, virtuous, and supportive of others.";
+"yoga_formation_kurma_yoga" = "Benefics in 5th/6th/7th with specific dignity conditions.";
+
+// [−] Kushtarog Yoga (268)
+"yoga_name_kushtarog_yoga_268" = "Kushtarog Yoga (268)";
+"yoga_outcome_kushtarog_yoga_268" = "Vulnerability to severe skin diseases; dermatological monitoring essential.";
+"yoga_formation_kushtarog_yoga_268" = "Specific malefic combinations affecting skin houses (var. 1).";
+
+// [−] Kushtarog Yoga (269)
+"yoga_name_kushtarog_yoga_269" = "Kushtarog Yoga (269)";
+"yoga_outcome_kushtarog_yoga_269" = "Chronic skin afflictions requiring sustained treatment and care.";
+"yoga_formation_kushtarog_yoga_269" = "Specific malefic combinations affecting skin houses (var. 2).";
+
+// [+] Kusuma Yoga
+"yoga_name_kusuma_yoga" = "Kusuma Yoga";
+"yoga_outcome_kusuma_yoga" = "Pure, flower-like character; the individual radiates grace, beauty, and spiritual purity.";
+"yoga_formation_kusuma_yoga" = "Venus in Lagna, Moon in Kendra, Jupiter and Saturn in Trikonas.";
+
+// [+] Lakshmi Yoga
+"yoga_name_lakshmi_yoga" = "Lakshmi Yoga";
+"yoga_outcome_lakshmi_yoga" = "Grants abundant wealth, divine grace, and all-round prosperity blessed by Goddess Lakshmi.";
+"yoga_formation_lakshmi_yoga" = "9th lord in Kendra in own/exalted sign, Lagna lord strong.";
+
+// [+] Madhya Vayasi Dhana Yoga
+"yoga_name_madhya_vayasi_dhana_yoga" = "Madhya Vayasi Dhana Yoga";
+"yoga_outcome_madhya_vayasi_dhana_yoga" = "Indicates wealth accumulation during mid-life (30-55 years).";
+"yoga_formation_madhya_vayasi_dhana_yoga" = "Wealth significators activate during middle-age Dasha periods.";
+
+// [+] Mahabhagya Yoga
+"yoga_name_mahabhagya_yoga" = "Mahabhagya Yoga";
+"yoga_outcome_mahabhagya_yoga" = "Exceptional fortune and great destiny; the individual leads a remarkably blessed life.";
+"yoga_formation_mahabhagya_yoga" = "Male: day birth, Sun/Moon/Lagna in odd signs. Female: night birth, all in even signs.";
+
+// [+] Makuta Yoga
+"yoga_name_makuta_yoga" = "Makuta Yoga";
+"yoga_outcome_makuta_yoga" = "Crown-like authority; heads institutions or governs with distinction.";
+"yoga_formation_makuta_yoga" = "Jupiter in 9th/10th with Lagna lord exalted.";
+
+// [+] Malavya Yoga
+"yoga_name_malavya_yoga" = "Malavya Yoga";
+"yoga_outcome_malavya_yoga" = "Grants artistic talents, material prosperity, refined tastes, strong family bonds, and success in creative fields.";
+"yoga_formation_malavya_yoga" = "Venus in a Kendra (1/4/7/10) in own sign (Taurus/Libra) or exaltation (Pisces).";
+
+// [+] Malika Yoga
+"yoga_name_malika_yoga" = "Malika Yoga";
+"yoga_outcome_malika_yoga" = "Garland of planetary blessings; outcomes depend on the starting house of the chain.";
+"yoga_formation_malika_yoga" = "Seven or more planets in continuous houses forming a garland pattern.";
+
+// [+] Marud Yoga
+"yoga_name_marud_yoga" = "Marud Yoga";
+"yoga_outcome_marud_yoga" = "Wind-like speed in learning; absorbs knowledge rapidly across diverse disciplines.";
+"yoga_formation_marud_yoga" = "Jupiter in Kendra from Venus, Moon in Trikona, benefics on 5th.";
+
+// [−] Matibhramana Yoga (291)
+"yoga_name_matibhramana_yoga_291" = "Matibhramana Yoga (291)";
+"yoga_outcome_matibhramana_yoga_291" = "Mental confusion or erratic thinking; mental discipline and stability routines advised.";
+"yoga_formation_matibhramana_yoga_291" = "Moon afflicted by Saturn with Rahu in specific positions (var. 1).";
+
+// [−] Matibhramana Yoga (292)
+"yoga_name_matibhramana_yoga_292" = "Matibhramana Yoga (292)";
+"yoga_outcome_matibhramana_yoga_292" = "Impulsive thinking and poor judgment; anger management and reflective practices help.";
+"yoga_formation_matibhramana_yoga_292" = "Moon afflicted by Mars with Rahu in specific positions (var. 2).";
+
+// [−] Matibhramana Yoga (293)
+"yoga_name_matibhramana_yoga_293" = "Matibhramana Yoga (293)";
+"yoga_outcome_matibhramana_yoga_293" = "Communication disorders or learning difficulties; early intervention recommended.";
+"yoga_formation_matibhramana_yoga_293" = "Mercury afflicted by malefics, no benefic aspects (var. 3).";
+
+// [−] Matibhramana Yoga (294)
+"yoga_name_matibhramana_yoga_294" = "Matibhramana Yoga (294)";
+"yoga_outcome_matibhramana_yoga_294" = "Potential for severe mental health challenges; professional care essential.";
+"yoga_formation_matibhramana_yoga_294" = "5th lord debilitated with malefic aspects on Moon (var. 4).";
+
+// [−] Matru Satrutwa Yoga
+"yoga_name_matru_satrutwa_yoga" = "Matru Satrutwa Yoga";
+"yoga_outcome_matru_satrutwa_yoga" = "Suggests tension with the mother; the maternal relationship requires conscious healing.";
+"yoga_formation_matru_satrutwa_yoga" = "Malefic influences on 4th house and Moon creating adversarial dynamics.";
+
+// [+] Matru Sneha Yoga
+"yoga_name_matru_sneha_yoga" = "Matru Sneha Yoga";
+"yoga_outcome_matru_sneha_yoga" = "Indicates a deep, loving relationship with the mother and unwavering maternal support.";
+"yoga_formation_matru_sneha_yoga" = "4th lord well-placed with benefic influences on maternal indicators.";
+
+// [+] Matrudeerghayur Yoga (196)
+"yoga_name_matrudeerghayur_yoga_196" = "Matrudeerghayur Yoga (196)";
+"yoga_outcome_matrudeerghayur_yoga_196" = "Long life for mother; individual enjoys extended maternal presence and support.";
+"yoga_formation_matrudeerghayur_yoga_196" = "4th lord strong with benefic aspects, Moon well-placed (var. 1).";
+
+// [+] Matrudeerghayur Yoga (197)
+"yoga_name_matrudeerghayur_yoga_197" = "Matrudeerghayur Yoga (197)";
+"yoga_outcome_matrudeerghayur_yoga_197" = "Maternal longevity and nurturing family environment confirmed.";
+"yoga_formation_matrudeerghayur_yoga_197" = "Venus and Moon supportive, 4th house protected (var. 2).";
+
+// [−] Matrugami Yoga
+"yoga_name_matrugami_yoga" = "Matrugami Yoga";
+"yoga_outcome_matrugami_yoga" = "Unhealthy or inappropriate attachment patterns in maternal relationships.";
+"yoga_formation_matrugami_yoga" = "Venus and 4th lord in specific taboo combinations.";
+
+// [+] Matrumooladhana Yoga
+"yoga_name_matrumooladhana_yoga" = "Matrumooladhana Yoga";
+"yoga_outcome_matrumooladhana_yoga" = "Wealth through maternal inheritance, real estate, or homeland connections.";
+"yoga_formation_matrumooladhana_yoga" = "4th lord connected to 2nd and 11th with benefic support.";
+
+// [−] Matrunasa Yoga (198)
+"yoga_name_matrunasa_yoga_198" = "Matrunasa Yoga (198)";
+"yoga_outcome_matrunasa_yoga_198" = "Early loss of mother or severe maternal health crisis.";
+"yoga_formation_matrunasa_yoga_198" = "4th lord and Moon severely afflicted by malefics (var. 1).";
+
+// [−] Matrunasa Yoga (199)
+"yoga_name_matrunasa_yoga_199" = "Matrunasa Yoga (199)";
+"yoga_outcome_matrunasa_yoga_199" = "Mother faces life-threatening circumstances; maternal welfare at risk.";
+"yoga_formation_matrunasa_yoga_199" = "Mars and Saturn afflicting 4th house and Moon (var. 2).";
+
+// [−] Matrusapa Sutakshaya Yoga
+"yoga_name_matrusapa_sutakshaya_yoga" = "Matrusapa Sutakshaya Yoga";
+"yoga_outcome_matrusapa_sutakshaya_yoga" = "Mother's curse affecting progeny; unresolved maternal karma impacts children.";
+"yoga_formation_matrusapa_sutakshaya_yoga" = "Moon afflicted with 5th lord in malefic combinations.";
+
+// [+] Matsya Yoga
+"yoga_name_matsya_yoga" = "Matsya Yoga";
+"yoga_outcome_matsya_yoga" = "Deep, ocean-like wisdom and spiritual knowledge; learned, compassionate, widely traveled.";
+"yoga_formation_matsya_yoga" = "Malefics in Lagna/9th, benefics in 5th, mixture in 4th/8th.";
+
+// [−] Mooka Yoga
+"yoga_name_mooka_yoga" = "Mooka Yoga";
+"yoga_outcome_mooka_yoga" = "Speech impediments or communication difficulties; therapy and remedies may help.";
+"yoga_formation_mooka_yoga" = "Mercury severely afflicted, 2nd lord debilitated with malefics.";
+
+// [+] Mridanga Yoga
+"yoga_name_mridanga_yoga" = "Mridanga Yoga";
+"yoga_outcome_mridanga_yoga" = "Supreme royal status like a ceremonial drum; fame resounds across the land.";
+"yoga_formation_mridanga_yoga" = "Lagna lord strong, all planets in Kendras/Trikonas.";
+
+// [+] Ardha Chandra Yoga
+"yoga_name_nabhasa_ardha_chandra" = "Ardha Chandra Yoga";
+"yoga_outcome_nabhasa_ardha_chandra" = "Half-moon formation; army commander, physically strong, attractive, and wealthy.";
+"yoga_formation_nabhasa_ardha_chandra" = "All planets in seven successive houses from a Kendra.";
+
+// [+] Chandra Yoga (Nabhasa)
+"yoga_name_nabhasa_chandra" = "Chandra Yoga (Nabhasa)";
+"yoga_outcome_nabhasa_chandra" = "Lunar formation; pleasing appearance, commanding stature, royal advisors.";
+"yoga_formation_nabhasa_chandra" = "All planets in upper half of zodiac (7th-12th houses).";
+
+// [+] Chapa Yoga (Nabhasa)
+"yoga_name_nabhasa_chapa" = "Chapa Yoga (Nabhasa)";
+"yoga_outcome_nabhasa_chapa" = "Bow formation; truthful, guards treasure, happiness in early and late life.";
+"yoga_formation_nabhasa_chapa" = "All planets in houses 10-4 (10th to 4th span).";
+
+// [+] Chhatra Yoga
+"yoga_name_nabhasa_chhatra" = "Chhatra Yoga";
+"yoga_outcome_nabhasa_chhatra" = "Umbrella formation; protector of others, helpful to all, comfortable old age.";
+"yoga_formation_nabhasa_chhatra" = "All planets in houses 7-1 (7th to 1st span).";
+
+// [+] Damini Yoga
+"yoga_name_nabhasa_damini" = "Damini Yoga";
+"yoga_outcome_nabhasa_damini" = "Lightning formation; generous, helpful, wealthy, and philanthropic nature.";
+"yoga_formation_nabhasa_damini" = "All planets in six successive houses.";
+
+// [+] Danda Yoga
+"yoga_name_nabhasa_danda" = "Danda Yoga";
+"yoga_outcome_nabhasa_danda" = "Staff formation; loss of family or isolation; service-oriented life.";
+"yoga_formation_nabhasa_danda" = "Planets in four consecutive houses starting from 10th.";
+
+// [+] Gada Yoga
+"yoga_name_nabhasa_gada" = "Gada Yoga";
+"yoga_outcome_nabhasa_gada" = "Mace-like strength; wealth through rituals, religious activities, or traditional pursuits.";
+"yoga_formation_nabhasa_gada" = "Planets in two successive Kendra houses.";
+
+// [+] Gola Yoga (Nabhasa)
+"yoga_name_nabhasa_gola" = "Gola Yoga (Nabhasa)";
+"yoga_outcome_nabhasa_gola" = "Sphere formation; poor, dirty, ignorant, but strong and wandering nature.";
+"yoga_formation_nabhasa_gola" = "All planets in one single house.";
+
+// [+] Hala Yoga
+"yoga_name_nabhasa_hala" = "Hala Yoga";
+"yoga_outcome_nabhasa_hala" = "Agricultural prosperity; hard-working nature with middle-class comforts.";
+"yoga_formation_nabhasa_hala" = "Planets in houses other than Kendras, forming plow shape.";
+
+// [+] Ishu Yoga
+"yoga_name_nabhasa_ishu" = "Ishu Yoga";
+"yoga_outcome_nabhasa_ishu" = "Arrow formation; connected to military, police, or prison administration.";
+"yoga_formation_nabhasa_ishu" = "Planets in four consecutive houses starting from 4th.";
+
+// [+] Kamala Yoga
+"yoga_name_nabhasa_kamala" = "Kamala Yoga";
+"yoga_outcome_nabhasa_kamala" = "Lotus formation; enduring fame, virtuous life, and hundred years of prosperity.";
+"yoga_formation_nabhasa_kamala" = "All planets in four Kendra houses (1/4/7/10).";
+
+// [+] Kedara Yoga
+"yoga_name_nabhasa_kedara" = "Kedara Yoga";
+"yoga_outcome_nabhasa_kedara" = "Field formation; agricultural wealth, helpful to many, truthful character.";
+"yoga_formation_nabhasa_kedara" = "All planets in five successive houses.";
+
+// [+] Kuta Yoga
+"yoga_name_nabhasa_kuta" = "Kuta Yoga";
+"yoga_outcome_nabhasa_kuta" = "Fortress formation; liar or diplomat, connected to prisons or confinement roles.";
+"yoga_formation_nabhasa_kuta" = "All planets in houses 4-10.";
+
+// [+] Mala Yoga
+"yoga_name_nabhasa_mala" = "Mala Yoga";
+"yoga_outcome_nabhasa_mala" = "Garland formation; comfortable life with vehicles, property, and lasting happiness.";
+"yoga_formation_nabhasa_mala" = "Planets in three successive Trikonas (1-5-9, 2-6-10, or 3-7-11).";
+
+// [+] Musala Yoga
+"yoga_name_nabhasa_musala" = "Musala Yoga";
+"yoga_outcome_nabhasa_musala" = "Firm resolve, fame, and wealth; steady, determined character.";
+"yoga_formation_nabhasa_musala" = "All planets in fixed signs (Taurus, Leo, Scorpio, Aquarius).";
+
+// [+] Nala Yoga
+"yoga_name_nabhasa_nala" = "Nala Yoga";
+"yoga_outcome_nabhasa_nala" = "Versatile, skilled in many fields; handsome appearance with fluctuating fortune.";
+"yoga_formation_nabhasa_nala" = "All planets in dual signs (Gemini, Virgo, Sagittarius, Pisces).";
+
+// [+] Nauka Yoga
+"yoga_name_nabhasa_nauka" = "Nauka Yoga";
+"yoga_outcome_nabhasa_nauka" = "Boat formation; wealth through water-related pursuits, fame on seas.";
+"yoga_formation_nabhasa_nauka" = "All planets in houses 1-7 (one half of zodiac).";
+
+// [−] Pasa Yoga
+"yoga_name_nabhasa_pasa" = "Pasa Yoga";
+"yoga_outcome_nabhasa_pasa" = "Noose formation; entangled in difficulties, imprisoned, or servant-like existence.";
+"yoga_formation_nabhasa_pasa" = "Planets only in specific bound patterns.";
+
+// [+] Rajju Yoga
+"yoga_name_nabhasa_rajju" = "Rajju Yoga";
+"yoga_outcome_nabhasa_rajju" = "Love of travel, wandering nature; success through mobility and adaptability.";
+"yoga_formation_nabhasa_rajju" = "All planets in movable signs (Aries, Cancer, Libra, Capricorn).";
+
+// [+] Samudra Yoga
+"yoga_name_nabhasa_samudra" = "Samudra Yoga";
+"yoga_outcome_nabhasa_samudra" = "Ocean formation; wealthy, many pleasures, equal to a king in enjoyment.";
+"yoga_formation_nabhasa_samudra" = "Planets evenly distributed in all Kendra groups.";
+
+// [−] Sarpa Yoga
+"yoga_name_nabhasa_sarpa" = "Sarpa Yoga";
+"yoga_outcome_nabhasa_sarpa" = "Misery, poverty, and serpent-like suffering; dependent on others for livelihood.";
+"yoga_formation_nabhasa_sarpa" = "All planets in cardinal houses (4th/8th/12th from Lagna).";
+
+// [−] Shakata Yoga
+"yoga_name_nabhasa_shakata" = "Shakata Yoga";
+"yoga_outcome_nabhasa_shakata" = "Cart-like life — ups and downs; wealth followed by poverty in cycles.";
+"yoga_formation_nabhasa_shakata" = "Planets only in 1st and 7th houses.";
+
+// [+] Shakti Yoga
+"yoga_name_nabhasa_shakti" = "Shakti Yoga";
+"yoga_outcome_nabhasa_shakti" = "Spear formation; lazy disposition but gains wealth through perseverance.";
+"yoga_formation_nabhasa_shakti" = "Planets in four consecutive houses starting from 7th.";
+
+// [+] Shringataka Yoga
+"yoga_name_nabhasa_shringataka" = "Shringataka Yoga";
+"yoga_outcome_nabhasa_shringataka" = "Peak formation; contentment, philanthropy, and amiable disposition.";
+"yoga_formation_nabhasa_shringataka" = "Planets in Trikona houses (1st, 5th, 9th).";
+
+// [−] Shula Yoga
+"yoga_name_nabhasa_shula" = "Shula Yoga";
+"yoga_outcome_nabhasa_shula" = "Trident formation; sharp, valorous, but poor; illness-prone and confrontational.";
+"yoga_formation_nabhasa_shula" = "Planets in three successive houses.";
+
+// [+] Vajra Yoga
+"yoga_name_nabhasa_vajra" = "Vajra Yoga";
+"yoga_outcome_nabhasa_vajra" = "Diamond-like brilliance; handsome, happy in youth and old age, martial valor.";
+"yoga_formation_nabhasa_vajra" = "Benefics in 1st/7th, malefics in 4th/10th.";
+
+// [+] Vapi Yoga
+"yoga_name_nabhasa_vapi" = "Vapi Yoga";
+"yoga_outcome_nabhasa_vapi" = "Well formation; wealth accumulation, hoarding tendency, lasting fortune.";
+"yoga_formation_nabhasa_vapi" = "All planets in non-Kendra houses (Panapara/Apoklima).";
+
+// [+] Veena Yoga
+"yoga_name_nabhasa_veena" = "Veena Yoga";
+"yoga_outcome_nabhasa_veena" = "Lute formation; lover of music, dance, and arts; skilled and happy disposition.";
+"yoga_formation_nabhasa_veena" = "All seven planets in seven successive houses.";
+
+// [+] Vihaga Yoga
+"yoga_name_nabhasa_vihaga" = "Vihaga Yoga";
+"yoga_outcome_nabhasa_vihaga" = "Bird-like freedom; ambassador nature, wandering, and message-carrying roles.";
+"yoga_formation_nabhasa_vihaga" = "Planets only in 4th and 10th houses.";
+
+// [+] Yava Yoga
+"yoga_name_nabhasa_yava" = "Yava Yoga";
+"yoga_outcome_nabhasa_yava" = "Barley-grain pattern; charitable nature, happiness in middle age.";
+"yoga_formation_nabhasa_yava" = "Benefics in 4th/10th, malefics in 1st/7th.";
+
+// [+] Yuga Yoga
+"yoga_name_nabhasa_yuga" = "Yuga Yoga";
+"yoga_outcome_nabhasa_yuga" = "Yoke formation; heretical, poor, outcast tendencies; unconventional path.";
+"yoga_formation_nabhasa_yuga" = "All planets in two successive houses.";
+
+// [+] Yupa Yoga
+"yoga_name_nabhasa_yupa" = "Yupa Yoga";
+"yoga_outcome_nabhasa_yupa" = "Sacrificial post; generous, learned, religious, and focused disposition.";
+"yoga_formation_nabhasa_yupa" = "Planets in four consecutive houses starting from Lagna.";
+
+// [−] Netranasa Yoga
+"yoga_name_netranasa_yoga" = "Netranasa Yoga";
+"yoga_outcome_netranasa_yoga" = "Susceptibility to eye problems or vision impairment; regular eye care essential.";
+"yoga_formation_netranasa_yoga" = "2nd/12th lords afflicted by malefics, Sun/Moon weakened.";
+
+// [+] Nishkapata Yoga (205)
+"yoga_name_nishkapata_yoga_205" = "Nishkapata Yoga (205)";
+"yoga_outcome_nishkapata_yoga_205" = "Grants transparent, guileless nature; naturally honest and earns respect through integrity.";
+"yoga_formation_nishkapata_yoga_205" = "Benefic planetary combinations indicating sincerity (var. 1).";
+
+// [+] Nishkapata Yoga (206)
+"yoga_name_nishkapata_yoga_206" = "Nishkapata Yoga (206)";
+"yoga_outcome_nishkapata_yoga_206" = "Bestows straightforward character and moral purity; thrives through honest dealings.";
+"yoga_formation_nishkapata_yoga_206" = "Benefic planetary combinations indicating sincerity (var. 2).";
+
+// [−] Nishturabhashi Yoga
+"yoga_name_nishturabhashi_yoga" = "Nishturabhashi Yoga";
+"yoga_outcome_nishturabhashi_yoga" = "Indicates tendency toward harsh speech; mindful communication advised.";
+"yoga_formation_nishturabhashi_yoga" = "Malefics influence Mercury and 2nd house.";
+
+// [+] Obhayachari Yoga
+"yoga_name_obhayachari_yoga" = "Obhayachari Yoga";
+"yoga_outcome_obhayachari_yoga" = "Bestows eloquence, handsome appearance, royal bearing, and distinction in life.";
+"yoga_formation_obhayachari_yoga" = "Planets (excl. Moon/Rahu/Ketu) in both 2nd and 12th from Sun.";
+
+// [+] Parakrama Yoga
+"yoga_name_parakrama_yoga" = "Parakrama Yoga";
+"yoga_outcome_parakrama_yoga" = "Grants exceptional courage, physical strength, and adventurous spirit in pursuits requiring bravery.";
+"yoga_formation_parakrama_yoga" = "3rd lord in benefic Navamsa with benefic influences; Mars in favorable dignity.";
+
+// [−] Parannabhojana Yoga
+"yoga_name_parannabhojana_yoga" = "Parannabhojana Yoga";
+"yoga_outcome_parannabhojana_yoga" = "Depends on others for food; financial constraints force reliance on charity or patronage.";
+"yoga_formation_parannabhojana_yoga" = "2nd lord weak, 6th lord influencing food houses.";
+
+// [+] Parihasaka Yoga
+"yoga_name_parihasaka_yoga" = "Parihasaka Yoga";
+"yoga_outcome_parihasaka_yoga" = "Natural wit, humor, and entertaining personality; brings joy to social gatherings.";
+"yoga_formation_parihasaka_yoga" = "Benefics in specific houses creating humorous disposition.";
+
+// [+] Parijatha Yoga
+"yoga_name_parijatha_yoga" = "Parijatha Yoga";
+"yoga_outcome_parijatha_yoga" = "Gradual but unstoppable rise to authority through merit and perseverance.";
+"yoga_formation_parijatha_yoga" = "Lagna lord's dispositor chain leads to planet in own/exalted in Kendra/Trikona.";
+
+// [+] Parvata Yoga
+"yoga_name_parvata_yoga" = "Parvata Yoga";
+"yoga_outcome_parvata_yoga" = "Mountain-like career stability, wealth, fame, and generosity.";
+"yoga_formation_parvata_yoga" = "Benefics in Kendras; 6th and 8th houses empty/unafflicted.";
+
+// [−] Peenasaroga Yoga
+"yoga_name_peenasaroga_yoga" = "Peenasaroga Yoga";
+"yoga_outcome_peenasaroga_yoga" = "Chronic sinusitis, nasal disorders, or respiratory allergies.";
+"yoga_formation_peenasaroga_yoga" = "Moon and 4th lord afflicted by Saturn and Rahu.";
+
+// [−] Pisacha Grastha Yoga
+"yoga_name_pisacha_grastha_yoga" = "Pisacha Grastha Yoga";
+"yoga_outcome_pisacha_grastha_yoga" = "Psychological disturbances or irrational fears; mental wellness practices provide relief.";
+"yoga_formation_pisacha_grastha_yoga" = "Rahu/Ketu conjunct Moon or Lagna lord with no benefic relief.";
+
+// [−] Pitrusapa Sutakshaya Yoga
+"yoga_name_pitrusapa_sutakshaya_yoga" = "Pitrusapa Sutakshaya Yoga";
+"yoga_outcome_pitrusapa_sutakshaya_yoga" = "Father's curse affecting progeny; unresolved paternal karma impacts children.";
+"yoga_formation_pitrusapa_sutakshaya_yoga" = "Sun afflicted with 5th lord in malefic combinations.";
+
+// [−] Pittaroga Yoga
+"yoga_name_pittaroga_yoga" = "Pittaroga Yoga";
+"yoga_outcome_pittaroga_yoga" = "Susceptibility to Pitta-related ailments (inflammation, acidity, liver issues).";
+"yoga_formation_pittaroga_yoga" = "Sun and Mars afflicting Lagna/6th with fire-element imbalance.";
+
+// [−] Pretasapa Yoga
+"yoga_name_pretasapa_yoga" = "Pretasapa Yoga";
+"yoga_outcome_pretasapa_yoga" = "Ancestral spirit affliction affecting family; spiritual cleansing recommended.";
+"yoga_formation_pretasapa_yoga" = "Saturn and Rahu afflicting 5th with no benefic aspects.";
+
+// [+] Pushkala Yoga
+"yoga_name_pushkala_yoga" = "Pushkala Yoga";
+"yoga_outcome_pushkala_yoga" = "Grants abundant prosperity, sweet speech, fame, and royal honor.";
+"yoga_formation_pushkala_yoga" = "Lagna lord conjunct Moon, aspected by strong Lagna dispositor.";
+
+// [+] Putra Sukha Yoga
+"yoga_name_putra_sukha_yoga" = "Putra Sukha Yoga";
+"yoga_outcome_putra_sukha_yoga" = "Deep happiness and satisfaction through children; strong parent-child bond.";
+"yoga_formation_putra_sukha_yoga" = "5th lord and Jupiter in mutual Kendra with benefic aspects.";
+
+// [−] Putrakalatraheena Yoga
+"yoga_name_putrakalatraheena_yoga" = "Putrakalatraheena Yoga";
+"yoga_outcome_putrakalatraheena_yoga" = "Challenges in having children and maintaining marriage; extra effort in relationships needed.";
+"yoga_formation_putrakalatraheena_yoga" = "5th and 7th lords severely afflicted in Dusthana.";
+
+// [+] Putramooladhana Yoga
+"yoga_name_putramooladhana_yoga" = "Putramooladhana Yoga";
+"yoga_outcome_putramooladhana_yoga" = "Wealth through children, creative endeavors, or speculative gains.";
+"yoga_formation_putramooladhana_yoga" = "5th lord connected to 2nd and 11th houses.";
+
+// [+] Raja Yoga (245)
+"yoga_name_raja_yoga_245" = "Raja Yoga (245)";
+"yoga_outcome_raja_yoga_245" = "Confers kingly status, authority, and rise to positions of great power.";
+"yoga_formation_raja_yoga_245" = "3+ planets exalted/own-house in Kendras/Trikonas.";
+
+// [+] Raja Yoga (246)
+"yoga_name_raja_yoga_246" = "Raja Yoga (246)";
+"yoga_outcome_raja_yoga_246" = "Political success and administrative authority through intelligence.";
+"yoga_formation_raja_yoga_246" = "Lagna lord and 5th lord in mutual Kendra with benefic aspects.";
+
+// [+] Raja Yoga (247)
+"yoga_name_raja_yoga_247" = "Raja Yoga (247)";
+"yoga_outcome_raja_yoga_247" = "Fortune aligns with career for spectacular professional success.";
+"yoga_formation_raja_yoga_247" = "9th and 10th lords in conjunction or mutual aspect (Dharma-Karma Adhipati).";
+
+// [+] Raja Yoga (248)
+"yoga_name_raja_yoga_248" = "Raja Yoga (248)";
+"yoga_outcome_raja_yoga_248" = "Rise to power through structural advantages and systemic support.";
+"yoga_formation_raja_yoga_248" = "Kendra and Trikona lords in mutual exchange (Parivarthana).";
+
+// [+] Raja Yoga (249)
+"yoga_name_raja_yoga_249" = "Raja Yoga (249)";
+"yoga_outcome_raja_yoga_249" = "Comprehensive authority — leads with wisdom, ethics, and popular support.";
+"yoga_formation_raja_yoga_249" = "1st, 5th, 9th lords interconnected with Kendra support.";
+
+// [+] Raja Yoga (250)
+"yoga_name_raja_yoga_250" = "Raja Yoga (250)";
+"yoga_outcome_raja_yoga_250" = "Career excellence and highest professional distinctions.";
+"yoga_formation_raja_yoga_250" = "10th lord exalted with 9th lord strong.";
+
+// [+] Raja Yoga (251)
+"yoga_name_raja_yoga_251" = "Raja Yoga (251)";
+"yoga_outcome_raja_yoga_251" = "Sustained authority and progressive career growth throughout life.";
+"yoga_formation_raja_yoga_251" = "Multiple Kendra lords in Trikonas or vice versa.";
+
+// [+] Raja Yoga (252)
+"yoga_name_raja_yoga_252" = "Raja Yoga (252)";
+"yoga_outcome_raja_yoga_252" = "Powerful self-made leader; identity inseparable from achievements.";
+"yoga_formation_raja_yoga_252" = "Lagna lord in 10th, 10th lord in Lagna (exchange).";
+
+// [+] Raja Yoga (253)
+"yoga_name_raja_yoga_253" = "Raja Yoga (253)";
+"yoga_outcome_raja_yoga_253" = "Authority through divine favor, past-life merit, and intellectual superiority.";
+"yoga_formation_raja_yoga_253" = "5th lord in 9th or 9th lord in 5th with benefic aspects.";
+
+// [+] Raja Yoga (254)
+"yoga_name_raja_yoga_254" = "Raja Yoga (254)";
+"yoga_outcome_raja_yoga_254" = "Benevolent leadership, diplomatic success, and cultural authority.";
+"yoga_formation_raja_yoga_254" = "Jupiter and Venus in Kendras with strong Lagna lord.";
+
+// [+] Raja Yoga (255)
+"yoga_name_raja_yoga_255" = "Raja Yoga (255)";
+"yoga_outcome_raja_yoga_255" = "Authority rooted in popular support, property, and institutional power.";
+"yoga_formation_raja_yoga_255" = "4th and 10th lords in mutual support with strong dignity.";
+
+// [+] Raja Yoga (256)
+"yoga_name_raja_yoga_256" = "Raja Yoga (256)";
+"yoga_outcome_raja_yoga_256" = "Governmental authority, administrative success, and public leadership.";
+"yoga_formation_raja_yoga_256" = "Sun strong in 10th with Jupiter's aspect.";
+
+// [+] Raja Yoga (257)
+"yoga_name_raja_yoga_257" = "Raja Yoga (257)";
+"yoga_outcome_raja_yoga_257" = "Popular leadership — loved by masses and rises through public support.";
+"yoga_formation_raja_yoga_257" = "Moon strong, connected to multiple Kendra/Trikona lords.";
+
+// [+] Raja Yoga (258)
+"yoga_name_raja_yoga_258" = "Raja Yoga (258)";
+"yoga_outcome_raja_yoga_258" = "Military/executive authority; commands large organizations.";
+"yoga_formation_raja_yoga_258" = "Mars in own/exalted sign in Kendra with 10th lord.";
+
+// [+] Raja Yoga (259)
+"yoga_name_raja_yoga_259" = "Raja Yoga (259)";
+"yoga_outcome_raja_yoga_259" = "Authority in intellectual, commercial, or communication fields.";
+"yoga_formation_raja_yoga_259" = "Mercury strong in 10th connected to 2nd and 11th lords.";
+
+// [+] Raja Yoga (260)
+"yoga_name_raja_yoga_260" = "Raja Yoga (260)";
+"yoga_outcome_raja_yoga_260" = "Lasting authority through disciplined governance and institutional leadership.";
+"yoga_formation_raja_yoga_260" = "Saturn in own/exalted in 10th with benefic aspects.";
+
+// [+] Raja Yoga (261)
+"yoga_name_raja_yoga_261" = "Raja Yoga (261)";
+"yoga_outcome_raja_yoga_261" = "Success in diplomacy, arts, or luxury industries with authority.";
+"yoga_formation_raja_yoga_261" = "Venus in 10th connected to 9th and Lagna lords.";
+
+// [+] Raja Yoga (262)
+"yoga_name_raja_yoga_262" = "Raja Yoga (262)";
+"yoga_outcome_raja_yoga_262" = "All-round professional success with authority, wealth, and recognition.";
+"yoga_formation_raja_yoga_262" = "Multiple benefics in Kendras with dignified 10th lord.";
+
+// [+] Raja Yoga (263)
+"yoga_name_raja_yoga_263" = "Raja Yoga (263)";
+"yoga_outcome_raja_yoga_263" = "Supreme Raja Yoga — extraordinary power and lasting legacy.";
+"yoga_formation_raja_yoga_263" = "All Trikona and Kendra lords mutually supportive (rare).";
+
+// [−] Raja Yoga Bhanga (298)
+"yoga_name_raja_yoga_bhanga_298" = "Raja Yoga Bhanga (298)";
+"yoga_outcome_raja_yoga_bhanga_298" = "Cancels Raja Yoga effects; success undermined by hidden adversaries.";
+"yoga_formation_raja_yoga_bhanga_298" = "Raja Yoga planets afflicted by strong malefics (var. 1).";
+
+// [−] Raja Yoga Bhanga (299)
+"yoga_name_raja_yoga_bhanga_299" = "Raja Yoga Bhanga (299)";
+"yoga_outcome_raja_yoga_bhanga_299" = "Destroys career progress; external forces derail professional advancement.";
+"yoga_formation_raja_yoga_bhanga_299" = "Raja Yoga planets debilitated or combust (var. 2).";
+
+// [−] Rajabhrashta Yoga
+"yoga_name_rajabhrashta_yoga" = "Rajabhrashta Yoga";
+"yoga_outcome_rajabhrashta_yoga" = "Fall from high position; sudden loss of authority or public disgrace.";
+"yoga_formation_rajabhrashta_yoga" = "Aroodha Lagna lord and Aroodha 12th lord in conjunction.";
+
+// [+] Rajalakshana Yoga
+"yoga_name_rajalakshana_yoga" = "Rajalakshana Yoga";
+"yoga_outcome_rajalakshana_yoga" = "Bestows noble bearing, aristocratic demeanor, and natural leadership qualities.";
+"yoga_formation_rajalakshana_yoga" = "Strong planets in Ascendant or Kendras with specific dignity conditions.";
+
+// [+] Ravi Yoga
+"yoga_name_ravi_yoga" = "Ravi Yoga";
+"yoga_outcome_ravi_yoga" = "Solar authority — shines in public life and government with confidence.";
+"yoga_formation_ravi_yoga" = "Sun in 10th in own/exalted, 9th lord strong.";
+
+// [−] Rogagrastha Yoga
+"yoga_name_rogagrastha_yoga" = "Rogagrastha Yoga";
+"yoga_outcome_rogagrastha_yoga" = "Chronic disease susceptibility; individual prone to recurring health issues.";
+"yoga_formation_rogagrastha_yoga" = "6th lord strong, Lagna lord weak, malefics aspecting Lagna.";
+
+// [+] Ruchaka Yoga
+"yoga_name_ruchaka_yoga" = "Ruchaka Yoga";
+"yoga_outcome_ruchaka_yoga" = "Grants courage, physical vitality, commanding presence, and success in competitive or military fields.";
+"yoga_formation_ruchaka_yoga" = "Mars in a Kendra (1/4/7/10) in own sign (Aries/Scorpio) or exaltation (Capricorn).";
+
+// [+] Sada Sanchara Yoga
+"yoga_name_sada_sanchara_yoga" = "Sada Sanchara Yoga";
+"yoga_outcome_sada_sanchara_yoga" = "Career involving constant travel — diplomacy, consulting, or international business.";
+"yoga_formation_sada_sanchara_yoga" = "10th lord in movable sign connected to 3rd/7th/12th houses.";
+
+// [−] Sahodareesangama Yoga
+"yoga_name_sahodareesangama_yoga" = "Sahodareesangama Yoga";
+"yoga_outcome_sahodareesangama_yoga" = "Inappropriate dynamics in sibling relationships requiring conscious boundaries.";
+"yoga_formation_sahodareesangama_yoga" = "3rd lord and Venus in afflicted combinations.";
+
+// [−] Sakata Yoga
+"yoga_name_sakata_yoga" = "Sakata Yoga";
+"yoga_outcome_sakata_yoga" = "Fluctuating fortune — prosperity alternates with setbacks; stability requires effort.";
+"yoga_formation_sakata_yoga" = "Moon in 6th/8th/12th from Jupiter.";
+
+// [−] Sanghataka Marana Yoga (276)
+"yoga_name_sanghataka_marana_yoga_276" = "Sanghataka Marana Yoga (276)";
+"yoga_outcome_sanghataka_marana_yoga_276" = "Collective tragedy or mass-incident vulnerability; caution during malefic transits.";
+"yoga_formation_sanghataka_marana_yoga_276" = "Specific malefic groupings in death-inflicting houses (var. 1).";
+
+// [−] Sanghataka Marana Yoga (277)
+"yoga_name_sanghataka_marana_yoga_277" = "Sanghataka Marana Yoga (277)";
+"yoga_outcome_sanghataka_marana_yoga_277" = "Risk during group activities or travel; heightened awareness during danger periods.";
+"yoga_formation_sanghataka_marana_yoga_277" = "Specific malefic groupings in death-inflicting houses (var. 2).";
+
+// [+] Sankha Yoga
+"yoga_name_sankha_yoga" = "Sankha Yoga";
+"yoga_outcome_sankha_yoga" = "Conch-like royal authority; wealth, longevity, and humanitarian leadership.";
+"yoga_formation_sankha_yoga" = "5th and 6th lords in mutual Kendras with strong Lagna lord.";
+
+// [+] Sarala Yoga
+"yoga_name_sarala_yoga" = "Sarala Yoga";
+"yoga_outcome_sarala_yoga" = "Grants fearlessness and longevity; conquers hidden dangers through resilience.";
+"yoga_formation_sarala_yoga" = "8th lord in 6th, 8th, or 12th house (Dusthana in Dusthana).";
+
+// [+] Saraswathi Yoga Education
+"yoga_name_saraswathi_yoga_education" = "Saraswathi Yoga Education";
+"yoga_outcome_saraswathi_yoga_education" = "Outcome details to be added";
+"yoga_formation_saraswathi_yoga_education" = "Formation details to be added";
+
+// [+] Sareera Soukhya Yoga
+"yoga_name_sareera_soukhya_yoga" = "Sareera Soukhya Yoga";
+"yoga_outcome_sareera_soukhya_yoga" = "Physical comfort, good health, and robust constitution throughout life.";
+"yoga_formation_sareera_soukhya_yoga" = "Lagna lord in own/exalted sign with benefic aspects on Lagna.";
+
+// [−] Sarpaganda Yoga
+"yoga_name_sarpaganda_yoga" = "Sarpaganda Yoga";
+"yoga_outcome_sarpaganda_yoga" = "Susceptibility to snake bites or reptile-related dangers; caution near serpents.";
+"yoga_formation_sarpaganda_yoga" = "Rahu in specific positions with malefic aspects on Lagna.";
+
+// [−] Sarpasapa Yoga (212)
+"yoga_name_sarpasapa_yoga_212" = "Sarpasapa Yoga (212)";
+"yoga_outcome_sarpasapa_yoga_212" = "Serpent curse affecting progeny; karmic obstacles to childbearing.";
+"yoga_formation_sarpasapa_yoga_212" = "Rahu in 5th with malefic aspects, no benefic relief (var. 1).";
+
+// [−] Sarpasapa Yoga (213)
+"yoga_name_sarpasapa_yoga_213" = "Sarpasapa Yoga (213)";
+"yoga_outcome_sarpasapa_yoga_213" = "Ancestral karmic debt manifesting as fertility challenges.";
+"yoga_formation_sarpasapa_yoga_213" = "Rahu/Ketu axis on 5th-11th with afflicted 5th lord (var. 2).";
+
+// [−] Sarpasapa Yoga (214)
+"yoga_name_sarpasapa_yoga_214" = "Sarpasapa Yoga (214)";
+"yoga_outcome_sarpasapa_yoga_214" = "Deep-rooted karmic blocks to having children; spiritual remedies essential.";
+"yoga_formation_sarpasapa_yoga_214" = "Specific Rahu combinations in 5th with Saturn (var. 3).";
+
+// [−] Sarpasapa Yoga (215)
+"yoga_name_sarpasapa_yoga_215" = "Sarpasapa Yoga (215)";
+"yoga_outcome_sarpasapa_yoga_215" = "Severe serpent curse impact on family lineage; ritual purification recommended.";
+"yoga_formation_sarpasapa_yoga_215" = "Rahu in 5th with 5th lord in 6th/8th/12th (var. 4).";
+
+// [+] Sasa Yoga
+"yoga_name_sasa_yoga" = "Sasa Yoga";
+"yoga_outcome_sasa_yoga" = "Confers discipline, leadership in governance, and success through perseverance and methodical effort.";
+"yoga_formation_sasa_yoga" = "Saturn in a Kendra (1/4/7/10) in own sign (Capricorn/Aquarius) or exaltation (Libra).";
+
+// [+] Satkalatra Yoga
+"yoga_name_satkalatra_yoga" = "Satkalatra Yoga";
+"yoga_outcome_satkalatra_yoga" = "Noble, virtuous spouse and harmonious marriage; life partner brings fortune and happiness.";
+"yoga_formation_satkalatra_yoga" = "7th lord well-placed with Venus strong and benefic aspects.";
+
+// [+] Satkathadisravana Yoga
+"yoga_name_satkathadisravana_yoga" = "Satkathadisravana Yoga";
+"yoga_outcome_satkathadisravana_yoga" = "Grants deep love for sacred knowledge, philosophical learning, and higher wisdom.";
+"yoga_formation_satkathadisravana_yoga" = "3rd house aspected by benefics, 3rd lord in benefic Navamsa with natural benefic aspects.";
+
+// [+] Satrumooladhana Yoga
+"yoga_name_satrumooladhana_yoga" = "Satrumooladhana Yoga";
+"yoga_outcome_satrumooladhana_yoga" = "Wealth through defeating competition, legal victories, or service income.";
+"yoga_formation_satrumooladhana_yoga" = "6th lord connected to 2nd and 11th houses.";
+
+// [−] Sirachcheda Yoga
+"yoga_name_sirachcheda_yoga" = "Sirachcheda Yoga";
+"yoga_outcome_sirachcheda_yoga" = "Risk of head injuries or severe trauma; protective measures and caution advised.";
+"yoga_formation_sirachcheda_yoga" = "Mars and Ketu afflicting Lagna with no benefic protection.";
+
+// [−] Sisnavyadhi Yoga
+"yoga_name_sisnavyadhi_yoga" = "Sisnavyadhi Yoga";
+"yoga_outcome_sisnavyadhi_yoga" = "Genital or reproductive health disorders; specialized medical attention advisable.";
+"yoga_formation_sisnavyadhi_yoga" = "Venus and 7th lord afflicted by malefics in 8th house.";
+
+// [+] Siva Yoga
+"yoga_name_siva_yoga" = "Siva Yoga";
+"yoga_outcome_siva_yoga" = "Lord Shiva's blessing; profound meditative abilities, ascetic wisdom, and transformative spiritual power.";
+"yoga_formation_siva_yoga" = "5th lord in 9th, 9th lord in 10th, 10th lord in 5th.";
+
+// [−] Sraddhannabhuktha Yoga
+"yoga_name_sraddhannabhuktha_yoga" = "Sraddhannabhuktha Yoga";
+"yoga_outcome_sraddhannabhuktha_yoga" = "Eats food intended for rituals or ceremonies; dependent on funeral/ritual offerings.";
+"yoga_formation_sraddhannabhuktha_yoga" = "Specific afflictions to 2nd house indicating impure food sources.";
+
+// [+] Sreenatha Yoga
+"yoga_name_sreenatha_yoga" = "Sreenatha Yoga";
+"yoga_outcome_sreenatha_yoga" = "Bestows divine favor, prosperity after marriage, and fortune through partnerships.";
+"yoga_formation_sreenatha_yoga" = "7th lord exalted in 10th, 9th and 10th lords in conjunction.";
+
+// [+] Sumukha Yoga (166)
+"yoga_name_sumukha_yoga_166" = "Sumukha Yoga (166)";
+"yoga_outcome_sumukha_yoga_166" = "Attractive face and pleasant appearance; magnetic personality and charming demeanor.";
+"yoga_formation_sumukha_yoga_166" = "Benefics in 2nd from Lagna, Lagna lord strong (var. 1).";
+
+// [+] Sumukha Yoga (167)
+"yoga_name_sumukha_yoga_167" = "Sumukha Yoga (167)";
+"yoga_outcome_sumukha_yoga_167" = "Handsome features and graceful bearing; naturally appealing and socially admired.";
+"yoga_formation_sumukha_yoga_167" = "Venus and Jupiter aspecting Lagna or 2nd house (var. 2).";
+
+// [+] Sunapha Yoga
+"yoga_name_sunapha_yoga" = "Sunapha Yoga";
+"yoga_outcome_sunapha_yoga" = "Grants self-earned wealth, intelligence, and prosperity through personal merit.";
+"yoga_formation_sunapha_yoga" = "Planet (excl. Sun/Rahu/Ketu) in 2nd house from Moon.";
+
+// [+] Suputra Yoga
+"yoga_name_suputra_yoga" = "Suputra Yoga";
+"yoga_outcome_suputra_yoga" = "Blessed with a worthy, virtuous child who brings great pride and family honor.";
+"yoga_formation_suputra_yoga" = "Jupiter strong aspecting 5th house, 5th lord dignified.";
+
+// [+] Swaveeryadhana Yoga
+"yoga_name_swaveeryadhana_yoga" = "Swaveeryadhana Yoga";
+"yoga_outcome_swaveeryadhana_yoga" = "Grants wealth entirely through self-effort; the individual is a self-made achiever.";
+"yoga_formation_swaveeryadhana_yoga" = "Lagna lord and 2nd lord strong without external house dependence.";
+
+// [−] Swetakushta Yoga
+"yoga_name_swetakushta_yoga" = "Swetakushta Yoga";
+"yoga_outcome_swetakushta_yoga" = "Susceptibility to chronic skin conditions; holistic health practices recommended.";
+"yoga_formation_swetakushta_yoga" = "Specific combinations affecting skin and vitality houses.";
+
+// [+] Theevrabuddhi Yoga
+"yoga_name_theevrabuddhi_yoga" = "Theevrabuddhi Yoga";
+"yoga_outcome_theevrabuddhi_yoga" = "Razor-sharp intelligence and quick comprehension; excels in logic and analytics.";
+"yoga_formation_theevrabuddhi_yoga" = "Mercury exalted/own sign in Kendra with Jupiter's aspect.";
+
+// [+] Thrikalagnana Yoga
+"yoga_name_thrikalagnana_yoga" = "Thrikalagnana Yoga";
+"yoga_outcome_thrikalagnana_yoga" = "Prophetic intuition and extraordinary foresight; uncanny predictive abilities.";
+"yoga_formation_thrikalagnana_yoga" = "Jupiter strong in Navamsa with specific Lagna connections.";
+
+// [+] Thrilochana Yoga
+"yoga_name_thrilochana_yoga" = "Thrilochana Yoga";
+"yoga_outcome_thrilochana_yoga" = "Grants immense wealth, fearlessness, and a commanding, prosperous presence.";
+"yoga_formation_thrilochana_yoga" = "Sun, Moon, and Mars in mutual trines (1-5-9 triangle).";
+
+// [+] Uttama Griha Yoga
+"yoga_name_uttama_griha_yoga" = "Uttama Griha Yoga";
+"yoga_outcome_uttama_griha_yoga" = "Grants ownership of excellent homes; individual lives in comfort with fine dwellings.";
+"yoga_formation_uttama_griha_yoga" = "4th lord strong in Kendra/Trikona with benefic influences.";
+
+// [+] Vahana Yoga (209)
+"yoga_name_vahana_yoga_209" = "Vahana Yoga (209)";
+"yoga_outcome_vahana_yoga_209" = "Grants fine vehicles, conveyances, and luxury transportation.";
+"yoga_formation_vahana_yoga_209" = "4th lord connected with benefics and Venus strong (var. 1).";
+
+// [+] Vahana Yoga (210)
+"yoga_name_vahana_yoga_210" = "Vahana Yoga (210)";
+"yoga_outcome_vahana_yoga_210" = "Ensures premium vehicles and comfortable travel throughout life.";
+"yoga_formation_vahana_yoga_210" = "Benefics in 4th house with Venus well-placed (var. 2).";
+
+// [−] Vakchalana Yoga
+"yoga_name_vakchalana_yoga" = "Vakchalana Yoga";
+"yoga_outcome_vakchalana_yoga" = "Speech defects, stammering, or language impediments; speech therapy beneficial.";
+"yoga_formation_vakchalana_yoga" = "Mercury severely afflicted with malefics, 2nd lord weak.";
+
+// [−] Vamsacheda Yoga
+"yoga_name_vamsacheda_yoga" = "Vamsacheda Yoga";
+"yoga_outcome_vamsacheda_yoga" = "Challenges in continuing family lineage; alternative family building may be considered.";
+"yoga_formation_vamsacheda_yoga" = "5th lord and Jupiter severely afflicted.";
+
+// [−] Vanchanachorabheethi Yoga
+"yoga_name_vanchanachorabheethi_yoga" = "Vanchanachorabheethi Yoga";
+"yoga_outcome_vanchanachorabheethi_yoga" = "Suggests vulnerability to deception or theft; caution in trusting others advised.";
+"yoga_formation_vanchanachorabheethi_yoga" = "Malefic influences on Lagna lord with Rahu/Ketu involvement.";
+
+// [+] Vasi Yoga
+"yoga_name_vasi_yoga" = "Vasi Yoga";
+"yoga_outcome_vasi_yoga" = "Grants charitable disposition, influence, good fortune, and social standing.";
+"yoga_formation_vasi_yoga" = "Planet (excl. Moon/Rahu/Ketu) in 12th house from Sun.";
+
+// [+] Vasumathi Yoga
+"yoga_name_vasumathi_yoga" = "Vasumathi Yoga";
+"yoga_outcome_vasumathi_yoga" = "Ensures steady wealth accumulation and financial stability through consistent effort.";
+"yoga_formation_vasumathi_yoga" = "Benefics in Upachaya houses (3/6/10/11) from Moon or Ascendant.";
+
+// [−] Vatharoga Yoga
+"yoga_name_vatharoga_yoga" = "Vatharoga Yoga";
+"yoga_outcome_vatharoga_yoga" = "Susceptibility to Vata-related ailments (joint pain, nervous disorders, gas).";
+"yoga_formation_vatharoga_yoga" = "Saturn afflicting Lagna/6th house with wind-element imbalance.";
+
+// [+] Vesi Yoga
+"yoga_name_vesi_yoga" = "Vesi Yoga";
+"yoga_outcome_vesi_yoga" = "Enhances truthfulness, industrious nature, and credibility through honest effort.";
+"yoga_formation_vesi_yoga" = "Planet (excl. Moon/Rahu/Ketu) in 2nd house from Sun.";
+
+// [+] Vichitra Saudha Prakara Yoga
+"yoga_name_vichitra_saudha_prakara_yoga" = "Vichitra Saudha Prakara Yoga";
+"yoga_outcome_vichitra_saudha_prakara_yoga" = "Bestows palatial residences and ownership of remarkable properties.";
+"yoga_formation_vichitra_saudha_prakara_yoga" = "Multiple planets supporting 4th house with dignified positions.";
+
+// [+] Vidyut Yoga
+"yoga_name_vidyut_yoga" = "Vidyut Yoga";
+"yoga_outcome_vidyut_yoga" = "Lightning-like brilliance; sudden, spectacular professional success.";
+"yoga_formation_vidyut_yoga" = "Venus as 11th lord conjunct Lagna lord in exalted Navamsa.";
+
+// [−] Vikalangapatni Yoga
+"yoga_name_vikalangapatni_yoga" = "Vikalangapatni Yoga";
+"yoga_outcome_vikalangapatni_yoga" = "Spouse may face health challenges or physical disabilities.";
+"yoga_formation_vikalangapatni_yoga" = "7th lord and Venus afflicted by malefics in Dusthana.";
+
+// [+] Vimala Yoga
+"yoga_name_vimala_yoga" = "Vimala Yoga";
+"yoga_outcome_vimala_yoga" = "Reduces losses and waste; individual achieves independence through detachment.";
+"yoga_formation_vimala_yoga" = "12th lord in 6th, 8th, or 12th house (Dusthana in Dusthana).";
+
+// [−] Vishaprayoga Yoga
+"yoga_name_vishaprayoga_yoga" = "Vishaprayoga Yoga";
+"yoga_outcome_vishaprayoga_yoga" = "Risk of poisoning or toxin-related health issues; dietary vigilance needed.";
+"yoga_formation_vishaprayoga_yoga" = "Specific malefic combinations involving Rahu and 2nd house.";
+
+// [+] Vishnu Yoga
+"yoga_name_vishnu_yoga" = "Vishnu Yoga";
+"yoga_outcome_vishnu_yoga" = "Lord Vishnu's blessing; divine preservation, prosperity, and righteous worldly success through spiritual merit.";
+"yoga_formation_vishnu_yoga" = "9th lord in 10th, 10th lord in 9th (exchange).";
+
+// [−] Vrana Yoga
+"yoga_name_vrana_yoga" = "Vrana Yoga";
+"yoga_outcome_vrana_yoga" = "Susceptibility to wounds, boils, or surgical conditions; injury-prone constitution.";
+"yoga_formation_vrana_yoga" = "Mars and Ketu afflicting Lagna or 6th house.";
+
+// [−] Yuddha Marana Yoga
+"yoga_name_yuddha_marana_yoga" = "Yuddha Marana Yoga";
+"yoga_outcome_yuddha_marana_yoga" = "Risk of death through conflict, accidents, or violent circumstances.";
+"yoga_formation_yuddha_marana_yoga" = "Mars in 6th/8th afflicting Lagna with Ketu involvement.";
+
+// [+] Yuddha Praveena Yoga
+"yoga_name_yuddha_praveena_yoga" = "Yuddha Praveena Yoga";
+"yoga_outcome_yuddha_praveena_yoga" = "Bestows strategic prowess in warfare, debate, or competitive professions.";
+"yoga_formation_yuddha_praveena_yoga" = "Navamsa lord of 3rd lord traced through chain ending in planet in own Vargas.";
+
+// [+] Yuddhatpaschaddrudha Yoga
+"yoga_name_yuddhatpaschaddrudha_yoga" = "Yuddhatpaschaddrudha Yoga";
+"yoga_outcome_yuddhatpaschaddrudha_yoga" = "Indicates resilience after setbacks — the individual recovers with tenacity from defeats.";
+"yoga_formation_yuddhatpaschaddrudha_yoga" = "3rd lord in fixed signs in D1 and D9, cruel D60, Rasi lord debilitated.";
+
+// [+] Yuddhatpoorvadridhachitta Yoga
+"yoga_name_yuddhatpoorvadridhachitta_yoga" = "Yuddhatpoorvadridhachitta Yoga";
+"yoga_outcome_yuddhatpoorvadridhachitta_yoga" = "Grants unwavering determination and mental fortitude before undertaking challenges.";
+"yoga_formation_yuddhatpoorvadridhachitta_yoga" = "3rd lord exalted, conjoined with malefics in movable sign.";
+
+// [+] Yukthi Samanwithavagmi (154)
+"yoga_name_yukthi_samanwithavagmi_yoga_154" = "Yukthi Samanwithavagmi (154)";
+"yoga_outcome_yukthi_samanwithavagmi_yoga_154" = "Logical eloquence and persuasive speech; excels in debate, law, or diplomacy.";
+"yoga_formation_yukthi_samanwithavagmi_yoga_154" = "Mercury strong with 2nd lord in benefic combinations (var. 1).";
+
+// [+] Yukthi Samanwithavagmi (155)
+"yoga_name_yukthi_samanwithavagmi_yoga_155" = "Yukthi Samanwithavagmi (155)";
+"yoga_outcome_yukthi_samanwithavagmi_yoga_155" = "Articulate expression and intellectual communication; compelling writer or orator.";
+"yoga_formation_yukthi_samanwithavagmi_yoga_155" = "Mercury strong with 2nd lord in benefic combinations (var. 2).";

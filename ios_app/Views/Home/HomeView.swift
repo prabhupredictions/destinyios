@@ -187,7 +187,7 @@ struct HomeView: View {
                         let typeText = yoga.isDosha ? "dosha (negative combination)" : "yoga (positive combination)"
                         
                         var contextParts: [String] = [
-                            "I have \(yoga.displayName) in my birth chart.",
+                            "I have \(yoga.localizedName) in my birth chart.",
                             "",
                             "Details:",
                             "- Type: \(typeText)",
@@ -202,6 +202,11 @@ struct HomeView: View {
                             contextParts.append("- Formation: \(formation)")
                         }
                         
+                        // Add outcome (What it means) if available
+                        if let outcome = yoga.localizedOutcome, !outcome.isEmpty {
+                            contextParts.append("- What it means: \(outcome)")
+                        }
+                        
                         if let reason = yoga.reason, !reason.isEmpty, yoga.status != "A" {
                             // Transform exception keys to human-readable text
                             let localizedReason = DoshaDescriptions.localizeExceptionKeys(in: reason)
@@ -209,7 +214,7 @@ struct HomeView: View {
                         }
                         
                         contextParts.append("")
-                        contextParts.append("Please explain:")
+                        contextParts.append("Please explain in more detail:")
                         contextParts.append("1. What this \(yoga.isDosha ? "dosha" : "yoga") means for my life")
                         
                         if yoga.status == "A" {

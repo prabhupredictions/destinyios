@@ -37,7 +37,7 @@ struct YogaDetailPopup: View {
                     
                     VStack(alignment: .leading, spacing: 4) {
                         // Yoga Name
-                        Text(yoga.displayName)
+                        Text(yoga.localizedName)
                             .font(AppTheme.Fonts.title(size: 17))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .lineLimit(2)
@@ -126,10 +126,30 @@ struct YogaDetailPopup: View {
                         .fill(AppTheme.Colors.surfaceBackground.opacity(0.5))
                 )
                 
-                // Formation Description (if available)
-                if let formation = yoga.formation, !formation.isEmpty {
+                // Outcome Description (professional interpretation)
+                if let outcome = yoga.localizedOutcome, !outcome.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("FORMATION")
+                        Text("yoga_outcome_label".localized)
+                            .font(AppTheme.Fonts.caption(size: 10))
+                            .foregroundColor(AppTheme.Colors.gold)
+                        
+                        Text(outcome)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(AppTheme.Colors.gold.opacity(0.06))
+                    )
+                }
+                
+                // Formation Description (if available)
+                if let formation = yoga.localizedFormation, !formation.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("yoga_formation_label".localized)
                             .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                         
@@ -289,6 +309,7 @@ struct YogaDetailPopup: View {
         YogaDetailPopup(
             yoga: YogaDetail(
                 name: "Gajakesari Yoga",
+                yogaKey: "gajakesari_yoga",
                 planets: "Moon, Jupiter",
                 houses: "1, 7",
                 status: "R",
@@ -296,6 +317,7 @@ struct YogaDetailPopup: View {
                 isDosha: false,
                 category: "Wealth",
                 formation: "Jupiter is in Kendra (7th house) from Moon",
+                outcome: "Confers intelligence, eloquence, lasting reputation, and virtuous, wealthy character.",
                 reason: "Jupiter is combust due to proximity to Sun"
             ),
             onAskMore: { print("Ask more tapped") },

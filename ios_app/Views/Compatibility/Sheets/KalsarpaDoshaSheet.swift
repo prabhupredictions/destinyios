@@ -110,11 +110,11 @@ struct KalsarpaDoshaSheet: View {
             .padding(.top, 20)
             
             VStack(spacing: 12) {
-                Text("Divine Protection")
+                Text("kalsarpa_divine_protection_title".localized)
                     .font(AppTheme.Fonts.title(size: 24))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
-                Text("Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.")
+                Text("kalsarpa_divine_protection_message".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -127,16 +127,16 @@ struct KalsarpaDoshaSheet: View {
                 HStack {
                     Image(systemName: "sparkles")
                         .foregroundColor(AppTheme.Colors.gold)
-                    Text("Relationship Benefits")
+                    Text("kalsarpa_relationship_benefits".localized)
                         .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     Spacer()
                 }
                 
                 HStack(spacing: 20) {
-                    benefitItem(icon: "heart.circle.fill", text: "Emotional\nHarmony")
-                    benefitItem(icon: "arrow.up.circle.fill", text: "Smooth\nProgression")
-                    benefitItem(icon: "sun.max.fill", text: "Positive\nenergy")
+                    benefitItem(icon: "heart.circle.fill", text: "kalsarpa_emotional_harmony".localized)
+                    benefitItem(icon: "arrow.up.circle.fill", text: "kalsarpa_smooth_progression".localized)
+                    benefitItem(icon: "sun.max.fill", text: "kalsarpa_positive_energy".localized)
                 }
             }
             .padding(20)
@@ -211,7 +211,7 @@ struct KalsarpaDoshaSheet: View {
                     Text(affectedName)
                         .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
                         .foregroundColor(AppTheme.Colors.textPrimary)
-                    Text("Has Dosha")
+                    Text("kalsarpa_has_dosha".localized)
                         .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                         .foregroundColor(AppTheme.Colors.error)
                         .padding(.horizontal, 8)
@@ -239,7 +239,7 @@ struct KalsarpaDoshaSheet: View {
                     Text(safeName)
                         .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
                         .foregroundColor(AppTheme.Colors.textPrimary)
-                    Text("Protected")
+                    Text("kalsarpa_protected".localized)
                         .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                         .foregroundColor(AppTheme.Colors.success)
                         .padding(.horizontal, 8)
@@ -287,7 +287,7 @@ struct KalsarpaDoshaSheet: View {
             // Detailed Analysis for Affected Partner
             if let data = affectedData {
                 VStack(spacing: 16) {
-                    Text("\(affectedName)'s Analysis")
+                    Text(String(format: "kalsarpa_analysis_title".localized, affectedName))
                         .font(AppTheme.Fonts.title(size: 20))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -322,15 +322,15 @@ struct KalsarpaDoshaSheet: View {
             }
             
             VStack(spacing: 12) {
-                Text("Mutual Kalsarpa")
+                Text("kalsarpa_mutual_kalsarpa".localized)
                     .font(AppTheme.Fonts.title(size: 24))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
-                Text("Dosha Samya Detected")
+                Text("kalsarpa_dosha_samya".localized)
                     .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
                     .foregroundColor(AppTheme.Colors.gold)
                 
-                Text("Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.")
+                Text("kalsarpa_mutual_message".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -601,7 +601,7 @@ struct KalsarpaDoshaSheet: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .font(AppTheme.Fonts.body(size: 14))
                 }
-                Text(forName != nil ? "Remedies for \(forName!)" : "recommended_remedies".localized)
+                Text(forName != nil ? String(format: "kalsarpa_remedies_for".localized, forName!) : "recommended_remedies".localized)
                     .font(AppTheme.Fonts.body(size: 15).weight(.bold))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()

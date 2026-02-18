@@ -56,7 +56,7 @@ struct AdditionalYogasSheet: View {
                     selectedIndex: $selectedPartner,
                     names: [boyName, girlName]
                 )
-                .padding(.horizontal, 32)
+                .padding(.horizontal, 16)
                 
                 // Content Area
                 if let data = currentData {

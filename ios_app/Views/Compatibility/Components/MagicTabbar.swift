@@ -16,100 +16,64 @@ struct MagicTabbar: View {
     @Namespace private var animation
     
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(tiles) { tile in
-                        tabButton(tile, proxy: proxy)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 4)
+        HStack(spacing: 2) {
+            ForEach(tiles) { tile in
+                tabButton(tile)
             }
-            .background(Color.clear) // Removed inner shadow background
-            .padding(.vertical, 2)
-            .background(Color.clear) // 100% Transparent - Removed Capsule & Stroke
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4) // Reduced from 8
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.white.opacity(0.03))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
+        )
+        .padding(.horizontal, 16)
     }
     
     @ViewBuilder
-    private func tabButton(_ tile: DestinyTileType, proxy: ScrollViewProxy) -> some View {
+    private func tabButton(_ tile: DestinyTileType) -> some View {
         let isSelected = selectedTab == tile
         let count = counts[tile] ?? 0
         
         Button {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+            withAnimation(.easeOut(duration: 0.3)) {
                 selectedTab = tile
-                proxy.scrollTo(tile.id, anchor: .center)
             }
-            // Haptic feedback
             HapticManager.shared.play(.light)
         } label: {
             VStack(spacing: 4) {
-                // Icon - Glowing when selected
-                Text(tile.icon)
-                    .font(.system(size: isSelected ? 26 : 22))
-                    .scaleEffect(isSelected ? 1.1 : 1.0)
-                    .shadow(color: isSelected ? tile.accentColor.opacity(0.8) : .clear, radius: 8, x: 0, y: 0)
+                // Icon
+                Image(isSelected ? tile.activeIconImage : tile.inactiveIconImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 32, height: 32)
+                    .scaleEffect(isSelected ? 1.12 : 1.0)
                 
-                Text(tile.rawValue)
-                    .font(AppTheme.Fonts.caption(size: 11).weight(isSelected ? .bold : .medium))
-                    .foregroundColor(isSelected ? .white : AppTheme.Colors.textSecondary) // White text for selected
+                // Label
+                Text(tile.rawValue.uppercased())
+                    .font(.system(size: 9, weight: isSelected ? .semibold : .medium))
+                    .tracking(0.5)
+                    .foregroundColor(isSelected ? .white : AppTheme.Colors.textSecondary)
                 
-                if count > 0 {
-                    Text("\(count)")
-                        .font(AppTheme.Fonts.caption(size: 9).weight(.bold))
-                        .foregroundColor(isSelected ? tile.accentColor : AppTheme.Colors.textTertiary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(
-                            Capsule()
-                                .fill(isSelected ? tile.accentColor.opacity(0.2) : Color.clear)
-                        )
-                }
+                // Active indicator dot
+                Circle()
+                    .fill(isSelected ? tile.accentColor : Color.clear)
+                    .frame(width: 3, height: 3)
+                    .shadow(color: isSelected ? tile.accentColor.opacity(0.6) : .clear, radius: 6, x: 0, y: 0)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 8)
+            .padding(.horizontal, 2)
+            .padding(.bottom, 6)
             .background(
                 Group {
                     if isSelected {
-                        ZStack {
-                            // 1. Glassy Jewel Base
-                            Capsule()
-                                .fill(tile.accentColor.opacity(0.15))
-                            
-                            // 2. Border Gradient
-                            Capsule()
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [
-                                            tile.accentColor.opacity(0.8),
-                                            tile.accentColor.opacity(0.2)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1
-                                )
-                            
-                            // 3. Specular Note (Top Shine)
-                            Capsule()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.white.opacity(0.2),
-                                            Color.clear
-                                        ],
-                                        startPoint: .top,
-                                        endPoint: .center
-                                    )
-                                )
-                                .padding(.horizontal, 6)
-                                .padding(.top, 2)
-                                .padding(.bottom, 15)
-                        }
-                        .matchedGeometryEffect(id: "TAB_INDICATOR", in: animation)
-                        .shadow(color: tile.accentColor.opacity(0.3), radius: 8, y: 4)
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color.white.opacity(0.07))
                     }
                 }
             )
@@ -119,7 +83,8 @@ struct MagicTabbar: View {
     }
 }
 
-/// A premium sliding toggle for switching between partners
+/// A premium cosmic toggle switch for switching between partners
+/// iOS-style sliding pill with gold accent and hint text
 struct ProfileSwitcher: View {
     @Binding var selectedIndex: Int
     let names: [String]
@@ -127,74 +92,78 @@ struct ProfileSwitcher: View {
     @Namespace private var animation
     
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(names.indices, id: \.self) { index in
-                profileButton(index: index, name: names[index])
+        VStack(spacing: 8) {
+            // Toggle Switch
+            HStack(spacing: 4) {
+                ForEach(names.indices, id: \.self) { index in
+                    toggleButton(index: index, name: names[index])
+                }
             }
+            .padding(4)
+            .background(
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.white.opacity(0.05))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+            )
+            .padding(.horizontal, 16)
         }
-        .padding(2)
-
-        .background(Color.clear) // 100% Transparent
-        // Removed overlay stroke for clean look
     }
     
     @ViewBuilder
-    private func profileButton(index: Int, name: String) -> some View {
+    private func toggleButton(index: Int, name: String) -> some View {
         let isSelected = selectedIndex == index
+        let firstName = getFirstName(from: name)
         
         Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 selectedIndex = index
             }
             HapticManager.shared.play(.medium)
         } label: {
-            Text(name)
-                .font(AppTheme.Fonts.caption(size: 13).weight(isSelected ? .bold : .medium))
-                .foregroundColor(isSelected ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
+            Text(firstName)
+                .font(.system(size: 14, weight: isSelected ? .semibold : .medium))
+                .foregroundColor(isSelected ? 
+                    AppTheme.Colors.mainBackground : 
+                    AppTheme.Colors.textSecondary
+                )
                 .lineLimit(1)
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
-            .background(
-                Group {
-                    if isSelected {
-                        ZStack {
-                            // 1. Jewel Base
-                            Capsule()
+                .background(
+                    Group {
+                        if isSelected {
+                            RoundedRectangle(cornerRadius: 20)
                                 .fill(
                                     LinearGradient(
                                         colors: [
                                             AppTheme.Colors.gold,
-                                            AppTheme.Colors.gold.opacity(0.7)
+                                            AppTheme.Colors.gold.opacity(0.85)
                                         ],
                                         startPoint: .top,
                                         endPoint: .bottom
                                     )
                                 )
-                            
-                            // 2. Glossy Shine (Top Highlight)
-                            Capsule()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.white.opacity(0.4),
-                                            Color.clear
-                                        ],
-                                        startPoint: .top,
-                                        endPoint: .center
-                                    )
+                                .shadow(
+                                    color: AppTheme.Colors.gold.opacity(0.5),
+                                    radius: 12,
+                                    x: 0,
+                                    y: 4
                                 )
-                                .padding(.horizontal, 4)
-                                .padding(.top, 2)
-                                .padding(.bottom, 12) // Fade out quickly
+                                .matchedGeometryEffect(id: "activeTab", in: animation)
                         }
-                        .matchedGeometryEffect(id: "PROFILE_INDICATOR", in: animation)
-                        .shadow(color: AppTheme.Colors.gold.opacity(0.5), radius: 8, y: 2)
                     }
-                }
-            )
+                )
         }
         .buttonStyle(.plain)
+    }
+    
+    /// Get first name from full name
+    private func getFirstName(from name: String) -> String {
+        String(name.split(separator: " ").first ?? Substring(name))
     }
 }
 

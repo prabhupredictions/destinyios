@@ -7,6 +7,59 @@
 
 import SwiftUI
 
+/// Extension to help with variant counting
+extension YogaItem {
+    /// Base name without variant numbers (e.g., "Daridra Yoga 144" -> "Daridra Yoga")
+    var baseName: String {
+        // Remove trailing numbers and parentheses
+        return name.replacingOccurrences(of: "\\s+[0-9]+\\s*$", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "\\s*\\([0-9]+\\)\\s*$", with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
+    }
+    
+    /// Extract variant number if present (e.g., "Daridra Yoga 144" -> 144)
+    var variantNumber: Int? {
+        let pattern = "(?:\\s+|\\()([0-9]+)(?:\\s*|\\))$"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []),
+              let match = regex.firstMatch(in: name, options: [], range: NSRange(location: 0, length: name.utf16.count)) else {
+            return nil
+        }
+        if let range = Range(match.range(at: 1), in: name) {
+            return Int(name[range])
+        }
+        return nil
+    }
+}
+
+/// Helper to calculate variant positions for a list of items
+struct VariantCounter {
+    static func calculatePositions(for items: [YogaItem]) -> [String: (current: Int, total: Int)] {
+        // Group by base name
+        let grouped = Dictionary(grouping: items) { $0.baseName }
+        
+        // Calculate positions
+        var positions: [String: (current: Int, total: Int)] = [:]
+        
+        for (baseName, variants) in grouped {
+            if variants.count > 1 {
+                // Sort by variant number or original index
+                let sorted = variants.enumerated().sorted { a, b in
+                    let numA = a.element.variantNumber ?? a.offset
+                    let numB = b.element.variantNumber ?? b.offset
+                    return numA < numB
+                }
+                
+                for (index, (originalIndex, item)) in sorted.enumerated() {
+                    let key = item.id
+                    positions[key] = (current: index + 1, total: sorted.count)
+                }
+            }
+        }
+        
+        return positions
+    }
+}
+
 /// Displays yogas for a specific topic tile, grouped into Active and Blocked sections
 struct TopicListView: View {
     let tile: DestinyTileType
@@ -25,6 +78,9 @@ struct TopicListView: View {
     }
     
     var body: some View {
+        let activeVariantPositions = VariantCounter.calculatePositions(for: activeItems)
+        let blockedVariantPositions = VariantCounter.calculatePositions(for: blockedItems)
+        
         ScrollView {
             LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
                 // Header
@@ -36,9 +92,10 @@ struct TopicListView: View {
                         ForEach(activeItems) { item in
                             ActiveYogaCard(
                                 item: item,
-                                tile: tile, // Passing tile
+                                tile: tile,
                                 isExpanded: expandedItems.contains(item.id),
-                                onTap: { toggleExpanded(item) }
+                                onTap: { toggleExpanded(item) },
+                                variantPosition: activeVariantPositions[item.id]
                             )
                         }
                     } header: {
@@ -57,9 +114,10 @@ struct TopicListView: View {
                         ForEach(blockedItems) { item in
                             BlockedYogaCard(
                                 item: item,
-                                tile: tile, // Passing tile
+                                tile: tile,
                                 isExpanded: expandedItems.contains(item.id),
-                                onTap: { toggleExpanded(item) }
+                                onTap: { toggleExpanded(item) },
+                                variantPosition: blockedVariantPositions[item.id]
                             )
                         }
                     } header: {
@@ -85,37 +143,38 @@ struct TopicListView: View {
     // MARK: - Header
     
     private var headerSection: some View {
-        VStack(spacing: 4) {
-            // Icon with Glow
-            Text(tile.icon)
-                .font(.system(size: 44))
-                .shadow(color: tile.accentColor.opacity(0.6), radius: 20, x: 0, y: 0)
-                .padding(.bottom, 8)
+        VStack(spacing: 8) {
+            // SVG Icon with Glow
+            Image(tile.activeIconImage)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 40, height: 40) // Reduced from 48
+                .shadow(color: tile.accentColor.opacity(0.3), radius: 12, x: 0, y: 0) // Reduced shadow
+                .padding(.bottom, 2)
             
-            // Title - Elegant & Clean, Centered
+            // Title
             Text(tile.displayTitle)
-                .font(.system(size: 24, weight: .bold, design: .serif))
+                .font(.system(size: 20, weight: .bold, design: .serif)) // Reduced from 22
                 .foregroundColor(.white)
-                .shadow(radius: 2)
-                .multilineTextAlignment(.center)
             
-            // Subtitle/Context (Optional, can be stats)
-            HStack(spacing: 12) {
-                statusText(label: "Active", count: activeItems.count, color: tile.accentColor)
+            // Counts
+            HStack(spacing: 8) {
+                Text("\(activeItems.count) Active")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(tile.accentColor)
                 
                 if !blockedItems.isEmpty {
-                    Circle()
-                        .fill(Color.white.opacity(0.3))
-                        .frame(width: 4, height: 4)
+                    Text("•")
+                        .foregroundColor(AppTheme.Colors.textTertiary)
                     
-                    statusText(label: "Inactive", count: blockedItems.count, color: AppTheme.Colors.textTertiary)
+                    Text("\(blockedItems.count) Inactive")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
-            .padding(.top, 4)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        // Removed the boxy background for an open, airy feel
+        .padding(.vertical, 12) // Reduced from 16
     }
     
     private func statusText(label: String, count: Int, color: Color) -> some View {
@@ -132,24 +191,18 @@ struct TopicListView: View {
     // MARK: - Section Header
     
     private func sectionHeader(title: String, icon: String, count: Int, color: Color) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundColor(color)
             Text(title.uppercased())
-                .font(.system(size: 13, weight: .bold, design: .rounded))
-                .tracking(1.5) // Premium spacing
+                .font(.system(size: 11, weight: .bold))
+                .tracking(1)
                 .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, 8)
         .padding(.horizontal, 4)
-        .background(
-            // subtle blur behind header so content doesn't clash when scrolling
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .opacity(0.0) // kept fully transparent as requested, or adjust if needed
-        )
     }
     
     // MARK: - Empty State
@@ -182,9 +235,25 @@ struct TopicListView: View {
 
 struct ActiveYogaCard: View {
     let item: YogaItem
-    let tile: DestinyTileType // Added tile
+    let tile: DestinyTileType
     let isExpanded: Bool
     let onTap: () -> Void
+    let variantPosition: (current: Int, total: Int)?  // NEW: Variant counter
+    
+    /// Clean base name: strip trailing reference numbers/parentheses from localized name
+    private var cleanBaseName: String {
+        item.localizedName
+            .replacingOccurrences(of: "\\s*\\(\\d+\\)\\s*$", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "\\s+\\d+\\s*$", with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
+    }
+    
+    private var displayName: String {
+        if let pos = variantPosition {
+            return "\(cleanBaseName) (\(pos.current)/\(pos.total))"
+        }
+        return cleanBaseName
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -197,11 +266,13 @@ struct ActiveYogaCard: View {
                     
                     // Name & Status
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(item.displayName)
+                        Text(displayName)
                             .font(AppTheme.Fonts.body(size: 15).weight(.semibold))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         
-                        if let category = item.category {
+                        // Only show category if it doesn't match the current tab (redundancy check)
+                        if let category = item.category, 
+                           !category.localizedCaseInsensitiveContains(tile.rawValue) {
                             Text(category)
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
@@ -229,64 +300,27 @@ struct ActiveYogaCard: View {
             }
         }
         .background(
-            ZStack {
-                // 1. Transparent Dark Base (No Blur)
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.black.opacity(0.45)) // Darker fill for contrast without blur
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                
-                // 2. Subtle Surface Shine
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(
-                        LinearGradient(
-                            stops: [
-                                .init(color: Color.white.opacity(0.08), location: 0),
-                                .init(color: Color.white.opacity(0.0), location: 0.45)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-            }
-            .overlay(
-                // 3. Glass Edge Border (Highlights top/left, fades bottom/right)
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.4),
-                                Color.white.opacity(0.1),
-                                Color.white.opacity(0.05)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1
-                    )
-            )
-            // 4. Inner Glow for Depth
-            .overlay(
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(tile.accentColor.opacity(0.3), lineWidth: 0) // Hint of color
-                    .shadow(color: tile.accentColor.opacity(0.4), radius: 8, x: 0, y: 0)
-                    .mask(RoundedRectangle(cornerRadius: 24))
-            )
-            // 5. Rich Drop Shadow
-            .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.03))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                )
         )
     }
     
     private var statusBadge: some View {
         let (text, color) = statusInfo
         return Text(text)
-            .font(AppTheme.Fonts.caption(size: 10).weight(.bold))
+            .font(.system(size: 10, weight: .semibold))
+            .tracking(0.5)
             .foregroundColor(color)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
             .background(
                 Capsule()
-                    .fill(color.opacity(0.15))
-                    .overlay(Capsule().stroke(color.opacity(0.3), lineWidth: 1))
+                    .fill(color.opacity(0.12))
+                    .overlay(Capsule().stroke(color.opacity(0.25), lineWidth: 0.5))
             )
     }
     
@@ -299,80 +333,141 @@ struct ActiveYogaCard: View {
     }
     
     private var expandedContent: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Divider()
-                .background(AppTheme.Colors.gold.opacity(0.2))
+                .background(Color.white.opacity(0.08))
+                .padding(.horizontal, -16)
+            
+            // Outcome (Professional interpretation)
+            if let outcome = item.localizedOutcome, !outcome.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 11))
+                            .foregroundColor(tile.accentColor)
+                        Text("yoga_outcome_label".localized.uppercased())
+                            .font(.system(size: 10, weight: .bold))
+                            .tracking(1)
+                            .foregroundColor(tile.accentColor)
+                    }
+                    Text(outcome)
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .lineSpacing(2)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(tile.accentColor.opacity(0.08))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(tile.accentColor.opacity(0.15), lineWidth: 1)
+                        )
+                )
+            }
             
             // Formation (Technical Details)
-            if let formation = item.formation, !formation.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
+            if let formation = item.localizedFormation, !formation.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 6) {
                         Image(systemName: "info.circle.fill")
-                            .font(.system(size: 12))
+                            .font(.system(size: 11))
                             .foregroundColor(AppTheme.Colors.textTertiary)
-                        Text("How It's Formed")
-                            .font(AppTheme.Fonts.caption(size: 11).weight(.medium))
+                        Text("yoga_formation_label".localized.uppercased())
+                            .font(.system(size: 10, weight: .bold))
+                            .tracking(1)
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                     Text(formation)
-                        .font(AppTheme.Fonts.body(size: 13))
+                        .font(.system(size: 13))
                         .foregroundColor(AppTheme.Colors.textSecondary)
+                        .lineSpacing(2)
                 }
             }
             
             // Planets & Houses
-            HStack {
+            HStack(spacing: 8) {
                 if let planets = item.uniquePlanets {
-                    detailChip(icon: "sparkle", text: planets, color: AppTheme.Colors.gold)
+                    detailChip(icon: "sparkle", text: planets, color: tile.accentColor)
                 }
                 if let houses = item.uniqueHouses {
-                    detailChip(icon: "house.fill", text: "H\(houses)", color: AppTheme.Colors.goldDim)
+                    detailChip(icon: "house.fill", text: "H\(houses)", color: AppTheme.Colors.textSecondary)
                 }
             }
             
             // Reason (for Reduced)
             if let reason = item.reason, !reason.isEmpty, item.status == "R" {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.Colors.gold)
-                        Text("Why Reduced")
-                            .font(AppTheme.Fonts.caption(size: 11).weight(.medium))
-                            .foregroundColor(AppTheme.Colors.gold)
+                            .font(.system(size: 11))
+                            .foregroundColor(AppTheme.Colors.warning)
+                        Text("yoga_why_reduced".localized.uppercased())
+                            .font(.system(size: 10, weight: .bold))
+                            .tracking(1)
+                            .foregroundColor(AppTheme.Colors.warning)
                     }
-                    Text(reason)
-                        .font(AppTheme.Fonts.body(size: 13))
-                        .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
+                    Text(DoshaDescriptions.localizeExceptionKeys(in: reason))
+                        .font(.system(size: 13))
+                        .foregroundColor(AppTheme.Colors.warning.opacity(0.9))
                 }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(AppTheme.Colors.warning.opacity(0.08))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(AppTheme.Colors.warning.opacity(0.15), lineWidth: 1)
+                        )
+                )
             }
         }
-        .padding(.horizontal)
-        .padding(.bottom)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
     }
     
     private func detailChip(icon: String, text: String, color: Color) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 10))
+                .font(.system(size: 9, weight: .medium))
             Text(text)
-                .font(AppTheme.Fonts.caption(size: 11).weight(.medium))
+                .font(.system(size: 11, weight: .medium))
         }
         .foregroundColor(color)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(color.opacity(0.1))
-        .clipShape(Capsule())
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(
+            Capsule()
+                .fill(Color.white.opacity(0.05))
+                .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 0.5))
+        )
     }
 }
-
 // MARK: - Blocked Yoga Card (Matte Gray)
 
 struct BlockedYogaCard: View {
     let item: YogaItem
-    let tile: DestinyTileType // Added tile
+    let tile: DestinyTileType
     let isExpanded: Bool
     let onTap: () -> Void
+    let variantPosition: (current: Int, total: Int)?  // NEW: Variant counter
+    
+    /// Clean base name: strip trailing reference numbers/parentheses from localized name
+    private var cleanBaseName: String {
+        item.localizedName
+            .replacingOccurrences(of: "\\s*\\(\\d+\\)\\s*$", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "\\s+\\d+\\s*$", with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
+    }
+    
+    private var displayName: String {
+        if let pos = variantPosition {
+            return "\(cleanBaseName) (\(pos.current)/\(pos.total))"
+        }
+        return cleanBaseName
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -391,11 +486,13 @@ struct BlockedYogaCard: View {
                     
                     // Name
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(item.displayName)
+                        Text(displayName)
                             .font(AppTheme.Fonts.body(size: 15).weight(.medium))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                         
-                        if let category = item.category {
+                        // Only show category if it doesn't match the current tab (redundancy check)
+                        if let category = item.category,
+                           !category.localizedCaseInsensitiveContains(tile.rawValue) {
                             Text(category)
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
@@ -406,13 +503,15 @@ struct BlockedYogaCard: View {
                     
                     // Inactive Badge
                     Text("Inactive")
-                        .font(AppTheme.Fonts.caption(size: 10).weight(.bold))
+                        .font(.system(size: 10, weight: .semibold))
+                        .tracking(0.5)
                         .foregroundColor(AppTheme.Colors.textTertiary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
                         .background(
                             Capsule()
-                                .fill(AppTheme.Colors.inputBackground)
+                                .fill(Color.white.opacity(0.05))
+                                .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 0.5))
                         )
                     
                     // Chevron
@@ -425,57 +524,129 @@ struct BlockedYogaCard: View {
             }
             .buttonStyle(.plain)
             
-            // Expanded - Show Reason
+            // Expanded - Show Reason + Outcome + Formation
             if isExpanded {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
                     Divider()
-                        .background(AppTheme.Colors.textTertiary.opacity(0.2))
+                        .background(Color.white.opacity(0.08))
+                        .padding(.horizontal, -16)
                     
-                    // REASON - Hero Text
+                    // Outcome (What it means) - Show FIRST for inactive too
+                    if let outcome = item.localizedOutcome, !outcome.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                                Text("yoga_outcome_label".localized.uppercased())
+                                    .font(.system(size: 10, weight: .bold))
+                                    .tracking(1)
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                            }
+                            Text(outcome)
+                                .font(.system(size: 14, weight: .regular))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                .lineSpacing(2)
+                        }
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.05))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                                )
+                        )
+                    }
+                    
+                    // REASON - Why Inactive (Hero section)
                     if let reason = item.reason, !reason.isEmpty {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 6) {
                             HStack(spacing: 6) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(AppTheme.Colors.error.opacity(0.8))
-                                Text("Why Inactive")
-                                    .font(AppTheme.Fonts.caption(size: 11).weight(.medium))
-                                    .foregroundColor(AppTheme.Colors.error.opacity(0.8))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(AppTheme.Colors.error)
+                                Text("yoga_why_inactive".localized.uppercased())
+                                    .font(.system(size: 10, weight: .bold))
+                                    .tracking(1)
+                                    .foregroundColor(AppTheme.Colors.error)
                             }
-                            Text(reason)
-                                .font(AppTheme.Fonts.body(size: 14).weight(.medium))
+                            Text(DoshaDescriptions.localizeExceptionKeys(in: reason))
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(AppTheme.Colors.error.opacity(0.9))
+                                .lineSpacing(2)
+                        }
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(AppTheme.Colors.error.opacity(0.08))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(AppTheme.Colors.error.opacity(0.15), lineWidth: 1)
+                                )
+                        )
+                    }
+                    
+                    // Formation (Technical Details)
+                    if let formation = item.localizedFormation, !formation.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "info.circle.fill")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
+                                Text("yoga_formation_label".localized.uppercased())
+                                    .font(.system(size: 10, weight: .bold))
+                                    .tracking(1)
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
+                            }
+                            Text(formation)
+                                .font(.system(size: 13))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .lineSpacing(2)
                         }
                     }
                     
-                    // Formation
-                    if let formation = item.formation, !formation.isEmpty {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Formation")
-                                .font(AppTheme.Fonts.caption(size: 11))
-                                .foregroundColor(AppTheme.Colors.textTertiary)
-                            Text(formation)
-                                .font(AppTheme.Fonts.body(size: 12))
-                                .foregroundColor(AppTheme.Colors.textTertiary)
+                    // Planets & Houses
+                    HStack(spacing: 8) {
+                        if let planets = item.uniquePlanets {
+                            detailChip(icon: "sparkle", text: planets, color: AppTheme.Colors.textSecondary)
+                        }
+                        if let houses = item.uniqueHouses {
+                            detailChip(icon: "house.fill", text: "H\(houses)", color: AppTheme.Colors.textTertiary)
                         }
                     }
                 }
-                .padding(.horizontal)
-                .padding(.bottom)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
         }
         .background(
-            ZStack {
-                // Transparent Dark Base (No Blur)
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.black.opacity(0.5)) // Darker fill for blocked items
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-            }
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
-            )
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.02))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
         )
-        .opacity(0.9)
+        .opacity(0.85)
+    }
+    
+    private func detailChip(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .medium))
+            Text(text)
+                .font(.system(size: 11, weight: .medium))
+        }
+        .foregroundColor(color)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(
+            Capsule()
+                .fill(Color.white.opacity(0.05))
+                .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 0.5))
+        )
     }
 }
