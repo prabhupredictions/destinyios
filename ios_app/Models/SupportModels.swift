@@ -67,6 +67,32 @@ struct BirthDetails: Codable, Sendable {
     var place: String = "Unknown"
 }
 
+// MARK: - Dosha Summary (V2.1)
+struct DoshaSummary: Codable, Sendable {
+    let totalDoshas: Int?
+    let cancelledCount: Int?
+    let activeCount: Int?
+    let details: [String: DoshaDetail]?
+    
+    enum CodingKeys: String, CodingKey {
+        case totalDoshas = "total_doshas"
+        case cancelledCount = "cancelled_count"
+        case activeCount = "active_count"
+        case details
+    }
+}
+
+struct DoshaDetail: Codable, Sendable {
+    let present: Bool?
+    let cancelled: Bool?
+    let reasonShort: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case present, cancelled
+        case reasonShort = "reason_short"
+    }
+}
+
 // MARK: - Compatibility Response
 struct CompatibilityResponse: Codable, Sendable {
     let sessionId: String?
@@ -79,6 +105,13 @@ struct CompatibilityResponse: Codable, Sendable {
     let comparisonGroupId: String?
     let partnerIndex: Int?
     
+    // V2.1 — Hard-no gate + adjusted scores
+    let hardNoFlags: HardNoFlags?
+    let adjustedTotalScore: Double?
+    let adjustedCategory: String?
+    let doshaSummary: DoshaSummary?
+    let comparisonIndicators: ComparisonIndicators?
+    
     enum CodingKeys: String, CodingKey {
         case sessionId = "session_id"
         case predictionId = "prediction_id"
@@ -86,6 +119,11 @@ struct CompatibilityResponse: Codable, Sendable {
         case analysisData = "analysis_data"
         case comparisonGroupId = "comparison_group_id"
         case partnerIndex = "partner_index"
+        case hardNoFlags = "hard_no_flags"
+        case adjustedTotalScore = "adjusted_total_score"
+        case adjustedCategory = "adjusted_category"
+        case doshaSummary = "dosha_summary"
+        case comparisonIndicators = "comparison_indicators"
         case status
     }
 }
@@ -163,6 +201,50 @@ struct AnyCodable: Codable, Sendable {
         } else {
             try container.encodeNil()
         }
+    }
+}
+
+// MARK: - Hard-No Gate Flags (V2.1)
+struct HardNoFlags: Codable, Sendable {
+    let isRecommended: Bool
+    let rejectionReasons: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case isRecommended = "is_recommended"
+        case rejectionReasons = "rejection_reasons"
+    }
+}
+
+// MARK: - Comparison Indicators (LLM-generated)
+struct ComparisonIndicators: Codable, Sendable {
+    let yogaImpact: YogaImpact?
+    let dashaOutlook: DashaOutlook?
+    let overallVerdict: OverallVerdict?
+    
+    struct YogaImpact: Codable, Sendable {
+        let score: Double?
+        let summary: String?
+    }
+    
+    struct DashaOutlook: Codable, Sendable {
+        let label: String?
+        let summary: String?
+    }
+    
+    struct OverallVerdict: Codable, Sendable {
+        let category: String?
+        let oneLiner: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case category
+            case oneLiner = "one_liner"
+        }
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case yogaImpact = "yoga_impact"
+        case dashaOutlook = "dasha_outlook"
+        case overallVerdict = "overall_verdict"
     }
 }
 

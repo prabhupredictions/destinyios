@@ -92,22 +92,11 @@ struct FullReportSheet: View {
     
     private func presentNativeShareSheet() {
         Task { @MainActor in
-            // Generate PDF
-            let pdfView = PremiumReportPDFView(
-                result: result,
-                boyName: boyName,
-                girlName: girlName,
-                boyDob: boyDob,
-                girlDob: girlDob,
-                sections: sections,
-                ratingText: ratingText,
-                starCount: starCount,
-                formattedDate: formattedDate
-            )
-            
-            let fileName = "Destiny_AI_\(boyName)_\(girlName)_Compatibility"
-            let pdfURL = ReportShareService.shared.generateMultiPagePDF(
-                from: pdfView,
+            // Generate section-aware PDF
+            let pdfSections = buildPDFSections()
+            let fileName = ReportShareService.shared.reportFileName(boyName: boyName, girlName: girlName)
+            let pdfURL = ReportShareService.shared.generateSectionAwarePDF(
+                sections: pdfSections,
                 width: 390,
                 fileName: fileName
             )
@@ -148,7 +137,7 @@ struct FullReportSheet: View {
     
     private var actionBar: some View {
         Button {
-            generateAndSharePDF()
+            generateAndSaveToFiles()
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: "arrow.down.doc.fill")
@@ -543,35 +532,146 @@ struct FullReportSheet: View {
     
     // MARK: - PDF & Share Actions
     
-    private func generateAndSharePDF() {
+    private func generateAndSaveToFiles() {
         isGeneratingPDF = true
         
         Task { @MainActor in
-            // Create a report view for PDF rendering
-            let pdfView = PremiumReportPDFView(
-                result: result,
-                boyName: boyName,
-                girlName: girlName,
-                boyDob: boyDob,
-                girlDob: girlDob,
-                sections: sections,
-                ratingText: ratingText,
-                starCount: starCount,
-                formattedDate: formattedDate
-            )
+            let pdfSections = buildPDFSections()
+            let fileName = ReportShareService.shared.reportFileName(boyName: boyName, girlName: girlName)
             
-            let fileName = "Destiny_AI_\(boyName)_\(girlName)_Compatibility"
-            
-            if let pdfURL = ReportShareService.shared.generateMultiPagePDF(
-                from: pdfView,
+            if let pdfURL = ReportShareService.shared.generateSectionAwarePDF(
+                sections: pdfSections,
                 width: 390,
                 fileName: fileName
             ) {
-                ReportShareService.shared.sharePDF(url: pdfURL)
+                ReportShareService.shared.presentSaveToFiles(fileURL: pdfURL)
             }
             
             isGeneratingPDF = false
         }
+    }
+    
+    // MARK: - PDF Section Builder
+    
+    private func buildPDFSections() -> [AnyView] {
+        let gold = Color(red: 0.83, green: 0.69, blue: 0.22)
+        var pdfSections: [AnyView] = []
+        
+        // 1. Header
+        let header = VStack(spacing: 12) {
+            Text("DESTINY AI ASTROLOGY")
+                .font(.system(size: 14, weight: .medium, design: .serif))
+                .foregroundColor(gold)
+                .tracking(4)
+            
+            Text("COMPATIBILITY REPORT")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(gold.opacity(0.6))
+                .tracking(3)
+            
+            Text("\(boyName) & \(girlName)")
+                .font(.system(size: 22, weight: .bold, design: .serif))
+                .foregroundColor(.white)
+            
+            if let bDob = boyDob, let gDob = girlDob {
+                Text("Born: \(bDob) · \(gDob)")
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.5))
+            }
+            
+            Text("\(result.totalScore)/\(result.maxScore) • \(Int(result.percentage * 100))% • \(ratingText)")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(gold)
+            
+            HStack(spacing: 3) {
+                ForEach(0..<5, id: \.self) { index in
+                    Image(systemName: index < starCount ? "star.fill" : "star")
+                        .font(.system(size: 12))
+                        .foregroundColor(gold)
+                }
+            }
+            
+            Rectangle()
+                .fill(gold.opacity(0.3))
+                .frame(height: 1)
+                .padding(.horizontal, 40)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        
+        pdfSections.append(AnyView(header))
+        
+        // 2. Each LLM section card
+        for section in sections {
+            let card = VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    if let symbolName = sfSymbol(for: section.emoji) {
+                        Image(systemName: symbolName)
+                            .font(.system(size: 12))
+                            .foregroundColor(gold)
+                    } else {
+                        Text(section.emoji)
+                            .font(.system(size: 14))
+                    }
+                    
+                    Text(section.title)
+                        .font(.system(size: 14, weight: .bold, design: .serif))
+                        .foregroundColor(gold)
+                }
+                
+                Rectangle()
+                    .fill(gold.opacity(0.2))
+                    .frame(height: 1)
+                
+                MarkdownTextView(
+                    content: replaceGenericLabels(in: section.content),
+                    textColor: .white.opacity(0.9),
+                    fontSize: 12
+                )
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.white.opacity(0.05))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(gold.opacity(0.15), lineWidth: 0.5)
+                    )
+            )
+            
+            pdfSections.append(AnyView(card))
+        }
+        
+        // 3. Disclaimer
+        let disclaimer = VStack(spacing: 8) {
+            Rectangle()
+                .fill(gold.opacity(0.2))
+                .frame(height: 1)
+                .padding(.horizontal, 40)
+            
+            Text("ⓘ AI-Generated Analysis")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(gold.opacity(0.5))
+            
+            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only.")
+                .font(.system(size: 8))
+                .foregroundColor(.white.opacity(0.3))
+                .multilineTextAlignment(.center)
+            
+            Text("© 2026 Destiny AI Astrology · destinyaiastrology.com")
+                .font(.system(size: 8))
+                .foregroundColor(.white.opacity(0.25))
+            
+            Text("Generated: \(formattedDate)")
+                .font(.system(size: 7))
+                .foregroundColor(.white.opacity(0.2))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        
+        pdfSections.append(AnyView(disclaimer))
+        
+        return pdfSections
     }
     
     private func shareScoreCard() {

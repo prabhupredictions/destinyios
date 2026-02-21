@@ -565,7 +565,13 @@ final class CompatibilityHistoryService {
                             summary: metadata.llmAnalysis ?? "",
                             recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
                             analysisData: metadata.analysisData,
-                            sessionId: metadata.sessionId
+                            sessionId: metadata.sessionId,
+                            isRecommended: metadata.hardNoFlags?.isRecommended ?? true,
+                            adjustedScore: metadata.adjustedTotalScore != nil ? Int(metadata.adjustedTotalScore!) : nil,
+                            adjustedCategory: metadata.adjustedCategory,
+                            doshaSummary: metadata.doshaSummary,
+                            rejectionReasons: metadata.hardNoFlags?.rejectionReasons ?? [],
+                            comparisonIndicators: metadata.comparisonIndicators
                         )
                     }
                     
@@ -764,7 +770,13 @@ final class CompatibilityHistoryService {
                         summary: metadata.llmAnalysis ?? "",
                         recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
                         analysisData: metadata.analysisData,
-                        sessionId: metadata.sessionId
+                        sessionId: metadata.sessionId,
+                        isRecommended: metadata.hardNoFlags?.isRecommended ?? true,
+                        adjustedScore: metadata.adjustedTotalScore != nil ? Int(metadata.adjustedTotalScore!) : nil,
+                        adjustedCategory: metadata.adjustedCategory,
+                        doshaSummary: metadata.doshaSummary,
+                        rejectionReasons: metadata.hardNoFlags?.rejectionReasons ?? [],
+                        comparisonIndicators: metadata.comparisonIndicators
                     )
                 }
                 

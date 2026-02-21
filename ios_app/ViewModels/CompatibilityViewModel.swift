@@ -948,7 +948,13 @@ class CompatibilityViewModel {
             summary: response.llmAnalysis ?? "\(totalScore)/36",
             recommendation: rec,
             analysisData: response.analysisData,
-            sessionId: response.sessionId
+            sessionId: response.sessionId,
+            isRecommended: response.hardNoFlags?.isRecommended ?? true,
+            adjustedScore: response.adjustedTotalScore != nil ? Int(response.adjustedTotalScore!) : nil,
+            adjustedCategory: response.adjustedCategory,
+            doshaSummary: response.doshaSummary,
+            rejectionReasons: response.hardNoFlags?.rejectionReasons ?? [],
+            comparisonIndicators: response.comparisonIndicators
         )
     }
     
@@ -1012,7 +1018,15 @@ class CompatibilityViewModel {
             maxScore: maxScore,
             kutas: kutas,
             summary: summary,
-            recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful"
+            recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
+            analysisData: nil,
+            sessionId: "mock-session-id",
+            isRecommended: totalScore >= 18,
+            adjustedScore: totalScore,
+            adjustedCategory: totalScore >= 18 ? "average" : "poor",
+            doshaSummary: nil,
+            rejectionReasons: [],
+            comparisonIndicators: nil
         )
     }
 }
@@ -1028,9 +1042,22 @@ struct CompatibilityResult: Identifiable, Codable {
     let analysisData: AnalysisData?
     let sessionId: String?
     
+    // V2.1 — Hard-no gate data
+    let isRecommended: Bool
+    let adjustedScore: Int?
+    let adjustedCategory: String?
+    let doshaSummary: DoshaSummary?
+    let rejectionReasons: [String]
+    let comparisonIndicators: ComparisonIndicators?
+    
     var percentage: Double {
         guard maxScore > 0 else { return 0 }
         return Double(totalScore) / Double(maxScore)
+    }
+    
+    var adjustedPercentage: Double {
+        guard maxScore > 0, let adj = adjustedScore else { return percentage }
+        return Double(adj) / Double(maxScore)
     }
     
     init(
@@ -1040,7 +1067,13 @@ struct CompatibilityResult: Identifiable, Codable {
         summary: String,
         recommendation: String,
         analysisData: AnalysisData? = nil,
-        sessionId: String? = nil
+        sessionId: String? = nil,
+        isRecommended: Bool = true,
+        adjustedScore: Int? = nil,
+        adjustedCategory: String? = nil,
+        doshaSummary: DoshaSummary? = nil,
+        rejectionReasons: [String] = [],
+        comparisonIndicators: ComparisonIndicators? = nil
     ) {
         self.totalScore = totalScore
         self.maxScore = maxScore
@@ -1049,6 +1082,18 @@ struct CompatibilityResult: Identifiable, Codable {
         self.recommendation = recommendation
         self.analysisData = analysisData
         self.sessionId = sessionId
+        // Client-side safety net: override to false if score < 18 or doshas are active
+        let effectiveScore = adjustedScore ?? totalScore
+        if effectiveScore < 18 || !rejectionReasons.isEmpty {
+            self.isRecommended = false
+        } else {
+            self.isRecommended = isRecommended
+        }
+        self.adjustedScore = adjustedScore
+        self.adjustedCategory = adjustedCategory
+        self.doshaSummary = doshaSummary
+        self.rejectionReasons = rejectionReasons
+        self.comparisonIndicators = comparisonIndicators
     }
 }
 

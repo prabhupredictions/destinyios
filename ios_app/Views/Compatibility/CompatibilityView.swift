@@ -83,7 +83,7 @@ struct CompatibilityView: View {
                     },
                     onBack: {
                         // If we came from comparison overview, go back there
-                        if !viewModel.comparisonResults.isEmpty && viewModel.partners.count > 1 {
+                        if viewModel.comparisonResults.count > 1 {
                             viewModel.showResult = false
                             viewModel.showComparisonOverview = true
                         } else {
