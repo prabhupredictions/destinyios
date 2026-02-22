@@ -12,11 +12,11 @@ struct ShareCardView: View {
     
     private var ratingText: String {
         let pct = percentage * 100
-        if pct >= 90 { return "Excellent" }
-        else if pct >= 75 { return "Very Good" }
-        else if pct >= 60 { return "Good" }
-        else if pct >= 50 { return "Average" }
-        else { return "Needs Attention" }
+        if pct >= 90 { return "excellent".localized }
+        else if pct >= 75 { return "very_good".localized }
+        else if pct >= 60 { return "good".localized }
+        else if pct >= 50 { return "average".localized }
+        else { return "not_recommended".localized }
     }
     
     private var starCount: Int {

@@ -467,14 +467,57 @@ struct CompatibilityView: View {
                     }
                     .padding(.horizontal, 4)
 
-                    // Error message
+                    // Error message with retry
                     if let error = viewModel.errorMessage, 
                        !error.hasPrefix("FREE_LIMIT") && !error.hasPrefix("FEATURE_") {
-                        Text(error)
-                            .font(AppTheme.Fonts.body(size: 13))
-                            .foregroundColor(AppTheme.Colors.error)
-                            .padding(.top, 4)
-                            .padding(.horizontal, 8)
+                        VStack(spacing: 10) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(AppTheme.Colors.error)
+                                    .font(.system(size: 14))
+                                
+                                Text(error)
+                                    .font(AppTheme.Fonts.body(size: 13))
+                                    .foregroundColor(AppTheme.Colors.error)
+                                    .lineLimit(3)
+                                
+                                Spacer()
+                            }
+                            
+                            if viewModel.hasFailedPartners {
+                                Button(action: {
+                                    HapticManager.shared.play(.medium)
+                                    Task {
+                                        await viewModel.retryFailedPartners()
+                                    }
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "arrow.clockwise")
+                                            .font(.system(size: 13, weight: .semibold))
+                                        Text("retry_failed".localized)
+                                            .font(AppTheme.Fonts.body(size: 13).weight(.semibold))
+                                    }
+                                    .foregroundColor(AppTheme.Colors.gold)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .strokeBorder(AppTheme.Colors.gold, lineWidth: 1.5)
+                                    )
+                                }
+                            }
+                        }
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(AppTheme.Colors.error.opacity(0.1))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(AppTheme.Colors.error.opacity(0.3), lineWidth: 1)
+                                )
+                        )
+                        .padding(.top, 4)
+                        .padding(.horizontal, 8)
                     }
                     
                     // Bottom padding for scrolling

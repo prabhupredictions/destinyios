@@ -1968,3 +1968,55 @@
 "yoga_name_yukthi_samanwithavagmi_yoga_155" = "Yukthi Samanwithavagmi (155)";
 "yoga_outcome_yukthi_samanwithavagmi_yoga_155" = "Articulate expression and intellectual communication; compelling writer or orator.";
 "yoga_formation_yukthi_samanwithavagmi_yoga_155" = "Mercury strong with 2nd lord in benefic combinations (var. 2).";
+
+// MARK: - Compatibility Result Labels
+"marriage_recommended" = "Marriage Recommended";
+"not_recommended" = "Not Recommended";
+"doshas" = "Doshas";
+"cancelled" = "Cancelled";
+"active" = "Active";
+"recommended" = "Recommended";
+"not_rec" = "Not Rec";
+"best_match" = "Best";
+"score" = "Score";
+"excellent" = "Excellent";
+"very_good" = "Very Good";
+"good" = "Good";
+"average" = "Average";
+"below_average" = "Below Average";
+"not_recommended_category" = "Not Recommended";
+"ashtakoot_score" = "Ashtakoot Score";
+"mangal_dosha" = "Mangal Dosha";
+"nadi_dosha" = "Nadi Dosha";
+"bhakoot_dosha" = "Bhakoot Dosha";
+"today_cosmic_vibe" = "Today's Cosmic Vibe";
+"current_dasha" = "Current Dasha";
+"how_is_my_day" = "How is my day today?";
+"whats_in_my_mind" = "What's in my mind?";
+"syncing_cosmic_data" = "Syncing your cosmic data...";
+
+// MARK: - Backend Value Translations (Severity, Category, etc.)
+"severity_mild" = "Mild";
+"severity_moderate" = "Moderate";
+"severity_high" = "High";
+"severity_severe" = "Severe";
+"severity_none" = "None";
+"category_excellent" = "Excellent";
+"category_very_good" = "Very Good";
+"category_good" = "Good";
+"category_average" = "Average";
+"category_below_average" = "Below Average";
+"category_not_recommended" = "Not Recommended";
+"category_difficult" = "Difficult";
+"category_challenging" = "Challenging";
+"present" = "Present";
+"absent" = "Absent";
+"compatible" = "Compatible";
+"needs_remedies" = "Needs Remedies";
+"critical" = "Critical";
+"analysis_failed_for" = "Analysis failed for";
+"tap_retry" = "Tap Retry to try again.";
+"retry_failed" = "Retry Failed";
+"analysis_still_failing" = "Analysis still failing for";
+"check_connection" = "Please check your connection.";
+"no_results" = "No results received. Please try again.";

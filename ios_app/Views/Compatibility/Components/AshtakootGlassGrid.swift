@@ -8,11 +8,29 @@ struct AshtakootData {
     let maxScore: Double
     let description: String
     
+    // V2.1 — Cancellation data
+    var doshaPresent: Bool = false
+    var doshaCancelled: Bool = false
+    var cancellationReason: String? = nil
+    var adjustedScore: Double? = nil
+    
+    /// Effective score after cancellation (adjusted if available, else raw)
+    var effectiveScore: Double {
+        adjustedScore ?? score
+    }
+    
     var statusColor: Color {
-        // Status Color Logic (v3)
-        // Red: 0 pts or very low
-        // Green: Max or near max
-        // Yellow: Average
+        // V2.1 — Cancellation-aware coloring
+        // Cancelled dosha: green (restored to max)
+        // Active dosha: red (0 points, not cancelled)
+        // No dosha: ratio-based
+        
+        if doshaPresent && doshaCancelled {
+            return AppTheme.Colors.success  // Green — dosha was cancelled
+        }
+        if doshaPresent && !doshaCancelled {
+            return .red  // Active dosha
+        }
         
         let ratio = score / maxScore
         

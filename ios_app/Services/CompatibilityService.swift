@@ -1,5 +1,23 @@
 import Foundation
 
+// MARK: - Compatibility Errors
+enum CompatibilityError: LocalizedError {
+    case serverError(String)
+    case noResponse
+    case decodingFailed(Error)
+    
+    var errorDescription: String? {
+        switch self {
+        case .serverError(let message):
+            return "Server error: \(message)"
+        case .noResponse:
+            return "No response received from server. Please try again."
+        case .decodingFailed(let error):
+            return "Failed to process response: \(error.localizedDescription)"
+        }
+    }
+}
+
 final class CompatibilityService: CompatibilityServiceProtocol {
     
     private let networkClient: NetworkClientProtocol
@@ -99,6 +117,17 @@ final class CompatibilityService: CompatibilityServiceProtocol {
                             onStep(stepInfo.step, stepInfo.display ?? stepInfo.step)
                         }
                     }
+                } else if currentEvent == "error" {
+                    // Server sent an error event — extract message and throw
+                    var serverMessage = "Unknown server error"
+                    if let data = dataString.data(using: .utf8),
+                       let errorInfo = try? JSONDecoder().decode(SSEErrorEvent.self, from: data) {
+                        serverMessage = errorInfo.message
+                    } else {
+                        serverMessage = dataString
+                    }
+                    print("[CompatibilityService] SERVER ERROR: \(serverMessage)")
+                    throw CompatibilityError.serverError(serverMessage)
                 } else if currentEvent == "final_json" {
                     finalJsonData = dataString.data(using: .utf8)
                     print("[CompatibilityService] Got final_json: \(dataString.prefix(200))...")
@@ -109,7 +138,7 @@ final class CompatibilityService: CompatibilityServiceProtocol {
         
         guard let data = finalJsonData else {
             print("[CompatibilityService] ERROR: No final_json found in stream")
-            throw URLError(.cannotParseResponse)
+            throw CompatibilityError.noResponse
         }
         
         // Decode the final_json payload
@@ -125,9 +154,11 @@ final class CompatibilityService: CompatibilityServiceProtocol {
                 print("[CompatibilityService] boy.chartData.d1 count: \(boyChart.d1.count)")
             }
             return result
+        } catch let error as CompatibilityError {
+            throw error  // Re-throw our custom errors
         } catch {
             print("[CompatibilityService] Decode error: \(error)")
-            throw error
+            throw CompatibilityError.decodingFailed(error)
         }
     }
     
@@ -146,4 +177,9 @@ final class CompatibilityService: CompatibilityServiceProtocol {
 struct StepEvent: Decodable {
     let step: String
     let display: String?
+}
+
+// MARK: - SSE Error Event
+struct SSEErrorEvent: Decodable {
+    let message: String
 }

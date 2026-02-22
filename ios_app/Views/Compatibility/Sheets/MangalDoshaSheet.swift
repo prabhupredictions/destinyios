@@ -92,7 +92,8 @@ struct MangalDoshaSheet: View {
                             girlName: girlName,
                             boyData: boyData,
                             girlData: girlData,
-                            reason: mangalCompatibility?["cancellation_reason"]?.value as? String ?? "Mutual cancellation"
+                            reason: mangalCompatibility?["cancellation_reason"]?.value as? String ?? "Dosha cancelled",
+                            mangalCompatibility: mangalCompatibility
                         )
                     case .effective:
                         EffectiveAnalysisView(
@@ -100,7 +101,8 @@ struct MangalDoshaSheet: View {
                             girlName: girlName,
                             boyData: boyData,
                             girlData: girlData,
-                            remedies: (boyData?.remedies ?? []) + (girlData?.remedies ?? [])
+                            remedies: (boyData?.remedies ?? []) + (girlData?.remedies ?? []),
+                            mangalCompatibility: mangalCompatibility
                         )
                     }
                 }
@@ -283,6 +285,7 @@ struct CancelledAnalysisView: View {
     let boyData: MangalDoshaData?
     let girlData: MangalDoshaData?
     let reason: String
+    var mangalCompatibility: [String: AnyCodable]? = nil
     
     var body: some View {
         VStack(spacing: 24) {
@@ -304,7 +307,14 @@ struct CancelledAnalysisView: View {
                         .font(AppTheme.Fonts.display(size: 22))
                         .foregroundColor(.blue)
                     
-                    Text("Any potential negative effects are neutralized.")
+                    Text({
+                        // Use first cancellation_factor from backend if available
+                        if let factors = mangalCompatibility?["cancellation_factors"]?.value as? [String],
+                           let first = factors.first {
+                            return first
+                        }
+                        return "Any potential negative effects are neutralized."
+                    }())
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -322,11 +332,8 @@ struct CancelledAnalysisView: View {
                 }
                 
                 Group {
-                    if reason.contains("Mutual") || reason.contains("mutual") {
-                         Text("mangal_mutual_cancellation".localized)
-                            .font(AppTheme.Fonts.body(size: 15))
-                            .foregroundColor(AppTheme.Colors.textPrimary)
-                    } else if (boyData?.exceptionDescriptions.count ?? 0) > 0 || (girlData?.exceptionDescriptions.count ?? 0) > 0 {
+                    if (boyData?.exceptionDescriptions.count ?? 0) > 0 || (girlData?.exceptionDescriptions.count ?? 0) > 0 {
+                        // Show individual exception details when available
                         VStack(alignment: .leading, spacing: 8) {
                             if let boy = boyData, !boy.exceptionDescriptions.isEmpty {
                                 Text(String(format: "mangal_exceptions_title".localized, boyName))
@@ -360,7 +367,7 @@ struct CancelledAnalysisView: View {
                             }
                         }
                     } else {
-                        // Parse fallback reason - replace exception keys with localized text
+                        // Fallback: use cancellation reason from backend directly
                         Text(localizeExceptionKeys(in: reason
                             .replacingOccurrences(of: "Girl", with: girlName)
                             .replacingOccurrences(of: "Boy", with: boyName)
@@ -427,6 +434,7 @@ struct EffectiveAnalysisView: View {
     let boyData: MangalDoshaData?
     let girlData: MangalDoshaData?
     let remedies: [String]
+    var mangalCompatibility: [String: AnyCodable]? = nil
     
     var body: some View {
         VStack(spacing: 24) {
@@ -448,7 +456,15 @@ struct EffectiveAnalysisView: View {
                         .font(AppTheme.Fonts.display(size: 22))
                         .foregroundColor(.orange)
                     
-                    Text("Mangal Dosha is effective and may cause friction.")
+                    Text({
+                        // Use cancellation_reason from backend or first residual_effect
+                        if let reason = mangalCompatibility?["cancellation_reason"]?.value as? String, !reason.isEmpty {
+                            return reason
+                                .replacingOccurrences(of: "Girl", with: girlName)
+                                .replacingOccurrences(of: "Boy", with: boyName)
+                        }
+                        return "Mangal Dosha is effective and may cause friction."
+                    }())
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -546,12 +562,25 @@ struct StatusPersonCard: View {
                 if hasDosha {
                     // Active Dosha Badge
                     VStack(spacing: 6) {
-                        Text("Manglik")
+                        Text({
+                            // Show severity from data if available
+                            let sev = data.severity.lowercased()
+                            if sev == "mild" { return "Mild Manglik" }
+                            else if sev == "moderate" { return "Moderate Manglik" }
+                            else if sev == "high" { return "High Manglik" }
+                            else if sev == "severe" { return "Severe Manglik" }
+                            return "Manglik"
+                        }())
                             .font(AppTheme.Fonts.caption(size: 12).bold())
                             .foregroundColor(.white)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(Color.orange)
+                            .background({
+                                let sev = data.severity.lowercased()
+                                if sev == "severe" || sev == "high" { return Color.red }
+                                else if sev == "moderate" { return Color.orange }
+                                return Color.orange.opacity(0.8)
+                            }())
                             .clipShape(Capsule())
                         
                         // Mars Position

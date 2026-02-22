@@ -215,7 +215,7 @@ struct ComparisonOverviewView: View {
     /// Horizontal scrollable card per partner: name, badge, adj score, [View Detail →]
     private func compactPartnerCard(result: ComparisonResult, isBest: Bool, index: Int) -> some View {
         let statusColor: Color = result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error
-        let badgeText = isBest ? "⭐ Best" : (result.isRecommended ? "✅ Recommended" : "❌ Not Rec")
+        let badgeText = isBest ? "⭐ " + "best_match".localized : (result.isRecommended ? "✅ " + "recommended".localized : "❌ " + "not_rec".localized)
         
         return DivineGlassCard(cornerRadius: 14) {
             VStack(spacing: 6) {
@@ -502,6 +502,12 @@ struct ComparisonOverviewView: View {
             
             ForEach(sortedResults, id: \.id) { result in
                 let hasMangalRejection = result.rejectionReasons.contains { $0.contains("Mangal") }
+                let mangalCompat = result.result.analysisData?.joint?.mangalCompatibility
+                
+                // Use structured data: check cancellation.occurs or compatibility_category
+                let cancellationOccurs = (mangalCompat?["cancellation"]?.value as? [String: Any])?["occurs"] as? Bool
+                let compatCategory = mangalCompat?["compatibility_category"]?.value as? String
+                let hasMangalData = mangalCompat != nil
                 
                 HStack(spacing: 1) {
                     if hasMangalRejection {
@@ -510,14 +516,35 @@ struct ComparisonOverviewView: View {
                             .foregroundColor(AppTheme.Colors.error)
                         Text("🚫")
                             .font(.system(size: 8))
-                    } else {
-                        // Check if mangal was cancelled or not present
-                        let hasMangalMention = result.result.summary.lowercased().contains("mangal")
-                        Text(hasMangalMention ? "Cancelled" : "None")
+                    } else if cancellationOccurs == true {
+                        // Structured data: cancellation confirmed
+                        Text("Cancelled")
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.success)
                         Text("✅")
                             .font(.system(size: 8))
+                    } else if let cat = compatCategory {
+                        // Structured data: use compatibility category
+                        Text(cat.prefix(1).uppercased() + cat.dropFirst().lowercased())
+                            .font(AppTheme.Fonts.caption(size: 11))
+                            .foregroundColor(
+                                cat.lowercased() == "excellent" ? AppTheme.Colors.success :
+                                cat.lowercased() == "good" ? AppTheme.Colors.success :
+                                cat.lowercased() == "moderate" ? .orange : .yellow
+                            )
+                        Text(cat.lowercased() == "excellent" || cat.lowercased() == "good" ? "✅" : "⚠️")
+                            .font(.system(size: 8))
+                    } else if !hasMangalData {
+                        // No mangal data at all — neither present
+                        Text("None")
+                            .font(AppTheme.Fonts.caption(size: 11))
+                            .foregroundColor(AppTheme.Colors.success)
+                        Text("✅")
+                            .font(.system(size: 8))
+                    } else {
+                        Text("View")
+                            .font(AppTheme.Fonts.caption(size: 11))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -639,7 +666,7 @@ struct ComparisonOverviewView: View {
             let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: ", ")
             var shareText = "✨ Compatibility Analysis – \(userName)\n\n"
             for r in sortedResults {
-                let status = r.isRecommended ? "✅ Recommended" : "❌ Not Recommended"
+                let status = r.isRecommended ? "✅ " + "recommended".localized : "❌ " + "not_recommended".localized
                 shareText += "• \(r.partner.name): \(r.adjustedScore)/\(r.maxScore) – \(status)\n"
             }
             shareText += "\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
@@ -731,7 +758,7 @@ struct ComparisonOverviewView: View {
                             .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     }
                     
-                    Text(r.isRecommended ? "✅ Recommended" : "❌ Not Recommended")
+                    Text(r.isRecommended ? "✅ " + "recommended".localized : "❌ " + "not_recommended".localized)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(r.isRecommended ? .green : .red)
                     

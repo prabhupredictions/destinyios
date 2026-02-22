@@ -34,6 +34,9 @@ class HomeViewModel {
     // NEW: Premium Transit & Dasha UI
     var dashaInsight: DashaInsight?
     var transitInfluences: [TransitInfluence] = []
+    
+    /// Timestamp of last successful full data load (for 24-hour cache guard)
+    private var lastFullLoadDate: Date?
 
     
     struct TransitDisplayData: Identifiable {
@@ -126,21 +129,39 @@ class HomeViewModel {
         }
         
         // Create a task group to fetch all data concurrently
+        // Check if full chart/dasha data needs refreshing (24-hour guard)
+        let needsFullRefresh: Bool
+        if let lastLoad = lastFullLoadDate,
+           Date().timeIntervalSince(lastLoad) < 86400, // 24 hours
+           fullAstroData != nil,
+           dashaResponse != nil {
+            needsFullRefresh = false
+            print("[HomeViewModel] Full chart/dasha data still fresh (loaded \(Int(Date().timeIntervalSince(lastLoad)))s ago) — skipping")
+        } else {
+            needsFullRefresh = true
+        }
+        
         await withTaskGroup(of: Void.self) { group in
-            // 1. Fetch Todays Prediction (Existing)
+            // 1. Fetch Todays Prediction (uses TodaysPredictionCache internally)
             group.addTask {
                 await self.fetchTodaysPrediction(birthData: birthData)
             }
             
-            // 2. Fetch Full Chart Data (for Yogas, Doshas)
-            group.addTask {
-                await self.fetchFullChart(birthData: birthData)
+            if needsFullRefresh {
+                // 2. Fetch Full Chart Data (for Yogas, Doshas)
+                group.addTask {
+                    await self.fetchFullChart(birthData: birthData)
+                }
+                
+                // 3. Fetch Dasha Periods (for Widget)
+                group.addTask {
+                    await self.fetchDashaPeriods(birthData: birthData)
+                }
             }
-            
-            // 3. Fetch Dasha Periods (for Widget)
-            group.addTask {
-                await self.fetchDashaPeriods(birthData: birthData)
-            }
+        }
+        
+        if needsFullRefresh {
+            lastFullLoadDate = Date()
         }
         
         await MainActor.run {

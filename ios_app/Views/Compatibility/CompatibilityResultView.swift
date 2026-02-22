@@ -114,7 +114,7 @@ struct CompatibilityResultView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 8) { // Reduced spacing to compact layout
                         
-                        // 1. Hero: Planetary Orbit (v5)
+                        // 1. Hero: Planetary Orbit (v5) — with adjusted score & cancellation data
                         OrbitAshtakootView(
                             kutas: result.kutas,
                             centerView: {
@@ -125,14 +125,19 @@ struct CompatibilityResultView: View {
                                         boyName: boyName,
                                         girlName: girlName,
                                         size: 160,
-                                        showAvatars: false
+                                        showAvatars: false,
+                                        adjustedScore: result.adjustedScore != nil ? Double(result.adjustedScore!) : nil
                                     )
                                 )
                             },
                             boyName: boyName,
-                            girlName: girlName
+                            girlName: girlName,
+                            doshaSummary: result.doshaSummary
                         )
                         .padding(.bottom, 0) // Removed extra padding to close gap
+                        
+                        // 1.5. Recommendation + Dosha Summary Banner
+                        recommendationBanner
                         
                         // 2. Partners (Removed - Embedded in Orbit)
                         
@@ -241,12 +246,110 @@ struct CompatibilityResultView: View {
         .sheet(isPresented: $showAskDestiny) {
             AskDestinySheet(result: result, boyName: boyName, girlName: girlName)
         }
-        .sheet(isPresented: $showHistorySheet) {
+         .sheet(isPresented: $showHistorySheet) {
             CompatibilityHistorySheet { selectedItem in
                 showHistorySheet = false
                 onLoadHistory?(selectedItem)
             }
         }
+    }
+    
+    // MARK: - Recommendation + Dosha Summary Banner
+    @ViewBuilder
+    private var recommendationBanner: some View {
+        let hasDosha = (result.doshaSummary?.totalDoshas ?? 0) > 0
+        let cancelledCount = result.doshaSummary?.cancelledCount ?? 0
+        let activeCount = result.doshaSummary?.activeCount ?? 0
+        
+        if hasDosha || !result.isRecommended || !result.rejectionReasons.isEmpty {
+            VStack(spacing: 8) {
+                // Recommendation status
+                HStack(spacing: 8) {
+                    Image(systemName: result.isRecommended ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
+                    
+                    Text(result.isRecommended ? "marriage_recommended".localized : "not_recommended".localized)
+                        .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
+                        .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
+                    
+                    Spacer()
+                }
+                
+                // Dosha summary counts
+                if hasDosha {
+                    HStack(spacing: 12) {
+                        doshaPill(count: result.doshaSummary?.totalDoshas ?? 0, label: "doshas".localized, color: AppTheme.Colors.warning)
+                        if cancelledCount > 0 {
+                            doshaPill(count: cancelledCount, label: "cancelled".localized, color: AppTheme.Colors.success)
+                        }
+                        if activeCount > 0 {
+                            doshaPill(count: activeCount, label: "active".localized, color: AppTheme.Colors.error)
+                        }
+                        Spacer()
+                    }
+                }
+                
+                // Rejection reasons (if not recommended)
+                if !result.rejectionReasons.isEmpty {
+                    ForEach(result.rejectionReasons, id: \.self) { reason in
+                        let displayReason = reason
+                            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
+                            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
+                            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
+                            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
+                        HStack(alignment: .top, spacing: 6) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundColor(AppTheme.Colors.error.opacity(0.8))
+                                .padding(.top, 2)
+                            Text(displayReason)
+                                .font(AppTheme.Fonts.caption(size: 12))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.bottom, 4)
+                    }
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(AppTheme.Colors.cardBackground)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        result.isRecommended
+                            ? AppTheme.Colors.success.opacity(0.2)
+                            : AppTheme.Colors.error.opacity(0.3),
+                        lineWidth: 1
+                    )
+            )
+            .padding(.horizontal, 0)
+            .padding(.top, 8)
+        }
+    }
+    
+    private func doshaPill(count: Int, label: String, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Text("\(count)")
+                .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
+                .foregroundColor(color)
+            Text(label)
+                .font(AppTheme.Fonts.caption(size: 11))
+                .foregroundColor(AppTheme.Colors.textTertiary)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule()
+                .fill(color.opacity(0.1))
+        )
+        .overlay(
+            Capsule()
+                .stroke(color.opacity(0.25), lineWidth: 0.5)
+        )
     }
     
     // Helper needed for Sheet Data Extraction
