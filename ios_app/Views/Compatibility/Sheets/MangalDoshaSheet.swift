@@ -583,8 +583,13 @@ struct StatusPersonCard: View {
                             }())
                             .clipShape(Capsule())
                         
-                        // Mars Position
-                        if let pos = data.marsPosition,
+                        // Mars Position / Dosha Source
+                        if let doshaSource = data.activeDoshaSourcesDisplay {
+                            Text(doshaSource)
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                                .multilineTextAlignment(.center)
+                        } else if let pos = data.marsPosition,
                            let houseValue = pos["house"]?.value,
                            let houseNum = extractHouseNumber(from: houseValue),
                            houseNum > 0 {

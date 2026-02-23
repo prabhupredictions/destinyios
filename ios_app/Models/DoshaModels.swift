@@ -20,6 +20,7 @@ struct MangalDoshaData: Codable {
     let intensityFactorCount: Int?
     let remedies: [String]?
     let explanation: String?
+    let doshaFrom: [String: AnyCodable]?
     
     enum CodingKeys: String, CodingKey {
         case hasMangalDosha = "has_mangal_dosha"
@@ -33,6 +34,7 @@ struct MangalDoshaData: Codable {
         case intensityFactorCount = "intensity_factor_count"
         case remedies
         case explanation
+        case doshaFrom = "dosha_from"
     }
     
     init(from decoder: Decoder) throws {
@@ -56,6 +58,7 @@ struct MangalDoshaData: Codable {
         intensityFactorCount = try container.decodeIfPresent(Int.self, forKey: .intensityFactorCount)
         remedies = try container.decodeIfPresent([String].self, forKey: .remedies)
         explanation = try container.decodeIfPresent(String.self, forKey: .explanation)
+        doshaFrom = try container.decodeIfPresent([String: AnyCodable].self, forKey: .doshaFrom)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -70,6 +73,7 @@ struct MangalDoshaData: Codable {
         try container.encodeIfPresent(intensityFactorCount, forKey: .intensityFactorCount)
         try container.encodeIfPresent(remedies, forKey: .remedies)
         try container.encodeIfPresent(explanation, forKey: .explanation)
+        try container.encodeIfPresent(doshaFrom, forKey: .doshaFrom)
     }
     
     /// Dosha score for display (0.0 to 1.0)
@@ -119,6 +123,57 @@ struct MangalDoshaData: Codable {
     var intensityDescriptions: [String] {
         return activeIntensityFactors.map { DoshaDescriptions.intensity($0) }
     }
+    
+    /// Display active dosha sources from the dosha_from dictionary
+    var activeDoshaSourcesDisplay: String? {
+        guard let doshaDict = doshaFrom else { return nil }
+        
+        var sources: [String] = []
+        
+        // Helper to safely extract Int
+        func getInt(_ key: String) -> Int? {
+            if let val = doshaDict[key]?.value {
+                return extractHouseNumber(from: val)
+            }
+            return nil
+        }
+        
+        // Check Lagna Chart
+        if let lagna = doshaDict["lagna"]?.value as? Bool, lagna,
+           let house = getInt("mars_house_from_lagna") {
+            sources.append("House \(house) (from Lagna)")
+        }
+        
+        // Check Moon Chart
+        if let moon = doshaDict["moon"]?.value as? Bool, moon,
+           let house = getInt("mars_house_from_moon") {
+            sources.append("House \(house) (from Moon)")
+        }
+        
+        // Check Venus Chart
+        if let venus = doshaDict["venus"]?.value as? Bool, venus,
+           let house = getInt("mars_house_from_venus") {
+            sources.append("House \(house) (from Venus)")
+        }
+        
+        if sources.isEmpty {
+            return nil
+        }
+        
+        return sources.joined(separator: " • ")
+    }
+}
+
+// Helper to extract house number from AnyCodable value outside View scope
+private func extractHouseNumber(from value: Any) -> Int? {
+    if let intVal = value as? Int {
+        return intVal
+    } else if let doubleVal = value as? Double {
+        return Int(doubleVal)
+    } else if let nsNum = value as? NSNumber {
+        return nsNum.intValue
+    }
+    return nil
 }
 
 struct MarsPosition: Codable {

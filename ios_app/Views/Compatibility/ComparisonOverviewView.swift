@@ -244,9 +244,15 @@ struct ComparisonOverviewView: View {
                             .minimumScaleFactor(0.7)
                     }
                 } else {
-                    Text("\(result.overallScore)/36 actual")
-                        .font(AppTheme.Fonts.caption(size: 12))
-                        .foregroundColor(AppTheme.Colors.gold)
+                    VStack(spacing: 0) {
+                        Text("\(result.overallScore)/36 actual")
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.gold)
+                        Text("No Adjustment")
+                            .font(AppTheme.Fonts.caption(size: 9))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
+                            .minimumScaleFactor(0.7)
+                    }
                 }
                 
                 // Badge
