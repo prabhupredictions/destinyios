@@ -109,6 +109,17 @@ struct MangalDoshaData: Codable {
         return intensityFactors?.compactMap { $0.value ? $0.key : nil } ?? []
     }
     
+    /// Whether dosha exists but is effectively cancelled by exceptions
+    var isCancelled: Bool {
+        return hasMangalDosha && (severity.lowercased() == "none" || severity.lowercased() == "cancelled" || doshaScore == 0.0)
+    }
+    
+    /// Effective severity label that accounts for cancellation
+    var effectiveSeverityLabel: String {
+        if isCancelled { return "Cancelled" }
+        return severity.capitalized
+    }
+    
     /// Display severity label
     var severityLabel: String {
         return DoshaDescriptions.severity(severity)

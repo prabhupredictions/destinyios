@@ -562,26 +562,36 @@ struct StatusPersonCard: View {
                 if hasDosha {
                     // Active Dosha Badge
                     VStack(spacing: 6) {
-                        Text({
-                            // Show severity from data if available
-                            let sev = data.severity.lowercased()
-                            if sev == "mild" { return "Mild Manglik" }
-                            else if sev == "moderate" { return "Moderate Manglik" }
-                            else if sev == "high" { return "High Manglik" }
-                            else if sev == "severe" { return "Severe Manglik" }
-                            return "Manglik"
-                        }())
-                            .font(AppTheme.Fonts.caption(size: 12).bold())
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background({
+                        if data.isCancelled {
+                            // Cancelled by exceptions
+                            Text("Cancelled")
+                                .font(AppTheme.Fonts.caption(size: 12).bold())
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(AppTheme.Colors.success)
+                                .clipShape(Capsule())
+                        } else {
+                            Text({
                                 let sev = data.severity.lowercased()
-                                if sev == "severe" || sev == "high" { return Color.red }
-                                else if sev == "moderate" { return Color.orange }
-                                return Color.orange.opacity(0.8)
+                                if sev == "mild" { return "Mild Manglik" }
+                                else if sev == "moderate" { return "Moderate Manglik" }
+                                else if sev == "high" { return "High Manglik" }
+                                else if sev == "severe" { return "Severe Manglik" }
+                                return "Manglik"
                             }())
-                            .clipShape(Capsule())
+                                .font(AppTheme.Fonts.caption(size: 12).bold())
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background({
+                                    let sev = data.severity.lowercased()
+                                    if sev == "severe" || sev == "high" { return Color.red }
+                                    else if sev == "moderate" { return Color.orange }
+                                    return Color.orange.opacity(0.8)
+                                }())
+                                .clipShape(Capsule())
+                        }
                         
                         // Mars Position / Dosha Source
                         if let doshaSource = data.activeDoshaSourcesDisplay {
@@ -598,6 +608,16 @@ struct StatusPersonCard: View {
                             Text("Mars in House \(houseNum)")
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
+                        }
+                        
+                        // Show exception count when cancelled
+                        if data.isCancelled {
+                            let excCount = data.activeExceptions.count
+                            if excCount > 0 {
+                                Text("\(excCount) exception\(excCount == 1 ? "" : "s") apply")
+                                    .font(AppTheme.Fonts.caption(size: 10))
+                                    .foregroundColor(AppTheme.Colors.success.opacity(0.8))
+                            }
                         }
                     }
                 } else {
@@ -638,7 +658,9 @@ struct StatusPersonCard: View {
                 RoundedRectangle(cornerRadius: 24)
                     .stroke(
                         hasDosha
-                            ? LinearGradient(colors: [Color.orange.opacity(0.6), Color.orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            ? (data?.isCancelled == true
+                                ? LinearGradient(colors: [AppTheme.Colors.success.opacity(0.6), AppTheme.Colors.success.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                : LinearGradient(colors: [Color.orange.opacity(0.6), Color.orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
                             : LinearGradient(colors: [Color.white.opacity(0.3), Color.white.opacity(0.08)], startPoint: .topLeading, endPoint: .bottomTrailing),
                         lineWidth: hasDosha ? 1.5 : 1
                     )
