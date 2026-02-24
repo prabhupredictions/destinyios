@@ -477,6 +477,88 @@ struct EffectiveAnalysisView: View {
                 StatusPersonCard(name: girlName, data: girlData)
             }
             
+            // 2b. Show exception details for any individually cancelled dosha
+            if (boyData?.isCancelled == true && !boyData!.exceptionDescriptions.isEmpty) ||
+               (girlData?.isCancelled == true && !girlData!.exceptionDescriptions.isEmpty) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Image(systemName: "shield.checkered")
+                            .foregroundColor(AppTheme.Colors.success)
+                        Text("Cancellation Exceptions")
+                            .font(AppTheme.Fonts.title(size: 16))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                        Spacer()
+                    }
+                    
+                    if let boy = boyData, boy.isCancelled, !boy.exceptionDescriptions.isEmpty {
+                        Text(String(format: "mangal_exceptions_title".localized, boyName))
+                            .font(AppTheme.Fonts.caption(size: 13).bold())
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                        ForEach(boy.exceptionDescriptions, id: \.self) { desc in
+                            HStack(alignment: .top, spacing: 8) {
+                                Text("•").foregroundColor(AppTheme.Colors.success)
+                                Text(desc)
+                                    .font(AppTheme.Fonts.body(size: 13))
+                                    .foregroundColor(AppTheme.Colors.textPrimary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                    
+                    if let girl = girlData, girl.isCancelled, !girl.exceptionDescriptions.isEmpty {
+                        if boyData?.isCancelled == true && !(boyData?.exceptionDescriptions.isEmpty ?? true) {
+                            Divider().padding(.vertical, 4)
+                        }
+                        Text(String(format: "mangal_exceptions_title".localized, girlName))
+                            .font(AppTheme.Fonts.caption(size: 13).bold())
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                        ForEach(girl.exceptionDescriptions, id: \.self) { desc in
+                            HStack(alignment: .top, spacing: 8) {
+                                Text("•").foregroundColor(AppTheme.Colors.success)
+                                Text(desc)
+                                    .font(AppTheme.Fonts.body(size: 13))
+                                    .foregroundColor(AppTheme.Colors.textPrimary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+                .padding(20)
+                .background(
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(Color.black.opacity(0.45))
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(
+                                LinearGradient(
+                                    stops: [
+                                        .init(color: Color.white.opacity(0.08), location: 0),
+                                        .init(color: Color.white.opacity(0.0), location: 0.45)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        AppTheme.Colors.success.opacity(0.4),
+                                        AppTheme.Colors.success.opacity(0.1),
+                                        Color.white.opacity(0.05)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+                    .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
+                )
+            }
+            
             // 3. Remedies (Top Priority Here)
             if !remedies.isEmpty {
                 VStack(alignment: .leading, spacing: 16) {
