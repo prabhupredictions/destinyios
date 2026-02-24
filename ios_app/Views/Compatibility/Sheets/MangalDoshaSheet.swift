@@ -332,48 +332,26 @@ struct CancelledAnalysisView: View {
                 }
                 
                 Group {
-                    if (boyData?.exceptionDescriptions.count ?? 0) > 0 || (girlData?.exceptionDescriptions.count ?? 0) > 0 {
-                        // Show individual exception details when available
+                    let boyHasExc = (boyData?.activeExceptions.count ?? 0) > 0
+                    let girlHasExc = (girlData?.activeExceptions.count ?? 0) > 0
+                    
+                    if boyHasExc || girlHasExc {
                         VStack(alignment: .leading, spacing: 8) {
-                            if let boy = boyData, !boy.exceptionDescriptions.isEmpty {
-                                Text(String(format: "mangal_exceptions_title".localized, boyName))
-                                    .font(AppTheme.Fonts.caption(size: 13).bold())
-                                    .foregroundColor(AppTheme.Colors.textSecondary)
-                                ForEach(boy.exceptionDescriptions, id: \.self) { desc in
-                                    HStack(alignment: .top) {
-                                        Text("•").foregroundColor(AppTheme.Colors.gold)
-                                        Text(desc)
-                                            .font(AppTheme.Fonts.body(size: 14))
-                                            .foregroundColor(AppTheme.Colors.textPrimary)
-                                    }
-                                }
-                            }
+                            Text("Both partners' Mangal Dosha is at the same level, causing mutual neutralisation.")
+                                .font(AppTheme.Fonts.body(size: 13))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
                             
-                            if let girl = girlData, !girl.exceptionDescriptions.isEmpty {
-                                if (boyData?.exceptionDescriptions.count ?? 0) > 0 {
-                                    Divider().padding(.vertical, 4)
-                                }
-                                Text(String(format: "mangal_exceptions_title".localized, girlName))
-                                    .font(AppTheme.Fonts.caption(size: 13).bold())
-                                    .foregroundColor(AppTheme.Colors.textSecondary)
-                                ForEach(girl.exceptionDescriptions, id: \.self) { desc in
-                                    HStack(alignment: .top) {
-                                        Text("•").foregroundColor(AppTheme.Colors.gold)
-                                        Text(desc)
-                                            .font(AppTheme.Fonts.body(size: 14))
-                                            .foregroundColor(AppTheme.Colors.textPrimary)
-                                    }
-                                }
+                            if let boy = boyData, boyHasExc {
+                                ExceptionPersonBlock(name: boyName, data: boy)
+                            }
+                            if let girl = girlData, girlHasExc {
+                                if boyHasExc { Divider().padding(.vertical, 2) }
+                                ExceptionPersonBlock(name: girlName, data: girl)
                             }
                         }
                     } else {
-                        // Fallback: use cancellation reason from backend directly
-                        Text(localizeExceptionKeys(in: reason
-                            .replacingOccurrences(of: "Girl", with: girlName)
-                            .replacingOccurrences(of: "Boy", with: boyName)
-                            .replacingOccurrences(of: "girl", with: girlName)
-                            .replacingOccurrences(of: "boy", with: boyName)
-                        ))
+                        Text(localizeExceptionKeys(in: reason))
                             .font(AppTheme.Fonts.body(size: 15))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     }
@@ -477,50 +455,41 @@ struct EffectiveAnalysisView: View {
                 StatusPersonCard(name: girlName, data: girlData)
             }
             
-            // 2b. Show exception details for any individually cancelled dosha
-            if (boyData?.isCancelled == true && !boyData!.exceptionDescriptions.isEmpty) ||
-               (girlData?.isCancelled == true && !girlData!.exceptionDescriptions.isEmpty) {
-                VStack(alignment: .leading, spacing: 12) {
+            // 2b. Mitigating Exceptions — show for ALL persons who have exceptions
+            let boyHasExc = (boyData?.activeExceptions.count ?? 0) > 0
+            let girlHasExc = (girlData?.activeExceptions.count ?? 0) > 0
+            
+            if boyHasExc || girlHasExc {
+                VStack(alignment: .leading, spacing: 16) {
                     HStack {
                         Image(systemName: "shield.checkered")
-                            .foregroundColor(AppTheme.Colors.success)
-                        Text("Cancellation Exceptions")
+                            .foregroundColor(AppTheme.Colors.gold)
+                        Text("Mitigating Exceptions")
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         Spacer()
                     }
                     
-                    if let boy = boyData, boy.isCancelled, !boy.exceptionDescriptions.isEmpty {
-                        Text(String(format: "mangal_exceptions_title".localized, boyName))
-                            .font(AppTheme.Fonts.caption(size: 13).bold())
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                        ForEach(boy.exceptionDescriptions, id: \.self) { desc in
-                            HStack(alignment: .top, spacing: 8) {
-                                Text("•").foregroundColor(AppTheme.Colors.success)
-                                Text(desc)
-                                    .font(AppTheme.Fonts.body(size: 13))
-                                    .foregroundColor(AppTheme.Colors.textPrimary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                        }
+                    Text("Vedic astrology recognises planetary conditions that reduce or neutralise Mangal Dosha. Below are the exceptions found in each chart.")
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    // Boy exceptions
+                    if let boy = boyData, boyHasExc {
+                        ExceptionPersonBlock(
+                            name: boyName,
+                            data: boy
+                        )
                     }
                     
-                    if let girl = girlData, girl.isCancelled, !girl.exceptionDescriptions.isEmpty {
-                        if boyData?.isCancelled == true && !(boyData?.exceptionDescriptions.isEmpty ?? true) {
-                            Divider().padding(.vertical, 4)
-                        }
-                        Text(String(format: "mangal_exceptions_title".localized, girlName))
-                            .font(AppTheme.Fonts.caption(size: 13).bold())
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                        ForEach(girl.exceptionDescriptions, id: \.self) { desc in
-                            HStack(alignment: .top, spacing: 8) {
-                                Text("•").foregroundColor(AppTheme.Colors.success)
-                                Text(desc)
-                                    .font(AppTheme.Fonts.body(size: 13))
-                                    .foregroundColor(AppTheme.Colors.textPrimary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                        }
+                    // Girl exceptions
+                    if let girl = girlData, girlHasExc {
+                        if boyHasExc { Divider().padding(.vertical, 2) }
+                        ExceptionPersonBlock(
+                            name: girlName,
+                            data: girl
+                        )
                     }
                 }
                 .padding(20)
@@ -545,8 +514,8 @@ struct EffectiveAnalysisView: View {
                             .stroke(
                                 LinearGradient(
                                     colors: [
-                                        AppTheme.Colors.success.opacity(0.4),
-                                        AppTheme.Colors.success.opacity(0.1),
+                                        AppTheme.Colors.gold.opacity(0.3),
+                                        Color.white.opacity(0.1),
                                         Color.white.opacity(0.05)
                                     ],
                                     startPoint: .topLeading,
@@ -627,14 +596,86 @@ struct EffectiveAnalysisView: View {
 
 // MARK: - Shared Components
 
+struct ExceptionPersonBlock: View {
+    let name: String
+    let data: MangalDoshaData
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Impact header with color-coded icon
+            HStack(spacing: 6) {
+                Image(systemName: data.isCancelled ? "checkmark.circle.fill" : "arrow.down.circle.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(data.isCancelled ? AppTheme.Colors.success : .yellow)
+                
+                if let impact = data.exceptionImpactSummary {
+                    Text("\(name): \(impact)")
+                        .font(AppTheme.Fonts.caption(size: 13).bold())
+                        .foregroundColor(data.isCancelled ? AppTheme.Colors.success : .yellow)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text("\(name)")
+                        .font(AppTheme.Fonts.caption(size: 13).bold())
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+            }
+            
+            // Exception list
+            ForEach(data.exceptionDescriptions, id: \.self) { desc in
+                HStack(alignment: .top, spacing: 8) {
+                    Text("•")
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
+                    Text(desc)
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.leading, 4)
+            }
+            
+            // Intensity factors (if any)
+            if !data.activeIntensityFactors.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(.orange.opacity(0.8))
+                    Text("\(data.activeIntensityFactors.count) intensifying factor\(data.activeIntensityFactors.count == 1 ? "" : "s")")
+                        .font(AppTheme.Fonts.caption(size: 12))
+                        .foregroundColor(.orange.opacity(0.8))
+                }
+                .padding(.top, 4)
+                
+                ForEach(data.intensityDescriptions, id: \.self) { desc in
+                    HStack(alignment: .top, spacing: 8) {
+                        Text("•")
+                            .foregroundColor(.orange.opacity(0.6))
+                        Text(desc)
+                            .font(AppTheme.Fonts.body(size: 13))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.leading, 4)
+                }
+            }
+        }
+    }
+}
+
 struct StatusPersonCard: View {
     let name: String
     let data: MangalDoshaData?
     
     var hasDosha: Bool { data?.hasMangalDosha ?? false }
     
+    private var borderColor: Color {
+        guard let data = data, hasDosha else { return .white }
+        if data.isCancelled { return AppTheme.Colors.success }
+        if data.isReduced { return .yellow }
+        return .orange
+    }
+    
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
             Text(name)
                 .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(AppTheme.Colors.textPrimary)
@@ -642,10 +683,9 @@ struct StatusPersonCard: View {
             
             if let data = data {
                 if hasDosha {
-                    // Active Dosha Badge
                     VStack(spacing: 6) {
+                        // Severity Badge
                         if data.isCancelled {
-                            // Cancelled by exceptions
                             Text("Cancelled")
                                 .font(AppTheme.Fonts.caption(size: 12).bold())
                                 .foregroundColor(.white)
@@ -675,7 +715,7 @@ struct StatusPersonCard: View {
                                 .clipShape(Capsule())
                         }
                         
-                        // Mars Position / Dosha Source
+                        // Dosha Source
                         if let doshaSource = data.activeDoshaSourcesDisplay {
                             Text(doshaSource)
                                 .font(AppTheme.Fonts.caption(size: 11))
@@ -692,18 +732,16 @@ struct StatusPersonCard: View {
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                         
-                        // Show exception count when cancelled
-                        if data.isCancelled {
-                            let excCount = data.activeExceptions.count
-                            if excCount > 0 {
-                                Text("\(excCount) exception\(excCount == 1 ? "" : "s") apply")
-                                    .font(AppTheme.Fonts.caption(size: 10))
-                                    .foregroundColor(AppTheme.Colors.success.opacity(0.8))
-                            }
+                        // Exception impact summary (for both reduced AND cancelled)
+                        if let impact = data.exceptionImpactSummary {
+                            Text(impact)
+                                .font(AppTheme.Fonts.caption(size: 10))
+                                .foregroundColor(data.isCancelled ? AppTheme.Colors.success.opacity(0.9) : .yellow.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
                 } else {
-                    // Safe Badge
                     Text("Safe")
                         .font(AppTheme.Fonts.caption(size: 12).bold())
                         .foregroundColor(AppTheme.Colors.success)
@@ -739,11 +777,11 @@ struct StatusPersonCard: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 24)
                     .stroke(
-                        hasDosha
-                            ? (data?.isCancelled == true
-                                ? LinearGradient(colors: [AppTheme.Colors.success.opacity(0.6), AppTheme.Colors.success.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                                : LinearGradient(colors: [Color.orange.opacity(0.6), Color.orange.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                            : LinearGradient(colors: [Color.white.opacity(0.3), Color.white.opacity(0.08)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                        LinearGradient(
+                            colors: [borderColor.opacity(0.6), borderColor.opacity(0.2)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
                         lineWidth: hasDosha ? 1.5 : 1
                     )
             )

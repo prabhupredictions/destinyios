@@ -21,6 +21,7 @@ struct MangalDoshaData: Codable {
     let remedies: [String]?
     let explanation: String?
     let doshaFrom: [String: AnyCodable]?
+    let doshaBalanceDetails: [String: AnyCodable]?
     
     enum CodingKeys: String, CodingKey {
         case hasMangalDosha = "has_mangal_dosha"
@@ -35,6 +36,7 @@ struct MangalDoshaData: Codable {
         case remedies
         case explanation
         case doshaFrom = "dosha_from"
+        case doshaBalanceDetails = "dosha_balance_details"
     }
     
     init(from decoder: Decoder) throws {
@@ -59,6 +61,7 @@ struct MangalDoshaData: Codable {
         remedies = try container.decodeIfPresent([String].self, forKey: .remedies)
         explanation = try container.decodeIfPresent(String.self, forKey: .explanation)
         doshaFrom = try container.decodeIfPresent([String: AnyCodable].self, forKey: .doshaFrom)
+        doshaBalanceDetails = try container.decodeIfPresent([String: AnyCodable].self, forKey: .doshaBalanceDetails)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -74,6 +77,7 @@ struct MangalDoshaData: Codable {
         try container.encodeIfPresent(remedies, forKey: .remedies)
         try container.encodeIfPresent(explanation, forKey: .explanation)
         try container.encodeIfPresent(doshaFrom, forKey: .doshaFrom)
+        try container.encodeIfPresent(doshaBalanceDetails, forKey: .doshaBalanceDetails)
     }
     
     /// Dosha score for display (0.0 to 1.0)
@@ -114,10 +118,48 @@ struct MangalDoshaData: Codable {
         return hasMangalDosha && (severity.lowercased() == "none" || severity.lowercased() == "cancelled" || doshaScore == 0.0)
     }
     
-    /// Effective severity label that accounts for cancellation
+    /// Whether exceptions reduced the severity (but didn't fully cancel)
+    var isReduced: Bool {
+        guard hasMangalDosha, !isCancelled else { return false }
+        return activeExceptions.count > 0
+    }
+    
+    /// Base score before exceptions/intensity (from dosha_balance_details)
+    var baseScore: Double? {
+        guard let details = doshaBalanceDetails,
+              let val = details["base_score"]?.value else { return nil }
+        if let d = val as? Double { return d }
+        if let n = val as? NSNumber { return n.doubleValue }
+        return nil
+    }
+    
+    /// Severity label for the base score (what severity would be without exceptions)
+    var baseSeverityLabel: String {
+        guard let base = baseScore else { return "Unknown" }
+        if base >= 0.75 { return "Severe" }
+        else if base >= 0.50 { return "High" }
+        else if base >= 0.25 { return "Moderate" }
+        else if base > 0 { return "Mild" }
+        return "None"
+    }
+    
+    /// Effective severity label that accounts for cancellation and reduction
     var effectiveSeverityLabel: String {
         if isCancelled { return "Cancelled" }
         return severity.capitalized
+    }
+    
+    /// User-facing summary of exception impact
+    var exceptionImpactSummary: String? {
+        let excCount = activeExceptions.count
+        guard excCount > 0 else { return nil }
+        if isCancelled {
+            return "\(excCount) exception\(excCount == 1 ? "" : "s") fully cancelled this dosha"
+        } else if let base = baseScore, base > doshaScore {
+            return "\(excCount) exception\(excCount == 1 ? "" : "s") reduced severity from \(baseSeverityLabel) to \(severity.capitalized)"
+        } else {
+            return "\(excCount) exception\(excCount == 1 ? "" : "s") reduced this dosha"
+        }
     }
     
     /// Display severity label
