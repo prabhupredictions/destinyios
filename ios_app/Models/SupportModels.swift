@@ -167,14 +167,16 @@ struct AnyCodable: Codable, Sendable {
     
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let intValue = try? container.decode(Int.self) {
+        // Bool MUST come before Int: Swift's JSONDecoder can decode JSON true/false as Int (1/0)
+        // causing booleans to be silently stored as integers if Int is tried first.
+        if let boolValue = try? container.decode(Bool.self) {
+            value = boolValue
+        } else if let intValue = try? container.decode(Int.self) {
             value = intValue
         } else if let doubleValue = try? container.decode(Double.self) {
             value = doubleValue
         } else if let stringValue = try? container.decode(String.self) {
             value = stringValue
-        } else if let boolValue = try? container.decode(Bool.self) {
-            value = boolValue
         } else if let arrayValue = try? container.decode([AnyCodable].self) {
             value = arrayValue.map { $0.value }
         } else if let dictValue = try? container.decode([String: AnyCodable].self) {
@@ -186,14 +188,16 @@ struct AnyCodable: Codable, Sendable {
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        if let intValue = value as? Int {
+        // Bool MUST come before Int: Swift's Bool is a subtype of Int in some contexts,
+        // so Int check would match Bool values and encode true/false as 1/0 integers.
+        if let boolValue = value as? Bool {
+            try container.encode(boolValue)
+        } else if let intValue = value as? Int {
             try container.encode(intValue)
         } else if let doubleValue = value as? Double {
             try container.encode(doubleValue)
         } else if let stringValue = value as? String {
             try container.encode(stringValue)
-        } else if let boolValue = value as? Bool {
-            try container.encode(boolValue)
         } else if let arrayValue = value as? [Any] {
             try container.encode(arrayValue.map { AnyCodable($0) })
         } else if let dictValue = value as? [String: Any] {

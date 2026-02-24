@@ -589,6 +589,8 @@ struct StatusPersonCard: View {
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                                 .multilineTextAlignment(.center)
+                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
                         } else if let pos = data.marsPosition,
                            let houseValue = pos["house"]?.value,
                            let houseNum = extractHouseNumber(from: houseValue),
@@ -616,7 +618,6 @@ struct StatusPersonCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .frame(height: 110)
         .background(
             ZStack {
                 RoundedRectangle(cornerRadius: 24)

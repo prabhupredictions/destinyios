@@ -126,41 +126,78 @@ struct MangalDoshaData: Codable {
     
     /// Display active dosha sources from the dosha_from dictionary
     var activeDoshaSourcesDisplay: String? {
-        guard let doshaDict = doshaFrom else { return nil }
+        guard let doshaDict = doshaFrom else {
+            print("[DoshaSource] ❌ doshaFrom is nil — no chart source available")
+            return nil
+        }
+        
+        print("[DoshaSource] ✅ doshaFrom has \(doshaDict.count) keys: \(Array(doshaDict.keys).sorted())")
+        
+        // Debug: print each key's value and type
+        for (key, anyCodable) in doshaDict {
+            print("[DoshaSource]   key='\(key)' value=\(String(describing: anyCodable.value)) type=\(type(of: anyCodable.value))")
+        }
         
         var sources: [String] = []
         
         // Helper to safely extract Int
         func getInt(_ key: String) -> Int? {
             if let val = doshaDict[key]?.value {
-                return extractHouseNumber(from: val)
+                let result = extractHouseNumber(from: val)
+                print("[DoshaSource]   getInt('\(key)'): val=\(val) -> \(String(describing: result))")
+                return result
             }
+            print("[DoshaSource]   getInt('\(key)'): key not found in doshaDict")
             return nil
+        }
+        
+        // Helper to safely extract Bool (handles Bool, NSNumber, Int)
+        func getBool(_ key: String) -> Bool {
+            guard let val = doshaDict[key]?.value else { 
+                print("[DoshaSource]   getBool('\(key)'): key not found")
+                return false 
+            }
+            let result: Bool
+            if let boolVal = val as? Bool {
+                result = boolVal
+                print("[DoshaSource]   getBool('\(key)'): Bool -> \(result)")
+            } else if let numVal = val as? NSNumber {
+                result = numVal.boolValue
+                print("[DoshaSource]   getBool('\(key)'): NSNumber(\(numVal)) -> \(result)")
+            } else if let intVal = val as? Int {
+                result = intVal != 0
+                print("[DoshaSource]   getBool('\(key)'): Int(\(intVal)) -> \(result)")
+            } else {
+                result = false
+                print("[DoshaSource]   getBool('\(key)'): unknown type \(type(of: val)) -> false")
+            }
+            return result
         }
         
         // Check Lagna Chart
-        if let lagna = doshaDict["lagna"]?.value as? Bool, lagna,
-           let house = getInt("mars_house_from_lagna") {
+        let lagnaActive = getBool("lagna")
+        if lagnaActive, let house = getInt("mars_house_from_lagna") {
             sources.append("House \(house) (from Lagna)")
+            print("[DoshaSource] ✅ Added Lagna source: House \(house)")
         }
         
         // Check Moon Chart
-        if let moon = doshaDict["moon"]?.value as? Bool, moon,
-           let house = getInt("mars_house_from_moon") {
+        let moonActive = getBool("moon")
+        if moonActive, let house = getInt("mars_house_from_moon") {
             sources.append("House \(house) (from Moon)")
+            print("[DoshaSource] ✅ Added Moon source: House \(house)")
         }
         
         // Check Venus Chart
-        if let venus = doshaDict["venus"]?.value as? Bool, venus,
-           let house = getInt("mars_house_from_venus") {
+        let venusActive = getBool("venus")
+        if venusActive, let house = getInt("mars_house_from_venus") {
             sources.append("House \(house) (from Venus)")
+            print("[DoshaSource] ✅ Added Venus source: House \(house)")
         }
         
-        if sources.isEmpty {
-            return nil
-        }
-        
-        return sources.joined(separator: " • ")
+        let result = sources.isEmpty ? nil : sources.joined(separator: " • ")
+        print("[DoshaSource] 📊 Final result: \(String(describing: result)) (sources.count=\(sources.count))")
+        return result
     }
 }
 

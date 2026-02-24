@@ -354,13 +354,44 @@ struct CompatibilityResultView: View {
     
     // Helper needed for Sheet Data Extraction
     static func extractMangalDoshaData(from anyCodable: AnyCodable?) -> MangalDoshaData? {
-        guard let dict = anyCodable?.value as? [String: Any] else { return nil }
+        guard let dict = anyCodable?.value as? [String: Any] else {
+            print("[MangalDosha] ❌ anyCodable?.value is not [String: Any], type=\(type(of: anyCodable?.value)) value=\(String(describing: anyCodable?.value))")
+            return nil
+        }
+        
+        // Debug: Print all keys and their types
+        print("[MangalDosha] 📋 Dictionary keys: \(Array(dict.keys).sorted())")
+        if let doshaFromVal = dict["dosha_from"] {
+            print("[MangalDosha] 📋 dosha_from value: \(String(describing: doshaFromVal)), type: \(type(of: doshaFromVal))")
+        } else {
+            print("[MangalDosha] ❌ dosha_from key NOT FOUND in dict")
+        }
+        
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
+            
+            // Debug: Print the JSON that was serialized
+            if let jsonStr = String(data: jsonData, encoding: .utf8) {
+                // Find dosha_from in the JSON string
+                if let range = jsonStr.range(of: "dosha_from") {
+                    let start = jsonStr.index(range.upperBound, offsetBy: 0)
+                    let end = jsonStr.index(start, offsetBy: min(200, jsonStr.distance(from: start, to: jsonStr.endIndex)))
+                    print("[MangalDosha] 📋 JSON dosha_from snippet: \(jsonStr[start..<end])")
+                } else {
+                    print("[MangalDosha] ❌ dosha_from not found in serialized JSON")
+                }
+            }
+            
             let decoder = JSONDecoder()
-            return try decoder.decode(MangalDoshaData.self, from: jsonData)
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let result = try decoder.decode(MangalDoshaData.self, from: jsonData)
+            print("[MangalDosha] ✅ Decoded successfully - doshaFrom has \(result.doshaFrom?.count ?? 0) keys")
+            return result
         } catch {
-            print("Failed to decode MangalDoshaData: \(error)")
+            print("[MangalDosha] ❌ Failed to decode: \(error)")
+            if let jsonStr = String(data: (try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)) ?? Data(), encoding: .utf8) {
+                print("[MangalDosha] 📋 Full JSON: \(jsonStr)")
+            }
             return nil
         }
     }
