@@ -86,12 +86,16 @@ struct AdditionalYogasSheet: View {
     }
     
     private func itemsForCurrentTile(_ data: YogaDoshaData) -> [YogaItem] {
+        let items: [YogaItem]
         if selectedTile == .dosha {
             // Show all doshas (active and cancelled)
-            return data.allItems.filter { $0.isDosha ?? false }
+            items = data.allItems.filter { $0.isDosha ?? false }
         } else {
-            return data.items(for: selectedTile)
+            items = data.items(for: selectedTile)
         }
+        
+        // Sort by yoga name to group same yogas together
+        return items.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
     
     // MARK: - Empty State

@@ -32,6 +32,14 @@ struct SubscriptionView: View {
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .padding(.vertical, 40)
                     } else {
+                        // Subheader
+                        Text("Upgrade to keep going and unlock unlimited access")
+                            .font(AppTheme.Fonts.body(size: 15))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 4)
+                        
                         // Plan cards with feature lists
                         planCardsSection
                         
