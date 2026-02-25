@@ -492,6 +492,8 @@
 "sign_in_to_view_plans" = "Sign in to view subscription plans";
 "sign_in_to_switch_profiles" = "Sign in to switch between profiles";
 "sign_in_to_save_profiles" = "Sign in to save and manage profiles";
+"create_account_to_continue" = "Create an account to keep going and save your progress";
+"free_limit_reached" = "Create an account to keep going and save your progress";
 "back" = "Back";
 
 // MARK: - Match History

@@ -948,7 +948,7 @@ struct CompatibilityView: View {
                                 // Guest users should only see Sign In option (no subscribe)
                                 quotaErrorMessage = "sign_in_to_continue_matching".localized
                             } else {
-                                quotaErrorMessage = "You've reached your free limit. Subscribe for unlimited access."
+                                quotaErrorMessage = "free_limit_reached".localized
                             }
                             showQuotaExhausted = true
                         } else {

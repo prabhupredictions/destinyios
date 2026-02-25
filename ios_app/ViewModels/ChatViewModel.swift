@@ -177,7 +177,7 @@ class ChatViewModel {
                     if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
                         quotaDetails = "sign_in_to_continue_asking".localized
                     } else {
-                        quotaDetails = "You've reached your free limit. Subscribe for unlimited access."
+                        quotaDetails = "free_limit_reached".localized
                     }
                     showQuotaSheet = true
                 } else {
