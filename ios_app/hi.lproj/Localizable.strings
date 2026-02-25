@@ -1950,3 +1950,19 @@
 "analysis_still_failing" = "विश्लेषण अभी भी विफल";
 "check_connection" = "कृपया अपना कनेक्शन जांचें।";
 "no_results" = "कोई परिणाम प्राप्त नहीं हुआ। कृपया पुनः प्रयास करें।";
+
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "साइन इन आवश्यक";
+"sign_in_to_check_compatibility" = "कंपैटिबिलिटी जांचने के लिए साइन इन करें";
+"sign_in_to_continue_asking" = "प्रश्न पूछना जारी रखने के लिए साइन इन करें";
+"sign_in_to_continue_matching" = "कंपैटिबिलिटी मैचिंग अनलॉक करने के लिए साइन इन करें";
+"sign_in_to_view_plans" = "सब्सक्रिप्शन प्लान देखने के लिए साइन इन करें";
+"sign_in_to_switch_profiles" = "प्रोफाइल के बीच स्विच करने के लिए साइन इन करें";
+"sign_in_to_save_profiles" = "प्रोफाइल सेव और मैनेज करने के लिए साइन इन करें";
+"create_account_to_continue" = "जारी रखने और अपनी प्रगति सेव करने के लिए खाता बनाएं";
+"free_limit_reached" = "जारी रखने और अपनी प्रगति सेव करने के लिए खाता बनाएं";
+"birth_data_registered" = "यह जन्म डेटा पहले से ही पंजीकृत है। जारी रखने के लिए साइन इन करें।";
+"age_requirement" = "खाता बनाने के लिए आपकम कम से कम 13 वर्ष का होना चाहिए";
+    "back" = "वापस";
+

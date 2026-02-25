@@ -1929,3 +1929,19 @@
 "analysis_still_failing" = "分析がまだ失敗しています";
 "check_connection" = "接続を確認してください。";
 "no_results" = "結果が受信されませんでした。もう一度お試しください。";
+
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "サインインが必要です";
+"sign_in_to_check_compatibility" = "相性をチェックするためにサインイン";
+"sign_in_to_continue_asking" = "質問を続けるためにサインイン";
+"sign_in_to_continue_matching" = "相性マッチングを解除するためにサインイン";
+"sign_in_to_view_plans" = "サブスクリプションプランを表示するためにサインイン";
+"sign_in_to_switch_profiles" = "プロファイル間を切り替えるためにサインイン";
+"sign_in_to_save_profiles" = "プロファイルを保存・管理するためにサインイン";
+"create_account_to_continue" = "続行して進捗を保存するためにアカウントを作成";
+"free_limit_reached" = "続行して進捗を保存するためにアカウントを作成";
+"birth_data_registered" = "この出生データは既に登録されています。続行するにはサインインしてください。";
+"age_requirement" = "アカウントを作成するには13歳以上である必要があります";
+    "back" = "戻る";
+

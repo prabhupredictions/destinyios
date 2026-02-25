@@ -178,7 +178,7 @@ struct BirthDataView: View {
         .sheet(isPresented: $showSignInPrompt) {
             // Guest tried to use birth data that belongs to a registered user
             GuestSignInPromptView(
-                message: viewModel.errorMessage ?? "This birth data is already registered. Please sign in to continue.",
+                message: viewModel.errorMessage ?? "birth_data_registered".localized,
                 provider: viewModel.birthDataTakenProvider,
                 onBack: { showSignInPrompt = false }
             )
@@ -310,7 +310,7 @@ struct BirthDataView: View {
             
             // Age validation message
             if viewModel.isUnder13 {
-                Text("You must be at least 13 years old to create an account")
+                Text("age_requirement".localized)
                     .font(AppTheme.Fonts.caption(size: 13))
                     .foregroundColor(AppTheme.Colors.error)
                     .frame(maxWidth: .infinity, alignment: .leading)

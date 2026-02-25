@@ -1364,9 +1364,9 @@ struct AskDestinySheet: View {
                 // Show quota sheet with sign-in/upgrade options
                 let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
                 if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "Free questions used. Sign In or Subscribe to continue."
+                    quotaMessage = "sign_in_to_continue_asking".localized
                 } else {
-                    quotaMessage = "You've reached your question limit. Subscribe for unlimited access."
+                    quotaMessage = "free_limit_reached".localized
                 }
                 showQuotaSheet = true
             } else {
@@ -1386,9 +1386,9 @@ struct AskDestinySheet: View {
             if errorString.contains("maximum free") || errorString.contains("quota") || errorString.contains("limit") {
                 let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
                 if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "Free questions used. Sign In or Subscribe to continue."
+                    quotaMessage = "sign_in_to_continue_asking".localized
                 } else {
-                    quotaMessage = "You've reached your question limit. Subscribe for unlimited access."
+                    quotaMessage = "free_limit_reached".localized
                 }
                 showQuotaSheet = true
             } else {

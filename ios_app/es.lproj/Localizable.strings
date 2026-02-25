@@ -1929,3 +1929,19 @@
 "analysis_still_failing" = "El análisis sigue fallando para";
 "check_connection" = "Verifica tu conexión.";
 "no_results" = "No se recibieron resultados. Inténtalo de nuevo.";
+
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "Se requiere iniciar sesión";
+"sign_in_to_check_compatibility" = "Inicia sesión para verificar compatibilidad";
+"sign_in_to_continue_asking" = "Inicia sesión para continuar haciendo preguntas";
+"sign_in_to_continue_matching" = "Inicia sesión para desbloquear compatibilidad";
+"sign_in_to_view_plans" = "Inicia sesión para ver planes de suscripción";
+"sign_in_to_switch_profiles" = "Inicia sesión para cambiar entre perfiles";
+"sign_in_to_save_profiles" = "Inicia sesión para guardar y administrar perfiles";
+"create_account_to_continue" = "Crea una cuenta para continuar y guardar tu progreso";
+"free_limit_reached" = "Crea una cuenta para continuar y guardar tu progreso";
+"birth_data_registered" = "Estos datos de nacimiento ya están registrados. Inicia sesión para continuar.";
+"age_requirement" = "Debes tener al menos 13 años para crear una cuenta";
+    "back" = "Atrás";
+

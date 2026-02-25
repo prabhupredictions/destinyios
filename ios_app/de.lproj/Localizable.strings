@@ -1929,3 +1929,19 @@
 "analysis_still_failing" = "Analyse schlägt weiterhin fehl für";
 "check_connection" = "Bitte überprüfen Sie Ihre Verbindung.";
 "no_results" = "Keine Ergebnisse erhalten. Bitte versuchen Sie es erneut.";
+
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "Anmeldung erforderlich";
+"sign_in_to_check_compatibility" = "Anmelden, um Kompatibilität zu prüfen";
+"sign_in_to_continue_asking" = "Anmelden, um weiterhin Fragen zu stellen";
+"sign_in_to_continue_matching" = "Anmelden, um Kompatibilitäts-Abgleich zu entsperren";
+"sign_in_to_view_plans" = "Anmelden, um Abonnementpläne anzuzeigen";
+"sign_in_to_switch_profiles" = "Anmelden, um zwischen Profilen zu wechseln";
+"sign_in_to_save_profiles" = "Anmelden, um Profile zu speichern und zu verwalten";
+"create_account_to_continue" = "Konto erstellen, um weiterzumachen und Ihren Fortschritt zu speichern";
+"free_limit_reached" = "Konto erstellen, um weiterzumachen und Ihren Fortschritt zu speichern";
+"birth_data_registered" = "Diese Geburtsdaten sind bereits registriert. Bitte anmelden, um fortzufahren.";
+"age_requirement" = "Sie müssen mindestens 13 Jahre alt sein, um ein Konto zu erstellen";
+    "back" = "Zurück";
+

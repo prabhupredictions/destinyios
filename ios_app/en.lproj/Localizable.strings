@@ -494,6 +494,8 @@
 "sign_in_to_save_profiles" = "Sign in to save and manage profiles";
 "create_account_to_continue" = "Create an account to keep going and save your progress";
 "free_limit_reached" = "Create an account to keep going and save your progress";
+"birth_data_registered" = "This birth data is already registered. Please sign in to continue.";
+"age_requirement" = "You must be at least 13 years old to create an account";
 "back" = "Back";
 
 // MARK: - Match History

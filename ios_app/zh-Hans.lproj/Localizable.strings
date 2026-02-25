@@ -1929,3 +1929,19 @@
 "analysis_still_failing" = "分析仍然失败";
 "check_connection" = "请检查您的网络连接。";
 "no_results" = "未收到结果。请重试。";
+
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "需要登录";
+"sign_in_to_check_compatibility" = "登录以检查兼容性";
+"sign_in_to_continue_asking" = "登录以继续提问";
+"sign_in_to_continue_matching" = "登录以解锁兼容性匹配";
+"sign_in_to_view_plans" = "登录以查看订阅计划";
+"sign_in_to_switch_profiles" = "登录以切换配置文件";
+"sign_in_to_save_profiles" = "登录以保存和管理配置文件";
+"create_account_to_continue" = "创建账户以继续并保存您的进度";
+"free_limit_reached" = "创建账户以继续并保存您的进度";
+"birth_data_registered" = "此出生数据已注册。请登录以继续。";
+"age_requirement" = "您必须年满13岁才能创建账户";
+    "back" = "返回";
+
