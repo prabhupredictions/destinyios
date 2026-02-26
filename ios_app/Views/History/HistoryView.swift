@@ -46,6 +46,12 @@ struct HistoryView: View {
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .alert("Delete", isPresented: $viewModel.showDeleteConfirmation) {
+                Button("Cancel", role: .cancel) { viewModel.itemToDelete = nil }
+                Button("Delete", role: .destructive) { viewModel.confirmDelete() }
+            } message: {
+                Text("Are you sure you want to delete \"\(viewModel.deleteItemTitle)\"?")
+            }
             .task {
                 await viewModel.loadHistory()
             }
@@ -77,33 +83,66 @@ struct HistoryView: View {
     
     // MARK: - History List
     private var historyListView: some View {
-        ScrollView {
-            LazyVStack(spacing: 24) {
-                ForEach(viewModel.groupedItems.keys.sorted(by: >), id: \.self) { date in
-                    Section(header: sectionHeader(for: date)) {
-                        VStack(spacing: 12) {
-                            ForEach(viewModel.groupedItems[date] ?? []) { item in
-                                HistoryRowView(item: item) {
-                                    handleSelection(item)
-                                }
-                                .onAppear {
-                                    Task {
-                                        await viewModel.loadMoreIfNeeded(currentItem: item)
+        let displayItems = viewModel.filteredGroupedItems
+        
+        return VStack(spacing: 0) {
+            // Search bar
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .font(.system(size: 15))
+                
+                TextField("Search history...", text: $viewModel.searchText)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .autocorrectionDisabled()
+                
+                if !viewModel.searchText.isEmpty {
+                    Button(action: { viewModel.searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .font(.system(size: 15))
+                    }
+                }
+            }
+            .padding(10)
+            .background(Color.white.opacity(0.08))
+            .cornerRadius(10)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            
+            ScrollView {
+                LazyVStack(spacing: 24) {
+                    ForEach(displayItems.keys.sorted(by: >), id: \.self) { date in
+                        Section(header: sectionHeader(for: date)) {
+                            VStack(spacing: 12) {
+                                ForEach(displayItems[date] ?? []) { item in
+                                    HistoryRowView(
+                                        item: item,
+                                        onTap: { handleSelection(item) },
+                                        onDelete: { viewModel.requestDelete(item) },
+                                        onPin: { viewModel.togglePin(item) }
+                                    )
+                                    .onAppear {
+                                        Task {
+                                            await viewModel.loadMoreIfNeeded(currentItem: item)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    
+                    // Loading more indicator
+                    if viewModel.isLoadingMore {
+                        ProgressView()
+                            .tint(AppTheme.Colors.gold)
+                            .padding(.vertical, 16)
+                    }
                 }
-                
-                // Loading more indicator
-                if viewModel.isLoadingMore {
-                    ProgressView()
-                        .tint(AppTheme.Colors.gold)
-                        .padding(.vertical, 16)
-                }
+                .padding(16)
             }
-            .padding(16)
         }
     }
     
@@ -153,6 +192,8 @@ struct HistoryView: View {
 struct HistoryRowView: View {
     let item: UnifiedHistoryItem
     let onTap: () -> Void
+    let onDelete: () -> Void
+    let onPin: () -> Void
     
     var body: some View {
         Button(action: {
@@ -160,6 +201,16 @@ struct HistoryRowView: View {
             onTap()
         }) {
             HStack(spacing: 16) {
+                // Pin indicator
+                if isPinned {
+                    Image(systemName: "pin.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 12)
+                } else {
+                    Color.clear.frame(width: 12)
+                }
+                
                 // Icon
                 ZStack {
                     Circle()
@@ -195,16 +246,37 @@ struct HistoryRowView: View {
                     extraInfoView
                 }
             }
-            .padding(16)
+            .padding(.vertical, 14)
+            .padding(.horizontal, 12)
             .background(AppTheme.Colors.cardBackground)
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(AppTheme.Colors.separator, lineWidth: 1)
+                    .stroke(isPinned ? AppTheme.Colors.gold.opacity(0.3) : AppTheme.Colors.separator, lineWidth: 1)
             )
             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
         .buttonStyle(ScaleButtonStyle())
+        .contextMenu {
+            Button(action: onPin) {
+                Label(
+                    isPinned ? "Unpin" : "Pin",
+                    systemImage: isPinned ? "pin.slash" : "pin"
+                )
+            }
+            
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+    
+    private var isPinned: Bool {
+        switch item {
+        case .chat(let thread): return thread.isPinned
+        case .match(let m): return m.isPinned
+        case .matchGroup(let g): return g.isPinned || g.items.first?.isPinned == true
+        }
     }
     
     // MARK: - Helpers determining content
@@ -263,16 +335,9 @@ struct HistoryRowView: View {
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 
-                // Pin indicator
-                if thread.isPinned {
-                    Image(systemName: "pin.fill")
-                        .font(AppTheme.Fonts.caption(size: 10))
-                        .foregroundColor(AppTheme.Colors.gold)
-                } else {
-                    Text("Messages")
-                        .font(AppTheme.Fonts.caption(size: 10))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                }
+                Text("Messages")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
             }
         case .match(let match):
             // Display score clearly with context

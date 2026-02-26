@@ -480,6 +480,13 @@ struct ChatHistorySidebar: View {
     private let pageSize = 20
     @State private var currentOffset = 0
     
+    // Search
+    @State private var searchText = ""
+    
+    // Delete confirmation
+    @State private var threadToDelete: LocalChatThread?
+    @State private var showDeleteConfirmation = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -522,6 +529,18 @@ struct ChatHistorySidebar: View {
             .onAppear {
                 loadFirstPage()
             }
+            .alert("Delete", isPresented: $showDeleteConfirmation) {
+                Button("Cancel", role: .cancel) { threadToDelete = nil }
+                Button("Delete", role: .destructive) {
+                    if let thread = threadToDelete {
+                        viewModel.deleteThread(thread)
+                        loadedThreads.removeAll { $0.id == thread.id }
+                        threadToDelete = nil
+                    }
+                }
+            } message: {
+                Text("Are you sure you want to delete \"\(threadToDelete?.title ?? "")\"?")
+            }
         }
     }
     
@@ -553,7 +572,12 @@ struct ChatHistorySidebar: View {
         let now = Date()
         var grouped: [String: [LocalChatThread]] = [:]
         
-        for thread in loadedThreads {
+        let filtered = searchText.isEmpty ? loadedThreads : loadedThreads.filter {
+            $0.title.localizedCaseInsensitiveContains(searchText) ||
+            $0.preview.localizedCaseInsensitiveContains(searchText)
+        }
+        
+        for thread in filtered {
             let key: String
             if calendar.isDateInToday(thread.updatedAt) {
                 key = "Today"
@@ -582,18 +606,44 @@ struct ChatHistorySidebar: View {
     private var historyList: some View {
         let grouped = groupedThreads
         
-        return Group {
+        return VStack(spacing: 0) {
+            // Search bar
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .font(.system(size: 15))
+                
+                TextField("Search chats...", text: $searchText)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .autocorrectionDisabled()
+                
+                if !searchText.isEmpty {
+                    Button(action: { searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .font(.system(size: 15))
+                    }
+                }
+            }
+            .padding(10)
+            .background(Color.white.opacity(0.08))
+            .cornerRadius(10)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            
             if grouped.isEmpty {
                 VStack(spacing: 16) {
                     Image(systemName: "bubble.left.and.bubble.right")
                         .font(AppTheme.Fonts.display(size: 48))
                         .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
                     
-                    Text("no_chat_history".localized)
+                    Text(searchText.isEmpty ? "no_chat_history".localized : "No results found")
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.top, 80)
             } else {
                 List {
@@ -613,8 +663,8 @@ struct ChatHistorySidebar: View {
                                         onDismiss()
                                     },
                                     onDelete: {
-                                        viewModel.deleteThread(thread)
-                                        loadedThreads.removeAll { $0.id == thread.id }
+                                        threadToDelete = thread
+                                        showDeleteConfirmation = true
                                     },
                                     onPin: {
                                         viewModel.togglePinThread(thread)

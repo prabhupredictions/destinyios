@@ -34,6 +34,11 @@ class HistoryViewModel {
     var isLoadingMore = false
     var hasMoreChats = false
     var errorMessage: String?
+    var searchText: String = ""
+    
+    // Delete confirmation
+    var itemToDelete: UnifiedHistoryItem?
+    var showDeleteConfirmation = false
     
     // Pagination
     private let pageSize = 20
@@ -200,30 +205,78 @@ class HistoryViewModel {
         return matchItems
     }
     
-    // MARK: - Delete Logic
-    func deleteItems(at indexSet: IndexSet, for date: Date) async {
-        guard let itemsForDate = groupedItems[date] else { return }
-        
-        for index in indexSet {
-            let item = itemsForDate[index]
-            switch item {
-            case .chat(let thread):
-                dataManager.deleteThread(thread)
-            case .match(let matchItem):
-                CompatibilityHistoryService.shared.delete(sessionId: matchItem.sessionId)
-            case .matchGroup(let group):
-                CompatibilityHistoryService.shared.deleteGroup(groupId: group.id)
+    // MARK: - Search Filtering
+    var filteredGroupedItems: [Date: [UnifiedHistoryItem]] {
+        guard !searchText.isEmpty else { return groupedItems }
+        let query = searchText.lowercased()
+        var filtered: [Date: [UnifiedHistoryItem]] = [:]
+        for (date, items) in groupedItems {
+            let matching = items.filter { item in
+                switch item {
+                case .chat(let thread):
+                    return thread.title.lowercased().contains(query) ||
+                           thread.preview.lowercased().contains(query)
+                case .match(let m):
+                    return m.boyName.lowercased().contains(query) ||
+                           m.girlName.lowercased().contains(query)
+                case .matchGroup(let g):
+                    return g.userName.lowercased().contains(query) ||
+                           g.items.contains { $0.girlName.lowercased().contains(query) }
+                }
+            }
+            if !matching.isEmpty {
+                filtered[date] = matching
             }
         }
-        
-        // Remove deleted items locally and recompute groups
-        let deletedIds = Set(indexSet.compactMap { index -> String? in
-            guard index < itemsForDate.count else { return nil }
-            return itemsForDate[index].id
-        })
-        items.removeAll { deletedIds.contains($0.id) }
-        loadedMatchItems.removeAll { deletedIds.contains($0.id) }
+        return filtered
+    }
+    
+    // MARK: - Request Delete (with confirmation)
+    func requestDelete(_ item: UnifiedHistoryItem) {
+        itemToDelete = item
+        showDeleteConfirmation = true
+    }
+    
+    // MARK: - Confirm Delete
+    func confirmDelete() {
+        guard let item = itemToDelete else { return }
+        switch item {
+        case .chat(let thread):
+            dataManager.deleteThread(thread)
+        case .match(let matchItem):
+            CompatibilityHistoryService.shared.delete(sessionId: matchItem.sessionId)
+        case .matchGroup(let group):
+            CompatibilityHistoryService.shared.deleteGroup(groupId: group.id)
+        }
+        items.removeAll { $0.id == item.id }
+        loadedMatchItems.removeAll { $0.id == item.id }
         recomputeGroupedItems()
+        itemToDelete = nil
+        HapticManager.shared.play(.heavy)
+    }
+    
+    // MARK: - Toggle Pin
+    func togglePin(_ item: UnifiedHistoryItem) {
+        switch item {
+        case .chat(let thread):
+            dataManager.togglePinThread(thread)
+        case .match(let matchItem):
+            CompatibilityHistoryService.shared.togglePin(sessionId: matchItem.sessionId)
+        case .matchGroup(let group):
+            CompatibilityHistoryService.shared.togglePinGroup(groupId: group.id)
+        }
+        // Reload to reflect pin state changes
+        Task { await loadHistory() }
+    }
+    
+    // MARK: - Delete title for confirmation
+    var deleteItemTitle: String {
+        guard let item = itemToDelete else { return "" }
+        switch item {
+        case .chat(let thread): return thread.title
+        case .match(let m): return m.displayTitle
+        case .matchGroup(let g): return g.displayTitle
+        }
     }
     
     // MARK: - Format Section Date

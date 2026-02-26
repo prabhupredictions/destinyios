@@ -36,6 +36,9 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
     // Chat messages from Ask Destiny
     var chatMessages: [CompatChatMessageData]
     
+    // Pin status
+    var isPinned: Bool
+    
     // MARK: - Computed Properties
     
     var displayTitle: String {
@@ -75,7 +78,8 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
         result: CompatibilityResult?,
         chatMessages: [CompatChatMessageData],
         comparisonGroupId: String? = nil,
-        partnerIndex: Int? = nil
+        partnerIndex: Int? = nil,
+        isPinned: Bool = false
     ) {
         self.sessionId = sessionId
         self.timestamp = timestamp
@@ -93,6 +97,29 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
         self.maxScore = maxScore
         self.result = result
         self.chatMessages = chatMessages
+        self.isPinned = isPinned
+    }
+    
+    // Custom decoder for backwards compatibility (existing items lack isPinned)
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decode(String.self, forKey: .sessionId)
+        timestamp = try container.decode(Date.self, forKey: .timestamp)
+        comparisonGroupId = try container.decodeIfPresent(String.self, forKey: .comparisonGroupId)
+        partnerIndex = try container.decodeIfPresent(Int.self, forKey: .partnerIndex)
+        boyName = try container.decode(String.self, forKey: .boyName)
+        boyDob = try container.decode(String.self, forKey: .boyDob)
+        boyTime = try container.decode(String.self, forKey: .boyTime)
+        boyCity = try container.decode(String.self, forKey: .boyCity)
+        girlName = try container.decode(String.self, forKey: .girlName)
+        girlDob = try container.decode(String.self, forKey: .girlDob)
+        girlTime = try container.decode(String.self, forKey: .girlTime)
+        girlCity = try container.decode(String.self, forKey: .girlCity)
+        totalScore = try container.decode(Int.self, forKey: .totalScore)
+        maxScore = try container.decode(Int.self, forKey: .maxScore)
+        result = try container.decodeIfPresent(CompatibilityResult.self, forKey: .result)
+        chatMessages = try container.decode([CompatChatMessageData].self, forKey: .chatMessages)
+        isPinned = try container.decodeIfPresent(Bool.self, forKey: .isPinned) ?? false
     }
 }
 
@@ -106,6 +133,7 @@ struct ComparisonGroup: Identifiable, Equatable {
     let timestamp: Date
     let userName: String
     let items: [CompatibilityHistoryItem]
+    var isPinned: Bool = false
     
     // MARK: - Computed Properties
     
