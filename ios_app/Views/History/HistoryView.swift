@@ -201,67 +201,66 @@ struct HistoryRowView: View {
     let onPin: () -> Void
     
     var body: some View {
-        Button(action: {
+        HStack(spacing: 16) {
+            // Pin indicator
+            if isPinned {
+                Image(systemName: "pin.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .frame(width: 12)
+            } else {
+                Color.clear.frame(width: 12)
+            }
+            
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(iconBackgroundColor)
+                    .frame(width: 48, height: 48)
+                
+                Image(systemName: iconName)
+                    .font(AppTheme.Fonts.title(size: 20))
+                    .foregroundColor(iconColor)
+            }
+            
+            // Content
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(AppTheme.Fonts.title(size: 16))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .lineLimit(1)
+                
+                Text(subtitle)
+                    .font(AppTheme.Fonts.caption(size: 13))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .lineLimit(1)
+            }
+            
+            Spacer()
+            
+            // Time / Extra Info
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(formatTime(item.date))
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
+                
+                extraInfoView
+            }
+        }
+        .padding(.vertical, 14)
+        .padding(.horizontal, 12)
+        .background(AppTheme.Colors.cardBackground)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(isPinned ? AppTheme.Colors.gold.opacity(0.3) : AppTheme.Colors.separator, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+        .contentShape(Rectangle())
+        .onTapGesture {
             HapticManager.shared.play(.light)
             onTap()
-        }) {
-            HStack(spacing: 16) {
-                // Pin indicator
-                if isPinned {
-                    Image(systemName: "pin.fill")
-                        .font(.system(size: 10))
-                        .foregroundColor(AppTheme.Colors.gold)
-                        .frame(width: 12)
-                } else {
-                    Color.clear.frame(width: 12)
-                }
-                
-                // Icon
-                ZStack {
-                    Circle()
-                        .fill(iconBackgroundColor)
-                        .frame(width: 48, height: 48)
-                    
-                    Image(systemName: iconName)
-                        .font(AppTheme.Fonts.title(size: 20))
-                        .foregroundColor(iconColor)
-                }
-                
-                // Content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(AppTheme.Fonts.title(size: 16))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .lineLimit(1)
-                    
-                    Text(subtitle)
-                        .font(AppTheme.Fonts.caption(size: 13))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .lineLimit(1)
-                }
-                
-                Spacer()
-                
-                // Time / Extra Info
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(formatTime(item.date))
-                        .font(AppTheme.Fonts.caption(size: 12))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                    
-                    extraInfoView
-                }
-            }
-            .padding(.vertical, 14)
-            .padding(.horizontal, 12)
-            .background(AppTheme.Colors.cardBackground)
-            .cornerRadius(16)
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isPinned ? AppTheme.Colors.gold.opacity(0.3) : AppTheme.Colors.separator, lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
-        .buttonStyle(ScaleButtonStyle())
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button(role: .destructive, action: onDelete) {
                 Label("Delete", systemImage: "trash")
