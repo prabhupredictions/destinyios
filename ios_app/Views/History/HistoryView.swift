@@ -257,6 +257,20 @@ struct HistoryRowView: View {
             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
         .buttonStyle(ScaleButtonStyle())
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
+            .tint(AppTheme.Colors.error)
+            
+            Button(action: onPin) {
+                Label(
+                    isPinned ? "Unpin" : "Pin",
+                    systemImage: isPinned ? "pin.slash" : "pin"
+                )
+            }
+            .tint(AppTheme.Colors.gold)
+        }
         .contextMenu {
             Button(action: onPin) {
                 Label(
