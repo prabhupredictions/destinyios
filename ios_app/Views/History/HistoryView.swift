@@ -112,37 +112,42 @@ struct HistoryView: View {
             .padding(.top, 8)
             .padding(.bottom, 4)
             
-            ScrollView {
-                LazyVStack(spacing: 24) {
-                    ForEach(displayItems.keys.sorted(by: >), id: \.self) { date in
-                        Section(header: sectionHeader(for: date)) {
-                            VStack(spacing: 12) {
-                                ForEach(displayItems[date] ?? []) { item in
-                                    HistoryRowView(
-                                        item: item,
-                                        onTap: { handleSelection(item) },
-                                        onDelete: { viewModel.requestDelete(item) },
-                                        onPin: { viewModel.togglePin(item) }
-                                    )
-                                    .onAppear {
-                                        Task {
-                                            await viewModel.loadMoreIfNeeded(currentItem: item)
-                                        }
-                                    }
+            List {
+                ForEach(displayItems.keys.sorted(by: >), id: \.self) { date in
+                    Section(header: sectionHeader(for: date)) {
+                        ForEach(displayItems[date] ?? []) { item in
+                            HistoryRowView(
+                                item: item,
+                                onTap: { handleSelection(item) },
+                                onDelete: { viewModel.requestDelete(item) },
+                                onPin: { viewModel.togglePin(item) }
+                            )
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                            .listRowSeparator(.hidden)
+                            .onAppear {
+                                Task {
+                                    await viewModel.loadMoreIfNeeded(currentItem: item)
                                 }
                             }
                         }
                     }
-                    
-                    // Loading more indicator
-                    if viewModel.isLoadingMore {
+                }
+                
+                // Loading more indicator
+                if viewModel.isLoadingMore {
+                    HStack {
+                        Spacer()
                         ProgressView()
                             .tint(AppTheme.Colors.gold)
-                            .padding(.vertical, 16)
+                        Spacer()
                     }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
                 }
-                .padding(16)
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
     }
     
