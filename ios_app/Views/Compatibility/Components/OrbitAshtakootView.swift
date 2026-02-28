@@ -496,9 +496,10 @@ struct PlanetBubble: View {
                         .padding(.bottom, 2)
                         .shadow(color: item.statusColor.opacity(0.5), radius: 4)
                     
-                    Text("\(format(item.score))/\(format(item.maxScore))")
+                    let displayScore = (item.doshaPresent && item.doshaCancelled && item.adjustedScore != nil) ? item.adjustedScore! : item.score
+                    Text("\(format(displayScore))/\(format(item.maxScore))")
                         .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .foregroundColor(AppTheme.Colors.goldLight)
+                        .foregroundColor(item.doshaCancelled ? AppTheme.Colors.success : AppTheme.Colors.goldLight)
                     
                     Text(item.label)
                         .font(AppTheme.Fonts.caption(size: 8))

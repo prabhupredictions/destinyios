@@ -102,12 +102,13 @@ final class CompatibilityService: CompatibilityServiceProtocol {
         
         // Parse SSE stream line by line
         for try await line in bytes.lines {
-            print("[SSE] \(line)")
+            print("[SSE] \(line.prefix(120))")
             
             if line.hasPrefix("event:") {
                 currentEvent = line.replacingOccurrences(of: "event:", with: "").trimmingCharacters(in: .whitespaces)
             } else if line.hasPrefix("data:") {
-                let dataString = line.replacingOccurrences(of: "data:", with: "").trimmingCharacters(in: .whitespaces)
+                // IMPORTANT: Only strip the SSE "data:" prefix, not all occurrences
+                let dataString = String(line.dropFirst(5)).trimmingCharacters(in: .whitespaces)
                 
                 // Handle step events for progress UI
                 if currentEvent == "step_start" || currentEvent == "step_done" {
@@ -147,6 +148,9 @@ final class CompatibilityService: CompatibilityServiceProtocol {
             let result = try decoder.decode(CompatibilityResponse.self, from: data)
             print("[CompatibilityService] Decoded successfully, analysisData: \(result.analysisData != nil)")
             print("[CompatibilityService] SESSION_ID from response: \(result.sessionId ?? "NIL")")
+            print("[CompatibilityService] DEBUG hardNoFlags: \(String(describing: result.hardNoFlags))")
+            print("[CompatibilityService] DEBUG rejectionReasons: \(result.hardNoFlags?.rejectionReasons ?? [])")
+            print("[CompatibilityService] DEBUG doshaSummary: \(String(describing: result.doshaSummary))")
             // Debug chart_data
             print("[CompatibilityService] boy: \(result.analysisData?.boy != nil)")
             print("[CompatibilityService] boy.chartData: \(result.analysisData?.boy?.chartData != nil)")

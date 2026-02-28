@@ -1076,6 +1076,11 @@ class CompatibilityViewModel {
         let rec = totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful"
         
         print("[CompatibilityViewModel] STORING session_id in result: \(response.sessionId ?? "NIL")")
+        print("[CompatibilityViewModel] DEBUG hardNoFlags: \(String(describing: response.hardNoFlags))")
+        print("[CompatibilityViewModel] DEBUG isRecommended: \(response.hardNoFlags?.isRecommended ?? true)")
+        print("[CompatibilityViewModel] DEBUG rejectionReasons: \(response.hardNoFlags?.rejectionReasons ?? [])")
+        print("[CompatibilityViewModel] DEBUG doshaSummary: \(String(describing: response.doshaSummary))")
+        print("[CompatibilityViewModel] DEBUG adjustedTotalScore: \(String(describing: response.adjustedTotalScore))")
         
         return CompatibilityResult(
             totalScore: totalScore,

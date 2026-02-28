@@ -311,6 +311,53 @@ struct CompatibilityResultView: View {
                         .padding(.bottom, 4)
                     }
                 }
+                
+                // Active dosha details (from doshaSummary — shows ALL active issues)
+                if let details = result.doshaSummary?.details {
+                    let doshaOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "vashya", "tara", "varna"]
+                    let doshaNames = [
+                        "nadi": "Nadi Dosha",
+                        "bhakoot": "Bhakoot Dosha",
+                        "gana": "Gana Dosha",
+                        "maitri": "Maitri Dosha",
+                        "yoni": "Yoni Dosha",
+                        "vashya": "Vashya Dosha",
+                        "tara": "Tara Dosha",
+                        "varna": "Varna Dosha"
+                    ]
+                    
+                    let activeDoshas = doshaOrder.compactMap { key -> (name: String, detail: DoshaDetail)? in
+                        guard let detail = details[key],
+                              detail.present == true,
+                              detail.cancelled != true else { return nil }
+                        return (name: doshaNames[key] ?? key.capitalized, detail: detail)
+                    }
+                    // Only show if there are active doshas not already covered by rejection reasons
+                    let uncoveredDoshas = activeDoshas.filter { dosha in
+                        !result.rejectionReasons.contains(where: { $0.localizedCaseInsensitiveContains(dosha.name.replacingOccurrences(of: " Dosha", with: "")) })
+                    }
+                    
+                    if !uncoveredDoshas.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Active Doshas:")
+                                .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
+                                .foregroundColor(AppTheme.Colors.warning)
+                            
+                            ForEach(uncoveredDoshas, id: \.name) { dosha in
+                                HStack(alignment: .top, spacing: 6) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.system(size: 10))
+                                        .foregroundColor(AppTheme.Colors.warning.opacity(0.7))
+                                        .padding(.top, 2)
+                                    Text(dosha.name)
+                                        .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                }
+                            }
+                        }
+                        .padding(.top, 2)
+                    }
+                }
             }
             .padding(14)
             .background(

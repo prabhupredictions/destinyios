@@ -17,6 +17,7 @@ struct FullReportSheet: View {
     }
     
     private var ratingText: String {
+        if !result.isRecommended { return "not_recommended".localized }
         let pct = result.percentage * 100
         if pct >= 90 { return "excellent".localized }
         else if pct >= 75 { return "very_good".localized }
@@ -26,6 +27,7 @@ struct FullReportSheet: View {
     }
     
     private var starCount: Int {
+        if !result.isRecommended { return 1 }
         let pct = result.percentage * 100
         if pct >= 90 { return 5 }
         else if pct >= 75 { return 4 }
@@ -107,7 +109,8 @@ struct FullReportSheet: View {
                 girlName: girlName,
                 totalScore: result.totalScore,
                 maxScore: result.maxScore,
-                percentage: result.percentage
+                percentage: result.percentage,
+                isRecommended: result.isRecommended
             )
             let shareImage = ReportShareService.shared.generateShareImage(from: cardView)
             
@@ -255,6 +258,47 @@ struct FullReportSheet: View {
                 .font(.system(size: 13, weight: .semibold, design: .serif))
                 .foregroundColor(AppTheme.Colors.gold)
                 .tracking(3)
+            
+            // Transparency: explain why star rating differs from raw score
+            if !result.isRecommended {
+                VStack(spacing: 6) {
+                    // Raw score context
+                    let rawLabel: String = {
+                        let pct = result.percentage * 100
+                        if pct >= 90 { return "Excellent" }
+                        else if pct >= 75 { return "Very Good" }
+                        else if pct >= 60 { return "Good" }
+                        else if pct >= 50 { return "Average" }
+                        else { return "Below Average" }
+                    }()
+                    
+                    Text("Ashtakoot: \(result.totalScore)/\(result.maxScore) (\(rawLabel)) — overridden by compatibility issues:")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                    
+                    // Rejection reasons
+                    ForEach(result.rejectionReasons, id: \.self) { reason in
+                        let displayReason = reason
+                            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
+                            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
+                            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
+                            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
+                        HStack(alignment: .top, spacing: 4) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 9))
+                                .foregroundColor(AppTheme.Colors.error.opacity(0.7))
+                                .padding(.top, 1)
+                            Text(displayReason)
+                                .font(AppTheme.Fonts.caption(size: 10))
+                                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.8))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, 4)
+            }
             
             // Report date
             Text("Report generated: \(formattedDate)")
@@ -681,7 +725,8 @@ struct FullReportSheet: View {
                 girlName: girlName,
                 totalScore: result.totalScore,
                 maxScore: result.maxScore,
-                percentage: result.percentage
+                percentage: result.percentage,
+                isRecommended: result.isRecommended
             )
             
             if let image = ReportShareService.shared.generateShareImage(from: cardView) {

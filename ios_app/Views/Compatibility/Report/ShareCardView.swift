@@ -9,8 +9,10 @@ struct ShareCardView: View {
     let totalScore: Int
     let maxScore: Int
     let percentage: Double
+    var isRecommended: Bool = true
     
     private var ratingText: String {
+        if !isRecommended { return "not_recommended".localized }
         let pct = percentage * 100
         if pct >= 90 { return "excellent".localized }
         else if pct >= 75 { return "very_good".localized }
@@ -20,6 +22,7 @@ struct ShareCardView: View {
     }
     
     private var starCount: Int {
+        if !isRecommended { return 1 }
         let pct = percentage * 100
         if pct >= 90 { return 5 }
         else if pct >= 75 { return 4 }
