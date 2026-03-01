@@ -276,8 +276,9 @@ struct NotificationPreferencesSheet: View {
     
     /// Open Destiny app settings in iOS Settings
     private func openAppSettings() {
+        // Modern iOS: Use App-Prefs:apps&path= to open specific app settings page
         if let bundleId = Bundle.main.bundleIdentifier,
-           let url = URL(string: "App-Prefs:root=NOTIFICATIONS&path=\(bundleId)") {
+           let url = URL(string: "App-Prefs:apps&path=\(bundleId)") {
             UIApplication.shared.open(url)
         } else if let url = URL(string: UIApplication.openSettingsURLString) {
             openURL(url)
