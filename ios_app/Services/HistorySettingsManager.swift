@@ -6,8 +6,7 @@ extension Notification.Name {
 }
 
 /// Manages the "Save conversation history" toggle and "Clear history" action.
-/// Uses UserDefaults with a global key (not profile-scoped, since the setting
-/// applies to the entire account — the user either wants history or doesn't).
+/// Syncs the toggle to the backend so the predict API also respects it.
 @Observable
 final class HistorySettingsManager {
     
@@ -23,6 +22,8 @@ final class HistorySettingsManager {
     var isHistoryEnabled: Bool {
         didSet {
             UserDefaults.standard.set(isHistoryEnabled, forKey: Self.isHistoryEnabledKey)
+            // Sync to backend so predict API also respects the setting
+            syncSettingToServer(enabled: isHistoryEnabled)
         }
     }
     
@@ -32,6 +33,73 @@ final class HistorySettingsManager {
             self.isHistoryEnabled = true
         } else {
             self.isHistoryEnabled = UserDefaults.standard.bool(forKey: Self.isHistoryEnabledKey)
+        }
+    }
+    
+    // MARK: - Fetch Settings from Server (on login)
+    
+    /// Fetches history setting from server and updates local state.
+    /// Call this after login to ensure iOS and backend are in sync.
+    func fetchSettingsFromServer() async {
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        guard !userEmail.isEmpty, !userEmail.contains("guest") else { return }
+        
+        let urlString = "\(APIConfig.baseURL)/chat-history/settings/\(userEmail)"
+        guard let url = URL(string: urlString) else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let historyEnabled = json["history_enabled"] as? Bool {
+                    await MainActor.run {
+                        // Update local state without triggering didSet server sync
+                        UserDefaults.standard.set(historyEnabled, forKey: Self.isHistoryEnabledKey)
+                        self.isHistoryEnabled = historyEnabled
+                    }
+                    print("[HistorySettingsManager] Fetched server setting: history_enabled=\(historyEnabled)")
+                }
+            }
+        } catch {
+            print("[HistorySettingsManager] Failed to fetch settings from server: \(error)")
+        }
+    }
+    
+    // MARK: - Sync Toggle to Server
+    
+    /// Syncs the history_enabled setting to the backend.
+    /// The predict API checks this before saving chat history.
+    private func syncSettingToServer(enabled: Bool) {
+        let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        guard !userEmail.isEmpty, !userEmail.contains("guest") else { return }
+        
+        let urlString = "\(APIConfig.baseURL)/chat-history/settings/\(userEmail)?history_enabled=\(enabled)&save_conversations=\(enabled)"
+        guard let url = URL(string: urlString) else {
+            print("[HistorySettingsManager] Invalid URL for settings sync")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        Task {
+            do {
+                let (_, response) = try await URLSession.shared.data(for: request)
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode == 200 {
+                        print("[HistorySettingsManager] Synced history_enabled=\(enabled) to server")
+                    } else {
+                        print("[HistorySettingsManager] Server settings sync failed: HTTP \(httpResponse.statusCode)")
+                    }
+                }
+            } catch {
+                print("[HistorySettingsManager] Failed to sync settings to server: \(error)")
+            }
         }
     }
     
@@ -67,7 +135,7 @@ final class HistorySettingsManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
-        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
