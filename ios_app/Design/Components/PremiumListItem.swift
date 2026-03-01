@@ -12,18 +12,20 @@ struct PremiumListItem<Content: View>: View {
     let subtitle: String?
     let icon: String?
     let showChevron: Bool
-    let isPremiumFeature: Bool  // Shows gold crown badge for Plus-only features
+    let isPremiumFeature: Bool  // Shows crown badge for premium features
     let premiumBadgeText: String  // Customizable badge text (e.g., "Plus", "Core")
+    let premiumBadgeColor: Color  // Green if unlocked, gold if locked
     let trailingContent: Content?
     let action: (() -> Void)?
     
-    init(title: String, subtitle: String? = nil, icon: String? = nil, showChevron: Bool = true, isPremiumFeature: Bool = false, premiumBadgeText: String = "Plus", action: (() -> Void)? = nil, @ViewBuilder trailing: () -> Content = { EmptyView() }) {
+    init(title: String, subtitle: String? = nil, icon: String? = nil, showChevron: Bool = true, isPremiumFeature: Bool = false, premiumBadgeText: String = "Plus", premiumBadgeColor: Color = AppTheme.Colors.gold, action: (() -> Void)? = nil, @ViewBuilder trailing: () -> Content = { EmptyView() }) {
         self.title = title
         self.subtitle = subtitle
         self.icon = icon
         self.showChevron = showChevron
         self.isPremiumFeature = isPremiumFeature
         self.premiumBadgeText = premiumBadgeText
+        self.premiumBadgeColor = premiumBadgeColor
         self.action = action
         self.trailingContent = trailing()
     }
@@ -78,7 +80,7 @@ struct PremiumListItem<Content: View>: View {
                 trailingContent
             }
             
-            // Premium badge for Plus-only features
+            // Premium badge for premium features (green = unlocked, gold = locked)
             if isPremiumFeature {
                 HStack(spacing: 3) {
                     Image(systemName: "crown.fill")
@@ -86,12 +88,12 @@ struct PremiumListItem<Content: View>: View {
                     Text(premiumBadgeText)
                         .font(AppTheme.Fonts.caption(size: 10))
                 }
-                .foregroundColor(AppTheme.Colors.gold)
+                .foregroundColor(premiumBadgeColor)
                 .padding(.horizontal, 6)
                 .padding(.vertical, 3)
                 .background(
                     Capsule()
-                        .fill(AppTheme.Colors.gold.opacity(0.15))
+                        .fill(premiumBadgeColor.opacity(0.15))
                 )
             }
             

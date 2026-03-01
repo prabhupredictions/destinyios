@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// Professional Profile screen with account info, settings navigation, and subscription status
 /// Follows standard iOS design patterns with Midnight Gold theme
@@ -40,6 +41,9 @@ struct ProfileView: View {
     @State private var showClearHistoryAlert = false
     @State private var showClearSuccessAlert = false
     @State private var clearedThreadCount = 0
+    
+    // Notification toggle
+    @State private var notificationsEnabled = false
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -166,6 +170,10 @@ struct ProfileView: View {
                 )
             }
             .preferredColorScheme(.dark)
+            .onAppear { checkNotificationStatus() }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                checkNotificationStatus()
+            }
             .alert("Turn off history?", isPresented: $showTurnOffHistoryAlert) {
                 Button("Cancel", role: .cancel) {
                     // Revert toggle back to ON
@@ -280,13 +288,14 @@ struct ProfileView: View {
                     action: { showBirthDetails = true }
                 )
                 
-                // Manage Birth Charts (Plus-only)
+                // Manage Birth Charts (Core+)
                 PremiumListItem(
                     title: "Manage Birth Charts",
-                    subtitle: quotaManager.hasFeature(.maintainProfile) ? "Manage birth charts" : "Plus plan feature",
+                    subtitle: "Add and edit birth charts for Destiny Matching\u{2122}",
                     icon: "person.2.fill",
                     isPremiumFeature: true,
                     premiumBadgeText: "Core",
+                    premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : AppTheme.Colors.gold,
                     action: {
                         if isGuestUser {
                             showGuestSignInForSwitch = true
@@ -298,16 +307,13 @@ struct ProfileView: View {
                     }
                 )
                 
-                // Switch Birth Chart - moved from HomeView header
+                // Switch Profile/Birth Chart (Plus-only)
                 PremiumListItem(
-                    title: "Switch Birth Chart",
-                    subtitle: quotaManager.hasFeature(.switchProfile)
-                        ? (ProfileContextManager.shared.isUsingSelf 
-                            ? "Viewing as \(ProfileContextManager.shared.activeProfileName)" 
-                            : "Using \(ProfileContextManager.shared.activeProfileName)'s chart")
-                        : "Plus plan feature",
+                    title: "Switch Profile/Birth Chart",
+                    subtitle: "Viewing as \(ProfileContextManager.shared.activeProfileName)",
                     icon: "arrow.triangle.2.circlepath",
                     isPremiumFeature: true,
+                    premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : AppTheme.Colors.gold,
                     action: {
                         // GUEST RULE: Guests must sign in first
                         if isGuestUser {
@@ -355,12 +361,34 @@ struct ProfileView: View {
                     action: { showChartStylePicker = true }
                 )
                 
-                // Notification Preferences (Plus-only)
+                // Notifications toggle (available to everyone)
                 PremiumListItem(
-                    title: "Notification Preferences",
-                    subtitle: quotaManager.hasFeature(.alerts) ? "Customize your alerts" : "Plus plan feature",
+                    title: "Notifications",
+                    subtitle: "Turn notifications on or off",
+                    icon: "bell.fill",
+                    showChevron: false
+                ) {
+                    Toggle("", isOn: Binding(
+                        get: { notificationsEnabled },
+                        set: { newValue in
+                            if newValue {
+                                requestNotificationPermission()
+                            } else {
+                                openNotificationSettings()
+                            }
+                        }
+                    ))
+                    .labelsHidden()
+                    .tint(AppTheme.Colors.gold)
+                }
+                
+                // Personalized Alerts (Plus-only)
+                PremiumListItem(
+                    title: "Personalized Alerts",
+                    subtitle: "Customize alerts based on your chart",
                     icon: "bell.badge.fill",
                     isPremiumFeature: true,
+                    premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : AppTheme.Colors.gold,
                     action: {
                         if quotaManager.hasFeature(.alerts) {
                             showNotificationPreferences = true
@@ -760,6 +788,55 @@ struct ProfileView: View {
                     deleteErrorMessage = error.localizedDescription
                 }
             }
+        }
+    }
+    
+    // MARK: - Notification Helpers
+    
+    /// Check current iOS notification permission status and update toggle
+    private func checkNotificationStatus() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                notificationsEnabled = settings.authorizationStatus == .authorized
+            }
+        }
+    }
+    
+    /// Request notification permission from iOS
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                switch settings.authorizationStatus {
+                case .notDetermined:
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+                        DispatchQueue.main.async {
+                            notificationsEnabled = granted
+                            if granted {
+                                UIApplication.shared.registerForRemoteNotifications()
+                            }
+                        }
+                    }
+                case .denied:
+                    // Already denied — must go to iOS Settings
+                    openNotificationSettings()
+                case .authorized, .provisional, .ephemeral:
+                    notificationsEnabled = true
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+    
+    /// Open Destiny app settings directly (not general iOS Settings)
+    private func openNotificationSettings() {
+        // Use app bundle identifier to open app-specific settings
+        if let bundleId = Bundle.main.bundleIdentifier,
+           let url = URL(string: "App-Prefs:root=NOTIFICATIONS&path=\(bundleId)") {
+            UIApplication.shared.open(url)
+        } else if let url = URL(string: UIApplication.openSettingsURLString) {
+            // Fallback to general settings
+            openURL(url)
         }
     }
     
