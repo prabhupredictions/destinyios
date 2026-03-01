@@ -108,11 +108,12 @@ final class HistorySettingsManager {
     /// Clears all chat threads + messages (SwiftData) and all compatibility history (UserDefaults)
     /// for the current user. This is irreversible.
     /// Also deletes all history from the backend server.
-    func clearAllHistory(dataManager: DataManager) async {
+    /// Returns the number of threads deleted from the server.
+    func clearAllHistory(dataManager: DataManager) async -> Int {
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         
         // 1. Delete from server first (includes both chat and compatibility threads)
-        await deleteAllHistoryFromServer(userEmail: userEmail)
+        let deletedCount = await deleteAllHistoryFromServer(userEmail: userEmail)
         
         // 2. Clear local chat threads and messages
         dataManager.deleteAllThreads(for: userEmail)
@@ -121,16 +122,18 @@ final class HistorySettingsManager {
         CompatibilityHistoryService.shared.clearAll()
         
         print("[HistorySettingsManager] Cleared all history (local + server) for \(userEmail)")
+        return deletedCount
     }
     
     /// Deletes all chat history from the server (GDPR endpoint)
-    private func deleteAllHistoryFromServer(userEmail: String) async {
-        guard !userEmail.isEmpty else { return }
+    /// Returns the number of threads deleted
+    private func deleteAllHistoryFromServer(userEmail: String) async -> Int {
+        guard !userEmail.isEmpty else { return 0 }
         
         let urlString = "\(APIConfig.baseURL)/chat-history/all/\(userEmail)"
         guard let url = URL(string: urlString) else {
             print("[HistorySettingsManager] Invalid URL for delete all")
-            return
+            return 0
         }
         
         var request = URLRequest(url: url)
@@ -145,6 +148,7 @@ final class HistorySettingsManager {
                     if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                        let deletedCount = json["deleted_count"] as? Int {
                         print("[HistorySettingsManager] Deleted \(deletedCount) threads from server")
+                        return deletedCount
                     }
                 } else {
                     print("[HistorySettingsManager] Server delete failed with status \(httpResponse.statusCode)")
@@ -153,5 +157,7 @@ final class HistorySettingsManager {
         } catch {
             print("[HistorySettingsManager] Failed to delete history from server: \(error)")
         }
+        
+        return 0
     }
 }

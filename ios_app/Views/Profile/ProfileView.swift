@@ -38,6 +38,8 @@ struct ProfileView: View {
     @State private var historySettings = HistorySettingsManager.shared
     @State private var showTurnOffHistoryAlert = false
     @State private var showClearHistoryAlert = false
+    @State private var showClearSuccessAlert = false
+    @State private var clearedThreadCount = 0
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -180,12 +182,21 @@ struct ProfileView: View {
                 Button("Cancel", role: .cancel) {}
                 Button("Clear", role: .destructive) {
                     Task {
-                        await historySettings.clearAllHistory(dataManager: DataManager.shared)
+                        let count = await historySettings.clearAllHistory(dataManager: DataManager.shared)
+                        await MainActor.run {
+                            clearedThreadCount = count
+                            showClearSuccessAlert = true
+                        }
                         HapticManager.shared.play(.heavy)
                     }
                 }
             } message: {
                 Text("This will remove saved chats and match history. This can't be undone.")
+            }
+            .alert("History Cleared", isPresented: $showClearSuccessAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Successfully deleted \(clearedThreadCount) conversation\(clearedThreadCount == 1 ? "" : "s").")
             }
         }
     }
