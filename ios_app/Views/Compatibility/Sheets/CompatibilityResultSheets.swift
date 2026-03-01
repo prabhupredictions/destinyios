@@ -94,23 +94,26 @@ struct FullReportSheet: View {
     
     private func presentNativeShareSheet() {
         Task { @MainActor in
-            // Generate section-aware PDF
-            let pdfSections = buildPDFSections()
-            let fileName = ReportShareService.shared.reportFileName(boyName: boyName, girlName: girlName)
-            let pdfURL = ReportShareService.shared.generateSectionAwarePDF(
-                sections: pdfSections,
-                width: 390,
-                fileName: fileName
+            // Generate professional vector PDF
+            let renderer = CompatibilityPDFRenderer(
+                result: result,
+                boyName: boyName,
+                girlName: girlName,
+                boyDob: boyDob,
+                girlDob: girlDob,
+                sections: sections
             )
+            let pdfURL = renderer.generateReport()
             
-            // Generate Score Card Image
+            // Generate Score Card Image (for social media)
             let cardView = ShareCardView(
                 boyName: boyName,
                 girlName: girlName,
                 totalScore: result.totalScore,
                 maxScore: result.maxScore,
                 percentage: result.percentage,
-                isRecommended: result.isRecommended
+                isRecommended: result.isRecommended,
+                adjustedScore: result.adjustedScore
             )
             let shareImage = ReportShareService.shared.generateShareImage(from: cardView)
             
@@ -215,14 +218,21 @@ struct FullReportSheet: View {
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
-            // Score Ring
+            // Score Ring — show adjusted score for transparency
             ZStack {
                 Circle()
                     .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 3)
                     .frame(width: 100, height: 100)
                 
+                let displayPct: Double = {
+                    if let adj = result.adjustedScore, adj != result.totalScore {
+                        return Double(adj) / Double(result.maxScore)
+                    }
+                    return result.percentage
+                }()
+                
                 Circle()
-                    .trim(from: 0, to: result.percentage)
+                    .trim(from: 0, to: displayPct)
                     .stroke(
                         LinearGradient(
                             colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.7)],
@@ -235,7 +245,7 @@ struct FullReportSheet: View {
                     .rotationEffect(.degrees(-90))
                 
                 VStack(spacing: 2) {
-                    Text("\(result.totalScore)")
+                    Text("\(result.adjustedScore ?? result.totalScore)")
                         .font(.system(size: 28, weight: .bold, design: .serif))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     Text("/ \(result.maxScore)")
@@ -259,22 +269,25 @@ struct FullReportSheet: View {
                 .foregroundColor(AppTheme.Colors.gold)
                 .tracking(3)
             
-            // Transparency: explain why star rating differs from raw score
+            // Transparency: show original vs adjusted score for all cases
+            if let adjScore = result.adjustedScore, adjScore != result.totalScore {
+                Text("Ashtakoot: \(result.totalScore)/\(result.maxScore) · Adjusted: \(adjScore)/\(result.maxScore)")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
+                    .padding(.top, 2)
+            } else {
+                Text("Ashtakoot Score: \(result.totalScore)/\(result.maxScore)")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
+                    .padding(.top, 2)
+            }
+            
+            // Rejection reasons for Not Recommended
             if !result.isRecommended {
                 VStack(spacing: 6) {
-                    // Raw score context
-                    let rawLabel: String = {
-                        let pct = result.percentage * 100
-                        if pct >= 90 { return "Excellent" }
-                        else if pct >= 75 { return "Very Good" }
-                        else if pct >= 60 { return "Good" }
-                        else if pct >= 50 { return "Average" }
-                        else { return "Below Average" }
-                    }()
-                    
-                    Text("Ashtakoot: \(result.totalScore)/\(result.maxScore) (\(rawLabel)) — overridden by compatibility issues:")
+                    Text("Overridden due to compatibility issues:")
                         .font(AppTheme.Fonts.caption(size: 10))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                         .multilineTextAlignment(.center)
                     
                     // Rejection reasons
@@ -580,14 +593,16 @@ struct FullReportSheet: View {
         isGeneratingPDF = true
         
         Task { @MainActor in
-            let pdfSections = buildPDFSections()
-            let fileName = ReportShareService.shared.reportFileName(boyName: boyName, girlName: girlName)
+            let renderer = CompatibilityPDFRenderer(
+                result: result,
+                boyName: boyName,
+                girlName: girlName,
+                boyDob: boyDob,
+                girlDob: girlDob,
+                sections: sections
+            )
             
-            if let pdfURL = ReportShareService.shared.generateSectionAwarePDF(
-                sections: pdfSections,
-                width: 390,
-                fileName: fileName
-            ) {
+            if let pdfURL = renderer.generateReport() {
                 ReportShareService.shared.presentSaveToFiles(fileURL: pdfURL)
             }
             
@@ -726,7 +741,8 @@ struct FullReportSheet: View {
                 totalScore: result.totalScore,
                 maxScore: result.maxScore,
                 percentage: result.percentage,
-                isRecommended: result.isRecommended
+                isRecommended: result.isRecommended,
+                adjustedScore: result.adjustedScore
             )
             
             if let image = ReportShareService.shared.generateShareImage(from: cardView) {

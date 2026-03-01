@@ -10,6 +10,16 @@ struct ShareCardView: View {
     let maxScore: Int
     let percentage: Double
     var isRecommended: Bool = true
+    var adjustedScore: Int? = nil
+    
+    private var displayScore: Int {
+        adjustedScore ?? totalScore
+    }
+    
+    private var displayPercentage: Double {
+        guard maxScore > 0 else { return 0 }
+        return Double(displayScore) / Double(maxScore)
+    }
     
     private var ratingText: String {
         if !isRecommended { return "not_recommended".localized }
@@ -120,7 +130,7 @@ struct ShareCardView: View {
                         .frame(width: 160, height: 160)
                     
                     Circle()
-                        .trim(from: 0, to: percentage)
+                        .trim(from: 0, to: displayPercentage)
                         .stroke(
                             LinearGradient(
                                 colors: [
@@ -136,10 +146,10 @@ struct ShareCardView: View {
                         .rotationEffect(.degrees(-90))
                     
                     VStack(spacing: 4) {
-                        Text("\(Int(percentage * 100))%")
+                        Text("\(displayScore)")
                             .font(.system(size: 48, weight: .bold, design: .serif))
                             .foregroundColor(.white)
-                        Text("\(totalScore)/\(maxScore)")
+                        Text("/\(maxScore)")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     }
@@ -158,9 +168,29 @@ struct ShareCardView: View {
                 
                 Text(ratingText.uppercased())
                     .font(.system(size: 20, weight: .semibold, design: .serif))
-                    .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    .foregroundColor(!isRecommended ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(4)
                     .padding(.top, 8)
+                
+                // Transparency: show original & adjusted scores
+                if let adj = adjustedScore, adj != totalScore {
+                    Text("Ashtakoot: \(totalScore)/\(maxScore) · Adjusted: \(adj)/\(maxScore)")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.4))
+                        .padding(.top, 4)
+                    
+                    if !isRecommended {
+                        Text("Overridden due to dosha incompatibility")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(red: 0.95, green: 0.35, blue: 0.35).opacity(0.6))
+                            .padding(.top, 2)
+                    }
+                } else {
+                    Text("Ashtakoot Score: \(totalScore)/\(maxScore)")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.4))
+                        .padding(.top, 4)
+                }
                 
                 Spacer()
                 
