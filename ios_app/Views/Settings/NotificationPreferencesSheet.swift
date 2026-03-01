@@ -1,10 +1,15 @@
 import SwiftUI
+import UserNotifications
 
 /// Notification Preferences sheet (Plus-only).
 /// Follows the same List + section + gold styling as AstrologySettingsSheet.
 struct NotificationPreferencesSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @StateObject private var viewModel = NotificationPreferencesViewModel()
+    
+    // iOS notification permission state
+    @State private var iOSNotificationsAuthorized = false
     
     let userEmail: String
     
@@ -42,7 +47,9 @@ struct NotificationPreferencesSheet: View {
                         if viewModel.isEnabled {
                             // MARK: - Channels
                             Section {
-                                channelToggle("Push Notifications", icon: "iphone.radiowaves.left.and.right", isOn: $viewModel.pushEnabled)
+                                // Push Notifications with iOS permission check
+                                pushNotificationsRow
+                                
                                 channelToggle("Email", icon: "envelope.fill", isOn: $viewModel.emailEnabled)
                                 channelToggle("In-App Inbox", icon: "tray.fill", isOn: $viewModel.inAppEnabled)
                             } header: {
@@ -212,8 +219,136 @@ struct NotificationPreferencesSheet: View {
             }
             .task {
                 await viewModel.loadPreferences(email: userEmail)
+                checkIOSNotificationPermission()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                checkIOSNotificationPermission()
             }
         }
+    }
+    
+    // MARK: - iOS Permission Helpers
+    
+    /// Check current iOS notification permission status
+    private func checkIOSNotificationPermission() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                iOSNotificationsAuthorized = settings.authorizationStatus == .authorized
+            }
+        }
+    }
+    
+    /// Request iOS notification permission or open settings if denied
+    private func handlePushToggleAttempt(enabled: Bool) {
+        guard enabled else {
+            // User is turning OFF push - allow it
+            viewModel.pushEnabled = false
+            return
+        }
+        
+        // User is turning ON push - check iOS permission first
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                switch settings.authorizationStatus {
+                case .notDetermined:
+                    // Request permission
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+                        DispatchQueue.main.async {
+                            iOSNotificationsAuthorized = granted
+                            if granted {
+                                viewModel.pushEnabled = true
+                                UIApplication.shared.registerForRemoteNotifications()
+                            }
+                        }
+                    }
+                case .denied:
+                    // Permission denied - open iOS Settings for Destiny app
+                    openAppSettings()
+                case .authorized, .provisional, .ephemeral:
+                    iOSNotificationsAuthorized = true
+                    viewModel.pushEnabled = true
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+    
+    /// Open Destiny app settings in iOS Settings
+    private func openAppSettings() {
+        if let bundleId = Bundle.main.bundleIdentifier,
+           let url = URL(string: "App-Prefs:root=NOTIFICATIONS&path=\(bundleId)") {
+            UIApplication.shared.open(url)
+        } else if let url = URL(string: UIApplication.openSettingsURLString) {
+            openURL(url)
+        }
+    }
+    
+    // MARK: - Push Notifications Row with Permission Check
+    
+    private var pushNotificationsRow: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Image(systemName: "iphone.radiowaves.left.and.right")
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .frame(width: 24)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Push Notifications")
+                        .font(AppTheme.Fonts.body(size: 16))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    
+                    if !iOSNotificationsAuthorized {
+                        Text("Permission required in iOS Settings")
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.error)
+                    }
+                }
+                
+                Spacer()
+                
+                Toggle("", isOn: Binding(
+                    get: { viewModel.pushEnabled && iOSNotificationsAuthorized },
+                    set: { newValue in
+                        handlePushToggleAttempt(enabled: newValue)
+                    }
+                ))
+                .labelsHidden()
+                .tint(AppTheme.Colors.gold)
+                .disabled(!iOSNotificationsAuthorized && !viewModel.pushEnabled)
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+            .background(AppTheme.Colors.cardBackground)
+            
+            // Warning row if permission denied
+            if !iOSNotificationsAuthorized {
+                Button(action: openAppSettings) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(AppTheme.Colors.error)
+                            .font(.system(size: 14))
+                        
+                        Text("Enable in iOS Settings → Notifications → Destiny")
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.error)
+                            .multilineTextAlignment(.leading)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "arrow.up.right")
+                            .foregroundColor(AppTheme.Colors.error)
+                            .font(.system(size: 12))
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16)
+                    .background(AppTheme.Colors.error.opacity(0.1))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
     }
     
     // MARK: - Components
