@@ -669,7 +669,6 @@ struct ComparisonOverviewView: View {
     private func shareComparisonReport() {
         Task { @MainActor in
             // Build a text summary for sharing
-            let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: ", ")
             var shareText = "✨ Compatibility Analysis – \(userName)\n\n"
             for r in sortedResults {
                 let status = r.isRecommended ? "✅ " + "recommended".localized : "❌ " + "not_recommended".localized
@@ -677,23 +676,18 @@ struct ComparisonOverviewView: View {
             }
             shareText += "\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
             
-            // Generate PDF
-            let pdfView = comparisonPDFView()
+            // Generate professional PDF
+            let renderer = ComparisonPDFRenderer(results: results, userName: userName)
+            let pdfData = renderer.render()
+            
+            let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: "_")
             let firstName = userName.components(separatedBy: " ").first ?? userName
-            let fileName = ReportShareService.shared.reportFileName(
-                boyName: firstName,
-                girlName: partnerNames
-            )
-            let pdfURL = ReportShareService.shared.generateMultiPagePDF(
-                from: pdfView,
-                width: 390,
-                fileName: fileName
-            )
+            let fileName = "\(firstName)_vs_\(partnerNames)_comparison.pdf"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            try? pdfData.write(to: tempURL)
             
             var shareItems: [Any] = [shareText]
-            if let url = pdfURL {
-                shareItems.append(url)
-            }
+            shareItems.append(tempURL)
             
             ReportShareService.shared.presentShareSheet(items: shareItems)
         }
@@ -703,21 +697,16 @@ struct ComparisonOverviewView: View {
         isGeneratingPDF = true
         
         Task { @MainActor in
-            let pdfView = comparisonPDFView()
-            let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: ", ")
-            let firstName = userName.components(separatedBy: " ").first ?? userName
-            let fileName = ReportShareService.shared.reportFileName(
-                boyName: firstName,
-                girlName: partnerNames
-            )
+            let renderer = ComparisonPDFRenderer(results: results, userName: userName)
+            let pdfData = renderer.render()
             
-            if let pdfURL = ReportShareService.shared.generateMultiPagePDF(
-                from: pdfView,
-                width: 390,
-                fileName: fileName
-            ) {
-                ReportShareService.shared.presentSaveToFiles(fileURL: pdfURL)
-            }
+            let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: "_")
+            let firstName = userName.components(separatedBy: " ").first ?? userName
+            let fileName = "\(firstName)_vs_\(partnerNames)_comparison.pdf"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            try? pdfData.write(to: tempURL)
+            
+            ReportShareService.shared.presentSaveToFiles(fileURL: tempURL)
             
             isGeneratingPDF = false
         }
