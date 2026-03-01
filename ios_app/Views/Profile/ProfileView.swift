@@ -179,8 +179,10 @@ struct ProfileView: View {
             .alert("Clear history?", isPresented: $showClearHistoryAlert) {
                 Button("Cancel", role: .cancel) {}
                 Button("Clear", role: .destructive) {
-                    historySettings.clearAllHistory(dataManager: DataManager.shared)
-                    HapticManager.shared.play(.heavy)
+                    Task {
+                        await historySettings.clearAllHistory(dataManager: DataManager.shared)
+                        HapticManager.shared.play(.heavy)
+                    }
                 }
             } message: {
                 Text("This will remove saved chats and match history. This can't be undone.")
