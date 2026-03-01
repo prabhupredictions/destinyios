@@ -312,13 +312,7 @@ final class CompatibilityHistoryService {
         }
     }
     
-    // MARK: - Clear All
-    /// Clears all history for current user (current profile only)
-    func clearAll() {
-        UserDefaults.standard.removeObject(forKey: storageKey)
-        print("[CompatibilityHistoryService] Cleared history for current profile")
-    }
-    
+    // MARK: - Clear All By Email
     /// Clears ALL compatibility history for a specific user across ALL profiles
     /// Used on logout to prevent cross-profile data contamination
     func clearAll(forUser email: String) {
