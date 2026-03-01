@@ -85,12 +85,17 @@ class ChatViewModel {
     
     func startNewChat() {
         // Create new thread with profile context
-        let thread = dataManager.createThread(
-            sessionId: currentSessionId,
-            userEmail: userEmail,
-            profileId: ProfileContextManager.shared.activeProfileId  // Switch Profile feature
-        )
-        currentThreadId = thread.id
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            let thread = dataManager.createThread(
+                sessionId: currentSessionId,
+                userEmail: userEmail,
+                profileId: ProfileContextManager.shared.activeProfileId  // Switch Profile feature
+            )
+            currentThreadId = thread.id
+        } else {
+            // Generate an ephemeral thread ID (not persisted)
+            currentThreadId = UUID().uuidString
+        }
         messages = []
         
         addWelcomeMessage()
@@ -125,7 +130,9 @@ class ChatViewModel {
             content: greeting
         )
         messages.append(welcome)
-        dataManager.saveMessage(welcome)
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            dataManager.saveMessage(welcome)
+        }
     }
     
     // MARK: - Send Message (Non-Streaming — matches compat chat pattern)
@@ -147,7 +154,9 @@ class ChatViewModel {
             content: query
         )
         messages.append(userMessage)
-        dataManager.saveMessage(userMessage)
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            dataManager.saveMessage(userMessage)
+        }
         
         isLoading = true
         
@@ -221,7 +230,9 @@ class ChatViewModel {
             )
             typewriterMessageId = aiMessage.id  // Trigger typewriter in MessageBubble
             messages.append(aiMessage)
-            dataManager.saveMessage(aiMessage)
+            if HistorySettingsManager.shared.isHistoryEnabled {
+                dataManager.saveMessage(aiMessage)
+            }
             
             suggestedQuestions = resp.followUpSuggestions
             

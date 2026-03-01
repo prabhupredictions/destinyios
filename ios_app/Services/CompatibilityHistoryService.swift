@@ -230,6 +230,13 @@ final class CompatibilityHistoryService {
         }
     }
     
+    // MARK: - Clear All History
+    /// Removes all compatibility history items for the current user
+    func clearAll() {
+        persist([])
+        print("[CompatibilityHistoryService] Cleared all history for \(currentUserEmail)")
+    }
+    
     /// Toggles pin for all items in a group
     func togglePinGroup(groupId: String) {
         var items = loadAll()

@@ -492,7 +492,11 @@ struct ChatHistorySidebar: View {
             ZStack {
                 CosmicBackgroundView().ignoresSafeArea()
                 
-                historyList
+                if !HistorySettingsManager.shared.isHistoryEnabled {
+                    chatHistoryDisabledView
+                } else {
+                    historyList
+                }
             }
             .navigationTitle("Chat History")
             #if os(iOS)
@@ -540,6 +544,43 @@ struct ChatHistorySidebar: View {
                 }
             } message: {
                 Text("Are you sure you want to delete \"\(threadToDelete?.title ?? "")\"?")
+            }
+        }
+    }
+    
+    // MARK: - History Disabled View
+    private var chatHistoryDisabledView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "clock.badge.xmark")
+                .font(AppTheme.Fonts.display(size: 48))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
+            
+            Text("History is turned off")
+                .font(AppTheme.Fonts.title(size: 20))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            Text("Your conversations aren't being saved.")
+                .font(AppTheme.Fonts.body(size: 15))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            
+            Button(action: {
+                onDismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    NotificationCenter.default.post(name: .openProfileSettings, object: nil)
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "gearshape")
+                    Text("Open Settings")
+                }
+                .font(AppTheme.Fonts.title(size: 15))
+                .foregroundColor(AppTheme.Colors.mainBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(AppTheme.Colors.gold)
+                .cornerRadius(12)
             }
         }
     }

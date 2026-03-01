@@ -904,7 +904,9 @@ class CompatibilityViewModel {
             partnerIndex: partnerIndex
         )
         
-        CompatibilityHistoryService.shared.save(item)
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            CompatibilityHistoryService.shared.save(item)
+        }
     }
     
     /// Load state from a history item

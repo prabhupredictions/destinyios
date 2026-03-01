@@ -30,7 +30,9 @@ struct CompatibilityHistorySheet: View {
                 CosmicBackgroundView()
                     .ignoresSafeArea()
                 
-                if groups.isEmpty {
+                if !HistorySettingsManager.shared.isHistoryEnabled {
+                    compatHistoryDisabledView
+                } else if groups.isEmpty {
                     emptyState
                 } else {
                     VStack(spacing: 0) {
@@ -97,6 +99,43 @@ struct CompatibilityHistorySheet: View {
         .preferredColorScheme(.dark)
         .onAppear {
             loadHistory()
+        }
+    }
+    
+    // MARK: - History Disabled View
+    private var compatHistoryDisabledView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "clock.badge.xmark")
+                .font(AppTheme.Fonts.display(size: 48))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
+            
+            Text("History is turned off")
+                .font(AppTheme.Fonts.title(size: 20))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            Text("Your match results aren't being saved.")
+                .font(AppTheme.Fonts.body(size: 15))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            
+            Button(action: {
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    NotificationCenter.default.post(name: .openProfileSettings, object: nil)
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "gearshape")
+                    Text("Open Settings")
+                }
+                .font(AppTheme.Fonts.title(size: 15))
+                .foregroundColor(AppTheme.Colors.mainBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(AppTheme.Colors.gold)
+                .cornerRadius(12)
+            }
         }
     }
     

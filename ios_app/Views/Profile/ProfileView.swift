@@ -7,6 +7,7 @@ struct ProfileView: View {
     @Environment(\.openURL) private var openURL
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     @StateObject private var quotaManager = QuotaManager.shared
+    @State private var profileContext = ProfileContextManager.shared
     @State private var authViewModel = AuthViewModel()
     
     // User preferences from storage
@@ -32,6 +33,11 @@ struct ProfileView: View {
     @State private var showDeleteAccountSheet = false  // Delete account confirmation
     @State private var isDeletingAccount = false
     @State private var deleteErrorMessage: String? = nil
+    
+    // History settings
+    @State private var historySettings = HistorySettingsManager.shared
+    @State private var showTurnOffHistoryAlert = false
+    @State private var showClearHistoryAlert = false
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -72,6 +78,9 @@ struct ProfileView: View {
                         
                         // MARK: - Astrology Settings
                         astrologySection
+                        
+                        // MARK: - History Settings
+                        historySection
                         
                         // MARK: - Support
                         supportSection
@@ -155,6 +164,27 @@ struct ProfileView: View {
                 )
             }
             .preferredColorScheme(.dark)
+            .alert("Turn off history?", isPresented: $showTurnOffHistoryAlert) {
+                Button("Cancel", role: .cancel) {
+                    // Revert toggle back to ON
+                    historySettings.isHistoryEnabled = true
+                }
+                Button("Turn Off", role: .destructive) {
+                    historySettings.isHistoryEnabled = false
+                    HapticManager.shared.play(.heavy)
+                }
+            } message: {
+                Text("New chats and matches won't be saved. You can turn this back on anytime.")
+            }
+            .alert("Clear history?", isPresented: $showClearHistoryAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Clear", role: .destructive) {
+                    historySettings.clearAllHistory(dataManager: DataManager.shared)
+                    HapticManager.shared.play(.heavy)
+                }
+            } message: {
+                Text("This will remove saved chats and match history. This can't be undone.")
+            }
         }
     }
     
@@ -186,6 +216,16 @@ struct ProfileView: View {
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                     }
+                    
+                    // Display Active Chart
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.text.rectangle")
+                            .font(AppTheme.Fonts.caption(size: 11))
+                        Text("Viewing Birth Chart : \(profileContext.activeProfileName)")
+                            .font(AppTheme.Fonts.caption(size: 11))
+                    }
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .padding(.top, 4)
                     
                     // Plan badge - Only show for free users (Premium users have the large card below)
                     if !quotaManager.isPremium {
@@ -317,6 +357,104 @@ struct ProfileView: View {
                     }
                 )
             }
+        }
+    }
+    
+    // MARK: - History Settings
+    private var historySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("History")
+                .font(AppTheme.Fonts.title(size: 18))
+                .foregroundColor(AppTheme.Colors.gold)
+                .padding(.leading, 4)
+            
+            VStack(spacing: 0) {
+                // Save history toggle
+                HStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
+                            .frame(width: 36, height: 36)
+                        
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(AppTheme.Fonts.title(size: 16))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Save conversation history")
+                            .font(AppTheme.Fonts.body(size: 16))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                        
+                        Text(historySettings.isHistoryEnabled ? "Chats and matches are saved" : "History is turned off")
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Toggle("", isOn: Binding(
+                        get: { historySettings.isHistoryEnabled },
+                        set: { newValue in
+                            if !newValue {
+                                // Show confirmation before turning off
+                                showTurnOffHistoryAlert = true
+                            } else {
+                                historySettings.isHistoryEnabled = true
+                                HapticManager.shared.play(.light)
+                            }
+                        }
+                    ))
+                    .labelsHidden()
+                    .tint(AppTheme.Colors.gold)
+                }
+                .padding(16)
+                .background(AppTheme.Colors.cardBackground)
+                
+                Divider()
+                    .background(AppTheme.Colors.separator)
+                
+                // Clear history button
+                Button(action: {
+                    showClearHistoryAlert = true
+                }) {
+                    HStack(spacing: 14) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(AppTheme.Colors.error.opacity(0.15))
+                                .frame(width: 36, height: 36)
+                            
+                            Image(systemName: "trash")
+                                .font(AppTheme.Fonts.title(size: 16))
+                                .foregroundColor(AppTheme.Colors.error)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Clear history")
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.error)
+                            
+                            Text("Remove all saved chats and matches")
+                                .font(AppTheme.Fonts.caption(size: 12))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(AppTheme.Fonts.caption(size: 14))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
+                    }
+                    .padding(16)
+                    .background(AppTheme.Colors.cardBackground)
+                }
+                .buttonStyle(.plain)
+            }
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppTheme.Colors.separator, lineWidth: 1)
+            )
         }
     }
     

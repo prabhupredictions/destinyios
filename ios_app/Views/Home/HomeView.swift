@@ -295,6 +295,9 @@ struct HomeView: View {
                 onBack: { showGuestSignInSheet = false }
             )
         }
+        .onReceive(NotificationCenter.default.publisher(for: .openProfileSettings)) { _ in
+            showProfile = true
+        }
     }
     
     // MARK: - Animations
