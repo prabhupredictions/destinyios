@@ -76,11 +76,11 @@ struct ProfileView: View {
                         // MARK: - Profile Settings
                         profileSection
                         
-                        // MARK: - Astrology Settings
-                        astrologySection
-                        
                         // MARK: - History Settings
                         historySection
+                        
+                        // MARK: - Astrology Settings
+                        astrologySection
                         
                         // MARK: - Support
                         supportSection

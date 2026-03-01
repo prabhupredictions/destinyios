@@ -19,6 +19,7 @@ struct CompatibilityResultView: View {
     @State private var showFullReport = false
     @State private var showAskDestiny = false
     @State private var showHistorySheet = false
+    @State private var showProfile = false
     
     // Animation State
     @State private var contentOpacity: Double = 0
@@ -251,6 +252,12 @@ struct CompatibilityResultView: View {
                 showHistorySheet = false
                 onLoadHistory?(selectedItem)
             }
+        }
+        .sheet(isPresented: $showProfile) {
+            ProfileView()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openProfileSettings)) { _ in
+            showProfile = true
         }
     }
     
