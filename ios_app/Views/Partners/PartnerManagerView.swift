@@ -58,7 +58,7 @@ struct PartnerManagerView: View {
             }
         }
         .confirmationDialog(
-            "Delete Profile?",
+            "Delete Birth Chart?",
             isPresented: $showDeleteConfirmation,
             presenting: partnerToDelete
         ) { partner in
@@ -72,7 +72,7 @@ struct PartnerManagerView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: { partner in
-            Text("This will permanently remove \(partner.name) from your saved profiles.")
+            Text("This will permanently remove \(partner.name) from your saved birth charts.")
         }
         .alert("Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
@@ -89,7 +89,7 @@ struct PartnerManagerView: View {
         .sheet(isPresented: $showUpgradePrompt) {
             SubscriptionView()
         }
-        .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
+        .alert("Birth Chart Limit Reached", isPresented: .constant(limitMessage != nil)) {
             Button("Upgrade") {
                 limitMessage = nil
                 showUpgradePrompt = true
@@ -117,7 +117,7 @@ struct PartnerManagerView: View {
                     showUpgradePrompt = true
                 } else {
                     // Core user at limit
-                    limitMessage = "You can save up to \(result.limit) profiles. Upgrade to Plus for unlimited profiles."
+                    limitMessage = "You can save up to \(result.limit) birth charts. Upgrade to Plus for unlimited."
                 }
             }
         }
@@ -172,7 +172,7 @@ struct PartnerManagerView: View {
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
                 .scaleEffect(1.5)
             
-            Text("Loading profiles...")
+            Text("Loading birth charts...")
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -197,7 +197,7 @@ struct PartnerManagerView: View {
                 .font(AppTheme.Fonts.title(size: 24))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Save profiles for quick matching")
+            Text("Save birth charts for quick matching")
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -206,7 +206,7 @@ struct PartnerManagerView: View {
                 HapticManager.shared.play(.medium)
                 checkAndShowAddForm()
             }) {
-                Text("Add Profile")
+                Text("Add Birth Chart")
                     .font(AppTheme.Fonts.title(size: 16))
                     .foregroundColor(AppTheme.Colors.mainBackground)
                     .padding(.horizontal, 32)

@@ -53,18 +53,21 @@ class PartnerProfileService {
             let userEmail: String
             let profile: PartnerProfileRequest
             let consentGiven: Bool
+            let guardianConsentGiven: Bool
             
             enum CodingKeys: String, CodingKey {
                 case userEmail = "user_email"
                 case profile
                 case consentGiven = "consent_given"
+                case guardianConsentGiven = "guardian_consent_given"
             }
         }
         
         let createRequest = CreateRequest(
             userEmail: email,
             profile: PartnerProfileRequest(from: profile),
-            consentGiven: profile.consentGiven
+            consentGiven: profile.consentGiven,
+            guardianConsentGiven: profile.guardianConsentGiven
         )
         
         var request = URLRequest(url: url)
@@ -258,7 +261,7 @@ enum PartnerProfileError: Error, LocalizedError {
         case .serverError(let code): return "Server error: \(code)"
         case .decodingError: return "Failed to decode response"
         case .notFound: return "Partner not found"
-        case .duplicateProfile: return "A profile with this birth data already exists."
+        case .duplicateProfile: return "A birth chart with the same birth data already exists."
         }
     }
 }

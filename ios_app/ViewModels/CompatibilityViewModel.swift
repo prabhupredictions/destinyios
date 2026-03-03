@@ -85,6 +85,7 @@ class CompatibilityViewModel {
     var result: CompatibilityResult?
     var sessionId: String? // For follow-up queries
     var historyLoadedToast = false // Shows brief "Loaded from history" indicator
+    var duplicateMessage: String? // Shows when save attempt finds a duplicate birth chart
     
     // Streaming progress state
     var currentStep: AnalysisStep = .calculatingCharts
@@ -387,7 +388,8 @@ class CompatibilityViewModel {
                 latitude: partner.latitude,
                 longitude: partner.longitude,
                 birthTimeUnknown: partner.timeUnknown,
-                consentGiven: true
+                consentGiven: true,
+                forCompatibility: true
             )
             
             // Save locally (Smart Check)
@@ -397,9 +399,14 @@ class CompatibilityViewModel {
             Task {
                 if let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty {
                     do {
-                        // API usually handles duplicates (returns existing or updates)
                         let created = try await PartnerProfileService.shared.createPartner(newPartner, email: email)
                         print("Synced partner: \(created.name)")
+                    } catch PartnerProfileError.duplicateProfile {
+                        // Surface duplicate message to user
+                        await MainActor.run {
+                            duplicateMessage = "A birth chart with the same birth details already exists for \(partner.name). It was not saved again."
+                        }
+                        print("[CompatibilityViewModel] Duplicate partner detected: \(partner.name)")
                     } catch {
                         print("Failed to sync partner: \(error)")
                     }

@@ -10,6 +10,7 @@ struct PartnerPickerSheet: View {
     @Binding var isPresented: Bool
     let gender: String? // nil = all, "male", "female"
     let excludeIds: Set<String> // IDs to exclude (already selected partners + active profile)
+    let forCompatibilityOnly: Bool // If true, only show charts marked for compatibility
     let onSelect: (PartnerProfile) -> Void
     
     @State private var viewModel = PartnerProfileViewModel()
@@ -49,6 +50,11 @@ struct PartnerPickerSheet: View {
                 $0.name.localizedCaseInsensitiveContains(searchText) ||
                 ($0.cityOfBirth?.localizedCaseInsensitiveContains(searchText) ?? false)
             }
+        }
+        
+        // Filter by compatibility flag
+        if forCompatibilityOnly {
+            result = result.filter { $0.forCompatibility }
         }
         
         return result
@@ -155,7 +161,7 @@ struct PartnerPickerSheet: View {
             Spacer()
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-            Text("Loading profiles...")
+            Text("Loading birth charts...")
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
@@ -173,7 +179,7 @@ struct PartnerPickerSheet: View {
                 .opacity(0.8)
             
             if viewModel.partners.isEmpty {
-                Text("No saved profiles yet")
+                Text("No saved birth charts yet")
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             } else {
@@ -301,7 +307,7 @@ struct PartnerPickerSheet: View {
                 } else if result.limit == 0 {
                     showUpgradePrompt = true
                 } else {
-                    limitMessage = "You can save up to \(result.limit) profiles. Upgrade to Plus for unlimited profiles."
+                    limitMessage = "You can save up to \(result.limit) birth charts. Upgrade to Plus for unlimited."
                 }
             }
         }
@@ -314,7 +320,8 @@ struct PartnerPickerSheet: View {
     PartnerPickerSheet(
         isPresented: .constant(true),
         gender: nil,
-        excludeIds: []
+        excludeIds: [],
+        forCompatibilityOnly: false
     ) { partner in
         print("Selected: \(partner.name)")
     }

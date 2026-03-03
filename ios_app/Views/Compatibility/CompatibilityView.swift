@@ -201,6 +201,15 @@ struct CompatibilityView: View {
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
         }
+        // Duplicate birth chart alert
+        .alert("Duplicate Birth Chart", isPresented: .init(
+            get: { viewModel.duplicateMessage != nil },
+            set: { if !$0 { viewModel.duplicateMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { viewModel.duplicateMessage = nil }
+        } message: {
+            Text(viewModel.duplicateMessage ?? "")
+        }
         // "Loaded from history" toast when cached match is used
         .overlay(alignment: .top) {
             if viewModel.historyLoadedToast {
@@ -260,7 +269,8 @@ struct CompatibilityView: View {
             PartnerPickerSheet(
                 isPresented: $showPartnerPicker,
                 gender: nil,  // Show all partners, let user pick
-                excludeIds: excludeIds
+                excludeIds: excludeIds,
+                forCompatibilityOnly: true
             ) { partner in
                 // Fill form with selected partner data
                 viewModel.girlName = partner.name

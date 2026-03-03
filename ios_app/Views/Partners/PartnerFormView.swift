@@ -7,8 +7,8 @@ enum PartnerFormMode {
     
     var title: String {
         switch self {
-        case .add: return "Add Profile"
-        case .edit: return "Edit Profile"
+        case .add: return "Add Birth Chart"
+        case .edit: return "Edit Birth Chart"
         }
     }
     
@@ -61,6 +61,9 @@ struct PartnerFormView: View {
     // Guardian consent state
     @State private var guardianConsentGiven = false
     
+    // Compatibility matching flag
+    @State private var forCompatibility = false
+    
     // Validation
     private var isValid: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -101,7 +104,7 @@ struct PartnerFormView: View {
                         PremiumInputField(
                             label: "Name",
                             icon: "person.circle",
-                            placeholder: "Enter profile name",
+                            placeholder: "Enter name",
                             text: $name,
                             isFocused: $isNameFocused
                         )
@@ -195,6 +198,25 @@ struct PartnerFormView: View {
                             .padding(.vertical, 4)
                         }
                         
+                        // For compatibility matching toggle
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            withAnimation { forCompatibility.toggle() }
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: forCompatibility ? "checkmark.square.fill" : "square")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(forCompatibility ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                
+                                Text("For compatibility matching")
+                                    .font(AppTheme.Fonts.body(size: 14))
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                                
+                                Spacer()
+                            }
+                            .padding(.leading, 4)
+                        }
+                        
                         // City of Birth
                         PremiumSelectionRow(
                             icon: "location",
@@ -209,7 +231,7 @@ struct PartnerFormView: View {
                         Spacer(minLength: 20)
                         
                         // Save Button
-                        ShimmerButton(title: "Save Profile", icon: "checkmark") {
+                        ShimmerButton(title: "Save Birth Chart", icon: "checkmark") {
                             savePartner()
                         }
                         .disabled(!isValid || isSaving)
@@ -291,6 +313,8 @@ struct PartnerFormView: View {
         cityOfBirth = partner.cityOfBirth ?? ""
         latitude = partner.latitude ?? 0
         longitude = partner.longitude ?? 0
+        guardianConsentGiven = partner.guardianConsentGiven
+        forCompatibility = partner.forCompatibility
         
         // Parse date of birth
         let formatter = DateFormatter()
@@ -342,7 +366,9 @@ struct PartnerFormView: View {
             longitude: longitude == 0 ? nil : longitude,
             timezone: nil,
             birthTimeUnknown: birthTimeUnknown,
-            consentGiven: true
+            consentGiven: true,
+            guardianConsentGiven: guardianConsentGiven,
+            forCompatibility: forCompatibility
         )
         
         onSave(partner)

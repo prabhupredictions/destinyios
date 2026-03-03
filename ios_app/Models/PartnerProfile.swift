@@ -16,6 +16,8 @@ final class PartnerProfile: Identifiable {
     var timezone: Double?
     var birthTimeUnknown: Bool
     var consentGiven: Bool
+    var guardianConsentGiven: Bool
+    var forCompatibility: Bool
     var createdAt: Date
     var updatedAt: Date
     var lastMatchedAt: Date?
@@ -41,6 +43,8 @@ final class PartnerProfile: Identifiable {
         timezone: Double? = nil,
         birthTimeUnknown: Bool = false,
         consentGiven: Bool = true,
+        guardianConsentGiven: Bool = false,
+        forCompatibility: Bool = false,
         createdAt: Date = Date(),
         updatedAt: Date = Date(),
         lastMatchedAt: Date? = nil,
@@ -61,6 +65,8 @@ final class PartnerProfile: Identifiable {
         self.timezone = timezone
         self.birthTimeUnknown = birthTimeUnknown
         self.consentGiven = consentGiven
+        self.guardianConsentGiven = guardianConsentGiven
+        self.forCompatibility = forCompatibility
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.lastMatchedAt = lastMatchedAt
@@ -118,6 +124,8 @@ struct PartnerProfileResponse: Codable {
     let timezone: Double?
     let birthTimeUnknown: Bool
     let consentGiven: Bool
+    let guardianConsentGiven: Bool?
+    let forCompatibility: Bool?
     let createdAt: String
     let updatedAt: String
     let lastMatchedAt: String?
@@ -132,6 +140,8 @@ struct PartnerProfileResponse: Codable {
         case cityOfBirth = "city_of_birth"
         case birthTimeUnknown = "birth_time_unknown"
         case consentGiven = "consent_given"
+        case guardianConsentGiven = "guardian_consent_given"
+        case forCompatibility = "for_compatibility"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case lastMatchedAt = "last_matched_at"
@@ -169,6 +179,8 @@ struct PartnerProfileResponse: Codable {
             timezone: timezone,
             birthTimeUnknown: birthTimeUnknown,
             consentGiven: consentGiven,
+            guardianConsentGiven: guardianConsentGiven ?? false,
+            forCompatibility: forCompatibility ?? false,
             createdAt: parseDate(createdAt) ?? Date(),
             updatedAt: parseDate(updatedAt) ?? Date(),
             lastMatchedAt: parseDate(lastMatchedAt),
@@ -195,6 +207,8 @@ struct PartnerProfileRequest: Codable {
     let timezone: Double?
     let birthTimeUnknown: Bool
     let isSelf: Bool
+    let forCompatibility: Bool
+    let guardianConsentGiven: Bool
     
     enum CodingKeys: String, CodingKey {
         case name, gender, latitude, longitude, timezone
@@ -203,6 +217,8 @@ struct PartnerProfileRequest: Codable {
         case cityOfBirth = "city_of_birth"
         case birthTimeUnknown = "birth_time_unknown"
         case isSelf = "is_self"
+        case forCompatibility = "for_compatibility"
+        case guardianConsentGiven = "guardian_consent_given"
     }
     
     init(from profile: PartnerProfile) {
@@ -216,5 +232,7 @@ struct PartnerProfileRequest: Codable {
         self.timezone = profile.timezone
         self.birthTimeUnknown = profile.birthTimeUnknown
         self.isSelf = profile.isSelf
+        self.forCompatibility = profile.forCompatibility
+        self.guardianConsentGiven = profile.guardianConsentGiven
     }
 }
