@@ -261,6 +261,7 @@ struct YogasContainer: Codable {
 
 struct YogaDetail: Codable {
     let name: String
+    let yogaKey: String? // Machine-readable key for localization (e.g. "gajakesari_yoga")
     let planets: String
     let houses: String
     let status: String
@@ -268,10 +269,12 @@ struct YogaDetail: Codable {
     let isDosha: Bool
     let category: String? // Added for filtering
     let formation: String? // How the yoga is formed
+    let outcome: String? // Professional description of yoga/dosha effect
     let reason: String? // Why cancelled/reduced (if applicable)
     
     enum CodingKeys: String, CodingKey {
-        case name, planets, houses, status, strength, category, formation, reason
+        case name, planets, houses, status, strength, category, formation, outcome, reason
+        case yogaKey = "yoga_key"
         case isDosha = "is_dosha"
     }
     
@@ -287,6 +290,33 @@ struct YogaDetail: Codable {
         
         // 2. Fallback: Remove trailing numbers/parens
         return name.replacingOccurrences(of: "\\s*\\(?\\d+\\)?\\s*$", with: "", options: .regularExpression)
+    }
+    
+    // MARK: - Localized Content (uses yogaKey to lookup from Localizable.strings)
+    
+    /// Localized yoga name - looks up using yoga_key from Localizable.strings
+    var localizedName: String {
+        guard let key = yogaKey, !key.isEmpty else { return displayName }
+        let lookupKey = "yoga_name_\(key)"
+        let localized = lookupKey.localized
+        // If localization returns the key itself, fallback to displayName
+        return localized == lookupKey ? displayName : localized
+    }
+    
+    /// Localized outcome description - from Localizable.strings or API fallback
+    var localizedOutcome: String? {
+        guard let key = yogaKey, !key.isEmpty else { return outcome }
+        let lookupKey = "yoga_outcome_\(key)"
+        let localized = lookupKey.localized
+        return localized == lookupKey ? outcome : localized
+    }
+    
+    /// Localized formation description - from Localizable.strings or API fallback
+    var localizedFormation: String? {
+        guard let key = yogaKey, !key.isEmpty else { return formation }
+        let lookupKey = "yoga_formation_\(key)"
+        let localized = lookupKey.localized
+        return localized == lookupKey ? formation : localized
     }
 }
 

@@ -1,0 +1,18 @@
+<svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="careerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A8E6CF"/><stop offset="100%" stop-color="#5BAF8A"/>
+    </linearGradient>
+  </defs>
+  <path d="M24 6 Q20 16 20 26 L28 26 Q28 16 24 6 Z" stroke="url(#careerGrad)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+  <path d="M24 6 Q22.5 12 22 16" stroke="url(#careerGrad)" stroke-width="0.6" opacity="0.3" stroke-linecap="round"/>
+  <path d="M20 22 L14 30 L20 28" stroke="url(#careerGrad)" stroke-width="1.2" fill="none" stroke-linejoin="round" opacity="0.7"/>
+  <path d="M28 22 L34 30 L28 28" stroke="url(#careerGrad)" stroke-width="1.2" fill="none" stroke-linejoin="round" opacity="0.7"/>
+  <circle cx="24" cy="18" r="2.5" stroke="url(#careerGrad)" stroke-width="1" fill="none" opacity="0.6"/>
+  <path d="M21 26 Q22 32 20 36" stroke="url(#careerGrad)" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <path d="M24 26 Q24 33 24 38" stroke="url(#careerGrad)" stroke-width="0.9" opacity="0.4" stroke-linecap="round"/>
+  <path d="M27 26 Q26 32 28 36" stroke="url(#careerGrad)" stroke-width="0.8" opacity="0.35" stroke-linecap="round"/>
+  <circle cx="22" cy="40" r="0.8" fill="url(#careerGrad)" opacity="0.25"/>
+  <circle cx="26" cy="42" r="0.6" fill="url(#careerGrad)" opacity="0.2"/>
+  <circle cx="24" cy="44" r="0.5" fill="url(#careerGrad)" opacity="0.15"/>
+</svg>

@@ -194,9 +194,9 @@ struct CustomTabBar: View {
         .frame(maxWidth: .infinity)
         .background(
             ZStack {
-                // Sleek Transparent Background
+                // Solid Background matching ChatView to prevent text overlap
                 Rectangle()
-                    .fill(Color.clear) // Transparent
+                    .fill(AppTheme.Colors.mainBackground)
                     .ignoresSafeArea()
                 
                 // Top Border Line

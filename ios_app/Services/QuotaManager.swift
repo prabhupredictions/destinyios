@@ -43,6 +43,16 @@ struct RegisteredUserConflictError: Error, LocalizedError {
     }
 }
 
+/// Thrown when a soft-deleted account tries to sign in or register
+/// The user must be informed that the account is permanently deactivated
+struct AccountDeletedError: Error, LocalizedError {
+    let message: String
+    
+    var errorDescription: String? {
+        return message
+    }
+}
+
 /// Thrown when trying to save birth data that already belongs to another registered user
 /// Used during guest upgrade when their birth data matches another registered user
 struct BirthDataTakenError: Error, LocalizedError {
@@ -477,6 +487,18 @@ class QuotaManager: ObservableObject {
             throw URLError(.badServerResponse)
         }
         
+        // Handle 403 Forbidden - account was soft-deleted
+        if httpResponse.statusCode == 403 {
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               let error = detail["error"] as? String,
+               error == "account_deleted" {
+                let message = detail["message"] as? String ?? "This account has been deleted."
+                print("[QuotaManager] 🚫 Account deleted: \(message)")
+                throw AccountDeletedError(message: message)
+            }
+        }
+        
         guard httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
@@ -565,9 +587,10 @@ class QuotaManager: ObservableObject {
         availableFeatures.contains(FeatureID.aiQuestions.rawValue)
     }
     
-    /// Check if current user is a guest (based on cached plan)
-    var isGuest: Bool {
-        currentPlan?.planId == "free_guest"
+    /// Check if user is on a free plan (free_guest or free_registered)
+    var isFreePlan: Bool {
+        let planId = currentPlan?.planId ?? ""
+        return planId == "free_guest" || planId == "free_registered"
     }
     
     /// Check if user is on Plus plan (for Plus-exclusive features like multi-partner matching)
@@ -622,9 +645,18 @@ class QuotaManager: ObservableObject {
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         
-        // For active subscriptions, say "Renews" since auto-renewal is on by default
-        // For cancelled/expired, say "Expires"
-        let prefix = (subscriptionStatus == "active") ? "Renews" : "Expires"
+        // For active subscriptions, say "Renews on"
+        // For cancelled subscriptions (in grace period), say "Ends on"
+        // For others, "Expires on"
+        let prefix: String
+        if subscriptionStatus == "active" {
+            prefix = "Renews on"
+        } else if subscriptionStatus == "cancelled" || subscriptionStatus == "grace_period" {
+            prefix = "Ends on"
+        } else {
+            prefix = "Expires on"
+        }
+        
         return "\(prefix) \(formatter.string(from: expiryDate))"
     }
     

@@ -50,12 +50,24 @@ struct PartnerFormView: View {
     @State private var isDateSelected = false
     @State private var isTimeSelected = false
     
+    // Age check
+    private var isUnder13: Bool {
+        guard isDateSelected else { return false }
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: dateOfBirth, to: Date())
+        return (ageComponents.year ?? 0) < 13
+    }
+    
+    // Guardian consent state
+    @State private var guardianConsentGiven = false
+    
     // Validation
     private var isValid: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
         !gender.isEmpty &&
         isDateSelected &&
-        (isTimeSelected || birthTimeUnknown)
+        (isTimeSelected || birthTimeUnknown) &&
+        (!isUnder13 || guardianConsentGiven)
     }
     
     init(mode: PartnerFormMode, onSave: @escaping (PartnerProfile) -> Void) {
@@ -157,6 +169,30 @@ struct PartnerFormView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 4)
                             }
+                        }
+                        
+                        // Guardian consent for under-13
+                        if isUnder13 {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Button(action: {
+                                    HapticManager.shared.play(.light)
+                                    withAnimation { guardianConsentGiven.toggle() }
+                                }) {
+                                    HStack(alignment: .top, spacing: 8) {
+                                        Image(systemName: guardianConsentGiven ? "checkmark.square.fill" : "square")
+                                            .font(.system(size: 18))
+                                            .foregroundColor(guardianConsentGiven ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                            .padding(.top, 2)
+                                        
+                                        Text("By adding this birth chart, you confirm that you are the parent or legal guardian and have the authority to provide this information")
+                                            .font(AppTheme.Fonts.caption(size: 13))
+                                            .foregroundColor(AppTheme.Colors.textSecondary)
+                                            .multilineTextAlignment(.leading)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 4)
                         }
                         
                         // City of Birth

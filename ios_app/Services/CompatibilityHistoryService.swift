@@ -96,8 +96,14 @@ final class CompatibilityHistoryService {
             ))
         }
         
-        // Sort by most recent
-        return result.sorted { $0.timestamp > $1.timestamp }
+        // Sort pinned first, then by most recent
+        return result.sorted { g1, g2 in
+            let pin1 = g1.items.first?.isPinned ?? false
+            let pin2 = g2.items.first?.isPinned ?? false
+            if pin1 && !pin2 { return true }
+            if !pin1 && pin2 { return false }
+            return g1.timestamp > g2.timestamp
+        }
     }
     
     // MARK: - Delete Group
@@ -214,6 +220,36 @@ final class CompatibilityHistoryService {
         }
     }
     
+    // MARK: - Toggle Pin
+    /// Toggles pin status for a single item or all items in a group
+    func togglePin(sessionId: String) {
+        var items = loadAll()
+        if let index = items.firstIndex(where: { $0.sessionId == sessionId }) {
+            items[index].isPinned.toggle()
+            persist(items)
+        }
+    }
+    
+    // MARK: - Clear All History
+    /// Removes all compatibility history items for the current user
+    func clearAll() {
+        persist([])
+        print("[CompatibilityHistoryService] Cleared all history for \(currentUserEmail)")
+    }
+    
+    /// Toggles pin for all items in a group
+    func togglePinGroup(groupId: String) {
+        var items = loadAll()
+        let groupItems = items.filter { $0.comparisonGroupId == groupId || $0.sessionId == groupId }
+        let newPinState = !(groupItems.first?.isPinned ?? false)
+        for i in items.indices {
+            if items[i].comparisonGroupId == groupId || items[i].sessionId == groupId {
+                items[i].isPinned = newPinState
+            }
+        }
+        persist(items)
+    }
+    
     // MARK: - Delete Single
     /// Deletes a single history item by session ID (local + server)
     func delete(sessionId: String) {
@@ -276,13 +312,7 @@ final class CompatibilityHistoryService {
         }
     }
     
-    // MARK: - Clear All
-    /// Clears all history for current user (current profile only)
-    func clearAll() {
-        UserDefaults.standard.removeObject(forKey: storageKey)
-        print("[CompatibilityHistoryService] Cleared history for current profile")
-    }
-    
+    // MARK: - Clear All By Email
     /// Clears ALL compatibility history for a specific user across ALL profiles
     /// Used on logout to prevent cross-profile data contamination
     func clearAll(forUser email: String) {
@@ -565,7 +595,13 @@ final class CompatibilityHistoryService {
                             summary: metadata.llmAnalysis ?? "",
                             recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
                             analysisData: metadata.analysisData,
-                            sessionId: metadata.sessionId
+                            sessionId: metadata.sessionId,
+                            isRecommended: metadata.hardNoFlags?.isRecommended ?? true,
+                            adjustedScore: metadata.adjustedTotalScore != nil ? Int(metadata.adjustedTotalScore!) : nil,
+                            adjustedCategory: metadata.adjustedCategory,
+                            doshaSummary: metadata.doshaSummary,
+                            rejectionReasons: metadata.hardNoFlags?.rejectionReasons ?? [],
+                            comparisonIndicators: metadata.comparisonIndicators
                         )
                     }
                     
@@ -764,7 +800,13 @@ final class CompatibilityHistoryService {
                         summary: metadata.llmAnalysis ?? "",
                         recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
                         analysisData: metadata.analysisData,
-                        sessionId: metadata.sessionId
+                        sessionId: metadata.sessionId,
+                        isRecommended: metadata.hardNoFlags?.isRecommended ?? true,
+                        adjustedScore: metadata.adjustedTotalScore != nil ? Int(metadata.adjustedTotalScore!) : nil,
+                        adjustedCategory: metadata.adjustedCategory,
+                        doshaSummary: metadata.doshaSummary,
+                        rejectionReasons: metadata.hardNoFlags?.rejectionReasons ?? [],
+                        comparisonIndicators: metadata.comparisonIndicators
                     )
                 }
                 

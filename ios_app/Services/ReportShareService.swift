@@ -102,6 +102,102 @@ final class ReportShareService {
         return FileManager.default.fileExists(atPath: tempURL.path) ? tempURL : nil
     }
     
+    /// Generates a section-aware multi-page PDF where each section is kept whole
+    /// (not split across page boundaries) whenever possible
+    @MainActor
+    func generateSectionAwarePDF(
+        sections: [AnyView],
+        width: CGFloat = 390,
+        fileName: String = "Report",
+        pageBackgroundColor: UIColor = UIColor(red: 0.04, green: 0.06, blue: 0.10, alpha: 1.0)
+    ) -> URL? {
+        let pageWidth: CGFloat = 612
+        let pageHeight: CGFloat = 792
+        let margin: CGFloat = 24
+        let sectionSpacing: CGFloat = 8
+        let contentWidth = pageWidth - 2 * margin
+        let contentHeight = pageHeight - 2 * margin
+        let renderScale: CGFloat = 2.0
+        
+        // 1. Render each section to get CGImage + display height
+        var rendered: [(image: CGImage, displayHeight: CGFloat)] = []
+        for section in sections {
+            let renderer = ImageRenderer(content: section.frame(width: width))
+            renderer.scale = renderScale
+            guard let img = renderer.cgImage else { continue }
+            let naturalW = CGFloat(img.width) / renderScale
+            let naturalH = CGFloat(img.height) / renderScale
+            let displayH = naturalH * (contentWidth / naturalW)
+            rendered.append((image: img, displayHeight: displayH))
+        }
+        guard !rendered.isEmpty else { return nil }
+        
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(fileName).pdf")
+        try? FileManager.default.removeItem(at: tempURL)
+        
+        // 2. Compose pages
+        let pageRect = CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight)
+        UIGraphicsBeginPDFContextToFile(tempURL.path, .zero, nil)
+        
+        var currentY = pageHeight // Force first page start
+        
+        func startPage() {
+            UIGraphicsBeginPDFPageWithInfo(pageRect, nil)
+            if let ctx = UIGraphicsGetCurrentContext() {
+                ctx.setFillColor(pageBackgroundColor.cgColor)
+                ctx.fill(pageRect)
+            }
+            currentY = margin
+        }
+        
+        func drawImage(_ img: CGImage, height: CGFloat) {
+            guard let ctx = UIGraphicsGetCurrentContext() else { return }
+            ctx.saveGState()
+            ctx.translateBy(x: margin, y: currentY + height)
+            ctx.scaleBy(x: 1, y: -1)
+            ctx.draw(img, in: CGRect(x: 0, y: 0, width: contentWidth, height: height))
+            ctx.restoreGState()
+        }
+        
+        for (i, section) in rendered.enumerated() {
+            let spacing: CGFloat = i > 0 ? sectionSpacing : 0
+            let needed = spacing + section.displayHeight
+            
+            // Need new page?
+            if currentY + needed > pageHeight - margin {
+                startPage()
+            }
+            
+            if i > 0 && currentY > margin { currentY += sectionSpacing }
+            
+            // Handle oversized sections (taller than content area)
+            if section.displayHeight > contentHeight {
+                var remaining = section.displayHeight
+                var srcY: CGFloat = 0
+                while remaining > 0 {
+                    let avail = pageHeight - margin - currentY
+                    let chunk = min(avail, remaining)
+                    let cropY = srcY / section.displayHeight * CGFloat(section.image.height)
+                    let cropH = chunk / section.displayHeight * CGFloat(section.image.height)
+                    if let cropped = section.image.cropping(to: CGRect(x: 0, y: cropY, width: CGFloat(section.image.width), height: cropH)) {
+                        drawImage(cropped, height: chunk)
+                    }
+                    currentY += chunk
+                    srcY += chunk
+                    remaining -= chunk
+                    if remaining > 0 { startPage() }
+                }
+            } else {
+                drawImage(section.image, height: section.displayHeight)
+                currentY += section.displayHeight
+            }
+        }
+        
+        UIGraphicsEndPDFContext()
+        return FileManager.default.fileExists(atPath: tempURL.path) ? tempURL : nil
+    }
+    
     // MARK: - Share Card Generation
     
     /// Renders a SwiftUI view as a UIImage for social sharing
@@ -161,5 +257,38 @@ final class ReportShareService {
             items.insert(text, at: 0)
         }
         presentShareSheet(items: items)
+    }
+    
+    // MARK: - Save to Files (Document Picker)
+    
+    /// Presents the iOS Files picker directly for saving a file
+    @MainActor
+    func presentSaveToFiles(fileURL: URL) {
+        let picker = UIDocumentPickerViewController(forExporting: [fileURL], asCopy: true)
+        picker.shouldShowFileExtensions = true
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else {
+            return
+        }
+        
+        // Find the topmost presented view controller
+        var topVC = rootVC
+        while let presented = topVC.presentedViewController {
+            topVC = presented
+        }
+        
+        topVC.present(picker, animated: true)
+    }
+    
+    // MARK: - File Naming
+    
+    /// Generates a formatted filename for compatibility reports
+    /// Format: "Compatibility Report – Name1 and Name2 – YYYY-MM-DD"
+    func reportFileName(boyName: String, girlName: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateStr = dateFormatter.string(from: Date())
+        return "Compatibility Report – \(boyName) and \(girlName) – \(dateStr)"
     }
 }

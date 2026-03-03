@@ -101,7 +101,19 @@ struct ComparisonResult: Identifiable, Hashable {
     var maxScore: Int { result.maxScore }
     var percentage: Double { result.percentage }
     
+    // V2.1 — Hard-no gate derived values
+    var isRecommended: Bool { result.isRecommended }
+    var adjustedScore: Int { result.adjustedScore ?? result.totalScore }
+    var adjustedPercentage: Double { result.adjustedPercentage }
+    var rejectionReasons: [String] { result.rejectionReasons }
+    
+    /// AI-generated one-liner from comparison_indicators
+    var oneLiner: String? {
+        result.comparisonIndicators?.overallVerdict?.oneLiner
+    }
+    
     var briefSummary: String {
+        if let liner = oneLiner, !liner.isEmpty { return liner }
         let summary = result.summary
         if summary.count > 60 {
             return String(summary.prefix(60)) + "..."
@@ -110,21 +122,37 @@ struct ComparisonResult: Identifiable, Hashable {
     }
     
     var statusLabel: String {
-        switch percentage {
+        if !isRecommended { return "Not Recommended" }
+        switch adjustedPercentage {
         case 0.75...1.0: return "Excellent Match"
         case 0.6..<0.75: return "Good Match"
-        case 0.45..<0.6: return "Average"
-        default: return "Challenging"
+        case 0.5..<0.6: return "Average"
+        default: return "Recommended"
         }
     }
     
     var statusColor: String {
-        switch percentage {
+        if !isRecommended { return "red" }
+        switch adjustedPercentage {
         case 0.75...1.0: return "green"
         case 0.6..<0.75: return "gold"
-        case 0.45..<0.6: return "orange"
-        default: return "red"
+        case 0.5..<0.6: return "orange"
+        default: return "gold"
         }
+    }
+    
+    // MARK: - Cancellation Info
+    func doshaCancellationReason(for koota: String) -> String? {
+        guard let summary = result.doshaSummary, let details = summary.details else { return nil }
+        
+        // The API returns lowercase keys like 'nadi', 'bhakoot', 'gana', etc.
+        let key = koota.lowercased()
+        
+        // Find if this specific dosha was cancelled, and return the reason
+        if let detail = details[key], detail.cancelled == true {
+            return detail.reasonShort
+        }
+        return nil
     }
     
     // MARK: - Hashable

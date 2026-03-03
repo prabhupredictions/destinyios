@@ -140,7 +140,7 @@ struct LanguageSelectionView: View {
                 .font(AppTheme.Fonts.display(size: 26))
                 .goldGradient()
             
-            Text("Your cosmic journey begins in your language")
+            Text("Personalized guidance, in your language")
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -278,6 +278,9 @@ struct LanguageSelectionView: View {
         
         UserDefaults.standard.set([code], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
+        
+        // Post notification for language change
+        NotificationCenter.default.post(name: .appLanguageChanged, object: code)
         
         // Success haptic
         // Success haptic

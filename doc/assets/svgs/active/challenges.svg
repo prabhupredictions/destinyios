@@ -1,0 +1,17 @@
+<svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="challengesGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB088"/><stop offset="100%" stop-color="#D4623B"/>
+    </linearGradient>
+  </defs>
+  <path d="M28 4 L18 22 L24 22 L16 44 L36 20 L28 20 Z" stroke="url(#challengesGrad)" stroke-width="1.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M26 10 L21 22" stroke="url(#challengesGrad)" stroke-width="0.7" opacity="0.3" stroke-linecap="round"/>
+  <path d="M24 24 L20 36" stroke="url(#challengesGrad)" stroke-width="0.7" opacity="0.25" stroke-linecap="round"/>
+  <line x1="10" y1="18" x2="6" y2="16" stroke="url(#challengesGrad)" stroke-width="0.8" opacity="0.3" stroke-linecap="round"/>
+  <line x1="10" y1="24" x2="5" y2="25" stroke="url(#challengesGrad)" stroke-width="0.8" opacity="0.25" stroke-linecap="round"/>
+  <line x1="40" y1="20" x2="44" y2="19" stroke="url(#challengesGrad)" stroke-width="0.8" opacity="0.25" stroke-linecap="round"/>
+  <line x1="38" y1="14" x2="42" y2="12" stroke="url(#challengesGrad)" stroke-width="0.7" opacity="0.2" stroke-linecap="round"/>
+  <circle cx="12" cy="14" r="0.8" fill="url(#challengesGrad)" opacity="0.25"/>
+  <circle cx="40" cy="26" r="0.7" fill="url(#challengesGrad)" opacity="0.2"/>
+  <circle cx="14" cy="30" r="0.6" fill="url(#challengesGrad)" opacity="0.15"/>
+</svg>

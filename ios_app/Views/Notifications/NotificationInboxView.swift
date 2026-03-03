@@ -118,10 +118,8 @@ struct NotificationInboxView: View {
                 Text("Personalize alerts")
                     .font(.system(size: 16, weight: .semibold))
                 
-                if !quotaManager.hasFeature(.alerts) {
-                    Image(systemName: "crown.fill")
-                        .font(.system(size: 12))
-                }
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 12))
             }
             .foregroundColor(AppTheme.Colors.mainBackground)
             .frame(maxWidth: .infinity)

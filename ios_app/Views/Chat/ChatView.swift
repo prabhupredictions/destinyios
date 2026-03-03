@@ -92,7 +92,7 @@ struct ChatView: View {
                     }
                 }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
         }
         .sheet(isPresented: $showSubscription) {
@@ -287,16 +287,17 @@ struct ChatView: View {
                             }
                         }) {
                             Text(question)
-                                .font(AppTheme.Fonts.body(size: 13))
+                                .font(.system(size: 11, weight: .medium))
                                 .foregroundColor(AppTheme.Colors.gold)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
+                                .lineLimit(1)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 18)
+                                    Capsule()
                                         .fill(AppTheme.Colors.gold.opacity(0.1))
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 18)
-                                                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                                            Capsule()
+                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
                                         )
                                 )
                         }
@@ -339,6 +340,8 @@ struct ChatView: View {
                         // Inline suggested questions — only after typewriter finishes
                         if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && viewModel.typewriterMessageId == nil {
                             inlineSuggestedQuestionsView
+                                .id("suggestions")
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
                         }
                     }
                     .padding(.horizontal, 12)
@@ -353,8 +356,10 @@ struct ChatView: View {
             .scrollDismissesKeyboard(.interactively)
             // Scroll when a new message is added (user msg or AI response)
             .onChange(of: viewModel.messages.count) { _, _ in
-                withAnimation {
-                    proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                    }
                 }
             }
             // Scroll when loading starts (show thinking indicator)
@@ -362,6 +367,26 @@ struct ChatView: View {
                 withAnimation {
                     if isLoading {
                         proxy.scrollTo("loading", anchor: .bottom)
+                    }
+                }
+            }
+            // Scroll smoothly when suggested questions appear
+            .onChange(of: viewModel.suggestedQuestions) { _, newQuestions in
+                if !newQuestions.isEmpty && viewModel.typewriterMessageId == nil {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo("suggestions", anchor: .bottom)
+                        }
+                    }
+                }
+            }
+            // Scroll when typewriter finishes (suggestions may already be loaded)
+            .onChange(of: viewModel.typewriterMessageId) { _, newId in
+                if newId == nil && !viewModel.suggestedQuestions.isEmpty {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo("suggestions", anchor: .bottom)
+                        }
                     }
                 }
             }
@@ -455,12 +480,23 @@ struct ChatHistorySidebar: View {
     private let pageSize = 20
     @State private var currentOffset = 0
     
+    // Search
+    @State private var searchText = ""
+    
+    // Delete confirmation
+    @State private var threadToDelete: LocalChatThread?
+    @State private var showDeleteConfirmation = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 CosmicBackgroundView().ignoresSafeArea()
                 
-                historyList
+                if !HistorySettingsManager.shared.isHistoryEnabled {
+                    chatHistoryDisabledView
+                } else {
+                    historyList
+                }
             }
             .navigationTitle("Chat History")
             #if os(iOS)
@@ -497,6 +533,55 @@ struct ChatHistorySidebar: View {
             .onAppear {
                 loadFirstPage()
             }
+            .alert("Delete", isPresented: $showDeleteConfirmation) {
+                Button("Cancel", role: .cancel) { threadToDelete = nil }
+                Button("Delete", role: .destructive) {
+                    if let thread = threadToDelete {
+                        viewModel.deleteThread(thread)
+                        loadedThreads.removeAll { $0.id == thread.id }
+                        threadToDelete = nil
+                    }
+                }
+            } message: {
+                Text("Are you sure you want to delete \"\(threadToDelete?.title ?? "")\"?")
+            }
+        }
+    }
+    
+    // MARK: - History Disabled View
+    private var chatHistoryDisabledView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "clock.badge.xmark")
+                .font(AppTheme.Fonts.display(size: 48))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
+            
+            Text("History is turned off")
+                .font(AppTheme.Fonts.title(size: 20))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            Text("Your conversations aren't being saved.")
+                .font(AppTheme.Fonts.body(size: 15))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            
+            Button(action: {
+                onDismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    NotificationCenter.default.post(name: .openProfileSettings, object: nil)
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "gearshape")
+                    Text("Open Settings")
+                }
+                .font(AppTheme.Fonts.title(size: 15))
+                .foregroundColor(AppTheme.Colors.mainBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(AppTheme.Colors.gold)
+                .cornerRadius(12)
+            }
         }
     }
     
@@ -528,7 +613,12 @@ struct ChatHistorySidebar: View {
         let now = Date()
         var grouped: [String: [LocalChatThread]] = [:]
         
-        for thread in loadedThreads {
+        let filtered = searchText.isEmpty ? loadedThreads : loadedThreads.filter {
+            $0.title.localizedCaseInsensitiveContains(searchText) ||
+            $0.preview.localizedCaseInsensitiveContains(searchText)
+        }
+        
+        for thread in filtered {
             let key: String
             if calendar.isDateInToday(thread.updatedAt) {
                 key = "Today"
@@ -557,18 +647,44 @@ struct ChatHistorySidebar: View {
     private var historyList: some View {
         let grouped = groupedThreads
         
-        return Group {
+        return VStack(spacing: 0) {
+            // Search bar
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .font(.system(size: 15))
+                
+                TextField("Search chats...", text: $searchText)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .autocorrectionDisabled()
+                
+                if !searchText.isEmpty {
+                    Button(action: { searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .font(.system(size: 15))
+                    }
+                }
+            }
+            .padding(10)
+            .background(Color.white.opacity(0.08))
+            .cornerRadius(10)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            
             if grouped.isEmpty {
                 VStack(spacing: 16) {
                     Image(systemName: "bubble.left.and.bubble.right")
                         .font(AppTheme.Fonts.display(size: 48))
                         .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
                     
-                    Text("no_chat_history".localized)
+                    Text(searchText.isEmpty ? "no_chat_history".localized : "No results found")
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.top, 80)
             } else {
                 List {
@@ -588,8 +704,8 @@ struct ChatHistorySidebar: View {
                                         onDismiss()
                                     },
                                     onDelete: {
-                                        viewModel.deleteThread(thread)
-                                        loadedThreads.removeAll { $0.id == thread.id }
+                                        threadToDelete = thread
+                                        showDeleteConfirmation = true
                                     },
                                     onPin: {
                                         viewModel.togglePinThread(thread)

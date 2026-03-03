@@ -108,6 +108,12 @@ class CompatibilityViewModel {
     /// Unique ID to group related matches in history (generated when analysis starts with >1 partner)
     var currentComparisonGroupId: String? = nil
     
+    /// Tracks which partner indices failed during multi-partner analysis (for retry)
+    var failedPartnerIndices: [Int] = []
+    
+    /// Whether there are failed partners that can be retried
+    var hasFailedPartners: Bool { !failedPartnerIndices.isEmpty }
+    
     // MARK: - Current Partner (v1 Compatibility)
     /// Convenience accessor for the current partner being edited
     var currentPartner: PartnerData {
@@ -580,6 +586,7 @@ class CompatibilityViewModel {
         // Clear previous results
         await MainActor.run {
             comparisonResults = []
+            failedPartnerIndices = []
             isAnalyzing = true
             showStreamingView = true
             currentStep = .calculatingCharts
@@ -710,20 +717,149 @@ class CompatibilityViewModel {
                 
             } catch {
                 print("[Multi-Partner] Analysis failed for partner \(index): \(error)")
+                await MainActor.run {
+                    failedPartnerIndices.append(index)
+                }
             }
         }
         
-        // All done - show overview
+        // All done - show overview or error
         await MainActor.run {
             currentStep = .complete
             isAnalyzing = false
             showStreamingView = false
             
+            // Set error message if any partners failed
+            if !failedPartnerIndices.isEmpty {
+                let failedNames = failedPartnerIndices.compactMap { idx -> String? in
+                    guard partners.indices.contains(idx) else { return nil }
+                    let name = partners[idx].name
+                    return name.isEmpty ? "Partner \(idx + 1)" : name
+                }
+                errorMessage = "\("analysis_failed_for".localized) \(failedNames.joined(separator: ", ")). \("tap_retry".localized)"
+            }
+            
             if comparisonResults.count > 1 {
-                // Multi-partner: show overview
+                // Multi-partner: show overview (even if some failed)
                 showComparisonOverview = true
             } else if let first = comparisonResults.first {
                 // Single partner fallback: show result directly
+                result = first.result
+                showResult = true
+            } else if failedPartnerIndices.isEmpty {
+                // No results and no failures = shouldn't happen, but handle gracefully
+                errorMessage = "no_results".localized
+            }
+        }
+    }
+    
+    /// Retry analysis only for partners that failed in the last run
+    func retryFailedPartners() async {
+        let indicesToRetry = failedPartnerIndices
+        guard !indicesToRetry.isEmpty else { return }
+        
+        await MainActor.run {
+            failedPartnerIndices = []
+            isAnalyzing = true
+            showStreamingView = true
+            currentStep = .calculatingCharts
+            streamingText = ""
+            errorMessage = nil
+        }
+        
+        let currentEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        
+        for index in indicesToRetry {
+            guard partners.indices.contains(index) else { continue }
+            let partner = partners[index]
+            guard partner.isComplete else { continue }
+            
+            await MainActor.run {
+                activePartnerIndex = index
+                streamingText = "Retrying \(partner.name.isEmpty ? "Partner \(index + 1)" : partner.name)..."
+                currentStep = .calculatingCharts
+            }
+            
+            do {
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let timeFormatter = DateFormatter()
+                timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+                timeFormatter.dateFormat = "HH:mm:ss"
+                
+                let roundedBoyLat = (boyLatitude * 1_000_000).rounded() / 1_000_000
+                let roundedBoyLon = (boyLongitude * 1_000_000).rounded() / 1_000_000
+                let roundedPartnerLat = (partner.latitude * 1_000_000).rounded() / 1_000_000
+                let roundedPartnerLon = (partner.longitude * 1_000_000).rounded() / 1_000_000
+                
+                let request = CompatibilityRequest(
+                    boy: BirthDetails(
+                        dob: dateFormatter.string(from: boyBirthDate),
+                        time: timeFormatter.string(from: boyBirthTime),
+                        lat: roundedBoyLat,
+                        lon: roundedBoyLon,
+                        name: boyName,
+                        place: boyCity
+                    ),
+                    girl: BirthDetails(
+                        dob: dateFormatter.string(from: partner.birthDate),
+                        time: timeFormatter.string(from: partner.birthTime),
+                        lat: roundedPartnerLat,
+                        lon: roundedPartnerLon,
+                        name: partner.name,
+                        place: partner.city
+                    ),
+                    sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
+                    userEmail: currentEmail,
+                    profileId: ProfileContextManager.shared.activeProfileId,
+                    comparisonGroupId: currentComparisonGroupId,
+                    partnerIndex: index
+                )
+                
+                let response: CompatibilityResponse
+                if let service = compatibilityService as? CompatibilityService {
+                    response = try await service.analyzeWithProgress(request: request) { [weak self] step, _ in
+                        self?.updateStep(step)
+                    }
+                } else {
+                    response = try await compatibilityService.analyzeStream(request: request)
+                }
+                
+                let result = parseApiResponse(response)
+                
+                await MainActor.run {
+                    let compResult = ComparisonResult(partner: partner, result: result)
+                    comparisonResults.append(compResult)
+                    saveToHistory(result: result, groupId: currentComparisonGroupId, partnerIndex: index)
+                }
+                
+            } catch {
+                print("[Multi-Partner Retry] Analysis failed for partner \(index): \(error)")
+                await MainActor.run {
+                    failedPartnerIndices.append(index)
+                }
+            }
+        }
+        
+        // Retry complete
+        await MainActor.run {
+            currentStep = .complete
+            isAnalyzing = false
+            showStreamingView = false
+            
+            if !failedPartnerIndices.isEmpty {
+                let failedNames = failedPartnerIndices.compactMap { idx -> String? in
+                    guard partners.indices.contains(idx) else { return nil }
+                    let name = partners[idx].name
+                    return name.isEmpty ? "Partner \(idx + 1)" : name
+                }
+                errorMessage = "\("analysis_still_failing".localized) \(failedNames.joined(separator: ", ")). \("check_connection".localized)"
+            }
+            
+            if comparisonResults.count > 1 {
+                showComparisonOverview = true
+            } else if let first = comparisonResults.first {
                 result = first.result
                 showResult = true
             }
@@ -768,7 +904,9 @@ class CompatibilityViewModel {
             partnerIndex: partnerIndex
         )
         
-        CompatibilityHistoryService.shared.save(item)
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            CompatibilityHistoryService.shared.save(item)
+        }
     }
     
     /// Load state from a history item
@@ -940,6 +1078,11 @@ class CompatibilityViewModel {
         let rec = totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful"
         
         print("[CompatibilityViewModel] STORING session_id in result: \(response.sessionId ?? "NIL")")
+        print("[CompatibilityViewModel] DEBUG hardNoFlags: \(String(describing: response.hardNoFlags))")
+        print("[CompatibilityViewModel] DEBUG isRecommended: \(response.hardNoFlags?.isRecommended ?? true)")
+        print("[CompatibilityViewModel] DEBUG rejectionReasons: \(response.hardNoFlags?.rejectionReasons ?? [])")
+        print("[CompatibilityViewModel] DEBUG doshaSummary: \(String(describing: response.doshaSummary))")
+        print("[CompatibilityViewModel] DEBUG adjustedTotalScore: \(String(describing: response.adjustedTotalScore))")
         
         return CompatibilityResult(
             totalScore: totalScore,
@@ -948,7 +1091,13 @@ class CompatibilityViewModel {
             summary: response.llmAnalysis ?? "\(totalScore)/36",
             recommendation: rec,
             analysisData: response.analysisData,
-            sessionId: response.sessionId
+            sessionId: response.sessionId,
+            isRecommended: response.hardNoFlags?.isRecommended ?? true,
+            adjustedScore: response.adjustedTotalScore != nil ? Int(response.adjustedTotalScore!) : nil,
+            adjustedCategory: response.adjustedCategory,
+            doshaSummary: response.doshaSummary,
+            rejectionReasons: response.hardNoFlags?.rejectionReasons ?? [],
+            comparisonIndicators: response.comparisonIndicators
         )
     }
     
@@ -1012,7 +1161,15 @@ class CompatibilityViewModel {
             maxScore: maxScore,
             kutas: kutas,
             summary: summary,
-            recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful"
+            recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
+            analysisData: nil,
+            sessionId: "mock-session-id",
+            isRecommended: totalScore >= 18,
+            adjustedScore: totalScore,
+            adjustedCategory: totalScore >= 18 ? "average" : "poor",
+            doshaSummary: nil,
+            rejectionReasons: [],
+            comparisonIndicators: nil
         )
     }
 }
@@ -1028,9 +1185,22 @@ struct CompatibilityResult: Identifiable, Codable {
     let analysisData: AnalysisData?
     let sessionId: String?
     
+    // V2.1 — Hard-no gate data
+    let isRecommended: Bool
+    let adjustedScore: Int?
+    let adjustedCategory: String?
+    let doshaSummary: DoshaSummary?
+    let rejectionReasons: [String]
+    let comparisonIndicators: ComparisonIndicators?
+    
     var percentage: Double {
         guard maxScore > 0 else { return 0 }
         return Double(totalScore) / Double(maxScore)
+    }
+    
+    var adjustedPercentage: Double {
+        guard maxScore > 0, let adj = adjustedScore else { return percentage }
+        return Double(adj) / Double(maxScore)
     }
     
     init(
@@ -1040,7 +1210,13 @@ struct CompatibilityResult: Identifiable, Codable {
         summary: String,
         recommendation: String,
         analysisData: AnalysisData? = nil,
-        sessionId: String? = nil
+        sessionId: String? = nil,
+        isRecommended: Bool = true,
+        adjustedScore: Int? = nil,
+        adjustedCategory: String? = nil,
+        doshaSummary: DoshaSummary? = nil,
+        rejectionReasons: [String] = [],
+        comparisonIndicators: ComparisonIndicators? = nil
     ) {
         self.totalScore = totalScore
         self.maxScore = maxScore
@@ -1049,6 +1225,21 @@ struct CompatibilityResult: Identifiable, Codable {
         self.recommendation = recommendation
         self.analysisData = analysisData
         self.sessionId = sessionId
+        // V2.1: Trust backend's is_recommended from hard_no_flags  
+        // Backend already factors in: uncancelled Nadi/Bhakoot doshas + adjusted score < 18
+        // Only apply a critical override for extremely low scores
+        let effectiveScore = adjustedScore ?? totalScore
+        if effectiveScore < 10 {
+            // Critical safety: scores under 10 are never recommended regardless
+            self.isRecommended = false
+        } else {
+            self.isRecommended = isRecommended
+        }
+        self.adjustedScore = adjustedScore
+        self.adjustedCategory = adjustedCategory
+        self.doshaSummary = doshaSummary
+        self.rejectionReasons = rejectionReasons
+        self.comparisonIndicators = comparisonIndicators
     }
 }
 

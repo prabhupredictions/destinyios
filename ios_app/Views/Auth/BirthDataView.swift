@@ -5,6 +5,7 @@ struct BirthDataView: View {
     // MARK: - State
     @State private var viewModel = BirthDataViewModel()
     @AppStorage("hasBirthData") private var hasBirthData = false
+    @AppStorage("isAuthenticated") private var isAuthenticated = false
     
     // Animation states
     @State private var contentOpacity: Double = 0
@@ -58,8 +59,35 @@ struct BirthDataView: View {
                     }
                     .opacity(contentOpacity)
                     
-                    // Sound Toggle - Fixed, Transparent, Floating
-                    if AppTheme.Features.showSoundToggle {
+                    // Top bar: Back button (left) + Sound toggle (right)
+                    HStack {
+                        // Back button for guests to return to sign-up
+                        if UserDefaults.standard.bool(forKey: "isGuest") {
+                            Button(action: {
+                                HapticManager.shared.play(.light)
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    isAuthenticated = false
+                                }
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 14, weight: .medium))
+                                    Text("Sign up")
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                }
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .padding(8)
+                                .background(Color.white.opacity(0.1))
+                                .clipShape(Capsule())
+                            }
+                            .padding(.leading, AppTheme.BirthData.soundToggleTrailingPadding)
+                            .padding(.top, AppTheme.BirthData.soundToggleTopPadding)
+                        }
+                        
+                        Spacer()
+                        
+                        // Sound Toggle - Fixed, Transparent, Floating
+                        if AppTheme.Features.showSoundToggle {
                         Button(action: {
                             HapticManager.shared.play(.light)
                             SoundManager.shared.toggleSound()
@@ -150,7 +178,7 @@ struct BirthDataView: View {
         .sheet(isPresented: $showSignInPrompt) {
             // Guest tried to use birth data that belongs to a registered user
             GuestSignInPromptView(
-                message: viewModel.errorMessage ?? "This birth data is already registered. Please sign in to continue.",
+                message: viewModel.errorMessage ?? "birth_data_registered".localized,
                 provider: viewModel.birthDataTakenProvider,
                 onBack: { showSignInPrompt = false }
             )
@@ -170,6 +198,7 @@ struct BirthDataView: View {
                 viewModel.reloadUserInfo()
             }
         }
+    }
     }
     
     // MARK: - Header (Compact, consistent with Auth screen)
@@ -279,6 +308,15 @@ struct BirthDataView: View {
                 .disabled(viewModel.timeUnknown)
             }
             
+            // Age validation message
+            if viewModel.isUnder13 {
+                Text("age_requirement".localized)
+                    .font(AppTheme.Fonts.caption(size: 13))
+                    .foregroundColor(AppTheme.Colors.error)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 4)
+            }
+            
             // Time Unknown Toggle
             VStack(alignment: .leading, spacing: 6) {
                 Button(action: {
@@ -371,7 +409,6 @@ struct BirthDataView: View {
         }
         .disabled(!viewModel.isValid)
         .opacity(viewModel.isValid ? 1 : 0.5)
-        .bioRhythm(bpm: 60, intensity: 1.02, active: viewModel.isValid) // Subtle pulse when valid
     }
     
     // MARK: - Backend Registration
@@ -413,6 +450,13 @@ struct BirthDataView: View {
                 showSignInPrompt = true
             }
             return false // Don't proceed - conflict detected
+        } catch let error as AccountDeletedError {
+            // Account was soft-deleted — block all access
+            print("🚫 Account deleted: \(error.message)")
+            await MainActor.run {
+                viewModel.errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support."
+            }
+            return false // Don't proceed - account deleted
         } catch {
             print("❌ Failed to register with backend: \(error)")
             // Continue to profile sync anyway

@@ -94,6 +94,9 @@ struct LanguageSettingsSheet: View {
         UserDefaults.standard.set([language.code], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
         
+        // Post notification to refresh UI across the app
+        NotificationCenter.default.post(name: .appLanguageChanged, object: language.code)
+        
         // Haptic feedback
         HapticManager.shared.play(.medium)
     }
@@ -115,6 +118,11 @@ struct LocalizedString {
         // Fallback to main bundle
         return NSLocalizedString(key, comment: "")
     }
+}
+
+// MARK: - Notification Names
+extension Notification.Name {
+    static let appLanguageChanged = Notification.Name("appLanguageChanged")
 }
 
 // MARK: - String Extension for Easy Localization

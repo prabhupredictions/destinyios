@@ -9,17 +9,30 @@ struct ShareCardView: View {
     let totalScore: Int
     let maxScore: Int
     let percentage: Double
+    var isRecommended: Bool = true
+    var adjustedScore: Int? = nil
+    
+    private var displayScore: Int {
+        adjustedScore ?? totalScore
+    }
+    
+    private var displayPercentage: Double {
+        guard maxScore > 0 else { return 0 }
+        return Double(displayScore) / Double(maxScore)
+    }
     
     private var ratingText: String {
+        if !isRecommended { return "not_recommended".localized }
         let pct = percentage * 100
-        if pct >= 90 { return "Excellent" }
-        else if pct >= 75 { return "Very Good" }
-        else if pct >= 60 { return "Good" }
-        else if pct >= 50 { return "Average" }
-        else { return "Needs Attention" }
+        if pct >= 90 { return "excellent".localized }
+        else if pct >= 75 { return "very_good".localized }
+        else if pct >= 60 { return "good".localized }
+        else if pct >= 50 { return "average".localized }
+        else { return "not_recommended".localized }
     }
     
     private var starCount: Int {
+        if !isRecommended { return 1 }
         let pct = percentage * 100
         if pct >= 90 { return 5 }
         else if pct >= 75 { return 4 }
@@ -117,7 +130,7 @@ struct ShareCardView: View {
                         .frame(width: 160, height: 160)
                     
                     Circle()
-                        .trim(from: 0, to: percentage)
+                        .trim(from: 0, to: displayPercentage)
                         .stroke(
                             LinearGradient(
                                 colors: [
@@ -133,10 +146,10 @@ struct ShareCardView: View {
                         .rotationEffect(.degrees(-90))
                     
                     VStack(spacing: 4) {
-                        Text("\(Int(percentage * 100))%")
+                        Text("\(displayScore)")
                             .font(.system(size: 48, weight: .bold, design: .serif))
                             .foregroundColor(.white)
-                        Text("\(totalScore)/\(maxScore)")
+                        Text("/\(maxScore)")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     }
@@ -155,9 +168,29 @@ struct ShareCardView: View {
                 
                 Text(ratingText.uppercased())
                     .font(.system(size: 20, weight: .semibold, design: .serif))
-                    .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    .foregroundColor(!isRecommended ? Color(red: 0.95, green: 0.35, blue: 0.35) : Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(4)
                     .padding(.top, 8)
+                
+                // Transparency: show original & adjusted scores
+                if let adj = adjustedScore, adj != totalScore {
+                    Text("Ashtakoot: \(totalScore)/\(maxScore) · Adjusted: \(adj)/\(maxScore)")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.4))
+                        .padding(.top, 4)
+                    
+                    if !isRecommended {
+                        Text("Overridden due to dosha incompatibility")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(red: 0.95, green: 0.35, blue: 0.35).opacity(0.6))
+                            .padding(.top, 2)
+                    }
+                } else {
+                    Text("Ashtakoot Score: \(totalScore)/\(maxScore)")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.4))
+                        .padding(.top, 4)
+                }
                 
                 Spacer()
                 

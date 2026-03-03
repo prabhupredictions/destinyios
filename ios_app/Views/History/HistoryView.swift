@@ -17,7 +17,9 @@ struct HistoryView: View {
                 CosmicBackgroundView()
                     .ignoresSafeArea()
                 
-                if viewModel.isLoading {
+                if !HistorySettingsManager.shared.isHistoryEnabled {
+                    historyDisabledView
+                } else if viewModel.isLoading {
                     ProgressView()
                         .scaleEffect(1.2)
                         .tint(AppTheme.Colors.gold)
@@ -46,6 +48,12 @@ struct HistoryView: View {
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .alert("Delete", isPresented: $viewModel.showDeleteConfirmation) {
+                Button("Cancel", role: .cancel) { viewModel.itemToDelete = nil }
+                Button("Delete", role: .destructive) { viewModel.confirmDelete() }
+            } message: {
+                Text("Are you sure you want to delete \"\(viewModel.deleteItemTitle)\"?")
+            }
             .task {
                 await viewModel.loadHistory()
             }
@@ -53,6 +61,45 @@ struct HistoryView: View {
                 Task {
                     await viewModel.loadHistory()
                 }
+            }
+        }
+    }
+    
+    // MARK: - History Disabled State
+    @State private var showProfileForSettings = false
+    
+    private var historyDisabledView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "clock.badge.xmark")
+                .font(AppTheme.Fonts.display(size: 48))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
+            
+            Text("History is turned off")
+                .font(AppTheme.Fonts.title(size: 20))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            Text("Your conversations and matches aren't being saved.")
+                .font(AppTheme.Fonts.body(size: 15))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            
+            Button(action: {
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    NotificationCenter.default.post(name: .openProfileSettings, object: nil)
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "gearshape")
+                    Text("Open Settings")
+                }
+                .font(AppTheme.Fonts.title(size: 15))
+                .foregroundColor(AppTheme.Colors.mainBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(AppTheme.Colors.gold)
+                .cornerRadius(12)
             }
         }
     }
@@ -77,19 +124,51 @@ struct HistoryView: View {
     
     // MARK: - History List
     private var historyListView: some View {
-        ScrollView {
-            LazyVStack(spacing: 24) {
-                ForEach(viewModel.groupedItems.keys.sorted(by: >), id: \.self) { date in
+        let displayItems = viewModel.filteredGroupedItems
+        
+        return VStack(spacing: 0) {
+            // Search bar
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .font(.system(size: 15))
+                
+                TextField("Search history...", text: $viewModel.searchText)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .autocorrectionDisabled()
+                
+                if !viewModel.searchText.isEmpty {
+                    Button(action: { viewModel.searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .font(.system(size: 15))
+                    }
+                }
+            }
+            .padding(10)
+            .background(Color.white.opacity(0.08))
+            .cornerRadius(10)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            
+            List {
+                ForEach(displayItems.keys.sorted(by: >), id: \.self) { date in
                     Section(header: sectionHeader(for: date)) {
-                        VStack(spacing: 12) {
-                            ForEach(viewModel.groupedItems[date] ?? []) { item in
-                                HistoryRowView(item: item) {
-                                    handleSelection(item)
-                                }
-                                .onAppear {
-                                    Task {
-                                        await viewModel.loadMoreIfNeeded(currentItem: item)
-                                    }
+                        ForEach(displayItems[date] ?? []) { item in
+                            HistoryRowView(
+                                item: item,
+                                onTap: { handleSelection(item) },
+                                onDelete: { viewModel.requestDelete(item) },
+                                onPin: { viewModel.togglePin(item) }
+                            )
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                            .listRowSeparator(.hidden)
+                            .onAppear {
+                                Task {
+                                    await viewModel.loadMoreIfNeeded(currentItem: item)
                                 }
                             }
                         }
@@ -98,12 +177,18 @@ struct HistoryView: View {
                 
                 // Loading more indicator
                 if viewModel.isLoadingMore {
-                    ProgressView()
-                        .tint(AppTheme.Colors.gold)
-                        .padding(.vertical, 16)
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .tint(AppTheme.Colors.gold)
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
                 }
             }
-            .padding(16)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
     }
     
@@ -153,58 +238,104 @@ struct HistoryView: View {
 struct HistoryRowView: View {
     let item: UnifiedHistoryItem
     let onTap: () -> Void
+    let onDelete: () -> Void
+    let onPin: () -> Void
     
     var body: some View {
-        Button(action: {
+        HStack(spacing: 16) {
+            // Pin indicator
+            if isPinned {
+                Image(systemName: "pin.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .frame(width: 12)
+            } else {
+                Color.clear.frame(width: 12)
+            }
+            
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(iconBackgroundColor)
+                    .frame(width: 48, height: 48)
+                
+                Image(systemName: iconName)
+                    .font(AppTheme.Fonts.title(size: 20))
+                    .foregroundColor(iconColor)
+            }
+            
+            // Content
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(AppTheme.Fonts.title(size: 16))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .lineLimit(1)
+                
+                Text(subtitle)
+                    .font(AppTheme.Fonts.caption(size: 13))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .lineLimit(1)
+            }
+            
+            Spacer()
+            
+            // Time / Extra Info
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(formatTime(item.date))
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
+                
+                extraInfoView
+            }
+        }
+        .padding(.vertical, 14)
+        .padding(.horizontal, 12)
+        .background(AppTheme.Colors.cardBackground)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(isPinned ? AppTheme.Colors.gold.opacity(0.3) : AppTheme.Colors.separator, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+        .contentShape(Rectangle())
+        .onTapGesture {
             HapticManager.shared.play(.light)
             onTap()
-        }) {
-            HStack(spacing: 16) {
-                // Icon
-                ZStack {
-                    Circle()
-                        .fill(iconBackgroundColor)
-                        .frame(width: 48, height: 48)
-                    
-                    Image(systemName: iconName)
-                        .font(AppTheme.Fonts.title(size: 20))
-                        .foregroundColor(iconColor)
-                }
-                
-                // Content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(AppTheme.Fonts.title(size: 16))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .lineLimit(1)
-                    
-                    Text(subtitle)
-                        .font(AppTheme.Fonts.caption(size: 13))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .lineLimit(1)
-                }
-                
-                Spacer()
-                
-                // Time / Extra Info
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(formatTime(item.date))
-                        .font(AppTheme.Fonts.caption(size: 12))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                    
-                    extraInfoView
-                }
-            }
-            .padding(16)
-            .background(AppTheme.Colors.cardBackground)
-            .cornerRadius(16)
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(AppTheme.Colors.separator, lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
-        .buttonStyle(ScaleButtonStyle())
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
+            .tint(AppTheme.Colors.error)
+            
+            Button(action: onPin) {
+                Label(
+                    isPinned ? "Unpin" : "Pin",
+                    systemImage: isPinned ? "pin.slash" : "pin"
+                )
+            }
+            .tint(AppTheme.Colors.gold)
+        }
+        .contextMenu {
+            Button(action: onPin) {
+                Label(
+                    isPinned ? "Unpin" : "Pin",
+                    systemImage: isPinned ? "pin.slash" : "pin"
+                )
+            }
+            
+            Button(role: .destructive, action: onDelete) {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+    
+    private var isPinned: Bool {
+        switch item {
+        case .chat(let thread): return thread.isPinned
+        case .match(let m): return m.isPinned
+        case .matchGroup(let g): return g.isPinned || g.items.first?.isPinned == true
+        }
     }
     
     // MARK: - Helpers determining content
@@ -263,16 +394,9 @@ struct HistoryRowView: View {
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 
-                // Pin indicator
-                if thread.isPinned {
-                    Image(systemName: "pin.fill")
-                        .font(AppTheme.Fonts.caption(size: 10))
-                        .foregroundColor(AppTheme.Colors.gold)
-                } else {
-                    Text("Messages")
-                        .font(AppTheme.Fonts.caption(size: 10))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                }
+                Text("Messages")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
             }
         case .match(let match):
             // Display score clearly with context

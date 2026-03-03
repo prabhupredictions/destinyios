@@ -330,7 +330,7 @@ struct GuestSignInPromptView: View {
 
 #Preview {
     GuestSignInPromptView(
-        message: "Sign in to check compatibility",
+        message: "sign_in_to_check_compatibility".localized,
         onBack: { }
     )
 }

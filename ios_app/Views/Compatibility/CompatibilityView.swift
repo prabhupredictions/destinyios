@@ -83,7 +83,7 @@ struct CompatibilityView: View {
                     },
                     onBack: {
                         // If we came from comparison overview, go back there
-                        if !viewModel.comparisonResults.isEmpty && viewModel.partners.count > 1 {
+                        if viewModel.comparisonResults.count > 1 {
                             viewModel.showResult = false
                             viewModel.showComparisonOverview = true
                         } else {
@@ -195,7 +195,7 @@ struct CompatibilityView: View {
                     }
                 }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
         }
         .sheet(isPresented: $showSubscription) {
@@ -316,6 +316,11 @@ struct CompatibilityView: View {
                     viewModel.loadFromHistoryGroup(group)
                 }
             }
+            
+            // Pre-check "Save birth chart" for paid users (hide + unchecked for free users)
+            if !quotaManager.isFreePlan {
+                savePartnerForFuture = true
+            }
         }
         .onChange(of: initialMatchGroup) { oldValue, newValue in
             if let group = newValue {
@@ -410,7 +415,7 @@ struct CompatibilityView: View {
                             Text("your_details".localized)
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.gold)
-                                .textCase(.uppercase)
+
                             Spacer()
                             // Change button removed as requested
                         }
@@ -454,7 +459,6 @@ struct CompatibilityView: View {
                             Text("partner_details".localized)
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.gold)
-                                .textCase(.uppercase)
                         }
                         
                         // Compact Manual Entry Section (with search in name field)
@@ -463,14 +467,57 @@ struct CompatibilityView: View {
                     }
                     .padding(.horizontal, 4)
 
-                    // Error message
+                    // Error message with retry
                     if let error = viewModel.errorMessage, 
                        !error.hasPrefix("FREE_LIMIT") && !error.hasPrefix("FEATURE_") {
-                        Text(error)
-                            .font(AppTheme.Fonts.body(size: 13))
-                            .foregroundColor(AppTheme.Colors.error)
-                            .padding(.top, 4)
-                            .padding(.horizontal, 8)
+                        VStack(spacing: 10) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(AppTheme.Colors.error)
+                                    .font(.system(size: 14))
+                                
+                                Text(error)
+                                    .font(AppTheme.Fonts.body(size: 13))
+                                    .foregroundColor(AppTheme.Colors.error)
+                                    .lineLimit(3)
+                                
+                                Spacer()
+                            }
+                            
+                            if viewModel.hasFailedPartners {
+                                Button(action: {
+                                    HapticManager.shared.play(.medium)
+                                    Task {
+                                        await viewModel.retryFailedPartners()
+                                    }
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "arrow.clockwise")
+                                            .font(.system(size: 13, weight: .semibold))
+                                        Text("retry_failed".localized)
+                                            .font(AppTheme.Fonts.body(size: 13).weight(.semibold))
+                                    }
+                                    .foregroundColor(AppTheme.Colors.gold)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .strokeBorder(AppTheme.Colors.gold, lineWidth: 1.5)
+                                    )
+                                }
+                            }
+                        }
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(AppTheme.Colors.error.opacity(0.1))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(AppTheme.Colors.error.opacity(0.3), lineWidth: 1)
+                                )
+                        )
+                        .padding(.top, 4)
+                        .padding(.horizontal, 8)
                     }
                     
                     // Bottom padding for scrolling
@@ -765,22 +812,24 @@ struct CompatibilityView: View {
                     .accessibilityLabel("Birth time unknown")
                     .accessibilityAddTraits(viewModel.partnerTimeUnknown ? .isSelected : [])
                     
-                    // Save Partner Toggle
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        withAnimation { savePartnerForFuture.toggle() }
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: savePartnerForFuture ? "checkmark.square.fill" : "square")
-                                .font(.system(size: 14))
-                                .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                            Text("save".localized)
-                                .font(AppTheme.Fonts.caption(size: 11))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
+                    // Save Partner Toggle (hidden for free plan users)
+                    if !quotaManager.isFreePlan {
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            withAnimation { savePartnerForFuture.toggle() }
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: savePartnerForFuture ? "checkmark.square.fill" : "square")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                Text("save_birth_chart".localized)
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                            }
                         }
+                        .accessibilityLabel("Save partner for future")
+                        .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     }
-                    .accessibilityLabel("Save partner for future")
-                    .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     
                     Spacer()
                 }
@@ -899,7 +948,7 @@ struct CompatibilityView: View {
                                 // Guest users should only see Sign In option (no subscribe)
                                 quotaErrorMessage = "sign_in_to_continue_matching".localized
                             } else {
-                                quotaErrorMessage = "You've reached your free limit. Subscribe for unlimited access."
+                                quotaErrorMessage = "free_limit_reached".localized
                             }
                             showQuotaExhausted = true
                         } else {

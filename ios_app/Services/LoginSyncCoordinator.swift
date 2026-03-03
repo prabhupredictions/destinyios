@@ -13,6 +13,9 @@ final class LoginSyncCoordinator {
     func syncAll(userEmail: String, dataManager: DataManager) async {
         print("[LoginSyncCoordinator] Starting coordinated sync for \(userEmail)")
         
+        // Fetch history settings from server first (ensures iOS toggle matches backend)
+        await HistorySettingsManager.shared.fetchSettingsFromServer()
+        
         do {
             // 1. Single thread list fetch (saves one duplicate API call)
             let allThreads = try await ChatHistorySyncService.shared.fetchThreads(userEmail: userEmail, profileId: nil)

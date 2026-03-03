@@ -20,6 +20,8 @@ struct MangalDoshaData: Codable {
     let intensityFactorCount: Int?
     let remedies: [String]?
     let explanation: String?
+    let doshaFrom: [String: AnyCodable]?
+    let doshaBalanceDetails: [String: AnyCodable]?
     
     enum CodingKeys: String, CodingKey {
         case hasMangalDosha = "has_mangal_dosha"
@@ -33,6 +35,8 @@ struct MangalDoshaData: Codable {
         case intensityFactorCount = "intensity_factor_count"
         case remedies
         case explanation
+        case doshaFrom = "dosha_from"
+        case doshaBalanceDetails = "dosha_balance_details"
     }
     
     init(from decoder: Decoder) throws {
@@ -56,6 +60,8 @@ struct MangalDoshaData: Codable {
         intensityFactorCount = try container.decodeIfPresent(Int.self, forKey: .intensityFactorCount)
         remedies = try container.decodeIfPresent([String].self, forKey: .remedies)
         explanation = try container.decodeIfPresent(String.self, forKey: .explanation)
+        doshaFrom = try container.decodeIfPresent([String: AnyCodable].self, forKey: .doshaFrom)
+        doshaBalanceDetails = try container.decodeIfPresent([String: AnyCodable].self, forKey: .doshaBalanceDetails)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -70,6 +76,8 @@ struct MangalDoshaData: Codable {
         try container.encodeIfPresent(intensityFactorCount, forKey: .intensityFactorCount)
         try container.encodeIfPresent(remedies, forKey: .remedies)
         try container.encodeIfPresent(explanation, forKey: .explanation)
+        try container.encodeIfPresent(doshaFrom, forKey: .doshaFrom)
+        try container.encodeIfPresent(doshaBalanceDetails, forKey: .doshaBalanceDetails)
     }
     
     /// Dosha score for display (0.0 to 1.0)
@@ -105,6 +113,55 @@ struct MangalDoshaData: Codable {
         return intensityFactors?.compactMap { $0.value ? $0.key : nil } ?? []
     }
     
+    /// Whether dosha exists but is effectively cancelled by exceptions
+    var isCancelled: Bool {
+        return hasMangalDosha && (severity.lowercased() == "none" || severity.lowercased() == "cancelled" || doshaScore == 0.0)
+    }
+    
+    /// Whether exceptions reduced the severity (but didn't fully cancel)
+    var isReduced: Bool {
+        guard hasMangalDosha, !isCancelled else { return false }
+        return activeExceptions.count > 0
+    }
+    
+    /// Base score before exceptions/intensity (from dosha_balance_details)
+    var baseScore: Double? {
+        guard let details = doshaBalanceDetails,
+              let val = details["base_score"]?.value else { return nil }
+        if let d = val as? Double { return d }
+        if let n = val as? NSNumber { return n.doubleValue }
+        return nil
+    }
+    
+    /// Severity label for the base score (what severity would be without exceptions)
+    var baseSeverityLabel: String {
+        guard let base = baseScore else { return "Unknown" }
+        if base >= 0.75 { return "Severe" }
+        else if base >= 0.50 { return "High" }
+        else if base >= 0.25 { return "Moderate" }
+        else if base > 0 { return "Mild" }
+        return "None"
+    }
+    
+    /// Effective severity label that accounts for cancellation and reduction
+    var effectiveSeverityLabel: String {
+        if isCancelled { return "Cancelled" }
+        return severity.capitalized
+    }
+    
+    /// User-facing summary of exception impact
+    var exceptionImpactSummary: String? {
+        let excCount = activeExceptions.count
+        guard excCount > 0 else { return nil }
+        if isCancelled {
+            return "\(excCount) exception\(excCount == 1 ? "" : "s") fully cancelled this dosha"
+        } else if let base = baseScore, base > doshaScore {
+            return "\(excCount) exception\(excCount == 1 ? "" : "s") reduced severity from \(baseSeverityLabel) to \(severity.capitalized)"
+        } else {
+            return "\(excCount) exception\(excCount == 1 ? "" : "s") reduced this dosha"
+        }
+    }
+    
     /// Display severity label
     var severityLabel: String {
         return DoshaDescriptions.severity(severity)
@@ -119,6 +176,94 @@ struct MangalDoshaData: Codable {
     var intensityDescriptions: [String] {
         return activeIntensityFactors.map { DoshaDescriptions.intensity($0) }
     }
+    
+    /// Display active dosha sources from the dosha_from dictionary
+    var activeDoshaSourcesDisplay: String? {
+        guard let doshaDict = doshaFrom else {
+            print("[DoshaSource] ❌ doshaFrom is nil — no chart source available")
+            return nil
+        }
+        
+        print("[DoshaSource] ✅ doshaFrom has \(doshaDict.count) keys: \(Array(doshaDict.keys).sorted())")
+        
+        // Debug: print each key's value and type
+        for (key, anyCodable) in doshaDict {
+            print("[DoshaSource]   key='\(key)' value=\(String(describing: anyCodable.value)) type=\(type(of: anyCodable.value))")
+        }
+        
+        var sources: [String] = []
+        
+        // Helper to safely extract Int
+        func getInt(_ key: String) -> Int? {
+            if let val = doshaDict[key]?.value {
+                let result = extractHouseNumber(from: val)
+                print("[DoshaSource]   getInt('\(key)'): val=\(val) -> \(String(describing: result))")
+                return result
+            }
+            print("[DoshaSource]   getInt('\(key)'): key not found in doshaDict")
+            return nil
+        }
+        
+        // Helper to safely extract Bool (handles Bool, NSNumber, Int)
+        func getBool(_ key: String) -> Bool {
+            guard let val = doshaDict[key]?.value else { 
+                print("[DoshaSource]   getBool('\(key)'): key not found")
+                return false 
+            }
+            let result: Bool
+            if let boolVal = val as? Bool {
+                result = boolVal
+                print("[DoshaSource]   getBool('\(key)'): Bool -> \(result)")
+            } else if let numVal = val as? NSNumber {
+                result = numVal.boolValue
+                print("[DoshaSource]   getBool('\(key)'): NSNumber(\(numVal)) -> \(result)")
+            } else if let intVal = val as? Int {
+                result = intVal != 0
+                print("[DoshaSource]   getBool('\(key)'): Int(\(intVal)) -> \(result)")
+            } else {
+                result = false
+                print("[DoshaSource]   getBool('\(key)'): unknown type \(type(of: val)) -> false")
+            }
+            return result
+        }
+        
+        // Check Lagna Chart
+        let lagnaActive = getBool("lagna")
+        if lagnaActive, let house = getInt("mars_house_from_lagna") {
+            sources.append("House \(house) (from Lagna)")
+            print("[DoshaSource] ✅ Added Lagna source: House \(house)")
+        }
+        
+        // Check Moon Chart
+        let moonActive = getBool("moon")
+        if moonActive, let house = getInt("mars_house_from_moon") {
+            sources.append("House \(house) (from Moon)")
+            print("[DoshaSource] ✅ Added Moon source: House \(house)")
+        }
+        
+        // Check Venus Chart
+        let venusActive = getBool("venus")
+        if venusActive, let house = getInt("mars_house_from_venus") {
+            sources.append("House \(house) (from Venus)")
+            print("[DoshaSource] ✅ Added Venus source: House \(house)")
+        }
+        
+        let result = sources.isEmpty ? nil : sources.joined(separator: " • ")
+        print("[DoshaSource] 📊 Final result: \(String(describing: result)) (sources.count=\(sources.count))")
+        return result
+    }
+}
+
+// Helper to extract house number from AnyCodable value outside View scope
+private func extractHouseNumber(from value: Any) -> Int? {
+    if let intVal = value as? Int {
+        return intVal
+    } else if let doubleVal = value as? Double {
+        return Int(doubleVal)
+    } else if let nsNum = value as? NSNumber {
+        return nsNum.intValue
+    }
+    return nil
 }
 
 struct MarsPosition: Codable {
@@ -252,23 +397,27 @@ struct YogaDoshaData: Codable {
 struct YogaItem: Codable, Identifiable {
     var id: String { name }
     let name: String
+    let yogaKey: String?  // Machine-readable key for localization (e.g. "gajakesari_yoga")
     let status: String  // A = Active, R = Reduced, C = Cancelled
     let strengthValue: AnyCodable?  // API sends String like "R" or Double
     let category: String?
     let planets: String?
     let houses: String?
     let formation: String?
+    let outcome: String?  // Professional description of yoga/dosha effect
     let reason: String?  // Cancellation/reduction reason from API
     let isDosha: Bool?   // Explicit backend flag
     
     enum CodingKeys: String, CodingKey {
         case name
+        case yogaKey = "yoga_key"
         case status
         case strengthValue = "strength"
         case category
         case planets
         case houses
         case formation
+        case outcome
         case reason
         case isDosha = "is_dosha"
     }
@@ -276,12 +425,19 @@ struct YogaItem: Codable, Identifiable {
     /// Clean display name - strips numbers/parentheses after Yoga/Dosha
     /// e.g., "Grihanasa Yoga (192)" → "Grihanasa Yoga"
     /// e.g., "Bhagya Yoga 241" → "Bhagya Yoga"
+    /// e.g., "kala_sarpa" → "Kala Sarpa"
     var displayName: String {
         // Find "Yoga" or "Dosha" and truncate after it
         if let yogaRange = name.range(of: "Yoga", options: .caseInsensitive) {
             return String(name[..<yogaRange.upperBound])
         } else if let doshaRange = name.range(of: "Dosha", options: .caseInsensitive) {
             return String(name[..<doshaRange.upperBound])
+        }
+        // Handle snake_case names (e.g., "kala_sarpa" → "Kala Sarpa")
+        if name.contains("_") {
+            return name.split(separator: "_")
+                .map { $0.prefix(1).uppercased() + $0.dropFirst() }
+                .joined(separator: " ")
         }
         // Fallback: strip trailing numbers/parentheses
         return name.replacingOccurrences(of: "\\s*[\\(\\d\\)]+$", with: "", options: .regularExpression)
@@ -358,6 +514,33 @@ struct YogaItem: Codable, Identifiable {
     /// Is this a yoga (positive) or dosha (negative)?
     var isYoga: Bool {
         return true // Set by parent context
+    }
+    
+    // MARK: - Localized Content (uses yogaKey to lookup from Localizable.strings)
+    
+    /// Localized yoga name - looks up using yoga_key from Localizable.strings
+    var localizedName: String {
+        guard let key = yogaKey, !key.isEmpty else { return displayName }
+        let lookupKey = "yoga_name_\(key)"
+        let localized = lookupKey.localized
+        // If localization returns the key itself, fallback to displayName
+        return localized == lookupKey ? displayName : localized
+    }
+    
+    /// Localized outcome description - from Localizable.strings or API fallback
+    var localizedOutcome: String? {
+        guard let key = yogaKey, !key.isEmpty else { return outcome }
+        let lookupKey = "yoga_outcome_\(key)"
+        let localized = lookupKey.localized
+        return localized == lookupKey ? outcome : localized
+    }
+    
+    /// Localized formation description - from Localizable.strings or API fallback
+    var localizedFormation: String? {
+        guard let key = yogaKey, !key.isEmpty else { return formation }
+        let lookupKey = "yoga_formation_\(key)"
+        let localized = lookupKey.localized
+        return localized == lookupKey ? formation : localized
     }
 }
 

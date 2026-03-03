@@ -17,15 +17,17 @@ struct FullReportSheet: View {
     }
     
     private var ratingText: String {
+        if !result.isRecommended { return "not_recommended".localized }
         let pct = result.percentage * 100
-        if pct >= 90 { return "Excellent" }
-        else if pct >= 75 { return "Very Good" }
-        else if pct >= 60 { return "Good" }
-        else if pct >= 50 { return "Average" }
-        else { return "Needs Attention" }
+        if pct >= 90 { return "excellent".localized }
+        else if pct >= 75 { return "very_good".localized }
+        else if pct >= 60 { return "good".localized }
+        else if pct >= 50 { return "average".localized }
+        else { return "not_recommended".localized }
     }
     
     private var starCount: Int {
+        if !result.isRecommended { return 1 }
         let pct = result.percentage * 100
         if pct >= 90 { return 5 }
         else if pct >= 75 { return 4 }
@@ -41,11 +43,11 @@ struct FullReportSheet: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        // 1. Action Bar
-                        actionBar
-                        
-                        // 2. Branded Header
+                        // 1. Branded Header (Score Card)
                         brandedHeader
+                        
+                        // 2. Save to Files row
+                        actionBar
                         
                         // 3. Section Cards (parsed from LLM output)
                         if sections.isEmpty {
@@ -68,79 +70,108 @@ struct FullReportSheet: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .font(AppTheme.Fonts.title(size: 17))
-                        .foregroundColor(AppTheme.Colors.gold)
+                    Button {
+                        presentNativeShareSheet()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 18))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
                 }
             }
-        }
-        .confirmationDialog("Share Report", isPresented: $showShareOptions) {
-            Button("Share as PDF") {
-                generateAndSharePDF()
-            }
-            Button("Share Score Card") {
-                shareScoreCard()
-            }
-            Button("Cancel", role: .cancel) {}
         }
     }
     
-    // MARK: - Action Bar
+    // MARK: - Native Share Sheet
+    
+    private func presentNativeShareSheet() {
+        Task { @MainActor in
+            // Generate professional vector PDF
+            let renderer = CompatibilityPDFRenderer(
+                result: result,
+                boyName: boyName,
+                girlName: girlName,
+                boyDob: boyDob,
+                girlDob: girlDob,
+                sections: sections
+            )
+            let pdfURL = renderer.generateReport()
+            
+            // Generate Score Card Image (for social media)
+            let cardView = ShareCardView(
+                boyName: boyName,
+                girlName: girlName,
+                totalScore: result.totalScore,
+                maxScore: result.maxScore,
+                percentage: result.percentage,
+                isRecommended: result.isRecommended,
+                adjustedScore: result.adjustedScore
+            )
+            let shareImage = ReportShareService.shared.generateShareImage(from: cardView)
+            
+            // Prepare share items
+            var shareItems: [Any] = []
+            
+            // Add share text
+            let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
+            shareItems.append(shareText)
+            
+            // Add image if available
+            if let image = shareImage {
+                shareItems.append(image)
+            }
+            
+            // Add PDF if available
+            if let url = pdfURL {
+                shareItems.append(url)
+            }
+            
+            // Present native share sheet
+            ReportShareService.shared.presentShareSheet(items: shareItems)
+        }
+    }
+    
+    // MARK: - Action Bar (Save to Files row style)
     
     private var actionBar: some View {
-        HStack(spacing: 12) {
-            // Download PDF Button
-            Button {
-                generateAndSharePDF()
-            } label: {
-                HStack(spacing: 6) {
-                    if isGeneratingPDF {
-                        ProgressView()
-                            .tint(AppTheme.Colors.gold)
-                            .scaleEffect(0.7)
-                    } else {
-                        Image(systemName: "arrow.down.doc.fill")
-                    }
-                    Text("Download PDF")
-                        .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
-                }
-                .foregroundColor(AppTheme.Colors.mainBackground)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.8)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                )
+        Button {
+            generateAndSaveToFiles()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "arrow.down.doc.fill")
+                    .font(.system(size: 18))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                
+                Text("Save to Files")
+                    .font(AppTheme.Fonts.body(size: 16))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
-            .disabled(isGeneratingPDF)
-            
-            // Share Button
-            Button {
-                showShareOptions = true
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "square.and.arrow.up")
-                    Text("Share")
-                        .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
-                }
-                .foregroundColor(AppTheme.Colors.gold)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
-                )
-            }
-            
-            Spacer()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(AppTheme.Colors.cardBackground)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
+                    )
+            )
         }
+        .disabled(isGeneratingPDF)
         .padding(.top, 8)
     }
     
@@ -187,14 +218,21 @@ struct FullReportSheet: View {
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
             
-            // Score Ring
+            // Score Ring — show adjusted score for transparency
             ZStack {
                 Circle()
                     .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 3)
                     .frame(width: 100, height: 100)
                 
+                let displayPct: Double = {
+                    if let adj = result.adjustedScore, adj != result.totalScore {
+                        return Double(adj) / Double(result.maxScore)
+                    }
+                    return result.percentage
+                }()
+                
                 Circle()
-                    .trim(from: 0, to: result.percentage)
+                    .trim(from: 0, to: displayPct)
                     .stroke(
                         LinearGradient(
                             colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.7)],
@@ -207,7 +245,7 @@ struct FullReportSheet: View {
                     .rotationEffect(.degrees(-90))
                 
                 VStack(spacing: 2) {
-                    Text("\(result.totalScore)")
+                    Text("\(result.adjustedScore ?? result.totalScore)")
                         .font(.system(size: 28, weight: .bold, design: .serif))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     Text("/ \(result.maxScore)")
@@ -230,6 +268,50 @@ struct FullReportSheet: View {
                 .font(.system(size: 13, weight: .semibold, design: .serif))
                 .foregroundColor(AppTheme.Colors.gold)
                 .tracking(3)
+            
+            // Transparency: show original vs adjusted score for all cases
+            if let adjScore = result.adjustedScore, adjScore != result.totalScore {
+                Text("Ashtakoot: \(result.totalScore)/\(result.maxScore) · Adjusted: \(adjScore)/\(result.maxScore)")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
+                    .padding(.top, 2)
+            } else {
+                Text("Ashtakoot Score: \(result.totalScore)/\(result.maxScore)")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
+                    .padding(.top, 2)
+            }
+            
+            // Rejection reasons for Not Recommended
+            if !result.isRecommended {
+                VStack(spacing: 6) {
+                    Text("Overridden due to compatibility issues:")
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.error.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                    
+                    // Rejection reasons
+                    ForEach(result.rejectionReasons, id: \.self) { reason in
+                        let displayReason = reason
+                            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
+                            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
+                            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
+                            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
+                        HStack(alignment: .top, spacing: 4) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 9))
+                                .foregroundColor(AppTheme.Colors.error.opacity(0.7))
+                                .padding(.top, 1)
+                            Text(displayReason)
+                                .font(AppTheme.Fonts.caption(size: 10))
+                                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.8))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, 4)
+            }
             
             // Report date
             Text("Report generated: \(formattedDate)")
@@ -263,12 +345,31 @@ struct FullReportSheet: View {
     
     // MARK: - Section Card
     
+    // SF Symbol mapping for section emojis
+    private func sfSymbol(for emoji: String) -> String? {
+        switch emoji {
+        case "🎯": return "target"                    // COMPATIBILITY VERDICT
+        case "🌟", "⭐": return "star.fill"          // KEY STRENGTHS
+        case "ⓘ", "ℹ️": return "info.circle.fill"    // KEY CHALLENGES
+        case "🔮": return "wand.and.stars"          // FINAL RECOMMENDATION
+        case "📋": return "doc.text"                // Default/Analysis
+        default: return nil
+        }
+    }
+    
     private func sectionCard(emoji: String, title: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             // Section header
             HStack(spacing: 8) {
-                Text(emoji)
-                    .font(.system(size: 18))
+                // Use SF Symbol if mapped, otherwise use emoji
+                if let symbolName = sfSymbol(for: emoji) {
+                    Image(systemName: symbolName)
+                        .font(.system(size: 16))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                } else {
+                    Text(emoji)
+                        .font(.system(size: 18))
+                }
                 
                 Text(title.uppercased())
                     .font(.system(size: 13, weight: .bold, design: .serif))
@@ -326,7 +427,7 @@ struct FullReportSheet: View {
                 .frame(height: 1)
             
             HStack(spacing: 6) {
-                Image(systemName: "exclamationmark.triangle.fill")
+                Image(systemName: "info.circle.fill")
                     .font(.system(size: 11))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                 Text("AI-Generated Analysis")
@@ -334,7 +435,7 @@ struct FullReportSheet: View {
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             }
             
-            Text("This report was generated using AI-powered Vedic astrology analysis based on BPHS (Brihat Parashara Hora Shastra) principles. Results are for informational and entertainment purposes only. Marriage decisions should consider multiple factors beyond astrological compatibility. Consult a qualified astrologer for personalized guidance.")
+            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
                 .lineSpacing(3)
@@ -406,25 +507,28 @@ struct FullReportSheet: View {
     private func extractEmojiAndTitle(from text: String) -> (emoji: String, title: String) {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         
-        // Check if first character is an emoji
-        if let first = trimmed.unicodeScalars.first,
-           first.properties.isEmoji && first.value > 0x238 {
-            // Find where the emoji ends
-            let firstChar = String(trimmed.prefix(1))
-            // Some emojis are multi-scalar
-            var emojiEnd = trimmed.index(trimmed.startIndex, offsetBy: 1)
-            // Walk forward while still in emoji territory
-            while emojiEnd < trimmed.endIndex {
-                let scalar = trimmed.unicodeScalars[trimmed.unicodeScalars.index(trimmed.unicodeScalars.startIndex, offsetBy: trimmed.distance(from: trimmed.startIndex, to: emojiEnd))]
-                if scalar.properties.isEmoji || scalar.value == 0xFE0F || scalar.value == 0x200D {
-                    emojiEnd = trimmed.index(after: emojiEnd)
-                } else {
-                    break
+        // Handle special case for circled characters (ⓘ, ⓒ, etc.) that don't have isEmoji property
+        if let first = trimmed.unicodeScalars.first {
+            let firstScalar = first.value
+            // Check for circled letters (ⓘ = U+24D8, etc.)
+            if (firstScalar >= 0x24B6 && firstScalar <= 0x24E9) || // Circled Latin
+               (firstScalar >= 0x24EA && firstScalar <= 0x24FF) || // Circled numbers
+               (first.properties.isEmoji && firstScalar > 0x238) {
+                var emojiEnd = trimmed.index(trimmed.startIndex, offsetBy: 1)
+                // Walk forward while still in emoji territory (for multi-scalar emojis)
+                while emojiEnd < trimmed.endIndex {
+                    let scalarIndex = trimmed.unicodeScalars.index(trimmed.unicodeScalars.startIndex, offsetBy: trimmed.distance(from: trimmed.startIndex, to: emojiEnd))
+                    let scalar = trimmed.unicodeScalars[scalarIndex]
+                    if scalar.properties.isEmoji || scalar.value == 0xFE0F || scalar.value == 0x200D {
+                        emojiEnd = trimmed.index(after: emojiEnd)
+                    } else {
+                        break
+                    }
                 }
+                let emoji = String(trimmed[trimmed.startIndex..<emojiEnd])
+                let title = String(trimmed[emojiEnd...]).trimmingCharacters(in: .whitespaces)
+                return (emoji: emoji, title: title)
             }
-            let emoji = String(trimmed[trimmed.startIndex..<emojiEnd])
-            let title = String(trimmed[emojiEnd...]).trimmingCharacters(in: .whitespaces)
-            return (emoji: emoji, title: title)
         }
         
         return (emoji: "📋", title: trimmed)
@@ -485,35 +589,148 @@ struct FullReportSheet: View {
     
     // MARK: - PDF & Share Actions
     
-    private func generateAndSharePDF() {
+    private func generateAndSaveToFiles() {
         isGeneratingPDF = true
         
         Task { @MainActor in
-            // Create a report view for PDF rendering
-            let pdfView = PremiumReportPDFView(
+            let renderer = CompatibilityPDFRenderer(
                 result: result,
                 boyName: boyName,
                 girlName: girlName,
                 boyDob: boyDob,
                 girlDob: girlDob,
-                sections: sections,
-                ratingText: ratingText,
-                starCount: starCount,
-                formattedDate: formattedDate
+                sections: sections
             )
             
-            let fileName = "Destiny_AI_\(boyName)_\(girlName)_Compatibility"
-            
-            if let pdfURL = ReportShareService.shared.generateMultiPagePDF(
-                from: pdfView,
-                width: 390,
-                fileName: fileName
-            ) {
-                ReportShareService.shared.sharePDF(url: pdfURL)
+            if let pdfURL = renderer.generateReport() {
+                ReportShareService.shared.presentSaveToFiles(fileURL: pdfURL)
             }
             
             isGeneratingPDF = false
         }
+    }
+    
+    // MARK: - PDF Section Builder
+    
+    private func buildPDFSections() -> [AnyView] {
+        let gold = Color(red: 0.83, green: 0.69, blue: 0.22)
+        var pdfSections: [AnyView] = []
+        
+        // 1. Header
+        let header = VStack(spacing: 12) {
+            Text("DESTINY AI ASTROLOGY")
+                .font(.system(size: 14, weight: .medium, design: .serif))
+                .foregroundColor(gold)
+                .tracking(4)
+            
+            Text("COMPATIBILITY REPORT")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(gold.opacity(0.6))
+                .tracking(3)
+            
+            Text("\(boyName) & \(girlName)")
+                .font(.system(size: 22, weight: .bold, design: .serif))
+                .foregroundColor(.white)
+            
+            if let bDob = boyDob, let gDob = girlDob {
+                Text("Born: \(bDob) · \(gDob)")
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.5))
+            }
+            
+            Text("\(result.totalScore)/\(result.maxScore) • \(Int(result.percentage * 100))% • \(ratingText)")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(gold)
+            
+            HStack(spacing: 3) {
+                ForEach(0..<5, id: \.self) { index in
+                    Image(systemName: index < starCount ? "star.fill" : "star")
+                        .font(.system(size: 12))
+                        .foregroundColor(gold)
+                }
+            }
+            
+            Rectangle()
+                .fill(gold.opacity(0.3))
+                .frame(height: 1)
+                .padding(.horizontal, 40)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        
+        pdfSections.append(AnyView(header))
+        
+        // 2. Each LLM section card
+        for section in sections {
+            let card = VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    if let symbolName = sfSymbol(for: section.emoji) {
+                        Image(systemName: symbolName)
+                            .font(.system(size: 12))
+                            .foregroundColor(gold)
+                    } else {
+                        Text(section.emoji)
+                            .font(.system(size: 14))
+                    }
+                    
+                    Text(section.title)
+                        .font(.system(size: 14, weight: .bold, design: .serif))
+                        .foregroundColor(gold)
+                }
+                
+                Rectangle()
+                    .fill(gold.opacity(0.2))
+                    .frame(height: 1)
+                
+                MarkdownTextView(
+                    content: replaceGenericLabels(in: section.content),
+                    textColor: .white.opacity(0.9),
+                    fontSize: 12
+                )
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.white.opacity(0.05))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(gold.opacity(0.15), lineWidth: 0.5)
+                    )
+            )
+            
+            pdfSections.append(AnyView(card))
+        }
+        
+        // 3. Disclaimer
+        let disclaimer = VStack(spacing: 8) {
+            Rectangle()
+                .fill(gold.opacity(0.2))
+                .frame(height: 1)
+                .padding(.horizontal, 40)
+            
+            Text("ⓘ AI-Generated Analysis")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(gold.opacity(0.5))
+            
+            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only.")
+                .font(.system(size: 8))
+                .foregroundColor(.white.opacity(0.3))
+                .multilineTextAlignment(.center)
+            
+            Text("© 2026 Destiny AI Astrology · destinyaiastrology.com")
+                .font(.system(size: 8))
+                .foregroundColor(.white.opacity(0.25))
+            
+            Text("Generated: \(formattedDate)")
+                .font(.system(size: 7))
+                .foregroundColor(.white.opacity(0.2))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        
+        pdfSections.append(AnyView(disclaimer))
+        
+        return pdfSections
     }
     
     private func shareScoreCard() {
@@ -523,11 +740,13 @@ struct FullReportSheet: View {
                 girlName: girlName,
                 totalScore: result.totalScore,
                 maxScore: result.maxScore,
-                percentage: result.percentage
+                percentage: result.percentage,
+                isRecommended: result.isRecommended,
+                adjustedScore: result.adjustedScore
             )
             
             if let image = ReportShareService.shared.generateShareImage(from: cardView) {
-                let shareText = "✨ \(boyName) & \(girlName) — Cosmic Score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
+                let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
                 ReportShareService.shared.shareImage(image, text: shareText)
             }
         }
@@ -546,6 +765,18 @@ private struct PremiumReportPDFView: View {
     let ratingText: String
     let starCount: Int
     let formattedDate: String
+    
+    // SF Symbol mapping for section emojis (duplicated here since this is a separate struct)
+    private func sfSymbol(for emoji: String) -> String? {
+        switch emoji {
+        case "🎯": return "target"                    // COMPATIBILITY VERDICT
+        case "🌟", "⭐": return "star.fill"          // KEY STRENGTHS
+        case "ⓘ", "ℹ️": return "info.circle.fill"    // KEY CHALLENGES
+        case "🔮": return "wand.and.stars"          // FINAL RECOMMENDATION
+        case "📋": return "doc.text"                // Default/Analysis
+        default: return nil
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -594,9 +825,21 @@ private struct PremiumReportPDFView: View {
             // Sections
             ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("\(section.emoji) \(section.title)")
-                        .font(.system(size: 14, weight: .bold, design: .serif))
-                        .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    HStack(spacing: 6) {
+                        // Use SF Symbol for emoji in PDF
+                        if let symbolName = sfSymbol(for: section.emoji) {
+                            Image(systemName: symbolName)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                        } else {
+                            Text(section.emoji)
+                                .font(.system(size: 14))
+                        }
+                        
+                        Text(section.title)
+                            .font(.system(size: 14, weight: .bold, design: .serif))
+                            .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
+                    }
                     
                     Rectangle()
                         .fill(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.2))
@@ -626,11 +869,11 @@ private struct PremiumReportPDFView: View {
                     .frame(height: 1)
                     .padding(.horizontal, 40)
                 
-                Text("⚠️ AI-GENERATED ANALYSIS")
+                Text("ⓘ AI-Generated Analysis")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.5))
                 
-                Text("This report was generated using AI-powered Vedic astrology analysis based on BPHS principles. Results are for informational and entertainment purposes only.")
+                Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.3))
                     .multilineTextAlignment(.center)
@@ -666,6 +909,7 @@ struct AskDestinySheet: View {
     @State private var showQuotaSheet: Bool = false
     @State private var quotaMessage: String = ""
     @State private var showSubscription: Bool = false
+    @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -700,13 +944,14 @@ struct AskDestinySheet: View {
                     .padding(.vertical, 12)
                     
                     // Messages List
+                    GeometryReader { scrollGeo in
                     ScrollViewReader { proxy in
                         ScrollView {
                             LazyVStack(spacing: 16) {
-                                // Welcome message
+                                // Welcome message — vertically centered
                                 if messages.isEmpty && !isLoading {
                                     welcomeView
-                                        .padding(.top, 20)
+                                        .frame(minHeight: scrollGeo.size.height - 32)
                                 }
                                 
                                 ForEach(messages) { message in
@@ -719,6 +964,13 @@ struct AskDestinySheet: View {
                                     CompatTypingIndicator()
                                         .id("loading")
                                 }
+                                
+                                // Inline suggested follow-up questions
+                                if !suggestedQuestions.isEmpty && !isLoading {
+                                    inlineSuggestedQuestionsView
+                                        .id("suggestions")
+                                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                                }
                             }
                             .padding(.horizontal, 12)  // Match ChatView padding
                             .padding(.vertical, 16)
@@ -726,9 +978,11 @@ struct AskDestinySheet: View {
                         .defaultScrollAnchor(.bottom)
                         .scrollDismissesKeyboard(.interactively)
                         .onChange(of: messages.count) { _, _ in
-                            withAnimation {
-                                if let lastId = messages.last?.id {
-                                    proxy.scrollTo(lastId, anchor: .bottom)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                withAnimation(.easeOut(duration: 0.25)) {
+                                    if let lastId = messages.last?.id {
+                                        proxy.scrollTo(lastId, anchor: .bottom)
+                                    }
                                 }
                             }
                         }
@@ -739,7 +993,18 @@ struct AskDestinySheet: View {
                                 }
                             }
                         }
+                        // Scroll smoothly when suggested questions appear
+                        .onChange(of: suggestedQuestions) { _, newQuestions in
+                            if !newQuestions.isEmpty {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        proxy.scrollTo("suggestions", anchor: .bottom)
+                                    }
+                                }
+                            }
+                        }
                     }
+                    } // GeometryReader
                     
                     // Error Banner
                     if let error = errorMessage {
@@ -778,7 +1043,7 @@ struct AskDestinySheet: View {
                     }
                 }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
         }
         .sheet(isPresented: $showSubscription) {
@@ -884,13 +1149,13 @@ struct AskDestinySheet: View {
             
             // Quick Questions
             VStack(spacing: 8) {
-                quickQuestionButton("What are the main challenges?")
-                quickQuestionButton("How can they improve communication?")
-                quickQuestionButton("What about \(boyName)'s career?")
+                quickQuestionButton("Key strengths of this match?")
+                quickQuestionButton("Key challenges of this match?")
+                quickQuestionButton("Best timing for relationship harmony?")
             }
             .padding(.top, 8)
         }
-        .padding(24)
+        .padding(.horizontal, 24)
     }
     
     private func quickQuestionButton(_ text: String) -> some View {
@@ -912,6 +1177,45 @@ struct AskDestinySheet: View {
                         )
                 )
         }
+    }
+    
+    // MARK: - Inline Suggested Questions (horizontal scrollable pills)
+    private var inlineSuggestedQuestionsView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Suggested questions")
+                .font(AppTheme.Fonts.caption())
+                .foregroundColor(AppTheme.Colors.textSecondary)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(suggestedQuestions, id: \.self) { question in
+                        Button(action: {
+                            HapticManager.shared.play(.light)
+                            inputText = question
+                            suggestedQuestions = []
+                            Task { await sendMessage() }
+                        }) {
+                            Text(question)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .lineLimit(1)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule()
+                                        .fill(AppTheme.Colors.gold.opacity(0.1))
+                                        .overlay(
+                                            Capsule()
+                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
+                                        )
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(.top, 4)
     }
     
     // MARK: - Input Bar
@@ -970,6 +1274,7 @@ struct AskDestinySheet: View {
         
         inputText = ""
         errorMessage = nil
+        suggestedQuestions = []  // Clear previous suggestions
         
         // Add user message
         let userMessage = CompatChatMessage(content: query, isUser: true, type: .user)
@@ -1021,6 +1326,11 @@ struct AskDestinySheet: View {
                 let aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
                 messages.append(aiMessage)
                 saveMessagesToHistory()  // Persist messages
+                
+                // Set follow-up suggestions from API
+                if let followUps = response.followUpSuggestions, !followUps.isEmpty {
+                    suggestedQuestions = followUps
+                }
             } else if let message = response.message {
                 // Info/error message
                 let aiMessage = CompatChatMessage(content: message, isUser: false, type: .info)
@@ -1100,6 +1410,11 @@ struct AskDestinySheet: View {
             messages.append(aiMessage)
             saveMessagesToHistory()  // Persist messages
             
+            // Set follow-up suggestions from predict API
+            if !predictResponse.followUpSuggestions.isEmpty {
+                suggestedQuestions = predictResponse.followUpSuggestions
+            }
+            
         } catch let error as NetworkError {
             // Remove redirect message
             messages.removeAll { $0.id == redirectMsgId }
@@ -1110,9 +1425,9 @@ struct AskDestinySheet: View {
                 // Show quota sheet with sign-in/upgrade options
                 let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
                 if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "Free questions used. Sign In or Subscribe to continue."
+                    quotaMessage = "sign_in_to_continue_asking".localized
                 } else {
-                    quotaMessage = "You've reached your question limit. Subscribe for unlimited access."
+                    quotaMessage = "free_limit_reached".localized
                 }
                 showQuotaSheet = true
             } else {
@@ -1132,9 +1447,9 @@ struct AskDestinySheet: View {
             if errorString.contains("maximum free") || errorString.contains("quota") || errorString.contains("limit") {
                 let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
                 if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "Free questions used. Sign In or Subscribe to continue."
+                    quotaMessage = "sign_in_to_continue_asking".localized
                 } else {
-                    quotaMessage = "You've reached your question limit. Subscribe for unlimited access."
+                    quotaMessage = "free_limit_reached".localized
                 }
                 showQuotaSheet = true
             } else {

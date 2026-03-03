@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// Professional Profile screen with account info, settings navigation, and subscription status
 /// Follows standard iOS design patterns with Midnight Gold theme
@@ -7,6 +8,7 @@ struct ProfileView: View {
     @Environment(\.openURL) private var openURL
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     @StateObject private var quotaManager = QuotaManager.shared
+    @State private var profileContext = ProfileContextManager.shared
     @State private var authViewModel = AuthViewModel()
     
     // User preferences from storage
@@ -14,6 +16,7 @@ struct ProfileView: View {
     @AppStorage("userEmail") private var userEmail: String = ""
     @AppStorage("chartStyle") private var chartStyle: String = "north"
     @AppStorage("isGuest") private var isGuest: Bool = false
+    @AppStorage("appLanguageCode") private var appLanguageCode: String = "en"
     
     // Navigation states for settings sheets
     @State private var showBirthDetails = false
@@ -28,6 +31,19 @@ struct ProfileView: View {
     @State private var showGuestSignInForSwitch = false  // Guest sign-in prompt for Switch Profile
     @State private var showNotificationPreferences = false  // Notification preferences sheet
     @State private var showPartnerManager = false  // Partner manager sheet (Plus-only)
+    @State private var showDeleteAccountSheet = false  // Delete account confirmation
+    @State private var isDeletingAccount = false
+    @State private var deleteErrorMessage: String? = nil
+    
+    // History settings
+    @State private var historySettings = HistorySettingsManager.shared
+    @State private var showTurnOffHistoryAlert = false
+    @State private var showClearHistoryAlert = false
+    @State private var showClearSuccessAlert = false
+    @State private var clearedThreadCount = 0
+    
+    // Notification toggle
+    @State private var notificationsEnabled = false
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -66,6 +82,9 @@ struct ProfileView: View {
                         // MARK: - Profile Settings
                         profileSection
                         
+                        // MARK: - History Settings
+                        historySection
+                        
                         // MARK: - Astrology Settings
                         astrologySection
                         
@@ -77,6 +96,11 @@ struct ProfileView: View {
                         
                         // MARK: - Sign Out
                         signOutSection
+                        
+                        // MARK: - Delete Account (registered users only)
+                        if !isGuestUser {
+                            deleteAccountSection
+                        }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
@@ -135,7 +159,53 @@ struct ProfileView: View {
                     PartnerManagerView()
                 }
             }
+            .sheet(isPresented: $showDeleteAccountSheet) {
+                DeleteAccountSheet(
+                    isDeleting: $isDeletingAccount,
+                    errorMessage: $deleteErrorMessage,
+                    hasActiveSubscription: hasActivePaidSubscription,
+                    onConfirmDelete: {
+                        performAccountDeletion()
+                    }
+                )
+            }
             .preferredColorScheme(.dark)
+            .onAppear { checkNotificationStatus() }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                checkNotificationStatus()
+            }
+            .alert("Turn off history?", isPresented: $showTurnOffHistoryAlert) {
+                Button("Cancel", role: .cancel) {
+                    // Revert toggle back to ON
+                    historySettings.isHistoryEnabled = true
+                }
+                Button("Turn Off", role: .destructive) {
+                    historySettings.isHistoryEnabled = false
+                    HapticManager.shared.play(.heavy)
+                }
+            } message: {
+                Text("New chats and matches won't be saved. You can turn this back on anytime.")
+            }
+            .alert("Clear history?", isPresented: $showClearHistoryAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Clear", role: .destructive) {
+                    Task {
+                        let count = await historySettings.clearAllHistory(dataManager: DataManager.shared)
+                        await MainActor.run {
+                            clearedThreadCount = count
+                            showClearSuccessAlert = true
+                        }
+                        HapticManager.shared.play(.heavy)
+                    }
+                }
+            } message: {
+                Text("This will remove saved chats and match history. This can't be undone.")
+            }
+            .alert("History Cleared", isPresented: $showClearSuccessAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Successfully deleted \(clearedThreadCount) conversation\(clearedThreadCount == 1 ? "" : "s").")
+            }
         }
     }
     
@@ -164,23 +234,37 @@ struct ProfileView: View {
                         Text(userEmail)
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                     
-                    // Plan badge - always show (Free Plan or Premium)
+                    // Display Active Chart
                     HStack(spacing: 4) {
-                        Image(systemName: quotaManager.isPremium ? "crown.fill" : "star.fill")
-                            .font(AppTheme.Fonts.caption(size: 10))
-                        Text(quotaManager.planDisplayName)
-                            .font(AppTheme.Fonts.title(size: 11))
+                        Image(systemName: "person.text.rectangle")
+                            .font(AppTheme.Fonts.caption(size: 11))
+                        Text("Viewing Birth Chart : \(profileContext.activeProfileName)")
+                            .font(AppTheme.Fonts.caption(size: 11))
                     }
-                    .foregroundColor(quotaManager.isPremium ? AppTheme.Colors.mainBackground : AppTheme.Colors.gold)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(
-                        Capsule()
-                            .fill(quotaManager.isPremium ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.2))
-                    )
+                    .foregroundColor(AppTheme.Colors.gold)
                     .padding(.top, 4)
+                    
+                    // Plan badge - Only show for free users (Premium users have the large card below)
+                    if !quotaManager.isPremium {
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(AppTheme.Fonts.caption(size: 10))
+                            Text(quotaManager.planDisplayName)
+                                .font(AppTheme.Fonts.title(size: 11))
+                        }
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(AppTheme.Colors.gold.opacity(0.2))
+                        )
+                        .padding(.top, 4)
+                    }
                 }
                 
                 Spacer()
@@ -204,12 +288,14 @@ struct ProfileView: View {
                     action: { showBirthDetails = true }
                 )
                 
-                // Manage Birth Charts (Plus-only)
+                // Manage Birth Charts (Core+)
                 PremiumListItem(
                     title: "Manage Birth Charts",
-                    subtitle: quotaManager.hasFeature(.maintainProfile) ? "Manage birth charts" : "Plus plan feature",
+                    subtitle: "Add and edit birth charts for Destiny Matching\u{2122}",
                     icon: "person.2.fill",
-                    isPremiumFeature: !quotaManager.hasFeature(.maintainProfile),
+                    isPremiumFeature: true,
+                    premiumBadgeText: "Core",
+                    premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : AppTheme.Colors.gold,
                     action: {
                         if isGuestUser {
                             showGuestSignInForSwitch = true
@@ -221,16 +307,13 @@ struct ProfileView: View {
                     }
                 )
                 
-                // Switch Birth Chart - moved from HomeView header
+                // Switch Profile/Birth Chart (Plus-only)
                 PremiumListItem(
-                    title: "Switch Birth Chart",
-                    subtitle: quotaManager.hasFeature(.switchProfile)
-                        ? (ProfileContextManager.shared.isUsingSelf 
-                            ? "Viewing as \(ProfileContextManager.shared.activeProfileName)" 
-                            : "Using \(ProfileContextManager.shared.activeProfileName)'s chart")
-                        : "Plus plan feature",
+                    title: "Switch Profile/Birth Chart",
+                    subtitle: "Viewing as \(ProfileContextManager.shared.activeProfileName)",
                     icon: "arrow.triangle.2.circlepath",
-                    isPremiumFeature: !quotaManager.hasFeature(.switchProfile),
+                    isPremiumFeature: true,
+                    premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : AppTheme.Colors.gold,
                     action: {
                         // GUEST RULE: Guests must sign in first
                         if isGuestUser {
@@ -278,12 +361,34 @@ struct ProfileView: View {
                     action: { showChartStylePicker = true }
                 )
                 
-                // Notification Preferences (Plus-only)
+                // Notifications toggle (available to everyone)
                 PremiumListItem(
-                    title: "Notification Preferences",
-                    subtitle: quotaManager.hasFeature(.alerts) ? "Customize your alerts" : "Plus plan feature",
+                    title: "Notifications",
+                    subtitle: "Turn notifications on or off",
+                    icon: "bell.fill",
+                    showChevron: false
+                ) {
+                    Toggle("", isOn: Binding(
+                        get: { notificationsEnabled },
+                        set: { newValue in
+                            if newValue {
+                                requestNotificationPermission()
+                            } else {
+                                openNotificationSettings()
+                            }
+                        }
+                    ))
+                    .labelsHidden()
+                    .tint(AppTheme.Colors.gold)
+                }
+                
+                // Personalized Alerts (Plus-only)
+                PremiumListItem(
+                    title: "Personalized Alerts",
+                    subtitle: "Customize alerts based on your chart",
                     icon: "bell.badge.fill",
-                    isPremiumFeature: !quotaManager.hasFeature(.alerts),
+                    isPremiumFeature: true,
+                    premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : AppTheme.Colors.gold,
                     action: {
                         if quotaManager.hasFeature(.alerts) {
                             showNotificationPreferences = true
@@ -293,6 +398,104 @@ struct ProfileView: View {
                     }
                 )
             }
+        }
+    }
+    
+    // MARK: - History Settings
+    private var historySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("History")
+                .font(AppTheme.Fonts.title(size: 18))
+                .foregroundColor(AppTheme.Colors.gold)
+                .padding(.leading, 4)
+            
+            VStack(spacing: 0) {
+                // Save history toggle
+                HStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
+                            .frame(width: 36, height: 36)
+                        
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(AppTheme.Fonts.title(size: 16))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Save conversation history")
+                            .font(AppTheme.Fonts.body(size: 16))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                        
+                        Text(historySettings.isHistoryEnabled ? "Chats and matches are saved" : "History is turned off")
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Toggle("", isOn: Binding(
+                        get: { historySettings.isHistoryEnabled },
+                        set: { newValue in
+                            if !newValue {
+                                // Show confirmation before turning off
+                                showTurnOffHistoryAlert = true
+                            } else {
+                                historySettings.isHistoryEnabled = true
+                                HapticManager.shared.play(.light)
+                            }
+                        }
+                    ))
+                    .labelsHidden()
+                    .tint(AppTheme.Colors.gold)
+                }
+                .padding(16)
+                .background(AppTheme.Colors.cardBackground)
+                
+                Divider()
+                    .background(AppTheme.Colors.separator)
+                
+                // Clear history button
+                Button(action: {
+                    showClearHistoryAlert = true
+                }) {
+                    HStack(spacing: 14) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(AppTheme.Colors.error.opacity(0.15))
+                                .frame(width: 36, height: 36)
+                            
+                            Image(systemName: "trash")
+                                .font(AppTheme.Fonts.title(size: 16))
+                                .foregroundColor(AppTheme.Colors.error)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Clear history")
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.error)
+                            
+                            Text("Remove all saved chats and matches")
+                                .font(AppTheme.Fonts.caption(size: 12))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(AppTheme.Fonts.caption(size: 14))
+                            .foregroundColor(AppTheme.Colors.textTertiary)
+                    }
+                    .padding(16)
+                    .background(AppTheme.Colors.cardBackground)
+                }
+                .buttonStyle(.plain)
+            }
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppTheme.Colors.separator, lineWidth: 1)
+            )
         }
     }
     
@@ -362,6 +565,11 @@ struct ProfileView: View {
                     HStack(spacing: 14) {
                         // Premium icon
                         ZStack {
+                            // Dark backdrop for contrast against any background
+                            Circle()
+                                .fill(AppTheme.Colors.mainBackground.opacity(0.3))
+                                .frame(width: 44, height: 44)
+                            
                             Circle()
                                 .fill(Color.white.opacity(0.2))
                                 .frame(width: 40, height: 40)
@@ -369,6 +577,7 @@ struct ProfileView: View {
                             Image(systemName: "crown.fill")
                                 .font(AppTheme.Fonts.title(size: 18))
                                 .foregroundColor(.white)
+                                .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
                         }
                         
                         VStack(alignment: .leading, spacing: 2) {
@@ -529,6 +738,118 @@ struct ProfileView: View {
         }
     }
     
+    // MARK: - Delete Account Section
+    private var deleteAccountSection: some View {
+        Button(action: {
+            deleteErrorMessage = nil
+            showDeleteAccountSheet = true
+        }) {
+            Text("Delete Account")
+                .font(AppTheme.Fonts.title(size: 16))
+                .foregroundColor(AppTheme.Colors.error.opacity(0.7))
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.clear)
+        }
+        .buttonStyle(ScaleButtonStyle())
+        .padding(.top, -12)
+    }
+    
+    /// Whether the user has an active paid subscription (must cancel before deleting)
+    private var hasActivePaidSubscription: Bool {
+        quotaManager.isPremium && subscriptionManager.hasActiveSubscription
+    }
+    
+    /// Perform the account deletion API call, then sign out locally
+    private func performAccountDeletion() {
+        isDeletingAccount = true
+        deleteErrorMessage = nil
+        
+        Task {
+            do {
+                try await ProfileService.shared.deleteAccount(email: userEmail)
+                
+                // Success — close sheet, sign out, and dismiss profile
+                await MainActor.run {
+                    isDeletingAccount = false
+                    showDeleteAccountSheet = false
+                }
+                
+                // Small delay for sheet dismissal animation
+                try? await Task.sleep(nanoseconds: 400_000_000)
+                
+                await authViewModel.signOutAsync()
+                await MainActor.run {
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    isDeletingAccount = false
+                    deleteErrorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+    
+    // MARK: - Notification Helpers
+    
+    /// Check current iOS notification permission status and update toggle
+    private func checkNotificationStatus() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                notificationsEnabled = settings.authorizationStatus == .authorized
+            }
+        }
+    }
+    
+    /// Request notification permission from iOS
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                switch settings.authorizationStatus {
+                case .notDetermined:
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+                        DispatchQueue.main.async {
+                            notificationsEnabled = granted
+                            if granted {
+                                UIApplication.shared.registerForRemoteNotifications()
+                            }
+                        }
+                    }
+                case .denied:
+                    // Already denied — must go to iOS Settings
+                    openNotificationSettings()
+                case .authorized, .provisional, .ephemeral:
+                    notificationsEnabled = true
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+    
+    /// Open Destiny app settings directly when notifications toggle is off
+    private func openNotificationSettings() {
+        // Modern iOS: Use App-Prefs:apps&path= to open specific app settings page
+        if let bundleId = Bundle.main.bundleIdentifier,
+           let url = URL(string: "App-Prefs:apps&path=\(bundleId)") {
+            UIApplication.shared.open(url)
+        } else if let url = URL(string: UIApplication.openSettingsURLString) {
+            openURL(url)
+        }
+    }
+    
+    /// Open Destiny app settings in iOS Settings
+    private func openAppSettings() {
+        // Modern iOS: Use App-Prefs:apps&path= to open specific app settings page
+        if let bundleId = Bundle.main.bundleIdentifier,
+           let url = URL(string: "App-Prefs:apps&path=\(bundleId)") {
+            UIApplication.shared.open(url)
+        } else if let url = URL(string: UIApplication.openSettingsURLString) {
+            openURL(url)
+        }
+    }
+    
     // MARK: - Computed Properties
     private var avatarInitials: String {
         if userName.isEmpty { return "G" }
@@ -540,13 +861,12 @@ struct ProfileView: View {
     }
     
     private var currentLanguageDisplay: String {
-        let code = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
         let languageNames: [String: String] = [
             "en": "English", "hi": "हिंदी", "ta": "தமிழ்", "te": "తెలుగు",
             "kn": "ಕನ್ನಡ", "ml": "മലയാളം", "es": "Español", "pt": "Português",
             "de": "Deutsch", "fr": "Français", "zh-Hans": "中文", "ja": "日本語", "ru": "Русский"
         ]
-        return languageNames[code] ?? "English"
+        return languageNames[appLanguageCode] ?? "English"
     }
     
     private var appVersion: String {

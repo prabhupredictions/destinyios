@@ -8,9 +8,20 @@ struct CompatibilityHistorySheet: View {
     @State private var groups: [ComparisonGroup] = []
     @State private var groupToDelete: ComparisonGroup?
     @State private var showDeleteConfirmation = false
+    @State private var searchText = ""
     
     var onSelect: ((CompatibilityHistoryItem) -> Void)?
     var onGroupSelect: ((ComparisonGroup) -> Void)?
+    
+    /// Filtered groups based on search text
+    private var filteredGroups: [ComparisonGroup] {
+        guard !searchText.isEmpty else { return groups }
+        let query = searchText.lowercased()
+        return groups.filter { group in
+            group.userName.lowercased().contains(query) ||
+            group.items.contains { $0.girlName.lowercased().contains(query) || $0.boyName.lowercased().contains(query) }
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -19,10 +30,48 @@ struct CompatibilityHistorySheet: View {
                 CosmicBackgroundView()
                     .ignoresSafeArea()
                 
-                if groups.isEmpty {
+                if !HistorySettingsManager.shared.isHistoryEnabled {
+                    compatHistoryDisabledView
+                } else if groups.isEmpty {
                     emptyState
                 } else {
-                    historyList
+                    VStack(spacing: 0) {
+                        // Search bar
+                        HStack(spacing: 10) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .font(.system(size: 15))
+                            
+                            TextField("Search matches...", text: $searchText)
+                                .font(AppTheme.Fonts.body(size: 15))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                .autocorrectionDisabled()
+                            
+                            if !searchText.isEmpty {
+                                Button(action: { searchText = "" }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                        .font(.system(size: 15))
+                                }
+                            }
+                        }
+                        .padding(10)
+                        .background(Color.white.opacity(0.08))
+                        .cornerRadius(10)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
+                        .padding(.bottom, 4)
+                        
+                        if filteredGroups.isEmpty {
+                            Spacer()
+                            Text("No results found")
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                            Spacer()
+                        } else {
+                            historyList
+                        }
+                    }
                 }
             }
             .navigationTitle("Match History")
@@ -53,6 +102,43 @@ struct CompatibilityHistorySheet: View {
         }
     }
     
+    // MARK: - History Disabled View
+    private var compatHistoryDisabledView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "clock.badge.xmark")
+                .font(AppTheme.Fonts.display(size: 48))
+                .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
+            
+            Text("History is turned off")
+                .font(AppTheme.Fonts.title(size: 20))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            
+            Text("Your match results aren't being saved.")
+                .font(AppTheme.Fonts.body(size: 15))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            
+            Button(action: {
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    NotificationCenter.default.post(name: .openProfileSettings, object: nil)
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "gearshape")
+                    Text("Open Settings")
+                }
+                .font(AppTheme.Fonts.title(size: 15))
+                .foregroundColor(AppTheme.Colors.mainBackground)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(AppTheme.Colors.gold)
+                .cornerRadius(12)
+            }
+        }
+    }
+    
     // MARK: - Empty State
     private var emptyState: some View {
         VStack(spacing: 16) {
@@ -75,7 +161,7 @@ struct CompatibilityHistorySheet: View {
     // MARK: - History List
     private var historyList: some View {
         List {
-            ForEach(groups) { group in
+            ForEach(filteredGroups) { group in
                 if group.items.count > 1 {
                     // Multi-partner group row
                     GroupHistoryRow(
@@ -93,9 +179,36 @@ struct CompatibilityHistorySheet: View {
                         } label: {
                             Label("delete".localized, systemImage: "trash")
                         }
+                        
+                        Button {
+                            togglePinGroup(group)
+                        } label: {
+                            Label(
+                                group.items.first?.isPinned == true ? "Unpin" : "Pin",
+                                systemImage: group.items.first?.isPinned == true ? "pin.slash" : "pin"
+                            )
+                        }
+                        .tint(AppTheme.Colors.gold)
+                    }
+                    .contextMenu {
+                        Button {
+                            togglePinGroup(group)
+                        } label: {
+                            Label(
+                                group.items.first?.isPinned == true ? "Unpin" : "Pin",
+                                systemImage: group.items.first?.isPinned == true ? "pin.slash" : "pin"
+                            )
+                        }
+                        
+                        Button(role: .destructive) {
+                            groupToDelete = group
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("delete".localized, systemImage: "trash")
+                        }
                     }
                 } else if let item = group.items.first {
-                    // Single match row (unchanged behavior)
+                    // Single match row
                     HistoryItemRow(
                         item: item,
                         onTap: {
@@ -105,6 +218,33 @@ struct CompatibilityHistorySheet: View {
                     .listRowBackground(AppTheme.Colors.cardBackground)
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            groupToDelete = group
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label("delete".localized, systemImage: "trash")
+                        }
+                        
+                        Button {
+                            togglePinItem(item)
+                        } label: {
+                            Label(
+                                item.isPinned ? "Unpin" : "Pin",
+                                systemImage: item.isPinned ? "pin.slash" : "pin"
+                            )
+                        }
+                        .tint(AppTheme.Colors.gold)
+                    }
+                    .contextMenu {
+                        Button {
+                            togglePinItem(item)
+                        } label: {
+                            Label(
+                                item.isPinned ? "Unpin" : "Pin",
+                                systemImage: item.isPinned ? "pin.slash" : "pin"
+                            )
+                        }
+                        
                         Button(role: .destructive) {
                             groupToDelete = group
                             showDeleteConfirmation = true
@@ -156,6 +296,18 @@ struct CompatibilityHistorySheet: View {
         }
         HapticManager.shared.play(.heavy)
     }
+    
+    private func togglePinItem(_ item: CompatibilityHistoryItem) {
+        CompatibilityHistoryService.shared.togglePin(sessionId: item.sessionId)
+        loadHistory()
+        HapticManager.shared.play(.light)
+    }
+    
+    private func togglePinGroup(_ group: ComparisonGroup) {
+        CompatibilityHistoryService.shared.togglePinGroup(groupId: group.id)
+        loadHistory()
+        HapticManager.shared.play(.light)
+    }
 }
 
 // MARK: - Group History Row (multi-partner)
@@ -168,6 +320,14 @@ struct GroupHistoryRow: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 14) {
+                // Pin indicator
+                if group.items.first?.isPinned == true {
+                    Image(systemName: "pin.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 12)
+                }
+                
                 // Group icon badge
                 ZStack {
                     Circle()
@@ -234,6 +394,14 @@ struct HistoryItemRow: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 14) {
+                // Pin indicator
+                if item.isPinned {
+                    Image(systemName: "pin.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 12)
+                }
+                
                 // Score badge
                 ZStack {
                     Circle()

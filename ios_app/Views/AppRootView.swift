@@ -14,6 +14,7 @@ struct AppRootView: View {
     
     // MARK: - Local State
     @State private var showSplash = true
+    @State private var languageRefreshID = UUID()
     
     // Computed property to check if guest needs birth data
     private var guestNeedsBirthData: Bool {
@@ -80,6 +81,13 @@ struct AppRootView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .appLanguageChanged)) { _ in
+            // Force UI refresh when language changes
+            withAnimation(.easeOut(duration: 0.3)) {
+                languageRefreshID = UUID()
+            }
+        }
+        .id(languageRefreshID)
     }
     
     // MARK: - Profile Context

@@ -167,6 +167,15 @@ class ProfileService {
         }
         
         guard httpResponse.statusCode == 200 else {
+            // Parse structured error responses
+            if httpResponse.statusCode == 403,
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               let errorType = detail["error"] as? String,
+               errorType == "account_deleted" {
+                let message = detail["message"] as? String ?? "This account has been deleted."
+                throw ProfileError.accountDeleted(message)
+            }
             throw ProfileError.serverError(statusCode: httpResponse.statusCode)
         }
         
@@ -480,6 +489,47 @@ class ProfileService {
             print("[ProfileService] Failed to create self partner profile: \(error)")
         }
     }
+    
+    // MARK: - Delete Account (Soft Delete)
+    
+    /// Soft-delete the user account on server
+    func deleteAccount(email: String) async throws {
+        guard let url = URL(string: "\(APIConfig.baseURL)/subscription/account/delete") else {
+            throw ProfileError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        let body: [String: String] = [
+            "user_email": email,
+            "confirmation": "DELETE"
+        ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ProfileError.invalidResponse
+        }
+        
+        if httpResponse.statusCode == 403 {
+            // Active subscription — parse detail message
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? String {
+                throw ProfileError.accountDeletionBlocked(detail)
+            }
+            throw ProfileError.accountDeletionBlocked("Please cancel your subscription before deleting your account.")
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            throw ProfileError.serverError(statusCode: httpResponse.statusCode)
+        }
+        
+        print("[ProfileService] Account deleted successfully for \(email)")
+    }
 }
 
 // MARK: - Birth Profile Data (for API request)
@@ -502,6 +552,14 @@ enum ProfileError: Error, LocalizedError {
     case serverError(statusCode: Int)
     case decodingError
     case birthDataTaken(existingEmail: String?, provider: String?)  // Birth data belongs to another registered user
+    case accountDeletionBlocked(String)
+    case accountDeleted(String)  // Account was soft-deleted — sign-in blocked
+    
+    /// Helper for pattern matching in catch clauses
+    var isAccountDeleted: Bool {
+        if case .accountDeleted = self { return true }
+        return false
+    }
     
     var errorDescription: String? {
         switch self {
@@ -522,6 +580,10 @@ enum ProfileError: Error, LocalizedError {
             default:
                 return "This birth data is already registered. Please sign in."
             }
+        case .accountDeletionBlocked(let reason):
+            return reason
+        case .accountDeleted(let message):
+            return message
         }
     }
 }

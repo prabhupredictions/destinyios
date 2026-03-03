@@ -176,6 +176,22 @@ struct ChartComparisonSheet: View {
         ascendant: String?
     ) -> some View {
         VStack(spacing: 12) {
+            // Person Name Header
+            HStack {
+                Text(personName)
+                    .font(AppTheme.Fonts.title(size: 16))
+                    .foregroundColor(AppTheme.Colors.gold)
+                
+                if let asc = ascendant {
+                    Text("• Asc: \(ChartConstants.signFullNames[asc] ?? asc)")
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 4)
+            
             // Chart (clean - just planet codes)
             if chartStyle == "north" {
                 NorthIndianChartView(
