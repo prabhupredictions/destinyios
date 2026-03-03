@@ -1,7 +1,7 @@
 import SwiftUI
 import UserNotifications
 
-/// Notification Preferences sheet (Plus-only).
+/// Personalized Alerts sheet (Plus-only).
 /// Follows the same List + section + gold styling as AstrologySettingsSheet.
 struct NotificationPreferencesSheet: View {
     @Environment(\.dismiss) private var dismiss
@@ -10,6 +10,14 @@ struct NotificationPreferencesSheet: View {
     
     // iOS notification permission state
     @State private var iOSNotificationsAuthorized = false
+    
+    // Suggestion chips
+    private let suggestions = [
+        "Good day to invest or take calculated risks",
+        "Good day for tough relationship conversations and conflict resolution",
+        "Good day to shop for a big purchase and negotiate a deal",
+        "Good day to ask for a raise, negotiate, or pitch something important"
+    ]
     
     let userEmail: String
     
@@ -27,7 +35,7 @@ struct NotificationPreferencesSheet: View {
                         Section {
                             Toggle(isOn: $viewModel.isEnabled) {
                                 Label {
-                                    Text("Enable Notifications")
+                                    Text("Enable Alerts")
                                         .font(AppTheme.Fonts.body(size: 16))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
                                 } icon: {
@@ -39,8 +47,8 @@ struct NotificationPreferencesSheet: View {
                             .listRowBackground(AppTheme.Colors.cardBackground)
                         } header: {
                             sectionHeader(
-                                title: "Notifications",
-                                description: "Master switch for all custom notifications"
+                                title: "Alerts",
+                                description: "Master switch for all personalized alerts"
                             )
                         }
                         
@@ -55,7 +63,7 @@ struct NotificationPreferencesSheet: View {
                             } header: {
                                 sectionHeader(
                                     title: "Channels",
-                                    description: "Choose how you receive notifications"
+                                    description: "Choose how you want to receive alerts"
                                 )
                             }
                             
@@ -124,12 +132,12 @@ struct NotificationPreferencesSheet: View {
                                 }
                             } header: {
                                 sectionHeader(
-                                    title: "Frequency",
-                                    description: "How often you'd like to receive notifications"
+                                    title: "Alert frequency",
+                                    description: "How often you want alerts"
                                 )
                             }
                             
-                            // MARK: - Custom Instructions
+                            // MARK: - Alert Preferences
                             Section {
                                 VStack(alignment: .leading, spacing: 8) {
                                     TextEditor(text: $viewModel.customInstruction)
@@ -146,13 +154,43 @@ struct NotificationPreferencesSheet: View {
                                 .listRowBackground(AppTheme.Colors.cardBackground)
                             } header: {
                                 sectionHeader(
-                                    title: "Custom Instructions",
-                                    description: "Tell the AI what topics or style you prefer for your notifications"
+                                    title: "Alert preferences",
+                                    description: "Tell Destiny what you want personalized alerts about"
                                 )
-                            } footer: {
-                                Text("Example: \"Focus on career and finance. Keep it short and uplifting.\"")
-                                    .font(AppTheme.Fonts.caption(size: 12))
-                                    .foregroundColor(AppTheme.Colors.textTertiary)
+                            }
+                            
+                            // MARK: - Suggestions
+                            Section {
+                                ForEach(suggestions, id: \.self) { suggestion in
+                                    Button {
+                                        appendSuggestion(suggestion)
+                                        HapticManager.shared.play(.light)
+                                    } label: {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: "sparkles")
+                                                .foregroundColor(AppTheme.Colors.gold)
+                                                .font(.system(size: 14))
+                                                .frame(width: 20)
+                                            
+                                            Text(suggestion)
+                                                .font(AppTheme.Fonts.body(size: 14))
+                                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                                .multilineTextAlignment(.leading)
+                                            
+                                            Spacer()
+                                            
+                                            Image(systemName: "plus.circle")
+                                                .foregroundColor(AppTheme.Colors.gold)
+                                                .font(.system(size: 16))
+                                        }
+                                    }
+                                    .listRowBackground(AppTheme.Colors.cardBackground)
+                                }
+                            } header: {
+                                sectionHeader(
+                                    title: "Suggestions",
+                                    description: "Tap to add"
+                                )
                             }
                         }
                     }
@@ -168,7 +206,7 @@ struct NotificationPreferencesSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(AppTheme.Colors.success)
-                            Text("Preferences saved")
+                            Text("Alerts saved")
                                 .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                         }
@@ -184,7 +222,7 @@ struct NotificationPreferencesSheet: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .navigationTitle("Notification Preferences")
+            .navigationTitle("Personalized Alerts")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -330,7 +368,7 @@ struct NotificationPreferencesSheet: View {
                             .foregroundColor(AppTheme.Colors.error)
                             .font(.system(size: 14))
                         
-                        Text("Enable in iOS Settings → Notifications → Destiny")
+                        Text("Enable in iOS Settings → Apps → Destiny → Notifications")
                             .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.error)
                             .multilineTextAlignment(.leading)
@@ -350,6 +388,21 @@ struct NotificationPreferencesSheet: View {
         }
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - Suggestion Helper
+    
+    /// Appends a suggestion to the custom instruction text box
+    private func appendSuggestion(_ suggestion: String) {
+        if viewModel.customInstruction.isEmpty {
+            viewModel.customInstruction = suggestion
+        } else {
+            viewModel.customInstruction += "\n" + suggestion
+        }
+        // Respect the 500 char limit
+        if viewModel.customInstruction.count > 500 {
+            viewModel.customInstruction = String(viewModel.customInstruction.prefix(500))
+        }
     }
     
     // MARK: - Components

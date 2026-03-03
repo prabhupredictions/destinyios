@@ -40,9 +40,9 @@ final class NotificationPreferencesViewModel: ObservableObject {
         
         var icon: String {
             switch self {
-            case .daily: return "sun.max.fill"
+            case .daily: return "calendar.day.timeline.left"
             case .weekly: return "calendar.badge.clock"
-            case .monthly: return "calendar"
+            case .monthly: return "calendar.badge.checkmark"
             }
         }
     }
