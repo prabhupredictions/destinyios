@@ -1,10 +1,29 @@
 import Foundation
 import Combine
 
-/// ViewModel for Notification Preferences (Plus-only feature).
+// MARK: - Alert Item Model
+
+struct AlertItem: Identifiable, Equatable {
+    let id: String
+    var text: String
+    var frequency: NotificationPreferencesViewModel.NotificationFrequency
+    var frequencyDay: Int?
+    
+    init(id: String = UUID().uuidString, text: String, frequency: NotificationPreferencesViewModel.NotificationFrequency = .daily, frequencyDay: Int? = nil) {
+        self.id = id
+        self.text = text
+        self.frequency = frequency
+        self.frequencyDay = frequencyDay
+    }
+}
+
+/// ViewModel for Personalized Alerts (Plus-only feature).
 /// Handles CRUD against `GET/PUT /notifications/preferences`.
+/// Supports multiple alert items (max 5), each with independent frequency.
 @MainActor
 final class NotificationPreferencesViewModel: ObservableObject {
+    
+    static let maxAlerts = 5
     
     // MARK: - Published State
     
@@ -12,9 +31,7 @@ final class NotificationPreferencesViewModel: ObservableObject {
     @Published var emailEnabled: Bool = true
     @Published var pushEnabled: Bool = true
     @Published var inAppEnabled: Bool = true
-    @Published var customInstruction: String = ""
-    @Published var frequency: NotificationFrequency = .daily
-    @Published var frequencyDay: Int? = nil
+    @Published var alertItems: [AlertItem] = []
     @Published var preferredTimeUTC: String = "00:30"
     @Published var timezone: String = TimeZone.current.identifier
     
@@ -22,6 +39,8 @@ final class NotificationPreferencesViewModel: ObservableObject {
     @Published var isSaving: Bool = false
     @Published var errorMessage: String? = nil
     @Published var showSaveSuccess: Bool = false
+    
+    var canAddMore: Bool { alertItems.count < Self.maxAlerts }
     
     enum NotificationFrequency: String, CaseIterable, Identifiable {
         case daily = "DAILY"
@@ -45,6 +64,23 @@ final class NotificationPreferencesViewModel: ObservableObject {
             case .monthly: return "calendar.badge.checkmark"
             }
         }
+    }
+    
+    // MARK: - Alert CRUD
+    
+    func addAlert(_ item: AlertItem) {
+        guard canAddMore else { return }
+        alertItems.append(item)
+    }
+    
+    func updateAlert(_ item: AlertItem) {
+        if let idx = alertItems.firstIndex(where: { $0.id == item.id }) {
+            alertItems[idx] = item
+        }
+    }
+    
+    func deleteAlert(id: String) {
+        alertItems.removeAll { $0.id == id }
     }
     
     // MARK: - Load
@@ -97,14 +133,21 @@ final class NotificationPreferencesViewModel: ObservableObject {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
             
+            let apiAlertItems = alertItems.map { item in
+                AlertItemAPI(
+                    id: item.id,
+                    text: item.text,
+                    frequency: item.frequency.rawValue,
+                    frequency_day: item.frequencyDay
+                )
+            }
+            
             let body = PreferencesUpdateRequest(
                 is_enabled: isEnabled,
                 email_enabled: emailEnabled,
                 push_enabled: pushEnabled,
                 in_app_enabled: inAppEnabled,
-                custom_instruction: customInstruction.isEmpty ? nil : customInstruction,
-                frequency: frequency.rawValue,
-                frequency_day: frequencyDay,
+                alert_items: apiAlertItems,
                 preferred_time_utc: preferredTimeUTC,
                 timezone: timezone
             )
@@ -143,29 +186,39 @@ final class NotificationPreferencesViewModel: ObservableObject {
         emailEnabled = (prefs["email_enabled"]?.value as? Bool) ?? true
         pushEnabled = (prefs["push_enabled"]?.value as? Bool) ?? true
         inAppEnabled = (prefs["in_app_enabled"]?.value as? Bool) ?? true
-        customInstruction = (prefs["custom_instruction"]?.value as? String) ?? ""
         timezone = (prefs["timezone"]?.value as? String) ?? TimeZone.current.identifier
         preferredTimeUTC = (prefs["preferred_time_utc"]?.value as? String) ?? "00:30"
         
-        if let freqStr = prefs["frequency"]?.value as? String,
-           let freq = NotificationFrequency(rawValue: freqStr) {
-            frequency = freq
+        // Parse alert_items from API response
+        alertItems = []
+        if let rawItems = prefs["alert_items"]?.value as? [[String: Any]] {
+            for raw in rawItems.prefix(Self.maxAlerts) {
+                let id = (raw["id"] as? String) ?? UUID().uuidString
+                let text = (raw["text"] as? String) ?? ""
+                let freqStr = (raw["frequency"] as? String) ?? "DAILY"
+                let freq = NotificationFrequency(rawValue: freqStr) ?? .daily
+                let freqDay = raw["frequency_day"] as? Int
+                alertItems.append(AlertItem(id: id, text: text, frequency: freq, frequencyDay: freqDay))
+            }
         }
-        
-        frequencyDay = prefs["frequency_day"]?.value as? Int
     }
 }
 
 // MARK: - API Models
+
+private struct AlertItemAPI: Encodable {
+    let id: String
+    let text: String
+    let frequency: String
+    let frequency_day: Int?
+}
 
 private struct PreferencesUpdateRequest: Encodable {
     let is_enabled: Bool
     let email_enabled: Bool
     let push_enabled: Bool
     let in_app_enabled: Bool
-    let custom_instruction: String?
-    let frequency: String
-    let frequency_day: Int?
+    let alert_items: [AlertItemAPI]
     let preferred_time_utc: String
     let timezone: String
 }

@@ -2,7 +2,7 @@ import SwiftUI
 import UserNotifications
 
 /// Personalized Alerts sheet (Plus-only).
-/// Follows the same List + section + gold styling as AstrologySettingsSheet.
+/// Supports multiple alert items (max 5), each with independent frequency.
 struct NotificationPreferencesSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -10,6 +10,14 @@ struct NotificationPreferencesSheet: View {
     
     // iOS notification permission state
     @State private var iOSNotificationsAuthorized = false
+    
+    // Add/Edit sheet state
+    @State private var showAddEditSheet = false
+    @State private var editingAlert: AlertItem? = nil
+    
+    // Delete confirmation
+    @State private var alertToDelete: AlertItem? = nil
+    @State private var showDeleteConfirmation = false
     
     // Suggestion chips
     private let suggestions = [
@@ -31,172 +39,118 @@ struct NotificationPreferencesSheet: View {
                         .tint(AppTheme.Colors.gold)
                 } else {
                     List {
-                        // MARK: - Master Toggle
+                        // MARK: - Channels
                         Section {
-                            Toggle(isOn: $viewModel.isEnabled) {
-                                Label {
-                                    Text("Enable Alerts")
-                                        .font(AppTheme.Fonts.body(size: 16))
-                                        .foregroundColor(AppTheme.Colors.textPrimary)
-                                } icon: {
-                                    Image(systemName: "bell.badge.fill")
-                                        .foregroundColor(AppTheme.Colors.gold)
-                                }
-                            }
-                            .tint(AppTheme.Colors.gold)
-                            .listRowBackground(AppTheme.Colors.cardBackground)
+                            pushNotificationsRow
+                            channelToggle("Email", icon: "envelope.fill", isOn: $viewModel.emailEnabled)
+                            channelToggle("In-App inbox", icon: "tray.fill", isOn: $viewModel.inAppEnabled)
                         } header: {
                             sectionHeader(
-                                title: "Alerts",
-                                description: "Master switch for all personalized alerts"
+                                title: "Channels",
+                                description: "Choose how you want to receive alerts"
                             )
                         }
                         
-                        if viewModel.isEnabled {
-                            // MARK: - Channels
-                            Section {
-                                // Push Notifications with iOS permission check
-                                pushNotificationsRow
-                                
-                                channelToggle("Email", icon: "envelope.fill", isOn: $viewModel.emailEnabled)
-                                channelToggle("In-App Inbox", icon: "tray.fill", isOn: $viewModel.inAppEnabled)
-                            } header: {
-                                sectionHeader(
-                                    title: "Channels",
-                                    description: "Choose how you want to receive alerts"
-                                )
-                            }
-                            
-                            // MARK: - Frequency
-                            Section {
-                                ForEach(NotificationPreferencesViewModel.NotificationFrequency.allCases) { freq in
-                                    Button {
-                                        viewModel.frequency = freq
-                                        viewModel.frequencyDay = nil
-                                        HapticManager.shared.play(.light)
-                                    } label: {
-                                        HStack {
-                                            Image(systemName: freq.icon)
-                                                .foregroundColor(AppTheme.Colors.gold)
-                                                .frame(width: 24)
-                                            
-                                            Text(freq.displayName)
-                                                .font(AppTheme.Fonts.body(size: 16))
-                                                .foregroundColor(AppTheme.Colors.textPrimary)
-                                            
-                                            Spacer()
-                                            
-                                            if viewModel.frequency == freq {
-                                                Image(systemName: "checkmark")
-                                                    .foregroundColor(AppTheme.Colors.gold)
-                                                    .font(AppTheme.Fonts.title(size: 14))
-                                            }
-                                        }
+                        // MARK: - Alert Items
+                        Section {
+                            if viewModel.alertItems.isEmpty {
+                                HStack {
+                                    Spacer()
+                                    VStack(spacing: 8) {
+                                        Image(systemName: "bell.slash")
+                                            .font(.system(size: 28))
+                                            .foregroundColor(AppTheme.Colors.textTertiary)
+                                        Text("No alerts yet")
+                                            .font(AppTheme.Fonts.body(size: 14))
+                                            .foregroundColor(AppTheme.Colors.textTertiary)
+                                        Text("Add your first personalized alert below")
+                                            .font(AppTheme.Fonts.caption(size: 12))
+                                            .foregroundColor(AppTheme.Colors.textTertiary)
                                     }
-                                    .listRowBackground(AppTheme.Colors.cardBackground)
-                                }
-                                
-                                // Day picker for weekly/monthly
-                                if viewModel.frequency == .weekly {
-                                    Picker("Day of Week", selection: Binding(
-                                        get: { viewModel.frequencyDay ?? 1 },
-                                        set: { viewModel.frequencyDay = $0 }
-                                    )) {
-                                        Text("Monday").tag(1)
-                                        Text("Tuesday").tag(2)
-                                        Text("Wednesday").tag(3)
-                                        Text("Thursday").tag(4)
-                                        Text("Friday").tag(5)
-                                        Text("Saturday").tag(6)
-                                        Text("Sunday").tag(7)
-                                    }
-                                    .font(AppTheme.Fonts.body(size: 16))
-                                    .foregroundColor(AppTheme.Colors.textPrimary)
-                                    .tint(AppTheme.Colors.gold)
-                                    .listRowBackground(AppTheme.Colors.cardBackground)
-                                }
-                                
-                                if viewModel.frequency == .monthly {
-                                    Picker("Day of Month", selection: Binding(
-                                        get: { viewModel.frequencyDay ?? 1 },
-                                        set: { viewModel.frequencyDay = $0 }
-                                    )) {
-                                        ForEach(1...28, id: \.self) { day in
-                                            Text("\(day)").tag(day)
-                                        }
-                                    }
-                                    .font(AppTheme.Fonts.body(size: 16))
-                                    .foregroundColor(AppTheme.Colors.textPrimary)
-                                    .tint(AppTheme.Colors.gold)
-                                    .listRowBackground(AppTheme.Colors.cardBackground)
-                                }
-                            } header: {
-                                sectionHeader(
-                                    title: "Alert frequency",
-                                    description: "How often you want alerts"
-                                )
-                            }
-                            
-                            // MARK: - Alert Preferences
-                            Section {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    TextEditor(text: $viewModel.customInstruction)
-                                        .font(AppTheme.Fonts.body(size: 15))
-                                        .foregroundColor(AppTheme.Colors.textPrimary)
-                                        .scrollContentBackground(.hidden)
-                                        .frame(minHeight: 100)
-                                    
-                                    Text("\(viewModel.customInstruction.count)/500")
-                                        .font(AppTheme.Fonts.caption(size: 12))
-                                        .foregroundColor(AppTheme.Colors.textTertiary)
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .padding(.vertical, 20)
+                                    Spacer()
                                 }
                                 .listRowBackground(AppTheme.Colors.cardBackground)
-                            } header: {
-                                sectionHeader(
-                                    title: "Alert preferences",
-                                    description: "Tell Destiny what you want personalized alerts about"
-                                )
+                            } else {
+                                ForEach(viewModel.alertItems) { item in
+                                    alertItemRow(item)
+                                }
                             }
                             
-                            // MARK: - Suggestions
-                            Section {
-                                ForEach(suggestions, id: \.self) { suggestion in
-                                    Button {
-                                        appendSuggestion(suggestion)
-                                        HapticManager.shared.play(.light)
-                                    } label: {
-                                        HStack(spacing: 12) {
-                                            Image(systemName: "sparkles")
-                                                .foregroundColor(AppTheme.Colors.gold)
-                                                .font(.system(size: 14))
-                                                .frame(width: 20)
-                                            
-                                            Text(suggestion)
-                                                .font(AppTheme.Fonts.body(size: 14))
-                                                .foregroundColor(AppTheme.Colors.textPrimary)
-                                                .multilineTextAlignment(.leading)
-                                            
-                                            Spacer()
-                                            
-                                            Image(systemName: "plus.circle")
-                                                .foregroundColor(AppTheme.Colors.gold)
-                                                .font(.system(size: 16))
-                                        }
+                            // Add button
+                            if viewModel.canAddMore {
+                                Button {
+                                    editingAlert = nil
+                                    showAddEditSheet = true
+                                    HapticManager.shared.play(.light)
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "plus")
+                                            .font(.system(size: 14, weight: .semibold))
+                                        Text("Add new alert preference")
+                                            .font(AppTheme.Fonts.body(size: 15))
                                     }
-                                    .listRowBackground(AppTheme.Colors.cardBackground)
+                                    .foregroundColor(AppTheme.Colors.gold)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
                                 }
-                            } header: {
-                                sectionHeader(
-                                    title: "Suggestions",
-                                    description: "Tap to add"
-                                )
+                                .listRowBackground(AppTheme.Colors.cardBackground.opacity(0.6))
+                            } else {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "info.circle")
+                                        .font(.system(size: 12))
+                                    Text("Maximum 5 alerts reached")
+                                        .font(AppTheme.Fonts.caption(size: 12))
+                                }
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .listRowBackground(Color.clear)
                             }
+                        } header: {
+                            sectionHeader(
+                                title: "Alert preferences",
+                                description: "Tell Destiny what you want personalized alerts about"
+                            )
+                        }
+                        
+                        // MARK: - Suggestions
+                        Section {
+                            ForEach(suggestions, id: \.self) { suggestion in
+                                Button {
+                                    addSuggestionAsAlert(suggestion)
+                                    HapticManager.shared.play(.light)
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "sparkles")
+                                            .foregroundColor(AppTheme.Colors.gold)
+                                            .font(.system(size: 14))
+                                            .frame(width: 20)
+                                        
+                                        Text(suggestion)
+                                            .font(AppTheme.Fonts.body(size: 14))
+                                            .foregroundColor(AppTheme.Colors.textPrimary)
+                                            .multilineTextAlignment(.leading)
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: "plus.circle")
+                                            .foregroundColor(viewModel.canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                            .font(.system(size: 16))
+                                    }
+                                }
+                                .disabled(!viewModel.canAddMore)
+                                .listRowBackground(AppTheme.Colors.cardBackground)
+                            }
+                        } header: {
+                            sectionHeader(
+                                title: "Suggestions",
+                                description: "Tap to add"
+                            )
                         }
                     }
                     .listStyle(.insetGrouped)
                     .scrollContentBackground(.hidden)
-                    .animation(.easeInOut(duration: 0.3), value: viewModel.isEnabled)
                 }
                 
                 // Success toast
@@ -222,7 +176,7 @@ struct NotificationPreferencesSheet: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .navigationTitle("Personalized Alerts")
+            .navigationTitle("Personalized alerts")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -255,6 +209,34 @@ struct NotificationPreferencesSheet: View {
             } message: {
                 Text(viewModel.errorMessage ?? "")
             }
+            .alert("Delete Alert", isPresented: $showDeleteConfirmation) {
+                Button("Cancel", role: .cancel) { alertToDelete = nil }
+                Button("Delete", role: .destructive) {
+                    if let item = alertToDelete {
+                        withAnimation { viewModel.deleteAlert(id: item.id) }
+                        alertToDelete = nil
+                    }
+                }
+            } message: {
+                if let item = alertToDelete {
+                    Text("Remove \"\(item.text.prefix(50))...\"?")
+                } else {
+                    Text("Remove this alert?")
+                }
+            }
+            .sheet(isPresented: $showAddEditSheet) {
+                AddEditAlertSheet(
+                    editingItem: editingAlert,
+                    suggestions: suggestions,
+                    canAddMore: viewModel.canAddMore
+                ) { savedItem in
+                    if editingAlert != nil {
+                        viewModel.updateAlert(savedItem)
+                    } else {
+                        viewModel.addAlert(savedItem)
+                    }
+                }
+            }
             .task {
                 await viewModel.loadPreferences(email: userEmail)
                 checkIOSNotificationPermission()
@@ -265,9 +247,72 @@ struct NotificationPreferencesSheet: View {
         }
     }
     
+    // MARK: - Alert Item Row
+    
+    private func alertItemRow(_ item: AlertItem) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: item.frequency.icon)
+                .foregroundColor(AppTheme.Colors.gold)
+                .font(.system(size: 16))
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.text)
+                    .font(AppTheme.Fonts.body(size: 14))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .lineLimit(2)
+                
+                Text(item.frequency.displayName)
+                    .font(AppTheme.Fonts.caption(size: 11))
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(
+                        Capsule()
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
+                    )
+            }
+            
+            Spacer()
+            
+            // Edit button
+            Button {
+                editingAlert = item
+                showAddEditSheet = true
+            } label: {
+                Image(systemName: "pencil")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .frame(width: 28, height: 28)
+            }
+            .buttonStyle(.plain)
+            
+            // Delete button
+            Button {
+                alertToDelete = item
+                showDeleteConfirmation = true
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .frame(width: 28, height: 28)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 4)
+        .listRowBackground(AppTheme.Colors.cardBackground)
+    }
+    
+    // MARK: - Suggestion Helper
+    
+    private func addSuggestionAsAlert(_ suggestion: String) {
+        guard viewModel.canAddMore else { return }
+        let newItem = AlertItem(text: suggestion, frequency: .daily)
+        viewModel.addAlert(newItem)
+    }
+    
     // MARK: - iOS Permission Helpers
     
-    /// Check current iOS notification permission status
     private func checkIOSNotificationPermission() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
@@ -276,20 +321,16 @@ struct NotificationPreferencesSheet: View {
         }
     }
     
-    /// Request iOS notification permission or open settings if denied
     private func handlePushToggleAttempt(enabled: Bool) {
         guard enabled else {
-            // User is turning OFF push - allow it
             viewModel.pushEnabled = false
             return
         }
         
-        // User is turning ON push - check iOS permission first
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
                 switch settings.authorizationStatus {
                 case .notDetermined:
-                    // Request permission
                     UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
                         DispatchQueue.main.async {
                             iOSNotificationsAuthorized = granted
@@ -300,7 +341,6 @@ struct NotificationPreferencesSheet: View {
                         }
                     }
                 case .denied:
-                    // Permission denied - open iOS Settings for Destiny app
                     openAppSettings()
                 case .authorized, .provisional, .ephemeral:
                     iOSNotificationsAuthorized = true
@@ -312,9 +352,7 @@ struct NotificationPreferencesSheet: View {
         }
     }
     
-    /// Open Destiny app settings in iOS Settings
     private func openAppSettings() {
-        // Modern iOS: Use App-Prefs:apps&path= to open specific app settings page
         if let bundleId = Bundle.main.bundleIdentifier,
            let url = URL(string: "App-Prefs:apps&path=\(bundleId)") {
             UIApplication.shared.open(url)
@@ -323,7 +361,7 @@ struct NotificationPreferencesSheet: View {
         }
     }
     
-    // MARK: - Push Notifications Row with Permission Check
+    // MARK: - Push Notifications Row
     
     private var pushNotificationsRow: some View {
         VStack(spacing: 0) {
@@ -333,7 +371,7 @@ struct NotificationPreferencesSheet: View {
                     .frame(width: 24)
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Push Notifications")
+                    Text("Push notifications")
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
@@ -360,7 +398,6 @@ struct NotificationPreferencesSheet: View {
             .padding(.horizontal, 16)
             .background(AppTheme.Colors.cardBackground)
             
-            // Warning row if permission denied
             if !iOSNotificationsAuthorized {
                 Button(action: openAppSettings) {
                     HStack(spacing: 8) {
@@ -390,21 +427,6 @@ struct NotificationPreferencesSheet: View {
         .listRowBackground(Color.clear)
     }
     
-    // MARK: - Suggestion Helper
-    
-    /// Appends a suggestion to the custom instruction text box
-    private func appendSuggestion(_ suggestion: String) {
-        if viewModel.customInstruction.isEmpty {
-            viewModel.customInstruction = suggestion
-        } else {
-            viewModel.customInstruction += "\n" + suggestion
-        }
-        // Respect the 500 char limit
-        if viewModel.customInstruction.count > 500 {
-            viewModel.customInstruction = String(viewModel.customInstruction.prefix(500))
-        }
-    }
-    
     // MARK: - Components
     
     private func sectionHeader(title: String, description: String) -> some View {
@@ -431,6 +453,208 @@ struct NotificationPreferencesSheet: View {
         }
         .tint(AppTheme.Colors.gold)
         .listRowBackground(AppTheme.Colors.cardBackground)
+    }
+}
+
+// MARK: - Add / Edit Alert Sheet
+
+struct AddEditAlertSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    let editingItem: AlertItem?
+    let suggestions: [String]
+    let canAddMore: Bool
+    let onSave: (AlertItem) -> Void
+    
+    @State private var text: String = ""
+    @State private var frequency: NotificationPreferencesViewModel.NotificationFrequency = .daily
+    @State private var frequencyDay: Int? = nil
+    @FocusState private var isTextFocused: Bool
+    
+    private var isEditing: Bool { editingItem != nil }
+    private var canSave: Bool { !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                AppTheme.Colors.mainBackground.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // MARK: - Text Input
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("What do you want alerts about?")
+                                .font(AppTheme.Fonts.title(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            
+                            TextField("Type what you want alerts about", text: $text, axis: .vertical)
+                                .font(AppTheme.Fonts.body(size: 15))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                .lineLimit(3...6)
+                                .padding(12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(AppTheme.Colors.cardBackground)
+                                )
+                                .focused($isTextFocused)
+                            
+                            Text("\(text.count)/200")
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.horizontal, 16)
+                        
+                        // MARK: - Frequency Picker
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Alert frequency")
+                                .font(AppTheme.Fonts.title(size: 14))
+                                .foregroundColor(AppTheme.Colors.gold)
+                            
+                            VStack(spacing: 0) {
+                                ForEach(NotificationPreferencesViewModel.NotificationFrequency.allCases) { freq in
+                                    Button {
+                                        frequency = freq
+                                        frequencyDay = nil
+                                        HapticManager.shared.play(.light)
+                                    } label: {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: freq.icon)
+                                                .foregroundColor(AppTheme.Colors.gold)
+                                                .frame(width: 24)
+                                            
+                                            Text(freq.displayName)
+                                                .font(AppTheme.Fonts.body(size: 16))
+                                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                            
+                                            Spacer()
+                                            
+                                            if frequency == freq {
+                                                Image(systemName: "checkmark")
+                                                    .foregroundColor(AppTheme.Colors.gold)
+                                                    .font(.system(size: 14, weight: .semibold))
+                                            }
+                                        }
+                                        .padding(.vertical, 14)
+                                        .padding(.horizontal, 16)
+                                    }
+                                    .buttonStyle(.plain)
+                                    
+                                    if freq != .monthly {
+                                        Divider()
+                                            .background(AppTheme.Colors.textTertiary.opacity(0.3))
+                                    }
+                                }
+                            }
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(AppTheme.Colors.cardBackground)
+                            )
+                        }
+                        .padding(.horizontal, 16)
+                        
+                        // MARK: - Suggestions
+                        if !isEditing {
+                            VStack(alignment: .leading, spacing: 8) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Suggestions")
+                                        .font(AppTheme.Fonts.title(size: 14))
+                                        .foregroundColor(AppTheme.Colors.gold)
+                                    Text("Tap to add")
+                                        .font(AppTheme.Fonts.caption(size: 12))
+                                        .foregroundColor(AppTheme.Colors.textTertiary)
+                                }
+                                
+                                VStack(spacing: 0) {
+                                    ForEach(Array(suggestions.enumerated()), id: \.offset) { index, suggestion in
+                                        Button {
+                                            text = suggestion
+                                            HapticManager.shared.play(.light)
+                                        } label: {
+                                            HStack(spacing: 12) {
+                                                Image(systemName: "sparkles")
+                                                    .foregroundColor(AppTheme.Colors.gold)
+                                                    .font(.system(size: 14))
+                                                    .frame(width: 20)
+                                                
+                                                Text(suggestion)
+                                                    .font(AppTheme.Fonts.body(size: 14))
+                                                    .foregroundColor(AppTheme.Colors.textPrimary)
+                                                    .multilineTextAlignment(.leading)
+                                                
+                                                Spacer()
+                                                
+                                                Image(systemName: "plus.circle")
+                                                    .foregroundColor(AppTheme.Colors.gold)
+                                                    .font(.system(size: 16))
+                                            }
+                                            .padding(.vertical, 12)
+                                            .padding(.horizontal, 16)
+                                        }
+                                        .buttonStyle(.plain)
+                                        
+                                        if index < suggestions.count - 1 {
+                                            Divider()
+                                                .background(AppTheme.Colors.textTertiary.opacity(0.3))
+                                        }
+                                    }
+                                }
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(AppTheme.Colors.cardBackground)
+                                )
+                            }
+                            .padding(.horizontal, 16)
+                        }
+                    }
+                    .padding(.top, 16)
+                    .padding(.bottom, 40)
+                }
+            }
+            .navigationTitle(isEditing ? "Edit alert" : "New alert")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let limitedText = String(trimmed.prefix(200))
+                        let item = AlertItem(
+                            id: editingItem?.id ?? UUID().uuidString,
+                            text: limitedText,
+                            frequency: frequency,
+                            frequencyDay: frequencyDay
+                        )
+                        onSave(item)
+                        dismiss()
+                    } label: {
+                        Text(isEditing ? "Save" : "Add")
+                            .fontWeight(.semibold)
+                            .foregroundColor(canSave ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                    }
+                    .disabled(!canSave)
+                }
+            }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .onAppear {
+                if let item = editingItem {
+                    text = item.text
+                    frequency = item.frequency
+                    frequencyDay = item.frequencyDay
+                }
+                isTextFocused = true
+            }
+            .onChange(of: text) { _, newValue in
+                if newValue.count > 200 {
+                    text = String(newValue.prefix(200))
+                }
+            }
+        }
+        .presentationDetents([.large])
     }
 }
 
