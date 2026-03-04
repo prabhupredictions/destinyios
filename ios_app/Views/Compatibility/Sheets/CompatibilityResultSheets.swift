@@ -10,6 +10,7 @@ struct FullReportSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isGeneratingPDF = false
     @State private var showShareOptions = false
+    @State private var showAskDestiny = false
     
     // Parse summary into sections by ### headers
     private var sections: [(emoji: String, title: String, content: String)] {
@@ -65,6 +66,14 @@ struct FullReportSheet: View {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 32)
                 }
+                
+                // Floating AMA Chat Button
+                FloatingContextButton(
+                    icon: "bubble.left.and.bubble.right.fill",
+                    action: { showAskDestiny = true }
+                )
+                .padding(20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -87,6 +96,9 @@ struct FullReportSheet: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showAskDestiny) {
+            AskDestinySheet(result: result, boyName: boyName, girlName: girlName)
         }
     }
     
