@@ -301,6 +301,10 @@ struct CompatibilityView: View {
                     }
                 }
                 
+                // Chart is already saved — uncheck so we don't duplicate it.
+                // User can manually re-check if they modify any details.
+                savePartnerForFuture = false
+                
                 HapticManager.shared.playSuccess()
             }
         }
