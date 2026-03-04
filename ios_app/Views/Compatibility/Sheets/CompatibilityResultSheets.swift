@@ -1333,6 +1333,10 @@ struct AskDestinySheet: View {
             if response.status == "redirect", let target = response.target {
                 // Individual question - redirect to predict API
                 await handleRedirect(query: query, target: target, response: response)
+            } else if response.status == "redirect_no_data", let target = response.target {
+                // Backend couldn't find birth data in cache — use locally stored data as fallback
+                print("[AskDestiny] redirect_no_data — falling back to local birth data for target: \(target)")
+                await handleRedirect(query: query, target: target, response: response)
             } else if let answer = response.answer {
                 // Normal compatibility answer
                 let aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
@@ -1344,9 +1348,17 @@ struct AskDestinySheet: View {
                     suggestedQuestions = followUps
                 }
             } else if let message = response.message {
-                // Info/error message
-                let aiMessage = CompatChatMessage(content: message, isUser: false, type: .info)
-                messages.append(aiMessage)
+                // Info/error message — but if it looks like a redirect failure, try local fallback
+                let isRedirectFailure = message.contains("birth details") || message.contains("individual analysis")
+                if isRedirectFailure && result.analysisData?.boy?.details != nil {
+                    // Backend couldn't retrieve birth data from cache — use local result data instead
+                    print("[AskDestiny] Redirect failed, attempting local fallback with boyName as target")
+                    await handleRedirectWithLocalData(query: query, target: boyName, response: response)
+                } else {
+                    let aiMessage = CompatChatMessage(content: message, isUser: false, type: .info)
+                    messages.append(aiMessage)
+
+                }
             }
             
         } catch {
@@ -1357,6 +1369,22 @@ struct AskDestinySheet: View {
         isLoading = false
     }
     
+    // MARK: - Handle Redirect With Local Data (fallback when backend has no cache)
+    private func handleRedirectWithLocalData(query: String, target: String, response: CompatibilityFollowUpResponse) async {
+        // Build a response with birthData = nil so handleRedirect uses result.analysisData (local) instead
+        let localResponse = CompatibilityFollowUpResponse(
+            status: "redirect",
+            target: target,
+            answer: nil,
+            message: nil,
+            birthData: nil,  // Force handleRedirect to use result.analysisData
+            reason: response.reason,
+            executionTimeMs: nil,
+            followUpSuggestions: nil
+        )
+        await handleRedirect(query: query, target: target, response: localResponse)
+    }
+
     // MARK: - Handle Redirect to Individual Analysis
     private func handleRedirect(query: String, target: String, response: CompatibilityFollowUpResponse) async {
         // Show redirect message (temporary - will be removed when result arrives)
@@ -1368,12 +1396,30 @@ struct AskDestinySheet: View {
         messages.append(redirectMsg)
         let redirectMsgId = redirectMsg.id
         
-        // Get birth data for target
+        // Get birth data for target — prefer locally stored data (always available) over backend-provided data
+        let targetLower = target.lowercased()
+        let boyNameLower = boyName.lowercased()
+        let girlNameLower = girlName.lowercased()
+        
+        let isBoyTarget = targetLower.contains("boy") ||
+                          targetLower == boyNameLower ||
+                          boyNameLower.hasPrefix(targetLower) ||
+                          targetLower.hasPrefix(boyNameLower)
+        let isGirlTarget = targetLower.contains("girl") ||
+                           targetLower == girlNameLower ||
+                           girlNameLower.hasPrefix(targetLower) ||
+                           targetLower.hasPrefix(girlNameLower)
+        
         let birthDetails: BirthDetails?
-        if target.lowercased().contains("boy") || target.lowercased() == boyName.lowercased() {
-            birthDetails = response.birthData ?? result.analysisData?.boy?.details
+        if isBoyTarget {
+            // Local data first (most reliable), backend redirect data as secondary
+            birthDetails = result.analysisData?.boy?.details ?? response.birthData
+        } else if isGirlTarget {
+            birthDetails = result.analysisData?.girl?.details ?? response.birthData
         } else {
-            birthDetails = response.birthData ?? result.analysisData?.girl?.details
+            // Ambiguous — default to boy's data (most common for individual queries)
+            birthDetails = result.analysisData?.boy?.details ?? response.birthData
+            print("[AskDestiny] Ambiguous target '\(target)' — defaulting to boy's data")
         }
         
         guard let details = birthDetails else {
