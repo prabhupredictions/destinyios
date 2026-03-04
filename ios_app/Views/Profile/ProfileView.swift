@@ -45,6 +45,10 @@ struct ProfileView: View {
     // Notification toggle
     @State private var notificationsEnabled = false
     
+    // Analytics consent toggle
+    @State private var analyticsConsent = true
+    @State private var isUpdatingAnalyticsConsent = false
+    
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
         // Guest emails use format: YYYYMMDD_HHMM_CityPrefix_LatInt_LngInt@daa.com
@@ -170,7 +174,10 @@ struct ProfileView: View {
                 )
             }
             .preferredColorScheme(.dark)
-            .onAppear { checkNotificationStatus() }
+            .onAppear { 
+                checkNotificationStatus()
+                loadAnalyticsConsent()
+            }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                 checkNotificationStatus()
             }
@@ -397,6 +404,26 @@ struct ProfileView: View {
                         }
                     }
                 )
+                
+                // Analytics Consent Toggle
+                PremiumListItem(
+                    title: "Share Usage Analytics",
+                    subtitle: "Help improve the app by sharing usage analytics",
+                    icon: "chart.bar.fill",
+                    showChevron: false
+                ) {
+                    Toggle("", isOn: Binding(
+                        get: { analyticsConsent },
+                        set: { newValue in
+                            Task {
+                                await updateAnalyticsConsent(newValue)
+                            }
+                        }
+                    ))
+                    .labelsHidden()
+                    .tint(AppTheme.Colors.gold)
+                    .disabled(isUpdatingAnalyticsConsent)
+                }
             }
         }
     }
@@ -847,6 +874,54 @@ struct ProfileView: View {
             UIApplication.shared.open(url)
         } else if let url = URL(string: UIApplication.openSettingsURLString) {
             openURL(url)
+        }
+    }
+    
+    // MARK: - Analytics Consent Helpers
+    
+    /// Load current analytics consent status from user profile
+    private func loadAnalyticsConsent() {
+        Task {
+            do {
+                let status = try await ProfileService.shared.getUserStatus(email: userEmail)
+                await MainActor.run {
+                    analyticsConsent = status.analyticsConsent ?? true
+                }
+            } catch {
+                logger.warning("Failed to load analytics consent: \(error.localizedDescription)")
+                // Keep default value (true) on error
+            }
+        }
+    }
+    
+    /// Update analytics consent preference via API
+    private func updateAnalyticsConsent(_ newValue: Bool) async {
+        guard !userEmail.isEmpty else { return }
+        
+        await MainActor.run {
+            isUpdatingAnalyticsConsent = true
+        }
+        
+        do {
+            let response = try await ProfileService.shared.updateAnalyticsConsent(
+                email: userEmail,
+                consent: newValue
+            )
+            
+            await MainActor.run {
+                analyticsConsent = response.analyticsConsent
+                isUpdatingAnalyticsConsent = false
+                HapticManager.shared.play(.light)
+            }
+            
+            logger.info("Analytics consent updated: \(newValue)")
+        } catch {
+            await MainActor.run {
+                isUpdatingAnalyticsConsent = false
+                // Revert to previous value on error
+                analyticsConsent = !newValue
+            }
+            logger.error("Failed to update analytics consent: \(error.localizedDescription)")
         }
     }
     

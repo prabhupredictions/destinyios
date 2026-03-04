@@ -76,6 +76,7 @@ class ProfileService {
         let isPremium: Bool
         let featureUsage: [String: FeatureUsageInfo]?
         let subscriptionStatus: String?
+        let analyticsConsent: Bool?  // Analytics consent status
         
         enum CodingKeys: String, CodingKey {
             case userEmail = "user_email"
@@ -84,6 +85,22 @@ class ProfileService {
             case isPremium = "is_premium"
             case featureUsage = "feature_usage"
             case subscriptionStatus = "subscription_status"
+            case analyticsConsent = "analytics_consent"
+        }
+    }
+    
+    /// Response from /subscription/analytics-consent
+    struct AnalyticsConsentResponse: Codable {
+        let success: Bool
+        let analyticsConsent: Bool
+        let analyticsConsentUpdatedAt: String?
+        let message: String
+        
+        enum CodingKeys: String, CodingKey {
+            case success
+            case analyticsConsent = "analytics_consent"
+            case analyticsConsentUpdatedAt = "analytics_consent_updated_at"
+            case message
         }
     }
     
@@ -529,6 +546,93 @@ class ProfileService {
         }
         
         print("[ProfileService] Account deleted successfully for \(email)")
+    }
+    
+    // MARK: - User Status (includes analytics consent)
+    
+    /// Get user status from server (lightweight status check)
+    struct UserStatusResponse: Codable {
+        let userEmail: String
+        let planId: String?
+        let isGeneratedEmail: Bool
+        let isPremium: Bool
+        let featureUsage: [String: FeatureUsageInfo]?
+        let subscriptionStatus: String?
+        let subscriptionExpiresAt: String?
+        let analyticsConsent: Bool?
+        let analyticsConsentUpdatedAt: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case userEmail = "user_email"
+            case planId = "plan_id"
+            case isGeneratedEmail = "is_generated_email"
+            case isPremium = "is_premium"
+            case featureUsage = "feature_usage"
+            case subscriptionStatus = "subscription_status"
+            case subscriptionExpiresAt = "subscription_expires_at"
+            case analyticsConsent = "analytics_consent"
+            case analyticsConsentUpdatedAt = "analytics_consent_updated_at"
+        }
+    }
+    
+    /// Fetch user status from server
+    func getUserStatus(email: String) async throws -> UserStatusResponse {
+        let urlString = "\(APIConfig.baseURL)/subscription/status?email=\(email.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? email)"
+        
+        guard let url = URL(string: urlString) else {
+            throw ProfileError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ProfileError.invalidResponse
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            throw ProfileError.serverError(statusCode: httpResponse.statusCode)
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode(UserStatusResponse.self, from: data)
+    }
+    
+    // MARK: - Update Analytics Consent
+    
+    /// Update user's analytics consent preference
+    func updateAnalyticsConsent(email: String, consent: Bool) async throws -> AnalyticsConsentResponse {
+        guard let url = URL(string: "\(APIConfig.baseURL)/subscription/analytics-consent") else {
+            throw ProfileError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        let body: [String: Any] = [
+            "user_email": email,
+            "analytics_consent": consent
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw ProfileError.invalidResponse
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            throw ProfileError.serverError(statusCode: httpResponse.statusCode)
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode(AnalyticsConsentResponse.self, from: data)
     }
 }
 
