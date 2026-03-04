@@ -888,7 +888,7 @@ struct ProfileView: View {
                     analyticsConsent = status.analyticsConsent ?? true
                 }
             } catch {
-                logger.warning("Failed to load analytics consent: \(error.localizedDescription)")
+                print("[ProfileView] Failed to load analytics consent: \(error.localizedDescription)")
                 // Keep default value (true) on error
             }
         }
@@ -914,14 +914,14 @@ struct ProfileView: View {
                 HapticManager.shared.play(.light)
             }
             
-            logger.info("Analytics consent updated: \(newValue)")
+            print("[ProfileView] Analytics consent updated: \(newValue)")
         } catch {
             await MainActor.run {
                 isUpdatingAnalyticsConsent = false
                 // Revert to previous value on error
                 analyticsConsent = !newValue
             }
-            logger.error("Failed to update analytics consent: \(error.localizedDescription)")
+            print("[ProfileView] Failed to update analytics consent: \(error.localizedDescription)")
         }
     }
     
