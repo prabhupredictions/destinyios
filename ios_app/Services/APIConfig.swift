@@ -34,7 +34,7 @@ struct APIConfig {
         case .test:
             return "https://astroapi-test-dsqvza5jza-ul.a.run.app"
         case .production:
-            return "https://astroapi-prod-dsqvza5jza-el.a.run.app"
+            return "https://astroapi-prod-dsqvza5jza-ul.a.run.app"
         }
     }
     
