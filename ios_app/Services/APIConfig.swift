@@ -32,7 +32,7 @@ struct APIConfig {
         case .local:
             return "http://127.0.0.1:8000"
         case .test:
-            return "https://astroapi-test-dsqvza5jza-el.a.run.app"
+            return "https://astroapi-test-dsqvza5jza-ul.a.run.app"
         case .production:
             return "https://astroapi-prod-dsqvza5jza-el.a.run.app"
         }
