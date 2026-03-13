@@ -224,6 +224,7 @@ struct TransitOrbView: View {
 /// Section displaying transit influences as horizontal scroll
 struct TransitInfluencesSection: View {
     let transits: [TransitInfluence]
+    var onTransitTapped: ((TransitInfluence) -> Void)? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -236,7 +237,12 @@ struct TransitInfluencesSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
                     ForEach(transits) { transit in
-                        TransitOrbView(transit: transit)
+                        Button(action: {
+                            onTransitTapped?(transit)
+                        }) {
+                            TransitOrbView(transit: transit)
+                        }
+                        .buttonStyle(ScaleButtonStyle())
                     }
                 }
                 .padding(.horizontal, 12) // Match parent edge

@@ -64,6 +64,9 @@ struct HomeView: View {
     @State private var showNotificationInbox = false
     @ObservedObject private var notificationService = NotificationInboxService.shared
     
+    // Shimmer animation for "What's in my mind" card borders
+    @State private var shimmerAngle: Double = 0
+    
     // Environment for detecting app foreground/background
     @Environment(\.scenePhase) private var scenePhase
     
@@ -88,7 +91,7 @@ struct HomeView: View {
                 
                 // 2. Scrollable Content
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 24) { // iOS HIG: 24pt between major sections
+                    VStack(spacing: 20) { // Compact premium spacing between major sections
                         
                         // Offline indicator
                         OfflineBanner()
@@ -114,29 +117,40 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity, minHeight: 300)
                             .padding(.top, 60)
                         } else {
-                            // 1. Hero: Cosmic Vibe
-                            insightHeroSection
-                            
-                            // 2. How is my day today? (Life Areas with filters)
-                            lifeAreasGridSection
+                            // 1. Life Area Story Orbs (Instagram-style, top of feed)
+                            storyOrbsSection
                             
                             // 3. What's in my mind? (Quick Questions)
                             whatsInMyMindSection
                             
-                            // 4. Current Dasha
+                            // 4. Current Dasha (Tappable → sends to chat)
                             if let dasha = viewModel.dashaInsight {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("Current Dasha")
                                         .font(AppTheme.Fonts.premiumDisplay(size: 18))
                                         .goldGradient()
                                     
-                                    DashaInsightCard(dasha: dasha)
+                                    Button(action: {
+                                        HapticManager.shared.play(.light)
+                                        let q = "Tell me about my current \(dasha.period) dasha period. Theme: \(dasha.theme), Quality: \(dasha.quality).\(dasha.meaning != nil ? " Current insight: \(dasha.meaning!)." : "") What should I expect and what remedies can help?"
+                                        onQuestionSelected?(q)
+                                    }) {
+                                        DashaInsightCard(dasha: dasha)
+                                    }
+                                    .buttonStyle(ScaleButtonStyle())
                                 }
                             }
                             
-                            // 5. Current Transit Influences (Horizontal Scroll)
+                            // 5. Current Transit Influences (Tappable → sends to chat)
                             if !viewModel.transitInfluences.isEmpty {
-                                TransitInfluencesSection(transits: viewModel.transitInfluences)
+                                TransitInfluencesSection(
+                                    transits: viewModel.transitInfluences,
+                                    onTransitTapped: { transit in
+                                        HapticManager.shared.play(.light)
+                                        let q = "Tell me about the current \(transit.planet) transit in \(transit.sign) (house \(transit.house)). \(transit.description) How does this affect me and what should I do?"
+                                        onQuestionSelected?(q)
+                                    }
+                                )
                             }
                             
                             // 6. Dosha Status
@@ -253,6 +267,11 @@ struct HomeView: View {
             
             // Request push notification permission
             PushNotificationService.shared.requestPermission()
+            
+            // Animate the golden shimmer border on "What's in my mind" cards
+            withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
+                shimmerAngle = 360
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
             // Reload home data when profile switches
@@ -595,70 +614,38 @@ struct HomeView: View {
         .premiumInertia(intensity: 0.5)
     }
     
-    // E. How is my day today? (formerly Life Areas)
-    // selectedFilter and filterOptions already declared at top of struct
-    
-    private var lifeAreasGridSection: some View {
-        VStack(spacing: 8) { // iOS HIG: 8pt internal spacing
-            // Header (no extra padding - parent handles it)
-            Text("How is my day today?")
-                .font(AppTheme.Fonts.premiumDisplay(size: 18))
-                .goldGradient()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityAddTraits(.isHeader)
-            
-            // Filter Tabs (Compact)
-            HStack(spacing: 8) {
-                ForEach(filterOptions, id: \.self) { filter in
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedFilter = filter
-                        }
-                        HapticManager.shared.play(.light)
-                    }) {
-                        Text(filter)
-                            .font(AppTheme.Fonts.caption(size: 11))
-                            .fontWeight(selectedFilter == filter ? .semibold : .regular)
-                            .foregroundColor(selectedFilter == filter ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(selectedFilter == filter ?
-                                          AppTheme.Colors.gold.opacity(0.1) : Color.clear)
-                                    .overlay(
-                                        Capsule()
-                                            .strokeBorder(
-                                                selectedFilter == filter ?
-                                                AppTheme.Colors.gold.opacity(0.5) :
-                                                AppTheme.Colors.textSecondary.opacity(0.2),
-                                                lineWidth: 1
-                                            )
-                                    )
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-                Spacer()
-            }
-            
-            // Horizontal Scrolling Celestial Orbs (filtered)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 0) { // Edge-to-edge orbs
-                    // Calculate dynamic size for 3.5 items visible
-                    let screenWidth = UIScreen.main.bounds.width
-                    // Total width available minus padding (if any significant padding exists, but here we want edge-to-edge calculation)
-                    // We target 3.5 items visible. Item width = orbSize * 1.4
-                    // So visibleWidth = 3.5 * (orbSize * 1.4)
-                    // orbSize = visibleWidth / (3.5 * 1.4)
-                    let dynamicSize = screenWidth / (3.5 * 1.4)
+    // E. Instagram-style Story Orbs (Life Areas)
+    private var storyOrbsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Greeting + subtitle
+            VStack(alignment: .leading, spacing: 6) {
+                Text(timeBasedGreeting + ", " + profileContext.activeProfileName)
+                    .font(AppTheme.Fonts.premiumDisplay(size: 22))
+                    .goldGradient()
+                
+                HStack(spacing: 6) {
+                    Text(viewModel.ascendantSign + " Ascendant")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                     
-                    ForEach(filteredAreas, id: \.area) { item in
-                        CelestialOrbView(
+                    Text("\u{00B7}")
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
+                    
+                    Text(viewModel.currentDasha)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+            }
+            .padding(.top, 16)
+            
+            // Horizontal story orbs — trailing peek for scroll hint
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(allAreas, id: \.area) { item in
+                        StoryOrbView(
                             icon: iconName(for: item.area),
                             title: item.area,
-                            status: item.status.status,
-                            size: dynamicSize
+                            status: item.status.status
                         ) {
                             HapticManager.shared.play(.light)
                             withAnimation(.spring(response: 0.4)) {
@@ -667,56 +654,125 @@ struct HomeView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 12) // Match parent edge
-                .padding(.vertical, 2)
+                .padding(.leading, 12)
+                .padding(.trailing, 80)
+                .padding(.vertical, 8)
             }
-            .padding(.horizontal, -12) // Negative margin to extend to edges
+            .padding(.horizontal, -12)
+            
+            // Guide text (centered, like Match screen)
+            HStack(spacing: 5) {
+                Image(systemName: "hand.tap.fill")
+                    .font(.system(size: 11))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+                Text("Tap to explore your day")
+                    .font(AppTheme.Fonts.caption(size: 11))
+                    .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.8))
+                    .italic()
+            }
+            .frame(maxWidth: .infinity)
         }
     }
     
-    // F. What's in my mind? (Quick Questions - taps go to Chat)
-    // F. What's in my mind? (Compact List View)
+    private var timeBasedGreeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12: return "Good morning"
+        case 12..<17: return "Good afternoon"
+        case 17..<21: return "Good evening"
+        default: return "Good night"
+        }
+    }
+    
+    // F. What's in my mind? (2×2 Golden Gradient Grid)
     private var whatsInMyMindSection: some View {
-        VStack(alignment: .leading, spacing: 8) { // iOS HIG: 8pt internal spacing
-            // Header (no extra padding - parent handles it)
+        VStack(alignment: .leading, spacing: 6) {
             Text("What's in my mind?")
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
                 .accessibilityAddTraits(.isHeader)
             
-            // Quick Questions (Compact List)
             let questions = viewModel.suggestedQuestions.isEmpty ?
                 ["When will I get married?", "Best career direction?", "Financial outlook?", "Health check"] :
                 Array(viewModel.suggestedQuestions.prefix(4))
             
-            VStack(spacing: 8) { // iOS HIG: 8pt grid
-                ForEach(questions, id: \.self) { question in
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        onQuestionSelected?(question)
-                    }) {
-                        HStack {
-                            Text(question)
-                                .font(AppTheme.Fonts.caption(size: 13))
-                                .foregroundColor(AppTheme.Colors.textPrimary)
-                                .lineLimit(1)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.black.opacity(0.1))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .strokeBorder(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
+            // 2×2 Grid
+            let rows = stride(from: 0, to: questions.count, by: 2).map { i in
+                Array(questions[i..<min(i + 2, questions.count)])
+            }
+            
+            VStack(spacing: 10) {
+                ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                    HStack(spacing: 10) {
+                        ForEach(row, id: \.self) { question in
+                            Button(action: {
+                                HapticManager.shared.play(.light)
+                                onQuestionSelected?(question)
+                            }) {
+                                HStack(spacing: 10) {
+                                    // Question text
+                                    Text(question)
+                                        .font(AppTheme.Fonts.caption(size: 13))
+                                        .fontWeight(.medium)
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                        .lineLimit(3)
+                                        .minimumScaleFactor(0.9)
+                                        .multilineTextAlignment(.leading)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                    
+                                    Spacer(minLength: 0)
+                                    
+                                    // Arrow CTA
+                                    Image(systemName: "arrow.right.circle.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 12)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
+                                                    Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
                                 )
-                        )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .strokeBorder(
+                                            AngularGradient(
+                                                gradient: Gradient(stops: [
+                                                    .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.0),
+                                                    .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.15),
+                                                    .init(color: AppTheme.Colors.goldLight.opacity(0.9), location: 0.2),
+                                                    .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.25),
+                                                    .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.4),
+                                                    .init(color: AppTheme.Colors.gold.opacity(0.05), location: 1.0)
+                                                ]),
+                                                center: .center,
+                                                startAngle: .degrees(shimmerAngle),
+                                                endAngle: .degrees(shimmerAngle + 360)
+                                            ),
+                                            lineWidth: 1.2
+                                        )
+                                )
+                                .shadow(color: AppTheme.Colors.gold.opacity(0.06), radius: 6, x: 0, y: 3)
+                            }
+                            .buttonStyle(ScaleButtonStyle())
+                        }
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
