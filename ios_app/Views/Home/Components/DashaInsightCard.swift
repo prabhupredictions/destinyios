@@ -1,91 +1,156 @@
 import SwiftUI
 
-/// Premium Dasha Insight Card
-/// Shows current dasha period with quality badge, theme, and meaning
+/// Premium Dasha Insight Card with animated golden border
+/// Professional layout: Steady badge top right, Arrow bottom right
 struct DashaInsightCard: View {
     let dasha: DashaInsight
     
+    @State private var shimmerAngle: Double = 0
+    @State private var arrowScale: CGFloat = 1.0
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header Row: Period + Quality Badge
-            HStack(spacing: 12) {
-                // Dasha Icon
-                ZStack {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [AppTheme.Colors.gold.opacity(0.4), AppTheme.Colors.gold.opacity(0.1)],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: 25
+        ZStack {
+            // Main content
+            VStack(alignment: .leading, spacing: 12) {
+                // Header Row: Icon + Period (Steady badge is in overlay at top right)
+                HStack(spacing: 12) {
+                    // Dasha Icon
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [AppTheme.Colors.gold.opacity(0.4), AppTheme.Colors.gold.opacity(0.1)],
+                                    center: .center,
+                                    startRadius: 0,
+                                    endRadius: 25
+                                )
                             )
-                        )
-                        .frame(width: 44, height: 44)
+                            .frame(width: 44, height: 44)
+                        
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
                     
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(AppTheme.Colors.gold)
+                    // Period Name
+                    Text(dasha.period)
+                        .font(AppTheme.Fonts.premiumDisplay(size: 17))
+                        .foregroundColor(.white)
+                    
+                    Spacer()
                 }
                 
-                // Period Name (no "Current Dasha" label - header is external now)
-                Text(dasha.period)
-                    .font(AppTheme.Fonts.premiumDisplay(size: 17))
-                    .foregroundColor(.white)
+                // Theme
+                HStack(spacing: 8) {
+                    Image(systemName: "theatermasks.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
+                    
+                    Text("Theme: \(dasha.theme)")
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .fontWeight(.medium)
+                        .foregroundColor(AppTheme.Colors.goldLight)
+                }
                 
+                // Meaning (if available)
+                if let meaning = dasha.meaning, !meaning.isEmpty {
+                    Text(meaning)
+                        .font(AppTheme.Fonts.body(size: 13))
+                        .foregroundColor(Color.white.opacity(0.7))
+                        .lineLimit(2)
+                }
+                
+                // Spacer to push arrow to bottom
+                Spacer(minLength: 0)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            
+            // Top Right: Quality Badge (overlay)
+            VStack {
+                HStack {
+                    Spacer()
+                    Text(dasha.quality)
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(qualityColor)
+                        )
+                }
                 Spacer()
-                
-                // Quality Badge
-                Text(dasha.quality)
-                    .font(AppTheme.Fonts.caption(size: 11))
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(qualityColor)
-                    )
             }
+            .padding(.top, 16)
+            .padding(.trailing, 16)
             
-            // Theme
-            HStack(spacing: 8) {
-                Image(systemName: "theatermasks.fill")
-                    .font(.system(size: 12))
-                    .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
-                
-                Text("Theme: \(dasha.theme)")
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .fontWeight(.medium)
-                    .foregroundColor(AppTheme.Colors.goldLight)
+            // Bottom Right: Animated Arrow click indicator
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.forward.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .scaleEffect(arrowScale)
+                }
             }
-            
-            // Meaning
-            if let meaning = dasha.meaning, !meaning.isEmpty {
-                Text(meaning)
-                    .font(AppTheme.Fonts.body(size: 13))
-                    .foregroundColor(Color.white.opacity(0.7))
-                    .lineLimit(2)
-            }
+            .padding(.bottom, 12)
+            .padding(.trailing, 12)
         }
-        .padding(16)
+        .frame(minHeight: 120)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.15, green: 0.12, blue: 0.08).opacity(0.8),
-                            Color(red: 0.1, green: 0.08, blue: 0.05).opacity(0.9)
+                            Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
+                            Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(
+                    AngularGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.0),
+                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.15),
+                            .init(color: AppTheme.Colors.goldLight.opacity(0.9), location: 0.2),
+                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.25),
+                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.4),
+                            .init(color: AppTheme.Colors.gold.opacity(0.05), location: 1.0)
+                        ]),
+                        center: .center,
+                        startAngle: .degrees(shimmerAngle),
+                        endAngle: .degrees(shimmerAngle + 360)
+                    ),
+                    lineWidth: 1.5
                 )
         )
-        .shadow(color: AppTheme.Colors.gold.opacity(0.15), radius: 10, x: 0, y: 5)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
+        .onAppear {
+            // Animate the golden shimmer border (slower: 10s per rotation)
+            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                shimmerAngle = 360
+            }
+            
+            // Animate arrow pulse scale
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                arrowScale = 1.15
+            }
+        }
     }
     
     // MARK: - Computed Properties

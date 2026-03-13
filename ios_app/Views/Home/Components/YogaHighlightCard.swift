@@ -160,6 +160,9 @@ struct YogaHighlightCard: View {
 struct PremiumYogaCard: View {
     let yoga: YogaDetail
     
+    @State private var shimmerAngle: Double = 0
+    @State private var arrowScale: CGFloat = 1.0
+    
     // Status Logic
     var statusText: String {
         switch yoga.status {
@@ -194,110 +197,155 @@ struct PremiumYogaCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Header: Icon + Status Badge
-            HStack(alignment: .center) {
-                ZStack {
-                    Circle()
-                        .fill(baseColor.opacity(0.1))
-                        .frame(width: 32, height: 32)
+        ZStack {
+            VStack(alignment: .leading, spacing: 8) {
+                // Header: Icon + Status Badge
+                HStack(alignment: .center) {
+                    ZStack {
+                        Circle()
+                            .fill(baseColor.opacity(0.1))
+                            .frame(width: 32, height: 32)
+                        
+                        Image(systemName: iconName)
+                            .font(.system(size: 14))
+                            .foregroundColor(baseColor)
+                    }
                     
-                    Image(systemName: iconName)
-                        .font(.system(size: 14))
-                        .foregroundColor(baseColor)
+                    Spacer()
+                    
+                    // Status Badge
+                    Text(statusText)
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .fontWeight(.bold)
+                        .foregroundColor(badgeColor)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .strokeBorder(badgeColor.opacity(0.4), lineWidth: 1)
+                                .background(Capsule().fill(badgeColor.opacity(0.1)))
+                        )
                 }
                 
-                Spacer()
+                // Yoga Name (Limit 2 lines)
+                Text(yoga.localizedName)
+                    .font(AppTheme.Fonts.title(size: 14))
+                    .foregroundColor(Color.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(height: 36, alignment: .topLeading) // Fixed height for alignment
                 
-                // Status Badge
-                Text(statusText)
-                    .font(AppTheme.Fonts.caption(size: 10))
-                    .fontWeight(.bold)
-                    .foregroundColor(badgeColor)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .strokeBorder(badgeColor.opacity(0.4), lineWidth: 1)
-                            .background(Capsule().fill(badgeColor.opacity(0.1)))
-                    )
-            }
-            
-            // Yoga Name (Limit 2 lines)
-            Text(yoga.localizedName)
-                .font(AppTheme.Fonts.title(size: 14))
-                .foregroundColor(Color.white)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(height: 36, alignment: .topLeading) // Fixed height for alignment
-            
-            // Divider
-            Rectangle()
-                .fill(LinearGradient(
-                    colors: [baseColor.opacity(0.5), .clear],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ))
-                .frame(height: 1)
-            
-            // Details: Planets & Houses
-            HStack(alignment: .top) {
-                // Left: Planets
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("PLANETS")
-                        .font(AppTheme.Fonts.caption(size: 9))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                        .tracking(1)
-                    
-                    Text(yoga.planets.isEmpty ? "Unknown" : yoga.planets)
-                        .font(AppTheme.Fonts.caption(size: 11))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .lineLimit(1)
-                }
+                // Divider
+                Rectangle()
+                    .fill(LinearGradient(
+                        colors: [baseColor.opacity(0.5), .clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ))
+                    .frame(height: 1)
                 
-                Spacer()
-                
-                // Right: Houses
-                if !yoga.houses.isEmpty {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("HOUSES")
+                // Details: Planets & Houses
+                HStack(alignment: .top) {
+                    // Left: Planets
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("PLANETS")
                             .font(AppTheme.Fonts.caption(size: 9))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                             .tracking(1)
                         
-                        Text(formatHouses(yoga.houses))
+                        Text(yoga.planets.isEmpty ? "Unknown" : yoga.planets)
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .lineLimit(1)
                     }
+                    
+                    Spacer()
+                    
+                    // Right: Houses
+                    if !yoga.houses.isEmpty {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("HOUSES")
+                                .font(AppTheme.Fonts.caption(size: 9))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                                .tracking(1)
+                            
+                            Text(formatHouses(yoga.houses))
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+                
+                // Spacer to push content up if needed
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            
+            // Bottom Right: Animated Arrow click indicator
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.forward.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .scaleEffect(arrowScale)
                 }
             }
-            
-            // Spacer to push content up if needed
-            Spacer(minLength: 0)
+            .padding(.bottom, 12)
+            .padding(.trailing, 12)
         }
-        .padding(14)
-        .frame(width: 170, height: 160) // Increased height to fit Houses
+        .frame(width: 170, height: 170)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(AppTheme.Colors.cardBackground)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
+                            Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
-                    LinearGradient(
-                        colors: [
-                            baseColor.opacity(0.3),
-                            Color.white.opacity(0.05)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                    AngularGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: baseColor.opacity(0.1), location: 0.0),
+                            .init(color: baseColor.opacity(0.6), location: 0.15),
+                            .init(color: baseColor.opacity(0.9), location: 0.2),
+                            .init(color: baseColor.opacity(0.6), location: 0.25),
+                            .init(color: baseColor.opacity(0.1), location: 0.4),
+                            .init(color: baseColor.opacity(0.05), location: 1.0)
+                        ]),
+                        center: .center,
+                        startAngle: .degrees(shimmerAngle),
+                        endAngle: .degrees(shimmerAngle + 360)
                     ),
-                    lineWidth: 1
+                    lineWidth: 1.5
                 )
         )
-        // Tinted shadow
-        .shadow(color: baseColor.opacity(0.08), radius: 10)
+        .shadow(color: baseColor.opacity(0.08), radius: 8, x: 0, y: 4)
+        .onAppear {
+            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                shimmerAngle = 360
+            }
+            
+            // Animate arrow pulse scale
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                arrowScale = 1.15
+            }
+        }
     }
     
     private func formatHouses(_ houses: String) -> String {

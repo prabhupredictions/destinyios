@@ -1,86 +1,159 @@
 import SwiftUI
 
-/// Premium Transit Influence Card matching reference mockup
-/// Shows planet icon, badge, description with cosmic background
+/// Premium Transit Influence Card matching Current Dasha style
+/// Professional layout: Badge top right, Arrow bottom right, animated golden border
 struct TransitInfluenceCard: View {
     let transit: TransitInfluence
     
+    @State private var shimmerAngle: Double = 0
+    @State private var arrowScale: CGFloat = 1.0
+    
     var body: some View {
-        HStack(spacing: 16) {
-            // Planet Icon (3D style)
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [planetGlowColor.opacity(0.6), planetGlowColor.opacity(0.1)],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 30
-                        )
-                    )
-                    .frame(width: 56, height: 56)
-                
-                Image(systemName: planetSymbol)
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color.white, planetGlowColor],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .shadow(color: planetGlowColor.opacity(0.8), radius: 8)
-            }
-            
-            // Content
-            VStack(alignment: .leading, spacing: 4) {
-                // Planet Name + Badge
-                HStack(spacing: 8) {
+        ZStack {
+            // Main content
+            VStack(alignment: .leading, spacing: 12) {
+                // Header Row: Icon + Planet Name (Badge is in overlay at top right)
+                HStack(spacing: 12) {
+                    // Planet Icon
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [planetGlowColor.opacity(0.4), planetGlowColor.opacity(0.1)],
+                                    center: .center,
+                                    startRadius: 0,
+                                    endRadius: 25
+                                )
+                            )
+                            .frame(width: 44, height: 44)
+                        
+                        Image(systemName: planetSymbol)
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color.white, planetGlowColor],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                    }
+                    
+                    // Planet Transit Name
                     Text("\(transit.planet) Transit")
-                        .font(AppTheme.Fonts.premiumDisplay(size: 16))
+                        .font(AppTheme.Fonts.premiumDisplay(size: 17))
                         .foregroundColor(.white)
                     
-                    // Badge Pill
-                    Text(transit.badge)
-                        .font(AppTheme.Fonts.caption(size: 10))
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(badgeColor)
-                        )
+                    Spacer()
+                }
+                
+                // Sign & House info
+                HStack(spacing: 8) {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
+                    
+                    Text("\(fullSignName(for: transit.sign)) · House \(transit.house)")
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .fontWeight(.medium)
+                        .foregroundColor(AppTheme.Colors.goldLight)
                 }
                 
                 // Description
                 Text(transit.description)
                     .font(AppTheme.Fonts.body(size: 13))
-                    .foregroundColor(Color.white.opacity(0.8))
+                    .foregroundColor(Color.white.opacity(0.7))
                     .lineLimit(2)
+                
+                // Spacer to push arrow to bottom
+                Spacer(minLength: 0)
             }
+            .padding(16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             
-            Spacer()
+            // Top Right: Badge Pill (overlay)
+            VStack {
+                HStack {
+                    Spacer()
+                    Text(transit.badge)
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(badgeColor)
+                        )
+                }
+                Spacer()
+            }
+            .padding(.top, 16)
+            .padding(.trailing, 16)
+            
+            // Bottom Right: Animated Arrow click indicator
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.forward.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .scaleEffect(arrowScale)
+                }
+            }
+            .padding(.bottom, 12)
+            .padding(.trailing, 12)
         }
-        .padding(16)
+        .frame(minHeight: 120)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.black.opacity(0.4),
-                            Color(red: 0.1, green: 0.1, blue: 0.15).opacity(0.6)
+                            Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
+                            Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(badgeColor.opacity(0.3), lineWidth: 1)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(
+                    AngularGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.0),
+                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.15),
+                            .init(color: AppTheme.Colors.goldLight.opacity(0.9), location: 0.2),
+                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.25),
+                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.4),
+                            .init(color: AppTheme.Colors.gold.opacity(0.05), location: 1.0)
+                        ]),
+                        center: .center,
+                        startAngle: .degrees(shimmerAngle),
+                        endAngle: .degrees(shimmerAngle + 360)
+                    ),
+                    lineWidth: 1.5
                 )
         )
-        .shadow(color: badgeColor.opacity(0.2), radius: 10, x: 0, y: 5)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
+        .onAppear {
+            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                shimmerAngle = 360
+            }
+            
+            // Animate arrow pulse scale
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                arrowScale = 1.15
+            }
+        }
     }
     
     // MARK: - Computed Properties
@@ -124,53 +197,108 @@ struct TransitInfluenceCard: View {
         default: return AppTheme.Colors.gold
         }
     }
+    
+    func fullSignName(for sign: String) -> String {
+        let signMap: [String: String] = [
+            "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini",
+            "Ca": "Cancer", "Le": "Leo", "Vi": "Virgo",
+            "Li": "Libra", "Sc": "Scorpio", "Sg": "Sagittarius",
+            "Cp": "Capricorn", "Aq": "Aquarius", "Pi": "Pisces"
+        ]
+        return signMap[sign] ?? sign
+    }
 }
 
 /// Compact Transit Orb (Divine Gold Edition)
 struct TransitOrbView: View {
     let transit: TransitInfluence
     
+    @State private var isHovering = false
+    @State private var shimmerAngle: Double = 0
+    @State private var arrowScale: CGFloat = 1.0
+    
     var body: some View {
-        VStack(spacing: 8) { // iOS HIG: 8pt grid
-            // Planet Orb
+        VStack(spacing: 4) { // Reduced spacing for tighter layout
+            // Planet Orb with centered name badge (floating together)
             ZStack {
                 // Planet Image Asset (Premium AI Generated)
                 Image(planetImageName)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 60, height: 60)
-                    // Dynamic premium shadow that pulses with the float
-                    .shadow(
-                        color: AppTheme.Colors.gold.opacity(isHovering ? 0.4 : 0.2),
-                        radius: isHovering ? 8 : 4,
-                        x: 0,
-                        y: isHovering ? 5 : 2
+                
+                // Planet Name Badge (centered, floating with planet)
+                Text(transit.planet)
+                    .font(AppTheme.Fonts.caption(size: 9))
+                    .fontWeight(.semibold)
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(
+                        Capsule()
+                            .fill(Color(red: 0.08, green: 0.08, blue: 0.12).opacity(0.85))
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(AppTheme.Colors.gold.opacity(0.4), lineWidth: 0.5)
+                            )
                     )
-                    // Gentle floating movement
+                    .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+                    // Same floating animation as planet
                     .offset(y: isHovering ? -3 : 3)
             }
-            .overlay(alignment: .bottomTrailing) {
-                // Status Dot (Keeping this functional element)
+            .frame(width: 60, height: 60)
+            // Dynamic premium shadow that pulses with the float
+            .shadow(
+                color: borderColor.opacity(isHovering ? 0.4 : 0.2),
+                radius: isHovering ? 8 : 4,
+                x: 0,
+                y: isHovering ? 5 : 2
+            )
+            // Gentle floating movement for entire orb
+            .offset(y: isHovering ? -3 : 3)
+            // Status-colored shimmer border around planet orb
+            .background(
                 Circle()
-                    .fill(badgeColor)
-                    .frame(width: 12, height: 12)
-                    .overlay(
-                        Circle()
-                            .strokeBorder(Color(red: 0.1, green: 0.1, blue: 0.15), lineWidth: 2)
+                    .strokeBorder(
+                        AngularGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: borderColor.opacity(0.1), location: 0.0),
+                                .init(color: borderColor.opacity(0.6), location: 0.15),
+                                .init(color: borderColor.opacity(0.9), location: 0.2),
+                                .init(color: borderColor.opacity(0.6), location: 0.25),
+                                .init(color: borderColor.opacity(0.1), location: 0.4),
+                                .init(color: borderColor.opacity(0.05), location: 1.0)
+                            ]),
+                            center: .center,
+                            startAngle: .degrees(shimmerAngle),
+                            endAngle: .degrees(shimmerAngle + 360)
+                        ),
+                        lineWidth: 1.5
                     )
-                    .offset(x: 2, y: 2)
-            }
-            
-            // Planet Name
-            Text(transit.planet)
-                .font(AppTheme.Fonts.caption(size: 11))
-                .fontWeight(.semibold)
-                .foregroundColor(AppTheme.Colors.gold)
+                    .frame(width: 68, height: 68)
+            )
             
             // Sign (Full Name)
             Text(fullSignName)
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary)
+            
+            // Animated Arrow Click Indicator (below sign name)
+            Image(systemName: "arrow.forward.circle.fill")
+                .font(.system(size: 14))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .scaleEffect(arrowScale)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                        arrowScale = 1.15
+                    }
+                }
         }
         .frame(width: 80) // Slightly wider for elegance
         .onAppear {
@@ -183,10 +311,13 @@ struct TransitOrbView: View {
             ) {
                 isHovering = true
             }
+            
+            // Animate status-colored shimmer border (slow: 10s per rotation)
+            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                shimmerAngle = 360
+            }
         }
     }
-    
-    @State private var isHovering = false
     
     // MARK: - Computed Properties
     
@@ -195,16 +326,13 @@ struct TransitOrbView: View {
         return "planet_\(name)"
     }
     
-    // Note: planetSymbol and planetGlowColor removed as we actully use assets now
-    
-    // Note: planetGlowColor removed as we are unifying to Gold theme
-    
-    var badgeColor: Color {
+    // Border color based on transit status (green=positive, red=caution, yellow=neutral)
+    var borderColor: Color {
         switch transit.badgeType.lowercased() {
-        case "positive": return AppTheme.Colors.success
-        case "caution": return AppTheme.Colors.error
-        case "warning": return AppTheme.Colors.error
-        case "neutral": return AppTheme.Colors.textSecondary
+        case "positive": return AppTheme.Colors.success // Green
+        case "caution": return AppTheme.Colors.error    // Red
+        case "warning": return AppTheme.Colors.error    // Red
+        case "neutral": return AppTheme.Colors.warning   // Yellow/Orange
         default: return AppTheme.Colors.gold
         }
     }

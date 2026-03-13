@@ -64,8 +64,6 @@ struct HomeView: View {
     @State private var showNotificationInbox = false
     @ObservedObject private var notificationService = NotificationInboxService.shared
     
-    // Shimmer animation for "What's in my mind" card borders
-    @State private var shimmerAngle: Double = 0
     
     // Environment for detecting app foreground/background
     @Environment(\.scenePhase) private var scenePhase
@@ -132,7 +130,7 @@ struct HomeView: View {
                                     
                                     Button(action: {
                                         HapticManager.shared.play(.light)
-                                        let q = "Tell me about my current \(dasha.period) dasha period. Theme: \(dasha.theme), Quality: \(dasha.quality).\(dasha.meaning != nil ? " Current insight: \(dasha.meaning!)." : "") What should I expect and what remedies can help?"
+                                        let q = "I am currently in my \(dasha.period) Dasha period, which carries a theme of '\(dasha.theme)' with a '\(dasha.quality)' overall quality.\(dasha.meaning != nil ? " The current phase suggests: '\(dasha.meaning!)'." : "")\n\nPlease provide a detailed analysis of how this Dasha period shapes my life, what opportunities or challenges to expect, and any recommended remedies."
                                         onQuestionSelected?(q)
                                     }) {
                                         DashaInsightCard(dasha: dasha)
@@ -147,7 +145,8 @@ struct HomeView: View {
                                     transits: viewModel.transitInfluences,
                                     onTransitTapped: { transit in
                                         HapticManager.shared.play(.light)
-                                        let q = "Tell me about the current \(transit.planet) transit in \(transit.sign) (house \(transit.house)). \(transit.description) How does this affect me and what should I do?"
+                                        let signName = fullZodiacName(for: transit.sign)
+                                        let q = "\(transit.planet) is currently transiting through \(signName) in my \(transit.house)th house. The key indication is: '\(transit.description)'.\n\nPlease share deeper insights on how this transit influences my life and any practical guidance for this period."
                                         onQuestionSelected?(q)
                                     }
                                 )
@@ -268,10 +267,6 @@ struct HomeView: View {
             // Request push notification permission
             PushNotificationService.shared.requestPermission()
             
-            // Animate the golden shimmer border on "What's in my mind" cards
-            withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
-                shimmerAngle = 360
-            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
             // Reload home data when profile switches
@@ -709,66 +704,7 @@ struct HomeView: View {
                                 HapticManager.shared.play(.light)
                                 onQuestionSelected?(question)
                             }) {
-                                HStack(spacing: 10) {
-                                    // Question text
-                                    Text(question)
-                                        .font(AppTheme.Fonts.caption(size: 13))
-                                        .fontWeight(.medium)
-                                        .foregroundColor(AppTheme.Colors.textPrimary)
-                                        .lineLimit(3)
-                                        .minimumScaleFactor(0.9)
-                                        .multilineTextAlignment(.leading)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                    
-                                    Spacer(minLength: 0)
-                                    
-                                    // Arrow CTA
-                                    Image(systemName: "arrow.right.circle.fill")
-                                        .font(.system(size: 16))
-                                        .foregroundStyle(
-                                            LinearGradient(
-                                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                }
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 12)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 14)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
-                                                    Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 14)
-                                        .strokeBorder(
-                                            AngularGradient(
-                                                gradient: Gradient(stops: [
-                                                    .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.0),
-                                                    .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.15),
-                                                    .init(color: AppTheme.Colors.goldLight.opacity(0.9), location: 0.2),
-                                                    .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.25),
-                                                    .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.4),
-                                                    .init(color: AppTheme.Colors.gold.opacity(0.05), location: 1.0)
-                                                ]),
-                                                center: .center,
-                                                startAngle: .degrees(shimmerAngle),
-                                                endAngle: .degrees(shimmerAngle + 360)
-                                            ),
-                                            lineWidth: 1.2
-                                        )
-                                )
-                                .shadow(color: AppTheme.Colors.gold.opacity(0.06), radius: 6, x: 0, y: 3)
+                                QuickQuestionCard(question: question)
                             }
                             .buttonStyle(ScaleButtonStyle())
                         }
@@ -961,4 +897,87 @@ struct LifeAreaLuxuryTile: View {
 
 #Preview {
     HomeView()
+}
+
+/// Standalone Quick Question Card with animated golden shimmer border
+/// Uses same @State animation pattern as DashaInsightCard for reliable shimmer
+struct QuickQuestionCard: View {
+    let question: String
+    
+    @State private var shimmerAngle: Double = 0
+    @State private var arrowScale: CGFloat = 1.0
+    
+    var body: some View {
+        HStack(spacing: 10) {
+            // Question text
+            Text(question)
+                .font(AppTheme.Fonts.caption(size: 13))
+                .fontWeight(.medium)
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .lineLimit(3)
+                .minimumScaleFactor(0.9)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Spacer(minLength: 0)
+            
+            // Animated Arrow CTA with pulse scale
+            Image(systemName: "arrow.forward.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .scaleEffect(arrowScale)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                        arrowScale = 1.15
+                    }
+                }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
+                            Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(
+                    AngularGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.0),
+                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.15),
+                            .init(color: AppTheme.Colors.goldLight.opacity(0.9), location: 0.2),
+                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.25),
+                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.4),
+                            .init(color: AppTheme.Colors.gold.opacity(0.05), location: 1.0)
+                        ]),
+                        center: .center,
+                        startAngle: .degrees(shimmerAngle),
+                        endAngle: .degrees(shimmerAngle + 360)
+                    ),
+                    lineWidth: 1.5
+                )
+        )
+        .shadow(color: AppTheme.Colors.gold.opacity(0.06), radius: 6, x: 0, y: 3)
+        .onAppear {
+            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                shimmerAngle = 360
+            }
+        }
+    }
 }
