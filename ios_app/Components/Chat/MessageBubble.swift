@@ -13,6 +13,7 @@ struct MessageBubble: View {
     @State private var revealedContent: String = ""
     @State private var typewriterFinished = false
     @State private var typewriterTimer: Timer?
+    @State private var showCopiedConfirmation = false
     
     private var isUser: Bool {
         message.messageRole == .user
@@ -80,9 +81,9 @@ struct MessageBubble: View {
         var wordIndex = 0
         revealedContent = ""
         
-        // Reveal 3 words every 60ms (~50 words/sec for smooth fast reveal)
-        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.06, repeats: true) { timer in
-            let batchEnd = min(wordIndex + 3, words.count)
+        // Reveal 4 words every 50ms (~80 words/sec for smooth fast reveal)
+        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
+            let batchEnd = min(wordIndex + 4, words.count)
             let batch = words[wordIndex..<batchEnd].joined(separator: " ")
             
             if revealedContent.isEmpty {
@@ -250,6 +251,25 @@ struct MessageBubble: View {
             }
             
             Spacer()
+            
+            // Copy button (for substantial AI messages)
+            if !isWelcomeMessage && message.content.count > 50 {
+                Button(action: {
+                    UIPasteboard.general.string = message.content
+                    showCopiedConfirmation = true
+                    HapticManager.shared.play(.light)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        showCopiedConfirmation = false
+                    }
+                }) {
+                    Image(systemName: showCopiedConfirmation ? "checkmark" : "doc.on.doc")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(showCopiedConfirmation ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                }
+                .buttonStyle(.plain)
+                .animation(.easeInOut(duration: 0.2), value: showCopiedConfirmation)
+                .accessibilityLabel("Copy response")
+            }
             
             // Inline rating (only for substantial AI messages)
             if !isWelcomeMessage && message.content.count > 50 {

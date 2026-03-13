@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - MarkdownTextView
 /// A reusable SwiftUI view that renders markdown-formatted text
 /// Handles: Headers, Bold, Italic, Code, Lists, Links, Blockquotes, Tables, Dividers
-/// v2 — Fixed: table rendering, divider handling, paragraph merging, inline parse hangs
+/// v3 — ChatGPT-style: bold-label sections, improved spacing, gold label rendering, better bullets
 struct MarkdownTextView: View {
     let content: String
     var textColor: Color = AppTheme.Colors.textPrimary
@@ -12,7 +12,7 @@ struct MarkdownTextView: View {
     @State private var blocks: [MarkdownBlock] = []
     
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 8) {
+        LazyVStack(alignment: .leading, spacing: 12) {
             ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 renderBlock(block)
             }
@@ -32,6 +32,7 @@ struct MarkdownTextView: View {
     private enum MarkdownBlock: Equatable {
         case header(level: Int, text: String)
         case paragraph(text: String)
+        case boldLabel(label: String, content: String)
         case bulletList(items: [String])
         case numberedList(items: [String])
         case codeBlock(code: String)
@@ -173,7 +174,12 @@ struct MarkdownTextView: View {
                 i += 1
             }
             if !paragraphLines.isEmpty {
-                blocks.append(.paragraph(text: paragraphLines.joined(separator: " ")))
+                let joined = paragraphLines.joined(separator: " ")
+                if let labelBlock = parseBoldLabel(joined) {
+                    blocks.append(labelBlock)
+                } else {
+                    blocks.append(.paragraph(text: joined))
+                }
             }
         }
         
@@ -295,6 +301,36 @@ struct MarkdownTextView: View {
         return nil
     }
     
+    // MARK: - Bold Label Detection
+    
+    /// Detect **Label:** Content pattern (ChatGPT-style section labels)
+    /// Returns a boldLabel block if the text starts with **SomeLabel:**
+    private func parseBoldLabel(_ text: String) -> MarkdownBlock? {
+        guard text.hasPrefix("**") else { return nil }
+        
+        // Find the closing ** after the label
+        let afterOpen = text.index(text.startIndex, offsetBy: 2)
+        guard let closeRange = text.range(of: "**", range: afterOpen..<text.endIndex) else {
+            return nil
+        }
+        
+        let label = String(text[afterOpen..<closeRange.lowerBound])
+        
+        // Label must end with : (e.g. "Verdict:", "Best Window:", "Chart Promise:")
+        guard label.hasSuffix(":") || label.hasSuffix(": ") else {
+            // Also accept labels WITHOUT colon if the rest is short (like **Verdict** Favorable)
+            // But primary pattern is **Label:** content
+            return nil
+        }
+        
+        let contentStart = closeRange.upperBound
+        let content = contentStart < text.endIndex
+            ? String(text[contentStart...]).trimmingCharacters(in: .whitespaces)
+            : ""
+        
+        return .boldLabel(label: label.trimmingCharacters(in: .whitespaces), content: content)
+    }
+    
     // MARK: - Block Renderer
     
     @ViewBuilder
@@ -306,28 +342,34 @@ struct MarkdownTextView: View {
         case .paragraph(let text):
             renderInlineMarkdown(text)
             
+        case .boldLabel(let label, let content):
+            renderBoldLabel(label: label, content: content)
+            
         case .bulletList(let items):
-            VStack(alignment: .leading, spacing: 4) {
-                ForEach(items, id: \.self) { item in
-                    HStack(alignment: .top, spacing: 8) {
-                        Text("•")
-                            .foregroundColor(AppTheme.Colors.gold)
-                            .font(.system(size: fontSize, weight: .bold))
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Circle()
+                            .fill(AppTheme.Colors.gold.opacity(0.7))
+                            .frame(width: 5, height: 5)
+                            .offset(y: 1)
                         renderInlineMarkdown(item)
                     }
+                    .padding(.leading, 4)
                 }
             }
             
         case .numberedList(let items):
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    HStack(alignment: .top, spacing: 8) {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
                         Text("\(index + 1).")
                             .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: fontSize, weight: .semibold))
                             .frame(minWidth: 20, alignment: .trailing)
                         renderInlineMarkdown(item)
                     }
+                    .padding(.leading, 4)
                 }
             }
             
@@ -474,6 +516,45 @@ struct MarkdownTextView: View {
         .padding(.bottom, 2)
     }
     
+    // MARK: - Bold Label Renderer (ChatGPT-style **Label:** content)
+    
+    @ViewBuilder
+    private func renderBoldLabel(label: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if content.isEmpty {
+                // Label-only line (e.g. "**Chart Promise:**" followed by bullet list)
+                Text(label)
+                    .font(.system(size: fontSize + 1, weight: .bold))
+                    .foregroundColor(AppTheme.Colors.gold)
+            } else {
+                // Label + inline content (e.g. "**Verdict:** Highly Favorable — Confidence: High")
+                (Text(label + " ")
+                    .font(.system(size: fontSize, weight: .bold))
+                    .foregroundColor(AppTheme.Colors.gold)
+                +
+                renderInlineAttributedString(content))
+                    .lineSpacing(5)
+                    .textSelection(.enabled)
+            }
+        }
+    }
+    
+    /// Build an AttributedString for inline content (used by bold label renderer)
+    private func renderInlineAttributedString(_ text: String) -> Text {
+        let sanitized = sanitizeForInlineParsing(text)
+        if let attrString = try? AttributedString(
+            markdown: sanitized,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        ) {
+            return Text(attrString)
+                .font(AppTheme.Fonts.body(size: fontSize))
+                .foregroundColor(textColor)
+        }
+        return Text(stripMarkdownBold(sanitized))
+            .font(AppTheme.Fonts.body(size: fontSize))
+            .foregroundColor(textColor)
+    }
+    
     // MARK: - Inline Markdown
     
     @ViewBuilder
@@ -488,14 +569,14 @@ struct MarkdownTextView: View {
             Text(attrString)
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
-                .lineSpacing(4)
+                .lineSpacing(5)
                 .textSelection(.enabled)
         } else {
             // Fallback: strip markdown markers and render as plain text
             Text(stripMarkdownBold(sanitized))
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
-                .lineSpacing(4)
+                .lineSpacing(5)
         }
     }
     
@@ -527,43 +608,27 @@ struct MarkdownTextView: View {
 #Preview("Full Markdown") {
     ScrollView {
         MarkdownTextView(content: """
-        ### 🎯 COMPATIBILITY VERDICT
-        
-        **Score:** 27.5/36 Ashtakoot | **Mangal Status:** Compatible (Cancelled)
-        **Overall Rating:** ⭐⭐⭐⭐⭐ Very Good
-        
-        **One-Line Verdict:** The compatibility is strong with excellent Ashtakoot scores and mitigated Mangal Dosha.
-        
-        ---
-        
-        ### 📊 ASHTAKOOT ANALYSIS
-        
-        **Total Score: 27.5/36 (Very Good)**
-        
-        | Koota | Score | Analysis |
-        |-------|-------|----------|
-        | Nadi | 8/8 | Perfect match |
-        | Bhakoot | 7/7 | Excellent emotional bonding |
-        | Gana | 6/6 | Great temperament compatibility |
-        | Varna | 0/1 | Minor work style difference |
-        
-        ---
-        
-        ### 🌟 KEY STRENGTHS
-        
-        1. Excellent Nadi compatibility ensures progeny health
-        2. Strong Bhakoot for emotional bonding
-        3. Mangal Dosha mutually cancelled
-        
-        ---
-        
-        ### ⚠️ KEY CHALLENGES
-        
-        - Varna mismatch may cause minor friction
-        - Maitri score is moderate
-        
-        > Note: Consult a qualified astrologer for personalized guidance.
-        """)
+        **Verdict:** Highly Favorable — Confidence: High
+
+        Your career chart shows exceptionally strong promise for a job change, primarily driven by **Jupiter** as your **10th lord**.
+
+        **Chart Promise:**
+        - **Jupiter** in **D10** — own sign (Sagittarius) in 10th house = high status
+        - **Jupiter** exalted in **D9** (Cancer), confirming D1 promise
+        - **Gajakesari Yoga** active via Jupiter-Moon = professional recognition
+
+        **Best Window:** November 2026 — April 2027
+        - **Saturn-Saturn-Jupiter dasha** directly activates your 10th lord
+        - Transit **Saturn** in Pisces aspecting **10th house** = restructuring
+        - Transit **Jupiter** in Cancer = double transit trigger
+
+        **Challenges:**
+        - Current **Saturn-Saturn** period may feel restrictive until the window opens
+        - **Mars** transit over **6th house** in Jan 2027 = workplace friction
+
+        **Guidance:**
+        Begin preparations now. The Nov 2026 window is strongest when both dasha and transit align. Network actively during **Jupiter's** Cancer transit — this is your career expansion period.
+        """, fontSize: 16)
         .padding()
     }
     .background(AppTheme.Colors.mainBackground)
