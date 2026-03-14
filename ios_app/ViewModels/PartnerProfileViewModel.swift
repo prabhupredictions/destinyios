@@ -155,6 +155,11 @@ class PartnerProfileViewModel {
                 partners[index] = updatedPartner
             }
             
+            // Update local SwiftData store
+            if let context = modelContext {
+                service.updatePartnerLocally(updatedPartner, context: context)
+            }
+            
             print("[PartnerProfileVM] Updated partner: \(updatedPartner.name)")
             isLoading = false
             return true
