@@ -633,9 +633,9 @@ struct HomeView: View {
             }
             .padding(.top, 16)
             
-            // Horizontal story orbs — trailing peek for scroll hint
+            // Horizontal story orbs — Instagram-style: last orb cropped as scroll hint
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 18) {
                     ForEach(allAreas, id: \.area) { item in
                         StoryOrbView(
                             icon: iconName(for: item.area),
@@ -649,8 +649,7 @@ struct HomeView: View {
                         }
                     }
                 }
-                .padding(.leading, 12)
-                .padding(.trailing, 80)
+                .padding(.horizontal, 4)
                 .padding(.vertical, 8)
             }
             .padding(.horizontal, -12)
