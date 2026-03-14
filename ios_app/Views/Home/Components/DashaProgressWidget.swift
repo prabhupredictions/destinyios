@@ -29,7 +29,7 @@ struct DashaProgressWidget: View {
                 
                 // Text Info
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Current Phase")
+                    Text("current_phase".localized)
                         .font(AppTheme.Fonts.caption(size: 11))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                     
@@ -55,7 +55,7 @@ struct DashaProgressWidget: View {
                 // Next Up (Mini)
                 if let next = upcomingPeriod {
                     VStack(alignment: .trailing, spacing: 2) {
-                        Text("Next")
+                        Text("next_label".localized)
                             .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                         Text(next.antardasha)

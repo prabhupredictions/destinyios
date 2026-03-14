@@ -30,8 +30,8 @@ struct DashaView: View {
                         .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
                 )
             } else {
-                Text("Select a year to view dasha periods")
-                    .font(.caption)
+                Text("select_year_dasha".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(.secondary)
             }
         }

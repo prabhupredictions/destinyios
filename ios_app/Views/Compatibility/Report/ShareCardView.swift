@@ -91,8 +91,8 @@ struct ShareCardView: View {
                     .scaledToFit()
                     .frame(height: 80)
                 
-                Text("DESTINY AI ASTROLOGY")
-                    .font(.system(size: 18, weight: .medium, design: .serif))
+                Text("destiny_ai_astrology_brand".localized)
+                    .font(.system(size: 12, weight: .bold, design: .serif))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(6)
                     .padding(.top, 8)
@@ -180,8 +180,8 @@ struct ShareCardView: View {
                         .padding(.top, 4)
                     
                     if !isRecommended {
-                        Text("Overridden due to dosha incompatibility")
-                            .font(.system(size: 11))
+                        Text("overridden_due_to_dosha".localized)
+                            .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(Color(red: 0.95, green: 0.35, blue: 0.35).opacity(0.6))
                             .padding(.top, 2)
                     }

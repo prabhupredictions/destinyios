@@ -196,7 +196,8 @@ struct ProfileView: View {
                     HapticManager.shared.play(.heavy)
                 }
             } message: {
-                Text("New chats and matches won't be saved. You can turn this back on anytime.")
+                Text("history_off_warning".localized)
+                    .font(AppTheme.Fonts.body(size: 15))
             }
             .alert("Clear history?", isPresented: $showClearHistoryAlert) {
                 Button("Cancel", role: .cancel) {}
@@ -211,7 +212,8 @@ struct ProfileView: View {
                     }
                 }
             } message: {
-                Text("This will remove saved chats and match history. This can't be undone.")
+                Text("clear_history_warning".localized)
+                    .font(AppTheme.Fonts.body(size: 15))
             }
             .alert("History Cleared", isPresented: $showClearSuccessAlert) {
                 Button("OK", role: .cancel) {}
@@ -442,7 +444,7 @@ struct ProfileView: View {
     // MARK: - History Settings
     private var historySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("History")
+            Text("history_section".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
@@ -461,7 +463,7 @@ struct ProfileView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Save conversation history")
+                        Text("save_conversation_history".localized)
                             .font(AppTheme.Fonts.body(size: 16))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         
@@ -509,11 +511,11 @@ struct ProfileView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Clear history")
+                            Text("clear_history".localized)
                                 .font(AppTheme.Fonts.body(size: 16))
                                 .foregroundColor(AppTheme.Colors.error)
                             
-                            Text("Remove all saved chats and matches")
+                            Text("remove_all_saved".localized)
                                 .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
@@ -661,7 +663,7 @@ struct ProfileView: View {
                 HStack {
                     Image(systemName: "gear")
                         .font(AppTheme.Fonts.body(size: 14))
-                    Text("Manage Subscription")
+                    Text("manage_subscription".localized)
                         .font(AppTheme.Fonts.body(size: 15))
                 }
                 .foregroundColor(AppTheme.Colors.gold)
@@ -669,7 +671,7 @@ struct ProfileView: View {
             
             // View plans button
             Button(action: { showSubscription = true }) {
-                Text("View All Plans")
+                Text("view_all_plans".localized)
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
@@ -732,7 +734,7 @@ struct ProfileView: View {
     // MARK: - App Info Section
     private var appInfoSection: some View {
         VStack(spacing: 8) {
-            Text("Destiny AI Astrology")
+            Text("destiny_ai_brand_name".localized)
                 .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
@@ -740,7 +742,7 @@ struct ProfileView: View {
                 .font(AppTheme.Fonts.body(size: 12))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             
-            Text("© 2026 Destiny AI. All rights reserved.")
+            Text("copyright_full".localized)
                 .font(AppTheme.Fonts.body(size: 11))
                 .foregroundColor(AppTheme.Colors.textTertiary)
         }
@@ -782,7 +784,7 @@ struct ProfileView: View {
             deleteErrorMessage = nil
             showDeleteAccountSheet = true
         }) {
-            Text("Delete Account")
+            Text("delete_account".localized)
                 .font(AppTheme.Fonts.title(size: 16))
                 .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                 .frame(maxWidth: .infinity)
@@ -978,7 +980,7 @@ struct FAQHelpView: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-                    Text("Common Questions")
+                    Text("common_questions".localized)
                         .font(AppTheme.Fonts.title(size: 18))
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(maxWidth: .infinity, alignment: .leading)

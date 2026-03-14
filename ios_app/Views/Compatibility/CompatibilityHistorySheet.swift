@@ -63,8 +63,7 @@ struct CompatibilityHistorySheet: View {
                         .padding(.bottom, 4)
                         
                         if filteredGroups.isEmpty {
-                            Spacer()
-                            Text("No results found")
+                            Text(searchText.isEmpty ? "no_history_yet".localized : "no_results_found".localized)
                                 .font(AppTheme.Fonts.body(size: 16))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                             Spacer()
@@ -109,11 +108,11 @@ struct CompatibilityHistorySheet: View {
                 .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
             
-            Text("History is turned off")
+            Text("history_turned_off".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Your match results aren't being saved.")
+            Text("match_results_not_saved".localized)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -127,7 +126,7 @@ struct CompatibilityHistorySheet: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "gearshape")
-                    Text("Open Settings")
+                    Text("open_settings".localized)
                 }
                 .font(AppTheme.Fonts.title(size: 15))
                 .foregroundColor(AppTheme.Colors.mainBackground)

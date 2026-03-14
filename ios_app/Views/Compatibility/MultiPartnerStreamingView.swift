@@ -35,7 +35,7 @@ struct MultiPartnerStreamingView: View {
                 .frame(maxHeight: 300)
                 
                 // Footer
-                Text("This may take a few moments...")
+                Text("this_may_take_moments".localized)
                     .font(AppTheme.Fonts.body(size: 13))
                     .foregroundColor(AppTheme.Colors.textTertiary)
             }
@@ -146,7 +146,7 @@ struct MultiPartnerStreamingView: View {
                         .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.gold)
                 } else if isPending {
-                    Text("Pending")
+                    Text("pending_label".localized)
                         .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                 }

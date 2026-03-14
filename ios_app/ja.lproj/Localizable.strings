@@ -1,6 +1,6 @@
 /* 
-  Localizable.strings (Japanese)
-  Destiny AI Astrology - 日本語
+  Localizable.strings (English)
+  Destiny AI Astrology
 */
 
 // MARK: - Common
@@ -44,6 +44,8 @@
 "support" = "ヘルプ";
 "help_faq" = "ヘルプ・よくある質問";
 "sign_out" = "ログアウト";
+"sign_out_message" = "サインアウトされます。データは再度サインインするときのために保存されます。";
+"sign_out_guest_message" = "ゲストとしてのあなたの出生データは削除されます。 Apple または Google でサインインしてデータを保存します。";
 
 // MARK: - Astrology Settings
 "ayanamsa" = "アヤナムサ";
@@ -100,6 +102,9 @@
 // MARK: - Compatibility/Match
 "compatibility" = "相性診断";
 "partner_details" = "相手の情報";
+"your_details" = "あなたの詳細";
+"loaded_from_profile" = "プロフィールからロード";
+"or_enter_manually" = "または手動で入力します";
 "calculate_match" = "相性を見る";
 "match_score" = "相性スコア";
 "boys_details" = "あなた";
@@ -122,6 +127,7 @@
 // MARK: - Birth Data Entry
 "create_birth_chart" = "あなたの星図を作成";
 "enter_details_desc" = "生年月日を入力して\nあなただけの占い結果を見よう";
+"enter_details_desc_compatibility" = "パートナーの詳細を入力して、関係と結婚の互換性を調べます";
 
 // MARK: - Subscription
 "unlock_premium" = "Destiny プレミアムを解除";
@@ -132,15 +138,15 @@
 
 // MARK: - Splash
 "aligning_stars" = "星を読み込み中...";
-"destiny_app_title" = "DESTINY";
-"ai_astrology_subtitle" = "AI星占い";
-"worlds_advanced_ai" = "世界最先端のAI占い師";
 
-// MARK: - Chat & History
+// MARK: - Chat
 "suggested_questions" = "おすすめの質問";
 "no_chat_history" = "まだ履歴がありません";
+
+// MARK: - History
 "no_conversations" = "まだ会話がありません";
 "start_asking" = "質問してみよう！\n履歴がここに表示されます。";
+"compatibility_match_subtitle" = "互換性の一致";
 
 // MARK: - Charts
 "ascendant" = "アセンダント";
@@ -159,6 +165,7 @@
 "birth_city" = "生まれた街";
 "select_date" = "日付を選ぶ";
 "select_time" = "時間を選ぶ";
+"select_gender" = "性別を選択してください";
 "partner_birth_time_unknown" = "パートナーの生まれた時間がわからない";
 "birth_time_warning" = "注意: 正確な時間がないと結果の精度が下がることがあります";
 
@@ -171,6 +178,13 @@
 "continue_with_google" = "Googleで続ける";
 "continue_with_email" = "メールで続ける";
 "i_dont_know_birth_time" = "生まれた時間がわからない";
+
+// MARK: - Splash
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "AI星占い";
+"worlds_advanced_ai" = "世界最先端のAI占い師";
+
+// MARK: - Onboarding
 "questions_asked" = "件の質問";
 
 // MARK: - Birth Details View
@@ -190,11 +204,15 @@
 "kundali_match" = "Chart Match";
 "ashtakoot_analysis" = "Birth Chart Compatibility";
 "out_of" = "中";
-"compatible" = "相性";
+"compatible" = "相性良好";
 "excellent_match" = "素晴らしい相性";
 "good_match" = "良い相性";
 "moderate_match" = "普通の相性";
+
+// Partner Cards
 "vs" = "VS";
+
+// Kuta Grid
 "ashtakoot_grid" = "アシュタクート詳細";
 "varna" = "ヴァルナ";
 "vashya" = "ヴァシヤ";
@@ -204,6 +222,8 @@
 "gana" = "ガナ";
 "bhakoot" = "バクート";
 "nadi" = "ナディ";
+
+// View Full Report
 "view_full_report" = "完全レポートを見る";
 "full_compatibility_report" = "完全相性レポート";
 "points" = "ポイント";
@@ -212,13 +232,18 @@
 "girl" = "彼女";
 "impact" = "影響";
 "excellent" = "優秀";
-"good" = "良好";
+"good" = "良い";
 "moderate" = "中程度";
 "needs_care" = "注意が必要";
+
 "mangal_dosha_status" = "マンガルドーシャ状態";
 "no_dosha" = "ドーシャなし";
 "has_dosha" = "ドーシャあり";
+
+// Remedies
 "recommended_remedies" = "推奨される治療法";
+
+// Ask Destiny
 "ask_destiny" = "Destinyに質問";
 "ask_destiny_about_match" = "この相性についてDestinyに質問";
 "ai_powered" = "AI搭載";
@@ -229,21 +254,21 @@
 "ask_dosha" = "ドーシャ";
 "ask_weak" = "弱点";
 "ask_remedies" = "対策";
+
+// Match Result Actions
 "new_match" = "新しいマッチ";
-
-
-
-// Match Result Additions
-"ask_more_match" = "このマッチについてもっと聞く...";
-"mangal_dosha" = "マンガル・ドーシャ";
-"mangal_dosha_desc" = "火星の位置分析";
-"kalsarpa_dosha" = "カルサルパ・ドーシャ";
-"kalsarpa_dosha_desc" = "ラーフ・ケートゥ軸分析";
-"additional_yoga" = "追加のヨガとドーシャ";
-"additional_yoga_desc" = "その他の吉祥な組み合わせ";
 "charts" = "チャート";
 "history" = "履歴";
 "report" = "レポート";
+"ask_more_match" = "このマッチについてもっと聞く...";
+
+// Dosha & Yoga
+"mangal_dosha" = "マンガルドーシャ";
+"mangal_dosha_desc" = "火星の位置分析";
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"kalsarpa_dosha_desc" = "ラーフ・ケートゥ軸分析";
+"additional_yoga" = "追加のヨガとドーシャ";
+"additional_yoga_desc" = "その他の吉祥な組み合わせ";
 
 "exception_mars_in_own_sign" = "火星が自室（牡羊座または蠍座）にある";
 "exception_mars_exalted" = "火星が山羊座で高揚";
@@ -268,7 +293,7 @@
 "exception_mars_strong_shadbala" = "火星のシャドバラが強い";
 "exception_moon_strong" = "チャートで月が強い";
 
-// MARK: - Intensity Factors (Japanese)
+// MARK: - Intensity Factors
 "intensity_mars_debilitated" = "火星が蟹座で減衰";
 "intensity_mars_conjunct_malefics" = "火星が凶星と合";
 "intensity_mars_critical_degrees" = "火星がガンダンタ度数にある";
@@ -279,7 +304,7 @@
 "intensity_mars_combust" = "火星がコンバスト（太陽に近すぎる）";
 "intensity_mars_low_ashtakavarga" = "火星のアシュタカヴァルガが低い";
 
-// MARK: - Zodiac Signs (Japanese)
+// MARK: - Zodiac Signs
 "sign_ar" = "牡羊座";
 "sign_ta" = "牡牛座";
 "sign_ge" = "双子座";
@@ -293,7 +318,7 @@
 "sign_aq" = "水瓶座";
 "sign_pi" = "魚座";
 
-// MARK: - Planets (Japanese)
+// MARK: - Planets
 "planet_sun" = "太陽";
 "planet_moon" = "月";
 "planet_mars" = "火星";
@@ -304,18 +329,20 @@
 "planet_rahu" = "ラーフ";
 "planet_ketu" = "ケートゥ";
 
-// MARK: - Severity/Status (Japanese)
+// MARK: - Severity Levels
 "severity_none" = "なし";
 "severity_mild" = "軽度";
-"severity_moderate" = "中度";
-"severity_high" = "重度";
-"severity_severe" = "深刻";
+"severity_moderate" = "中程度";
+"severity_high" = "高度";
+"severity_severe" = "重度";
+
+// MARK: - Status Labels
 "status_active" = "有効";
 "status_reduced" = "軽減";
 "status_cancelled" = "解除";
-"active" = "有効";
+"active" = "活性";
 "reduced" = "軽減";
-"cancelled" = "解除";
+"cancelled" = "解消済み";
 
 "mangal_dosha_analysis" = "マンガル・ドーシャ分析";
 "kalsarpa_analysis" = "カルサルパ・ドーシャ分析";
@@ -335,7 +362,7 @@
 "formation_details" = "形成の詳細";
 "strength" = "強さ";
 
-// MARK: - Nakshatra Names (27) - Japanese (Sanskrit names)
+// MARK: - Nakshatra Names (27)
 "nakshatra_ashwini" = "アシュヴィニー";
 "nakshatra_bharani" = "バラニー";
 "nakshatra_krittika" = "クリッティカー";
@@ -364,7 +391,7 @@
 "nakshatra_uttara_bhadrapada" = "ウッタラ・バードラパダー";
 "nakshatra_revati" = "レーヴァティー";
 
-// MARK: - New Exception Keys (8) - Japanese
+// MARK: - New Exception Keys (8)
 "exception_mars_yoga_karaka" = "火星がこのアセンダントのヨガカラカです";
 "exception_mars_jupiter_yoga" = "火星-木星の吉ヨガがあります";
 "exception_mars_venus_yoga" = "火星-金星の吉ヨガがあります";
@@ -377,9 +404,8 @@
 "exception_mars_strong_vimsopaka" = "火星のヴィムショパカ・バラが強い";
 "exception_chandra_mangala_yoga" = "チャンドラ・マンガラ・ヨガ（火星-月の富のヨガ）がある";
 "exception_mars_good_d24" = "D24（チャトゥルヴィムシャムシャ）チャートで火星が良好な位置にある";
-"exception_moon_strong" = "チャートで月が強い";
 
-// MARK: - Mars Position UI Labels (10) - Japanese
+// MARK: - Mars Position UI Labels (10)
 "mars_position" = "火星の位置";
 "house_label" = "ハウス";
 "sign_lord" = "星座支配星";
@@ -396,21 +422,83 @@
 "beneficial" = "Beneficial";
 "challenging" = "Challenging";
 "recommendations" = "Recommendations";
-"present" = "Present";
-"absent" = "Absent";
+"present" = "あり";
+"absent" = "なし";
 "no_data" = "No Data";
 "dosha_cancelled" = "Dosha Cancelled";
 
 // MARK: - Kala Sarpa Premium UI
-"kalsarpa_dosha" = "Kalsarpa Yoga";
 "dosha_details" = "Yoga Details";
 "rahu_ketu_axis" = "Rahu-Ketu Axis";
 "planets" = "Planets";
-"analysis_notes" = "Analysis Notes";
-"no_kalsarpa_data" = "No Kalsarpa data available";
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+
+/* Streaming Progress */
+"processing" = "処理...";
+"analyzing_match" = "互換性の分析";
+
+// MARK: - Mitigation Fallback
+"factors_reduce_severity" = "ドーシャの重症度を軽減する要因";
+"factors_increase_severity" = "ドーシャの重症度を高める要因";
+
+// MARK: - Life Areas
+"career" = "キャリア";
+"education" = "教育";
+"finance" = "ファイナンス";
+"family" = "家族";
+"health" = "健康";
+"relationship" = "関係";
+"investment" = "投資";
+"sudden_events" = "突然の出来事";
+
+// MARK: - Network Status
+"offline_mode" = "オフラインです";
+
+// MARK: - Profile Setup
+"setting_up_profile" = "プロフィールの設定";
+"cosmic_alignment" = "あなただけの宇宙を整える…";
+
+// Partner Profile Manager
+"select_saved_partner" = "保存されたパートナーを選択";
+"saved_partners" = "保存されたパートナー";
+"add_partner" = "パートナーの追加";
+"edit_partner" = "パートナーの編集";
+"no_saved_partners" = "保存されたパートナーはありません";
+"save_partner_description" = "パートナープロフィールを保存して簡単にマッチング";
+"save_for_future" = "将来のマッチングのために保存します";
+"save_birth_chart" = "出生図を保存する";
+
+// MARK: - Multi-Partner Comparison
+"comparison_results" = "比較結果";
+"partners_compared" = "比較したパートナー";
+"comparing_with" = "と比較して";
+"compare_all" = "すべて比較";
+"remove_partner" = "パートナーの削除";
+
+"syncing_cosmic_data" = "今日のインサイトを読み込んでいます…";
+"restoring_your_insights" = "洞察力を復元する";
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "サインインが必要です";
+"sign_in_to_check_compatibility" = "相性をチェックするためにサインイン";
+"sign_in_to_continue_asking" = "質問を続けるためにサインイン";
+"sign_in_to_continue_matching" = "相性マッチングを解除するためにサインイン";
+"sign_in_to_view_plans" = "サブスクリプションプランを表示するためにサインイン";
+"sign_in_to_switch_profiles" = "プロファイル間を切り替えるためにサインイン";
+"sign_in_to_save_profiles" = "プロファイルを保存・管理するためにサインイン";
+"create_account_to_continue" = "続行して進捗を保存するためにアカウントを作成";
+"free_limit_reached" = "続行して進捗を保存するためにアカウントを作成";
+"birth_data_registered" = "この出生データは既に登録されています。続行するにはサインインしてください。";
+"age_requirement" = "アカウントを作成するには13歳以上である必要があります";
+"back" = "戻る";
+
+// MARK: - Match History
+"no_match_history" = "対戦履歴がここに表示されます";
+"no_match_history_desc" = "パートナーとの互換性を計算して歴史を構築します";
 
 // MARK: - Birth Chart Protection
 "profile_protected_title" = "プロフィール保護";
@@ -434,9 +522,6 @@
 
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "同様の詳細を持つ出生チャートが既に存在します。各人につきチャートは1つのみです。サポートについては、support@destinyaiastrology.com にお問い合わせください。";
-
-
-"syncing_cosmic_data" = "今日のインサイトを読み込んでいます…";
 
 // ════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════════
@@ -473,8 +558,10 @@
 // [+] Yukthi Samanwithavagmi (155)
 // Total yoga entries: 284
 
-// === Missing yoga entries (copied from English) ===
-// === Missing yoga entries (copied from English) ===
+// MARK: - Kala Sarpa/Amrita Variants
+// [−] Kala Sarpa Dosha
+// Additional Kala Sarpa variants
+// [+] Bandhu Pujya 194
 "kalsarpa_divine_protection_title" = "Divine Protection";
 "kalsarpa_divine_protection_message" = "Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.";
 "kalsarpa_relationship_benefits" = "Relationship Benefits";
@@ -488,6 +575,7 @@
 "kalsarpa_dosha_samya" = "Dosha Samya Detected";
 "kalsarpa_mutual_message" = "Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.";
 "kalsarpa_remedies_for" = "Remedies for %@";
+
 "mangal_mutual_cancellation" = "Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.";
 "mangal_exceptions_title" = "%@'s exceptions:";
 
@@ -1887,29 +1975,22 @@
 "marriage_recommended" = "結婚推奨";
 "not_recommended" = "非推奨";
 "doshas" = "ドーシャ";
-"cancelled" = "解消済み";
-"active" = "活性";
 "recommended" = "推奨";
 "not_rec" = "非推奨";
 "best_match" = "最良";
-"score" = "スコア";
-"excellent" = "優秀";
 "very_good" = "とても良い";
-"good" = "良い";
 "average" = "平均";
 "below_average" = "平均以下";
 "not_recommended_category" = "非推奨";
 "ashtakoot_score" = "アシュタクートスコア";
-"mangal_dosha" = "マンガルドーシャ";
 "nadi_dosha" = "ナーディドーシャ";
 "bhakoot_dosha" = "バクートドーシャ";
 "today_cosmic_vibe" = "今日の宇宙エネルギー";
 "current_dasha" = "現在のダシャー";
-"severity_mild" = "軽度";
-"severity_moderate" = "中程度";
-"severity_high" = "高度";
-"severity_severe" = "重度";
-"severity_none" = "なし";
+"how_is_my_day" = "今日の私の一日はどうですか？";
+"whats_in_my_mind" = "私の心の中には何があるのでしょうか？";
+
+// MARK: - Backend Value Translations (Severity, Category, etc.)
 "category_excellent" = "優秀";
 "category_very_good" = "とても良い";
 "category_good" = "良い";
@@ -1918,9 +1999,6 @@
 "category_not_recommended" = "非推奨";
 "category_difficult" = "困難";
 "category_challenging" = "挑戦的";
-"present" = "あり";
-"absent" = "なし";
-"compatible" = "相性良好";
 "needs_remedies" = "対策が必要";
 "critical" = "重大";
 "analysis_failed_for" = "分析に失敗しました";
@@ -1930,18 +2008,242 @@
 "check_connection" = "接続を確認してください。";
 "no_results" = "結果が受信されませんでした。もう一度お試しください。";
 
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Home Screen — Section Headers & Labels
+// ════════════════════════════════════════════════════════════════════════════
 
-// MARK: - Guest Sign-In Prompts
-"sign_in_required" = "サインインが必要です";
-"sign_in_to_check_compatibility" = "相性をチェックするためにサインイン";
-"sign_in_to_continue_asking" = "質問を続けるためにサインイン";
-"sign_in_to_continue_matching" = "相性マッチングを解除するためにサインイン";
-"sign_in_to_view_plans" = "サブスクリプションプランを表示するためにサインイン";
-"sign_in_to_switch_profiles" = "プロファイル間を切り替えるためにサインイン";
-"sign_in_to_save_profiles" = "プロファイルを保存・管理するためにサインイン";
-"create_account_to_continue" = "続行して進捗を保存するためにアカウントを作成";
-"free_limit_reached" = "続行して進捗を保存するためにアカウントを作成";
-"birth_data_registered" = "この出生データは既に登録されています。続行するにはサインインしてください。";
-"age_requirement" = "アカウントを作成するには13歳以上である必要があります";
-    "back" = "戻る";
+"asc_label" = "ASC";
+"tap_to_explore_day" = "タップして一日を探索してください";
+"current_transits" = "電流通過";
+"current_phase" = "現在のフェーズ";
+"next_label" = "次";
+"dosha_insights" = "ドーシャに関する洞察";
+"cosmic_shifts" = "宇宙の変化";
+"transit_in" = "で";
+"planets_label" = "惑星";
+"houses_label" = "住宅";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat — Status & Feedback
+// ════════════════════════════════════════════════════════════════════════════
+
+"chat_welcome_subtitle" = "あなただけの占星術ガイド。あなたの一日、人間関係、キャリア、将来の道について尋ねてください。";
+"thinking" = "考え...";
+"analyzing_chart" = "チャートを分析しています...";
+"analyzing_label" = "分析中";
+"rate_this_response" = "この回答を評価します";
+"thanks_for_feedback" = "フィードバックをお寄せいただきありがとうございます。";
+"history_turned_off" = "履歴がオフになっています";
+"conversations_not_saved" = "会話は保存されていません。";
+"open_settings" = "設定を開く";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Compatibility — Comparison & Details
+// ════════════════════════════════════════════════════════════════════════════
+
+"loaded_from_history" = "履歴からロード";
+"partner_name_placeholder" = "パートナー名";
+"no_results_found" = "結果が見つかりませんでした";
+"match_results_not_saved" = "試合結果は保存されません。";
+"after_dosha_cancellation" = "※ドーシャ解除後";
+"save_to_files" = "ファイルに保存";
+"no_adjustment" = "調整なし";
+"view_details" = "詳細を見る";
+"area_label" = "エリア";
+"actual_label" = "実際の";
+"adjusted_label" = "調整済み";
+"manglik_label" = "マングリク";
+"none_label" = "なし";
+"view_label" = "ビュー";
+"no_profiles_meet_threshold" = "どのプロファイルも推奨互換性しきい値を満たしていません。";
+"review_individual_analyses" = "詳細な洞察については、以下の個々の分析を確認してください。";
+"destiny_ai_astrology_brand" = "DESTINY AI占星術";
+"compatibility_comparison" = "互換性の比較";
+"copyright_notice" = "©2026 Destiny AI 占星術 · destinationaiastrology.com";
+"description_not_available" = "説明がありません";
+"this_may_take_moments" = "これには少し時間がかかる場合があります...";
+"pending_label" = "保留中";
+"overridden_due_to_dosha" = "Dosha の非互換性のためオーバーライドされました";
+"active_doshas" = "活動的なドーシャ:";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Profile — Settings, History & Account Management
+// ════════════════════════════════════════════════════════════════════════════
+
+"history_section" = "歴史";
+"save_conversation_history" = "会話履歴を保存する";
+"clear_history" = "履歴をクリアする";
+"remove_all_saved" = "保存されているチャットとマッチをすべて削除します";
+"history_off_warning" = "新しいチャットと対戦は保存されません。これはいつでもオンに戻すことができます。";
+"clear_history_warning" = "これにより、保存されたチャットと試合履歴が削除されます。これを元に戻すことはできません。";
+"manage_subscription" = "サブスクリプションの管理";
+"view_all_plans" = "すべてのプランを見る";
+"destiny_ai_brand_name" = "Destiny AI 占星術";
+"copyright_full" = "©2026 Destiny AI.無断転載を禁じます。";
+"delete_account" = "アカウントの削除";
+"common_questions" = "よくある質問";
+
+// Profile Switcher
+"loading_profiles" = "プロファイルを読み込んでいます...";
+"switch_birth_chart" = "出生図を切り替える";
+"no_profiles_found" = "プロファイルが見つかりません";
+"add_partner_to_start" = "パートナー プロフィールを追加して開始してください";
+"manage_birth_charts" = "出生図の管理";
+"you_label" = "YOU";
+"active_profile" = "アクティブなプロファイル";
+
+// Delete Account
+"delete_your_account" = "アカウントを削除しますか?";
+"cancel_subscription_first" = "アカウントを削除する前に、App Store でサブスクリプションをキャンセルしてください。";
+"type_delete_to_confirm" = "「DELETE」と入力して確認します";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - History View
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_history_yet" = "まだ履歴がありません";
+"chats_matches_appear_here" = "チャットと試合がここに表示されます。";
+"messages_label" = "メッセージ";
+"match_label" = "マッチ";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Inbox
+// ════════════════════════════════════════════════════════════════════════════
+
+"notifications_title" = "通知";
+"loading_notifications" = "通知を読み込んでいます...";
+"no_notifications" = "通知はありません";
+"no_notifications_desc" = "何か新しいことがあればお知らせします";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Preferences (Settings)
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_alerts_yet" = "まだアラートはありません";
+"add_first_alert" = "最初のパーソナライズされたアラートを以下に追加します";
+"add_new_alert" = "新しいアラート設定を追加する";
+"max_alerts_reached" = "最大 5 件のアラートに達しました";
+"alerts_saved" = "アラートが保存されました";
+"remove_alert" = "このアラートを削除しますか?";
+"push_notifications" = "プッシュ通知";
+"permission_required_ios" = "iOSの設定で許可が必要です";
+"enable_in_ios_settings" = "iOSの設定→アプリ→Destiny→通知で有効にします";
+"what_alerts_about" = "何についてのアラートが必要ですか?";
+"alert_frequency" = "アラートの頻度";
+"suggestions_label" = "提案";
+"tap_to_add" = "タップして追加";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Subscription — Plans, Legal & Billing
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_plans_available" = "利用可能なプランはありません";
+"upgrade_to_keep_going" = "アップグレードして継続し、無制限のアクセスをロック解除します";
+"subscription_active_message" = "サブスクリプションが有効になりました。プレミアム機能をお楽しみください!";
+"what_is_destiny_matching" = "デスティニーマッチング™とは何ですか？";
+"destiny_matching_desc_1" = "Destiny Matching™ は、表面レベルの互換性を超えたものを目指します。";
+"destiny_matching_desc_2" = "多くの占星術アプリは不一致を指摘することに重点を置いていますが、Destiny は 2 つのチャートがどのように相互作用するか、どこに違いが現れるか、そして物事がずれていると感じられる場合でもどのように一致を見つけることができるかを調査します。";
+"destiny_matching_desc_3" = "占星術を使用して、人間関係を単に良いか悪いかで分類するのではなく、状況に応じて理解してナビゲートするのに役立ちます。";
+"subscription_auto_renew" = "現在の期間が終了する少なくとも 24 時間前にキャンセルしない限り、サブスクリプションは自動的に更新されます。";
+"unlimited_fair_use" = "無制限のアクセスは公正使用の対象となります。";
+"billing_info" = "購入は Apple ID を通じて請求されます。 「設定」→「Apple ID」→「サブスクリプション」で管理します。";
+"current_plan" = "現在";
+"scheduled_plan" = "予定されている";
+"per_month" = "/ 月";
+"everything_in_core_plus" = "Core のすべてに加えて:";
+"coming_soon" = "（近日公開）";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Settings — Chart Style & Astrology Preferences
+// ════════════════════════════════════════════════════════════════════════════
+
+"chart_style" = "グラフのスタイル";
+"choose_chart_display" = "出生図の表示方法を選択する";
+"select_chart_style" = "チャートスタイルの選択";
+"chart_style_note" = "これは、互換性分析における出生図の表示方法に影響します。";
+"north_indian_style" = "北インドスタイル";
+"north_indian_desc" = "ひし形のレイアウト、家は固定、看板は回転";
+"south_indian_style" = "南インド風";
+"south_indian_desc" = "グリッドのレイアウト、標識は固定され、家は回転します";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Charts — Planetary Positions, Transits & Dasha
+// ════════════════════════════════════════════════════════════════════════════
+
+"select_year_transits" = "トランジットを表示するには年を選択してください";
+"select_year_dasha" = "ダシャー期間を表示するには年を選択してください";
+"calculating_chart" = "チャートを計算中...";
+"failed_to_load_chart" = "チャートのロードに失敗しました";
+"planet_details" = "惑星の詳細";
+"planet_cards" = "プラネットカード";
+"boy_chart_not_available" = "ボーイチャートデータは利用できません";
+"girl_chart_not_available" = "ガールチャートデータは利用できません";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Onboarding & Language Selection
+// ════════════════════════════════════════════════════════════════════════════
+
+"personalized_guidance" = "あなたの言語でカスタマイズされたガイダンス";
+"stat_questions_asked" = "270万以上";
+"stat_rating" = "4/5";
+"rating_label" = "評価";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Components — Quota, Search & Shared UI
+// ════════════════════════════════════════════════════════════════════════════
+
+"sign_in_button" = "サインイン";
+"go_premium" = "プレミアムに行く";
+"contact_support" = "サポートに連絡する";
+"sign_up_button" = "サインアップ";
+"not_now" = "今じゃない";
+"search_for_city" = "都市を検索...";
+"searching" = "検索中...";
+"no_cities_found" = "都市が見つかりません";
+"try_different_search" = "別の検索語を試してください";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Backend API Value Mappings (Transit Badges, Life Area Status)
+// These keys map backend enum values to user-facing labels.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Life Area Status (from todays_prediction API)
+"status_good" = "良い";
+"status_steady" = "安定した";
+"status_caution" = "注意";
+
+// Transit Badge Labels (from prediction_service API)
+"badge_auspicious" = "縁起の良い";
+"badge_challenging" = "挑戦的";
+"badge_neutral" = "中性";
+
+// Ashtakoot Kuta Status (from ashtakoot_matching_calculator API)
+"kuta_excellent" = "素晴らしい";
+"kuta_good" = "良い";
+"kuta_partial" = "部分的";
+"kuta_incompatible" = "互換性がありません";
+"kuta_average" = "平均";
+"kuta_poor" = "貧しい";
+"kuta_challenging" = "挑戦的";
+"kuta_inauspicious" = "不吉な";
+"kuta_perfect" = "完璧";
+
+// Dasha Quality (from todays_prediction API)
+"dasha_quality_good" = "良い";
+"dasha_quality_steady" = "安定した";
+"dasha_quality_caution" = "注意";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Accessibility Labels
+// ════════════════════════════════════════════════════════════════════════════
+
+"a11y_close" = "近い";
+"a11y_history" = "歴史";
+"a11y_send_question" = "質問を送信する";
+"a11y_remove_partner" = "パートナーを削除する";
+"a11y_search_saved_partners" = "保存されたパートナーを検索する";
+"a11y_birth_time_unknown" = "出生時間不明";
+"a11y_save_partner" = "将来のためにパートナーを保存する";
+"a11y_refresh_subscription" = "サブスクリプションステータスを更新する";
+"a11y_mark_all_read" = "すべて既読としてマークする";
 

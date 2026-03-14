@@ -62,8 +62,8 @@ struct LocationSearchView: View {
             
             ZStack(alignment: .leading) {
                 if searchText.isEmpty {
-                    Text("Search for a city...")
-                        .font(AppTheme.Fonts.body(size: 16))
+                    Text("search_for_city".localized)
+                        .font(AppTheme.Fonts.body(size: 17))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                 }
                 
@@ -101,8 +101,8 @@ struct LocationSearchView: View {
             ProgressView()
                 .scaleEffect(1.2)
                 .tint(AppTheme.Colors.gold)
-            Text("Searching...")
-                .font(AppTheme.Fonts.body(size: 14))
+            Text("searching".localized)
+                .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
         }
@@ -118,12 +118,12 @@ struct LocationSearchView: View {
                 .font(.system(size: 40))
                 .foregroundColor(AppTheme.Colors.textTertiary)
             
-            Text("No cities found")
-                .font(AppTheme.Fonts.body(size: 16).weight(.medium))
+            Text("no_cities_found".localized)
+                .font(AppTheme.Fonts.title(size: 18).weight(.medium))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Try a different search term")
-                .font(AppTheme.Fonts.body(size: 14))
+            Text("try_different_search".localized)
+                .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
         }

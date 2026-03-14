@@ -24,8 +24,8 @@ struct TransitsView: View {
                     }
                 }
             } else {
-                Text("Select a year to view transits")
-                    .font(.caption)
+                Text("select_year_transits".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(.secondary)
             }
         }

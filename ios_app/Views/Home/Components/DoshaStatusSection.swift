@@ -8,7 +8,7 @@ struct DoshaStatusSection: View {
         if let mangal = mangalDosha, let kala = kalaSarpa {
             VStack(alignment: .leading, spacing: 10) {
                 // Header
-                Text("Dosha Insights")
+                Text("dosha_insights".localized)
                     .font(AppTheme.Fonts.premiumDisplay(size: 18))
                     .goldGradient()
                 

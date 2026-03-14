@@ -56,7 +56,7 @@ struct ComparisonOverviewView: View {
                         .padding(.horizontal, sortedResults.count > 2 ? 2 : 16)
                         
                         if sortedResults.contains(where: { $0.adjustedScore != $0.overallScore }) {
-                            Text("*After dosha cancellation")
+                            Text("after_dosha_cancellation".localized)
                                 .font(AppTheme.Fonts.caption(size: 11).italic())
                                 .foregroundColor(AppTheme.Colors.gold)
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -100,8 +100,8 @@ struct ComparisonOverviewView: View {
                                     .font(.system(size: 18))
                                     .foregroundColor(AppTheme.Colors.textPrimary)
                                 
-                                Text("Save to Files")
-                                    .font(AppTheme.Fonts.body(size: 16))
+                                Text("save_to_files".localized)
+                                    .font(AppTheme.Fonts.body(size: 14))
                                     .foregroundColor(AppTheme.Colors.textPrimary)
                                 
                                 Spacer()
@@ -248,8 +248,8 @@ struct ComparisonOverviewView: View {
                         Text("\(result.overallScore)/36 actual")
                             .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.gold)
-                        Text("No Adjustment")
-                            .font(AppTheme.Fonts.caption(size: 9))
+                        Text("no_adjustment".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                             .minimumScaleFactor(0.7)
                     }
@@ -266,7 +266,7 @@ struct ComparisonOverviewView: View {
                 
                 // Re-added View Details indicator
                 HStack(spacing: 4) {
-                    Text("View Details")
+                    Text("view_details".localized)
                         .font(AppTheme.Fonts.caption(size: 10).weight(.semibold))
                         .foregroundColor(AppTheme.Colors.gold)
                     Image(systemName: "arrow.right")
@@ -305,8 +305,8 @@ struct ComparisonOverviewView: View {
                 VStack(spacing: 0) {
                     // Header Row
                     HStack(spacing: 0) {
-                        Text("Area")
-                            .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
+                        Text("area_label".localized)
+                            .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                             .frame(width: sortedResults.count > 2 ? 70 : 95, alignment: .leading)
                             .lineLimit(1)
@@ -348,8 +348,8 @@ struct ComparisonOverviewView: View {
                     
                     // Actual totals
                     HStack(spacing: 0) {
-                        Text("Actual")
-                            .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
+                        Text("actual_label".localized)
+                            .font(AppTheme.Fonts.caption(size: 10).weight(.semibold))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .frame(width: sortedResults.count > 2 ? 70 : 95, alignment: .leading)
                             .lineLimit(1)
@@ -367,8 +367,8 @@ struct ComparisonOverviewView: View {
                     
                     // Adjusted totals (bold gold)
                     HStack(spacing: 0) {
-                        Text("Adjusted")
-                            .font(AppTheme.Fonts.caption(size: 13).weight(.bold))
+                        Text("adjusted_label".localized)
+                            .font(AppTheme.Fonts.caption(size: 10).weight(.black))
                             .foregroundColor(AppTheme.Colors.gold)
                             .frame(width: sortedResults.count > 2 ? 70 : 95, alignment: .leading)
                             .lineLimit(1)
@@ -499,8 +499,8 @@ struct ComparisonOverviewView: View {
     // MARK: - Manglik Row
     private var mangalRow: some View {
         HStack(spacing: 0) {
-            Text("Manglik")
-                .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
+            Text("manglik_label".localized)
+                .font(AppTheme.Fonts.title(size: 16).weight(.medium))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .frame(width: sortedResults.count > 2 ? 70 : 95, alignment: .leading)
                 .lineLimit(1)
@@ -542,14 +542,14 @@ struct ComparisonOverviewView: View {
                             .font(.system(size: 8))
                     } else if !hasMangalData {
                         // No mangal data at all — neither present
-                        Text("None")
-                            .font(AppTheme.Fonts.caption(size: 11))
+                        Text("none_label".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.success)
                         Text("✅")
                             .font(.system(size: 8))
                     } else {
-                        Text("View")
-                            .font(AppTheme.Fonts.caption(size: 11))
+                        Text("view_label".localized)
+                            .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }
@@ -607,8 +607,8 @@ struct ComparisonOverviewView: View {
                         Text("⚠️")
                             .font(.system(size: 18))
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("None of the profiles meet the recommended compatibility threshold.")
-                                .font(AppTheme.Fonts.body(size: 13))
+                            Text("no_profiles_meet_threshold".localized)
+                                .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.warning)
                                 .fixedSize(horizontal: false, vertical: true)
                             Text("Review individual analyses below for detailed insights.")
@@ -718,12 +718,12 @@ struct ComparisonOverviewView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
             VStack(spacing: 8) {
-                Text("DESTINY AI ASTROLOGY")
-                    .font(.system(size: 14, weight: .medium, design: .serif))
+                Text("destiny_ai_astrology_brand".localized)
+                    .font(.system(size: 12, weight: .medium, design: .serif))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(4)
                 
-                Text("COMPATIBILITY COMPARISON")
+                Text("compatibility_comparison".localized)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.6))
                     .tracking(3)

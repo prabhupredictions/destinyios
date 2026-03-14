@@ -214,8 +214,8 @@ struct QuotaExhaustedView: View {
                                 HStack(spacing: 10) {
                                     Image(systemName: "envelope.fill")
                                         .font(.system(size: 16))
-                                    Text("Contact Support")
-                                        .font(AppTheme.Fonts.title(size: 17))
+                                    Text("contact_support".localized)
+                                        .font(AppTheme.Fonts.body(size: 16).weight(.semibold))
                                 }
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -234,8 +234,8 @@ struct QuotaExhaustedView: View {
                                 HStack(spacing: 10) {
                                     Image(systemName: "person.fill")
                                         .font(.system(size: 16))
-                                    Text("Sign up")
-                                        .font(AppTheme.Fonts.title(size: 17))
+                                    Text("sign_up_button".localized)
+                                        .font(AppTheme.Fonts.body(size: 16).weight(.semibold))
                                 }
                                 .foregroundColor(AppTheme.Colors.gold)
                                 .frame(maxWidth: .infinity)
@@ -249,8 +249,8 @@ struct QuotaExhaustedView: View {
                         
                         // Maybe later
                         Button(action: { dismiss() }) {
-                            Text("Not now")
-                                .font(AppTheme.Fonts.body(size: 15))
+                            Text("not_now".localized)
+                                .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                         .padding(.top, 8)

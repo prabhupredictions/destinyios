@@ -111,11 +111,11 @@ struct HistoryView: View {
                 .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.3))
             
-            Text("No History Yet")
+            Text("no_history_yet".localized)
                 .font(AppTheme.Fonts.title(size: 22))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Your chats and matches will appear here.")
+            Text("chats_matches_appear_here".localized)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -394,8 +394,8 @@ struct HistoryRowView: View {
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 
-                Text("Messages")
-                    .font(AppTheme.Fonts.caption(size: 10))
+                Text("messages_label".localized)
+                    .font(AppTheme.Fonts.caption(size: 13))
                     .foregroundColor(AppTheme.Colors.textTertiary)
             }
         case .match(let match):
@@ -417,8 +417,8 @@ struct HistoryRowView: View {
                     }
                     .foregroundColor(AppTheme.Colors.gold)
                 } else {
-                    Text("Match")
-                        .font(AppTheme.Fonts.caption(size: 10))
+                    Text("match_label".localized)
+                        .font(AppTheme.Fonts.caption(size: 13))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                 }
             }

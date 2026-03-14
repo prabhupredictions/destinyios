@@ -1,6 +1,6 @@
 /* 
-  Localizable.strings (Russian)
-  Destiny AI Astrology - Русский
+  Localizable.strings (English)
+  Destiny AI Astrology
 */
 
 // MARK: - Common
@@ -44,6 +44,8 @@
 "support" = "Помощь";
 "help_faq" = "Помощь и FAQ";
 "sign_out" = "Выйти";
+"sign_out_message" = "Вы выйдете из системы. Ваши данные будут сохранены до следующего входа в систему.";
+"sign_out_guest_message" = "В качестве гостя ваши данные о рождении будут удалены. Войдите в систему с помощью Apple или Google, чтобы сохранить свои данные.";
 
 // MARK: - Astrology Settings
 "ayanamsa" = "Аянамса";
@@ -100,6 +102,9 @@
 // MARK: - Compatibility/Match
 "compatibility" = "Совместимость";
 "partner_details" = "Данные партнёра";
+"your_details" = "Ваши данные";
+"loaded_from_profile" = "Загружено из профиля";
+"or_enter_manually" = "или введите вручную";
 "calculate_match" = "Проверить совместимость";
 "match_score" = "Результат";
 "boys_details" = "Ты";
@@ -122,6 +127,7 @@
 // MARK: - Birth Data Entry
 "create_birth_chart" = "Создай свою натальную карту";
 "enter_details_desc" = "Введи данные рождения\nдля персонального гороскопа";
+"enter_details_desc_compatibility" = "Введите данные партнера, чтобы узнать совместимость отношений и брака.";
 
 // MARK: - Subscription
 "unlock_premium" = "Получить Destiny Premium";
@@ -132,15 +138,15 @@
 
 // MARK: - Splash
 "aligning_stars" = "Читаем звёзды...";
-"destiny_app_title" = "DESTINY";
-"ai_astrology_subtitle" = "ИИ-АСТРОЛОГИЯ";
-"worlds_advanced_ai" = "САМЫЙ ПРОДВИНУТЫЙ ИИ-АСТРОЛОГ В МИРЕ";
 
-// MARK: - Chat & History
+// MARK: - Chat
 "suggested_questions" = "Популярные вопросы";
 "no_chat_history" = "Пока нет чатов";
+
+// MARK: - History
 "no_conversations" = "Пока нет диалогов";
 "start_asking" = "Задай свой первый вопрос,\nи история появится здесь.";
+"compatibility_match_subtitle" = "Совместимость";
 
 // MARK: - Charts
 "ascendant" = "Асцендент";
@@ -159,6 +165,7 @@
 "birth_city" = "Город рождения";
 "select_date" = "Выбрать дату";
 "select_time" = "Выбрать время";
+"select_gender" = "Выберите пол";
 "partner_birth_time_unknown" = "Я не знаю время рождения";
 "birth_time_warning" = "Внимание: Результаты могут быть менее точными без точного времени";
 
@@ -171,6 +178,13 @@
 "continue_with_google" = "Войти через Google";
 "continue_with_email" = "Войти через Email";
 "i_dont_know_birth_time" = "Не знаю время рождения";
+
+// MARK: - Splash
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "ИИ-АСТРОЛОГИЯ";
+"worlds_advanced_ai" = "САМЫЙ ПРОДВИНУТЫЙ ИИ-АСТРОЛОГ В МИРЕ";
+
+// MARK: - Onboarding
 "questions_asked" = "вопросов задано";
 
 // MARK: - Birth Details View
@@ -190,11 +204,15 @@
 "kundali_match" = "Chart Match";
 "ashtakoot_analysis" = "Birth Chart Compatibility";
 "out_of" = "из";
-"compatible" = "совместимы";
+"compatible" = "Совместимо";
 "excellent_match" = "Отличная Совместимость";
 "good_match" = "Хорошая Совместимость";
 "moderate_match" = "Умеренная Совместимость";
+
+// Partner Cards
 "vs" = "VS";
+
+// Kuta Grid
 "ashtakoot_grid" = "Детали Аштакута";
 "varna" = "Варна";
 "vashya" = "Вашья";
@@ -204,10 +222,12 @@
 "gana" = "Гана";
 "bhakoot" = "Бхакут";
 "nadi" = "Нади";
+
+// View Full Report
 "view_full_report" = "Посмотреть Полный Отчет";
 "full_compatibility_report" = "Полный Отчет о Совместимости";
 "points" = "Баллы";
-"score" = "Счет";
+"score" = "Балл";
 "boy" = "Он";
 "girl" = "Она";
 "impact" = "Влияние";
@@ -215,10 +235,15 @@
 "good" = "Хорошо";
 "moderate" = "Умеренно";
 "needs_care" = "Требует Внимания";
+
 "mangal_dosha_status" = "Статус Мангал Доши";
 "no_dosha" = "Нет Доши";
 "has_dosha" = "Есть Доша";
+
+// Remedies
 "recommended_remedies" = "Рекомендуемые Средства";
+
+// Ask Destiny
 "ask_destiny" = "Спросить Destiny";
 "ask_destiny_about_match" = "Спроси Destiny об этой совместимости";
 "ai_powered" = "На базе ИИ";
@@ -229,21 +254,21 @@
 "ask_dosha" = "Доша";
 "ask_weak" = "Слабости";
 "ask_remedies" = "Средства";
+
+// Match Result Actions
 "new_match" = "Новая Совместимость";
-
-
-
-// Match Result Additions
-"ask_more_match" = "Спросить больше об этом совпадении...";
-"mangal_dosha" = "Мангал Доша";
-"mangal_dosha_desc" = "Анализ положения Марса";
-"kalsarpa_dosha" = "Калсарпа Доша";
-"kalsarpa_dosha_desc" = "Анализ оси Раху-Кету";
-"additional_yoga" = "Дополнительные Йога и Доша";
-"additional_yoga_desc" = "Другие благоприятные комбинации";
 "charts" = "Карты";
 "history" = "История";
 "report" = "Отчет";
+"ask_more_match" = "Спросить больше об этом совпадении...";
+
+// Dosha & Yoga
+"mangal_dosha" = "Мангал Доша";
+"mangal_dosha_desc" = "Анализ положения Марса";
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"kalsarpa_dosha_desc" = "Анализ оси Раху-Кету";
+"additional_yoga" = "Дополнительные Йога и Доша";
+"additional_yoga_desc" = "Другие благоприятные комбинации";
 
 "exception_mars_in_own_sign" = "Марс в своём знаке (Овен или Скорпион)";
 "exception_mars_exalted" = "Марс экзальтирован в Козероге";
@@ -268,7 +293,7 @@
 "exception_mars_strong_shadbala" = "Марс имеет сильную Шадбалу";
 "exception_moon_strong" = "Сильная Луна в карте";
 
-// MARK: - Intensity Factors (Russian)
+// MARK: - Intensity Factors
 "intensity_mars_debilitated" = "Марс ослаблен в Раке";
 "intensity_mars_conjunct_malefics" = "Марс в соединении с вредителями";
 "intensity_mars_critical_degrees" = "Марс на критических градусах Гандханта";
@@ -279,7 +304,7 @@
 "intensity_mars_combust" = "Марс сожжён (слишком близко к Солнцу)";
 "intensity_mars_low_ashtakavarga" = "Марс со слабой Аштакаваргой";
 
-// MARK: - Zodiac Signs (Russian)
+// MARK: - Zodiac Signs
 "sign_ar" = "Овен";
 "sign_ta" = "Телец";
 "sign_ge" = "Близнецы";
@@ -293,7 +318,7 @@
 "sign_aq" = "Водолей";
 "sign_pi" = "Рыбы";
 
-// MARK: - Planets (Russian)
+// MARK: - Planets
 "planet_sun" = "Солнце";
 "planet_moon" = "Луна";
 "planet_mars" = "Марс";
@@ -304,18 +329,20 @@
 "planet_rahu" = "Раху";
 "planet_ketu" = "Кету";
 
-// MARK: - Severity/Status (Russian)
+// MARK: - Severity Levels
 "severity_none" = "Нет";
 "severity_mild" = "Лёгкая";
 "severity_moderate" = "Умеренная";
 "severity_high" = "Высокая";
 "severity_severe" = "Тяжёлая";
+
+// MARK: - Status Labels
 "status_active" = "Активна";
 "status_reduced" = "Ослаблена";
 "status_cancelled" = "Отменена";
-"active" = "Активна";
+"active" = "Активно";
 "reduced" = "Ослаблена";
-"cancelled" = "Отменена";
+"cancelled" = "Отменено";
 
 "mangal_dosha_analysis" = "Анализ Мангал Доша";
 "kalsarpa_analysis" = "Анализ Калсарпа Доша";
@@ -335,7 +362,7 @@
 "formation_details" = "Детали Формации";
 "strength" = "Сила";
 
-// MARK: - Nakshatra Names (27) - Russian (Sanskrit transliteration)
+// MARK: - Nakshatra Names (27)
 "nakshatra_ashwini" = "Ашвини";
 "nakshatra_bharani" = "Бхарани";
 "nakshatra_krittika" = "Криттика";
@@ -364,7 +391,7 @@
 "nakshatra_uttara_bhadrapada" = "Уттара Бхадрапада";
 "nakshatra_revati" = "Ревати";
 
-// MARK: - New Exception Keys (8) - Russian
+// MARK: - New Exception Keys (8)
 "exception_mars_yoga_karaka" = "Марс является Йога Караком для этого Асцендента";
 "exception_mars_jupiter_yoga" = "Присутствует благоприятная йога Марс-Юпитер";
 "exception_mars_venus_yoga" = "Присутствует благоприятная йога Марс-Венера";
@@ -377,9 +404,8 @@
 "exception_mars_strong_vimsopaka" = "Марс имеет сильную Вимшопака Балу";
 "exception_chandra_mangala_yoga" = "Чандра Мангала Йога (йога процветания Марса-Луны) присутствует";
 "exception_mars_good_d24" = "Марс хорошо расположен в карте D24 (Чатурвимшамша)";
-"exception_moon_strong" = "Сильная Луна в карте";
 
-// MARK: - Mars Position UI Labels (10) - Russian
+// MARK: - Mars Position UI Labels (10)
 "mars_position" = "Положение Марса";
 "house_label" = "Дом";
 "sign_lord" = "Управитель Знака";
@@ -396,21 +422,83 @@
 "beneficial" = "Beneficial";
 "challenging" = "Challenging";
 "recommendations" = "Recommendations";
-"present" = "Present";
-"absent" = "Absent";
+"present" = "Присутствует";
+"absent" = "Отсутствует";
 "no_data" = "No Data";
 "dosha_cancelled" = "Dosha Cancelled";
 
 // MARK: - Kala Sarpa Premium UI
-"kalsarpa_dosha" = "Kalsarpa Yoga";
 "dosha_details" = "Yoga Details";
 "rahu_ketu_axis" = "Rahu-Ketu Axis";
 "planets" = "Planets";
-"analysis_notes" = "Analysis Notes";
-"no_kalsarpa_data" = "No Kalsarpa data available";
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+
+/* Streaming Progress */
+"processing" = "Обработка...";
+"analyzing_match" = "Анализ совместимости";
+
+// MARK: - Mitigation Fallback
+"factors_reduce_severity" = "факторы снижают выраженность доши";
+"factors_increase_severity" = "Факторы увеличивают тяжесть доши";
+
+// MARK: - Life Areas
+"career" = "Карьера";
+"education" = "Образование";
+"finance" = "Финансы";
+"family" = "Семья";
+"health" = "Здоровье";
+"relationship" = "Отношение";
+"investment" = "Инвестиции";
+"sudden_events" = "Внезапные события";
+
+// MARK: - Network Status
+"offline_mode" = "Вы оффлайн";
+
+// MARK: - Profile Setup
+"setting_up_profile" = "Настройка вашего профиля";
+"cosmic_alignment" = "Выравнивание космоса специально для вас...";
+
+// Partner Profile Manager
+"select_saved_partner" = "Выберите сохраненного партнера";
+"saved_partners" = "Сохраненные партнеры";
+"add_partner" = "Добавить партнера";
+"edit_partner" = "Изменить партнера";
+"no_saved_partners" = "Нет сохраненных партнеров";
+"save_partner_description" = "Сохраняйте профили партнеров для быстрого сопоставления";
+"save_for_future" = "Сохранить для будущего сопоставления";
+"save_birth_chart" = "Сохранить карту рождения";
+
+// MARK: - Multi-Partner Comparison
+"comparison_results" = "Результаты сравнения";
+"partners_compared" = "партнеры по сравнению";
+"comparing_with" = "Сравнивая с";
+"compare_all" = "Сравнить все";
+"remove_partner" = "Удалить партнера";
+
+"syncing_cosmic_data" = "Загрузка сегодняшних инсайтов…";
+"restoring_your_insights" = "Восстановление ваших знаний";
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "Требуется вход";
+"sign_in_to_check_compatibility" = "Войдите, чтобы проверить совместимость";
+"sign_in_to_continue_asking" = "Войдите, чтобы продолжить задавать вопросы";
+"sign_in_to_continue_matching" = "Войдите, чтобы разблокировать совместимость";
+"sign_in_to_view_plans" = "Войдите, чтобы посмотреть планы подписки";
+"sign_in_to_switch_profiles" = "Войдите, чтобы переключаться между профилями";
+"sign_in_to_save_profiles" = "Войдите, чтобы сохранить и управлять профилями";
+"create_account_to_continue" = "Создайте аккаунт, чтобы продолжить и сохранить прогресс";
+"free_limit_reached" = "Создайте аккаунт, чтобы продолжить и сохранить прогресс";
+"birth_data_registered" = "Эти данные о рождении уже зарегистрированы. Войдите, чтобы продолжить.";
+"age_requirement" = "Вам должно быть не менее 13 лет для создания аккаунта";
+"back" = "Назад";
+
+// MARK: - Match History
+"no_match_history" = "Здесь появится ваша история матчей.";
+"no_match_history_desc" = "Рассчитайте совместимость с партнерами, чтобы построить свою историю";
 
 // MARK: - Birth Chart Protection
 "profile_protected_title" = "Профиль защищён";
@@ -434,9 +522,6 @@
 
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "Карта рождения с похожими данными уже существует. У каждого человека может быть только одна карта. За помощью обратитесь на support@destinyaiastrology.com.";
-
-
-"syncing_cosmic_data" = "Загрузка сегодняшних инсайтов…";
 
 // ════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════════
@@ -473,8 +558,10 @@
 // [+] Yukthi Samanwithavagmi (155)
 // Total yoga entries: 284
 
-// === Missing yoga entries (copied from English) ===
-// === Missing yoga entries (copied from English) ===
+// MARK: - Kala Sarpa/Amrita Variants
+// [−] Kala Sarpa Dosha
+// Additional Kala Sarpa variants
+// [+] Bandhu Pujya 194
 "kalsarpa_divine_protection_title" = "Divine Protection";
 "kalsarpa_divine_protection_message" = "Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.";
 "kalsarpa_relationship_benefits" = "Relationship Benefits";
@@ -488,6 +575,7 @@
 "kalsarpa_dosha_samya" = "Dosha Samya Detected";
 "kalsarpa_mutual_message" = "Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.";
 "kalsarpa_remedies_for" = "Remedies for %@";
+
 "mangal_mutual_cancellation" = "Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.";
 "mangal_exceptions_title" = "%@'s exceptions:";
 
@@ -1887,29 +1975,22 @@
 "marriage_recommended" = "Брак Рекомендован";
 "not_recommended" = "Не Рекомендовано";
 "doshas" = "Доши";
-"cancelled" = "Отменено";
-"active" = "Активно";
 "recommended" = "Рекомендовано";
 "not_rec" = "Не Рек.";
 "best_match" = "Лучший";
-"score" = "Балл";
-"excellent" = "Отлично";
 "very_good" = "Очень Хорошо";
-"good" = "Хорошо";
 "average" = "Средне";
 "below_average" = "Ниже Среднего";
 "not_recommended_category" = "Не Рекомендовано";
 "ashtakoot_score" = "Оценка Аштакут";
-"mangal_dosha" = "Мангал Доша";
 "nadi_dosha" = "Нади Доша";
 "bhakoot_dosha" = "Бхакут Доша";
 "today_cosmic_vibe" = "Космическая Энергия Сегодня";
 "current_dasha" = "Текущая Даша";
-"severity_mild" = "Лёгкая";
-"severity_moderate" = "Умеренная";
-"severity_high" = "Высокая";
-"severity_severe" = "Тяжёлая";
-"severity_none" = "Нет";
+"how_is_my_day" = "Как мой день сегодня?";
+"whats_in_my_mind" = "Что у меня на уме?";
+
+// MARK: - Backend Value Translations (Severity, Category, etc.)
 "category_excellent" = "Отлично";
 "category_very_good" = "Очень Хорошо";
 "category_good" = "Хорошо";
@@ -1918,9 +1999,6 @@
 "category_not_recommended" = "Не Рекомендовано";
 "category_difficult" = "Сложно";
 "category_challenging" = "Трудно";
-"present" = "Присутствует";
-"absent" = "Отсутствует";
-"compatible" = "Совместимо";
 "needs_remedies" = "Нужны Средства";
 "critical" = "Критично";
 "analysis_failed_for" = "Анализ не удался для";
@@ -1930,18 +2008,242 @@
 "check_connection" = "Проверьте подключение.";
 "no_results" = "Результаты не получены. Попробуйте ещё раз.";
 
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Home Screen — Section Headers & Labels
+// ════════════════════════════════════════════════════════════════════════════
 
-// MARK: - Guest Sign-In Prompts
-"sign_in_required" = "Требуется вход";
-"sign_in_to_check_compatibility" = "Войдите, чтобы проверить совместимость";
-"sign_in_to_continue_asking" = "Войдите, чтобы продолжить задавать вопросы";
-"sign_in_to_continue_matching" = "Войдите, чтобы разблокировать совместимость";
-"sign_in_to_view_plans" = "Войдите, чтобы посмотреть планы подписки";
-"sign_in_to_switch_profiles" = "Войдите, чтобы переключаться между профилями";
-"sign_in_to_save_profiles" = "Войдите, чтобы сохранить и управлять профилями";
-"create_account_to_continue" = "Создайте аккаунт, чтобы продолжить и сохранить прогресс";
-"free_limit_reached" = "Создайте аккаунт, чтобы продолжить и сохранить прогресс";
-"birth_data_registered" = "Эти данные о рождении уже зарегистрированы. Войдите, чтобы продолжить.";
-"age_requirement" = "Вам должно быть не менее 13 лет для создания аккаунта";
-    "back" = "Назад";
+"asc_label" = "ASC";
+"tap_to_explore_day" = "Нажмите, чтобы узнать, как прошел день";
+"current_transits" = "Текущие транзиты";
+"current_phase" = "Текущая фаза";
+"next_label" = "Следующий";
+"dosha_insights" = "Доша: информация";
+"cosmic_shifts" = "Космические сдвиги";
+"transit_in" = "в";
+"planets_label" = "ПЛАНЕТЫ";
+"houses_label" = "ДОМА";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat — Status & Feedback
+// ════════════════════════════════════════════════════════════════════════════
+
+"chat_welcome_subtitle" = "Ваш личный астрологический гид. Спросите о своем дне, отношениях, карьере или предстоящем пути.";
+"thinking" = "Думая...";
+"analyzing_chart" = "Анализ вашего графика...";
+"analyzing_label" = "Анализируя";
+"rate_this_response" = "Оцените этот ответ";
+"thanks_for_feedback" = "Спасибо за ваш отзыв!";
+"history_turned_off" = "История отключена";
+"conversations_not_saved" = "Ваши разговоры не сохраняются.";
+"open_settings" = "Открыть настройки";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Compatibility — Comparison & Details
+// ════════════════════════════════════════════════════════════════════════════
+
+"loaded_from_history" = "Загружено из истории";
+"partner_name_placeholder" = "Имя партнера";
+"no_results_found" = "Результаты не найдены";
+"match_results_not_saved" = "Результаты вашего матча не сохраняются.";
+"after_dosha_cancellation" = "*После отмены доши";
+"save_to_files" = "Сохранить в файлы";
+"no_adjustment" = "Без регулировки";
+"view_details" = "Посмотреть детали";
+"area_label" = "Область";
+"actual_label" = "Действительный";
+"adjusted_label" = "Скорректировано";
+"manglik_label" = "Манглик";
+"none_label" = "Никто";
+"view_label" = "Вид";
+"no_profiles_meet_threshold" = "Ни один из профилей не соответствует рекомендуемому порогу совместимости.";
+"review_individual_analyses" = "Просмотрите отдельные анализы ниже для получения подробной информации.";
+"destiny_ai_astrology_brand" = "СУДЬБА ИИ АСТРОЛОГИЯ";
+"compatibility_comparison" = "СРАВНЕНИЕ СОВМЕСТИМОСТИ";
+"copyright_notice" = "©2026 Destiny AI Астрология · Судьбаайастрология.com";
+"description_not_available" = "Описание недоступно";
+"this_may_take_moments" = "Это может занять несколько минут...";
+"pending_label" = "В ожидании";
+"overridden_due_to_dosha" = "Отменено из-за несовместимости дош.";
+"active_doshas" = "Активные Доши:";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Profile — Settings, History & Account Management
+// ════════════════════════════════════════════════════════════════════════════
+
+"history_section" = "История";
+"save_conversation_history" = "Сохранить историю разговоров";
+"clear_history" = "Очистить историю";
+"remove_all_saved" = "Удалить все сохраненные чаты и совпадения";
+"history_off_warning" = "Новые чаты и матчи не сохранятся. Вы можете включить это снова в любое время.";
+"clear_history_warning" = "Это приведет к удалению сохраненных чатов и истории матчей. Это невозможно отменить.";
+"manage_subscription" = "Управление подпиской";
+"view_all_plans" = "Просмотреть все планы";
+"destiny_ai_brand_name" = "Судьба AI Астрология";
+"copyright_full" = "©2026 Судьба ИИ. Все права защищены.";
+"delete_account" = "Удалить аккаунт";
+"common_questions" = "Общие вопросы";
+
+// Profile Switcher
+"loading_profiles" = "Загрузка профилей...";
+"switch_birth_chart" = "Переключить карту рождения";
+"no_profiles_found" = "Профили не найдены";
+"add_partner_to_start" = "Добавьте профиль партнера, чтобы начать";
+"manage_birth_charts" = "Управление картами рождения";
+"you_label" = "YOU";
+"active_profile" = "Активный профиль";
+
+// Delete Account
+"delete_your_account" = "Удалить свою учетную запись?";
+"cancel_subscription_first" = "Пожалуйста, отмените подписку в App Store, прежде чем удалять свою учетную запись.";
+"type_delete_to_confirm" = "Введите DELETE для подтверждения.";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - History View
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_history_yet" = "Пока нет истории";
+"chats_matches_appear_here" = "Здесь будут отображаться ваши чаты и совпадения.";
+"messages_label" = "Сообщения";
+"match_label" = "Соответствовать";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Inbox
+// ════════════════════════════════════════════════════════════════════════════
+
+"notifications_title" = "Уведомления";
+"loading_notifications" = "Загрузка уведомлений...";
+"no_notifications" = "Нет уведомлений";
+"no_notifications_desc" = "Мы сообщим вам, когда появится что-то новое";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Preferences (Settings)
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_alerts_yet" = "Оповещений пока нет";
+"add_first_alert" = "Добавьте свое первое персонализированное оповещение ниже";
+"add_new_alert" = "Добавить новую настройку оповещений";
+"max_alerts_reached" = "Достигнуто максимум 5 оповещений";
+"alerts_saved" = "Оповещения сохранены.";
+"remove_alert" = "Удалить это оповещение?";
+"push_notifications" = "Push-уведомления";
+"permission_required_ios" = "Требуется разрешение в настройках iOS";
+"enable_in_ios_settings" = "Включить в настройках iOS → Приложения → Destiny → Уведомления.";
+"what_alerts_about" = "О чем вы хотите получать оповещения?";
+"alert_frequency" = "Частота оповещений";
+"suggestions_label" = "Предложения";
+"tap_to_add" = "Нажмите, чтобы добавить";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Subscription — Plans, Legal & Billing
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_plans_available" = "Нет доступных планов";
+"upgrade_to_keep_going" = "Обновите, чтобы продолжить работу и разблокировать неограниченный доступ.";
+"subscription_active_message" = "Ваша подписка активна. Наслаждайтесь премиум-функциями!";
+"what_is_destiny_matching" = "Что такое Destiny Matching™?";
+"destiny_matching_desc_1" = "Destiny Matching™ выходит за рамки поверхностной совместимости.";
+"destiny_matching_desc_2" = "В то время как многие астрологические приложения сосредоточены на выявлении несоответствий, Destiny исследует, как взаимодействуют две карты, где проявляются различия и как можно найти совпадение, даже если кажется, что что-то не совпадает.";
+"destiny_matching_desc_3" = "Он использует астрологию, чтобы помочь вам понять отношения и ориентироваться в контексте, а не просто маркировать их как хорошие или плохие.";
+"subscription_auto_renew" = "Подписка автоматически продлевается, если она не отменена как минимум за 24 часа до окончания текущего периода.";
+"unlimited_fair_use" = "Неограниченный доступ возможен при условии добросовестного использования.";
+"billing_info" = "Оплата покупок осуществляется через ваш Apple ID. Управление осуществляется в «Настройки» → «Apple ID» → «Подписки».";
+"current_plan" = "Текущий";
+"scheduled_plan" = "Запланировано";
+"per_month" = "/ месяц";
+"everything_in_core_plus" = "Все в Core, плюс:";
+"coming_soon" = "(вскоре)";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Settings — Chart Style & Astrology Preferences
+// ════════════════════════════════════════════════════════════════════════════
+
+"chart_style" = "Стиль диаграммы";
+"choose_chart_display" = "Выберите способ отображения карт рождения";
+"select_chart_style" = "Выберите стиль диаграммы";
+"chart_style_note" = "Это влияет на то, как карты рождения отображаются в анализе совместимости.";
+"north_indian_style" = "Северо-индийский стиль";
+"north_indian_desc" = "Ромбовидная раскладка, дома исправлены, знаки вращаются.";
+"south_indian_style" = "Южно-индийский стиль";
+"south_indian_desc" = "Расположение сетки, исправлены знаки, дома вращаются.";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Charts — Planetary Positions, Transits & Dasha
+// ════════════════════════════════════════════════════════════════════════════
+
+"select_year_transits" = "Выберите год, чтобы просмотреть транзиты";
+"select_year_dasha" = "Выберите год, чтобы просмотреть периоды даши";
+"calculating_chart" = "Расчетная диаграмма...";
+"failed_to_load_chart" = "Не удалось загрузить диаграмму.";
+"planet_details" = "Детали планеты";
+"planet_cards" = "Карты планет";
+"boy_chart_not_available" = "Данные диаграммы мальчиков недоступны.";
+"girl_chart_not_available" = "Данные диаграммы девочек недоступны.";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Onboarding & Language Selection
+// ════════════════════════════════════════════════════════════════════════════
+
+"personalized_guidance" = "Персонализированное руководство на вашем языке";
+"stat_questions_asked" = "2,7 млн+";
+"stat_rating" = "4/5";
+"rating_label" = "рейтинг";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Components — Quota, Search & Shared UI
+// ════════════════════════════════════════════════════════════════════════════
+
+"sign_in_button" = "Войти";
+"go_premium" = "Перейти Премиум";
+"contact_support" = "Обратиться в службу поддержки";
+"sign_up_button" = "Зарегистрироваться";
+"not_now" = "Не сейчас";
+"search_for_city" = "Поиск города...";
+"searching" = "Идет поиск...";
+"no_cities_found" = "Города не найдены";
+"try_different_search" = "Попробуйте другой поисковый запрос";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Backend API Value Mappings (Transit Badges, Life Area Status)
+// These keys map backend enum values to user-facing labels.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Life Area Status (from todays_prediction API)
+"status_good" = "Хороший";
+"status_steady" = "Устойчивый";
+"status_caution" = "Осторожность";
+
+// Transit Badge Labels (from prediction_service API)
+"badge_auspicious" = "Благоприятный";
+"badge_challenging" = "Испытывающий";
+"badge_neutral" = "Нейтральный";
+
+// Ashtakoot Kuta Status (from ashtakoot_matching_calculator API)
+"kuta_excellent" = "Отличный";
+"kuta_good" = "Хороший";
+"kuta_partial" = "Частичный";
+"kuta_incompatible" = "Несовместимый";
+"kuta_average" = "Средний";
+"kuta_poor" = "Бедный";
+"kuta_challenging" = "Испытывающий";
+"kuta_inauspicious" = "Неблагоприятный";
+"kuta_perfect" = "Идеальный";
+
+// Dasha Quality (from todays_prediction API)
+"dasha_quality_good" = "Хороший";
+"dasha_quality_steady" = "Устойчивый";
+"dasha_quality_caution" = "Осторожность";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Accessibility Labels
+// ════════════════════════════════════════════════════════════════════════════
+
+"a11y_close" = "Закрывать";
+"a11y_history" = "История";
+"a11y_send_question" = "Отправить вопрос";
+"a11y_remove_partner" = "Удалить партнера";
+"a11y_search_saved_partners" = "Поиск сохраненных партнеров";
+"a11y_birth_time_unknown" = "Время рождения неизвестно";
+"a11y_save_partner" = "Сохраните партнера на будущее";
+"a11y_refresh_subscription" = "Обновить статус подписки";
+"a11y_mark_all_read" = "Отметить все как прочитанное";
 

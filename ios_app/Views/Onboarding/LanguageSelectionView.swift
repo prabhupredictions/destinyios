@@ -136,12 +136,12 @@ struct LanguageSelectionView: View {
             }
             .padding(.bottom, 8)
             
-            Text("Destiny AI Astrology")
-                .font(AppTheme.Fonts.display(size: 26))
+            Text("destiny_ai_brand_name".localized)
+                .font(.system(size: 24, weight: .bold, design: .serif))
                 .goldGradient()
             
-            Text("Personalized guidance, in your language")
-                .font(AppTheme.Fonts.body(size: 15))
+            Text("personalized_guidance".localized)
+                .font(.system(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)

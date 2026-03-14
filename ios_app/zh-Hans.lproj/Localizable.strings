@@ -1,6 +1,6 @@
 /* 
-  Localizable.strings (Chinese - Simplified)
-  Destiny AI Astrology - 简体中文
+  Localizable.strings (English)
+  Destiny AI Astrology
 */
 
 // MARK: - Common
@@ -44,6 +44,8 @@
 "support" = "帮助";
 "help_faq" = "帮助与常见问题";
 "sign_out" = "退出登录";
+"sign_out_message" = "您将被注销。您的数据将被保存，以便您再次登录时使用。";
+"sign_out_guest_message" = "作为访客，您的出生数据将被删除。使用 Apple 或 Google 登录以保存您的数据。";
 
 // MARK: - Astrology Settings
 "ayanamsa" = "岁差制";
@@ -100,6 +102,9 @@
 // MARK: - Compatibility/Match
 "compatibility" = "星座配对";
 "partner_details" = "对方信息";
+"your_details" = "您的详细信息";
+"loaded_from_profile" = "从配置文件加载";
+"or_enter_manually" = "或手动输入";
 "calculate_match" = "查看配对结果";
 "match_score" = "契合度";
 "boys_details" = "你";
@@ -122,6 +127,7 @@
 // MARK: - Birth Data Entry
 "create_birth_chart" = "创建你的星盘";
 "enter_details_desc" = "填写出生信息\n获取专属运势分析";
+"enter_details_desc_compatibility" = "输入伴侣详细信息以探索关系和婚姻兼容性";
 
 // MARK: - Subscription
 "unlock_premium" = "解锁 Destiny 高级版";
@@ -132,15 +138,15 @@
 
 // MARK: - Splash
 "aligning_stars" = "星辰解读中...";
-"destiny_app_title" = "DESTINY";
-"ai_astrology_subtitle" = "AI 星座";
-"worlds_advanced_ai" = "全球最先进的 AI 占星师";
 
-// MARK: - Chat & History
+// MARK: - Chat
 "suggested_questions" = "推荐问题";
 "no_chat_history" = "还没有聊天记录";
+
+// MARK: - History
 "no_conversations" = "还没有对话";
 "start_asking" = "开始提问吧，\n你的历史记录会显示在这里。";
+"compatibility_match_subtitle" = "兼容性匹配";
 
 // MARK: - Charts
 "ascendant" = "上升星座";
@@ -159,6 +165,7 @@
 "birth_city" = "出生城市";
 "select_date" = "选择日期";
 "select_time" = "选择时间";
+"select_gender" = "选择性别";
 "partner_birth_time_unknown" = "我不知道伴侣的出生时间";
 "birth_time_warning" = "注意: 没有准确时间，结果可能不够准确";
 
@@ -171,6 +178,13 @@
 "continue_with_google" = "通过 Google 继续";
 "continue_with_email" = "通过邮箱继续";
 "i_dont_know_birth_time" = "我不知道出生时间";
+
+// MARK: - Splash
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "AI 星座";
+"worlds_advanced_ai" = "全球最先进的 AI 占星师";
+
+// MARK: - Onboarding
 "questions_asked" = "个问题";
 
 // MARK: - Birth Details View
@@ -190,11 +204,15 @@
 "kundali_match" = "Chart Match";
 "ashtakoot_analysis" = "Birth Chart Compatibility";
 "out_of" = "共";
-"compatible" = "兼容";
+"compatible" = "相合";
 "excellent_match" = "绝佳匹配";
 "good_match" = "良好匹配";
 "moderate_match" = "中等匹配";
+
+// Partner Cards
 "vs" = "VS";
+
+// Kuta Grid
 "ashtakoot_grid" = "八宫详情";
 "varna" = "瓦尔纳";
 "vashya" = "瓦希亚";
@@ -204,21 +222,28 @@
 "gana" = "甘纳";
 "bhakoot" = "巴库特";
 "nadi" = "纳迪";
+
+// View Full Report
 "view_full_report" = "查看完整报告";
 "full_compatibility_report" = "完整兼容性报告";
 "points" = "分";
-"score" = "得分";
+"score" = "分数";
 "boy" = "他";
 "girl" = "她";
 "impact" = "影响";
 "excellent" = "优秀";
-"good" = "良好";
+"good" = "好";
 "moderate" = "中等";
 "needs_care" = "需要注意";
+
 "mangal_dosha_status" = "曼加尔多沙状态";
 "no_dosha" = "无多沙";
 "has_dosha" = "有多沙";
+
+// Remedies
 "recommended_remedies" = "推荐解决方案";
+
+// Ask Destiny
 "ask_destiny" = "询问Destiny";
 "ask_destiny_about_match" = "向Destiny询问此匹配";
 "ai_powered" = "AI驱动";
@@ -229,21 +254,21 @@
 "ask_dosha" = "多沙";
 "ask_weak" = "弱点";
 "ask_remedies" = "解决";
+
+// Match Result Actions
 "new_match" = "新匹配";
-
-
-
-// Match Result Additions
-"ask_more_match" = "询问更多关于此配对...";
-"mangal_dosha" = "曼格尔多沙";
-"mangal_dosha_desc" = "火星位置分析";
-"kalsarpa_dosha" = "卡尔萨帕多沙";
-"kalsarpa_dosha_desc" = "罗睺-计都轴线分析";
-"additional_yoga" = "其他瑜伽与多沙";
-"additional_yoga_desc" = "其他吉利组合";
 "charts" = "图表";
 "history" = "历史";
 "report" = "报告";
+"ask_more_match" = "询问更多关于此配对...";
+
+// Dosha & Yoga
+"mangal_dosha" = "火星缺陷";
+"mangal_dosha_desc" = "火星位置分析";
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"kalsarpa_dosha_desc" = "罗睺-计都轴线分析";
+"additional_yoga" = "其他瑜伽与多沙";
+"additional_yoga_desc" = "其他吉利组合";
 
 "exception_mars_in_own_sign" = "火星在本位（白羊座或天蝎座）";
 "exception_mars_exalted" = "火星在摩羯座入庙";
@@ -266,9 +291,9 @@
 "exception_mars_jupiter_in_trine" = "火星和木星在三合宫";
 "exception_mars_strong_ashtakavarga" = "火星阿什塔卡瓦尔加强";
 "exception_mars_strong_shadbala" = "火星沙德巴拉强";
-"exception_moon_strong" = "星盘中月亮强";
+"exception_moon_strong" = "星盘中月亮很强";
 
-// MARK: - Intensity Factors (Chinese Simplified)
+// MARK: - Intensity Factors
 "intensity_mars_debilitated" = "火星在巨蟹座落陷";
 "intensity_mars_conjunct_malefics" = "火星与凶星合相";
 "intensity_mars_critical_degrees" = "火星在关键甘丹塔度数";
@@ -279,7 +304,7 @@
 "intensity_mars_combust" = "火星燃烧（太靠近太阳）";
 "intensity_mars_low_ashtakavarga" = "火星阿什塔卡瓦尔加弱";
 
-// MARK: - Zodiac Signs (Chinese Simplified)
+// MARK: - Zodiac Signs
 "sign_ar" = "白羊座";
 "sign_ta" = "金牛座";
 "sign_ge" = "双子座";
@@ -293,7 +318,7 @@
 "sign_aq" = "水瓶座";
 "sign_pi" = "双鱼座";
 
-// MARK: - Planets (Chinese Simplified)
+// MARK: - Planets
 "planet_sun" = "太阳";
 "planet_moon" = "月亮";
 "planet_mars" = "火星";
@@ -304,18 +329,20 @@
 "planet_rahu" = "罗睺";
 "planet_ketu" = "计都";
 
-// MARK: - Severity/Status (Chinese Simplified)
+// MARK: - Severity Levels
 "severity_none" = "无";
 "severity_mild" = "轻微";
 "severity_moderate" = "中等";
 "severity_high" = "严重";
 "severity_severe" = "非常严重";
+
+// MARK: - Status Labels
 "status_active" = "有效";
 "status_reduced" = "减弱";
 "status_cancelled" = "取消";
-"active" = "有效";
+"active" = "活跃";
 "reduced" = "减弱";
-"cancelled" = "取消";
+"cancelled" = "已消除";
 
 "mangal_dosha_analysis" = "曼加尔多沙分析";
 "kalsarpa_analysis" = "卡尔萨帕多沙分析";
@@ -335,7 +362,7 @@
 "formation_details" = "形成详情";
 "strength" = "强度";
 
-// MARK: - Nakshatra Names (27) - Chinese (Sanskrit transliteration)
+// MARK: - Nakshatra Names (27)
 "nakshatra_ashwini" = "阿须毗尼";
 "nakshatra_bharani" = "婆罗尼";
 "nakshatra_krittika" = "昴宿";
@@ -364,7 +391,7 @@
 "nakshatra_uttara_bhadrapada" = "室宿";
 "nakshatra_revati" = "壁宿";
 
-// MARK: - New Exception Keys (8) - Chinese
+// MARK: - New Exception Keys (8)
 "exception_mars_yoga_karaka" = "火星是此上升点的瑜伽因子";
 "exception_mars_jupiter_yoga" = "存在火星-木星吉祥瑜伽";
 "exception_mars_venus_yoga" = "存在火星-金星吉祥瑜伽";
@@ -377,9 +404,8 @@
 "exception_mars_strong_vimsopaka" = "火星有强大的Vimsopaka Bala";
 "exception_chandra_mangala_yoga" = "存在月火财富瑜伽（Chandra Mangala Yoga）";
 "exception_mars_good_d24" = "火星在D24（Chaturvimsamsa）中位置良好";
-"exception_moon_strong" = "星盘中月亮很强";
 
-// MARK: - Mars Position UI Labels (10) - Chinese
+// MARK: - Mars Position UI Labels (10)
 "mars_position" = "火星位置";
 "house_label" = "宫位";
 "sign_lord" = "星座主宰";
@@ -396,21 +422,83 @@
 "beneficial" = "Beneficial";
 "challenging" = "Challenging";
 "recommendations" = "Recommendations";
-"present" = "Present";
-"absent" = "Absent";
+"present" = "存在";
+"absent" = "不存在";
 "no_data" = "No Data";
 "dosha_cancelled" = "Dosha Cancelled";
 
 // MARK: - Kala Sarpa Premium UI
-"kalsarpa_dosha" = "Kalsarpa Yoga";
 "dosha_details" = "Yoga Details";
 "rahu_ketu_axis" = "Rahu-Ketu Axis";
 "planets" = "Planets";
-"analysis_notes" = "Analysis Notes";
-"no_kalsarpa_data" = "No Kalsarpa data available";
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+
+/* Streaming Progress */
+"processing" = "加工...";
+"analyzing_match" = "分析兼容性";
+
+// MARK: - Mitigation Fallback
+"factors_reduce_severity" = "降低 Dosha 严重程度的因素";
+"factors_increase_severity" = "增加 Dosha 严重程度的因素";
+
+// MARK: - Life Areas
+"career" = "职业";
+"education" = "教育";
+"finance" = "金融";
+"family" = "家庭";
+"health" = "健康";
+"relationship" = "关系";
+"investment" = "投资";
+"sudden_events" = "突发事件";
+
+// MARK: - Network Status
+"offline_mode" = "你离线了";
+
+// MARK: - Profile Setup
+"setting_up_profile" = "设置您的个人资料";
+"cosmic_alignment" = "为你调整宇宙......";
+
+// Partner Profile Manager
+"select_saved_partner" = "选择已保存的合作伙伴";
+"saved_partners" = "已保存的合作伙伴";
+"add_partner" = "添加合作伙伴";
+"edit_partner" = "编辑合作伙伴";
+"no_saved_partners" = "没有保存的合作伙伴";
+"save_partner_description" = "保存合作伙伴资料以便快速匹配";
+"save_for_future" = "保存以供将来匹配";
+"save_birth_chart" = "保存出生图";
+
+// MARK: - Multi-Partner Comparison
+"comparison_results" = "比较结果";
+"partners_compared" = "合作伙伴比较";
+"comparing_with" = "与相比";
+"compare_all" = "比较全部";
+"remove_partner" = "删除合作伙伴";
+
+"syncing_cosmic_data" = "正在加载今天的见解…";
+"restoring_your_insights" = "恢复你的洞察力";
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "需要登录";
+"sign_in_to_check_compatibility" = "登录以检查兼容性";
+"sign_in_to_continue_asking" = "登录以继续提问";
+"sign_in_to_continue_matching" = "登录以解锁兼容性匹配";
+"sign_in_to_view_plans" = "登录以查看订阅计划";
+"sign_in_to_switch_profiles" = "登录以切换配置文件";
+"sign_in_to_save_profiles" = "登录以保存和管理配置文件";
+"create_account_to_continue" = "创建账户以继续并保存您的进度";
+"free_limit_reached" = "创建账户以继续并保存您的进度";
+"birth_data_registered" = "此出生数据已注册。请登录以继续。";
+"age_requirement" = "您必须年满13岁才能创建账户";
+"back" = "返回";
+
+// MARK: - Match History
+"no_match_history" = "您的比赛历史记录将显示在这里";
+"no_match_history_desc" = "计算与合作伙伴的兼容性以建立您的历史";
 
 // MARK: - Birth Chart Protection
 "profile_protected_title" = "档案受保护";
@@ -434,9 +522,6 @@
 
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "已存在相似信息的出生图表。每人只能有一个图表。如需帮助，请联系 support@destinyaiastrology.com。";
-
-
-"syncing_cosmic_data" = "正在加载今天的见解…";
 
 // ════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════════
@@ -473,8 +558,10 @@
 // [+] Yukthi Samanwithavagmi (155)
 // Total yoga entries: 284
 
-// === Missing yoga entries (copied from English) ===
-// === Missing yoga entries (copied from English) ===
+// MARK: - Kala Sarpa/Amrita Variants
+// [−] Kala Sarpa Dosha
+// Additional Kala Sarpa variants
+// [+] Bandhu Pujya 194
 "kalsarpa_divine_protection_title" = "Divine Protection";
 "kalsarpa_divine_protection_message" = "Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.";
 "kalsarpa_relationship_benefits" = "Relationship Benefits";
@@ -488,6 +575,7 @@
 "kalsarpa_dosha_samya" = "Dosha Samya Detected";
 "kalsarpa_mutual_message" = "Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.";
 "kalsarpa_remedies_for" = "Remedies for %@";
+
 "mangal_mutual_cancellation" = "Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.";
 "mangal_exceptions_title" = "%@'s exceptions:";
 
@@ -1887,29 +1975,22 @@
 "marriage_recommended" = "推荐结婚";
 "not_recommended" = "不推荐";
 "doshas" = "缺陷";
-"cancelled" = "已消除";
-"active" = "活跃";
 "recommended" = "推荐";
 "not_rec" = "不推荐";
 "best_match" = "最佳";
-"score" = "分数";
-"excellent" = "优秀";
 "very_good" = "很好";
-"good" = "好";
 "average" = "一般";
 "below_average" = "低于平均";
 "not_recommended_category" = "不推荐";
 "ashtakoot_score" = "八宫匹配分数";
-"mangal_dosha" = "火星缺陷";
 "nadi_dosha" = "脉轮缺陷";
 "bhakoot_dosha" = "宫位缺陷";
 "today_cosmic_vibe" = "今日宇宙能量";
 "current_dasha" = "当前大运";
-"severity_mild" = "轻微";
-"severity_moderate" = "中等";
-"severity_high" = "严重";
-"severity_severe" = "非常严重";
-"severity_none" = "无";
+"how_is_my_day" = "我今天过得怎么样？";
+"whats_in_my_mind" = "我心里在想什么？";
+
+// MARK: - Backend Value Translations (Severity, Category, etc.)
 "category_excellent" = "优秀";
 "category_very_good" = "很好";
 "category_good" = "好";
@@ -1918,9 +1999,6 @@
 "category_not_recommended" = "不推荐";
 "category_difficult" = "困难";
 "category_challenging" = "有挑战";
-"present" = "存在";
-"absent" = "不存在";
-"compatible" = "相合";
 "needs_remedies" = "需要化解";
 "critical" = "关键";
 "analysis_failed_for" = "分析失败";
@@ -1930,18 +2008,242 @@
 "check_connection" = "请检查您的网络连接。";
 "no_results" = "未收到结果。请重试。";
 
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Home Screen — Section Headers & Labels
+// ════════════════════════════════════════════════════════════════════════════
 
-// MARK: - Guest Sign-In Prompts
-"sign_in_required" = "需要登录";
-"sign_in_to_check_compatibility" = "登录以检查兼容性";
-"sign_in_to_continue_asking" = "登录以继续提问";
-"sign_in_to_continue_matching" = "登录以解锁兼容性匹配";
-"sign_in_to_view_plans" = "登录以查看订阅计划";
-"sign_in_to_switch_profiles" = "登录以切换配置文件";
-"sign_in_to_save_profiles" = "登录以保存和管理配置文件";
-"create_account_to_continue" = "创建账户以继续并保存您的进度";
-"free_limit_reached" = "创建账户以继续并保存您的进度";
-"birth_data_registered" = "此出生数据已注册。请登录以继续。";
-"age_requirement" = "您必须年满13岁才能创建账户";
-    "back" = "返回";
+"asc_label" = "ASC";
+"tap_to_explore_day" = "点击探索您的一天";
+"current_transits" = "目前的运输";
+"current_phase" = "当前阶段";
+"next_label" = "下一个";
+"dosha_insights" = "多沙见解";
+"cosmic_shifts" = "宇宙转变";
+"transit_in" = "在";
+"planets_label" = "行星";
+"houses_label" = "房屋";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat — Status & Feedback
+// ════════════════════════════════════════════════════════════════════════════
+
+"chat_welcome_subtitle" = "您的个人占星指南。询问你的一天、人际关系、职业或未来的道路。";
+"thinking" = "思维...";
+"analyzing_chart" = "正在分析您的图表...";
+"analyzing_label" = "分析中";
+"rate_this_response" = "评价此回复";
+"thanks_for_feedback" = "感谢您的反馈！";
+"history_turned_off" = "历史记录已关闭";
+"conversations_not_saved" = "您的对话未保存。";
+"open_settings" = "打开设置";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Compatibility — Comparison & Details
+// ════════════════════════════════════════════════════════════════════════════
+
+"loaded_from_history" = "从历史记录中加载";
+"partner_name_placeholder" = "合作伙伴名称";
+"no_results_found" = "没有找到结果";
+"match_results_not_saved" = "您的比赛结果尚未保存。";
+"after_dosha_cancellation" = "*dosha取消后";
+"save_to_files" = "保存到文件";
+"no_adjustment" = "无调整";
+"view_details" = "查看详情";
+"area_label" = "区域";
+"actual_label" = "实际的";
+"adjusted_label" = "调整后";
+"manglik_label" = "曼利克";
+"none_label" = "没有任何";
+"view_label" = "看法";
+"no_profiles_meet_threshold" = "所有配置文件均不符合建议的兼容性阈值。";
+"review_individual_analyses" = "查看下面的个别分析以获取详细见解。";
+"destiny_ai_astrology_brand" = "命运人工智能占星术";
+"compatibility_comparison" = "兼容性比较";
+"copyright_notice" = "©2026 命运人工智能占星术·destinyaiastrology.com";
+"description_not_available" = "描述不可用";
+"this_may_take_moments" = "这可能需要一些时间...";
+"pending_label" = "待办的";
+"overridden_due_to_dosha" = "由于 dosha 不兼容而被覆盖";
+"active_doshas" = "主动能量：";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Profile — Settings, History & Account Management
+// ════════════════════════════════════════════════════════════════════════════
+
+"history_section" = "历史";
+"save_conversation_history" = "保存对话历史记录";
+"clear_history" = "清除历史记录";
+"remove_all_saved" = "删除所有已保存的聊天和比赛";
+"history_off_warning" = "新的聊天和匹配将不会保存。您可以随时重新打开此功能。";
+"clear_history_warning" = "这将删除保存的聊天记录和比赛历史记录。这无法撤消。";
+"manage_subscription" = "管理订阅";
+"view_all_plans" = "查看所有计划";
+"destiny_ai_brand_name" = "命运人工智能占星术";
+"copyright_full" = "©2026 命运人工智能。版权所有。";
+"delete_account" = "删除账户";
+"common_questions" = "常见问题";
+
+// Profile Switcher
+"loading_profiles" = "正在加载配置文件...";
+"switch_birth_chart" = "切换出生图";
+"no_profiles_found" = "未找到个人资料";
+"add_partner_to_start" = "添加合作伙伴资料以开始使用";
+"manage_birth_charts" = "管理出生图";
+"you_label" = "YOU";
+"active_profile" = "活动档案";
+
+// Delete Account
+"delete_your_account" = "删除您的帐户？";
+"cancel_subscription_first" = "删除您的帐户之前，请在 App Store 中取消您的订阅。";
+"type_delete_to_confirm" = "键入 DELETE 进行确认";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - History View
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_history_yet" = "还没有历史记录";
+"chats_matches_appear_here" = "您的聊天和匹配将显示在此处。";
+"messages_label" = "留言";
+"match_label" = "匹配";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Inbox
+// ════════════════════════════════════════════════════════════════════════════
+
+"notifications_title" = "通知";
+"loading_notifications" = "正在加载通知...";
+"no_notifications" = "无通知";
+"no_notifications_desc" = "有新消息时我们会通知您";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Preferences (Settings)
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_alerts_yet" = "还没有警报";
+"add_first_alert" = "在下面添加您的第一个个性化提醒";
+"add_new_alert" = "添加新的警报首选项";
+"max_alerts_reached" = "已达到最多 5 个警报";
+"alerts_saved" = "提醒已保存";
+"remove_alert" = "删除此警报吗？";
+"push_notifications" = "推送通知";
+"permission_required_ios" = "iOS 设置中需要权限";
+"enable_in_ios_settings" = "在 iOS 设置 → 应用程序 → 命运 → 通知中启用";
+"what_alerts_about" = "您想要关于什么的警报？";
+"alert_frequency" = "警报频率";
+"suggestions_label" = "建议";
+"tap_to_add" = "点击添加";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Subscription — Plans, Legal & Billing
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_plans_available" = "没有可用的计划";
+"upgrade_to_keep_going" = "升级以继续前进并解锁无限访问权限";
+"subscription_active_message" = "您的订阅现已激活。享受您的高级功能！";
+"what_is_destiny_matching" = "什么是命运匹配™？";
+"destiny_matching_desc_1" = "Destiny Matching™ 超越了表面层面的兼容性。";
+"destiny_matching_desc_2" = "虽然许多占星应用程序专注于指出不匹配，但《命运》会检查两个图表如何相互作用、差异出现在哪里，以及即使事情感觉不一致，如何找到对齐。";
+"destiny_matching_desc_3" = "它使用占星学来帮助您理解和驾驭上下文中的关系，而不是简单地将它们标记为好或坏。";
+"subscription_auto_renew" = "除非在当前订阅期结束前至少 24 小时取消，否则订阅将自动续订。";
+"unlimited_fair_use" = "无限制访问须遵守合理使用原则。";
+"billing_info" = "购买费用通过您的 Apple ID 进行计费。在“设置”→“Apple ID”→“订阅”中管理。";
+"current_plan" = "当前的";
+"scheduled_plan" = "预定";
+"per_month" = "/ 月";
+"everything_in_core_plus" = "核心中的一切，加上：";
+"coming_soon" = "（即将推出）";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Settings — Chart Style & Astrology Preferences
+// ════════════════════════════════════════════════════════════════════════════
+
+"chart_style" = "图表样式";
+"choose_chart_display" = "选择出生图的显示方式";
+"select_chart_style" = "选择图表样式";
+"chart_style_note" = "这会影响出生图在兼容性分析中的显示方式。";
+"north_indian_style" = "北印度风格";
+"north_indian_desc" = "菱形布局，房屋固定，标志旋转";
+"south_indian_style" = "南印度风格";
+"south_indian_desc" = "网格布局，标志固定，房屋旋转";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Charts — Planetary Positions, Transits & Dasha
+// ════════════════════════════════════════════════════════════════════════════
+
+"select_year_transits" = "选择年份查看过境";
+"select_year_dasha" = "选择年份查看大煞时期";
+"calculating_chart" = "计算图表...";
+"failed_to_load_chart" = "加载图表失败";
+"planet_details" = "行星详细信息";
+"planet_cards" = "星球卡";
+"boy_chart_not_available" = "男孩图表数据不可用";
+"girl_chart_not_available" = "女孩图表数据不可用";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Onboarding & Language Selection
+// ════════════════════════════════════════════════════════════════════════════
+
+"personalized_guidance" = "用您的语言提供个性化指导";
+"stat_questions_asked" = "270万+";
+"stat_rating" = "4/5";
+"rating_label" = "等级";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Components — Quota, Search & Shared UI
+// ════════════════════════════════════════════════════════════════════════════
+
+"sign_in_button" = "登入";
+"go_premium" = "升级至高级版";
+"contact_support" = "联系支持人员";
+"sign_up_button" = "报名";
+"not_now" = "现在不要";
+"search_for_city" = "搜索一个城市...";
+"searching" = "正在寻找...";
+"no_cities_found" = "没有找到城市";
+"try_different_search" = "尝试不同的搜索词";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Backend API Value Mappings (Transit Badges, Life Area Status)
+// These keys map backend enum values to user-facing labels.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Life Area Status (from todays_prediction API)
+"status_good" = "好的";
+"status_steady" = "稳定的";
+"status_caution" = "警告";
+
+// Transit Badge Labels (from prediction_service API)
+"badge_auspicious" = "吉祥";
+"badge_challenging" = "具有挑战性的";
+"badge_neutral" = "中性的";
+
+// Ashtakoot Kuta Status (from ashtakoot_matching_calculator API)
+"kuta_excellent" = "出色的";
+"kuta_good" = "好的";
+"kuta_partial" = "部分的";
+"kuta_incompatible" = "不相容";
+"kuta_average" = "平均的";
+"kuta_poor" = "贫穷的";
+"kuta_challenging" = "具有挑战性的";
+"kuta_inauspicious" = "不祥";
+"kuta_perfect" = "完美的";
+
+// Dasha Quality (from todays_prediction API)
+"dasha_quality_good" = "好的";
+"dasha_quality_steady" = "稳定的";
+"dasha_quality_caution" = "警告";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Accessibility Labels
+// ════════════════════════════════════════════════════════════════════════════
+
+"a11y_close" = "关闭";
+"a11y_history" = "历史";
+"a11y_send_question" = "发送问题";
+"a11y_remove_partner" = "删除伙伴";
+"a11y_search_saved_partners" = "搜索已保存的合作伙伴";
+"a11y_birth_time_unknown" = "出生时间未知";
+"a11y_save_partner" = "为未来保存合作伙伴";
+"a11y_refresh_subscription" = "刷新订阅状态";
+"a11y_mark_all_read" = "全部标记为已读";
 

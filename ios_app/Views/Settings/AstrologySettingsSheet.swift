@@ -135,11 +135,11 @@ struct AstrologySettingsSheet: View {
                         }
                     } header: {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Chart Style")
-                                .font(AppTheme.Fonts.title(size: 14))
+                            Text("chart_style".localized)
+                                .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                                 .foregroundColor(AppTheme.Colors.gold)
-                            Text("Choose how birth charts are displayed")
-                                .font(AppTheme.Fonts.caption(size: 12))
+                            Text("choose_chart_display".localized)
+                                .font(AppTheme.Fonts.caption(size: 13))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                     }

@@ -154,7 +154,7 @@ struct MessageBubble: View {
         HStack(spacing: 10) {
             AnimatedDots()
             
-            Text("Thinking...")
+            Text("thinking".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -405,7 +405,7 @@ struct CollapsibleProgressView: View {
                     AnimatedDots()
                     
                     // Status text
-                    Text("Analyzing your chart")
+                    Text("analyzing_chart".localized)
                         .font(AppTheme.Fonts.body(size: 14).weight(.medium))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     

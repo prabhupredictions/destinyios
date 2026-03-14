@@ -218,12 +218,12 @@ struct ChatView: View {
             }
             
             // Title
-            Text("Ask Destiny")
+            Text("ask_destiny".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
             // Subtitle
-            Text("Your personal astrology guide. Ask about your day, relationships, career, or path ahead.")
+            Text("chat_welcome_subtitle".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -408,7 +408,7 @@ struct ChatView: View {
         HStack(spacing: 10) {
             AnimatedDots()
             
-            Text("Thinking...")
+            Text("thinking".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -555,11 +555,11 @@ struct ChatHistorySidebar: View {
                 .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
             
-            Text("History is turned off")
+            Text("history_turned_off".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Your conversations aren't being saved.")
+            Text("conversations_not_saved".localized)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -573,7 +573,7 @@ struct ChatHistorySidebar: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "gearshape")
-                    Text("Open Settings")
+                    Text("open_settings".localized)
                 }
                 .font(AppTheme.Fonts.title(size: 15))
                 .foregroundColor(AppTheme.Colors.mainBackground)

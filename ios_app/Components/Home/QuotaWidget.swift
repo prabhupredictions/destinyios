@@ -97,8 +97,8 @@ struct QuotaWidget: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "person.fill")
                                     .font(.system(size: 12))
-                                Text("Sign In")
-                                    .font(.system(size: 13, weight: .semibold))
+                                Text("sign_in_button".localized)
+                                    .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                             }
                             .foregroundColor(Color("NavyPrimary"))
                             .padding(.horizontal, 16)
@@ -115,8 +115,8 @@ struct QuotaWidget: View {
                         HStack(spacing: 6) {
                             Image(systemName: "crown.fill")
                                 .font(.system(size: 12))
-                            Text("Go Premium")
-                                .font(.system(size: 13, weight: .semibold))
+                            Text("go_premium".localized)
+                                .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                         }
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)

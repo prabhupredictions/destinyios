@@ -78,8 +78,8 @@ struct NotificationInboxView: View {
             
             // Title
             VStack(spacing: 2) {
-                Text("Notifications")
-                    .font(.system(size: 18, weight: .bold))
+                Text("notifications_title".localized)
+                    .font(AppTheme.Fonts.title(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
                 if service.unreadCount > 0 {
@@ -195,8 +195,8 @@ struct NotificationInboxView: View {
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
                 .scaleEffect(1.5)
             
-            Text("Loading notifications...")
-                .font(.system(size: 14))
+            Text("loading_notifications".localized)
+                .font(AppTheme.Fonts.caption(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
         .frame(maxHeight: .infinity)
@@ -210,12 +210,12 @@ struct NotificationInboxView: View {
                 .foregroundColor(AppTheme.Colors.goldDim)
             
             VStack(spacing: 8) {
-                Text("No Notifications")
-                    .font(.system(size: 20, weight: .bold))
+                Text("no_notifications".localized)
+                    .font(AppTheme.Fonts.title(size: 20))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
-                Text("We'll let you know when there's something new")
-                    .font(.system(size: 14))
+                Text("no_notifications_desc".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
             }
@@ -335,8 +335,8 @@ struct NotificationDetailSheet: View {
                 
                 // Dismiss button
                 Button(action: { dismiss() }) {
-                    Text("Done")
-                        .font(.system(size: 16, weight: .semibold))
+                    Text("done_button".localized)
+                        .font(AppTheme.Fonts.caption(size: 16))
                         .foregroundColor(AppTheme.Colors.mainBackground)
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)

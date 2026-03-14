@@ -1,7 +1,9 @@
 import SwiftUI
-import Combine
 
 /// Combined Dasha + Transit status strip - seamless design matching original carousel
+///
+/// BATTERY OPTIMIZATION: Replaced 60fps Timer.publish with SwiftUI-native animation.
+/// Core Animation handles the scrolling on the GPU instead of CPU-bound timer callbacks.
 struct CosmicStatusStrip: View {
     let currentDasha: String      // e.g., "Saturn-Saturn-Moon"
     let transits: [(planet: String, sign: String)]
@@ -30,11 +32,11 @@ struct CosmicStatusStrip: View {
         "sg": "♐\u{FE0E}", "sag": "♐\u{FE0E}", "cp": "♑\u{FE0E}", "cap": "♑\u{FE0E}", "aq": "♒\u{FE0E}", "pi": "♓\u{FE0E}"
     ]
     
-    // Auto-scroll state
+    // Auto-scroll state (GPU-driven animation, no timer)
     @State private var offsetX: CGFloat = 0
     @State private var contentWidth: CGFloat = 0
+    @State private var isAnimating = false
     private let speed: CGFloat = 0.5
-    private let timer = Timer.publish(every: 0.016, on: .main, in: .common).autoconnect()
     
     var body: some View {
         ZStack {
@@ -55,17 +57,15 @@ struct CosmicStatusStrip: View {
                 .background(
                     GeometryReader { contentGeo in
                         Color.clear.onAppear {
-                            contentWidth = (contentGeo.size.width - 120) / 3 // Exclude dasha width
+                            let measured = (contentGeo.size.width - 120) / 3
+                            if measured > 0 && !isAnimating {
+                                contentWidth = measured
+                                startScrollAnimation()
+                            }
                         }
                     }
                 )
                 .offset(x: offsetX)
-                .onReceive(timer) { _ in
-                    offsetX -= speed
-                    if contentWidth > 0 && abs(offsetX) >= contentWidth {
-                        offsetX += contentWidth
-                    }
-                }
             }
             .mask(RoundedRectangle(cornerRadius: 12))
             
@@ -83,6 +83,19 @@ struct CosmicStatusStrip: View {
             .allowsHitTesting(false)
         }
         .frame(height: 90) // Compact height
+    }
+    
+    // MARK: - Scroll Animation (replaces 60fps timer)
+    /// Uses recursive withAnimation for seamless marquee loop
+    private func startScrollAnimation() {
+        guard contentWidth > 0 else { return }
+        isAnimating = true
+        // Duration based on content width and speed (speed = pixels per 16ms tick)
+        let duration = Double(contentWidth) / (Double(speed) / 0.016)
+        offsetX = 0
+        withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+            offsetX = -contentWidth
+        }
     }
     
     // MARK: - Dasha Badge (Static on left)

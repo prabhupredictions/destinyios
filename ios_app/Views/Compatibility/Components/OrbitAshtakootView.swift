@@ -226,8 +226,8 @@ struct OrbitAshtakootView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
-                Text("Description not available")
-                    .font(AppTheme.Fonts.caption(size: 12))
+                Text("description_not_available".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .italic()
                     .foregroundColor(AppTheme.Colors.textTertiary)
             }

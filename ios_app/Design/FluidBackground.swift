@@ -10,11 +10,14 @@ import SwiftUI
 
 // MARK: - Liquid Gold Fluid Background
 /// A premium animated fluid background using Canvas API
+///
+/// BATTERY OPTIMIZATION: Added scenePhase awareness to pause when app is backgrounded.
 struct LiquidGoldBackground: View {
     @State private var phase: Double = 0
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
-        TimelineView(.animation) { timeline in
+        TimelineView(.animation(paused: scenePhase != .active)) { timeline in
             let time = timeline.date.timeIntervalSinceReferenceDate
             
             Canvas { context, size in

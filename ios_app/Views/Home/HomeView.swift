@@ -124,8 +124,8 @@ struct HomeView: View {
                             // 4. Current Dasha (Tappable → sends to chat)
                             if let dasha = viewModel.dashaInsight {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text("Current Dasha")
-                                        .font(AppTheme.Fonts.premiumDisplay(size: 18))
+                                    Text("current_dasha".localized)
+                                        .font(AppTheme.Fonts.caption(size: 11))
                                         .goldGradient()
                                     
                                     Button(action: {
@@ -490,7 +490,7 @@ struct HomeView: View {
                         .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
                         .padding(.top, 4)
                     
-                    Text("ASC")
+                    Text("asc_label".localized)
                         .font(.system(size: 8, weight: .black))
                         .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
                     
@@ -659,7 +659,7 @@ struct HomeView: View {
                 Image(systemName: "hand.tap.fill")
                     .font(.system(size: 11))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                Text("Tap to explore your day")
+                Text("tap_to_explore_day".localized)
                     .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.8))
                     .italic()
@@ -898,13 +898,9 @@ struct LifeAreaLuxuryTile: View {
     HomeView()
 }
 
-/// Standalone Quick Question Card with animated golden shimmer border
-/// Uses same @State animation pattern as DashaInsightCard for reliable shimmer
+/// Standalone Quick Question Card — battery-optimized (static border, no pulse)
 struct QuickQuestionCard: View {
     let question: String
-    
-    @State private var shimmerAngle: Double = 0
-    @State private var arrowScale: CGFloat = 1.0
     
     var body: some View {
         HStack(spacing: 10) {
@@ -920,7 +916,7 @@ struct QuickQuestionCard: View {
             
             Spacer(minLength: 0)
             
-            // Animated Arrow CTA with pulse scale
+            // Arrow CTA (static — pulse removed for battery optimization)
             Image(systemName: "arrow.forward.circle.fill")
                 .font(.system(size: 16))
                 .foregroundStyle(
@@ -930,12 +926,6 @@ struct QuickQuestionCard: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .scaleEffect(arrowScale)
-                .onAppear {
-                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                        arrowScale = 1.15
-                    }
-                }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
@@ -956,27 +946,10 @@ struct QuickQuestionCard: View {
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(
-                    AngularGradient(
-                        gradient: Gradient(stops: [
-                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.0),
-                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.15),
-                            .init(color: AppTheme.Colors.goldLight.opacity(0.9), location: 0.2),
-                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.25),
-                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.4),
-                            .init(color: AppTheme.Colors.gold.opacity(0.05), location: 1.0)
-                        ]),
-                        center: .center,
-                        startAngle: .degrees(shimmerAngle),
-                        endAngle: .degrees(shimmerAngle + 360)
-                    ),
-                    lineWidth: 1.5
+                    AppTheme.Colors.gold.opacity(0.25),
+                    lineWidth: 1
                 )
         )
         .shadow(color: AppTheme.Colors.gold.opacity(0.06), radius: 6, x: 0, y: 3)
-        .onAppear {
-            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
-                shimmerAngle = 360
-            }
-        }
     }
 }

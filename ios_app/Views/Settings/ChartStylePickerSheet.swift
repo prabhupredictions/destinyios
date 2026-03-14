@@ -19,11 +19,11 @@ struct ChartStylePickerSheet: View {
                         } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("North Indian Style")
+                                    Text("north_indian_style".localized)
                                         .foregroundColor(AppTheme.Colors.textPrimary)
-                                        .font(AppTheme.Fonts.body(size: 16))
-                                    Text("Diamond layout, houses fixed, signs rotate")
-                                        .font(AppTheme.Fonts.caption(size: 12))
+                                        .font(AppTheme.Fonts.body(size: 16).weight(.semibold))
+                                    Text("north_indian_desc".localized)
+                                        .font(AppTheme.Fonts.caption(size: 13))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
                                 
@@ -45,11 +45,11 @@ struct ChartStylePickerSheet: View {
                         } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("South Indian Style")
+                                    Text("south_indian_style".localized)
                                         .foregroundColor(AppTheme.Colors.textPrimary)
-                                        .font(AppTheme.Fonts.body(size: 16))
-                                    Text("Grid layout, signs fixed, houses rotate")
-                                        .font(AppTheme.Fonts.caption(size: 12))
+                                        .font(AppTheme.Fonts.body(size: 16).weight(.semibold))
+                                    Text("south_indian_desc".localized)
+                                        .font(AppTheme.Fonts.caption(size: 13))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
                                 
@@ -64,12 +64,12 @@ struct ChartStylePickerSheet: View {
                         }
                         .listRowBackground(AppTheme.Colors.cardBackground)
                     } header: {
-                        Text("Select Chart Style")
-                            .font(AppTheme.Fonts.title(size: 14))
+                        Text("select_chart_style".localized)
+                            .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.gold)
                     } footer: {
-                        Text("This affects how birth charts are displayed in compatibility analysis.")
-                            .font(AppTheme.Fonts.caption(size: 12))
+                        Text("chart_style_note".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }

@@ -14,7 +14,7 @@ struct ThinkingProgressView: View {
                 // Animated thinking indicator
                 LoadingDots()
                 
-                Text("Analyzing your chart...")
+                Text("analyzing_chart".localized)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(Color("NavyPrimary").opacity(0.7))
             }

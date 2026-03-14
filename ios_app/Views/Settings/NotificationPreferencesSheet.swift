@@ -60,8 +60,8 @@ struct NotificationPreferencesSheet: View {
                                         Image(systemName: "bell.slash")
                                             .font(.system(size: 28))
                                             .foregroundColor(AppTheme.Colors.textTertiary)
-                                        Text("No alerts yet")
-                                            .font(AppTheme.Fonts.body(size: 14))
+                                        Text("no_alerts_yet".localized)
+                                            .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                                             .foregroundColor(AppTheme.Colors.textTertiary)
                                         Text("Add your first personalized alert below")
                                             .font(AppTheme.Fonts.caption(size: 12))
@@ -99,8 +99,8 @@ struct NotificationPreferencesSheet: View {
                                 HStack(spacing: 6) {
                                     Image(systemName: "info.circle")
                                         .font(.system(size: 12))
-                                    Text("Maximum 5 alerts reached")
-                                        .font(AppTheme.Fonts.caption(size: 12))
+                                    Text("max_alerts_reached".localized)
+                                        .font(AppTheme.Fonts.caption(size: 13))
                                 }
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                                 .frame(maxWidth: .infinity)
@@ -371,8 +371,8 @@ struct NotificationPreferencesSheet: View {
                     .frame(width: 24)
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Push notifications")
-                        .font(AppTheme.Fonts.body(size: 16))
+                    Text("push_notifications".localized)
+                        .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     if !iOSNotificationsAuthorized {
@@ -557,10 +557,10 @@ struct AddEditAlertSheet: View {
                         if !isEditing {
                             VStack(alignment: .leading, spacing: 8) {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Suggestions")
-                                        .font(AppTheme.Fonts.title(size: 14))
+                                    Text("suggestions_label".localized)
+                                        .font(AppTheme.Fonts.caption(size: 13).weight(.medium))
                                         .foregroundColor(AppTheme.Colors.gold)
-                                    Text("Tap to add")
+                                    Text("tap_to_add".localized)
                                         .font(AppTheme.Fonts.caption(size: 12))
                                         .foregroundColor(AppTheme.Colors.textTertiary)
                                 }

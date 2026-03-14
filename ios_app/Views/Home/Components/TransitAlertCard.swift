@@ -17,7 +17,7 @@ struct TransitAlertCard: View {
                         .font(.system(size: 10))
                         .foregroundColor(AppTheme.Colors.gold)
                     
-                    Text("Cosmic Shifts")
+                    Text("cosmic_shifts".localized)
                         .font(AppTheme.Fonts.caption(size: 11))
                         .fontWeight(.bold)
                         .foregroundColor(AppTheme.Colors.gold)
@@ -33,7 +33,7 @@ struct TransitAlertCard: View {
                             HStack(spacing: 6) {
                                 Text(transit.planet)
                                     .fontWeight(.semibold)
-                                Text("in")
+                                Text("transit_in".localized)
                                     .fontWeight(.light)
                                 Text(transit.sign)
                                     .fontWeight(.medium)

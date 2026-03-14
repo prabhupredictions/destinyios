@@ -28,13 +28,13 @@ struct SubscriptionView: View {
                         ProgressView("Loading plans...")
                             .padding(.vertical, 40)
                     } else if plans.isEmpty {
-                        Text("No plans available")
+                        Text("no_plans_available".localized)
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .padding(.vertical, 40)
                     } else {
                         // Subheader
-                        Text("Upgrade to keep going and unlock unlimited access")
-                            .font(AppTheme.Fonts.body(size: 15))
+                        Text("upgrade_to_keep_going".localized)
+                            .font(AppTheme.Fonts.body(size: 16))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 16)
@@ -100,7 +100,7 @@ struct SubscriptionView: View {
                     dismiss()
                 }
             } message: {
-                Text("Your subscription is now active. Enjoy your premium features!")
+                Text("subscription_active_message".localized)
             }
             .task {
                 await loadPlans()
@@ -194,8 +194,8 @@ struct SubscriptionView: View {
                 HStack {
                     Image(systemName: showDestinyMatchingInfo ? "chevron.up" : "chevron.down")
                         .font(AppTheme.Fonts.title(size: 14))
-                    Text("What is Destiny Matching™?")
-                        .font(AppTheme.Fonts.body(size: 15))
+                    Text("what_is_destiny_matching".localized)
+                        .font(AppTheme.Fonts.title(size: 18))
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(AppTheme.Fonts.body(size: 14))
@@ -205,15 +205,15 @@ struct SubscriptionView: View {
             
             if showDestinyMatchingInfo {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Destiny Matching™ looks beyond surface-level compatibility.")
+                    Text("destiny_matching_desc_1".localized)
+                        .font(AppTheme.Fonts.body(size: 15).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                    
+                    Text("destiny_matching_desc_2".localized)
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                     
-                    Text("While many astrology apps focus on pointing out mismatches, Destiny examines how two charts interact, where differences show up, and how alignment can be found even when things feel misaligned.")
-                        .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                    
-                    Text("It uses astrology to help you understand and navigate relationships in context, not simply label them as good or bad.")
+                    Text("destiny_matching_desc_3".localized)
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -245,8 +245,8 @@ struct SubscriptionView: View {
     // MARK: - Footer Disclaimers
     private var footerDisclaimers: some View {
         VStack(spacing: 8) {
-            Text("Subscription automatically renews unless canceled at least 24 hours before the end of the current period.")
-                .font(AppTheme.Fonts.caption(size: 11))
+            Text("subscription_auto_renew".localized)
+                .font(AppTheme.Fonts.caption(size: 12))
                 .foregroundColor(AppTheme.Colors.textTertiary)
                 .multilineTextAlignment(.center)
             
@@ -389,8 +389,8 @@ struct PlanCardWithFeatures: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text("Current")
-                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("current_plan".localized)
+                                    .font(AppTheme.Fonts.caption(size: 10).weight(.heavy))
                             }
                             .foregroundColor(AppTheme.Colors.mainBackground)
                             .padding(.horizontal, 8)
@@ -406,8 +406,8 @@ struct PlanCardWithFeatures: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "clock.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text("Scheduled")
-                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("scheduled_plan".localized)
+                                    .font(AppTheme.Fonts.caption(size: 10).weight(.heavy))
                             }
                             .foregroundColor(AppTheme.Colors.mainBackground)
                             .padding(.horizontal, 8)
@@ -439,16 +439,16 @@ struct PlanCardWithFeatures: View {
                             .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     }
-                    Text("/ month")
-                        .font(AppTheme.Fonts.caption(size: 12))
+                    Text("per_month".localized)
+                        .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
             
             // For Plus: "Everything in Core, plus:" header
             if isPlus {
-                Text("Everything in Core, plus:")
-                    .font(AppTheme.Fonts.title(size: 15))
+                Text("everything_in_core_plus".localized)
+                    .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
                     .foregroundColor(AppTheme.Colors.gold)
                     .padding(.top, 4)
             }
@@ -559,8 +559,8 @@ struct FeatureItemRow: View {
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     if isComingSoon {
-                        Text("(coming soon)")
-                            .font(AppTheme.Fonts.caption(size: 12))
+                        Text("coming_soon".localized)
+                            .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }

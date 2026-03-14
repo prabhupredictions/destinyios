@@ -119,8 +119,8 @@ struct ChartComparisonSheet: View {
                     ascendant: boyAscendant
                 )
             } else {
-                Text("Boy chart data not available")
-                    .foregroundColor(.gray)
+                Text("boy_chart_not_available".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .font(.caption)
             }
             
@@ -133,8 +133,8 @@ struct ChartComparisonSheet: View {
                     ascendant: girlAscendant
                 )
             } else {
-                Text("Girl chart data not available")
-                    .foregroundColor(.gray)
+                Text("girl_chart_not_available".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .font(.caption)
             }
         }
@@ -212,8 +212,8 @@ struct ChartComparisonSheet: View {
             // Planet Detail Cards (3x3 grid) - only for D1
             if chartType == .d1 {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Planet Details")
-                        .font(AppTheme.Fonts.title(size: 12))
+                    Text("planet_details".localized)
+                        .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.9))
                         .padding(.horizontal, 4)
                     

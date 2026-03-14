@@ -657,7 +657,7 @@ struct PremiumTypingIndicator: View {
                 
                 // Typing label + dots
                 HStack(spacing: 4) {
-                    Text("Analyzing")
+                    Text("analyzing_label".localized)
                         .font(AppTheme.Fonts.body(size: 13))
                         .fontWeight(.medium)
                         .foregroundColor(AppTheme.Colors.textSecondary)

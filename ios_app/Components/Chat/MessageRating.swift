@@ -22,7 +22,7 @@ struct MessageRating: View {
                 thankYouView
             } else {
                 // Rating prompt
-                Text("Rate this response")
+                Text("rate_this_response".localized)
                     .font(.system(size: 11))
                     .foregroundColor(Color("NavyPrimary").opacity(0.5))
                 
@@ -69,7 +69,7 @@ struct MessageRating: View {
                 .font(.system(size: 12))
                 .foregroundColor(.green)
             
-            Text("Thanks for your feedback!")
+            Text("thanks_for_feedback".localized)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundColor(Color("NavyPrimary").opacity(0.6))
             

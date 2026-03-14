@@ -215,9 +215,9 @@ struct CompatibilityView: View {
             if viewModel.historyLoadedToast {
                 HStack(spacing: 8) {
                     Image(systemName: "clock.arrow.circlepath")
-                    Text("Loaded from history")
+                    Text("loaded_from_history".localized)
+                        .font(AppTheme.Fonts.caption(size: 13))
                 }
-                .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(.white)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 10)
@@ -655,8 +655,8 @@ struct CompatibilityView: View {
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
                     ZStack(alignment: .leading) {
                         if viewModel.girlName.isEmpty {
-                            Text("Partner Name")
-                                .font(AppTheme.Fonts.body(size: 13))
+                            Text("partner_name_placeholder".localized)
+                                .font(AppTheme.Fonts.body(size: 16))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                         TextField("", text: $viewModel.girlName)

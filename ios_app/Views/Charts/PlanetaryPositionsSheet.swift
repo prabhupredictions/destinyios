@@ -34,8 +34,8 @@ struct PlanetaryPositionsSheet: View {
                         Image(systemName: "exclamationmark.triangle")
                             .font(AppTheme.Fonts.display(size: 40))
                             .foregroundColor(.red.opacity(0.8))
-                        Text("Failed to load chart")
-                            .font(.headline)
+                        Text("failed_to_load_chart".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(.white)
                         Text(error)
                             .font(.caption)
@@ -145,7 +145,7 @@ struct PlanetaryPositionsSheet: View {
         
         return VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Planetary Positions")
+                Text("planetary_positions".localized)
                     .font(AppTheme.Fonts.title(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()

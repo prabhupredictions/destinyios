@@ -1,6 +1,6 @@
 /* 
-  Localizable.strings (French)
-  Destiny AI Astrology - Français
+  Localizable.strings (English)
+  Destiny AI Astrology
 */
 
 // MARK: - Common
@@ -44,6 +44,8 @@
 "support" = "Aide";
 "help_faq" = "Aide & FAQ";
 "sign_out" = "Se déconnecter";
+"sign_out_message" = "Vous serez déconnecté. Vos données seront enregistrées lorsque vous vous reconnecterez.";
+"sign_out_guest_message" = "En tant qu'invité, vos données de naissance seront supprimées. Connectez-vous avec Apple ou Google pour enregistrer vos données.";
 
 // MARK: - Astrology Settings
 "ayanamsa" = "Ayanamsa";
@@ -100,6 +102,9 @@
 // MARK: - Compatibility/Match
 "compatibility" = "Compatibilité";
 "partner_details" = "Infos partenaire";
+"your_details" = "Vos coordonnées";
+"loaded_from_profile" = "Chargé depuis le profil";
+"or_enter_manually" = "ou entrez manuellement";
 "calculate_match" = "Calculer";
 "match_score" = "Score";
 "boys_details" = "Toi";
@@ -122,6 +127,7 @@
 // MARK: - Birth Data Entry
 "create_birth_chart" = "Crée ton thème astral";
 "enter_details_desc" = "Entre tes données de naissance\npour des prédictions personnalisées";
+"enter_details_desc_compatibility" = "Entrez les détails du partenaire pour explorer la compatibilité des relations et du mariage";
 
 // MARK: - Subscription
 "unlock_premium" = "Obtenir Destiny Premium";
@@ -132,15 +138,15 @@
 
 // MARK: - Splash
 "aligning_stars" = "Les étoiles s'alignent...";
-"destiny_app_title" = "DESTINY";
-"ai_astrology_subtitle" = "ASTROLOGIE IA";
-"worlds_advanced_ai" = "L'ASTROLOGUE IA LE PLUS AVANCÉ AU MONDE";
 
-// MARK: - Chat & History
+// MARK: - Chat
 "suggested_questions" = "Questions suggérées";
 "no_chat_history" = "Pas encore de discussions";
+
+// MARK: - History
 "no_conversations" = "Pas encore de conversations";
 "start_asking" = "Pose ta première question\net ton historique apparaîtra ici.";
+"compatibility_match_subtitle" = "Correspondance de compatibilité";
 
 // MARK: - Charts
 "ascendant" = "Ascendant";
@@ -159,6 +165,7 @@
 "birth_city" = "Ville de naissance";
 "select_date" = "Choisir la date";
 "select_time" = "Choisir l'heure";
+"select_gender" = "Sélectionnez le sexe";
 "partner_birth_time_unknown" = "Je ne connais pas l'heure de naissance";
 "birth_time_warning" = "Note: Les résultats peuvent être moins précis sans l'heure exacte";
 
@@ -171,6 +178,13 @@
 "continue_with_google" = "Continuer avec Google";
 "continue_with_email" = "Continuer par e-mail";
 "i_dont_know_birth_time" = "Je ne connais pas mon heure de naissance";
+
+// MARK: - Splash
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "ASTROLOGIE IA";
+"worlds_advanced_ai" = "L'ASTROLOGUE IA LE PLUS AVANCÉ AU MONDE";
+
+// MARK: - Onboarding
 "questions_asked" = "questions posées";
 
 // MARK: - Birth Details View
@@ -190,11 +204,15 @@
 "kundali_match" = "Chart Match";
 "ashtakoot_analysis" = "Birth Chart Compatibility";
 "out_of" = "sur";
-"compatible" = "compatible";
+"compatible" = "Compatible";
 "excellent_match" = "Excellente Compatibilité";
 "good_match" = "Bonne Compatibilité";
 "moderate_match" = "Compatibilité Modérée";
+
+// Partner Cards
 "vs" = "VS";
+
+// Kuta Grid
 "ashtakoot_grid" = "Détails Ashtakoot";
 "varna" = "Varna";
 "vashya" = "Vashya";
@@ -204,6 +222,8 @@
 "gana" = "Gana";
 "bhakoot" = "Bhakoot";
 "nadi" = "Nadi";
+
+// View Full Report
 "view_full_report" = "Voir le Rapport Complet";
 "full_compatibility_report" = "Rapport Complet de Compatibilité";
 "points" = "Points";
@@ -215,10 +235,15 @@
 "good" = "Bon";
 "moderate" = "Modéré";
 "needs_care" = "Attention Requise";
+
 "mangal_dosha_status" = "Statut Mangal Dosha";
 "no_dosha" = "Pas de Dosha";
 "has_dosha" = "A un Dosha";
+
+// Remedies
 "recommended_remedies" = "Remèdes Recommandés";
+
+// Ask Destiny
 "ask_destiny" = "Demander à Destiny";
 "ask_destiny_about_match" = "Demande à Destiny à propos de cette compatibilité";
 "ai_powered" = "Alimenté par IA";
@@ -229,21 +254,21 @@
 "ask_dosha" = "Dosha";
 "ask_weak" = "Faiblesses";
 "ask_remedies" = "Remèdes";
+
+// Match Result Actions
 "new_match" = "Nouvelle Compatibilité";
-
-
-
-// Match Result Additions
-"ask_more_match" = "En savoir plus sur ce match...";
-"mangal_dosha" = "Mangal Dosha";
-"mangal_dosha_desc" = "Analyse de la position de Mars";
-"kalsarpa_dosha" = "Kalsarpa Dosha";
-"kalsarpa_dosha_desc" = "Analyse de l'axe Rahu-Ketu";
-"additional_yoga" = "Yoga & Dosha Supplémentaire";
-"additional_yoga_desc" = "Autres combinaisons auspicieuses";
 "charts" = "Thèmes";
 "history" = "Historique";
 "report" = "Rapport";
+"ask_more_match" = "En savoir plus sur ce match...";
+
+// Dosha & Yoga
+"mangal_dosha" = "Mangal Dosha";
+"mangal_dosha_desc" = "Analyse de la position de Mars";
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"kalsarpa_dosha_desc" = "Analyse de l'axe Rahu-Ketu";
+"additional_yoga" = "Yoga & Dosha Supplémentaire";
+"additional_yoga_desc" = "Autres combinaisons auspicieuses";
 
 "exception_mars_in_own_sign" = "Mars est dans son propre signe (Bélier ou Scorpion)";
 "exception_mars_exalted" = "Mars est exalté en Capricorne";
@@ -268,7 +293,7 @@
 "exception_mars_strong_shadbala" = "Mars a un Shadbala fort";
 "exception_moon_strong" = "Lune forte dans le thème";
 
-// MARK: - Intensity Factors (French)
+// MARK: - Intensity Factors
 "intensity_mars_debilitated" = "Mars affaibli en Cancer";
 "intensity_mars_conjunct_malefics" = "Mars conjoint avec des maléfiques";
 "intensity_mars_critical_degrees" = "Mars aux degrés critiques Gandanta";
@@ -279,7 +304,7 @@
 "intensity_mars_combust" = "Mars est en combustion (trop proche du Soleil)";
 "intensity_mars_low_ashtakavarga" = "Mars avec un Ashtakavarga faible";
 
-// MARK: - Zodiac Signs (French)
+// MARK: - Zodiac Signs
 "sign_ar" = "Bélier";
 "sign_ta" = "Taureau";
 "sign_ge" = "Gémeaux";
@@ -293,7 +318,7 @@
 "sign_aq" = "Verseau";
 "sign_pi" = "Poissons";
 
-// MARK: - Planets (French)
+// MARK: - Planets
 "planet_sun" = "Soleil";
 "planet_moon" = "Lune";
 "planet_mars" = "Mars";
@@ -304,12 +329,14 @@
 "planet_rahu" = "Rahu";
 "planet_ketu" = "Ketu";
 
-// MARK: - Severity/Status (French)
+// MARK: - Severity Levels
 "severity_none" = "Aucun";
 "severity_mild" = "Léger";
 "severity_moderate" = "Modéré";
 "severity_high" = "Élevé";
 "severity_severe" = "Sévère";
+
+// MARK: - Status Labels
 "status_active" = "Actif";
 "status_reduced" = "Réduit";
 "status_cancelled" = "Annulé";
@@ -335,7 +362,7 @@
 "formation_details" = "Détails de Formation";
 "strength" = "Force";
 
-// MARK: - Nakshatra Names (27) - French (Sanskrit names kept)
+// MARK: - Nakshatra Names (27)
 "nakshatra_ashwini" = "Ashwini";
 "nakshatra_bharani" = "Bharani";
 "nakshatra_krittika" = "Krittika";
@@ -364,7 +391,7 @@
 "nakshatra_uttara_bhadrapada" = "Uttara Bhadrapada";
 "nakshatra_revati" = "Revati";
 
-// MARK: - New Exception Keys (8) - French
+// MARK: - New Exception Keys (8)
 "exception_mars_yoga_karaka" = "Mars est Yoga Karaka pour cet Ascendant";
 "exception_mars_jupiter_yoga" = "Yoga bénéfique Mars-Jupiter présent";
 "exception_mars_venus_yoga" = "Yoga bénéfique Mars-Vénus présent";
@@ -377,9 +404,8 @@
 "exception_mars_strong_vimsopaka" = "Mars a un Vimsopaka Bala fort";
 "exception_chandra_mangala_yoga" = "Chandra Mangala Yoga (yoga de prospérité Mars-Lune) présent";
 "exception_mars_good_d24" = "Mars bien placé dans le thème D24 (Chaturvimsamsa)";
-"exception_moon_strong" = "Lune forte dans le thème";
 
-// MARK: - Mars Position UI Labels (10) - French
+// MARK: - Mars Position UI Labels (10)
 "mars_position" = "Position de Mars";
 "house_label" = "Maison";
 "sign_lord" = "Maître du Signe";
@@ -396,21 +422,83 @@
 "beneficial" = "Beneficial";
 "challenging" = "Challenging";
 "recommendations" = "Recommendations";
-"present" = "Present";
+"present" = "Présent";
 "absent" = "Absent";
 "no_data" = "No Data";
 "dosha_cancelled" = "Dosha Cancelled";
 
 // MARK: - Kala Sarpa Premium UI
-"kalsarpa_dosha" = "Kalsarpa Yoga";
 "dosha_details" = "Yoga Details";
 "rahu_ketu_axis" = "Rahu-Ketu Axis";
 "planets" = "Planets";
-"analysis_notes" = "Analysis Notes";
-"no_kalsarpa_data" = "No Kalsarpa data available";
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+
+/* Streaming Progress */
+"processing" = "Traitement...";
+"analyzing_match" = "Analyse de la compatibilité";
+
+// MARK: - Mitigation Fallback
+"factors_reduce_severity" = "les facteurs réduisent la gravité du dosha";
+"factors_increase_severity" = "les facteurs augmentent la gravité du dosha";
+
+// MARK: - Life Areas
+"career" = "Carrière";
+"education" = "Éducation";
+"finance" = "Finance";
+"family" = "Famille";
+"health" = "Santé";
+"relationship" = "Relation";
+"investment" = "Investissement";
+"sudden_events" = "Événements soudains";
+
+// MARK: - Network Status
+"offline_mode" = "Vous êtes hors ligne";
+
+// MARK: - Profile Setup
+"setting_up_profile" = "Configuration de votre profil";
+"cosmic_alignment" = "Aligner le cosmos rien que pour vous...";
+
+// Partner Profile Manager
+"select_saved_partner" = "Sélectionnez un partenaire enregistré";
+"saved_partners" = "Partenaires enregistrés";
+"add_partner" = "Ajouter un partenaire";
+"edit_partner" = "Modifier le partenaire";
+"no_saved_partners" = "Aucun partenaire enregistré";
+"save_partner_description" = "Enregistrez les profils de partenaires pour une correspondance rapide";
+"save_for_future" = "Enregistrer pour une correspondance future";
+"save_birth_chart" = "Enregistrer le thème de naissance";
+
+// MARK: - Multi-Partner Comparison
+"comparison_results" = "Résultats de comparaison";
+"partners_compared" = "partenaires comparés";
+"comparing_with" = "En comparant avec";
+"compare_all" = "Comparer tout";
+"remove_partner" = "Supprimer le partenaire";
+
+"syncing_cosmic_data" = "Chargement des insights du jour…";
+"restoring_your_insights" = "Restaurer vos connaissances";
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "Connexion requise";
+"sign_in_to_check_compatibility" = "Connectez-vous pour vérifier la compatibilité";
+"sign_in_to_continue_asking" = "Connectez-vous pour continuer à poser des questions";
+"sign_in_to_continue_matching" = "Connectez-vous pour débloquer la compatibilité";
+"sign_in_to_view_plans" = "Connectez-vous pour voir les plans d'abonnement";
+"sign_in_to_switch_profiles" = "Connectez-vous pour basculer entre les profils";
+"sign_in_to_save_profiles" = "Connectez-vous pour enregistrer et gérer les profils";
+"create_account_to_continue" = "Créez un compte pour continuer et sauvegarder votre progression";
+"free_limit_reached" = "Créez un compte pour continuer et sauvegarder votre progression";
+"birth_data_registered" = "Ces données de naissance sont déjà enregistrées. Veuillez vous connecter pour continuer.";
+"age_requirement" = "Vous devez avoir au moins 13 ans pour créer un compte";
+"back" = "Retour";
+
+// MARK: - Match History
+"no_match_history" = "L'historique de vos matchs apparaîtra ici";
+"no_match_history_desc" = "Calculez la compatibilité avec les partenaires pour construire votre historique";
 
 // MARK: - Birth Chart Protection
 "profile_protected_title" = "Profil protégé";
@@ -434,9 +522,6 @@
 
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "Un thème natal avec des détails similaires existe déjà. Chaque personne ne peut avoir qu'un seul thème. Pour assistance, contactez support@destinyaiastrology.com.";
-
-
-"syncing_cosmic_data" = "Chargement des insights du jour…";
 
 // ════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════════
@@ -473,8 +558,10 @@
 // [+] Yukthi Samanwithavagmi (155)
 // Total yoga entries: 284
 
-// === Missing yoga entries (copied from English) ===
-// === Missing yoga entries (copied from English) ===
+// MARK: - Kala Sarpa/Amrita Variants
+// [−] Kala Sarpa Dosha
+// Additional Kala Sarpa variants
+// [+] Bandhu Pujya 194
 "kalsarpa_divine_protection_title" = "Divine Protection";
 "kalsarpa_divine_protection_message" = "Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.";
 "kalsarpa_relationship_benefits" = "Relationship Benefits";
@@ -488,6 +575,7 @@
 "kalsarpa_dosha_samya" = "Dosha Samya Detected";
 "kalsarpa_mutual_message" = "Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.";
 "kalsarpa_remedies_for" = "Remedies for %@";
+
 "mangal_mutual_cancellation" = "Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.";
 "mangal_exceptions_title" = "%@'s exceptions:";
 
@@ -1887,29 +1975,22 @@
 "marriage_recommended" = "Mariage Recommandé";
 "not_recommended" = "Non Recommandé";
 "doshas" = "Doshas";
-"cancelled" = "Annulé";
-"active" = "Actif";
 "recommended" = "Recommandé";
 "not_rec" = "Non Rec";
 "best_match" = "Meilleur";
-"score" = "Score";
-"excellent" = "Excellent";
 "very_good" = "Très Bon";
-"good" = "Bon";
 "average" = "Moyen";
 "below_average" = "En Dessous de la Moyenne";
 "not_recommended_category" = "Non Recommandé";
 "ashtakoot_score" = "Score Ashtakoot";
-"mangal_dosha" = "Mangal Dosha";
 "nadi_dosha" = "Nadi Dosha";
 "bhakoot_dosha" = "Bhakoot Dosha";
 "today_cosmic_vibe" = "Vibration Cosmique du Jour";
 "current_dasha" = "Dasha Actuelle";
-"severity_mild" = "Léger";
-"severity_moderate" = "Modéré";
-"severity_high" = "Élevé";
-"severity_severe" = "Sévère";
-"severity_none" = "Aucun";
+"how_is_my_day" = "Comment se passe ma journée aujourd'hui ?";
+"whats_in_my_mind" = "Qu'est-ce que j'ai en tête ?";
+
+// MARK: - Backend Value Translations (Severity, Category, etc.)
 "category_excellent" = "Excellent";
 "category_very_good" = "Très Bon";
 "category_good" = "Bon";
@@ -1918,9 +1999,6 @@
 "category_not_recommended" = "Non Recommandé";
 "category_difficult" = "Difficile";
 "category_challenging" = "Difficile";
-"present" = "Présent";
-"absent" = "Absent";
-"compatible" = "Compatible";
 "needs_remedies" = "Remèdes Nécessaires";
 "critical" = "Critique";
 "analysis_failed_for" = "Analyse échouée pour";
@@ -1930,18 +2008,242 @@
 "check_connection" = "Vérifiez votre connexion.";
 "no_results" = "Aucun résultat reçu. Veuillez réessayer.";
 
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Home Screen — Section Headers & Labels
+// ════════════════════════════════════════════════════════════════════════════
 
-// MARK: - Guest Sign-In Prompts
-"sign_in_required" = "Connexion requise";
-"sign_in_to_check_compatibility" = "Connectez-vous pour vérifier la compatibilité";
-"sign_in_to_continue_asking" = "Connectez-vous pour continuer à poser des questions";
-"sign_in_to_continue_matching" = "Connectez-vous pour débloquer la compatibilité";
-"sign_in_to_view_plans" = "Connectez-vous pour voir les plans d'abonnement";
-"sign_in_to_switch_profiles" = "Connectez-vous pour basculer entre les profils";
-"sign_in_to_save_profiles" = "Connectez-vous pour enregistrer et gérer les profils";
-"create_account_to_continue" = "Créez un compte pour continuer et sauvegarder votre progression";
-"free_limit_reached" = "Créez un compte pour continuer et sauvegarder votre progression";
-"birth_data_registered" = "Ces données de naissance sont déjà enregistrées. Veuillez vous connecter pour continuer.";
-"age_requirement" = "Vous devez avoir au moins 13 ans pour créer un compte";
-    "back" = "Retour";
+"asc_label" = "ASC";
+"tap_to_explore_day" = "Appuyez pour explorer votre journée";
+"current_transits" = "Transits actuels";
+"current_phase" = "Phase actuelle";
+"next_label" = "Suivant";
+"dosha_insights" = "Aperçu des doshas";
+"cosmic_shifts" = "Changements cosmiques";
+"transit_in" = "dans";
+"planets_label" = "PLANÈTES";
+"houses_label" = "MAISONS";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat — Status & Feedback
+// ════════════════════════════════════════════════════════════════════════════
+
+"chat_welcome_subtitle" = "Votre guide d'astrologie personnel. Renseignez-vous sur votre journée, vos relations, votre carrière ou votre chemin à parcourir.";
+"thinking" = "Pensée...";
+"analyzing_chart" = "Analyse de votre graphique...";
+"analyzing_label" = "Analyser";
+"rate_this_response" = "Notez cette réponse";
+"thanks_for_feedback" = "Merci pour vos commentaires !";
+"history_turned_off" = "L'historique est désactivé";
+"conversations_not_saved" = "Vos conversations ne sont pas enregistrées.";
+"open_settings" = "Ouvrir les paramètres";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Compatibility — Comparison & Details
+// ════════════════════════════════════════════════════════════════════════════
+
+"loaded_from_history" = "Chargé depuis l'historique";
+"partner_name_placeholder" = "Nom du partenaire";
+"no_results_found" = "Aucun résultat trouvé";
+"match_results_not_saved" = "Les résultats de votre match ne sont pas enregistrés.";
+"after_dosha_cancellation" = "*Après l'annulation du dosha";
+"save_to_files" = "Enregistrer dans des fichiers";
+"no_adjustment" = "Aucun ajustement";
+"view_details" = "Afficher les détails";
+"area_label" = "Zone";
+"actual_label" = "Réel";
+"adjusted_label" = "Ajusté";
+"manglik_label" = "Manglik";
+"none_label" = "Aucun";
+"view_label" = "Voir";
+"no_profiles_meet_threshold" = "Aucun des profils ne répond au seuil de compatibilité recommandé.";
+"review_individual_analyses" = "Consultez les analyses individuelles ci-dessous pour obtenir des informations détaillées.";
+"destiny_ai_astrology_brand" = "DESTIN IA ASTROLOGIE";
+"compatibility_comparison" = "COMPARAISON DE COMPATIBILITÉ";
+"copyright_notice" = "©2026 Destiny AI Astrologie · destinyaiastrology.com";
+"description_not_available" = "Description non disponible";
+"this_may_take_moments" = "Cela peut prendre quelques instants...";
+"pending_label" = "En attente";
+"overridden_due_to_dosha" = "Annulé en raison d'une incompatibilité dosha";
+"active_doshas" = "Doshas actifs :";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Profile — Settings, History & Account Management
+// ════════════════════════════════════════════════════════════════════════════
+
+"history_section" = "Histoire";
+"save_conversation_history" = "Enregistrer l'historique des conversations";
+"clear_history" = "Effacer l'historique";
+"remove_all_saved" = "Supprimer toutes les discussions et correspondances enregistrées";
+"history_off_warning" = "Les nouvelles discussions et correspondances ne seront pas enregistrées. Vous pouvez réactiver cette option à tout moment.";
+"clear_history_warning" = "Cela supprimera les discussions enregistrées et l'historique des matchs. Cela ne peut pas être annulé.";
+"manage_subscription" = "Gérer l'abonnement";
+"view_all_plans" = "Voir tous les forfaits";
+"destiny_ai_brand_name" = "Astrologie Destinée IA";
+"copyright_full" = "©2026 Destin IA. Tous droits réservés.";
+"delete_account" = "Supprimer le compte";
+"common_questions" = "Questions courantes";
+
+// Profile Switcher
+"loading_profiles" = "Chargement des profils...";
+"switch_birth_chart" = "Changer de thème de naissance";
+"no_profiles_found" = "Aucun profil trouvé";
+"add_partner_to_start" = "Ajoutez un profil de partenaire pour commencer";
+"manage_birth_charts" = "Gérer les thèmes de naissance";
+"you_label" = "YOU";
+"active_profile" = "Profil actif";
+
+// Delete Account
+"delete_your_account" = "Supprimer votre compte ?";
+"cancel_subscription_first" = "Veuillez annuler votre abonnement dans l'App Store avant de supprimer votre compte.";
+"type_delete_to_confirm" = "Tapez SUPPR pour confirmer";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - History View
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_history_yet" = "Pas encore d'historique";
+"chats_matches_appear_here" = "Vos discussions et correspondances apparaîtront ici.";
+"messages_label" = "Messages";
+"match_label" = "Correspondre";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Inbox
+// ════════════════════════════════════════════════════════════════════════════
+
+"notifications_title" = "Notifications";
+"loading_notifications" = "Chargement des notifications...";
+"no_notifications" = "Aucune notification";
+"no_notifications_desc" = "Nous vous ferons savoir quand il y aura quelque chose de nouveau";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Preferences (Settings)
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_alerts_yet" = "Aucune alerte pour l'instant";
+"add_first_alert" = "Ajoutez votre première alerte personnalisée ci-dessous";
+"add_new_alert" = "Ajouter une nouvelle préférence d'alerte";
+"max_alerts_reached" = "Maximum de 5 alertes atteintes";
+"alerts_saved" = "Alertes enregistrées";
+"remove_alert" = "Supprimer cette alerte ?";
+"push_notifications" = "Notifications poussées";
+"permission_required_ios" = "Autorisation requise dans les paramètres iOS";
+"enable_in_ios_settings" = "Activer dans Paramètres iOS → Applications → Destiny → Notifications";
+"what_alerts_about" = "Sur quoi souhaitez-vous recevoir des alertes ?";
+"alert_frequency" = "Fréquence d'alerte";
+"suggestions_label" = "Suggestions";
+"tap_to_add" = "Appuyez pour ajouter";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Subscription — Plans, Legal & Billing
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_plans_available" = "Aucun forfait disponible";
+"upgrade_to_keep_going" = "Mettez à niveau pour continuer et débloquer un accès illimité";
+"subscription_active_message" = "Votre abonnement est désormais actif. Profitez de vos fonctionnalités premium !";
+"what_is_destiny_matching" = "Qu'est-ce que Destiny Matching™ ?";
+"destiny_matching_desc_1" = "Destiny Matching™ va au-delà de la compatibilité au niveau de la surface.";
+"destiny_matching_desc_2" = "Alors que de nombreuses applications d'astrologie se concentrent sur la détection des discordances, Destiny examine comment deux cartes interagissent, où les différences apparaissent et comment l'alignement peut être trouvé même lorsque les choses semblent mal alignées.";
+"destiny_matching_desc_3" = "Il utilise l'astrologie pour vous aider à comprendre et à naviguer dans les relations dans leur contexte, et pas simplement à les qualifier de bonnes ou de mauvaises.";
+"subscription_auto_renew" = "L'abonnement se renouvelle automatiquement sauf annulation au moins 24 heures avant la fin de la période en cours.";
+"unlimited_fair_use" = "L'accès illimité est soumis à un usage loyal.";
+"billing_info" = "Les achats sont facturés via votre identifiant Apple. Gérer dans Paramètres → Identifiant Apple → Abonnements.";
+"current_plan" = "Actuel";
+"scheduled_plan" = "Programmé";
+"per_month" = "/ mois";
+"everything_in_core_plus" = "Tout dans Core, plus :";
+"coming_soon" = "(à venir)";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Settings — Chart Style & Astrology Preferences
+// ════════════════════════════════════════════════════════════════════════════
+
+"chart_style" = "Style de graphique";
+"choose_chart_display" = "Choisissez comment les thèmes de naissance sont affichés";
+"select_chart_style" = "Sélectionnez le style de graphique";
+"chart_style_note" = "Cela affecte la façon dont les thèmes de naissance sont affichés dans l'analyse de compatibilité.";
+"north_indian_style" = "Style de l'Inde du Nord";
+"north_indian_desc" = "Disposition en diamant, maisons réparées, panneaux tournants";
+"south_indian_style" = "Style sud-indien";
+"south_indian_desc" = "Disposition en grille, panneaux fixes, rotation des maisons";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Charts — Planetary Positions, Transits & Dasha
+// ════════════════════════════════════════════════════════════════════════════
+
+"select_year_transits" = "Sélectionnez une année pour afficher les transits";
+"select_year_dasha" = "Sélectionnez une année pour afficher les périodes de dasha";
+"calculating_chart" = "Tableau de calcul...";
+"failed_to_load_chart" = "Échec du chargement du graphique";
+"planet_details" = "Détails de la planète";
+"planet_cards" = "Cartes Planète";
+"boy_chart_not_available" = "Données cartographiques pour garçons non disponibles";
+"girl_chart_not_available" = "Données du graphique des filles non disponibles";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Onboarding & Language Selection
+// ════════════════════════════════════════════════════════════════════════════
+
+"personalized_guidance" = "Des conseils personnalisés, dans votre langue";
+"stat_questions_asked" = "2,7 millions+";
+"stat_rating" = "4/5";
+"rating_label" = "notation";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Components — Quota, Search & Shared UI
+// ════════════════════════════════════════════════════════════════════════════
+
+"sign_in_button" = "Se connecter";
+"go_premium" = "Passez à la version premium";
+"contact_support" = "Contacter l'assistance";
+"sign_up_button" = "S'inscrire";
+"not_now" = "Pas maintenant";
+"search_for_city" = "Rechercher une ville...";
+"searching" = "Recherche...";
+"no_cities_found" = "Aucune ville trouvée";
+"try_different_search" = "Essayez un autre terme de recherche";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Backend API Value Mappings (Transit Badges, Life Area Status)
+// These keys map backend enum values to user-facing labels.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Life Area Status (from todays_prediction API)
+"status_good" = "Bien";
+"status_steady" = "Constant";
+"status_caution" = "Prudence";
+
+// Transit Badge Labels (from prediction_service API)
+"badge_auspicious" = "Propice";
+"badge_challenging" = "Stimulant";
+"badge_neutral" = "Neutre";
+
+// Ashtakoot Kuta Status (from ashtakoot_matching_calculator API)
+"kuta_excellent" = "Excellent";
+"kuta_good" = "Bien";
+"kuta_partial" = "Partiel";
+"kuta_incompatible" = "Incompatible";
+"kuta_average" = "Moyenne";
+"kuta_poor" = "Pauvre";
+"kuta_challenging" = "Stimulant";
+"kuta_inauspicious" = "Peu propice";
+"kuta_perfect" = "Parfait";
+
+// Dasha Quality (from todays_prediction API)
+"dasha_quality_good" = "Bien";
+"dasha_quality_steady" = "Constant";
+"dasha_quality_caution" = "Prudence";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Accessibility Labels
+// ════════════════════════════════════════════════════════════════════════════
+
+"a11y_close" = "Fermer";
+"a11y_history" = "Histoire";
+"a11y_send_question" = "Envoyer une question";
+"a11y_remove_partner" = "Supprimer le partenaire";
+"a11y_search_saved_partners" = "Rechercher des partenaires enregistrés";
+"a11y_birth_time_unknown" = "Heure de naissance inconnue";
+"a11y_save_partner" = "Sauvegarder le partenaire pour l'avenir";
+"a11y_refresh_subscription" = "Actualiser le statut de l'abonnement";
+"a11y_mark_all_read" = "Marquer tout comme lu";
 

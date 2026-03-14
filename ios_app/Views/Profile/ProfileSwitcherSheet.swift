@@ -50,15 +50,15 @@ struct ProfileSwitcherSheet: View {
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(AppTheme.Colors.gold)
-                        Text("Loading profiles...")
-                            .font(AppTheme.Fonts.caption(size: 14))
+                        Text("loading_profiles".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 } else {
                     VStack(spacing: 20) {
                         // Header
                         HStack {
-                            Text("Switch Birth Chart")
+                            Text("switch_birth_chart".localized)
                                 .font(AppTheme.Fonts.title(size: 20))
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             
@@ -141,11 +141,11 @@ struct ProfileSwitcherSheet: View {
                                         Image(systemName: "person.2.slash")
                                             .font(.system(size: 40))
                                             .foregroundColor(AppTheme.Colors.textSecondary)
-                                        Text("No profiles found")
+                                        Text("no_profiles_found".localized)
                                             .font(AppTheme.Fonts.body(size: 16))
                                             .foregroundColor(AppTheme.Colors.textSecondary)
-                                        Text("Add a partner profile to get started")
-                                            .font(AppTheme.Fonts.caption(size: 14))
+                                        Text("add_partner_to_start".localized)
+                                            .font(AppTheme.Fonts.body(size: 14))
                                             .foregroundColor(AppTheme.Colors.textTertiary)
                                     }
                                     .padding(.top, 40)
@@ -163,8 +163,8 @@ struct ProfileSwitcherSheet: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.system(size: 18))
-                                Text("Manage Birth Charts")
-                                    .font(AppTheme.Fonts.body(size: 15))
+                                Text("manage_birth_charts".localized)
+                                    .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
@@ -327,8 +327,8 @@ private struct ActiveProfileCard: View {
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
                 if profile.isSelf {
-                    Text("YOU")
-                        .font(AppTheme.Fonts.caption(size: 10))
+                    Text("you_label".localized)
+                        .font(AppTheme.Fonts.caption(size: 9).weight(.bold))
                         .foregroundColor(AppTheme.Colors.gold)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -337,8 +337,8 @@ private struct ActiveProfileCard: View {
                 }
             }
             
-            Text("Active Profile")
-                .font(AppTheme.Fonts.caption(size: 12))
+            Text("active_profile".localized)
+                .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
@@ -386,8 +386,8 @@ struct ProfileRow: View {
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         
                         if profile.isSelf {
-                            Text("YOU")
-                                .font(AppTheme.Fonts.caption(size: 10))
+                            Text("you_label".localized)
+                                .font(AppTheme.Fonts.caption(size: 9).weight(.bold))
                                 .foregroundColor(AppTheme.Colors.gold)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)

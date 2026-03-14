@@ -6,7 +6,7 @@ struct TransitInfluenceCard: View {
     let transit: TransitInfluence
     
     @State private var shimmerAngle: Double = 0
-    @State private var arrowScale: CGFloat = 1.0
+    
     
     var body: some View {
         ZStack {
@@ -104,7 +104,7 @@ struct TransitInfluenceCard: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .scaleEffect(arrowScale)
+                        .scaleEffect(1.0)
                 }
             }
             .padding(.bottom, 12)
@@ -147,11 +147,6 @@ struct TransitInfluenceCard: View {
         .onAppear {
             withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
                 shimmerAngle = 360
-            }
-            
-            // Animate arrow pulse scale
-            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                arrowScale = 1.15
             }
         }
     }
@@ -215,7 +210,7 @@ struct TransitOrbView: View {
     
     @State private var isHovering = false
     @State private var shimmerAngle: Double = 0
-    @State private var arrowScale: CGFloat = 1.0
+    
     
     var body: some View {
         VStack(spacing: 4) { // Reduced spacing for tighter layout
@@ -283,7 +278,7 @@ struct TransitOrbView: View {
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             
-            // Animated Arrow Click Indicator (below sign name)
+            // Arrow Click Indicator (static — pulse removed for battery optimization)
             Image(systemName: "arrow.forward.circle.fill")
                 .font(.system(size: 14))
                 .foregroundStyle(
@@ -293,12 +288,6 @@ struct TransitOrbView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .scaleEffect(arrowScale)
-                .onAppear {
-                    withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                        arrowScale = 1.15
-                    }
-                }
         }
         .frame(width: 80) // Slightly wider for elegance
         .onAppear {
@@ -357,7 +346,7 @@ struct TransitInfluencesSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Header (no extra padding - parent handles it)
-            Text("Current Transits")
+            Text("current_transits".localized)
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
             

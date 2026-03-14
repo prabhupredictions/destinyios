@@ -1,6 +1,6 @@
 /* 
-  Localizable.strings (Tamil)
-  Destiny AI Astrology - தமிழ்
+  Localizable.strings (English)
+  Destiny AI Astrology
 */
 
 // MARK: - Common
@@ -44,6 +44,8 @@
 "support" = "உதவி";
 "help_faq" = "உதவி & FAQ";
 "sign_out" = "வெளியேறு";
+"sign_out_message" = "நீங்கள் வெளியேறுவீர்கள். நீங்கள் மீண்டும் உள்நுழையும் போது உங்கள் தரவு சேமிக்கப்படும்.";
+"sign_out_guest_message" = "விருந்தினராக, உங்கள் பிறப்புத் தரவு நீக்கப்படும். உங்கள் தரவைச் சேமிக்க Apple அல்லது Google இல் உள்நுழையவும்.";
 
 // MARK: - Astrology Settings
 "ayanamsa" = "அயனாம்சம்";
@@ -78,6 +80,7 @@
 // MARK: - Birth Data
 "enter_birth_details" = "பிறப்பு தகவல் நிரப்புங்கள்";
 "your_name" = "உங்கள் பெயர்";
+"enter_your_name" = "உங்கள் பெயரை உள்ளிடவும்";
 "date_of_birth" = "பிறந்த தேதி";
 "time_of_birth" = "பிறந்த நேரம்";
 "birth_time_unknown" = "நேரம் தெரியாது";
@@ -99,6 +102,9 @@
 // MARK: - Compatibility/Match
 "compatibility" = "ஜாதக பொருத்தம்";
 "partner_details" = "பார்ட்னர் தகவல்";
+"your_details" = "உங்கள் விவரங்கள்";
+"loaded_from_profile" = "சுயவிவரத்திலிருந்து ஏற்றப்பட்டது";
+"or_enter_manually" = "அல்லது கைமுறையாக உள்ளிடவும்";
 "calculate_match" = "பொருத்தம் பார்";
 "match_score" = "பொருத்த மதிப்பெண்";
 "boys_details" = "நீங்கள்";
@@ -121,6 +127,7 @@
 // MARK: - Birth Data Entry
 "create_birth_chart" = "உங்கள் ஜாதகத்தை உருவாக்குங்கள்";
 "enter_details_desc" = "உங்கள் ஜாதகம் மற்றும் தனிப்பட்ட\nபலன்களுக்கு தகவலை நிரப்புங்கள்";
+"enter_details_desc_compatibility" = "உறவு மற்றும் திருமண இணக்கத்தன்மையை ஆராய பங்குதாரர் விவரங்களை உள்ளிடவும்";
 
 // MARK: - Subscription
 "unlock_premium" = "Destiny Premium பெறுங்கள்";
@@ -131,15 +138,15 @@
 
 // MARK: - Splash
 "aligning_stars" = "நட்சத்திரங்களைப் படிக்கிறோம்...";
-"destiny_app_title" = "DESTINY";
-"ai_astrology_subtitle" = "AI ஜோதிடம்";
-"worlds_advanced_ai" = "உலகின் மிகவும் மேம்பட்ட AI ஜோதிடர்";
 
-// MARK: - Chat & History
+// MARK: - Chat
 "suggested_questions" = "பரிந்துரைக்கப்பட்ட கேள்விகள்";
 "no_chat_history" = "இன்னும் சாட் இல்லை";
+
+// MARK: - History
 "no_conversations" = "இன்னும் உரையாடல் இல்லை";
 "start_asking" = "கேள்விகளைக் கேளுங்கள்,\nஉங்கள் வரலாறு இங்கே தோன்றும்.";
+"compatibility_match_subtitle" = "பொருந்தக்கூடிய பொருத்தம்";
 
 // MARK: - Charts
 "ascendant" = "லக்னம்";
@@ -158,6 +165,7 @@
 "birth_city" = "பிறந்த ஊர்";
 "select_date" = "தேதி தேர்வு செய்";
 "select_time" = "நேரம் தேர்வு செய்";
+"select_gender" = "பாலினத்தைத் தேர்ந்தெடுக்கவும்";
 "partner_birth_time_unknown" = "பார்ட்னர் பிறந்த நேரம் தெரியாது";
 "birth_time_warning" = "குறிப்பு: சரியான நேரம் இல்லாமல் முடிவுகள் சரியாக இல்லாமல் போகலாம்";
 
@@ -170,6 +178,13 @@
 "continue_with_google" = "Google மூலம் தொடரவும்";
 "continue_with_email" = "Email மூலம் தொடரவும்";
 "i_dont_know_birth_time" = "எனக்கு பிறந்த நேரம் தெரியாது";
+
+// MARK: - Splash
+"destiny_app_title" = "DESTINY";
+"ai_astrology_subtitle" = "AI ஜோதிடம்";
+"worlds_advanced_ai" = "உலகின் மிகவும் மேம்பட்ட AI ஜோதிடர்";
+
+// MARK: - Onboarding
 "questions_asked" = "கேள்விகள் கேட்கப்பட்டன";
 
 // MARK: - Birth Details View
@@ -184,17 +199,20 @@
 "contact_support_birth_data" = "பிறந்த தேதி, நேரம் அல்லது இடத்தை மாற்ற, ஆதரவு குழுவைத் தொடர்பு கொள்ளவும்.";
 "gender_identity" = "பாலின அடையாளம்";
 "select_birth_city" = "உங்கள் பிறந்த நகரத்தை தேர்வு செய்யவும்";
-"enter_your_name" = "உங்கள் பெயரை உள்ளிடவும்";
 
 // MARK: - Match Result Screen Redesign
 "kundali_match" = "Chart Match";
 "ashtakoot_analysis" = "Birth Chart Compatibility";
 "out_of" = "இல்";
-"compatible" = "பொருத்தம்";
+"compatible" = "இணக்கமான";
 "excellent_match" = "சிறந்த பொருத்தம்";
 "good_match" = "நல்ல பொருத்தம்";
 "moderate_match" = "மிதமான பொருத்தம்";
+
+// Partner Cards
 "vs" = "எதிர்";
+
+// Kuta Grid
 "ashtakoot_grid" = "அஷ்டகூட விவரங்கள்";
 "varna" = "வர்ணம்";
 "vashya" = "வஷ்யம்";
@@ -204,6 +222,8 @@
 "gana" = "கணம்";
 "bhakoot" = "பகூட்";
 "nadi" = "நாடி";
+
+// View Full Report
 "view_full_report" = "முழு அறிக்கை பார்க்க";
 "full_compatibility_report" = "முழு பொருத்த அறிக்கை";
 "points" = "புள்ளிகள்";
@@ -211,14 +231,19 @@
 "boy" = "மணமகன்";
 "girl" = "மணமகள்";
 "impact" = "தாக்கம்";
-"excellent" = "சிறந்த";
+"excellent" = "சிறப்பு";
 "good" = "நல்ல";
 "moderate" = "மிதமான";
 "needs_care" = "கவனம் தேவை";
+
 "mangal_dosha_status" = "செவ்வாய் தோஷம் நிலை";
 "no_dosha" = "தோஷம் இல்லை";
 "has_dosha" = "தோஷம் உள்ளது";
+
+// Remedies
 "recommended_remedies" = "பரிந்துரைக்கப்பட்ட பரிகாரங்கள்";
+
+// Ask Destiny
 "ask_destiny" = "Destiny-யிடம் கேளுங்கள்";
 "ask_destiny_about_match" = "இந்த பொருத்தம் பற்றி கேளுங்கள்";
 "ai_powered" = "AI மூலம்";
@@ -229,21 +254,21 @@
 "ask_dosha" = "தோஷம்";
 "ask_weak" = "பலவீனம்";
 "ask_remedies" = "பரிகாரம்";
+
+// Match Result Actions
 "new_match" = "புதிய பொருத்தம்";
-
-
-
-// Match Result Additions
-"ask_more_match" = "இந்த பொருத்தம் பற்றி மேலும் கேட்க...";
-"mangal_dosha" = "செவ்வாய் தோஷம்";
-"mangal_dosha_desc" = "செவ்வாய் நிலை பகுப்பாய்வு";
-"kalsarpa_dosha" = "கால சர்ப்ப தோஷம்";
-"kalsarpa_dosha_desc" = "ராகு-கேது அச்சு பகுப்பாய்வு";
-"additional_yoga" = "கூடுதல் யோகம் & தோஷம்";
-"additional_yoga_desc" = "பிற மங்களகரமான சேர்க்கைகள்";
 "charts" = "ஜாதகம்";
 "history" = "வரலாறு";
 "report" = "அறிக்கை";
+"ask_more_match" = "இந்த பொருத்தம் பற்றி மேலும் கேட்க...";
+
+// Dosha & Yoga
+"mangal_dosha" = "மங்கள் தோஷம்";
+"mangal_dosha_desc" = "செவ்வாய் நிலை பகுப்பாய்வு";
+"kalsarpa_dosha" = "Kalsarpa Yoga";
+"kalsarpa_dosha_desc" = "ராகு-கேது அச்சு பகுப்பாய்வு";
+"additional_yoga" = "கூடுதல் யோகம் & தோஷம்";
+"additional_yoga_desc" = "பிற மங்களகரமான சேர்க்கைகள்";
 
 "exception_mars_in_own_sign" = "செவ்வாய் சொந்த ராசியில் (மேஷம் அல்லது விருச்சிகம்)";
 "exception_mars_exalted" = "செவ்வாய் மகரத்தில் உச்சம்";
@@ -266,9 +291,9 @@
 "exception_mars_jupiter_in_trine" = "செவ்வாய், குரு திரிகோண வீடுகளில்";
 "exception_mars_strong_ashtakavarga" = "செவ்வாய் அஷ்டகவர்க்கம் வலிமை";
 "exception_mars_strong_shadbala" = "செவ்வாய் ஷட்பலம் வலிமை";
-"exception_moon_strong" = "ஜாதகத்தில் சந்திரன் வலிமை";
+"exception_moon_strong" = "சந்திரன் ஜாதகத்தில் பலமாக உள்ளது";
 
-// MARK: - Intensity Factors (Tamil)
+// MARK: - Intensity Factors
 "intensity_mars_debilitated" = "செவ்வாய் கடகத்தில் நீசம்";
 "intensity_mars_conjunct_malefics" = "செவ்வாய் பாப கிரகங்களுடன்";
 "intensity_mars_critical_degrees" = "செவ்வாய் காண்டாந்த பாகையில்";
@@ -279,7 +304,7 @@
 "intensity_mars_combust" = "செவ்வாய் அஸ்தமனம்";
 "intensity_mars_low_ashtakavarga" = "செவ்வாய் அஷ்டகவர்க்கம் குறைவு";
 
-// MARK: - Zodiac Signs (Tamil)
+// MARK: - Zodiac Signs
 "sign_ar" = "மேஷம்";
 "sign_ta" = "ரிஷபம்";
 "sign_ge" = "மிதுனம்";
@@ -293,7 +318,7 @@
 "sign_aq" = "கும்பம்";
 "sign_pi" = "மீனம்";
 
-// MARK: - Planets (Tamil)
+// MARK: - Planets
 "planet_sun" = "சூரியன்";
 "planet_moon" = "சந்திரன்";
 "planet_mars" = "செவ்வாய்";
@@ -304,12 +329,14 @@
 "planet_rahu" = "ராகு";
 "planet_ketu" = "கேது";
 
-// MARK: - Severity/Status (Tamil)
+// MARK: - Severity Levels
 "severity_none" = "இல்லை";
 "severity_mild" = "லேசான";
-"severity_moderate" = "நடுத்தரம்";
-"severity_high" = "கடுமை";
-"severity_severe" = "மிகக்கடுமை";
+"severity_moderate" = "மிதமான";
+"severity_high" = "அதிக";
+"severity_severe" = "கடுமையான";
+
+// MARK: - Status Labels
 "status_active" = "செயலில்";
 "status_reduced" = "குறைந்தது";
 "status_cancelled" = "ரத்து";
@@ -335,7 +362,7 @@
 "formation_details" = "அமைப்பு விவரங்கள்";
 "strength" = "வலிமை";
 
-// MARK: - Nakshatra Names (27) - Tamil
+// MARK: - Nakshatra Names (27)
 "nakshatra_ashwini" = "அஸ்வினி";
 "nakshatra_bharani" = "பரணி";
 "nakshatra_krittika" = "கிருத்திகை";
@@ -364,7 +391,7 @@
 "nakshatra_uttara_bhadrapada" = "உத்திரட்டாதி";
 "nakshatra_revati" = "ரேவதி";
 
-// MARK: - New Exception Keys (8) - Tamil
+// MARK: - New Exception Keys (8)
 "exception_mars_yoga_karaka" = "செவ்வாய் இந்த லக்னத்திற்கு யோககாரகர்";
 "exception_mars_jupiter_yoga" = "செவ்வாய்-குரு நல்ல யோகம் உள்ளது";
 "exception_mars_venus_yoga" = "செவ்வாய்-சுக்கிர நல்ல யோகம் உள்ளது";
@@ -377,9 +404,8 @@
 "exception_mars_strong_vimsopaka" = "செவ்வாய்க்கு வலுவான விம்சோபக பலம் உள்ளது";
 "exception_chandra_mangala_yoga" = "சந்திர மங்கள யோகம் (செவ்வாய்-சந்திர செல்வ யோகம்) உள்ளது";
 "exception_mars_good_d24" = "D24 (சதுர்விம்சாம்சம்) சார்ட்டில் செவ்வாய் நல்ல நிலையில் உள்ளது";
-"exception_moon_strong" = "சந்திரன் ஜாதகத்தில் பலமாக உள்ளது";
 
-// MARK: - Mars Position UI Labels (10) - Tamil
+// MARK: - Mars Position UI Labels (10)
 "mars_position" = "செவ்வாய் நிலை";
 "house_label" = "பாவம்";
 "sign_lord" = "ராசி அதிபதி";
@@ -396,27 +422,88 @@
 "beneficial" = "Beneficial";
 "challenging" = "Challenging";
 "recommendations" = "Recommendations";
-"present" = "Present";
-"absent" = "Absent";
+"present" = "உள்ளது";
+"absent" = "இல்லை";
 "no_data" = "No Data";
 "dosha_cancelled" = "Dosha Cancelled";
 
 // MARK: - Kala Sarpa Premium UI
-"kalsarpa_dosha" = "Kalsarpa Yoga";
 "dosha_details" = "Yoga Details";
 "rahu_ketu_axis" = "Rahu-Ketu Axis";
 "planets" = "Planets";
-"analysis_notes" = "Analysis Notes";
-"no_kalsarpa_data" = "No Kalsarpa data available";
 "planets_trapped" = "planets trapped";
 "head_of_serpent" = "Head of Serpent";
 "tail_of_serpent" = "Tail of Serpent";
+"analysis_notes" = "Analysis Notes";
+"no_kalsarpa_data" = "No Kalsarpa data available";
+
+/* Streaming Progress */
+"processing" = "செயலாக்குகிறது...";
+"analyzing_match" = "இணக்கத்தன்மையை பகுப்பாய்வு செய்தல்";
+
+// MARK: - Mitigation Fallback
+"factors_reduce_severity" = "காரணிகள் தோஷத்தின் தீவிரத்தை குறைக்கின்றன";
+"factors_increase_severity" = "காரணிகள் தோஷத்தின் தீவிரத்தை அதிகரிக்கும்";
+
+// MARK: - Life Areas
+"career" = "தொழில்";
+"education" = "கல்வி";
+"finance" = "நிதி";
+"family" = "குடும்பம்";
+"health" = "ஆரோக்கியம்";
+"relationship" = "உறவு";
+"investment" = "முதலீடு";
+"sudden_events" = "திடீர் நிகழ்வுகள்";
+
+// MARK: - Network Status
+"offline_mode" = "ஆஃப்லைனில் உள்ளீர்கள்";
+
+// MARK: - Profile Setup
+"setting_up_profile" = "உங்கள் சுயவிவரத்தை அமைத்தல்";
+"cosmic_alignment" = "உங்களுக்காக பிரபஞ்சத்தை சீரமைக்கிறது...";
+
+// Partner Profile Manager
+"select_saved_partner" = "சேமித்த கூட்டாளரைத் தேர்ந்தெடுக்கவும்";
+"saved_partners" = "சேமித்த கூட்டாளர்கள்";
+"add_partner" = "கூட்டாளரைச் சேர்க்கவும்";
+"edit_partner" = "கூட்டாளரைத் திருத்து";
+"no_saved_partners" = "சேமிக்கப்பட்ட கூட்டாளர்கள் இல்லை";
+"save_partner_description" = "விரைவான பொருத்தத்திற்கு கூட்டாளர் சுயவிவரங்களைச் சேமிக்கவும்";
+"save_for_future" = "எதிர்கால பொருத்தத்திற்காக சேமிக்கவும்";
+"save_birth_chart" = "பிறப்பு விளக்கப்படத்தை சேமிக்கவும்";
+
+// MARK: - Multi-Partner Comparison
+"comparison_results" = "ஒப்பீடு முடிவுகள்";
+"partners_compared" = "பங்குதாரர்கள் ஒப்பிடுகின்றனர்";
+"comparing_with" = "உடன் ஒப்பிடுதல்";
+"compare_all" = "அனைத்தையும் ஒப்பிடுக";
+"remove_partner" = "கூட்டாளரை அகற்று";
+
+"syncing_cosmic_data" = "இன்றைய தகவல்களை ஏற்றுகிறது…";
+"restoring_your_insights" = "உங்கள் நுண்ணறிவுகளை மீட்டெடுக்கிறது";
+
+// MARK: - Guest Sign-In Prompts
+"sign_in_required" = "உள்நுழைவு தேவை";
+"sign_in_to_check_compatibility" = "பொருத்தத்தை சரிபார்க்க உள்நுழையவும்";
+"sign_in_to_continue_asking" = "கேள்விகளை தொடர உள்நுழையவும்";
+"sign_in_to_continue_matching" = "பொருத்தத்தை திறக்க உள்நுழையவும்";
+"sign_in_to_view_plans" = "சந்தா திட்டங்களை பார்க்க உள்நுழையவும்";
+"sign_in_to_switch_profiles" = "சுயவிவரங்களுக்கு மாற உள்நுழையவும்";
+"sign_in_to_save_profiles" = "சுயவிவரங்களை சேமிக்க மற்றும் நிர்வகிக்க உள்நுழையவும்";
+"create_account_to_continue" = "தொடர மற்றும் உங்கள் முன்னேற்றத்தை சேமிக்க கணக்கை உருவாக்கவும்";
+"free_limit_reached" = "தொடர மற்றும் உங்கள் முன்னேற்றத்தை சேமிக்க கணக்கை உருவாக்கவும்";
+"birth_data_registered" = "இந்த பிறப்பு தரவு ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது. தொடர உள்நுழையவும்.";
+"age_requirement" = "கணக்கை உருவாக்க நீங்கள் குறைந்தது 13 வயது ஆகியிருக்க வேண்டும்";
+"back" = "திரும்பவும்";
+
+// MARK: - Match History
+"no_match_history" = "உங்கள் போட்டி வரலாறு இங்கே தோன்றும்";
+"no_match_history_desc" = "உங்கள் வரலாற்றை உருவாக்க கூட்டாளர்களுடன் இணக்கத்தன்மையைக் கணக்கிடுங்கள்";
 
 // MARK: - Birth Chart Protection
 "profile_protected_title" = "சுயவிவரம் பாதுகாக்கப்பட்டது";
 "primary_badge" = "முதன்மை";
 "active_badge" = "செயலில்";
-"used_badge" = "பயன்படுத்தப்பட்டது";
 "used_badge" = "பயன்படுத்தப்பட்டது";
 "why_cant_edit" = "ஏன் திருத்த முடியவில்லை?";
 "delete" = "நீக்கு";
@@ -435,9 +522,6 @@
 
 // Protection Messages - Duplicate
 "profile_add_blocked_duplicate" = "இதே போன்ற விவரங்களுடன் ஜாதக அட்டவணை ஏற்கனவே உள்ளது. ஒவ்வொரு நபருக்கும் ஒரே ஒரு அட்டவணை இருக்க முடியும். உதவிக்கு, support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
-
-
-"syncing_cosmic_data" = "இன்றைய தகவல்களை ஏற்றுகிறது…";
 
 // ════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════════
@@ -474,8 +558,10 @@
 // [+] Yukthi Samanwithavagmi (155)
 // Total yoga entries: 284
 
-// === Missing yoga entries (copied from English) ===
-// === Missing yoga entries (copied from English) ===
+// MARK: - Kala Sarpa/Amrita Variants
+// [−] Kala Sarpa Dosha
+// Additional Kala Sarpa variants
+// [+] Bandhu Pujya 194
 "kalsarpa_divine_protection_title" = "Divine Protection";
 "kalsarpa_divine_protection_message" = "Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.";
 "kalsarpa_relationship_benefits" = "Relationship Benefits";
@@ -489,6 +575,7 @@
 "kalsarpa_dosha_samya" = "Dosha Samya Detected";
 "kalsarpa_mutual_message" = "Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.";
 "kalsarpa_remedies_for" = "Remedies for %@";
+
 "mangal_mutual_cancellation" = "Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.";
 "mangal_exceptions_title" = "%@'s exceptions:";
 
@@ -1888,29 +1975,22 @@
 "marriage_recommended" = "திருமணம் பரிந்துரைக்கப்படுகிறது";
 "not_recommended" = "பரிந்துரைக்கப்படவில்லை";
 "doshas" = "தோஷங்கள்";
-"cancelled" = "ரத்து";
-"active" = "செயலில்";
 "recommended" = "பரிந்துரைக்கப்பட்டது";
 "not_rec" = "பரிந்துரைக்கப்படவில்லை";
 "best_match" = "சிறந்த";
-"score" = "மதிப்பெண்";
-"excellent" = "சிறப்பு";
 "very_good" = "மிக நல்ல";
-"good" = "நல்ல";
 "average" = "சராசரி";
 "below_average" = "சராசரிக்கு கீழ்";
 "not_recommended_category" = "பரிந்துரைக்கப்படவில்லை";
 "ashtakoot_score" = "அஷ்டகூட மதிப்பெண்";
-"mangal_dosha" = "மங்கள் தோஷம்";
 "nadi_dosha" = "நாடி தோஷம்";
 "bhakoot_dosha" = "பகூட் தோஷம்";
 "today_cosmic_vibe" = "இன்றைய அண்ட அதிர்வு";
 "current_dasha" = "தற்போதைய தசா";
-"severity_mild" = "லேசான";
-"severity_moderate" = "மிதமான";
-"severity_high" = "அதிக";
-"severity_severe" = "கடுமையான";
-"severity_none" = "இல்லை";
+"how_is_my_day" = "இன்று என் நாள் எப்படி இருக்கிறது?";
+"whats_in_my_mind" = "என் மனதில் என்ன இருக்கிறது?";
+
+// MARK: - Backend Value Translations (Severity, Category, etc.)
 "category_excellent" = "சிறப்பு";
 "category_very_good" = "மிக நல்ல";
 "category_good" = "நல்ல";
@@ -1919,9 +1999,6 @@
 "category_not_recommended" = "பரிந்துரைக்கப்படவில்லை";
 "category_difficult" = "கடினமான";
 "category_challenging" = "சவாலான";
-"present" = "உள்ளது";
-"absent" = "இல்லை";
-"compatible" = "இணக்கமான";
 "needs_remedies" = "பரிகாரம் தேவை";
 "critical" = "முக்கியமான";
 "analysis_failed_for" = "பகுப்பாய்வு தோல்வி";
@@ -1931,18 +2008,242 @@
 "check_connection" = "உங்கள் இணைப்பை சரிபாருங்கள்.";
 "no_results" = "முடிவுகள் எதுவும் பெறப்படவில்லை. மீண்டும் முயற்சிக்கவும்.";
 
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Home Screen — Section Headers & Labels
+// ════════════════════════════════════════════════════════════════════════════
 
-// MARK: - Guest Sign-In Prompts
-"sign_in_required" = "உள்நுழைவு தேவை";
-"sign_in_to_check_compatibility" = "பொருத்தத்தை சரிபார்க்க உள்நுழையவும்";
-"sign_in_to_continue_asking" = "கேள்விகளை தொடர உள்நுழையவும்";
-"sign_in_to_continue_matching" = "பொருத்தத்தை திறக்க உள்நுழையவும்";
-"sign_in_to_view_plans" = "சந்தா திட்டங்களை பார்க்க உள்நுழையவும்";
-"sign_in_to_switch_profiles" = "சுயவிவரங்களுக்கு மாற உள்நுழையவும்";
-"sign_in_to_save_profiles" = "சுயவிவரங்களை சேமிக்க மற்றும் நிர்வகிக்க உள்நுழையவும்";
-"create_account_to_continue" = "தொடர மற்றும் உங்கள் முன்னேற்றத்தை சேமிக்க கணக்கை உருவாக்கவும்";
-"free_limit_reached" = "தொடர மற்றும் உங்கள் முன்னேற்றத்தை சேமிக்க கணக்கை உருவாக்கவும்";
-"birth_data_registered" = "இந்த பிறப்பு தரவு ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது. தொடர உள்நுழையவும்.";
-"age_requirement" = "கணக்கை உருவாக்க நீங்கள் குறைந்தது 13 வயது ஆகியிருக்க வேண்டும்";
-    "back" = "திரும்பவும்";
+"asc_label" = "ASC";
+"tap_to_explore_day" = "உங்கள் நாளை ஆராய தட்டவும்";
+"current_transits" = "தற்போதைய போக்குவரத்துகள்";
+"current_phase" = "தற்போதைய கட்டம்";
+"next_label" = "அடுத்து";
+"dosha_insights" = "தோஷ நுண்ணறிவு";
+"cosmic_shifts" = "காஸ்மிக் மாற்றங்கள்";
+"transit_in" = "உள்ளே";
+"planets_label" = "கிரகங்கள்";
+"houses_label" = "வீடுகள்";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat — Status & Feedback
+// ════════════════════════════════════════════════════════════════════════════
+
+"chat_welcome_subtitle" = "உங்கள் தனிப்பட்ட ஜோதிட வழிகாட்டி. உங்கள் நாள், உறவுகள், தொழில் அல்லது முன்னோக்கி செல்லும் பாதை பற்றி கேளுங்கள்.";
+"thinking" = "நினைத்து...";
+"analyzing_chart" = "உங்கள் விளக்கப்படத்தை பகுப்பாய்வு செய்கிறது...";
+"analyzing_label" = "பகுப்பாய்வு செய்கிறது";
+"rate_this_response" = "இந்த பதிலை மதிப்பிடவும்";
+"thanks_for_feedback" = "உங்கள் கருத்துக்கு நன்றி!";
+"history_turned_off" = "வரலாறு முடக்கப்பட்டுள்ளது";
+"conversations_not_saved" = "உங்கள் உரையாடல்கள் சேமிக்கப்படவில்லை.";
+"open_settings" = "அமைப்புகளைத் திறக்கவும்";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Compatibility — Comparison & Details
+// ════════════════════════════════════════════════════════════════════════════
+
+"loaded_from_history" = "வரலாற்றிலிருந்து ஏற்றப்பட்டது";
+"partner_name_placeholder" = "கூட்டாளர் பெயர்";
+"no_results_found" = "முடிவுகள் எதுவும் கிடைக்கவில்லை";
+"match_results_not_saved" = "உங்கள் போட்டி முடிவுகள் சேமிக்கப்படவில்லை.";
+"after_dosha_cancellation" = "*தோஷ ரத்துக்குப் பிறகு";
+"save_to_files" = "கோப்புகளில் சேமிக்கவும்";
+"no_adjustment" = "சரிசெய்தல் இல்லை";
+"view_details" = "விவரங்களைக் காண்க";
+"area_label" = "பகுதி";
+"actual_label" = "உண்மையான";
+"adjusted_label" = "சரிசெய்யப்பட்டது";
+"manglik_label" = "மங்லிக்";
+"none_label" = "இல்லை";
+"view_label" = "காண்க";
+"no_profiles_meet_threshold" = "எந்த சுயவிவரமும் பரிந்துரைக்கப்பட்ட பொருந்தக்கூடிய வரம்பை சந்திக்கவில்லை.";
+"review_individual_analyses" = "விரிவான நுண்ணறிவுகளுக்கு கீழே உள்ள தனிப்பட்ட பகுப்பாய்வுகளை மதிப்பாய்வு செய்யவும்.";
+"destiny_ai_astrology_brand" = "DESTINY AI ஜோதிடம்";
+"compatibility_comparison" = "இணக்கம் ஒப்பீடு";
+"copyright_notice" = "©2026 டெஸ்டினி AI ஜோதிடம் · destinyaiastrology.com";
+"description_not_available" = "விளக்கம் கிடைக்கவில்லை";
+"this_may_take_moments" = "இதற்கு சில நிமிடங்கள் ஆகலாம்...";
+"pending_label" = "நிலுவையில் உள்ளது";
+"overridden_due_to_dosha" = "தோஷம் பொருந்தாமையால் மேலெழுதப்பட்டது";
+"active_doshas" = "செயலில் உள்ள தோஷங்கள்:";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Profile — Settings, History & Account Management
+// ════════════════════════════════════════════════════════════════════════════
+
+"history_section" = "வரலாறு";
+"save_conversation_history" = "உரையாடல் வரலாற்றைச் சேமிக்கவும்";
+"clear_history" = "தெளிவான வரலாறு";
+"remove_all_saved" = "சேமித்த அரட்டைகள் மற்றும் பொருத்தங்கள் அனைத்தையும் அகற்றவும்";
+"history_off_warning" = "புதிய அரட்டைகள் மற்றும் பொருத்தங்கள் சேமிக்கப்படாது. நீங்கள் எப்போது வேண்டுமானாலும் இதை மீண்டும் இயக்கலாம்.";
+"clear_history_warning" = "இது சேமித்த அரட்டைகள் மற்றும் போட்டி வரலாற்றை அகற்றும். இதை செயல்தவிர்க்க முடியாது.";
+"manage_subscription" = "சந்தாவை நிர்வகிக்கவும்";
+"view_all_plans" = "அனைத்து திட்டங்களையும் பார்க்கவும்";
+"destiny_ai_brand_name" = "டெஸ்டினி AI ஜோதிடம்";
+"copyright_full" = "©2026 டெஸ்டினி AI. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.";
+"delete_account" = "கணக்கை நீக்கு";
+"common_questions" = "பொதுவான கேள்விகள்";
+
+// Profile Switcher
+"loading_profiles" = "சுயவிவரங்களை ஏற்றுகிறது...";
+"switch_birth_chart" = "பிறப்பு விளக்கப்படத்தை மாற்றவும்";
+"no_profiles_found" = "சுயவிவரங்கள் எதுவும் இல்லை";
+"add_partner_to_start" = "தொடங்குவதற்கு கூட்டாளர் சுயவிவரத்தைச் சேர்க்கவும்";
+"manage_birth_charts" = "பிறப்பு விளக்கப்படங்களை நிர்வகிக்கவும்";
+"you_label" = "YOU";
+"active_profile" = "செயலில் உள்ள சுயவிவரம்";
+
+// Delete Account
+"delete_your_account" = "உங்கள் கணக்கை நீக்கவா?";
+"cancel_subscription_first" = "உங்கள் கணக்கை நீக்கும் முன் ஆப் ஸ்டோரில் உங்கள் சந்தாவை ரத்து செய்யவும்.";
+"type_delete_to_confirm" = "உறுதிப்படுத்த, DELETE என தட்டச்சு செய்யவும்";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - History View
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_history_yet" = "இன்னும் வரலாறு இல்லை";
+"chats_matches_appear_here" = "உங்கள் அரட்டைகள் மற்றும் போட்டிகள் இங்கே தோன்றும்.";
+"messages_label" = "செய்திகள்";
+"match_label" = "போட்டி";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Inbox
+// ════════════════════════════════════════════════════════════════════════════
+
+"notifications_title" = "அறிவிப்புகள்";
+"loading_notifications" = "அறிவிப்புகளை ஏற்றுகிறது...";
+"no_notifications" = "அறிவிப்புகள் இல்லை";
+"no_notifications_desc" = "புதிதாக ஏதாவது இருந்தால் உங்களுக்குத் தெரிவிப்போம்";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Notification Preferences (Settings)
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_alerts_yet" = "இதுவரை விழிப்பூட்டல்கள் இல்லை";
+"add_first_alert" = "உங்களின் முதல் தனிப்பயனாக்கப்பட்ட விழிப்பூட்டலை கீழே சேர்க்கவும்";
+"add_new_alert" = "புதிய எச்சரிக்கை விருப்பத்தைச் சேர்க்கவும்";
+"max_alerts_reached" = "அதிகபட்சம் 5 விழிப்பூட்டல்கள் எட்டப்பட்டுள்ளன";
+"alerts_saved" = "விழிப்பூட்டல்கள் சேமிக்கப்பட்டன";
+"remove_alert" = "இந்த எச்சரிக்கையை அகற்றவா?";
+"push_notifications" = "புஷ் அறிவிப்புகள்";
+"permission_required_ios" = "iOS அமைப்புகளில் அனுமதி தேவை";
+"enable_in_ios_settings" = "iOS அமைப்புகள் → ஆப்ஸ் → டெஸ்டினி → அறிவிப்புகளில் இயக்கு";
+"what_alerts_about" = "உங்களுக்கு என்ன எச்சரிக்கைகள் தேவை?";
+"alert_frequency" = "எச்சரிக்கை அதிர்வெண்";
+"suggestions_label" = "பரிந்துரைகள்";
+"tap_to_add" = "சேர்க்க தட்டவும்";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Subscription — Plans, Legal & Billing
+// ════════════════════════════════════════════════════════════════════════════
+
+"no_plans_available" = "திட்டங்கள் எதுவும் இல்லை";
+"upgrade_to_keep_going" = "தொடர்ந்து வரம்பற்ற அணுகலைத் திறக்க மேம்படுத்தவும்";
+"subscription_active_message" = "உங்கள் சந்தா இப்போது செயலில் உள்ளது. உங்கள் பிரீமியம் அம்சங்களை அனுபவிக்கவும்!";
+"what_is_destiny_matching" = "Destiny Matching™ என்றால் என்ன?";
+"destiny_matching_desc_1" = "Destiny Matching™ மேற்பரப்பு-நிலை இணக்கத்தன்மைக்கு அப்பாற்பட்டது.";
+"destiny_matching_desc_2" = "பல ஜோதிடப் பயன்பாடுகள் பொருந்தாதவற்றைச் சுட்டிக்காட்டுவதில் கவனம் செலுத்தும் போது, ​​இரண்டு விளக்கப்படங்கள் எவ்வாறு தொடர்பு கொள்கின்றன, வேறுபாடுகள் எங்கு தோன்றும், மற்றும் விஷயங்கள் தவறாகத் தெரிந்தாலும் எவ்வாறு சீரமைப்பைக் காணலாம் என்பதை டெஸ்டினி ஆராய்கிறது.";
+"destiny_matching_desc_3" = "இது ஜோதிடத்தைப் பயன்படுத்தி உறவுகளைப் புரிந்துகொள்வதற்கும் வழிசெலுத்துவதற்கும் உதவுகிறது, அவற்றை நல்லது அல்லது கெட்டது என்று முத்திரை குத்துவதில்லை.";
+"subscription_auto_renew" = "தற்போதைய காலம் முடிவதற்கு குறைந்தது 24 மணிநேரத்திற்கு முன்பு ரத்துசெய்யப்படாவிட்டால் சந்தா தானாகவே புதுப்பிக்கப்படும்.";
+"unlimited_fair_use" = "வரம்பற்ற அணுகல் நியாயமான பயன்பாட்டிற்கு உட்பட்டது.";
+"billing_info" = "உங்கள் ஆப்பிள் ஐடி மூலம் வாங்குதல்களுக்கு கட்டணம் விதிக்கப்படும். அமைப்புகள் → Apple ID → சந்தாக்களில் நிர்வகிக்கவும்.";
+"current_plan" = "தற்போதைய";
+"scheduled_plan" = "திட்டமிடப்பட்டது";
+"per_month" = "/ மாதம்";
+"everything_in_core_plus" = "மையத்தில் உள்ள அனைத்தும், மேலும்:";
+"coming_soon" = "(விரைவில்)";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Settings — Chart Style & Astrology Preferences
+// ════════════════════════════════════════════════════════════════════════════
+
+"chart_style" = "விளக்கப்படம் நடை";
+"choose_chart_display" = "பிறப்பு விளக்கப்படங்கள் எவ்வாறு காட்டப்படுகின்றன என்பதைத் தேர்வு செய்யவும்";
+"select_chart_style" = "விளக்கப்பட பாணியைத் தேர்ந்தெடுக்கவும்";
+"chart_style_note" = "பொருந்தக்கூடிய பகுப்பாய்வில் பிறப்பு விளக்கப்படங்கள் எவ்வாறு காட்டப்படுகின்றன என்பதை இது பாதிக்கிறது.";
+"north_indian_style" = "வட இந்திய பாணி";
+"north_indian_desc" = "வைர அமைப்பு, வீடுகள் நிலையானது, அடையாளங்கள் சுழலும்";
+"south_indian_style" = "தென்னிந்திய பாணி";
+"south_indian_desc" = "கட்ட அமைப்பு, அடையாளங்கள் சரி செய்யப்பட்டன, வீடுகள் சுழலும்";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Charts — Planetary Positions, Transits & Dasha
+// ════════════════════════════════════════════════════════════════════════════
+
+"select_year_transits" = "போக்குவரத்துகளைப் பார்க்க ஒரு வருடத்தைத் தேர்ந்தெடுக்கவும்";
+"select_year_dasha" = "தசா காலங்களைக் காண ஒரு வருடத்தைத் தேர்ந்தெடுக்கவும்";
+"calculating_chart" = "விளக்கப்படத்தைக் கணக்கிடுகிறது...";
+"failed_to_load_chart" = "விளக்கப்படத்தை ஏற்றுவதில் தோல்வி";
+"planet_details" = "கிரக விவரங்கள்";
+"planet_cards" = "கிரக அட்டைகள்";
+"boy_chart_not_available" = "சிறுவர் விளக்கப்படம் தரவு கிடைக்கவில்லை";
+"girl_chart_not_available" = "பெண் விளக்கப்பட தரவு கிடைக்கவில்லை";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Onboarding & Language Selection
+// ════════════════════════════════════════════════════════════════════════════
+
+"personalized_guidance" = "தனிப்பயனாக்கப்பட்ட வழிகாட்டுதல், உங்கள் மொழியில்";
+"stat_questions_asked" = "2.7M+";
+"stat_rating" = "4/5";
+"rating_label" = "மதிப்பீடு";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Components — Quota, Search & Shared UI
+// ════════════════════════════════════════════════════════════════════════════
+
+"sign_in_button" = "உள்நுழையவும்";
+"go_premium" = "பிரீமியம் செல்லுங்கள்";
+"contact_support" = "ஆதரவைத் தொடர்பு கொள்ளவும்";
+"sign_up_button" = "பதிவு செய்யவும்";
+"not_now" = "இப்போது இல்லை";
+"search_for_city" = "நகரத்தைத் தேடு...";
+"searching" = "தேடுகிறது...";
+"no_cities_found" = "நகரங்கள் எதுவும் இல்லை";
+"try_different_search" = "வேறு தேடல் சொல்லை முயற்சிக்கவும்";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Backend API Value Mappings (Transit Badges, Life Area Status)
+// These keys map backend enum values to user-facing labels.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Life Area Status (from todays_prediction API)
+"status_good" = "நல்லது";
+"status_steady" = "நிலையானது";
+"status_caution" = "எச்சரிக்கை";
+
+// Transit Badge Labels (from prediction_service API)
+"badge_auspicious" = "சுப";
+"badge_challenging" = "சவாலான";
+"badge_neutral" = "நடுநிலை";
+
+// Ashtakoot Kuta Status (from ashtakoot_matching_calculator API)
+"kuta_excellent" = "சிறப்பானது";
+"kuta_good" = "நல்லது";
+"kuta_partial" = "பகுதி";
+"kuta_incompatible" = "பொருந்தாதது";
+"kuta_average" = "சராசரி";
+"kuta_poor" = "ஏழை";
+"kuta_challenging" = "சவாலான";
+"kuta_inauspicious" = "அசுபமானது";
+"kuta_perfect" = "சரியானது";
+
+// Dasha Quality (from todays_prediction API)
+"dasha_quality_good" = "நல்லது";
+"dasha_quality_steady" = "நிலையானது";
+"dasha_quality_caution" = "எச்சரிக்கை";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Accessibility Labels
+// ════════════════════════════════════════════════════════════════════════════
+
+"a11y_close" = "மூடு";
+"a11y_history" = "வரலாறு";
+"a11y_send_question" = "கேள்வி அனுப்பு";
+"a11y_remove_partner" = "கூட்டாளரை அகற்று";
+"a11y_search_saved_partners" = "சேமித்த கூட்டாளர்களைத் தேடுங்கள்";
+"a11y_birth_time_unknown" = "பிறந்த நேரம் தெரியவில்லை";
+"a11y_save_partner" = "எதிர்காலத்திற்காக கூட்டாளரைச் சேமிக்கவும்";
+"a11y_refresh_subscription" = "சந்தா நிலையைப் புதுப்பிக்கவும்";
+"a11y_mark_all_read" = "அனைத்தையும் படித்ததாகக் குறிக்கவும்";
 

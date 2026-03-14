@@ -6,7 +6,7 @@ struct DashaInsightCard: View {
     let dasha: DashaInsight
     
     @State private var shimmerAngle: Double = 0
-    @State private var arrowScale: CGFloat = 1.0
+    
     
     var body: some View {
         ZStack {
@@ -100,7 +100,7 @@ struct DashaInsightCard: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .scaleEffect(arrowScale)
+                        .scaleEffect(1.0)
                 }
             }
             .padding(.bottom, 12)
@@ -144,11 +144,6 @@ struct DashaInsightCard: View {
             // Animate the golden shimmer border (slower: 10s per rotation)
             withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
                 shimmerAngle = 360
-            }
-            
-            // Animate arrow pulse scale
-            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                arrowScale = 1.15
             }
         }
     }

@@ -96,7 +96,7 @@ struct YogaHighlightCard: View {
                 
                 // Header & Filter
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Positive & Negative Combinations")
+                    Text("yoga_positive_negative".localized)
                         .font(AppTheme.Fonts.premiumDisplay(size: 18))
                         .goldGradient()
                     
@@ -161,7 +161,7 @@ struct PremiumYogaCard: View {
     let yoga: YogaDetail
     
     @State private var shimmerAngle: Double = 0
-    @State private var arrowScale: CGFloat = 1.0
+    
     
     // Status Logic
     var statusText: String {
@@ -248,7 +248,7 @@ struct PremiumYogaCard: View {
                 HStack(alignment: .top) {
                     // Left: Planets
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("PLANETS")
+                        Text("planets_label".localized)
                             .font(AppTheme.Fonts.caption(size: 9))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                             .tracking(1)
@@ -264,7 +264,7 @@ struct PremiumYogaCard: View {
                     // Right: Houses
                     if !yoga.houses.isEmpty {
                         VStack(alignment: .trailing, spacing: 2) {
-                            Text("HOUSES")
+                            Text("houses_label".localized)
                                 .font(AppTheme.Fonts.caption(size: 9))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                                 .tracking(1)
@@ -296,7 +296,7 @@ struct PremiumYogaCard: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .scaleEffect(arrowScale)
+                        .scaleEffect(1.0)
                 }
             }
             .padding(.bottom, 12)
@@ -339,11 +339,6 @@ struct PremiumYogaCard: View {
         .onAppear {
             withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
                 shimmerAngle = 360
-            }
-            
-            // Animate arrow pulse scale
-            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                arrowScale = 1.15
             }
         }
     }

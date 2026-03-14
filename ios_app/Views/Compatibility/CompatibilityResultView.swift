@@ -346,8 +346,8 @@ struct CompatibilityResultView: View {
                     
                     if !uncoveredDoshas.isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Active Doshas:")
-                                .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
+                            Text("active_doshas".localized)
+                                .font(AppTheme.Fonts.caption(size: 13).weight(.semibold))
                                 .foregroundColor(AppTheme.Colors.warning)
                             
                             ForEach(uncoveredDoshas, id: \.name) { dosha in
