@@ -61,8 +61,8 @@ struct PartnerFormView: View {
     // Guardian consent state
     @State private var guardianConsentGiven = false
     
-    // Compatibility matching flag
-    @State private var forCompatibility = false
+    // Compatibility matching flag (default ON for all new birth charts)
+    @State private var forCompatibility = true
     
     // Validation
     private var isValid: Bool {
@@ -379,5 +379,5 @@ struct PartnerFormView: View {
 // MARK: - Preview
 
 #Preview {
-    PartnerFormView(mode: .add) { _ in }
+    PartnerFormView(mode: .add) { newPartner in }
 }
