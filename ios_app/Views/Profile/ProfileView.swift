@@ -27,7 +27,8 @@ struct ProfileView: View {
     @State private var showSignOutAlert = false
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for subscription
     @State private var showProfileSwitcher = false  // Switch Birth Chart sheet
-    @State private var showUpgradePrompt = false  // Upgrade prompt for Switch Profile feature
+    @State private var showUpgradePrompt = false  // Upgrade prompt for premium features
+    @State private var showGuestSignInForAlerts = false  // Guest sign-in prompt for Personalized Alerts
     @State private var showGuestSignInForSwitch = false  // Guest sign-in prompt for Switch Profile
     @State private var showNotificationPreferences = false  // Notification preferences sheet
     @State private var showPartnerManager = false  // Partner manager sheet (Plus-only)
@@ -155,8 +156,12 @@ struct ProfileView: View {
                 )
                 .environment(authViewModel)
             }
-            .sheet(isPresented: $showNotificationPreferences) {
-                NotificationPreferencesSheet(userEmail: userEmail)
+            .sheet(isPresented: $showGuestSignInForAlerts) {
+                GuestSignInPromptView(
+                    message: "Sign in to enable personalized alerts based on your birth chart.",
+                    onBack: { showGuestSignInForAlerts = false }
+                )
+                .environment(authViewModel)
             }
             .sheet(isPresented: $showPartnerManager) {
                 NavigationStack {
@@ -296,13 +301,14 @@ struct ProfileView: View {
                 )
                 
                 // Manage Birth Charts (Core+)
+                // GUEST RULE: Guests must sign in first to manage birth charts
                 PremiumListItem(
                     title: "Manage Birth Charts",
                     subtitle: "Add and edit birth charts for Destiny Matching\u{2122}",
                     icon: "person.2.fill",
                     isPremiumFeature: true,
-                    premiumBadgeText: "Core",
-                    premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : AppTheme.Colors.gold,
+                    premiumBadgeText: isGuestUser ? "Sign In" : "Core",
+                    premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
                             showGuestSignInForSwitch = true
@@ -315,14 +321,15 @@ struct ProfileView: View {
                 )
                 
                 // Switch Profile/Birth Chart (Plus-only)
+                // GUEST RULE: Guests must sign in first to switch profiles
                 PremiumListItem(
                     title: "Switch Profile/Birth Chart",
                     subtitle: "Viewing as \(ProfileContextManager.shared.activeProfileName)",
                     icon: "arrow.triangle.2.circlepath",
                     isPremiumFeature: true,
-                    premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : AppTheme.Colors.gold,
+                    premiumBadgeText: isGuestUser ? "Sign In" : "Plus",
+                    premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
-                        // GUEST RULE: Guests must sign in first
                         if isGuestUser {
                             showGuestSignInForSwitch = true
                         } else if quotaManager.hasFeature(.switchProfile) {
@@ -389,15 +396,19 @@ struct ProfileView: View {
                     .tint(AppTheme.Colors.gold)
                 }
                 
+                // GUEST RULE: Guests must sign in first to access personalized alerts
                 // Personalized Alerts (Plus-only)
                 PremiumListItem(
                     title: "Personalized Alerts",
                     subtitle: "Customize alerts based on your chart",
                     icon: "bell.badge.fill",
                     isPremiumFeature: true,
-                    premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : AppTheme.Colors.gold,
+                    premiumBadgeText: isGuestUser ? "Sign In" : "Plus",
+                    premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
-                        if quotaManager.hasFeature(.alerts) {
+                        if isGuestUser {
+                            showGuestSignInForAlerts = true
+                        } else if quotaManager.hasFeature(.alerts) {
                             showNotificationPreferences = true
                         } else {
                             showUpgradePrompt = true

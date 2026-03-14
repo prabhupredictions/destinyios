@@ -10,6 +10,7 @@ struct NotificationInboxView: View {
     @State private var selectedNotification: NotificationItem? = nil
     @State private var showNotificationPreferences = false
     @State private var showUpgradePrompt = false
+    @State private var showGuestSignInSheet = false  // Guest sign-in prompt for alerts
     
     var body: some View {
         NavigationView {
@@ -49,6 +50,12 @@ struct NotificationInboxView: View {
             }
             .sheet(isPresented: $showUpgradePrompt) {
                 SubscriptionView()
+            }
+            .sheet(isPresented: $showGuestSignInSheet) {
+                GuestSignInPromptView(
+                    message: "Sign in to enable personalized alerts based on your birth chart.",
+                    onBack: { showGuestSignInSheet = false }
+                )
             }
         }
     }
@@ -104,29 +111,37 @@ struct NotificationInboxView: View {
     
     // MARK: - Personalize Alerts Button
     private var personalizeAlertsButton: some View {
-        Button {
-            if quotaManager.hasFeature(.alerts) {
+        let isGuestUser = UserDefaults.standard.string(forKey: "userEmail")?.hasSuffix("@daa.com") ?? false
+        
+        return Button {
+            if isGuestUser {
+                showGuestSignInSheet = true
+            } else if quotaManager.hasFeature(.alerts) {
                 showNotificationPreferences = true
             } else {
                 showUpgradePrompt = true
             }
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: "bell.badge")
+                Image(systemName: isGuestUser ? "person.badge.plus" : "bell.badge")
                     .font(.system(size: 15, weight: .semibold))
                 
-                Text("Personalize alerts")
+                Text(isGuestUser ? "Sign in to personalize alerts" : "Personalize alerts")
                     .font(.system(size: 16, weight: .semibold))
                 
-                Image(systemName: "crown.fill")
-                    .font(.system(size: 12))
+                if !isGuestUser {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 12))
+                }
             }
             .foregroundColor(AppTheme.Colors.mainBackground)
             .frame(maxWidth: .infinity)
             .frame(height: 48)
             .background(
                 LinearGradient(
-                    colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.85)],
+                    colors: isGuestUser ? 
+                        [AppTheme.Colors.textSecondary, AppTheme.Colors.textSecondary.opacity(0.85)] :
+                        [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.85)],
                     startPoint: .leading,
                     endPoint: .trailing
                 )
