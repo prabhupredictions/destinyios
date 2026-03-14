@@ -126,7 +126,7 @@ struct NotificationInboxView: View {
                 Image(systemName: isGuestUser ? "person.badge.plus" : "bell.badge")
                     .font(.system(size: 15, weight: .semibold))
                 
-                Text(isGuestUser ? "Sign in to personalize alerts" : "Personalize alerts")
+                Text(isGuestUser ? "Sign up to personalize alerts" : "Personalize alerts")
                     .font(.system(size: 16, weight: .semibold))
                 
                 if !isGuestUser {

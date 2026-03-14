@@ -307,7 +307,7 @@ struct ProfileView: View {
                     subtitle: "Add and edit birth charts for Destiny Matching\u{2122}",
                     icon: "person.2.fill",
                     isPremiumFeature: true,
-                    premiumBadgeText: isGuestUser ? "Sign In" : "Core",
+                    premiumBadgeText: isGuestUser ? "Sign Up" : "Core",
                     premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
@@ -327,7 +327,7 @@ struct ProfileView: View {
                     subtitle: "Viewing as \(ProfileContextManager.shared.activeProfileName)",
                     icon: "arrow.triangle.2.circlepath",
                     isPremiumFeature: true,
-                    premiumBadgeText: isGuestUser ? "Sign In" : "Plus",
+                    premiumBadgeText: isGuestUser ? "Sign Up" : "Plus",
                     premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
@@ -403,7 +403,7 @@ struct ProfileView: View {
                     subtitle: "Customize alerts based on your chart",
                     icon: "bell.badge.fill",
                     isPremiumFeature: true,
-                    premiumBadgeText: isGuestUser ? "Sign In" : "Plus",
+                    premiumBadgeText: isGuestUser ? "Sign Up" : "Plus",
                     premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
