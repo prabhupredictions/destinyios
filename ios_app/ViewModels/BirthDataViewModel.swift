@@ -126,12 +126,10 @@ class BirthDataViewModel {
     func loadSaved() {
         let email = userEmail ?? "guest"
         
-        // Try to load from SwiftData first
-        if !isGuest {
-            if let profile = dataManager.getBirthProfile(for: email) {
-                loadFromProfile(profile)
-                return
-            }
+        // Try to load from SwiftData first (works for both registered and guest users)
+        if let profile = dataManager.getBirthProfile(for: email) {
+            loadFromProfile(profile)
+            return
         }
         
         // Fallback to UserDefaults (User-Scoped)

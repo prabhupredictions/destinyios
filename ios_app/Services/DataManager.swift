@@ -33,6 +33,17 @@ final class DataManager {
         }
     }
     
+    // MARK: - Persistence Helper
+    
+    /// Save context with error logging instead of silent try?
+    private func persistContext(caller: String = #function) {
+        do {
+            try context.save()
+        } catch {
+            print("❌ [DataManager.\(caller)] SwiftData save failed: \(error)")
+        }
+    }
+    
     // MARK: - Session Management
     
     /// Get or create an active session for a user
@@ -44,13 +55,13 @@ final class DataManager {
         
         if let existing = try? context.fetch(descriptor).first {
             existing.lastAccessed = Date()
-            try? context.save()
+            persistContext()
             return existing
         }
         
         let newSession = UserSession(userEmail: email)
         context.insert(newSession)
-        try? context.save()
+        persistContext()
         return newSession
     }
     
@@ -59,6 +70,18 @@ final class DataManager {
         let predicate = #Predicate<UserSession> { $0.sessionId == id }
         let descriptor = FetchDescriptor<UserSession>(predicate: predicate)
         return try? context.fetch(descriptor).first
+    }
+    
+    /// Deactivate all sessions for a user (used on sign-out)
+    func deactivateSessions(for email: String) {
+        let predicate = #Predicate<UserSession> { $0.userEmail == email && $0.isActive }
+        let descriptor = FetchDescriptor<UserSession>(predicate: predicate)
+        if let sessions = try? context.fetch(descriptor) {
+            for session in sessions {
+                session.isActive = false
+            }
+            persistContext()
+        }
     }
     
     // MARK: - Thread Management
@@ -200,7 +223,7 @@ final class DataManager {
     func createThread(sessionId: String, userEmail: String, profileId: String? = nil, title: String = "New Conversation") -> LocalChatThread {
         let thread = LocalChatThread(sessionId: sessionId, userEmail: userEmail, profileId: profileId, title: title)
         context.insert(thread)
-        try? context.save()
+        persistContext()
         return thread
     }
     
@@ -223,7 +246,7 @@ final class DataManager {
             // Insert new
             context.insert(thread)
         }
-        try? context.save()
+        persistContext()
     }
     
     /// Get thread by ID
@@ -242,20 +265,20 @@ final class DataManager {
     func updateThread(_ thread: LocalChatThread) {
         let messages = fetchMessages(for: thread.id)
         thread.updateFromMessages(messages)
-        try? context.save()
+        persistContext()
     }
     
     /// Archive a thread
     func archiveThread(_ thread: LocalChatThread) {
         thread.isArchived = true
         thread.updatedAt = Date()
-        try? context.save()
+        persistContext()
     }
     
     /// Toggle pin status
     func togglePinThread(_ thread: LocalChatThread) {
         thread.isPinned.toggle()
-        try? context.save()
+        persistContext()
     }
     
     /// Delete a thread and its messages (local + server)
@@ -266,7 +289,7 @@ final class DataManager {
             context.delete(message)
         }
         context.delete(thread)
-        try? context.save()
+        persistContext()
         
         // Also delete from server so it doesn't re-sync on login
         deleteThreadFromServer(threadId: threadId)
@@ -321,7 +344,7 @@ final class DataManager {
             }
             context.delete(thread)
         }
-        try? context.save()
+        persistContext()
     }
     
     // MARK: - Message Management
@@ -345,7 +368,7 @@ final class DataManager {
         }
         
         context.insert(message)
-        try? context.save()
+        persistContext()
         
         if let thread = getThread(id: message.threadId) {
             updateThread(thread)
@@ -363,14 +386,14 @@ final class DataManager {
     func updateMessage(_ message: LocalChatMessage, content: String, isStreaming: Bool) {
         message.content = content
         message.isStreaming = isStreaming
-        try? context.save()
+        persistContext()
     }
     
     /// Delete a message
     func deleteMessage(_ message: LocalChatMessage) {
         let threadId = message.threadId
         context.delete(message)
-        try? context.save()
+        persistContext()
         
         if let thread = getThread(id: threadId) {
             updateThread(thread)
@@ -415,7 +438,21 @@ final class DataManager {
             }
         }
         
-        try? context.save()
+        let profileDescriptor = FetchDescriptor<UserBirthProfile>()
+        if let profiles = try? context.fetch(profileDescriptor) {
+            for profile in profiles {
+                context.delete(profile)
+            }
+        }
+        
+        let partnerDescriptor = FetchDescriptor<PartnerProfile>()
+        if let partners = try? context.fetch(partnerDescriptor) {
+            for partner in partners {
+                context.delete(partner)
+            }
+        }
+        
+        persistContext()
     }
     
     // MARK: - Helper Methods
@@ -524,7 +561,7 @@ final class DataManager {
             // Insert new
             context.insert(profile)
         }
-        try? context.save()
+        persistContext()
     }
     
     /// Get birth profile by email
@@ -578,7 +615,7 @@ final class DataManager {
     /// Delete birth profile
     func deleteBirthProfile(_ profile: UserBirthProfile) {
         context.delete(profile)
-        try? context.save()
+        persistContext()
     }
 }
 

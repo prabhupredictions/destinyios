@@ -157,14 +157,14 @@ struct OnboardingSlideView: View {
 struct StatsCard: View {
     var body: some View {
         VStack(spacing: 16) {
-            // Main stat: 2.2M+ questions
+            // Main stat: 2.7M+ questions
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(AppTheme.Colors.premiumGradient)
                     
-                    Text("2.5M+")
+                    Text("2.7M+")
                         .font(AppTheme.Fonts.premiumDisplay(size: 40))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }

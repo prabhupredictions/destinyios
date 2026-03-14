@@ -238,7 +238,7 @@ struct ProfileView: View {
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     if !userEmail.isEmpty {
-                        Text(userEmail)
+                        Text(isGuestUser ? "Guest user" : userEmail)
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .lineLimit(1)
@@ -563,11 +563,11 @@ struct ProfileView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Upgrade to Premium")
+                        Text(isGuestUser ? "Sign Up" : "Upgrade to Premium")
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(.white)
                         
-                        Text("Unlock unlimited insights")
+                        Text(isGuestUser ? "Save your birth chart & unlock insights" : "Unlock unlimited insights")
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }

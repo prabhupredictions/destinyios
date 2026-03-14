@@ -14,6 +14,7 @@ struct BirthDataView: View {
     @State private var showLocationSearch = false
     @State private var showGenderSheet = false
     @State private var showSignInPrompt = false  // For birthDataTaken case
+    @State private var showDataRefreshedBanner = false  // Backend wiped birth data
     
     @FocusState private var isNameFocused: Bool
     
@@ -38,6 +39,21 @@ struct BirthDataView: View {
                             // Compact Header
                             headerSection
                                 .padding(.top, AppTheme.BirthData.sectionTopPadding)
+                            
+                            // Backend data refresh banner
+                            if showDataRefreshedBanner {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundColor(AppTheme.Colors.warning)
+                                    Text("Your profile data was refreshed on the server. Please re-enter your birth details.")
+                                        .font(AppTheme.Fonts.caption())
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                }
+                                .padding(12)
+                                .background(AppTheme.Colors.warning.opacity(0.15))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .transition(.opacity)
+                            }
                             
                             // Form fields (Glass Slabs)
                             formSection
@@ -112,6 +128,11 @@ struct BirthDataView: View {
         }
         .onAppear {
             viewModel.loadSaved()
+            // Check if backend data was refreshed/wiped for returning user
+            if UserDefaults.standard.bool(forKey: "birthDataRefreshedOnServer") {
+                showDataRefreshedBanner = true
+                UserDefaults.standard.removeObject(forKey: "birthDataRefreshedOnServer")
+            }
             withAnimation(.easeOut(duration: 0.4)) {
                 contentOpacity = 1.0
             }

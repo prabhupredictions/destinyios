@@ -43,8 +43,9 @@ class ProfileContextManager {
     }
     
     /// The main user's email - ALWAYS use this for plan/quota validation
+    /// Returns stored userEmail, or empty string if not yet set (pre-login)
     var ownerEmail: String {
-        UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        UserDefaults.standard.string(forKey: "userEmail") ?? ""
     }
     
     /// Main user's display name
