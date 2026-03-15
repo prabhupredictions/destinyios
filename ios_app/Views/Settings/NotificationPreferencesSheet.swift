@@ -10,6 +10,7 @@ struct NotificationPreferencesSheet: View {
     
     // iOS notification permission state
     @State private var iOSNotificationsAuthorized = false
+    @State private var hasCheckedNotificationPermission = false  // Track if permission check completed
     
     // Add/Edit sheet state
     @State private var showAddEditSheet = false
@@ -317,6 +318,7 @@ struct NotificationPreferencesSheet: View {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
                 iOSNotificationsAuthorized = settings.authorizationStatus == .authorized
+                hasCheckedNotificationPermission = true  // Mark check as complete
             }
         }
     }
@@ -334,6 +336,7 @@ struct NotificationPreferencesSheet: View {
                     UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
                         DispatchQueue.main.async {
                             iOSNotificationsAuthorized = granted
+                            hasCheckedNotificationPermission = true
                             if granted {
                                 viewModel.pushEnabled = true
                                 UIApplication.shared.registerForRemoteNotifications()
@@ -344,6 +347,7 @@ struct NotificationPreferencesSheet: View {
                     openAppSettings()
                 case .authorized, .provisional, .ephemeral:
                     iOSNotificationsAuthorized = true
+                    hasCheckedNotificationPermission = true
                     viewModel.pushEnabled = true
                 @unknown default:
                     break
@@ -375,7 +379,8 @@ struct NotificationPreferencesSheet: View {
                         .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
-                    if !iOSNotificationsAuthorized {
+                    // Only show error text if we've checked permission and it's not authorized
+                    if hasCheckedNotificationPermission && !iOSNotificationsAuthorized {
                         Text("Permission required in iOS Settings")
                             .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.error)
@@ -398,7 +403,8 @@ struct NotificationPreferencesSheet: View {
             .padding(.horizontal, 16)
             .background(AppTheme.Colors.cardBackground)
             
-            if !iOSNotificationsAuthorized {
+            // Only show the settings button if we've checked permission and it's denied
+            if hasCheckedNotificationPermission && !iOSNotificationsAuthorized {
                 Button(action: openAppSettings) {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
