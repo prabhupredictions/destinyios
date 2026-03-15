@@ -1,12 +1,9 @@
 import SwiftUI
 
-/// Premium Dasha Insight Card with animated golden border
+/// Premium Dasha Insight Card with static golden border
 /// Professional layout: Steady badge top right, Arrow bottom right
 struct DashaInsightCard: View {
     let dasha: DashaInsight
-    
-    @State private var shimmerAngle: Double = 0
-    
     
     var body: some View {
         ZStack {
@@ -109,43 +106,16 @@ struct DashaInsightCard: View {
         .frame(minHeight: 120)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
-                            Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppTheme.Colors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(
-                    AngularGradient(
-                        gradient: Gradient(stops: [
-                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.0),
-                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.15),
-                            .init(color: AppTheme.Colors.goldLight.opacity(0.9), location: 0.2),
-                            .init(color: AppTheme.Colors.gold.opacity(0.6), location: 0.25),
-                            .init(color: AppTheme.Colors.gold.opacity(0.1), location: 0.4),
-                            .init(color: AppTheme.Colors.gold.opacity(0.05), location: 1.0)
-                        ]),
-                        center: .center,
-                        startAngle: .degrees(shimmerAngle),
-                        endAngle: .degrees(shimmerAngle + 360)
-                    ),
-                    lineWidth: 1.5
+                .stroke(
+                    AppTheme.Colors.gold.opacity(0.5),
+                    lineWidth: 2
                 )
         )
         .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
-        .onAppear {
-            // Animate the golden shimmer border (slower: 10s per rotation)
-            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
-                shimmerAngle = 360
-            }
-        }
     }
     
     // MARK: - Computed Properties

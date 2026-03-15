@@ -169,10 +169,10 @@ struct HomeView: View {
                             // 1. Life Area Story Orbs (Instagram-style, top of feed)
                             storyOrbsSection
                             
-                            // 3. What's in my mind? (Quick Questions)
+                            // 2. What's in my mind? (Quick Questions)
                             whatsInMyMindSection
                             
-                            // 4. Current Dasha (Tappable → sends to chat)
+                            // 3. Current Dasha (Tappable → sends to chat)
                             if let dasha = viewModel.dashaInsight {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("current_dasha".localized)
@@ -192,7 +192,7 @@ struct HomeView: View {
                                 }
                             }
                             
-                            // 5. Current Transit Influences (Tappable → sends to chat)
+                            // 4. Current Transit Influences (Tappable → sends to chat)
                             if !viewModel.transitInfluences.isEmpty {
                                 TransitInfluencesSection(
                                     transits: viewModel.transitInfluences,
@@ -206,10 +206,10 @@ struct HomeView: View {
                                 )
                             }
                             
-                            // 6. Dosha Status
+                            // 5. Dosha Status
                             // doshaStatusSection // Removed per user request
                             
-                            // 7. Yoga Cards
+                            // 6. Yoga Cards
                             yogaHighlightsSection
                             
                             Spacer(minLength: 20)
@@ -850,15 +850,6 @@ struct HomeView: View {
         )
     }
     
-    // J. Dasha Widget
-    private var dashaWidgetSection: some View {
-        DashaProgressWidget(
-            currentPeriod: viewModel.currentDashaPeriod,
-            upcomingPeriod: viewModel.upcomingDashaPeriod
-        )
-    }
-    
-    // Icon helper for orbs
     private func iconName(for area: String) -> String {
         switch area.lowercased() {
         case "career": return "briefcase.fill"
