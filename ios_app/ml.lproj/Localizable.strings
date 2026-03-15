@@ -18,6 +18,52 @@
 "greeting" = "നമസ്കാരം!";
 "todays_insight" = "ഇന്നത്തെ രാശിഫലം";
 
+// MARK: - Time Based Greetings
+"good_morning" = "സുപ്രഭാതം";
+"good_afternoon" = "ഉച്ചക്ക് ശുഭം";
+"good_evening" = "സായാഹ്നം ശുഭം";
+"good_night" = "ശുഭ രാത്രി";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "എന്റെ മനസ്സിൽ എന്താണ്?";
+"tap_to_explore_day" = "നിങ്ങളുടെ ദിനം പര്യവേക്ഷണം ചെയ്യാൻ ടാപ്പ് ചെയ്യുക";
+
+// MARK: - Filter Labels
+"all" = "എല്ലാം";
+"good" = "നല്ലത്";
+"steady" = "സ്ഥിരം";
+"caution" = "ശ്രദ്ധിക്കുക";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "തീം";
+"current_dasha" = "നിലവിലെ ദശ";
+
+// MARK: - Life Area Filters
+"love" = "സ്നേഹം";
+"wealth" = "സമ്പത്ത്";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "സജീവം";
+"yoga_status_reduced" = "കുറഞ്ഞു";
+"yoga_status_cancelled" = "റദ്ദാക്കി";
+"yoga_status_inactive" = "നിഷ്ക്രിയം";
+"planets_label" = "ഗ്രഹങ്ങൾ";
+"houses_label" = "ഭാവങ്ങൾ";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "എല്ലാം";
+"filter_wealth" = "സമ്പത്ത്";
+"filter_career" = "തൊഴിൽ";
+"filter_love" = "സ്നേഹം";
+"filter_health" = "ആരോഗ്യം";
+"filter_family" = "കുടുംബം";
+"filter_education" = "വിദ്യാഭ്യാസം";
+"filter_spiritual" = "ആത്മീയം";
+"filter_foundation" = "അടിസ്ഥാനം";
+"filter_personality" = "വ്യക്തിത്വം";
+"filter_special" = "വിശേഷം";
+"filter_relationship" = "ബന്ധം";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "ഇന്ന് ഞാൻ എന്ത് ശ്രദ്ധിക്കണം?";
 "how_improve_focus" = "എന്റെ ഏകാഗ്രത എങ്ങനെ കൂട്ടാം?";
@@ -444,6 +490,46 @@
 // MARK: - Mitigation Fallback
 "factors_reduce_severity" = "ഘടകങ്ങൾ ദോഷത്തിൻ്റെ തീവ്രത കുറയ്ക്കുന്നു";
 "factors_increase_severity" = "ഘടകങ്ങൾ ദോഷ തീവ്രത വർദ്ധിപ്പിക്കുന്നു";
+
+// MARK: - Full Zodiac Sign Names (for display)
+"Aries" = "മേടം";
+"Taurus" = "ഇടവം";
+"Gemini" = "മിഥുനം";
+"Cancer" = "കർക്കടകം";
+"Leo" = "ചിങ്ങം";
+"Virgo" = "കന്നി";
+"Libra" = "തുലാം";
+"Scorpio" = "വൃശ്ചികം";
+"Sagittarius" = "ധനു";
+"Capricorn" = "മകരം";
+"Aquarius" = "കുംഭം";
+"Pisces" = "മീനം";
+
+// MARK: - Full Planet Names (for display)
+"Sun" = "സൂര്യൻ";
+"Moon" = "ചന്ദ്രൻ";
+"Mars" = "അംഗാരകൻ";
+"Mercury" = "ബുധൻ";
+"Jupiter" = "ഗുരു";
+"Venus" = "ശുക്രൻ";
+"Saturn" = "ശനി";
+"Rahu" = "രാഹു";
+"Ketu" = "കേതു";
+
+// MARK: - UI Labels
+"Ascendant" = "ലഗ്നം";
+"House" = "ഭാവം";
+"Transit" = "ഗോചരം";
+
+// MARK: - Life Areas (with uppercase keys for StoryOrbs)
+"Career" = "തൊഴിൽ";
+"Relationship" = "ബന്ധം";
+"Finance" = "സമ്പത്ത്";
+"Health" = "ആരോഗ്യം";
+"Family" = "കുടുംബം";
+"Education" = "വിദ്യാഭ്യാസം";
+"Investment" = "നിക്ഷേപം";
+"Sudden Events" = "പെട്ടെന്നുള്ള സംഭവങ്ങൾ";
 
 // MARK: - Life Areas
 "career" = "കരിയർ";
@@ -2188,6 +2274,33 @@
 "stat_rating" = "4/5";
 "rating_label" = "റേറ്റിംഗ്";
 
+// Onboarding Slide 1
+"onboarding_slide1_title" = "175K+ ഉപയോക്താക്കളുടെ വിശ്വാസം";
+"onboarding_slide1_subtitle" = "ChatGPT Store-ൽ";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "പ്രതിദിന തീരുമാനങ്ങൾക്കുള്ള വ്യക്തത";
+"onboarding_slide2_description" = "Destiny നിങ്ങളുടെ ജീവിതത്തിലെ പാറ്റേണുകൾ മനസ്സിലാക്കാൻ ഒരു വ്യക്തിഗത ഇടമാണ്. പ്രണയം, ജോലി, സൗഹൃദം എന്നിവ നാവിഗേറ്റ് ചെയ്യാനും കാര്യങ്ങൾ നിമിഷത്തിൽ ചിന്തിക്കാനും, സന്ദർഭം ചേർക്കാൻ ജ്യോതിഷത്തെ ഭാഷയായി ഉപയോഗിക്കുന്നു.";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "യഥാർത്ഥ വ്യക്തിവൽക്കരണത്തിനായി നിർമ്മിച്ചത്";
+"onboarding_slide3_description" = "അനേകം കോടി ജ്യോതിഷ്യ സംയോജനങ്ങളിൽ, ശരിയായ ഉൾക്കാഴ്ച കണ്ടെത്തുന്നത് തുംഭിച്ച ചാക്കുകൾ നിറച്ച ഒരു ബാരലിൽ ഫിറ്റാകുന്ന ഒരു ചാക്കി കണ്ടെത്തുന്നതു പോലെയാണ്. Destiny 12+ വർഷങ്ങളിൽ വികസിപ്പിച്ച AI-വഴി പ്രവർത്തിക്കുന്ന ഉടമസ്ഥതയിലുള്ള അൽഗോരിഥം ഉപയോഗിക്കുന്നു, നിങ്ങളുടെ ജനന വിശദാംശങ്ങൾ പ്രതിദിന ജീവിതത്തിനായി കൂടുതൽ വ്യക്തവും വ്യക്തിഗതവുമായ മാർഗ്ഗനിർദ്ദേശത്തിലേക്ക് പരിഭാഷപ്പെടുത്തുന്നു.";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "നിങ്ങൾക്ക് ചെയ്യാൻ കഴിയുന്ന കാര്യങ്ങൾ ഇവിടെയുണ്ട്";
+
+// Onboarding Features
+"onboarding_feature1_title" = "എന്തും ചോദിക്കൂ";
+"onboarding_feature1_desc" = "നിങ്ങളുടെ ചോദ്യങ്ങൾക്കായി റിയൽ-ടൈം ജ്യോതിഷ്യ ഉൾക്കാഴ്ചകൾ";
+"onboarding_feature2_title" = "കൂടുതൽ കൃത്യത";
+"onboarding_feature2_desc" = "സമയത്തിനൊപ്പം മെച്ചപ്പെടുന്ന വ്യക്തിഗതമാക്കിയ ഉൾക്കാഴ്ചകൾ";
+"onboarding_feature3_title" = "അനുയോജ്യത മാച്ചിംഗ്";
+"onboarding_feature3_desc" = "ബന്ധം, വിവാഹ സാധ്യത എന്നിവ പര്യവേഷണം ചെയ്യാൻ പങ്കാളിയുമായി ജനന ചാർട്ടുകൾ പൊരുത്തപ്പെടുത്തുക";
+"onboarding_feature4_title" = "ചാറ്റ് ചരിത്രം";
+"onboarding_feature4_desc" = "എപ്പോൾ വേണമെങ്കിലും കഴിഞ്ഞ സംഭാഷണങ്ങൾ പുനരാരംഭിക്കുക";
+"onboarding_feature5_title" = "കസ്റ്റം ജ്യോതിഷ്യ അലേർട്ടുകൾ";
+"onboarding_feature5_desc" = "നിങ്ങളുടെ ചാർട്ടും മുൻഗണനകളും അടിസ്ഥാനമാക്കി അനുകൂലമായ ദിവസങ്ങളിൽ അറിയിപ്പുകൾ ലഭിക്കുക";
+
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
 // ════════════════════════════════════════════════════════════════════════════
@@ -2232,6 +2345,76 @@
 "dasha_quality_good" = "നല്ലത്";
 "dasha_quality_steady" = "സ്ഥിരതയുള്ള";
 "dasha_quality_caution" = "ജാഗ്രത";
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "നമസ്കാരം %@! ഞാൻ Destiny, നിങ്ങളുടെ വ്യക്തിഗത ജ്യോതിഷ മാർഗദർശി. നിങ്ങളുടെ ദിവസം, ബന്ധങ്ങൾ അല്ലെങ്കിൽ ഭാവി എന്നിവയെക്കുറിച്ച് എന്താണ് അറിയാൻ ആഗ്രഹിക്കുന്നത്?";
+
+// Life Area Context Question
+"context_life_area_question" = "ഇന്നത്തെ പ്രവചനത്തിൽ: '%@' എന്റെ %@ ന് സൂചിപ്പിച്ചിരിക്കുന്നു. ഇത് എനിക്ക് എന്താണ് അർത്ഥമാക്കുന്നത് എന്ന് വിശദീകരിക്കാമോ?";
+
+// Dasha Context Question
+"context_dasha_question" = "ഞാൻ നിലവിൽ %@ ദശാ കാലഘട്ടത്തിലാണ്, ഇതിന്റെ വിഷയം '%@', മൊത്തത്തിലുള്ള ഗുണനിലവാരം '%@'.%@\n\nഈ ദശാ കാലഘട്ടം എന്റെ ജീവിതത്തെ എങ്ങനെ രൂപപ്പെടുത്തുന്നു, ഏത് അവസരങ്ങളോ വെല്ലുവിളികളോ പ്രതീക്ഷിക്കണം, ശുപാർശ ചെയ്യുന്ന പരിഹാരങ്ങൾ എന്നിവ വിശദമായി വിശകലനം ചെയ്യുക.";
+"context_dasha_phase_suggests" = " നിലവിലെ ഘട്ടം സൂചിപ്പിക്കുന്നത്: '%@'.";
+
+// Transit Context Question
+"context_transit_question" = "%@ നിലവിൽ %@ വഴി ഗോചരം ചെയ്യുന്നു, എന്റെ %dാം ഭാവത്തിൽ. പ്രധാന സൂചന: '%@'.
+
+ഈ ഗോചരം എന്റെ ജീവിതത്തെ എങ്ങനെ സ്വാധീനിക്കുന്നു എന്നും ഈ കാലയളവിലേക്കുള്ള പ്രായോഗിക മാർഗനിർദേശവും പങ്കിടുക.";
+
+
+// Yoga/Dosha Status
+"status_active" = "സജീവം";
+"status_reduced" = "കുറഞ്ഞു";
+"status_cancelled" = "റദ്ദാക്കി";
+
+// Yoga/Dosha Types
+"type_dosha" = "ദോഷം (നെഗറ്റീവ് സംയോജനം)";
+"type_yoga" = "യോഗം (പോസിറ്റീവ് സംയോജനം)";
+"dosha" = "ദോഷം";
+"yoga" = "യോഗം";
+
+// Yoga Context Building
+"yoga_context_header" = "എന്റെ ജാതകത്തിൽ %@ ഉണ്ട്.";
+"yoga_context_details" = "വിശദാംശങ്ങൾ:";
+"yoga_context_type" = "- തരം: %@";
+"yoga_context_category" = "- വിഭാഗം: %@";
+"yoga_context_status" = "- നില: %@";
+"yoga_context_strength" = "- ശക്തി: %d%%";
+"yoga_context_planets" = "- ഉൾപ്പെട്ട ഗ്രഹങ്ങൾ: %@";
+"yoga_context_houses" = "- ഉൾപ്പെട്ട ഭാവങ്ങൾ: %@";
+"yoga_context_formation" = "- രൂപീകരണം: %@";
+"yoga_context_outcome" = "- ഇതിന്റെ അർത്ഥം: %@";
+"yoga_context_reduction_reason" = "- കുറയ്ക്കൽ കാരണം: %@";
+"yoga_context_cancellation_reason" = "- റദ്ദാക്കൽ കാരണം: %@";
+"yoga_context_explain_header" = "കൂടുതൽ വിശദമായി വിശദീകരിക്കുക:";
+"yoga_context_question_1" = "1. ഈ %@ എന്റെ ജീവിതത്തിന് എന്താണ് അർത്ഥം";
+"yoga_context_dosha_question_2" = "2. എന്ത് വെല്ലുവിളികൾ വരാം, പരിഹാരങ്ങൾ";
+"yoga_context_yoga_question_2" = "2. ഇതിന്റെ ഗുണങ്ങൾ എങ്ങനെ പരമാവധി പ്രയോജനപ്പെടുത്താം";
+"yoga_context_inactive_question_2" = "2. ഇത് എന്തുകൊണ്ട് %@ ആണ്, ഇതിന്റെ അർത്ഥം എന്ത്";
+"yoga_context_question_3" = "3. എനിക്ക് ചെയ്യാവുന്ന പരിഹാരങ്ങൾ അല്ലെങ്കിൽ നടപടികൾ";
+"yoga_context_unknown" = "അജ്ഞാതം";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "അടിസ്ഥാനം";
+"yoga_cat_personality" = "വ്യക്തിത്വം";
+"yoga_cat_wealth" = "സമ്പത്ത്";
+"yoga_cat_career" = "തൊഴിൽ";
+"yoga_cat_relationship" = "ബന്ധം";
+"yoga_cat_education" = "വിദ്യാഭ്യാസം";
+"yoga_cat_health" = "ആരോഗ്യം";
+"yoga_cat_family" = "കുടുംബം";
+"yoga_cat_spiritual" = "ആത്മീയം";
+"yoga_cat_special" = "പ്രത്യേകം";
+"yoga_cat_pancha_mahapurusha" = "പഞ്ച മഹാപുരുഷ";
+"yoga_cat_kendra" = "കേന്ദ്ര";
+"yoga_cat_power" = "ശക്തി";
+"yoga_cat_planetary" = "ഗ്രഹ സംബന്ധ";
+"yoga_cat_unknown" = "അജ്ഞാതം";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels

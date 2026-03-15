@@ -122,7 +122,7 @@ class ChatViewModel {
         // Use active profile name for Switch Profile feature
         // If viewing as another profile, greet them by that name
         let profileName = ProfileContextManager.shared.activeProfileName
-        let greeting = "Hello \(profileName)! I'm Destiny, your personal astrology guide. What would you like to know about your day, relationships, or path ahead?"
+        let greeting = String(format: "chat_welcome_greeting".localized, profileName)
         
         let welcome = LocalChatMessage(
             threadId: currentThreadId,
@@ -206,12 +206,14 @@ class ChatViewModel {
             return
         }
         
+        let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
         let request = PredictionRequest(
             query: query,
             birthData: birthData,
             sessionId: currentSessionId,
             conversationId: currentThreadId,
-            userEmail: userEmail
+            userEmail: userEmail,
+            language: appLanguage
         )
         
         // Non-streaming API call (server records quota + chat history)

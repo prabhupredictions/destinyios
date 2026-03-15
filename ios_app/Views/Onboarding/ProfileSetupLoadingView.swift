@@ -133,7 +133,8 @@ struct ProfileSetupLoadingView: View {
         withAnimation(.linear(duration: 1.5)) { progress = 0.9 }
         
         do {
-            let request = UserAstroDataRequest(birthData: userBirthData, userEmail: userEmail)
+            let language = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+            let request = UserAstroDataRequest(birthData: userBirthData, userEmail: userEmail, language: language)
             _ = try await PredictionService().getTodaysPrediction(request: request)
         } catch {
             print("[ProfileSetup] Prediction fetch failed: \(error)")

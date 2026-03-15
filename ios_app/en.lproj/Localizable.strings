@@ -18,6 +18,52 @@
 "greeting" = "Hey, there!";
 "todays_insight" = "TODAY'S INSIGHT";
 
+// MARK: - Time Based Greetings
+"good_morning" = "Good morning";
+"good_afternoon" = "Good afternoon";
+"good_evening" = "Good evening";
+"good_night" = "Good night";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "What's in my mind?";
+"tap_to_explore_day" = "Tap to explore your day";
+
+// MARK: - Filter Labels
+"all" = "All";
+"good" = "Good";
+"steady" = "Steady";
+"caution" = "Caution";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "Theme";
+"current_dasha" = "Current Dasha";
+
+// MARK: - Life Area Filters
+"love" = "Love";
+"wealth" = "Wealth";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "Active";
+"yoga_status_reduced" = "Reduced";
+"yoga_status_cancelled" = "Cancelled";
+"yoga_status_inactive" = "Inactive";
+"planets_label" = "Planets";
+"houses_label" = "Houses";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "All";
+"filter_wealth" = "Wealth";
+"filter_career" = "Career";
+"filter_love" = "Love";
+"filter_health" = "Health";
+"filter_family" = "Family";
+"filter_education" = "Education";
+"filter_spiritual" = "Spiritual";
+"filter_foundation" = "Foundation";
+"filter_personality" = "Personality";
+"filter_special" = "Special";
+"filter_relationship" = "Relationship";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "What should I be mindful of today?";
 "how_improve_focus" = "How can I improve my focus and productivity?";
@@ -2185,8 +2231,36 @@
 
 "personalized_guidance" = "Personalized guidance, in your language";
 "stat_questions_asked" = "2.7M+";
+"questions_asked" = "questions asked";
 "stat_rating" = "4/5";
 "rating_label" = "rating";
+
+// Onboarding Slide 1
+"onboarding_slide1_title" = "Trusted by 175K+ users";
+"onboarding_slide1_subtitle" = "on the ChatGPT Store";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "Clarity for everyday decisions";
+"onboarding_slide2_description" = "Destiny is a personal space to understand patterns in your life. It helps you navigate love, work, and friendships, and think things through in the moment, using astrology as the language to add context.";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "Built for real personalization";
+"onboarding_slide3_description" = "With billions of astrological combinations, finding the right insight is like finding one key that fits in a barrel full of keys. Destiny uses a proprietary algorithm, developed over 12+ years and powered by AI, to translate your birth details into clearer, more personal guidance for everyday life.";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "Here's what you can do";
+
+// Onboarding Features
+"onboarding_feature1_title" = "Ask anything";
+"onboarding_feature1_desc" = "Real-time astrology insights for your questions";
+"onboarding_feature2_title" = "Higher accuracy";
+"onboarding_feature2_desc" = "Personalized insights that improve over time";
+"onboarding_feature3_title" = "Compatibility matching";
+"onboarding_feature3_desc" = "Match birth charts with a partner to explore relationship and marriage potential";
+"onboarding_feature4_title" = "Chat history";
+"onboarding_feature4_desc" = "Resume past conversations anytime";
+"onboarding_feature5_title" = "Custom astrological alerts";
+"onboarding_feature5_desc" = "Get notified on favorable days based on your chart and preferences";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
@@ -2232,6 +2306,73 @@
 "dasha_quality_good" = "Good";
 "dasha_quality_steady" = "Steady";
 "dasha_quality_caution" = "Caution";
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "Hello %@! I'm Destiny, your personal astrology guide. What would you like to know about your day, relationships, or path ahead?";
+
+// Life Area Context Question
+"context_life_area_question" = "Today's forecast mentions: '%@' for my %@. Can you elaborate on what this means for me?";
+
+
+// Dasha Context Question
+"context_dasha_question" = "I am currently in my %@ Dasha period, which carries a theme of '%@' with a '%@' overall quality.%@\n\nPlease provide a detailed analysis of how this Dasha period shapes my life, what opportunities or challenges to expect, and any recommended remedies.";
+"context_dasha_phase_suggests" = " The current phase suggests: '%@'.";
+
+// Transit Context Question
+"context_transit_question" = "%@ is currently transiting through %@ in my %dth house. The key indication is: '%@'.\n\nPlease share deeper insights on how this transit influences my life and any practical guidance for this period.";
+
+// Yoga/Dosha Status
+"status_active" = "Active";
+"status_reduced" = "Reduced";
+"status_cancelled" = "Cancelled";
+
+// Yoga/Dosha Types
+"type_dosha" = "dosha (negative combination)";
+"type_yoga" = "yoga (positive combination)";
+"dosha" = "dosha";
+"yoga" = "yoga";
+
+// Yoga Context Building
+"yoga_context_header" = "I have %@ in my birth chart.";
+"yoga_context_details" = "Details:";
+"yoga_context_type" = "- Type: %@";
+"yoga_context_category" = "- Category: %@";
+"yoga_context_status" = "- Status: %@";
+"yoga_context_strength" = "- Strength: %d%%";
+"yoga_context_planets" = "- Planets Involved: %@";
+"yoga_context_houses" = "- Houses Involved: %@";
+"yoga_context_formation" = "- Formation: %@";
+"yoga_context_outcome" = "- What it means: %@";
+"yoga_context_reduction_reason" = "- Reduction Reason: %@";
+"yoga_context_cancellation_reason" = "- Cancellation Reason: %@";
+"yoga_context_explain_header" = "Please explain in more detail:";
+"yoga_context_question_1" = "1. What this %@ means for my life";
+"yoga_context_dosha_question_2" = "2. What challenges it may bring and any remedies";
+"yoga_context_yoga_question_2" = "2. How to maximize its benefits";
+"yoga_context_inactive_question_2" = "2. Why it is %@ and what this means";
+"yoga_context_question_3" = "3. Any remedies or actions I can take";
+"yoga_context_unknown" = "Unknown";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "Basic Foundation";
+"yoga_cat_personality" = "Personality";
+"yoga_cat_wealth" = "Wealth";
+"yoga_cat_career" = "Career";
+"yoga_cat_relationship" = "Relationship";
+"yoga_cat_education" = "Education";
+"yoga_cat_health" = "Health";
+"yoga_cat_family" = "Family";
+"yoga_cat_spiritual" = "Spiritual";
+"yoga_cat_special" = "Special";
+"yoga_cat_pancha_mahapurusha" = "Pancha Mahapurusha";
+"yoga_cat_kendra" = "Kendra";
+"yoga_cat_power" = "Power";
+"yoga_cat_planetary" = "Planetary";
+"yoga_cat_unknown" = "Unknown";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels

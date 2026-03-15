@@ -39,7 +39,7 @@ struct TransitInfluenceCard: View {
                     }
                     
                     // Planet Transit Name
-                    Text("\(transit.planet) Transit")
+                    Text("\(localizedPlanet) Transit".localized)
                         .font(AppTheme.Fonts.premiumDisplay(size: 17))
                         .foregroundColor(.white)
                     
@@ -52,7 +52,7 @@ struct TransitInfluenceCard: View {
                         .font(.system(size: 12))
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
                     
-                    Text("\(fullSignName(for: transit.sign)) · House \(transit.house)")
+                    Text("\(localizedSignName(for: transit.sign)) · house_label".localized + " \(transit.house)")
                         .font(AppTheme.Fonts.body(size: 14))
                         .fontWeight(.medium)
                         .foregroundColor(AppTheme.Colors.goldLight)
@@ -153,6 +153,41 @@ struct TransitInfluenceCard: View {
     
     // MARK: - Computed Properties
     
+    /// Localized planet name
+    var localizedPlanet: String {
+        switch transit.planet.lowercased() {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return transit.planet
+        }
+    }
+    
+    /// Localized sign name from abbreviation
+    func localizedSignName(for sign: String) -> String {
+        switch sign {
+        case "Ar": return "sign_ar".localized
+        case "Ta": return "sign_ta".localized
+        case "Ge": return "sign_ge".localized
+        case "Ca": return "sign_ca".localized
+        case "Le": return "sign_le".localized
+        case "Vi": return "sign_vi".localized
+        case "Li": return "sign_li".localized
+        case "Sc": return "sign_sc".localized
+        case "Sg": return "sign_sg".localized
+        case "Cp": return "sign_cp".localized
+        case "Aq": return "sign_aq".localized
+        case "Pi": return "sign_pi".localized
+        default: return sign
+        }
+    }
+    
     var planetSymbol: String {
         switch transit.planet.lowercased() {
         case "sun": return "sun.max.fill"
@@ -223,7 +258,7 @@ struct TransitOrbView: View {
                     .frame(width: 60, height: 60)
                 
                 // Planet Name Badge (centered, floating with planet)
-                Text(transit.planet)
+                Text(localizedPlanet)
                     .font(AppTheme.Fonts.caption(size: 9))
                     .fontWeight(.semibold)
                     .foregroundColor(AppTheme.Colors.gold)
@@ -273,8 +308,8 @@ struct TransitOrbView: View {
                     .frame(width: 68, height: 68)
             )
             
-            // Sign (Full Name)
-            Text(fullSignName)
+            // Sign (Full Name - Localized)
+            Text(localizedSignName)
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             
@@ -326,7 +361,42 @@ struct TransitOrbView: View {
         }
     }
     
-    /// Convert abbreviated sign to full name
+    /// Localized sign name from abbreviation
+    var localizedSignName: String {
+        switch transit.sign {
+        case "Ar": return "sign_ar".localized
+        case "Ta": return "sign_ta".localized
+        case "Ge": return "sign_ge".localized
+        case "Ca": return "sign_ca".localized
+        case "Le": return "sign_le".localized
+        case "Vi": return "sign_vi".localized
+        case "Li": return "sign_li".localized
+        case "Sc": return "sign_sc".localized
+        case "Sg": return "sign_sg".localized
+        case "Cp": return "sign_cp".localized
+        case "Aq": return "sign_aq".localized
+        case "Pi": return "sign_pi".localized
+        default: return transit.sign
+        }
+    }
+    
+    /// Localized planet name
+    var localizedPlanet: String {
+        switch transit.planet.lowercased() {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return transit.planet
+        }
+    }
+    
+    /// Convert abbreviated sign to full name (English - kept for backwards compatibility)
     var fullSignName: String {
         let signMap: [String: String] = [
             "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini",

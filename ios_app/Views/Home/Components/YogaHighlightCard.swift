@@ -8,24 +8,20 @@ struct YogaHighlightCard: View {
     @State private var selectedFilter: FilterType = .all
     
     enum FilterType: String, CaseIterable {
-        case all = "All"
-        case wealth = "Wealth"
-        case career = "Career"
-        case love = "Relationship"
-        case health = "Health"
-        case family = "Family"
-        case education = "Education"
-        case spiritual = "Spiritual"
-        case foundation = "Basic Foundation"
-        case personality = "Personality"
-        case special = "Special"
+        case all = "filter_all"
+        case wealth = "filter_wealth"
+        case career = "filter_career"
+        case love = "filter_relationship"
+        case health = "filter_health"
+        case family = "filter_family"
+        case education = "filter_education"
+        case spiritual = "filter_spiritual"
+        case foundation = "filter_foundation"
+        case personality = "filter_personality"
+        case special = "filter_special"
         
         var displayName: String {
-            switch self {
-            case .love: return "Love"
-            case .foundation: return "Foundation"
-            default: return self.rawValue
-            }
+            return self.rawValue.localized
         }
         
         // All possible backend values that match this filter
@@ -166,10 +162,10 @@ struct PremiumYogaCard: View {
     // Status Logic
     var statusText: String {
         switch yoga.status {
-        case "A": return "Active"
-        case "C": return "Cancelled"
-        case "R": return "Reduced"
-        default: return "Inactive"
+        case "A": return "yoga_status_active".localized
+        case "C": return "yoga_status_cancelled".localized
+        case "R": return "yoga_status_reduced".localized
+        default: return "yoga_status_inactive".localized
         }
     }
     
@@ -253,7 +249,7 @@ struct PremiumYogaCard: View {
                             .foregroundColor(AppTheme.Colors.textTertiary)
                             .tracking(1)
                         
-                        Text(yoga.planets.isEmpty ? "Unknown" : yoga.planets)
+                        Text(yoga.planets.isEmpty ? "Unknown" : localizedPlanets(yoga.planets))
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .lineLimit(1)
@@ -346,5 +342,25 @@ struct PremiumYogaCard: View {
     private func formatHouses(_ houses: String) -> String {
         let items = houses.split(separator: ",")
         return items.map { "H\($0.trimmingCharacters(in: .whitespaces))" }.joined(separator: ", ")
+    }
+    
+    private func localizedPlanets(_ planets: String) -> String {
+        let planetNames = planets.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        let localized = planetNames.map { planet -> String in
+            let key = planet.lowercased()
+            switch key {
+            case "sun": return "planet_sun".localized
+            case "moon": return "planet_moon".localized
+            case "mars": return "planet_mars".localized
+            case "mercury": return "planet_mercury".localized
+            case "jupiter": return "planet_jupiter".localized
+            case "venus": return "planet_venus".localized
+            case "saturn": return "planet_saturn".localized
+            case "rahu": return "planet_rahu".localized
+            case "ketu": return "planet_ketu".localized
+            default: return planet
+            }
+        }
+        return localized.joined(separator: ", ")
     }
 }

@@ -5,8 +5,9 @@ import Foundation
 struct UserAstroDataRequest: Codable {
     let birthData: UserBirthData
     let userEmail: String?
+    let language: String?  // Language code for LLM response (e.g., "en", "hi", "es")
     
-    init(birthData: UserBirthData, userEmail: String? = nil) {
+    init(birthData: UserBirthData, userEmail: String? = nil, language: String? = nil) {
         // Round coordinates to 6 decimal places to satisfy backend validation
         let roundedLat = (birthData.latitude * 1_000_000).rounded() / 1_000_000
         let roundedLong = (birthData.longitude * 1_000_000).rounded() / 1_000_000
@@ -23,11 +24,13 @@ struct UserAstroDataRequest: Codable {
             birthTimeUnknown: birthData.birthTimeUnknown
         )
         self.userEmail = userEmail
+        self.language = language
     }
     
     enum CodingKeys: String, CodingKey {
         case birthData = "birth_data"
         case userEmail = "user_email"
+        case language
     }
 }
 

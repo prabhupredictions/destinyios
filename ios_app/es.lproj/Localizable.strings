@@ -18,6 +18,52 @@
 "greeting" = "¡Hola!";
 "todays_insight" = "HORÓSCOPO DE HOY";
 
+// MARK: - Time Based Greetings
+"good_morning" = "Buenos días";
+"good_afternoon" = "Buenas tardes";
+"good_evening" = "Buenas noches";
+"good_night" = "Buena noche";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "¿Qué tengo en mente?";
+"tap_to_explore_day" = "Toca para explorar tu día";
+
+// MARK: - Filter Labels
+"all" = "Todos";
+"good" = "Bueno";
+"steady" = "Estable";
+"caution" = "Precaución";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "Tema";
+"current_dasha" = "Dasha Actual";
+
+// MARK: - Life Area Filters
+"love" = "Amor";
+"wealth" = "Riqueza";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "Activo";
+"yoga_status_reduced" = "Reducido";
+"yoga_status_cancelled" = "Cancelado";
+"yoga_status_inactive" = "Inactivo";
+"planets_label" = "Planetas";
+"houses_label" = "Casas";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "Todos";
+"filter_wealth" = "Riqueza";
+"filter_career" = "Carrera";
+"filter_love" = "Amor";
+"filter_health" = "Salud";
+"filter_family" = "Familia";
+"filter_education" = "Educación";
+"filter_spiritual" = "Espiritual";
+"filter_foundation" = "Fundamento";
+"filter_personality" = "Personalidad";
+"filter_special" = "Especial";
+"filter_relationship" = "Relación";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "¿Qué debería tener en cuenta hoy?";
 "how_improve_focus" = "¿Cómo puedo mejorar mi concentración?";
@@ -444,6 +490,46 @@
 // MARK: - Mitigation Fallback
 "factors_reduce_severity" = "Los factores reducen la gravedad del dosha.";
 "factors_increase_severity" = "Los factores aumentan la gravedad del dosha.";
+
+// MARK: - Full Zodiac Sign Names (for display)
+"Aries" = "Aries";
+"Taurus" = "Tauro";
+"Gemini" = "Géminis";
+"Cancer" = "Cáncer";
+"Leo" = "Leo";
+"Virgo" = "Virgo";
+"Libra" = "Libra";
+"Scorpio" = "Escorpio";
+"Sagittarius" = "Sagitario";
+"Capricorn" = "Capricornio";
+"Aquarius" = "Acuario";
+"Pisces" = "Piscis";
+
+// MARK: - Full Planet Names (for display)
+"Sun" = "Sol";
+"Moon" = "Luna";
+"Mars" = "Marte";
+"Mercury" = "Mercurio";
+"Jupiter" = "Júpiter";
+"Venus" = "Venus";
+"Saturn" = "Saturno";
+"Rahu" = "Rahu";
+"Ketu" = "Ketu";
+
+// MARK: - UI Labels
+"Ascendant" = "Ascendente";
+"House" = "Casa";
+"Transit" = "Tránsito";
+
+// MARK: - Life Areas (with uppercase keys for StoryOrbs)
+"Career" = "Carrera";
+"Relationship" = "Relación";
+"Finance" = "Finanzas";
+"Health" = "Salud";
+"Family" = "Familia";
+"Education" = "Educación";
+"Investment" = "Inversión";
+"Sudden Events" = "Eventos Repentinos";
 
 // MARK: - Life Areas
 "career" = "Carrera";
@@ -2186,7 +2272,34 @@
 "personalized_guidance" = "Orientación personalizada, en tu idioma.";
 "stat_questions_asked" = "2,7 millones+";
 "stat_rating" = "4/5";
-"rating_label" = "clasificación";
+"rating_label" = "valoración";
+
+// Onboarding Slide 1
+"onboarding_slide1_title" = "Confianza de más de 175 mil usuarios";
+"onboarding_slide1_subtitle" = "en la Tienda de ChatGPT";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "Claridad para las decisiones cotidianas";
+"onboarding_slide2_description" = "Destiny es un espacio personal para comprender los patrones de tu vida. Te ayuda a navegar el amor, el trabajo y la amistad, y a reflexionar en el momento, utilizando la astrología como idioma para añadir contexto.";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "Diseñado para la personalización real";
+"onboarding_slide3_description" = "Con miles de millones de combinaciones astrológicas, encontrar la perspicacia adecuada es como encontrar una llave que encaje en un barril lleno de llaves. Destiny utiliza un algoritmo patentado, desarrollado durante más de 12 años y potenciado por IA, para traducir los detalles de tu nacimiento en una guía más clara y personal para la vida cotidiana.";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "Esto es lo que puedes hacer";
+
+// Onboarding Features
+"onboarding_feature1_title" = "Pregunta cualquier cosa";
+"onboarding_feature1_desc" = "Perspectivas astrológicas en tiempo real para tus preguntas";
+"onboarding_feature2_title" = "Mayor precisión";
+"onboarding_feature2_desc" = "Perspectivas personalizadas que mejoran con el tiempo";
+"onboarding_feature3_title" = "Emparejamiento de compatibilidad";
+"onboarding_feature3_desc" = "Compara cartas natales con una pareja para explorar el potencial de relación y matrimonio";
+"onboarding_feature4_title" = "Historial de chat";
+"onboarding_feature4_desc" = "Reanuda conversaciones pasadas en cualquier momento";
+"onboarding_feature5_title" = "Alertas astrológicas personalizadas";
+"onboarding_feature5_desc" = "Recibe notificaciones de días favorables según tu carta y preferencias";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
@@ -2232,6 +2345,76 @@
 "dasha_quality_good" = "Bien";
 "dasha_quality_steady" = "Estable";
 "dasha_quality_caution" = "Precaución";
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "¡Hola %@! Soy Destiny, tu guía de astrología personal. ¿Qué te gustaría saber sobre tu día, relaciones o camino por delante?";
+
+// Life Area Context Question
+"context_life_area_question" = "El pronóstico de hoy menciona: '%@' para mi %@. ¿Puedes explicar qué significa esto para mí?";
+
+// Dasha Context Question
+"context_dasha_question" = "Actualmente estoy en mi período Dasha %@, con un tema de '%@' y una calidad general de '%@'.%@\n\nPor favor proporcione un análisis detallado de cómo este período Dasha influye en mi vida, qué oportunidades o desafíos esperar, y cualquier remedio recomendado.";
+"context_dasha_phase_suggests" = " La fase actual sugiere: '%@'.";
+
+// Transit Context Question
+"context_transit_question" = "%@ está transitando actualmente por %@ en mi casa %d. La indicación clave es: '%@'.
+
+Por favor comparta información más profunda sobre cómo este tránsito influye en mi vida y cualquier orientación práctica para este período.";
+
+
+// Yoga/Dosha Status
+"status_active" = "Activo";
+"status_reduced" = "Reducido";
+"status_cancelled" = "Cancelado";
+
+// Yoga/Dosha Types
+"type_dosha" = "dosha (combinación negativa)";
+"type_yoga" = "yoga (combinación positiva)";
+"dosha" = "dosha";
+"yoga" = "yoga";
+
+// Yoga Context Building
+"yoga_context_header" = "Tengo %@ en mi carta natal.";
+"yoga_context_details" = "Detalles:";
+"yoga_context_type" = "- Tipo: %@";
+"yoga_context_category" = "- Categoría: %@";
+"yoga_context_status" = "- Estado: %@";
+"yoga_context_strength" = "- Fuerza: %d%%";
+"yoga_context_planets" = "- Planetas involucrados: %@";
+"yoga_context_houses" = "- Casas involucradas: %@";
+"yoga_context_formation" = "- Formación: %@";
+"yoga_context_outcome" = "- Lo que significa: %@";
+"yoga_context_reduction_reason" = "- Razón de reducción: %@";
+"yoga_context_cancellation_reason" = "- Razón de cancelación: %@";
+"yoga_context_explain_header" = "Por favor explique con más detalle:";
+"yoga_context_question_1" = "1. Qué significa este %@ para mi vida";
+"yoga_context_dosha_question_2" = "2. Qué desafíos puede traer y remedios";
+"yoga_context_yoga_question_2" = "2. Cómo maximizar sus beneficios";
+"yoga_context_inactive_question_2" = "2. Por qué está %@ y qué significa";
+"yoga_context_question_3" = "3. Cualquier remedio o acción que pueda tomar";
+"yoga_context_unknown" = "Desconocido";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "Fundamento Básico";
+"yoga_cat_personality" = "Personalidad";
+"yoga_cat_wealth" = "Riqueza";
+"yoga_cat_career" = "Carrera";
+"yoga_cat_relationship" = "Relación";
+"yoga_cat_education" = "Educación";
+"yoga_cat_health" = "Salud";
+"yoga_cat_family" = "Familia";
+"yoga_cat_spiritual" = "Espiritual";
+"yoga_cat_special" = "Especial";
+"yoga_cat_pancha_mahapurusha" = "Pancha Mahapurusha";
+"yoga_cat_kendra" = "Kendra";
+"yoga_cat_power" = "Poder";
+"yoga_cat_planetary" = "Planetario";
+"yoga_cat_unknown" = "Desconocido";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels

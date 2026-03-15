@@ -518,6 +518,7 @@ class CompatibilityViewModel {
             let roundedGirlLat = (girlLatitude * 1_000_000).rounded() / 1_000_000
             let roundedGirlLon = (girlLongitude * 1_000_000).rounded() / 1_000_000
             
+            let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
             let request = CompatibilityRequest(
                 boy: BirthDetails(
                     dob: dateFormatter.string(from: boyBirthDate),
@@ -538,6 +539,7 @@ class CompatibilityViewModel {
                 sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
                 userEmail: UserDefaults.standard.string(forKey: "userEmail"),  // Pass real email for history storage
                 profileId: ProfileContextManager.shared.activeProfileId,  // Profile-scoped threads
+                language: appLanguage,
                 comparisonGroupId: currentComparisonGroupId,  // Multi-partner grouping
                 partnerIndex: partners.count > 1 ? activePartnerIndex : nil  // Partner order in group
             )
@@ -679,6 +681,7 @@ class CompatibilityViewModel {
                 let roundedPartnerLat = (partner.latitude * 1_000_000).rounded() / 1_000_000
                 let roundedPartnerLon = (partner.longitude * 1_000_000).rounded() / 1_000_000
                 
+                let appLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
                 let request = CompatibilityRequest(
                     boy: BirthDetails(
                         dob: dateFormatter.string(from: boyBirthDate),
@@ -699,6 +702,7 @@ class CompatibilityViewModel {
                     sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
                     userEmail: currentEmail,
                     profileId: ProfileContextManager.shared.activeProfileId,  // Profile-scoped threads
+                    language: appLang,
                     comparisonGroupId: currentComparisonGroupId,
                     partnerIndex: index
                 )
@@ -800,6 +804,7 @@ class CompatibilityViewModel {
                 let roundedPartnerLat = (partner.latitude * 1_000_000).rounded() / 1_000_000
                 let roundedPartnerLon = (partner.longitude * 1_000_000).rounded() / 1_000_000
                 
+                let retryLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
                 let request = CompatibilityRequest(
                     boy: BirthDetails(
                         dob: dateFormatter.string(from: boyBirthDate),
@@ -820,6 +825,7 @@ class CompatibilityViewModel {
                     sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
                     userEmail: currentEmail,
                     profileId: ProfileContextManager.shared.activeProfileId,
+                    language: retryLang,
                     comparisonGroupId: currentComparisonGroupId,
                     partnerIndex: index
                 )

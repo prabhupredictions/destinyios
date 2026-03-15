@@ -18,6 +18,52 @@
 "greeting" = "Привет!";
 "todays_insight" = "ГОРОСКОП НА СЕГОДНЯ";
 
+// MARK: - Time Based Greetings
+"good_morning" = "Доброе утро";
+"good_afternoon" = "Добрый день";
+"good_evening" = "Добрый вечер";
+"good_night" = "Доброй ночи";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "Что у меня на уме?";
+"tap_to_explore_day" = "Нажмите, чтобы исследовать день";
+
+// MARK: - Filter Labels
+"all" = "Все";
+"good" = "Хорошо";
+"steady" = "Стабильно";
+"caution" = "Осторожно";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "Тема";
+"current_dasha" = "Текущая Даша";
+
+// MARK: - Life Area Filters
+"love" = "Любовь";
+"wealth" = "Богатство";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "Активно";
+"yoga_status_reduced" = "Снижено";
+"yoga_status_cancelled" = "Отменено";
+"yoga_status_inactive" = "Неактивно";
+"planets_label" = "Планеты";
+"houses_label" = "Дома";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "Все";
+"filter_wealth" = "Богатство";
+"filter_career" = "Карьера";
+"filter_love" = "Любовь";
+"filter_health" = "Здоровье";
+"filter_family" = "Семья";
+"filter_education" = "Образование";
+"filter_spiritual" = "Духовное";
+"filter_foundation" = "Основа";
+"filter_personality" = "Личность";
+"filter_special" = "Особое";
+"filter_relationship" = "Отношения";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "На что обратить внимание сегодня?";
 "how_improve_focus" = "Как улучшить концентрацию?";
@@ -444,6 +490,46 @@
 // MARK: - Mitigation Fallback
 "factors_reduce_severity" = "факторы снижают выраженность доши";
 "factors_increase_severity" = "Факторы увеличивают тяжесть доши";
+
+// MARK: - Full Zodiac Sign Names (for display)
+"Aries" = "Овен";
+"Taurus" = "Телец";
+"Gemini" = "Близнецы";
+"Cancer" = "Рак";
+"Leo" = "Лев";
+"Virgo" = "Дева";
+"Libra" = "Весы";
+"Scorpio" = "Скорпион";
+"Sagittarius" = "Стрелец";
+"Capricorn" = "Козерог";
+"Aquarius" = "Водолей";
+"Pisces" = "Рыбы";
+
+// MARK: - Full Planet Names (for display)
+"Sun" = "Солнце";
+"Moon" = "Луна";
+"Mars" = "Марс";
+"Mercury" = "Меркурий";
+"Jupiter" = "Юпитер";
+"Venus" = "Венера";
+"Saturn" = "Сатурн";
+"Rahu" = "Раху";
+"Ketu" = "Кету";
+
+// MARK: - UI Labels
+"Ascendant" = "Асцендент";
+"House" = "Дом";
+"Transit" = "Транзит";
+
+// MARK: - Life Areas (with uppercase keys for StoryOrbs)
+"Career" = "Карьера";
+"Relationship" = "Отношения";
+"Finance" = "Финансы";
+"Health" = "Здоровье";
+"Family" = "Семья";
+"Education" = "Образование";
+"Investment" = "Инвестиции";
+"Sudden Events" = "Внезапные События";
 
 // MARK: - Life Areas
 "career" = "Карьера";
@@ -2188,6 +2274,33 @@
 "stat_rating" = "4/5";
 "rating_label" = "рейтинг";
 
+// Onboarding Slide 1
+"onboarding_slide1_title" = "Доверие более 175 тыс. пользователей";
+"onboarding_slide1_subtitle" = "в магазине ChatGPT";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "Ясность для повседневных решений";
+"onboarding_slide2_description" = "Destiny — это личное пространство для понимания закономерностей в вашей жизни. Он помогает вам ориентироваться в любви, работе и дружбе, и обдумывать все в данный момент, используя астрологию как язык для добавления контекста.";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "Создан для настоящей персонализации";
+"onboarding_slide3_description" = "С миллиардами астрологических комбинаций найти правильное понимание — это как найти один ключ, который подходит к бочке, полной ключей. Destiny использует проприетарный алгоритм, разработанный за более чем 12 лет и работающий на базе ИИ, чтобы переводить данные вашего рождения в более четкое, персональное руководство для повседневной жизни.";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "Вот что вы можете сделать";
+
+// Onboarding Features
+"onboarding_feature1_title" = "Спросите что угодно";
+"onboarding_feature1_desc" = "Астрологические инсайты в реальном времени для ваших вопросов";
+"onboarding_feature2_title" = "Высокая точность";
+"onboarding_feature2_desc" = "Персонализированные инсайты, которые улучшаются со временем";
+"onboarding_feature3_title" = "Совместимость партнеров";
+"onboarding_feature3_desc" = "Сопоставляйте карты рождения с партнером, чтобы исследовать потенциал отношений и брака";
+"onboarding_feature4_title" = "История чатов";
+"onboarding_feature4_desc" = "Возобновляйте прошлые разговоры в любое время";
+"onboarding_feature5_title" = "Пользовательские астрологические оповещения";
+"onboarding_feature5_desc" = "Получайте уведомления о благоприятных днях на основе вашей карты и предпочтений";
+
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
 // ════════════════════════════════════════════════════════════════════════════
@@ -2232,6 +2345,76 @@
 "dasha_quality_good" = "Хороший";
 "dasha_quality_steady" = "Устойчивый";
 "dasha_quality_caution" = "Осторожность";
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "Здравствуйте, %@! Я Destiny, ваш персональный астрологический гид. Что вы хотели бы узнать о своём дне, отношениях или будущем?";
+
+// Life Area Context Question
+"context_life_area_question" = "Сегодняшний прогноз упоминает: '%@' для моего раздела %@. Можете подробнее объяснить, что это значит для меня?";
+
+// Dasha Context Question
+"context_dasha_question" = "Я сейчас нахожусь в периоде Даша %@, тема которого — «%@», общее качество — «%@».%@\n\nПожалуйста, подробно проанализируйте, как этот период Даша влияет на мою жизнь, какие возможности или трудности ожидать, и какие есть рекомендуемые средства.";
+"context_dasha_phase_suggests" = " Текущая фаза указывает: «%@».";
+
+// Transit Context Question
+"context_transit_question" = "%@ сейчас транзитирует через %@ в моём %d-м доме. Ключевое указание: '%@'.
+
+Поделитесь более глубокими знаниями о том, как этот транзит влияет на мою жизнь, и практическими рекомендациями на этот период.";
+
+
+// Yoga/Dosha Status
+"status_active" = "Активный";
+"status_reduced" = "Ослаблен";
+"status_cancelled" = "Отменён";
+
+// Yoga/Dosha Types
+"type_dosha" = "доша (негативная комбинация)";
+"type_yoga" = "йога (позитивная комбинация)";
+"dosha" = "доша";
+"yoga" = "йога";
+
+// Yoga Context Building
+"yoga_context_header" = "В моей натальной карте есть %@.";
+"yoga_context_details" = "Подробности:";
+"yoga_context_type" = "- Тип: %@";
+"yoga_context_category" = "- Категория: %@";
+"yoga_context_status" = "- Статус: %@";
+"yoga_context_strength" = "- Сила: %d%%";
+"yoga_context_planets" = "- Участвующие планеты: %@";
+"yoga_context_houses" = "- Участвующие дома: %@";
+"yoga_context_formation" = "- Формация: %@";
+"yoga_context_outcome" = "- Значение: %@";
+"yoga_context_reduction_reason" = "- Причина ослабления: %@";
+"yoga_context_cancellation_reason" = "- Причина отмены: %@";
+"yoga_context_explain_header" = "Пожалуйста, объясните подробнее:";
+"yoga_context_question_1" = "1. Что эта %@ означает для моей жизни";
+"yoga_context_dosha_question_2" = "2. Какие трудности может принести и средства";
+"yoga_context_yoga_question_2" = "2. Как максимально использовать её преимущества";
+"yoga_context_inactive_question_2" = "2. Почему она %@ и что это значит";
+"yoga_context_question_3" = "3. Какие средства или действия я могу предпринять";
+"yoga_context_unknown" = "Неизвестно";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "Основа";
+"yoga_cat_personality" = "Личность";
+"yoga_cat_wealth" = "Богатство";
+"yoga_cat_career" = "Карьера";
+"yoga_cat_relationship" = "Отношения";
+"yoga_cat_education" = "Образование";
+"yoga_cat_health" = "Здоровье";
+"yoga_cat_family" = "Семья";
+"yoga_cat_spiritual" = "Духовность";
+"yoga_cat_special" = "Особая";
+"yoga_cat_pancha_mahapurusha" = "Панча Махапуруша";
+"yoga_cat_kendra" = "Кендра";
+"yoga_cat_power" = "Сила";
+"yoga_cat_planetary" = "Планетарная";
+"yoga_cat_unknown" = "Неизвестно";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels

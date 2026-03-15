@@ -94,6 +94,57 @@ struct HomeView: View {
                         // Offline indicator
                         OfflineBanner()
                         
+                        // Error banner with retry option
+                        if let errorMessage = viewModel.errorMessage {
+                            VStack(spacing: 12) {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(AppTheme.Colors.gold)
+                                    
+                                    Text(errorMessage)
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                        .multilineTextAlignment(.center)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                
+                                Button(action: {
+                                    HapticManager.shared.play(.light)
+                                    Task {
+                                        await viewModel.loadHomeData()
+                                    }
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "arrow.clockwise")
+                                            .font(.system(size: 12, weight: .semibold))
+                                        Text("Retry")
+                                            .font(AppTheme.Fonts.caption(size: 13))
+                                    }
+                                    .foregroundColor(AppTheme.Colors.textOnGold)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        AppTheme.Colors.premiumCardGradient
+                                            .clipShape(Capsule())
+                                    )
+                                }
+                                .buttonStyle(ScaleButtonStyle())
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .padding(.horizontal, 20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(AppTheme.Colors.error.opacity(0.15))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(AppTheme.Colors.error.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                            .padding(.horizontal, 4)
+                        }
+                        
                         if viewModel.isLoading {
                             VStack(spacing: 20) {
                                 // Animated cosmic icon
@@ -125,12 +176,14 @@ struct HomeView: View {
                             if let dasha = viewModel.dashaInsight {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("current_dasha".localized)
-                                        .font(AppTheme.Fonts.caption(size: 11))
+                                        .font(AppTheme.Fonts.premiumDisplay(size: 18))
                                         .goldGradient()
                                     
                                     Button(action: {
                                         HapticManager.shared.play(.light)
-                                        let q = "I am currently in my \(dasha.period) Dasha period, which carries a theme of '\(dasha.theme)' with a '\(dasha.quality)' overall quality.\(dasha.meaning != nil ? " The current phase suggests: '\(dasha.meaning!)'." : "")\n\nPlease provide a detailed analysis of how this Dasha period shapes my life, what opportunities or challenges to expect, and any recommended remedies."
+                                        let localizedQuality = localizedDashaQuality(dasha.quality)
+                                        let meaningPart = dasha.meaning != nil ? String(format: "context_dasha_phase_suggests".localized, dasha.meaning!) : ""
+                                        let q = String(format: "context_dasha_question".localized, dasha.period, dasha.theme, localizedQuality, meaningPart)
                                         onQuestionSelected?(q)
                                     }) {
                                         DashaInsightCard(dasha: dasha)
@@ -145,8 +198,9 @@ struct HomeView: View {
                                     transits: viewModel.transitInfluences,
                                     onTransitTapped: { transit in
                                         HapticManager.shared.play(.light)
-                                        let signName = fullZodiacName(for: transit.sign)
-                                        let q = "\(transit.planet) is currently transiting through \(signName) in my \(transit.house)th house. The key indication is: '\(transit.description)'.\n\nPlease share deeper insights on how this transit influences my life and any practical guidance for this period."
+                                        let signName = localizedZodiacName(for: transit.sign)
+                                        let localizedPlanet = localizedPlanetName(transit.planet)
+                                        let q = String(format: "context_transit_question".localized, localizedPlanet, signName, transit.house, transit.description)
                                         onQuestionSelected?(q)
                                     }
                                 )
@@ -179,7 +233,7 @@ struct HomeView: View {
                     brief: selected.status.brief,
                     iconName: iconName(for: selected.area),
                     onAskMore: {
-                        let contextualQuestion = "Today's forecast mentions: '\(selected.status.brief)' for my \(selected.area). Can you elaborate on what this means for me?"
+                        let contextualQuestion = String(format: "context_life_area_question".localized, selected.status.brief, selected.area.localized)
                         selectedLifeArea = nil
                         onQuestionSelected?(contextualQuestion)
                     },
@@ -196,49 +250,50 @@ struct HomeView: View {
                     yoga: yoga,
                     onAskMore: {
                         // Build rich LLM context
-                        let statusText = yoga.status == "A" ? "Active" : (yoga.status == "R" ? "Reduced" : "Cancelled")
-                        let typeText = yoga.isDosha ? "dosha (negative combination)" : "yoga (positive combination)"
+                        let statusText = yoga.status == "A" ? "status_active".localized : (yoga.status == "R" ? "status_reduced".localized : "status_cancelled".localized)
+                        let typeText = yoga.isDosha ? "type_dosha".localized : "type_yoga".localized
                         
                         var contextParts: [String] = [
-                            "I have \(yoga.localizedName) in my birth chart.",
+                            String(format: "yoga_context_header".localized, yoga.localizedName),
                             "",
-                            "Details:",
-                            "- Type: \(typeText)",
-                            "- Category: \(yoga.category ?? "Unknown")",
-                            "- Status: \(statusText)",
-                            "- Strength: \(Int(yoga.strength * 100))%",
-                            "- Planets Involved: \(yoga.planets)",
-                            "- Houses Involved: \(yoga.houses)"
+                            "yoga_context_details".localized,
+                            String(format: "yoga_context_type".localized, typeText),
+                            String(format: "yoga_context_category".localized, localizedYogaCategory(yoga.category)),
+                            String(format: "yoga_context_status".localized, statusText),
+                            String(format: "yoga_context_strength".localized, Int(yoga.strength * 100)),
+                            String(format: "yoga_context_planets".localized, localizedPlanets(yoga.planets)),
+                            String(format: "yoga_context_houses".localized, yoga.houses)
                         ]
                         
                         if let formation = yoga.formation, !formation.isEmpty {
-                            contextParts.append("- Formation: \(formation)")
+                            contextParts.append(String(format: "yoga_context_formation".localized, formation))
                         }
                         
                         // Add outcome (What it means) if available
                         if let outcome = yoga.localizedOutcome, !outcome.isEmpty {
-                            contextParts.append("- What it means: \(outcome)")
+                            contextParts.append(String(format: "yoga_context_outcome".localized, outcome))
                         }
                         
                         if let reason = yoga.reason, !reason.isEmpty, yoga.status != "A" {
                             // Transform exception keys to human-readable text
                             let localizedReason = DoshaDescriptions.localizeExceptionKeys(in: reason)
-                            contextParts.append("- \(yoga.status == "R" ? "Reduction" : "Cancellation") Reason: \(localizedReason)")
+                            let reasonKey = yoga.status == "R" ? "yoga_context_reduction_reason" : "yoga_context_cancellation_reason"
+                            contextParts.append(String(format: reasonKey.localized, localizedReason))
                         }
                         
                         contextParts.append("")
-                        contextParts.append("Please explain in more detail:")
-                        contextParts.append("1. What this \(yoga.isDosha ? "dosha" : "yoga") means for my life")
+                        contextParts.append("yoga_context_explain_header".localized)
+                        contextParts.append(String(format: "yoga_context_question_1".localized, yoga.isDosha ? "dosha".localized : "yoga".localized))
                         
                         if yoga.status == "A" {
                             if yoga.isDosha {
-                                contextParts.append("2. What challenges it may bring and any remedies")
+                                contextParts.append("yoga_context_dosha_question_2".localized)
                             } else {
-                                contextParts.append("2. How to maximize its benefits")
+                                contextParts.append("yoga_context_yoga_question_2".localized)
                             }
                         } else {
-                            contextParts.append("2. Why it is \(statusText.lowercased()) and what this means")
-                            contextParts.append("3. Any remedies or actions I can take")
+                            contextParts.append(String(format: "yoga_context_inactive_question_2".localized, statusText.lowercased()))
+                            contextParts.append("yoga_context_question_3".localized)
                         }
                         
                         let contextualQuestion = contextParts.joined(separator: "\n")
@@ -595,6 +650,47 @@ struct HomeView: View {
         return fullMap[sign] ?? sign
     }
     
+    /// Returns localized zodiac sign name using sign_* keys
+    private func localizedZodiacName(for sign: String) -> String {
+        let keyMap: [String: String] = [
+            "Ar": "sign_ar", "Aries": "sign_ar",
+            "Ta": "sign_ta", "Taurus": "sign_ta",
+            "Ge": "sign_ge", "Gemini": "sign_ge",
+            "Cn": "sign_ca", "Cancer": "sign_ca",
+            "Le": "sign_le", "Leo": "sign_le",
+            "Vi": "sign_vi", "Virgo": "sign_vi",
+            "Li": "sign_li", "Libra": "sign_li",
+            "Sc": "sign_sc", "Scorpio": "sign_sc",
+            "Sg": "sign_sg", "Sagittarius": "sign_sg", "Sag": "sign_sg",
+            "Cp": "sign_cp", "Capricorn": "sign_cp", "Cap": "sign_cp",
+            "Aq": "sign_aq", "Aquarius": "sign_aq",
+            "Pi": "sign_pi", "Pisces": "sign_pi"
+        ]
+        if let key = keyMap[sign] {
+            return key.localized
+        }
+        return sign
+    }
+    
+    /// Returns localized dasha quality string
+    private func localizedDashaQuality(_ quality: String) -> String {
+        switch quality.lowercased() {
+        case "good": return "dasha_quality_good".localized
+        case "steady": return "dasha_quality_steady".localized
+        case "caution": return "dasha_quality_caution".localized
+        default: return quality
+        }
+    }
+    
+    /// Returns localized yoga category name
+    private func localizedYogaCategory(_ category: String?) -> String {
+        guard let cat = category, !cat.isEmpty else { return "yoga_context_unknown".localized }
+        let key = "yoga_cat_" + cat.lowercased().replacingOccurrences(of: " ", with: "_")
+        let localized = key.localized
+        // If key not found (returns same string), fall back to original
+        return localized == key ? cat : localized
+    }
+    
     // C. Cosmic Status Strip
     private var cosmicStatusStrip: some View {
         let transits = viewModel.currentTransits.map { transit in
@@ -619,14 +715,7 @@ struct HomeView: View {
                     .goldGradient()
                 
                 HStack(spacing: 6) {
-                    Text(viewModel.ascendantSign + " Ascendant")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                    
-                    Text("\u{00B7}")
-                        .foregroundColor(AppTheme.Colors.gold.opacity(0.5))
-                    
-                    Text(viewModel.currentDasha)
+                    Text(localizedAscendant)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -671,17 +760,38 @@ struct HomeView: View {
     private var timeBasedGreeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 5..<12: return "Good morning"
-        case 12..<17: return "Good afternoon"
-        case 17..<21: return "Good evening"
-        default: return "Good night"
+        case 5..<12: return "good_morning".localized
+        case 12..<17: return "good_afternoon".localized
+        case 17..<21: return "good_evening".localized
+        default: return "good_night".localized
         }
+    }
+    
+    private var localizedAscendant: String {
+        let signKey = viewModel.ascendantSign.lowercased()
+        let localizedSign: String
+        switch signKey {
+        case "aries": localizedSign = "sign_ar".localized
+        case "taurus": localizedSign = "sign_ta".localized
+        case "gemini": localizedSign = "sign_ge".localized
+        case "cancer": localizedSign = "sign_ca".localized
+        case "leo": localizedSign = "sign_le".localized
+        case "virgo": localizedSign = "sign_vi".localized
+        case "libra": localizedSign = "sign_li".localized
+        case "scorpio": localizedSign = "sign_sc".localized
+        case "sagittarius": localizedSign = "sign_sg".localized
+        case "capricorn": localizedSign = "sign_cp".localized
+        case "aquarius": localizedSign = "sign_aq".localized
+        case "pisces": localizedSign = "sign_pi".localized
+        default: localizedSign = viewModel.ascendantSign
+        }
+        return localizedSign + " " + "Ascendant".localized
     }
     
     // F. What's in my mind? (2×2 Golden Gradient Grid)
     private var whatsInMyMindSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("What's in my mind?")
+            Text("what_in_my_mind".localized)
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
                 .accessibilityAddTraits(.isHeader)
@@ -800,6 +910,46 @@ struct HomeView: View {
             if selectedFilter == "Caution" { return s == "caution" || s == "difficult" || s == "challenging" }
             return false
         }
+    }
+    
+    // MARK: - Helper Functions for Localization
+    
+    /// Localizes a single planet name
+    private func localizedPlanetName(_ planet: String) -> String {
+        let key = planet.lowercased()
+        switch key {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return planet
+        }
+    }
+    
+    /// Localizes a comma-separated list of planet names
+    private func localizedPlanets(_ planets: String) -> String {
+        let planetNames = planets.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        let localized = planetNames.map { planet -> String in
+            let key = planet.lowercased()
+            switch key {
+            case "sun": return "planet_sun".localized
+            case "moon": return "planet_moon".localized
+            case "mars": return "planet_mars".localized
+            case "mercury": return "planet_mercury".localized
+            case "jupiter": return "planet_jupiter".localized
+            case "venus": return "planet_venus".localized
+            case "saturn": return "planet_saturn".localized
+            case "rahu": return "planet_rahu".localized
+            case "ketu": return "planet_ketu".localized
+            default: return planet
+            }
+        }
+        return localized.joined(separator: ", ")
     }
 }
 

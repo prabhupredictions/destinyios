@@ -18,6 +18,52 @@
 "greeting" = "こんにちは！";
 "todays_insight" = "今日の運勢";
 
+// MARK: - Time Based Greetings
+"good_morning" = "おはようございます";
+"good_afternoon" = "こんにちは";
+"good_evening" = "こんばんは";
+"good_night" = "おやすみなさい";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "気になることは？";
+"tap_to_explore_day" = "タップして今日を探索";
+
+// MARK: - Filter Labels
+"all" = "すべて";
+"good" = "良い";
+"steady" = "安定";
+"caution" = "注意";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "テーマ";
+"current_dasha" = "現在のダシャ";
+
+// MARK: - Life Area Filters
+"love" = "愛";
+"wealth" = "富";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "アクティブ";
+"yoga_status_reduced" = "軽減";
+"yoga_status_cancelled" = "キャンセル";
+"yoga_status_inactive" = "非アクティブ";
+"planets_label" = "惑星";
+"houses_label" = "ハウス";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "すべて";
+"filter_wealth" = "富";
+"filter_career" = "キャリア";
+"filter_love" = "愛";
+"filter_health" = "健康";
+"filter_family" = "家族";
+"filter_education" = "教育";
+"filter_spiritual" = "精神的";
+"filter_foundation" = "基礎";
+"filter_personality" = "個性";
+"filter_special" = "特別";
+"filter_relationship" = "関係";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "今日気をつけることは？";
 "how_improve_focus" = "集中力を上げるには？";
@@ -444,6 +490,46 @@
 // MARK: - Mitigation Fallback
 "factors_reduce_severity" = "ドーシャの重症度を軽減する要因";
 "factors_increase_severity" = "ドーシャの重症度を高める要因";
+
+// MARK: - Full Zodiac Sign Names (for display)
+"Aries" = "牡羊座";
+"Taurus" = "牡牛座";
+"Gemini" = "双子座";
+"Cancer" = "蟹座";
+"Leo" = "獅子座";
+"Virgo" = "乙女座";
+"Libra" = "天秤座";
+"Scorpio" = "蠍座";
+"Sagittarius" = "射手座";
+"Capricorn" = "山羊座";
+"Aquarius" = "水瓶座";
+"Pisces" = "魚座";
+
+// MARK: - Full Planet Names (for display)
+"Sun" = "太陽";
+"Moon" = "月";
+"Mars" = "火星";
+"Mercury" = "水星";
+"Jupiter" = "木星";
+"Venus" = "金星";
+"Saturn" = "土星";
+"Rahu" = "ラーフ";
+"Ketu" = "ケートゥ";
+
+// MARK: - UI Labels
+"Ascendant" = "アセンダント";
+"House" = "ハウス";
+"Transit" = "トランジット";
+
+// MARK: - Life Areas (with uppercase keys for StoryOrbs)
+"Career" = "キャリア";
+"Relationship" = "関係";
+"Finance" = "財務";
+"Health" = "健康";
+"Family" = "家族";
+"Education" = "教育";
+"Investment" = "投資";
+"Sudden Events" = "突然の出来事";
 
 // MARK: - Life Areas
 "career" = "キャリア";
@@ -2188,6 +2274,33 @@
 "stat_rating" = "4/5";
 "rating_label" = "評価";
 
+// Onboarding Slide 1
+"onboarding_slide1_title" = "175,000人以上のユーザーから信頼されています";
+"onboarding_slide1_subtitle" = "ChatGPTストアで";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "日常の決断のための明確さ";
+"onboarding_slide2_description" = "Destinyは、あなたの人生のパターンを理解するための個人的な空間です。愛、仕事、友情をナビゲートし、瞬間的に物事を考えるのを助け、文脈を加えるための言語として占星術を使用します。";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "真のパーソナライズのために構築されました";
+"onboarding_slide3_description" = "数十億もの占星術的な組み合わせの中で、正しい洞察を見つけることは、一杯の鍵が入った樽にフィットする鍵を見つけるようなものです。Destinyは、12年以上かけて開発され、AIによって強化された独自のアルゴリズムを使用して、あなたの出生詳細を、日常の生活のためのより明確で個人的なガイダンスに翻訳します。";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "ここでできること";
+
+// Onboarding Features
+"onboarding_feature1_title" = "何でも尋ねてください";
+"onboarding_feature1_desc" = "あなたの質問に対するリアルタイムの占星術の洞察";
+"onboarding_feature2_title" = "より高い精度";
+"onboarding_feature2_desc" = "時間とともに改善されるパーソナライズされた洞察";
+"onboarding_feature3_title" = "相性マッチング";
+"onboarding_feature3_desc" = "パートナーと出生図を照合して、関係と結婚の可能性を探る";
+"onboarding_feature4_title" = "チャット履歴";
+"onboarding_feature4_desc" = "いつでも過去の会話を再開できます";
+"onboarding_feature5_title" = "カスタム占星術アラート";
+"onboarding_feature5_desc" = "あなたの出生図と設定に基づいて、好ましい日に通知を受け取る";
+
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
 // ════════════════════════════════════════════════════════════════════════════
@@ -2232,6 +2345,76 @@
 "dasha_quality_good" = "良い";
 "dasha_quality_steady" = "安定した";
 "dasha_quality_caution" = "注意";
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "こんにちは%@さん！私はDestiny、あなたの専属占星術ガイドです。今日のこと、人間関係、将来について何を知りたいですか？";
+
+// Life Area Context Question
+"context_life_area_question" = "今日の予報では：'%@'が私の%@について言及されています。これが私にとって何を意味するか詳しく教えていただけますか？";
+
+// Dasha Context Question
+"context_dasha_question" = "私は現在%@のダシャー期間にあり、テーマは「%@」、全体的な質は「%@」です。%@\n\nこのダシャー期間が私の人生にどのような影響を与えるか、期待される機会や課題、そしておすすめの対処法について詳しく分析してください。";
+"context_dasha_phase_suggests" = " 現在のフェーズが示唆すること：「%@」。";
+
+// Transit Context Question
+"context_transit_question" = "%@は現在%@を通過中で、私の第%d室にあります。主な示唆：'%@'。
+
+このトランジットが私の人生にどう影響するか、この時期の実践的なアドバイスを共有してください。";
+
+
+// Yoga/Dosha Status
+"status_active" = "活性";
+"status_reduced" = "弱化";
+"status_cancelled" = "無効";
+
+// Yoga/Dosha Types
+"type_dosha" = "ドーシャ（負の組み合わせ）";
+"type_yoga" = "ヨーガ（正の組み合わせ）";
+"dosha" = "ドーシャ";
+"yoga" = "ヨーガ";
+
+// Yoga Context Building
+"yoga_context_header" = "私の出生図に%@があります。";
+"yoga_context_details" = "詳細：";
+"yoga_context_type" = "- 種類：%@";
+"yoga_context_category" = "- カテゴリ：%@";
+"yoga_context_status" = "- 状態：%@";
+"yoga_context_strength" = "- 強さ：%d%%";
+"yoga_context_planets" = "- 関連惑星：%@";
+"yoga_context_houses" = "- 関連ハウス：%@";
+"yoga_context_formation" = "- 形成：%@";
+"yoga_context_outcome" = "- 意味：%@";
+"yoga_context_reduction_reason" = "- 弱化の理由：%@";
+"yoga_context_cancellation_reason" = "- 無効の理由：%@";
+"yoga_context_explain_header" = "さらに詳しく説明してください：";
+"yoga_context_question_1" = "1. この%@が私の人生にとって何を意味するか";
+"yoga_context_dosha_question_2" = "2. どのような課題があり得るか、対処法は";
+"yoga_context_yoga_question_2" = "2. その恩恵を最大限に活かす方法";
+"yoga_context_inactive_question_2" = "2. なぜ%@なのか、それは何を意味するか";
+"yoga_context_question_3" = "3. 私にできる対処法や行動";
+"yoga_context_unknown" = "不明";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "基本基盤";
+"yoga_cat_personality" = "人格";
+"yoga_cat_wealth" = "富";
+"yoga_cat_career" = "キャリア";
+"yoga_cat_relationship" = "人間関係";
+"yoga_cat_education" = "教育";
+"yoga_cat_health" = "健康";
+"yoga_cat_family" = "家族";
+"yoga_cat_spiritual" = "精神性";
+"yoga_cat_special" = "特別";
+"yoga_cat_pancha_mahapurusha" = "パンチャ・マハープルシャ";
+"yoga_cat_kendra" = "ケンドラ";
+"yoga_cat_power" = "権力";
+"yoga_cat_planetary" = "惑星";
+"yoga_cat_unknown" = "不明";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels

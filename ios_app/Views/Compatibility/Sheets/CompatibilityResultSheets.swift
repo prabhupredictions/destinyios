@@ -1321,10 +1321,12 @@ struct AskDestinySheet: View {
         
         do {
             // Call follow-up API
+            let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
             let request = CompatibilityFollowUpRequest(
                 query: query,
                 sessionId: sessionId,
-                userEmail: email
+                userEmail: email,
+                language: appLanguage
             )
             
             let response = try await compatibilityService.followUp(request: request)
@@ -1450,12 +1452,14 @@ struct AskDestinySheet: View {
             // Ensure conversationId matches the compatibility thread ID (compat_sess_...)
             let compatThreadId = result.sessionId.map { "compat_\($0)" }
             
+            let redirectLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
             let predictRequest = PredictionRequest(
                 query: query,
                 birthData: birthData,
                 sessionId: nil,
                 conversationId: compatThreadId,
                 userEmail: email,
+                language: redirectLang,
                 quotaContext: "compatibility"  // Marks this as coming from compatibility
             )
             

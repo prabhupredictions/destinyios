@@ -37,13 +37,11 @@ struct FloatingIcon<Content: View>: View {
 }
 
 // MARK: - Shimmer Button
-/// Premium button with animated shimmer effect
+/// Premium button with gold gradient background - simple and clickable
 struct ShimmerButton: View {
     let title: String
     let icon: String?
     let action: () -> Void
-    
-    @State private var shimmerPhase: CGFloat = 0
     
     init(title: String, icon: String? = "arrow.right", action: @escaping () -> Void) {
         self.title = title
@@ -52,7 +50,10 @@ struct ShimmerButton: View {
     }
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            HapticManager.shared.play(.medium)
+            action()
+        }) {
             HStack(spacing: 10) {
                 Text(title)
                     .font(AppTheme.Fonts.title(size: 17))
@@ -66,24 +67,25 @@ struct ShimmerButton: View {
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(
-                ZStack {
-                    // Base gradient
-                    AppTheme.Colors.premiumCardGradient
-                    
-                    // Top highlight
-                    VStack {
-                        Rectangle()
-                            .fill(Color.white.opacity(0.3))
-                            .frame(height: 1)
-                        Spacer()
-                    }
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: AppTheme.Colors.gold.opacity(0.4), radius: 15, y: 6)
+                AppTheme.Colors.premiumCardGradient
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
             )
         }
-        .contentShape(Rectangle())
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(PressedButtonStyle())
+    }
+}
+
+// MARK: - Pressed Button Style
+/// Simple button style with immediate visual feedback on press
+struct PressedButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 

@@ -18,6 +18,52 @@
 "greeting" = "வணக்கம்!";
 "todays_insight" = "இன்றைய ராசி பலன்";
 
+// MARK: - Time Based Greetings
+"good_morning" = "காலை வணக்கம்";
+"good_afternoon" = "மதிய வணக்கம்";
+"good_evening" = "மாலை வணக்கம்";
+"good_night" = "இனிய இரவு";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "என் மனதில் என்ன இருக்கிறது?";
+"tap_to_explore_day" = "உங்கள் நாளை ஆராய தட்டவும்";
+
+// MARK: - Filter Labels
+"all" = "அனைத்தும்";
+"good" = "நல்லது";
+"steady" = "நிலையான";
+"caution" = "கவனம்";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "தீம்";
+"current_dasha" = "தற்போதைய தசா";
+
+// MARK: - Life Area Filters
+"love" = "காதல்";
+"wealth" = "செல்வம்";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "செயலில்";
+"yoga_status_reduced" = "குறைக்கப்பட்டது";
+"yoga_status_cancelled" = "ரத்து";
+"yoga_status_inactive" = "செயலற்றது";
+"planets_label" = "கிரகங்கள்";
+"houses_label" = "வீடுகள்";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "அனைத்தும்";
+"filter_wealth" = "செல்வம்";
+"filter_career" = "வேலை";
+"filter_love" = "காதல்";
+"filter_health" = "ஆரோக்கியம்";
+"filter_family" = "குடும்பம்";
+"filter_education" = "கல்வி";
+"filter_spiritual" = "ஆன்மீகம்";
+"filter_foundation" = "அடிப்படை";
+"filter_personality" = "ஆளுமை";
+"filter_special" = "சிறப்பு";
+"filter_relationship" = "உறவு";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "இன்று நான் எதை கவனிக்க வேண்டும்?";
 "how_improve_focus" = "என் கவனத்தை எப்படி கூட்டுவது?";
@@ -444,6 +490,46 @@
 // MARK: - Mitigation Fallback
 "factors_reduce_severity" = "காரணிகள் தோஷத்தின் தீவிரத்தை குறைக்கின்றன";
 "factors_increase_severity" = "காரணிகள் தோஷத்தின் தீவிரத்தை அதிகரிக்கும்";
+
+// MARK: - Full Zodiac Sign Names (for display)
+"Aries" = "மேஷம்";
+"Taurus" = "ரிஷபம்";
+"Gemini" = "மிதுனம்";
+"Cancer" = "கடகம்";
+"Leo" = "சிம்மம்";
+"Virgo" = "கன்னி";
+"Libra" = "துலாம்";
+"Scorpio" = "விருச்சிகம்";
+"Sagittarius" = "தனுசு";
+"Capricorn" = "மகரம்";
+"Aquarius" = "கும்பம்";
+"Pisces" = "மீனம்";
+
+// MARK: - Full Planet Names (for display)
+"Sun" = "சூரியன்";
+"Moon" = "சந்திரன்";
+"Mars" = "செவ்வாய்";
+"Mercury" = "புதன்";
+"Jupiter" = "குரு";
+"Venus" = "சுக்கிரன்";
+"Saturn" = "சனி";
+"Rahu" = "ராகு";
+"Ketu" = "கேது";
+
+// MARK: - UI Labels
+"Ascendant" = "லக்னம்";
+"House" = "வீடு";
+"Transit" = "கோச்சாரம்";
+
+// MARK: - Life Areas (with uppercase keys for StoryOrbs)
+"Career" = "வேலை";
+"Relationship" = "உறவு";
+"Finance" = "பணம்";
+"Health" = "ஆரோக்கியம்";
+"Family" = "குடும்பம்";
+"Education" = "கல்வி";
+"Investment" = "முதலீடு";
+"Sudden Events" = "திடீர் நிகழ்வுகள்";
 
 // MARK: - Life Areas
 "career" = "தொழில்";
@@ -2188,6 +2274,33 @@
 "stat_rating" = "4/5";
 "rating_label" = "மதிப்பீடு";
 
+// Onboarding Slide 1
+"onboarding_slide1_title" = "175K+ பயனர்களின் நம்பகம்";
+"onboarding_slide1_subtitle" = "ChatGPT Store-ல்";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "தினசரி முடிவுகளுக்கு தெளிவு";
+"onboarding_slide2_description" = "Destiny உங்கள் வாழ்க்கையில் உள்ள முறைகளைப் புரிந்துகொள்ள ஒரு தனிப்பட்ட இடமாகும். இது காதல், வேலை மற்றும் நட்புறவுகளை வழிநடத்த உதவுகிறது, மற்றும் ஜோதிடத்தை சூழலை சேர்க்கும் மொழியாகப் பயன்படுத்தி தருணத்தில் விஷயங்களை சிந்திக்க உதவுகிறது.";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "உண்மையான தனிப்பயனாக்கலுக்காக உருவாக்கப்பட்டது";
+"onboarding_slide3_description" = "பில்லியன்கணக்கான ஜோதிட சேர்க்கைகளுடன், சரியான நுண்ணறிவைக் கண்டுபிடிப்பது ஒரு பீப்பாயில் நிறைந்த சாவிகளில் பொருந்தக்கூடிய ஒரு சாவியைக் கண்டுபிடிப்பது போல். Destiny 12+ ஆண்டுகளில் வளர்க்கப்பட்ட மற்றும் AI மூலம் இயக்கப்படும் தனிப்பட்ட அல்காரிதத்தைப் பயன்படுத்துகிறது, உங்கள் பிறப்பு விவரங்களை தினசரி வாழ்க்கைக்கான தெளிவான, தனிப்பட்ட வழிகாட்டுதலாக மொழிபெயர்க்கிறது.";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "நீங்கள் செய்யக்கூடியவை இங்கே உள்ளன";
+
+// Onboarding Features
+"onboarding_feature1_title" = "எதையும் கேளுங்கள்";
+"onboarding_feature1_desc" = "உங்கள் கேள்விகளுக்கு நிகழ்நேர ஜோதிட நுண்ணறிவுகள்";
+"onboarding_feature2_title" = "அதிக துல்லியம்";
+"onboarding_feature2_desc" = "காலப்போக்கில் மேம்படும் தனிப்பயனாக்கப்பட்ட நுண்ணறிவுகள்";
+"onboarding_feature3_title" = "பொருத்தம் பொருத்துதல்";
+"onboarding_feature3_desc" = "துணைவருடன் உறவு மற்றும் திருமண சாத்தியங்களை ஆராய பிறப்பு விளக்கப்படங்களை பொருத்தவும்";
+"onboarding_feature4_title" = "அரட்டை வரலாறு";
+"onboarding_feature4_desc" = "எப்போது வேண்டுமானாலும் கடந்த உரையாடல்களை மீண்டும் தொடங்கவும்";
+"onboarding_feature5_title" = "தனிப்பயன் ஜோதிட எச்சரிக்கைகள்";
+"onboarding_feature5_desc" = "உங்கள் விளக்கப்படம் மற்றும் விருப்பங்களின் அடிப்படையில் சாதகமான நாட்களில் அறிவிப்புகளைப் பெறவும்";
+
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
 // ════════════════════════════════════════════════════════════════════════════
@@ -2232,6 +2345,76 @@
 "dasha_quality_good" = "நல்லது";
 "dasha_quality_steady" = "நிலையானது";
 "dasha_quality_caution" = "எச்சரிக்கை";
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "வணக்கம் %@! நான் Destiny, உங்கள் தனிப்பட்ட ஜோதிட வழிகாட்டி. உங்கள் நாள், உறவுகள் அல்லது எதிர்காலம் பற்றி என்ன தெரிந்துகொள்ள விரும்புகிறீர்கள்?";
+
+// Life Area Context Question
+"context_life_area_question" = "இன்றைய முன்னறிவிப்பில்: '%@' என் %@ க்கு குறிப்பிடப்பட்டுள்ளது. இது எனக்கு என்ன அர்த்தம் என்று விளக்க முடியுமா?";
+
+// Dasha Context Question
+"context_dasha_question" = "நான் தற்போது %@ தசா காலத்தில் இருக்கிறேன், இதன் கருப்பொருள் '%@' மற்றும் ஒட்டுமொத்த தரம் '%@'.%@\n\nஇந்த தசா காலம் என் வாழ்க்கையை எவ்வாறு வடிவமைக்கிறது, எதிர்பார்க்க வேண்டிய வாய்ப்புகள் அல்லது சவால்கள், மற்றும் பரிகாரங்கள் பற்றி விரிவாக பகுப்பாய்வு செய்யவும்.";
+"context_dasha_phase_suggests" = " தற்போதைய கட்டம் சுட்டிக்காட்டுவது: '%@'.";
+
+// Transit Context Question
+"context_transit_question" = "%@ தற்போது %@ வழியாக கோசாரம் செய்கிறது, என் %dவது வீட்டில். முக்கிய குறிப்பு: '%@'.
+
+இந்த கோசாரம் என் வாழ்க்கையை எவ்வாறு பாதிக்கிறது மற்றும் இந்த காலகட்டத்திற்கான நடைமுறை வழிகாட்டுதலை பகிரவும்.";
+
+
+// Yoga/Dosha Status
+"status_active" = "செயலில்";
+"status_reduced" = "குறைந்தது";
+"status_cancelled" = "ரத்து";
+
+// Yoga/Dosha Types
+"type_dosha" = "தோஷம் (எதிர்மறை சேர்க்கை)";
+"type_yoga" = "யோகம் (நேர்மறை சேர்க்கை)";
+"dosha" = "தோஷம்";
+"yoga" = "யோகம்";
+
+// Yoga Context Building
+"yoga_context_header" = "என் ஜாதகத்தில் %@ உள்ளது.";
+"yoga_context_details" = "விவரங்கள்:";
+"yoga_context_type" = "- வகை: %@";
+"yoga_context_category" = "- பிரிவு: %@";
+"yoga_context_status" = "- நிலை: %@";
+"yoga_context_strength" = "- வலிமை: %d%%";
+"yoga_context_planets" = "- சம்பந்தப்பட்ட கிரகங்கள்: %@";
+"yoga_context_houses" = "- சம்பந்தப்பட்ட வீடுகள்: %@";
+"yoga_context_formation" = "- அமைப்பு: %@";
+"yoga_context_outcome" = "- இதன் பொருள்: %@";
+"yoga_context_reduction_reason" = "- குறைப்பு காரணம்: %@";
+"yoga_context_cancellation_reason" = "- ரத்து காரணம்: %@";
+"yoga_context_explain_header" = "மேலும் விரிவாக விளக்கவும்:";
+"yoga_context_question_1" = "1. இந்த %@ என் வாழ்க்கைக்கு என்ன அர்த்தம்";
+"yoga_context_dosha_question_2" = "2. என்ன சவால்கள் வரலாம் மற்றும் பரிகாரங்கள்";
+"yoga_context_yoga_question_2" = "2. இதன் நன்மைகளை எவ்வாறு அதிகரிப்பது";
+"yoga_context_inactive_question_2" = "2. ஏன் இது %@ மற்றும் இதன் அர்த்தம் என்ன";
+"yoga_context_question_3" = "3. நான் செய்யக்கூடிய பரிகாரங்கள் அல்லது நடவடிக்கைகள்";
+"yoga_context_unknown" = "தெரியாத";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "அடிப்படை";
+"yoga_cat_personality" = "ஆளுமை";
+"yoga_cat_wealth" = "செல்வம்";
+"yoga_cat_career" = "தொழில்";
+"yoga_cat_relationship" = "உறவு";
+"yoga_cat_education" = "கல்வி";
+"yoga_cat_health" = "ஆரோக்கியம்";
+"yoga_cat_family" = "குடும்பம்";
+"yoga_cat_spiritual" = "ஆன்மீகம்";
+"yoga_cat_special" = "சிறப்பு";
+"yoga_cat_pancha_mahapurusha" = "பஞ்ச மகாபுருஷ";
+"yoga_cat_kendra" = "கேந்திர";
+"yoga_cat_power" = "சக்தி";
+"yoga_cat_planetary" = "கிரக";
+"yoga_cat_unknown" = "தெரியாத";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels

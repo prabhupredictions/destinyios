@@ -32,8 +32,8 @@ struct DashaInsightCard: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                     
-                    // Period Name
-                    Text(dasha.period)
+                    // Period Name - localized
+                    Text(localizedPeriod(dasha.period))
                         .font(AppTheme.Fonts.premiumDisplay(size: 17))
                         .foregroundColor(.white)
                     
@@ -46,7 +46,7 @@ struct DashaInsightCard: View {
                         .font(.system(size: 12))
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
                     
-                    Text("Theme: \(dasha.theme)")
+                    Text("theme_label".localized + ": \(dasha.theme)")
                         .font(AppTheme.Fonts.body(size: 14))
                         .fontWeight(.medium)
                         .foregroundColor(AppTheme.Colors.goldLight)
@@ -70,7 +70,7 @@ struct DashaInsightCard: View {
             VStack {
                 HStack {
                     Spacer()
-                    Text(dasha.quality)
+                    Text(localizedQuality(dasha.quality))
                         .font(AppTheme.Fonts.caption(size: 11))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -157,6 +157,37 @@ struct DashaInsightCard: View {
         case "caution": return Color.orange
         default: return AppTheme.Colors.gold
         }
+    }
+    
+    private func localizedQuality(_ quality: String) -> String {
+        let key = quality.lowercased()
+        switch key {
+        case "good": return "status_good".localized
+        case "steady": return "status_steady".localized
+        case "caution": return "status_caution".localized
+        default: return quality
+        }
+    }
+    
+    private func localizedPeriod(_ period: String) -> String {
+        // Split period like "Ketu-Rahu-Ketu" and localize each planet
+        let planets = period.split(separator: "-").map { String($0).trimmingCharacters(in: .whitespaces) }
+        let localized = planets.map { planet -> String in
+            let key = planet.lowercased()
+            switch key {
+            case "sun": return "planet_sun".localized
+            case "moon": return "planet_moon".localized
+            case "mars": return "planet_mars".localized
+            case "mercury": return "planet_mercury".localized
+            case "jupiter": return "planet_jupiter".localized
+            case "venus": return "planet_venus".localized
+            case "saturn": return "planet_saturn".localized
+            case "rahu": return "planet_rahu".localized
+            case "ketu": return "planet_ketu".localized
+            default: return planet
+            }
+        }
+        return localized.joined(separator: "-")
     }
 }
 

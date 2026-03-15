@@ -63,11 +63,13 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
             throw NetworkError.unauthorized
         case 400...499:
             // Try to parse error message from response body
-            if let errorJson = try? JSONDecoder().decode([String: String].self, from: data),
-               let message = errorJson["message"] {
-                throw NetworkError.serverError(message)
+            if let errorJson = try? JSONDecoder().decode([String: String].self, from: data) {
+                // FastAPI {"detail": "string"} or {"message": "string"}
+                if let message = errorJson["message"] ?? errorJson["detail"] {
+                    throw NetworkError.serverError(message)
+                }
             }
-            // Try nested detail format (FastAPI style)
+            // Try nested detail format (FastAPI style: {"detail": {"message": "..."}})
             if let errorData = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let detail = errorData["detail"] as? [String: Any],
                let message = detail["message"] as? String {
@@ -75,9 +77,21 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
             }
             throw NetworkError.serverError("Client Error: \(httpResponse.statusCode)")
         case 500...599:
-            // Try to parse error message from response body
-            if let errorStr = String(data: data, encoding: .utf8), !errorStr.isEmpty {
-                throw NetworkError.serverError(errorStr)
+            // Try to parse structured error from response body
+            if let errorData = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                // FastAPI {"detail": "string"}
+                if let detail = errorData["detail"] as? String {
+                    throw NetworkError.serverError(detail)
+                }
+                // Nested: {"detail": {"message": "..."}}
+                if let detail = errorData["detail"] as? [String: Any],
+                   let message = detail["message"] as? String {
+                    throw NetworkError.serverError(message)
+                }
+                // {"message": "string"}
+                if let message = errorData["message"] as? String {
+                    throw NetworkError.serverError(message)
+                }
             }
             throw NetworkError.serverError("Server Error: \(httpResponse.statusCode)")
         default:

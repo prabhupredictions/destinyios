@@ -30,14 +30,14 @@ struct DashaProgressWidget: View {
                 // Text Info
                 VStack(alignment: .leading, spacing: 4) {
                     Text("current_phase".localized)
-                        .font(AppTheme.Fonts.caption(size: 11))
+                        .font(.system(size: 11))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                     
                     HStack(alignment: .bottom, spacing: 4) {
-                        Text(period.mahadasha)
+                        Text(localizedPlanetName(period.mahadasha))
                             .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(AppTheme.Colors.textPrimary)
-                        Text("- \(period.antardasha)")
+                        Text("- \(localizedPlanetName(period.antardasha))")
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .padding(.bottom, 2)
@@ -58,7 +58,7 @@ struct DashaProgressWidget: View {
                         Text("next_label".localized)
                             .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
-                        Text(next.antardasha)
+                        Text(localizedPlanetName(next.antardasha))
                             .font(AppTheme.Fonts.body(size: 12))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
@@ -99,5 +99,21 @@ struct DashaProgressWidget: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, yyyy"
         return formatter.string(from: date)
+    }
+    
+    private func localizedPlanetName(_ planet: String) -> String {
+        let key = planet.lowercased()
+        switch key {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return planet
+        }
     }
 }

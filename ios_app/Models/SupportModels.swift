@@ -42,6 +42,7 @@ struct CompatibilityRequest: Codable, Sendable {
     var sessionId: String?
     var userEmail: String?
     var profileId: String?  // Active profile for thread scoping
+    var language: String = "en"
     
     // Multi-partner comparison support
     var comparisonGroupId: String?
@@ -52,6 +53,7 @@ struct CompatibilityRequest: Codable, Sendable {
         case sessionId = "session_id"
         case userEmail = "user_email"
         case profileId = "profile_id"
+        case language
         case comparisonGroupId = "comparison_group_id"
         case partnerIndex = "partner_index"
     }
@@ -257,11 +259,13 @@ struct CompatibilityFollowUpRequest: Codable, Sendable {
     let query: String
     let sessionId: String
     let userEmail: String
+    var language: String = "en"
     
     enum CodingKeys: String, CodingKey {
         case query
         case sessionId = "session_id"
         case userEmail = "user_email"
+        case language
     }
 }
 

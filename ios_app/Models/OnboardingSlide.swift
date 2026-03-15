@@ -4,43 +4,58 @@ import Foundation
 struct OnboardingSlide: Identifiable, Sendable {
     let id = UUID()
     let icon: String          // SF Symbol name or "logo" for app logo
-    let title: String
-    let subtitle: String?
-    let description: String
+    let titleKey: String      // Localization key for title
+    let subtitleKey: String?  // Localization key for subtitle
+    let descriptionKey: String // Localization key for description
     let showStats: Bool       // Show ratings card on first slide
     let isFeatureSlide: Bool  // Show features list on last slide
+    
+    /// Computed property to get localized title
+    var title: String {
+        titleKey.localized
+    }
+    
+    /// Computed property to get localized subtitle
+    var subtitle: String? {
+        subtitleKey?.localized
+    }
+    
+    /// Computed property to get localized description
+    var description: String {
+        descriptionKey.localized
+    }
     
     /// Pre-defined onboarding slides
     static let slides: [OnboardingSlide] = [
         OnboardingSlide(
             icon: "chatgpt",
-            title: "Trusted by 175K+ users",
-            subtitle: "on the ChatGPT Store",
-            description: "",
+            titleKey: "onboarding_slide1_title",
+            subtitleKey: "onboarding_slide1_subtitle",
+            descriptionKey: "",
             showStats: true,
             isFeatureSlide: false
         ),
         OnboardingSlide(
             icon: "onboarding_clarity",
-            title: "Clarity for everyday decisions",
-            subtitle: nil,
-            description: "Destiny is a personal space to understand patterns in your life. It helps you navigate love, work, and friendships, and think things through in the moment, using astrology as the language to add context.",
+            titleKey: "onboarding_slide2_title",
+            subtitleKey: nil,
+            descriptionKey: "onboarding_slide2_description",
             showStats: false,
             isFeatureSlide: false
         ),
         OnboardingSlide(
             icon: "onboarding_personalization",
-            title: "Built for real personalization",
-            subtitle: nil,
-            description: "With billions of astrological combinations, finding the right insight is like finding one key that fits in a barrel full of keys. Destiny uses a proprietary algorithm, developed over 12+ years and powered by AI, to translate your birth details into clearer, more personal guidance for everyday life.",
+            titleKey: "onboarding_slide3_title",
+            subtitleKey: nil,
+            descriptionKey: "onboarding_slide3_description",
             showStats: false,
             isFeatureSlide: false
         ),
         OnboardingSlide(
             icon: "onboarding_features",
-            title: "Here's what you can do",
-            subtitle: nil,
-            description: "",
+            titleKey: "onboarding_slide4_title",
+            subtitleKey: nil,
+            descriptionKey: "",
             showStats: false,
             isFeatureSlide: true
         )
@@ -51,34 +66,44 @@ struct OnboardingSlide: Identifiable, Sendable {
 struct OnboardingFeature: Identifiable {
     let id = UUID()
     let icon: String
-    let title: String
-    let description: String
+    let titleKey: String      // Localization key for title
+    let descriptionKey: String  // Localization key for description
+    
+    /// Computed property to get localized title
+    var title: String {
+        titleKey.localized
+    }
+    
+    /// Computed property to get localized description
+    var description: String {
+        descriptionKey.localized
+    }
     
     static let features: [OnboardingFeature] = [
         OnboardingFeature(
             icon: "bubble.left.and.bubble.right.fill",
-            title: "Ask anything",
-            description: "Real-time astrology insights for your questions"
+            titleKey: "onboarding_feature1_title",
+            descriptionKey: "onboarding_feature1_desc"
         ),
         OnboardingFeature(
             icon: "checkmark.seal.fill",
-            title: "Higher accuracy",
-            description: "Personalized insights that improve over time"
+            titleKey: "onboarding_feature2_title",
+            descriptionKey: "onboarding_feature2_desc"
         ),
         OnboardingFeature(
             icon: "heart.fill",
-            title: "Compatibility matching",
-            description: "Match birth charts with a partner to explore relationship and marriage potential"
+            titleKey: "onboarding_feature3_title",
+            descriptionKey: "onboarding_feature3_desc"
         ),
         OnboardingFeature(
             icon: "clock.arrow.circlepath",
-            title: "Chat history",
-            description: "Resume past conversations anytime"
+            titleKey: "onboarding_feature4_title",
+            descriptionKey: "onboarding_feature4_desc"
         ),
         OnboardingFeature(
             icon: "bell.fill",
-            title: "Custom astrological alerts",
-            description: "Get notified on favorable days based on your chart and preferences"
+            titleKey: "onboarding_feature5_title",
+            descriptionKey: "onboarding_feature5_desc"
         )
     ]
 }

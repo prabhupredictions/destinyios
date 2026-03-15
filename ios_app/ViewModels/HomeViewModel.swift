@@ -189,7 +189,9 @@ class HomeViewModel {
         
         do {
             let userEmail = UserDefaults.standard.string(forKey: "userEmail")
-            var request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail)
+            // Get current app language from user selection (not system locale)
+            let language = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+            var request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail, language: language)
             
             let response = try await predictionService.getTodaysPrediction(request: request)
             
@@ -198,12 +200,13 @@ class HomeViewModel {
             
             await MainActor.run {
                 self.applyPredictionResponse(response)
+                self.errorMessage = nil // Clear any previous error
             }
         } catch {
             print("[HomeViewModel] Prediction error for \(profileId): \(error)")
             await MainActor.run {
-                // Don't override general error if other calls succeed, just log it
-                // self.errorMessage = "Failed to load prediction" 
+                // Show user-friendly error — never expose raw server messages
+                self.errorMessage = Self.friendlyError(from: error)
             }
         }
     }
@@ -430,5 +433,36 @@ class HomeViewModel {
         
         let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 0
         return insights[dayOfYear % insights.count]
+    }
+    
+    // MARK: - User-Friendly Error Mapping
+    
+    static func friendlyError(from error: Error) -> String {
+        let raw: String
+        if let networkError = error as? NetworkError {
+            raw = networkError.errorDescription ?? ""
+        } else {
+            raw = error.localizedDescription
+        }
+        let lower = raw.lowercased()
+        
+        // Map known backend messages to user-friendly text
+        if lower.contains("email") && (lower.contains("valid") || lower.contains("invalid")) {
+            return "We couldn't verify your account. Please re-enter your birth details and try again."
+        }
+        if lower.contains("validation failed") {
+            return "Something went wrong with your data. Please update your birth details and try again."
+        }
+        if lower.contains("timeout") || lower.contains("timed out") {
+            return "The server is taking too long to respond. Please try again in a moment."
+        }
+        if lower.contains("no data") || lower.contains("empty") {
+            return "No data received from the server. Please check your connection and retry."
+        }
+        if lower.contains("unauthorized") || lower.contains("session expired") {
+            return "Your session has expired. Please sign in again."
+        }
+        // Fallback — never show raw JSON or technical details
+        return "Unable to load your prediction right now. Please try again."
     }
 }

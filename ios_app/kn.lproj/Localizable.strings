@@ -18,6 +18,52 @@
 "greeting" = "ನಮಸ್ಕಾರ!";
 "todays_insight" = "ಇಂದಿನ ರಾಶಿಫಲ";
 
+// MARK: - Time Based Greetings
+"good_morning" = "ಶುಭೋದಯ";
+"good_afternoon" = "ಶುಭ ಮಧ್ಯಾಹ್ನ";
+"good_evening" = "ಶುಭ ಸಂಜೆ";
+"good_night" = "ಶುಭ ರಾತ್ರಿ";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "ನನ್ನ ಮನಸ್ಸಿನಲ್ಲಿ ಏನಿದೆ?";
+"tap_to_explore_day" = "ನಿಮ್ಮ ದಿನವನ್ನು ಅನ್ವೇಷಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ";
+
+// MARK: - Filter Labels
+"all" = "ಎಲ್ಲಾ";
+"good" = "ಒಳ್ಳೆಯದು";
+"steady" = "ಸ್ಥಿರ";
+"caution" = "ಎಚ್ಚರಿಕೆ";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "ಥೀಮ್";
+"current_dasha" = "ಪ್ರಸ್ತುತ ದಶಾ";
+
+// MARK: - Life Area Filters
+"love" = "ಪ್ರೀತಿ";
+"wealth" = "ಐಶ್ವರ್ಯ";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "ಸಕ್ರಿಯ";
+"yoga_status_reduced" = "ಕಡಿತ";
+"yoga_status_cancelled" = "ರದ್ದು";
+"yoga_status_inactive" = "ನಿಷ್ಕ್ರಿಯ";
+"planets_label" = "ಗ್ರಹಗಳು";
+"houses_label" = "ಮನೆಗಳು";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "ಎಲ್ಲಾ";
+"filter_wealth" = "ಐಶ್ವರ್ಯ";
+"filter_career" = "ವೃತ್ತಿ";
+"filter_love" = "ಪ್ರೀತಿ";
+"filter_health" = "ಆರೋಗ್ಯ";
+"filter_family" = "ಕುಟುಂಬ";
+"filter_education" = "ಶಿಕ್ಷಣ";
+"filter_spiritual" = "ಆಧ್ಯಾತ್ಮಿಕ";
+"filter_foundation" = "ಆಧಾರ";
+"filter_personality" = "ವ್ಯಕ್ತಿತ್ವ";
+"filter_special" = "ವಿಶೇಷ";
+"filter_relationship" = "ಸಂಬಂಧ";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "ಇಂದು ನಾನು ಏನು ಗಮನಿಸಬೇಕು?";
 "how_improve_focus" = "ನನ್ನ ಏಕಾಗ್ರತೆ ಹೇಗೆ ಹೆಚ್ಚಿಸಬಹುದು?";
@@ -444,6 +490,46 @@
 // MARK: - Mitigation Fallback
 "factors_reduce_severity" = "ಅಂಶಗಳು ದೋಷದ ತೀವ್ರತೆಯನ್ನು ಕಡಿಮೆ ಮಾಡುತ್ತದೆ";
 "factors_increase_severity" = "ಅಂಶಗಳು ದೋಷದ ತೀವ್ರತೆಯನ್ನು ಹೆಚ್ಚಿಸುತ್ತವೆ";
+
+// MARK: - Full Zodiac Sign Names (for display)
+"Aries" = "ಮೇಷ";
+"Taurus" = "ವೃಷಭ";
+"Gemini" = "ಮಿಥುನ";
+"Cancer" = "ಕರ್ಕಾಟಕ";
+"Leo" = "ಸಿಂಹ";
+"Virgo" = "ಕನ್ಯಾ";
+"Libra" = "ತುಲಾ";
+"Scorpio" = "ವೃಶ್ಚಿಕ";
+"Sagittarius" = "ಧನು";
+"Capricorn" = "ಮಕರ";
+"Aquarius" = "ಕುಂಭ";
+"Pisces" = "ಮೀನ";
+
+// MARK: - Full Planet Names (for display)
+"Sun" = "ಸೂರ್ಯ";
+"Moon" = "ಚಂದ್ರ";
+"Mars" = "ಮಂಗಳ";
+"Mercury" = "ಬುಧ";
+"Jupiter" = "ಗುರು";
+"Venus" = "ಶುಕ್ರ";
+"Saturn" = "ಶನಿ";
+"Rahu" = "ರಾಹು";
+"Ketu" = "ಕೇತು";
+
+// MARK: - UI Labels
+"Ascendant" = "ಲಗ್ನ";
+"House" = "ಮನೆ";
+"Transit" = "ಗೋಚರ";
+
+// MARK: - Life Areas (with uppercase keys for StoryOrbs)
+"Career" = "ವೃತ್ತಿ";
+"Relationship" = "ಸಂಬಂಧ";
+"Finance" = "ಆರ್ಥಿಕ";
+"Health" = "ಆರೋಗ್ಯ";
+"Family" = "ಕುಟುಂಬ";
+"Education" = "ಶಿಕ್ಷಣ";
+"Investment" = "ಆದಾಯ";
+"Sudden Events" = "ಅಕಸ್ಮಾತ್ ಘಟನೆಗಳು";
 
 // MARK: - Life Areas
 "career" = "ವೃತ್ತಿ";
@@ -2188,6 +2274,33 @@
 "stat_rating" = "4/5";
 "rating_label" = "ರೇಟಿಂಗ್";
 
+// Onboarding Slide 1
+"onboarding_slide1_title" = "175K+ ಬಳಕೆದಾರರ ವಿಶ್ವಾಸ";
+"onboarding_slide1_subtitle" = "ChatGPT Store ನಲ್ಲಿ";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "ಪ್ರತಿದಿನದ ನಿರ್ಧಾರಗಳಿಗೆ ಸ್ಪಷ್ಟತೆ";
+"onboarding_slide2_description" = "Destiny ನಿಮ್ಮ ಜೀವನದ ಪ್ಯಾಟರ್ನ್‌ಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಒಂದು ವೈಯಕ್ತಿಕ ಸ್ಥಳವಾಗಿದೆ. ಇದು ಪ್ರೀತಿ, ಕೆಲಸ ಮತ್ತು ಸ್ನೇಹಿತರನ್ನು ನ್ಯಾವಿಗೇಟ್ ಮಾಡಲು, ಮತ್ತು ಕ್ಷಣದಲ್ಲಿ ವಿಷಯಗಳನ್ನು ಯೋಚಿಸಲು, ಸಂದರ್ಭವನ್ನು ಸೇರಿಸಲು ಜ್ಯೋತಿಷ್ಯವನ್ನು ಭಾಷೆಯಾಗಿ ಬಳಸುತ್ತದೆ.";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "ನೈಜ ವೈಯಕ್ತೀಕರಣಕ್ಕಾಗಿ ನಿರ್ಮಿಸಲಾಗಿದೆ";
+"onboarding_slide3_description" = "ಶತಕೋಟಿ ಜ್ಯೋತಿಷ್ಯ ಸಂಯೋಜನೆಗಳೊಂದಿಗೆ, ಸರಿಯಾದ ಒಳನೋಟವನ್ನು ಹುಡುಕುವುದು ಒಂದು ಬ್ಯಾರೆಲ್ ಚಾಕುಗಳನ್ನು ತುಂಬಿಸುವ ಒಂದು ಚಾಕಿಯನ್ನು ಹುಡುಕುವಂತೆ. Destiny 12+ ವರ್ಷಗಳಲ್ಲಿ ಅಭಿವೃದ್ಧಿಪಡಿಸಿದ ಮತ್ತು AI ದ್ವಾರಾ ಚಾಲಿತ ಮಾಲೀಕತ್ವದ ಅಲ್ಗಾರಿದಮ್ ಅನ್ನು ಬಳಸುತ್ತದೆ, ನಿಮ್ಮ ಜನ್ಮ ವಿವರಗಳನ್ನು ಪ್ರತಿದಿನದ ಜೀವನಕ್ಕಾಗಿ ಸ್ಪಷ್ಟವಾದ, ಹೆಚ್ಚು ವೈಯಕ್ತಿಕ ಮಾರ್ಗದರ್ಶನಕ್ಕೆ ಅನುವಾದಿಸುತ್ತದೆ.";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "ನೀವು ಮಾಡಬಹುದಾದ ಕೆಲಸಗಳು ಇಲ್ಲಿವೆ";
+
+// Onboarding Features
+"onboarding_feature1_title" = "ಏನಾದರೂ ಕೇಳಿ";
+"onboarding_feature1_desc" = "ನಿಮ್ಮ ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ ರಿಯಲ್-ಟೈಮ್ ಜ್ಯೋತಿಷ್ಯ ಒಳನೋಟಗಳು";
+"onboarding_feature2_title" = "ಹೆಚ್ಚಿನ ನಿಖರತೆ";
+"onboarding_feature2_desc" = "ಕಾಲಕ್ರಮೇಣ ಸುಧಾರಿಸುವ ವೈಯಕ್ತೀಕೃತ ಒಳನೋಟಗಳು";
+"onboarding_feature3_title" = "ಅನುಕೂಲತೆ ಚಂದಾ";
+"onboarding_feature3_desc" = "ಸಂಬಂಧ ಮತ್ತು ವಿವಾಹ ಸಾಧ್ಯತೆಯನ್ನು ಅನ್ವೇಷಿಸಲು ಪಾಲುದಾರರೊಂದಿಗೆ ಜನ್ಮ ಚಾರ್ಟ್‌ಗಳನ್ನು ಹೊಂದಿಸಿ";
+"onboarding_feature4_title" = "ಚಾಟ್ ಇತಿಹಾಸ";
+"onboarding_feature4_desc" = "ಎಂದಾದರೂ ಹಿಂದಿನ ಸಂಭಾಷಣೆಗಳನ್ನು ಪುನರಾರಂಭಿಸಿ";
+"onboarding_feature5_title" = "ಕಸ್ಟಮ್ ಜ್ಯೋತಿಷ್ಯ ಅಲರ್ಟ್‌ಗಳು";
+"onboarding_feature5_desc" = "ನಿಮ್ಮ ಚಾರ್ಟ್ ಮತ್ತು ಆದ್ಯತೆಗಳ ಆಧಾರದ ಮೇಲೆ ಅನುಕೂಲಕರ ದಿನಗಳಲ್ಲಿ ಅಧಿಸೂಚನೆಗಳನ್ನು ಪಡೆಯಿರಿ";
+
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
 // ════════════════════════════════════════════════════════════════════════════
@@ -2232,6 +2345,76 @@
 "dasha_quality_good" = "ಒಳ್ಳೆಯದು";
 "dasha_quality_steady" = "ಸ್ಥಿರ";
 "dasha_quality_caution" = "ಎಚ್ಚರಿಕೆ";
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "ನಮಸ್ಕಾರ %@! ನಾನು Destiny, ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಜ್ಯೋತಿಷ ಮಾರ್ಗದರ್ಶಿ. ನಿಮ್ಮ ದಿನ, ಸಂಬಂಧಗಳು ಅಥವಾ ಭವಿಷ್ಯದ ಬಗ್ಗೆ ಏನು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ?";
+
+// Life Area Context Question
+"context_life_area_question" = "ಇಂದಿನ ಮುನ್ಸೂಚನೆಯಲ್ಲಿ: '%@' ನನ್ನ %@ ಗಾಗಿ ಉಲ್ಲೇಖಿಸಲಾಗಿದೆ. ಇದು ನನಗೆ ಏನು ಅರ್ಥ ಎಂದು ವಿವರಿಸಬಹುದೇ?";
+
+// Dasha Context Question
+"context_dasha_question" = "ನಾನು ಪ್ರಸ್ತುತ %@ ದಶಾ ಅವಧಿಯಲ್ಲಿದ್ದೇನೆ, ಇದರ ವಿಷಯ '%@' ಮತ್ತು ಒಟ್ಟಾರೆ ಗುಣಮಟ್ಟ '%@'.%@\n\nಈ ದಶಾ ಅವಧಿ ನನ್ನ ಜೀವನವನ್ನು ಹೇಗೆ ರೂಪಿಸುತ್ತದೆ, ಯಾವ ಅವಕಾಶಗಳು ಅಥವಾ ಸವಾಲುಗಳನ್ನು ನಿರೀಕ್ಷಿಸಬೇಕು, ಮತ್ತು ಯಾವುದೇ ಶಿಫಾರಸು ಮಾಡಿದ ಪರಿಹಾರಗಳ ಬಗ್ಗೆ ವಿವರವಾಗಿ ವಿಶ್ಲೇಷಿಸಿ.";
+"context_dasha_phase_suggests" = " ಪ್ರಸ್ತುತ ಹಂತ ಸೂಚಿಸುತ್ತದೆ: '%@'.";
+
+// Transit Context Question
+"context_transit_question" = "%@ ಪ್ರಸ್ತುತ %@ ಮೂಲಕ ಸಂಚರಿಸುತ್ತಿದೆ, ನನ್ನ %dನೇ ಭಾವದಲ್ಲಿ. ಮುಖ್ಯ ಸೂಚನೆ: '%@'.
+
+ಈ ಗೋಚಾರ ನನ್ನ ಜೀವನವನ್ನು ಹೇಗೆ ಪ್ರಭಾವಿಸುತ್ತದೆ ಮತ್ತು ಈ ಅವಧಿಗೆ ಪ್ರಾಯೋಗಿಕ ಮಾರ್ಗದರ್ಶನವನ್ನು ಹಂಚಿಕೊಳ್ಳಿ.";
+
+
+// Yoga/Dosha Status
+"status_active" = "ಸಕ್ರಿಯ";
+"status_reduced" = "ಕಡಿಮೆಯಾಗಿದೆ";
+"status_cancelled" = "ರದ್ದು";
+
+// Yoga/Dosha Types
+"type_dosha" = "ದೋಷ (ಋಣಾತ್ಮಕ ಸಂಯೋಜನೆ)";
+"type_yoga" = "ಯೋಗ (ಧನಾತ್ಮಕ ಸಂಯೋಜನೆ)";
+"dosha" = "ದೋಷ";
+"yoga" = "ಯೋಗ";
+
+// Yoga Context Building
+"yoga_context_header" = "ನನ್ನ ಜನ್ಮ ಕುಂಡಲಿಯಲ್ಲಿ %@ ಇದೆ.";
+"yoga_context_details" = "ವಿವರಗಳು:";
+"yoga_context_type" = "- ಪ್ರಕಾರ: %@";
+"yoga_context_category" = "- ವರ್ಗ: %@";
+"yoga_context_status" = "- ಸ್ಥಿತಿ: %@";
+"yoga_context_strength" = "- ಶಕ್ತಿ: %d%%";
+"yoga_context_planets" = "- ಒಳಗೊಂಡ ಗ್ರಹಗಳು: %@";
+"yoga_context_houses" = "- ಒಳಗೊಂಡ ಭಾವಗಳು: %@";
+"yoga_context_formation" = "- ರಚನೆ: %@";
+"yoga_context_outcome" = "- ಇದರ ಅರ್ಥ: %@";
+"yoga_context_reduction_reason" = "- ಕಡಿತ ಕಾರಣ: %@";
+"yoga_context_cancellation_reason" = "- ರದ್ದು ಕಾರಣ: %@";
+"yoga_context_explain_header" = "ದಯವಿಟ್ಟು ಹೆಚ್ಚು ವಿವರವಾಗಿ ವಿವರಿಸಿ:";
+"yoga_context_question_1" = "1. ಈ %@ ನನ್ನ ಜೀವನಕ್ಕೆ ಏನು ಅರ್ಥ";
+"yoga_context_dosha_question_2" = "2. ಯಾವ ಸವಾಲುಗಳು ಬರಬಹುದು ಮತ್ತು ಪರಿಹಾರಗಳು";
+"yoga_context_yoga_question_2" = "2. ಅದರ ಪ್ರಯೋಜನಗಳನ್ನು ಹೇಗೆ ಗರಿಷ್ಠಗೊಳಿಸುವುದು";
+"yoga_context_inactive_question_2" = "2. ಇದು ಏಕೆ %@ ಮತ್ತು ಇದರ ಅರ್ಥ ಏನು";
+"yoga_context_question_3" = "3. ನಾನು ತೆಗೆದುಕೊಳ್ಳಬಹುದಾದ ಪರಿಹಾರಗಳು ಅಥವಾ ಕ್ರಮಗಳು";
+"yoga_context_unknown" = "ತಿಳಿದಿಲ್ಲ";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "ಮೂಲ ಅಡಿಪಾಯ";
+"yoga_cat_personality" = "ವ್ಯಕ್ತಿತ್ವ";
+"yoga_cat_wealth" = "ಸಂಪತ್ತು";
+"yoga_cat_career" = "ವೃತ್ತಿ";
+"yoga_cat_relationship" = "ಸಂಬಂಧ";
+"yoga_cat_education" = "ಶಿಕ್ಷಣ";
+"yoga_cat_health" = "ಆರೋಗ್ಯ";
+"yoga_cat_family" = "ಕುಟುಂಬ";
+"yoga_cat_spiritual" = "ಆಧ್ಯಾತ್ಮಿಕ";
+"yoga_cat_special" = "ವಿಶೇಷ";
+"yoga_cat_pancha_mahapurusha" = "ಪಂಚ ಮಹಾಪುರುಷ";
+"yoga_cat_kendra" = "ಕೇಂದ್ರ";
+"yoga_cat_power" = "ಶಕ್ತಿ";
+"yoga_cat_planetary" = "ಗ್ರಹ ಸಂಬಂಧಿ";
+"yoga_cat_unknown" = "ತಿಳಿದಿಲ್ಲ";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels

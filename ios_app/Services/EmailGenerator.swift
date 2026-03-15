@@ -30,9 +30,15 @@ struct EmailGenerator {
         // Remove separators from time (HH:MM -> HHMM)
         let tob = timeOfBirth.replacingOccurrences(of: ":", with: "")
         
-        // Get first 3 letters of city (or "Unk" if empty)
+        // Get first 3 ASCII letters of city (or "Unk" if empty)
+        // Transliterate non-Latin scripts (Hindi, etc.) to ASCII to ensure valid email
         let city = cityOfBirth.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cityPrefix = city.isEmpty ? "Unk" : String(city.prefix(3))
+        let asciiCity = city
+            .applyingTransform(.toLatin, reverse: false)?
+            .applyingTransform(.stripDiacritics, reverse: false)?
+            .components(separatedBy: CharacterSet.alphanumerics.inverted)
+            .joined() ?? ""
+        let cityPrefix = asciiCity.isEmpty ? "unk" : String(asciiCity.prefix(3)).lowercased()
         
         // Get integer part of lat/lng (convert negative to positive)
         let latInt = abs(Int(latitude))

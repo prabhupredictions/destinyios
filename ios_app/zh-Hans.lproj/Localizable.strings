@@ -18,6 +18,52 @@
 "greeting" = "你好！";
 "todays_insight" = "今日运势";
 
+// MARK: - Time Based Greetings
+"good_morning" = "早上好";
+"good_afternoon" = "下午好";
+"good_evening" = "晚上好";
+"good_night" = "晚安";
+
+// MARK: - Home Screen Section Headers
+"what_in_my_mind" = "我在想什么？";
+"tap_to_explore_day" = "点击探索你的一天";
+
+// MARK: - Filter Labels
+"all" = "全部";
+"good" = "好";
+"steady" = "稳定";
+"caution" = "注意";
+
+// MARK: - Dasha Card Labels
+"theme_label" = "主题";
+"current_dasha" = "当前大运";
+
+// MARK: - Life Area Filters
+"love" = "爱情";
+"wealth" = "财富";
+
+// MARK: - Yoga Card Status
+"yoga_status_active" = "活跃";
+"yoga_status_reduced" = "减弱";
+"yoga_status_cancelled" = "取消";
+"yoga_status_inactive" = "不活跃";
+"planets_label" = "行星";
+"houses_label" = "宫位";
+
+// MARK: - Yoga Category Filters
+"filter_all" = "全部";
+"filter_wealth" = "财富";
+"filter_career" = "事业";
+"filter_love" = "爱情";
+"filter_health" = "健康";
+"filter_family" = "家庭";
+"filter_education" = "教育";
+"filter_spiritual" = "灵性";
+"filter_foundation" = "基础";
+"filter_personality" = "性格";
+"filter_special" = "特别";
+"filter_relationship" = "关系";
+
 // MARK: - Suggested Questions
 "what_mindful_today" = "今天我需要注意什么？";
 "how_improve_focus" = "如何提高专注力？";
@@ -444,6 +490,46 @@
 // MARK: - Mitigation Fallback
 "factors_reduce_severity" = "降低 Dosha 严重程度的因素";
 "factors_increase_severity" = "增加 Dosha 严重程度的因素";
+
+// MARK: - Full Zodiac Sign Names (for display)
+"Aries" = "白羊座";
+"Taurus" = "金牛座";
+"Gemini" = "双子座";
+"Cancer" = "巨蟹座";
+"Leo" = "狮子座";
+"Virgo" = "处女座";
+"Libra" = "天秤座";
+"Scorpio" = "天蝎座";
+"Sagittarius" = "射手座";
+"Capricorn" = "摩羯座";
+"Aquarius" = "水瓶座";
+"Pisces" = "双鱼座";
+
+// MARK: - Full Planet Names (for display)
+"Sun" = "太阳";
+"Moon" = "月亮";
+"Mars" = "火星";
+"Mercury" = "水星";
+"Jupiter" = "木星";
+"Venus" = "金星";
+"Saturn" = "土星";
+"Rahu" = "罗喉";
+"Ketu" = "计都";
+
+// MARK: - UI Labels
+"Ascendant" = "上升星座";
+"House" = "宫位";
+"Transit" = "行运";
+
+// MARK: - Life Areas (with uppercase keys for StoryOrbs)
+"Career" = "事业";
+"Relationship" = "感情";
+"Finance" = "财务";
+"Health" = "健康";
+"Family" = "家庭";
+"Education" = "教育";
+"Investment" = "投资";
+"Sudden Events" = "突发事件";
 
 // MARK: - Life Areas
 "career" = "职业";
@@ -2186,7 +2272,34 @@
 "personalized_guidance" = "用您的语言提供个性化指导";
 "stat_questions_asked" = "270万+";
 "stat_rating" = "4/5";
-"rating_label" = "等级";
+"rating_label" = "评分";
+
+// Onboarding Slide 1
+"onboarding_slide1_title" = "超过 175,000 名用户信赖";
+"onboarding_slide1_subtitle" = "在 ChatGPT Store 上";
+
+// Onboarding Slide 2
+"onboarding_slide2_title" = "为日常决策提供清晰指引";
+"onboarding_slide2_description" = "Destiny 是一个理解您生活模式的私人空间。它帮助您驾驭爱情、工作和友谊，并在当下进行思考，使用占星术作为添加背景的语言。";
+
+// Onboarding Slide 3
+"onboarding_slide3_title" = "为真正的个性化而构建";
+"onboarding_slide3_description" = "凭借数十亿种占星组合，找到正确的洞察力就像在装满钥匙的桶中找到一把合适的钥匙。Destiny 使用专有的算法，经过 12 年以上的开发并由 AI 驱动，将您的出生详细信息转化为更清晰、更个性化的日常生活指导。";
+
+// Onboarding Slide 4
+"onboarding_slide4_title" = "以下是您可以做的";
+
+// Onboarding Features
+"onboarding_feature1_title" = "问任何问题";
+"onboarding_feature1_desc" = "针对您的问题的实时占星洞察";
+"onboarding_feature2_title" = "更高准确性";
+"onboarding_feature2_desc" = "随时间改进的个性化洞察";
+"onboarding_feature3_title" = "兼容性匹配";
+"onboarding_feature3_desc" = "与伴侣匹配出生星盘，探索关系和婚姻潜力";
+"onboarding_feature4_title" = "聊天历史";
+"onboarding_feature4_desc" = "随时恢复过去的对话";
+"onboarding_feature5_title" = "自定义占星提醒";
+"onboarding_feature5_desc" = "根据您的星盘和偏好在有利的日子接收通知";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Components — Quota, Search & Shared UI
@@ -2232,6 +2345,76 @@
 "dasha_quality_good" = "好的";
 "dasha_quality_steady" = "稳定的";
 "dasha_quality_caution" = "警告";
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Chat Context Building (Life Area, Yoga, Dasha, Transit)
+// ════════════════════════════════════════════════════════════════════════════
+
+// Chat Welcome Message
+"chat_welcome_greeting" = "你好%@！我是Destiny，你的专属占星指南。你想了解关于今天、人际关系还是未来的什么呢？";
+
+// Life Area Context Question
+"context_life_area_question" = "今日预测提到：'%@'与我的%@相关。能详细解释这对我意味着什么吗？";
+
+// Dasha Context Question
+"context_dasha_question" = "我目前处于%@大运期，主题为「%@」，整体质量为「%@」。%@\n\n请详细分析这个大运期如何影响我的生活，可能的机遇或挑战，以及任何建议的补救措施。";
+"context_dasha_phase_suggests" = " 当前阶段提示：「%@」。";
+
+// Transit Context Question
+"context_transit_question" = "%@目前正在%@过境，位于我的第%d宫。关键提示：'%@'。
+
+请分享这个过境如何影响我的生活以及这段时期的实用建议。";
+
+
+// Yoga/Dosha Status
+"status_active" = "活跃";
+"status_reduced" = "减弱";
+"status_cancelled" = "取消";
+
+// Yoga/Dosha Types
+"type_dosha" = "凶相（负面组合）";
+"type_yoga" = "吉相（正面组合）";
+"dosha" = "凶相";
+"yoga" = "吉相";
+
+// Yoga Context Building
+"yoga_context_header" = "我的出生星盘中有%@。";
+"yoga_context_details" = "详情：";
+"yoga_context_type" = "- 类型：%@";
+"yoga_context_category" = "- 类别：%@";
+"yoga_context_status" = "- 状态：%@";
+"yoga_context_strength" = "- 强度：%d%%";
+"yoga_context_planets" = "- 相关行星：%@";
+"yoga_context_houses" = "- 相关宫位：%@";
+"yoga_context_formation" = "- 形成：%@";
+"yoga_context_outcome" = "- 含义：%@";
+"yoga_context_reduction_reason" = "- 减弱原因：%@";
+"yoga_context_cancellation_reason" = "- 取消原因：%@";
+"yoga_context_explain_header" = "请更详细地解释：";
+"yoga_context_question_1" = "1. 这个%@对我的生活意味着什么";
+"yoga_context_dosha_question_2" = "2. 可能带来什么挑战以及补救措施";
+"yoga_context_yoga_question_2" = "2. 如何最大化其益处";
+"yoga_context_inactive_question_2" = "2. 为什么它是%@的，这意味着什么";
+"yoga_context_question_3" = "3. 我可以采取的补救措施或行动";
+"yoga_context_unknown" = "未知";
+
+// Yoga/Dosha Category Names
+"yoga_cat_basic_foundation" = "基础";
+"yoga_cat_personality" = "个性";
+"yoga_cat_wealth" = "财富";
+"yoga_cat_career" = "事业";
+"yoga_cat_relationship" = "关系";
+"yoga_cat_education" = "教育";
+"yoga_cat_health" = "健康";
+"yoga_cat_family" = "家庭";
+"yoga_cat_spiritual" = "灵性";
+"yoga_cat_special" = "特殊";
+"yoga_cat_pancha_mahapurusha" = "五大人物瑜伽";
+"yoga_cat_kendra" = "肯德拉";
+"yoga_cat_power" = "权力";
+"yoga_cat_planetary" = "行星";
+"yoga_cat_unknown" = "未知";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Accessibility Labels
