@@ -327,6 +327,43 @@ struct CompatibilityView: View {
                 viewModel.reloadUserData()
             }
         }
+        // Detect any partner detail modification and re-enable save checkbox
+        .onChange(of: viewModel.girlName) { _, _ in
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.girlCity) { _, _ in
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.girlBirthDate) { _, _ in
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.girlBirthTime) { _, _ in
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.partnerGender) { _, _ in
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.partnerTimeUnknown) { _, _ in
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
     }
     
     // MARK: - Sign Out for Guest Re-auth
