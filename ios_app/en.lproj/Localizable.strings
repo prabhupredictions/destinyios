@@ -2388,3 +2388,8 @@
 "a11y_refresh_subscription" = "Refresh subscription status";
 "a11y_mark_all_read" = "Mark all as read";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "Cancel";
+"yoga_outcome_label" = "What this brings you";
+"yoga_formation_label" = "How this forms";
+

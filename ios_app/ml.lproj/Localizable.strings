@@ -2430,3 +2430,8 @@
 "a11y_refresh_subscription" = "സബ്‌സ്‌ക്രിപ്‌ഷൻ നില പുതുക്കുക";
 "a11y_mark_all_read" = "എല്ലാം വായിച്ചതായി അടയാളപ്പെടുത്തുക";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "റദ്ദാക്കുക";
+"yoga_outcome_label" = "ഇത് നിങ്ങൾക്ക് എന്ത് നൽകുന്നു";
+"yoga_formation_label" = "ഇത് എങ്ങനെ രൂപപ്പെടുന്നു";
+

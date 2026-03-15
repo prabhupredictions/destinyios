@@ -2430,3 +2430,8 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "a11y_refresh_subscription" = "Actualizar el estado de la suscripción";
 "a11y_mark_all_read" = "Marcar todo como leído";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "Cancelar";
+"yoga_outcome_label" = "Lo que esto te aporta";
+"yoga_formation_label" = "Cómo se forma";
+

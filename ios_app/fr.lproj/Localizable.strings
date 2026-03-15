@@ -2430,3 +2430,8 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "a11y_refresh_subscription" = "Actualiser le statut de l'abonnement";
 "a11y_mark_all_read" = "Marquer tout comme lu";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "Annuler";
+"yoga_outcome_label" = "Ce que cela vous apporte";
+"yoga_formation_label" = "Comment cela se forme";
+

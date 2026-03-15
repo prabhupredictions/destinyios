@@ -2430,3 +2430,8 @@
 "a11y_refresh_subscription" = "సభ్యత్వ స్థితిని రిఫ్రెష్ చేయండి";
 "a11y_mark_all_read" = "అన్నింటినీ చదివినట్లుగా గుర్తించండి";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "రద్దు చేయి";
+"yoga_outcome_label" = "ఇది మీకు ఏమి తెస్తుంది";
+"yoga_formation_label" = "ఇది ఎలా ఏర్పడుతుంది";
+

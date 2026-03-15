@@ -2425,3 +2425,8 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "a11y_refresh_subscription" = "Abonnementstatus aktualisieren";
 "a11y_mark_all_read" = "Alle als gelesen markieren";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "Abbrechen";
+"yoga_outcome_label" = "Was Ihnen dies bringt";
+"yoga_formation_label" = "Wie dies entsteht";
+

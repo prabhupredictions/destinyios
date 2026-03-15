@@ -2430,3 +2430,8 @@
 "a11y_refresh_subscription" = "サブスクリプションステータスを更新する";
 "a11y_mark_all_read" = "すべて既読としてマークする";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "キャンセル";
+"yoga_outcome_label" = "これがもたらすもの";
+"yoga_formation_label" = "形成の仕組み";
+

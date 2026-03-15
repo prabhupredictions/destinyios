@@ -11,6 +11,7 @@ struct CompatibilityView: View {
     @State private var showChartsSheet = false
     @State private var showPartnerPicker = false
     @State private var savePartnerForFuture = false
+    @State private var partnerFromSavedChart = false
     
     // Focus State for Name Field
     @FocusState private var isNameFocused: Bool
@@ -201,38 +202,14 @@ struct CompatibilityView: View {
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
         }
-        // Duplicate birth chart alert
+        // Duplicate birth chart alert (suppress when partner came from saved charts)
         .alert("Duplicate Birth Chart", isPresented: .init(
-            get: { viewModel.duplicateMessage != nil },
+            get: { viewModel.duplicateMessage != nil && !partnerFromSavedChart },
             set: { if !$0 { viewModel.duplicateMessage = nil } }
         )) {
             Button("OK", role: .cancel) { viewModel.duplicateMessage = nil }
         } message: {
             Text(viewModel.duplicateMessage ?? "")
-        }
-        // "Loaded from history" toast when cached match is used
-        .overlay(alignment: .top) {
-            if viewModel.historyLoadedToast {
-                HStack(spacing: 8) {
-                    Image(systemName: "clock.arrow.circlepath")
-                    Text("loaded_from_history".localized)
-                        .font(AppTheme.Fonts.caption(size: 13))
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .fill(Color.purple.opacity(0.85))
-                )
-                .padding(.top, 60)
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        withAnimation { viewModel.historyLoadedToast = false }
-                    }
-                }
-            }
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.historyLoadedToast)
         .sheet(isPresented: $showHistorySheet) {
@@ -301,9 +278,9 @@ struct CompatibilityView: View {
                     }
                 }
                 
-                // Chart is already saved — uncheck so we don't duplicate it.
-                // User can manually re-check if they modify any details.
+                // Chart is already saved — disable save checkbox
                 savePartnerForFuture = false
+                partnerFromSavedChart = true
                 
                 HapticManager.shared.playSuccess()
             }
@@ -335,6 +312,7 @@ struct CompatibilityView: View {
             if !quotaManager.isFreePlan {
                 savePartnerForFuture = true
             }
+            partnerFromSavedChart = false
         }
         .onChange(of: initialMatchGroup) { oldValue, newValue in
             if let group = newValue {
@@ -826,21 +804,23 @@ struct CompatibilityView: View {
                     .accessibilityLabel("Birth time unknown")
                     .accessibilityAddTraits(viewModel.partnerTimeUnknown ? .isSelected : [])
                     
-                    // Save Partner Toggle (hidden for free plan users)
+                    // Save Partner Toggle (hidden for free plan users, disabled when picked from saved charts)
                     if !quotaManager.isFreePlan {
                         Button(action: {
+                            guard !partnerFromSavedChart else { return }
                             HapticManager.shared.play(.light)
                             withAnimation { savePartnerForFuture.toggle() }
                         }) {
                             HStack(spacing: 6) {
-                                Image(systemName: savePartnerForFuture ? "checkmark.square.fill" : "square")
+                                Image(systemName: (savePartnerForFuture || partnerFromSavedChart) ? "checkmark.square.fill" : "square")
                                     .font(.system(size: 14))
-                                    .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                    .foregroundColor(partnerFromSavedChart ? AppTheme.Colors.gold.opacity(0.4) : (savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary))
                                 Text("save_birth_chart".localized)
                                     .font(AppTheme.Fonts.caption(size: 11))
-                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                                    .foregroundColor(partnerFromSavedChart ? AppTheme.Colors.textSecondary.opacity(0.5) : AppTheme.Colors.textSecondary)
                             }
                         }
+                        .disabled(partnerFromSavedChart)
                         .accessibilityLabel("Save partner for future")
                         .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     }

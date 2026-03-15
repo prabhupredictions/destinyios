@@ -2430,3 +2430,8 @@
 "a11y_refresh_subscription" = "刷新订阅状态";
 "a11y_mark_all_read" = "全部标记为已读";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "取消";
+"yoga_outcome_label" = "这为您带来什么";
+"yoga_formation_label" = "如何形成";
+

@@ -2430,3 +2430,8 @@
 "a11y_refresh_subscription" = "Обновить статус подписки";
 "a11y_mark_all_read" = "Отметить все как прочитанное";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "Отмена";
+"yoga_outcome_label" = "Что это вам даёт";
+"yoga_formation_label" = "Как это формируется";
+

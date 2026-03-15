@@ -2430,3 +2430,8 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "a11y_refresh_subscription" = "Atualizar status da assinatura";
 "a11y_mark_all_read" = "Marcar tudo como lido";
 
+// MARK: - Missing UI Keys
+"cancel_action" = "Cancelar";
+"yoga_outcome_label" = "O que isso traz para você";
+"yoga_formation_label" = "Como isso se forma";
+
