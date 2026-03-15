@@ -298,31 +298,14 @@ struct PremiumYogaCard: View {
         .frame(width: 170, height: 170)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
-                            Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppTheme.Colors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(
-                    // Static gradient border - no animation for performance
-                    LinearGradient(
-                        colors: [
-                            baseColor.opacity(0.6),
-                            baseColor.opacity(0.2),
-                            baseColor.opacity(0.6)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1.5
+                .stroke(
+                    // Static border matching comparison result card style
+                    yoga.isDosha ? AppTheme.Colors.error.opacity(0.4) : AppTheme.Colors.gold.opacity(0.5),
+                    lineWidth: yoga.isDosha ? 1.5 : 2
                 )
         )
         .shadow(color: baseColor.opacity(0.08), radius: 8, x: 0, y: 4)

@@ -52,24 +52,19 @@ struct TransitAlertCard: View {
                 }
             }
             .padding(.vertical, 10)
+            .padding(.horizontal, 12)
             .background(
-                // Dark Glass Strip (Cinematic Anchor)
-                // Soft gradient bar that provides structure without hard edges
-                LinearGradient(
-                    colors: [
-                        Color.black.opacity(0.0),
-                        Color.black.opacity(0.4),
-                        Color.black.opacity(0.4),
-                        Color.black.opacity(0.0)
-                    ],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .padding(.vertical, -4) // Slight bleed
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(AppTheme.Colors.cardBackground)
             )
             .overlay(
-                EmptyView() // Removed outer golden border
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(
+                        AppTheme.Colors.gold.opacity(0.5),
+                        lineWidth: 2
+                    )
             )
+            .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
         }
     }
 }

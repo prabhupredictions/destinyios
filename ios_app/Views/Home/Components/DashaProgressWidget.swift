@@ -67,12 +67,16 @@ struct DashaProgressWidget: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.clear) // Transparent
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
+                    .fill(AppTheme.Colors.cardBackground)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        AppTheme.Colors.gold.opacity(0.5),
+                        lineWidth: 2
                     )
             )
+            .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
             .padding(.horizontal, 12)
         }
     }

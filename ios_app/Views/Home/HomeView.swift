@@ -1082,24 +1082,15 @@ struct QuickQuestionCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.10, green: 0.12, blue: 0.18).opacity(0.8),
-                            Color(red: 0.08, green: 0.10, blue: 0.15).opacity(0.9)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppTheme.Colors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(
-                    AppTheme.Colors.gold.opacity(0.25),
-                    lineWidth: 1
+                .stroke(
+                    AppTheme.Colors.gold.opacity(0.5),
+                    lineWidth: 2
                 )
         )
-        .shadow(color: AppTheme.Colors.gold.opacity(0.06), radius: 6, x: 0, y: 3)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
     }
 }
