@@ -37,6 +37,31 @@ class HomeViewModel {
     
     /// Timestamp of last successful full data load (for 24-hour cache guard)
     private var lastFullLoadDate: Date?
+    
+    /// Reset cached state when switching profiles so fresh data is fetched
+    @MainActor
+    func resetForProfileSwitch() {
+        // Clear 24h cache guard so full chart/dasha always re-fetches
+        lastFullLoadDate = nil
+        // Clear stale chart/dasha/yoga data from previous profile
+        fullAstroData = nil
+        dashaResponse = nil
+        dashaInsight = nil
+        transitInfluences = []
+        yogaCombinations = []
+        doshaStatus = (nil, nil)
+        currentDashaPeriod = nil
+        upcomingDashaPeriod = nil
+        // Clear displayed prediction data from previous profile
+        dailyInsight = ""
+        suggestedQuestions = []
+        lifeAreas = [:]
+        currentTransits = []
+        moonSign = ""
+        // Reset loading flag to prevent race with any in-flight load
+        isLoading = false
+        loadUserInfo()
+    }
 
     
     struct TransitDisplayData: Identifiable {

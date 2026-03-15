@@ -324,8 +324,8 @@ struct HomeView: View {
             
         }
         .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
-            // Reload home data when profile switches
-            // Uses profile-scoped cache, so API only called once/day per profile
+            // Reset stale data + 24h cache guard so fresh data is fetched for new profile
+            viewModel.resetForProfileSwitch()
             Task {
                 await viewModel.loadHomeData()
                 await notificationService.fetchUnreadCount()
