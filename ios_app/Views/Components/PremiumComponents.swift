@@ -129,6 +129,7 @@ struct TypewriterText: View {
     @State private var displayedText = ""
     @State private var showCursor = true
     @State private var isComplete = false
+    @State private var cursorTimer: Timer?
     
     init(_ text: String, font: Font = AppTheme.Fonts.display(size: 30), color: Color = .white) {
         self.fullText = text
@@ -154,6 +155,10 @@ struct TypewriterText: View {
             startTyping()
             startCursorBlink()
         }
+        .onDisappear {
+            cursorTimer?.invalidate()
+            cursorTimer = nil
+        }
     }
     
     private func startTyping() {
@@ -174,7 +179,7 @@ struct TypewriterText: View {
     }
     
     private func startCursorBlink() {
-        Timer.scheduledTimer(withTimeInterval: AppTheme.Visionary.Typewriter.cursorBlinkDuration, repeats: true) { _ in
+        cursorTimer = Timer.scheduledTimer(withTimeInterval: AppTheme.Visionary.Typewriter.cursorBlinkDuration, repeats: true) { _ in
             showCursor.toggle()
         }
     }
@@ -295,8 +300,8 @@ struct BentoGridFeaturesView: View {
 
 // MARK: - 3D Tilt Modifier (Device Motion)
 /// Applies 3D rotation effect based on device tilt using MotionManager
+/// BATTERY OPTIMIZATION: No-op while motion is disabled in MotionManager.start().
 struct Tilt3DModifier: ViewModifier {
-    @StateObject private var motionManager = MotionManager()
     let intensity: CGFloat
     let perspective: CGFloat
     
@@ -306,26 +311,14 @@ struct Tilt3DModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content
-            .rotation3DEffect(
-                .degrees(Double(motionManager.yOffset * intensity / 25)),
-                axis: (x: 1, y: 0, z: 0),
-                perspective: perspective
-            )
-            .rotation3DEffect(
-                .degrees(Double(motionManager.xOffset * intensity / 25)),
-                axis: (x: 0, y: 1, z: 0),
-                perspective: perspective
-            )
-            .onAppear { motionManager.start() }
-            .onDisappear { motionManager.stop() }
+        content // No-op: motion disabled
     }
 }
 
 // MARK: - Inertia Motion Modifier (Proprioception/Weight)
 /// Simulates mass by making content "lag" behind device movement
+/// BATTERY OPTIMIZATION: No-op while motion is disabled in MotionManager.start().
 struct InertiaModifier: ViewModifier {
-    @StateObject private var motionManager = MotionManager()
     let intensity: CGFloat
     
     init(intensity: CGFloat = 10) {
@@ -333,14 +326,7 @@ struct InertiaModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content
-            .offset(
-                x: motionManager.xOffset * intensity,
-                y: motionManager.yOffset * intensity
-            )
-            .animation(.interpolatingSpring(stiffness: 100, damping: 10), value: motionManager.xOffset)
-            .onAppear { motionManager.start() }
-            .onDisappear { motionManager.stop() }
+        content // No-op: motion disabled
     }
 }
 

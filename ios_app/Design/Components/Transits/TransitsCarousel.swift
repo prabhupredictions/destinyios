@@ -5,6 +5,7 @@ struct TransitsCarousel: View {
     // Dark Navy Background Colors
     private let darkNavyStart = Color(red: 10/255, green: 14/255, blue: 26/255) // #0a0e1a
     private let darkNavyEnd = Color(red: 21/255, green: 25/255, blue: 34/255)   // #151922
+    @Environment(\.scenePhase) private var scenePhase
     
     // Sample Data based on Spec
     private let transits: [(planet: String, sign: String)] = [
@@ -68,6 +69,11 @@ struct TransitsCarousel: View {
             .allowsHitTesting(false)
         }
         .frame(height: 110) // Reduced height for compact fit
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active && contentWidth > 0 {
+                startScrollAnimation()
+            }
+        }
     }
     
     // MARK: - Scroll Animation (replaces 60fps timer)

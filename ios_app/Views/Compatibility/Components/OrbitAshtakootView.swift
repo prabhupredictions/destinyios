@@ -382,29 +382,23 @@ struct PlanetBubble: View {
     let isSelected: Bool
     let action: () -> Void
     
-    @State private var pulsePhase: Bool = false
-    
     var body: some View {
         let orbSize: CGFloat = 64
         
         Button(action: action) {
             ZStack {
-                // 0. Outer ring (double circle effect for all orbs)
+                // 0. Outer ring (static — pulse animation removed for battery optimization)
                 Circle()
                     .stroke(
                         item.doshaPresent
                             ? (item.doshaCancelled
-                                ? AppTheme.Colors.success.opacity(pulsePhase ? 0.5 : 0.15)
-                                : AppTheme.Colors.error.opacity(pulsePhase ? 0.6 : 0.15))
-                            : item.statusColor.opacity(pulsePhase ? 0.5 : 0.15),
+                                ? AppTheme.Colors.success.opacity(0.35)
+                                : AppTheme.Colors.error.opacity(0.4))
+                            : item.statusColor.opacity(0.35),
                         lineWidth: 2
                     )
                     .frame(width: orbSize + 8, height: orbSize + 8)
-                    .scaleEffect(pulsePhase ? 1.15 : 1.0)
-                    .animation(
-                        .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
-                        value: pulsePhase
-                    )
+                    .scaleEffect(1.08)
                 
                 // 1. Status Glow Aura
                 Circle()
@@ -532,9 +526,6 @@ struct PlanetBubble: View {
             }
             .frame(width: 64, height: 64)
             .scaleEffect(isSelected ? 1.1 : 1.0) // Pop effect
-        }
-        .onAppear {
-            pulsePhase = true
         }
     }
     

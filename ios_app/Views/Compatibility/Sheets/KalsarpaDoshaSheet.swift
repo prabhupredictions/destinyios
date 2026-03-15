@@ -13,8 +13,8 @@ struct KalsarpaDoshaSheet: View {
     let boyName: String
     let girlName: String
     
-    @State private var animateSnake: Bool = false
-    @State private var animateOrbit: Bool = false
+    @State private var animateSnake: Bool = true
+    @State private var animateOrbit: Bool = true
     
     // MARK: - Scenario Logic
     
@@ -62,14 +62,6 @@ struct KalsarpaDoshaSheet: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbarBackground(.hidden, for: .navigationBar)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                animateSnake = true
-            }
-            withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
-                animateOrbit = true
-            }
-        }
     }
     
     // MARK: - Star Field Overlay

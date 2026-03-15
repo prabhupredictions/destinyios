@@ -18,73 +18,30 @@ struct DivineGlassCard<Content: View>: View {
         ZStack {
             // 1. Crystal Base (Tinted Glass)
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.1, green: 0.12, blue: 0.18).opacity(0.8),  // Dark blue tint
-                            Color(red: 0.08, green: 0.1, blue: 0.15).opacity(0.9)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppTheme.Colors.cardBackground)
             
-            // 2. Glass Material Overlay
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(.ultraThinMaterial)
-                .opacity(0.5)
-            
-            // 3. Inner Depth Layer (Simulates Thickness)
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .strokeBorder(Color.black.opacity(0.4), lineWidth: 4)
-                .blur(radius: 6)
-                .mask(RoundedRectangle(cornerRadius: cornerRadius))
-            
-            // 4. Surface Gloss (Visible Sheen)
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.25),
-                            Color.clear,
-                            Color.white.opacity(0.08)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .blendMode(.overlay)
-            
-            // 5. The "Rim Light" Bevel (Bright Gold Edge)
+            // 2. Gold Rim Border
             RoundedRectangle(cornerRadius: cornerRadius)
                 .strokeBorder(
                     LinearGradient(
                         stops: [
-                            .init(color: Color.white.opacity(1.0), location: 0.05), // Pure white highlight
-                            .init(color: AppTheme.Colors.gold, location: 0.2), // Solid gold
+                            .init(color: Color.white.opacity(0.8), location: 0.05),
+                            .init(color: AppTheme.Colors.gold, location: 0.2),
                             .init(color: AppTheme.Colors.gold.opacity(0.3), location: 0.5),
-                            .init(color: AppTheme.Colors.gold, location: 0.8), // Gold return
-                            .init(color: Color.white.opacity(0.9), location: 0.98) // Rim light
+                            .init(color: AppTheme.Colors.gold, location: 0.8),
+                            .init(color: Color.white.opacity(0.7), location: 0.98)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1.5 // Thicker for visibility
+                    lineWidth: 1.5
                 )
             
-            // 6. Ambient Glow
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(AppTheme.Colors.gold.opacity(0.2), lineWidth: 4)
-                .blur(radius: 10)
-            
-            // 7. Content
+            // 3. Content
             content
                 .padding(16)
         }
-        // 8. Physicality
-        .tilt3D(intensity: 12)
-        .premiumInertia(intensity: 0.7)
-        .shadow(color: Color.black.opacity(0.5), radius: 15, x: 0, y: 10)
+        .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 6)
     }
 }
 

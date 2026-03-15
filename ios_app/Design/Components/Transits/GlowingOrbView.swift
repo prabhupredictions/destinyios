@@ -3,7 +3,6 @@ import SwiftUI
 struct GlowingOrbView: View {
     let symbol: String
     
-    @State private var isPulsing = false
     
     // Golden Colors
     private let goldBase = Color(red: 212/255, green: 175/255, blue: 55/255) // #D4AF37
@@ -50,13 +49,9 @@ struct GlowingOrbView: View {
                 .shadow(color: goldBase.opacity(0.8), radius: 6, x: 0, y: 0) // Text glow
                 .shadow(color: goldBase.opacity(0.4), radius: 12, x: 0, y: 0) // Text outer glow
         }
-        // 5. Outer Pulsing Glow Animation
-        .shadow(color: goldBase.opacity(isPulsing ? 0.6 : 0.4), radius: isPulsing ? 30 : 20)
-        .scaleEffect(isPulsing ? 1.05 : 1.0)
-        .animation(Animation.easeInOut(duration: 3).repeatForever(autoreverses: true), value: isPulsing)
-        .onAppear {
-            isPulsing = true
-        }
+        // 5. Static Outer Glow (pulse animation removed for battery optimization)
+        .shadow(color: goldBase.opacity(0.5), radius: 25)
+        .scaleEffect(1.02)
     }
 }
 

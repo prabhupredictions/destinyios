@@ -641,6 +641,7 @@ struct MarkdownTextView: View {
 struct PremiumTypingIndicator: View {
     @State private var animationPhase: Int = 0
     @State private var dotScales: [CGFloat] = [1.0, 1.0, 1.0]
+    @State private var bounceTimer: Timer?
     
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
@@ -690,11 +691,15 @@ struct PremiumTypingIndicator: View {
         .onAppear {
             startBouncingAnimation()
         }
+        .onDisappear {
+            bounceTimer?.invalidate()
+            bounceTimer = nil
+        }
     }
     
     private func startBouncingAnimation() {
         // Continuous bouncing animation
-        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
+        bounceTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
             withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                 animationPhase = (animationPhase + 1) % 3
             }

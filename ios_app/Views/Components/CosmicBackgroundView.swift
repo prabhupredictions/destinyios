@@ -3,12 +3,12 @@ import SwiftUI
 /// Premium cosmic background with rotating nebulae and twinkling stars
 /// Responds to device tilt for parallax effect
 ///
-/// BATTERY OPTIMIZATION: Replaced 10Hz Timer.scheduledTimer (per-star phase mutation)
-/// with a single GPU-driven SwiftUI animation. This view is instantiated 30+ times
-/// across the app — the old timer was the #1 battery drain source.
+/// BATTERY OPTIMIZATION v2: Made fully static. This view is instantiated 41+ times
+/// across the app — even GPU-driven repeatForever animations compound to significant drain.
+/// Static nebulae + stars provide the same premium look at zero animation cost.
 struct CosmicBackgroundView: View {
-    @State private var nebulaRotation: Double = 0
-    @State private var starBrightness: Double = 0.4
+    private let nebulaRotation: Double = 25 // Fixed aesthetic angle
+    private let starBrightness: Double = 0.7 // Fixed comfortable brightness
     
     private let stars: [Star]
     
@@ -76,16 +76,6 @@ struct CosmicBackgroundView: View {
             }
         }
         .accessibilityHidden(true)
-        .onAppear {
-            // Continuous nebula rotation (GPU-driven, no CPU cost)
-            withAnimation(.linear(duration: AppTheme.Onboarding.nebulaRotationDuration).repeatForever(autoreverses: false)) {
-                nebulaRotation = 360
-            }
-            // Single gentle breathing animation for all stars (replaces 10Hz timer)
-            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
-                starBrightness = 1.0
-            }
-        }
     }
 }
 

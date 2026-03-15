@@ -17,7 +17,7 @@ struct LiquidGoldBackground: View {
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
-        TimelineView(.animation(paused: scenePhase != .active)) { timeline in
+        TimelineView(.animation(minimumInterval: 1.0/15, paused: scenePhase != .active)) { timeline in
             let time = timeline.date.timeIntervalSinceReferenceDate
             
             Canvas { context, size in

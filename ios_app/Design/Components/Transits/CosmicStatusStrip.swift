@@ -7,6 +7,7 @@ import SwiftUI
 struct CosmicStatusStrip: View {
     let currentDasha: String      // e.g., "Saturn-Saturn-Moon"
     let transits: [(planet: String, sign: String)]
+    @Environment(\.scenePhase) private var scenePhase
     
     // Dark Navy Background (matches main background)
     private let darkNavyStart = Color(red: 10/255, green: 14/255, blue: 26/255) // #0a0e1a
@@ -83,6 +84,11 @@ struct CosmicStatusStrip: View {
             .allowsHitTesting(false)
         }
         .frame(height: 90) // Compact height
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active && contentWidth > 0 {
+                startScrollAnimation()
+            }
+        }
     }
     
     // MARK: - Scroll Animation (replaces 60fps timer)
