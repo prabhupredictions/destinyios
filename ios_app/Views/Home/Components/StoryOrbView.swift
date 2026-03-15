@@ -19,8 +19,6 @@ struct StoryOrbView: View {
     var size: CGFloat = 72 // Standardized: shows ~4.5 orbs on screen
     let action: () -> Void
     
-    @State private var pulsePhase: Bool = false
-    
     // Ring geometry
     private var ringWidth: CGFloat { 2.5 }
     private var gapWidth: CGFloat { 3 }
@@ -30,22 +28,20 @@ struct StoryOrbView: View {
         Button(action: action) {
             VStack(spacing: 6) {
                 ZStack {
-                    // 0. BREATHING OUTER RING (like Match screen PlanetBubble)
-                    // This is the key "alive" indicator that invites tapping
+                    // 0. STATIC OUTER RING (performance optimized - removed animation)
                     Circle()
                         .stroke(
-                            statusDotColor.opacity(pulsePhase ? 0.5 : 0.12),
+                            statusDotColor.opacity(0.25),
                             lineWidth: 2
                         )
                         .frame(width: size + 8, height: size + 8)
-                        .scaleEffect(pulsePhase ? 1.12 : 1.0)
                     
-                    // 1. Glow Aura (soft, status-colored)
+                    // 1. Glow Aura (soft, status-colored) - static for performance
                     Circle()
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    statusDotColor.opacity(pulsePhase ? 0.4 : 0.15),
+                                    statusDotColor.opacity(0.25),
                                     statusDotColor.opacity(0.08),
                                     Color.clear
                                 ],
@@ -155,17 +151,6 @@ struct StoryOrbView: View {
         .buttonStyle(StoryOrbButtonStyle())
         .accessibilityLabel("\(title): \(status)")
         .accessibilityHint("Double tap for details")
-        .onAppear {
-            // Staggered breathing animation (like PlanetBubble)
-            let randomDelay = Double.random(in: 0...1.5)
-            withAnimation(
-                .easeInOut(duration: 1.8)
-                .repeatForever(autoreverses: true)
-                .delay(randomDelay)
-            ) {
-                pulsePhase = true
-            }
-        }
     }
     
     // MARK: - Status-based colors

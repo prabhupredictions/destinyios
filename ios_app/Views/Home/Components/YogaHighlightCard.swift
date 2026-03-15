@@ -156,9 +156,6 @@ struct YogaHighlightCard: View {
 struct PremiumYogaCard: View {
     let yoga: YogaDetail
     
-    @State private var shimmerAngle: Double = 0
-    
-    
     // Status Logic
     var statusText: String {
         switch yoga.status {
@@ -315,28 +312,20 @@ struct PremiumYogaCard: View {
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
-                    AngularGradient(
-                        gradient: Gradient(stops: [
-                            .init(color: baseColor.opacity(0.1), location: 0.0),
-                            .init(color: baseColor.opacity(0.6), location: 0.15),
-                            .init(color: baseColor.opacity(0.9), location: 0.2),
-                            .init(color: baseColor.opacity(0.6), location: 0.25),
-                            .init(color: baseColor.opacity(0.1), location: 0.4),
-                            .init(color: baseColor.opacity(0.05), location: 1.0)
-                        ]),
-                        center: .center,
-                        startAngle: .degrees(shimmerAngle),
-                        endAngle: .degrees(shimmerAngle + 360)
+                    // Static gradient border - no animation for performance
+                    LinearGradient(
+                        colors: [
+                            baseColor.opacity(0.6),
+                            baseColor.opacity(0.2),
+                            baseColor.opacity(0.6)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     ),
                     lineWidth: 1.5
                 )
         )
         .shadow(color: baseColor.opacity(0.08), radius: 8, x: 0, y: 4)
-        .onAppear {
-            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
-                shimmerAngle = 360
-            }
-        }
     }
     
     private func formatHouses(_ houses: String) -> String {
