@@ -163,6 +163,9 @@ struct ProfileView: View {
                 )
                 .environment(authViewModel)
             }
+            .sheet(isPresented: $showNotificationPreferences) {
+                NotificationPreferencesSheet(userEmail: userEmail)
+            }
             .sheet(isPresented: $showPartnerManager) {
                 NavigationStack {
                     PartnerManagerView()
