@@ -52,8 +52,8 @@ struct FullReportSheet: View {
                         
                         // 3. Section Cards (parsed from LLM output)
                         if sections.isEmpty {
-                            // Fallback: render full summary as markdown
-                            sectionCard(emoji: "📋", title: "Analysis", content: result.summary)
+                            // Fallback: render full summary as markdown (strip follow-up section)
+                            sectionCard(emoji: "📋", title: "Analysis", content: ComparisonOverviewView.stripFollowUpSection(result.summary))
                         } else {
                             ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
                                 sectionCard(emoji: section.emoji, title: section.title, content: section.content)
@@ -512,7 +512,10 @@ struct FullReportSheet: View {
             }
         }
         
-        return result
+        // Strip follow-up questions section — only relevant in Ask Destiny chat, not in reports or share
+        return result.filter { section in
+            !section.title.localizedCaseInsensitiveContains("SUGGESTED FOLLOW-UP")
+        }
     }
     
     /// Extract emoji and title from header like "🎯 COMPATIBILITY VERDICT"
@@ -923,6 +926,7 @@ struct AskDestinySheet: View {
     @State private var showSubscription: Bool = false
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
+    @State private var typewriterFinished = false  // Track if typewriter effect has completed
     
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -974,7 +978,10 @@ struct AskDestinySheet: View {
                                     CompatChatBubble(
                                         message: message,
                                         enableTypewriter: isLastAI,
-                                        onTypewriterFinished: isLastAI ? { requestCompatScroll() } : nil,
+                                        onTypewriterFinished: isLastAI ? { 
+                                            typewriterFinished = true
+                                            requestCompatScroll() 
+                                        } : nil,
                                         onTypewriterProgress: isLastAI ? { requestCompatScroll() } : nil
                                     )
                                     .id(message.id)
@@ -987,7 +994,7 @@ struct AskDestinySheet: View {
                                 }
                                 
                                 // Inline suggested follow-up questions
-                                if !suggestedQuestions.isEmpty && !isLoading {
+                                if !suggestedQuestions.isEmpty && !isLoading && typewriterFinished {
                                     inlineSuggestedQuestionsView
                                         .id("suggestions")
                                         .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -1294,6 +1301,7 @@ struct AskDestinySheet: View {
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []  // Clear previous suggestions
+        typewriterFinished = false  // Reset typewriter state
         
         // Add user message
         let userMessage = CompatChatMessage(content: query, isUser: true, type: .user)
@@ -1318,6 +1326,7 @@ struct AskDestinySheet: View {
         }
         
         isLoading = true
+        typewriterFinished = false  // Reset when loading starts
         
         // Get session ID
         guard let sessionId = result.sessionId else {
@@ -1339,13 +1348,12 @@ struct AskDestinySheet: View {
             let response = try await compatibilityService.followUp(request: request)
             
             // Handle response
-            if response.status == "redirect", let target = response.target {
-                // Individual question - redirect to predict API
-                await handleRedirect(query: query, target: target, response: response)
-            } else if response.status == "redirect_no_data", let target = response.target {
-                // Backend couldn't find birth data in cache — use locally stored data as fallback
-                print("[AskDestiny] redirect_no_data — falling back to local birth data for target: \(target)")
-                await handleRedirect(query: query, target: target, response: response)
+            let redirectTarget = response.target  // May be nil if backend returned null
+            if response.status == "redirect" || response.status == "redirect_no_data" {
+                // Use backend-provided target, or fall back to boyName if nil
+                let resolvedTarget = redirectTarget ?? boyName
+                print("[AskDestiny] redirect status=\(response.status ?? "") target=\(resolvedTarget)")
+                await handleRedirect(query: query, target: resolvedTarget, response: response)
             } else if let answer = response.answer {
                 // Normal compatibility answer
                 let aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
@@ -1357,16 +1365,16 @@ struct AskDestinySheet: View {
                     suggestedQuestions = followUps
                 }
             } else if let message = response.message {
-                // Info/error message — but if it looks like a redirect failure, try local fallback
-                let isRedirectFailure = message.contains("birth details") || message.contains("individual analysis")
-                if isRedirectFailure && result.analysisData?.boy?.details != nil {
-                    // Backend couldn't retrieve birth data from cache — use local result data instead
-                    print("[AskDestiny] Redirect failed, attempting local fallback with boyName as target")
+                // Info/error message — detect redirect patterns (including "None's chart" from backend bug)
+                let isRedirectMsg = message.contains("Redirecting") || message.contains("individual analysis") ||
+                                    message.contains("None's chart") || message.contains("birth details")
+                if isRedirectMsg && result.analysisData?.boy?.details != nil {
+                    // Fallback: backend sent redirect as message instead of status — use local data
+                    print("[AskDestiny] Redirect fallback from message pattern, using boyName")
                     await handleRedirectWithLocalData(query: query, target: boyName, response: response)
                 } else {
                     let aiMessage = CompatChatMessage(content: message, isUser: false, type: .info)
                     messages.append(aiMessage)
-
                 }
             }
             
@@ -1396,40 +1404,46 @@ struct AskDestinySheet: View {
 
     // MARK: - Handle Redirect to Individual Analysis
     private func handleRedirect(query: String, target: String, response: CompatibilityFollowUpResponse) async {
-        // Show redirect message (temporary - will be removed when result arrives)
+        let targetLower = target.lowercased()
+        let boyNameLower = boyName.lowercased()
+        let girlNameLower = girlName.lowercased()
+        let boyFirst = boyName.components(separatedBy: " ").first ?? boyName
+        let girlFirst = girlName.components(separatedBy: " ").first ?? girlName
+        
+        // Determine actual person — match "boy"/"his"/"him" → boyName, "girl"/"her"/"she" → girlName
+        let isBoyTarget = targetLower.contains("boy") || targetLower.contains("him") || targetLower.contains("his") ||
+                          targetLower == boyNameLower ||
+                          boyNameLower.hasPrefix(targetLower) ||
+                          targetLower.hasPrefix(boyNameLower)
+        let isGirlTarget = targetLower.contains("girl") || targetLower.contains("her") || targetLower.contains("she") ||
+                           targetLower == girlNameLower ||
+                           girlNameLower.hasPrefix(targetLower) ||
+                           targetLower.hasPrefix(girlNameLower)
+        
+        // Resolved display name — always a real person's name, never "Boy"/"Girl"
+        let resolvedDisplayName: String
+        let birthDetails: BirthDetails?
+        if isBoyTarget {
+            resolvedDisplayName = boyFirst
+            birthDetails = result.analysisData?.boy?.details ?? response.birthData
+        } else if isGirlTarget {
+            resolvedDisplayName = girlFirst
+            birthDetails = result.analysisData?.girl?.details ?? response.birthData
+        } else {
+            // Ambiguous — default to boy
+            resolvedDisplayName = boyFirst
+            birthDetails = result.analysisData?.boy?.details ?? response.birthData
+            print("[AskDestiny] Ambiguous target '\(target)' — defaulting to \(boyFirst)'s data")
+        }
+        
+        // Show redirect message with actual name (temporary - removed when result arrives)
         let redirectMsg = CompatChatMessage(
-            content: "🔄 Redirecting to \(target)'s individual analysis...",
+            content: "🔄 Looking up \(resolvedDisplayName)'s individual chart...",
             isUser: false,
             type: .info
         )
         messages.append(redirectMsg)
         let redirectMsgId = redirectMsg.id
-        
-        // Get birth data for target — prefer locally stored data (always available) over backend-provided data
-        let targetLower = target.lowercased()
-        let boyNameLower = boyName.lowercased()
-        let girlNameLower = girlName.lowercased()
-        
-        let isBoyTarget = targetLower.contains("boy") ||
-                          targetLower == boyNameLower ||
-                          boyNameLower.hasPrefix(targetLower) ||
-                          targetLower.hasPrefix(boyNameLower)
-        let isGirlTarget = targetLower.contains("girl") ||
-                           targetLower == girlNameLower ||
-                           girlNameLower.hasPrefix(targetLower) ||
-                           targetLower.hasPrefix(girlNameLower)
-        
-        let birthDetails: BirthDetails?
-        if isBoyTarget {
-            // Local data first (most reliable), backend redirect data as secondary
-            birthDetails = result.analysisData?.boy?.details ?? response.birthData
-        } else if isGirlTarget {
-            birthDetails = result.analysisData?.girl?.details ?? response.birthData
-        } else {
-            // Ambiguous — default to boy's data (most common for individual queries)
-            birthDetails = result.analysisData?.boy?.details ?? response.birthData
-            print("[AskDestiny] Ambiguous target '\(target)' — defaulting to boy's data")
-        }
         
         guard let details = birthDetails else {
             // Remove redirect message and show error
@@ -1437,7 +1451,7 @@ struct AskDestinySheet: View {
                 messages.removeAll { $0.id == redirectMsgId }
             }
             let errorMsg = CompatChatMessage(
-                content: "Could not retrieve \(target)'s birth data for individual analysis.",
+                content: "Could not retrieve \(resolvedDisplayName)'s birth data for individual analysis.",
                 isUser: false,
                 type: .error
             )
@@ -1478,7 +1492,7 @@ struct AskDestinySheet: View {
             withAnimation(.easeInOut(duration: 0.2)) {
                 messages.removeAll { $0.id == redirectMsgId }
             }
-            let analysisContent = "**Individual Analysis (\(target)):**\n\n\(predictResponse.answer)"
+            let analysisContent = "**Individual Analysis (\(resolvedDisplayName)):**\n\n\(predictResponse.answer)"
             let aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
             messages.append(aiMessage)
             saveMessagesToHistory()  // Persist messages

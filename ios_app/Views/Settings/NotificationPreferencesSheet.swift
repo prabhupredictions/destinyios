@@ -20,7 +20,12 @@ struct NotificationPreferencesSheet: View {
     @State private var alertToDelete: AlertItem? = nil
     @State private var showDeleteConfirmation = false
     
-    // Suggestion chips
+    // Suggestion chips - filtered to exclude already-added alerts
+    private var availableSuggestions: [String] {
+        let addedTexts = Set(viewModel.alertItems.map { $0.text.lowercased() })
+        return suggestions.filter { !addedTexts.contains($0.lowercased()) }
+    }
+    
     private let suggestions = [
         "Good day to invest or take calculated risks",
         "Good day for tough relationship conversations and conflict resolution",
@@ -88,7 +93,7 @@ struct NotificationPreferencesSheet: View {
                                     HStack(spacing: 8) {
                                         Image(systemName: "plus")
                                             .font(.system(size: 14, weight: .semibold))
-                                        Text("Add new alert preference")
+                                        Text("Add new alert")
                                             .font(AppTheme.Fonts.body(size: 15))
                                     }
                                     .foregroundColor(AppTheme.Colors.gold)
@@ -116,38 +121,40 @@ struct NotificationPreferencesSheet: View {
                         }
                         
                         // MARK: - Suggestions
-                        Section {
-                            ForEach(suggestions, id: \.self) { suggestion in
-                                Button {
-                                    addSuggestionAsAlert(suggestion)
-                                    HapticManager.shared.play(.light)
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: "sparkles")
-                                            .foregroundColor(AppTheme.Colors.gold)
-                                            .font(.system(size: 14))
-                                            .frame(width: 20)
-                                        
-                                        Text(suggestion)
-                                            .font(AppTheme.Fonts.body(size: 14))
-                                            .foregroundColor(AppTheme.Colors.textPrimary)
-                                            .multilineTextAlignment(.leading)
-                                        
-                                        Spacer()
-                                        
-                                        Image(systemName: "plus.circle")
-                                            .foregroundColor(viewModel.canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                                            .font(.system(size: 16))
+                        if !availableSuggestions.isEmpty {
+                            Section {
+                                ForEach(availableSuggestions, id: \.self) { suggestion in
+                                    Button {
+                                        addSuggestionAsAlert(suggestion)
+                                        HapticManager.shared.play(.light)
+                                    } label: {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: "sparkles")
+                                                .foregroundColor(AppTheme.Colors.gold)
+                                                .font(.system(size: 14))
+                                                .frame(width: 20)
+                                            
+                                            Text(suggestion)
+                                                .font(AppTheme.Fonts.body(size: 14))
+                                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                                .multilineTextAlignment(.leading)
+                                            
+                                            Spacer()
+                                            
+                                            Image(systemName: "plus.circle")
+                                                .foregroundColor(viewModel.canAddMore ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                                .font(.system(size: 16))
+                                        }
                                     }
+                                    .disabled(!viewModel.canAddMore)
+                                    .listRowBackground(AppTheme.Colors.cardBackground)
                                 }
-                                .disabled(!viewModel.canAddMore)
-                                .listRowBackground(AppTheme.Colors.cardBackground)
+                            } header: {
+                                sectionHeader(
+                                    title: "Suggestions",
+                                    description: "Tap to add"
+                                )
                             }
-                        } header: {
-                            sectionHeader(
-                                title: "Suggestions",
-                                description: "Tap to add"
-                            )
                         }
                     }
                     .listStyle(.insetGrouped)
@@ -186,7 +193,13 @@ struct NotificationPreferencesSheet: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        Task { await viewModel.savePreferences(email: userEmail) }
+                        Task {
+                            await viewModel.savePreferences(email: userEmail)
+                            // Dismiss after successful save (like Edit Alerts screen)
+                            if viewModel.errorMessage == nil {
+                                dismiss()
+                            }
+                        }
                     } label: {
                         if viewModel.isSaving {
                             ProgressView()

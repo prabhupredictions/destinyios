@@ -826,11 +826,36 @@ struct ComparisonOverviewView: View {
     }
     
     // MARK: - Helpers
+    
+    /// Strips the "SUGGESTED FOLLOW-UP QUESTIONS" section and everything after it from analysis text.
+    /// Follow-up questions are only relevant in the Ask Destiny chat, not in reports or multi-partner views.
+    static func stripFollowUpSection(_ text: String) -> String {
+        let markers = [
+            "### 💬 SUGGESTED FOLLOW-UP QUESTIONS",
+            "SUGGESTED FOLLOW-UP QUESTIONS",
+            "💬 SUGGESTED FOLLOW-UP"
+        ]
+        var result = text
+        for marker in markers {
+            if let range = result.range(of: marker, options: .caseInsensitive) {
+                result = String(result[result.startIndex..<range.lowerBound])
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                break
+            }
+        }
+        // Also strip trailing "---" separator left behind
+        while result.hasSuffix("---") {
+            result = String(result.dropLast(3)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return result
+    }
+    
     private func extractFinalRecommendation(from text: String) -> String {
+        let cleaned = ComparisonOverviewView.stripFollowUpSection(text)
         let pattern = "FINAL RECOMMENDATION"
-        guard let range = text.range(of: pattern) else { return text }
+        guard let range = cleaned.range(of: pattern) else { return cleaned }
         
-        let afterRecommendation = String(text[range.upperBound...])
+        let afterRecommendation = String(cleaned[range.upperBound...])
         return afterRecommendation.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     

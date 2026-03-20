@@ -58,7 +58,8 @@ struct ChatView: View {
                     text: $viewModel.inputText,
                     isFocused: $isInputFocused,
                     isLoading: viewModel.isLoading,
-                    isStreaming: viewModel.isStreaming
+                    isStreaming: viewModel.isStreaming,
+                    isTyping: viewModel.typewriterMessageId != nil
                 ) {
                     // Check quota before sending
                     if viewModel.canAskQuestion {

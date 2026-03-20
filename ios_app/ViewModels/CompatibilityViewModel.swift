@@ -270,6 +270,25 @@ class CompatibilityViewModel {
         }
     }
     
+    // MARK: - Age Validation (18+ required for compatibility matching)
+    private static func ageInYears(from date: Date) -> Int {
+        Calendar.current.dateComponents([.year], from: date, to: Date()).year ?? 0
+    }
+    
+    var isUserMinor: Bool {
+        Self.ageInYears(from: boyBirthDate) <= 18
+    }
+    
+    var isPartnerMinor: Bool {
+        guard currentPartner.birthDateSet else { return false }
+        return Self.ageInYears(from: currentPartner.birthDate) <= 18
+    }
+    
+    var ageBlockMessage: String? {
+        guard isUserMinor || isPartnerMinor else { return nil }
+        return "Destiny matching requires both individuals to be 18 or older"
+    }
+    
     // MARK: - Validation
     var isFormValid: Bool {
         // Names, locations, and dates are now required
@@ -282,7 +301,9 @@ class CompatibilityViewModel {
         girlLatitude != 0 &&
         girlLongitude != 0 &&
         currentPartner.birthDateSet &&  // Date must be explicitly selected
-        (currentPartner.birthTimeSet || partnerTimeUnknown)  // Time must be set OR marked as unknown
+        (currentPartner.birthTimeSet || partnerTimeUnknown) &&  // Time must be set OR marked as unknown
+        !isUserMinor &&  // Both must be over 18
+        !isPartnerMinor
     }
     
     // Effective names with fallback

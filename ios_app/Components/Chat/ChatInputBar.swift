@@ -6,10 +6,11 @@ struct ChatInputBar: View {
     @FocusState.Binding var isFocused: Bool
     let isLoading: Bool
     let isStreaming: Bool
+    let isTyping: Bool  // New: disable during typewriter effect
     let onSend: () -> Void
     
     private var canSend: Bool {
-        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming
+        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming && !isTyping
     }
     
     var body: some View {
@@ -90,7 +91,8 @@ struct ChatInputBar: View {
                     text: $text,
                     isFocused: $isFocused,
                     isLoading: false,
-                    isStreaming: false
+                    isStreaming: false,
+                    isTyping: false
                 ) {
                     print("Send: \(text)")
                     text = ""

@@ -465,7 +465,7 @@ class AuthViewModel {
         } catch let error as ProfileError where error.isAccountDeleted {
             print("🚫 [AuthViewModel] Account deleted — blocking sign-in: \(error)")
             await MainActor.run {
-                errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support."
+                errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support at support@destinyaiastrology.com."
             }
         } catch let error as BirthDataTakenError {
             print("🚫 [AuthViewModel] Birth data conflict: \(error)")

@@ -50,12 +50,19 @@ struct PartnerFormView: View {
     @State private var isDateSelected = false
     @State private var isTimeSelected = false
     
-    // Age check
+    // Age checks
     private var isUnder13: Bool {
         guard isDateSelected else { return false }
         let calendar = Calendar.current
         let ageComponents = calendar.dateComponents([.year], from: dateOfBirth, to: Date())
         return (ageComponents.year ?? 0) < 13
+    }
+    
+    private var isUnder18: Bool {
+        guard isDateSelected else { return false }
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: dateOfBirth, to: Date())
+        return (ageComponents.year ?? 0) <= 18
     }
     
     // Guardian consent state
@@ -199,22 +206,33 @@ struct PartnerFormView: View {
                         }
                         
                         // For compatibility matching toggle
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            withAnimation { forCompatibility.toggle() }
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: forCompatibility ? "checkmark.square.fill" : "square")
-                                    .font(.system(size: 18))
-                                    .foregroundColor(forCompatibility ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                                
-                                Text("For compatibility matching")
-                                    .font(AppTheme.Fonts.body(size: 14))
-                                    .foregroundColor(AppTheme.Colors.textSecondary)
-                                
-                                Spacer()
+                        VStack(alignment: .leading, spacing: 6) {
+                            Button(action: {
+                                guard !isUnder18 else { return }
+                                HapticManager.shared.play(.light)
+                                withAnimation { forCompatibility.toggle() }
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: (forCompatibility && !isUnder18) ? "checkmark.square.fill" : "square")
+                                        .font(.system(size: 18))
+                                        .foregroundColor((forCompatibility && !isUnder18) ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                    
+                                    Text("For compatibility matching")
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                        .foregroundColor(isUnder18 ? AppTheme.Colors.textTertiary : AppTheme.Colors.textSecondary)
+                                    
+                                    Spacer()
+                                }
+                                .padding(.leading, 4)
                             }
-                            .padding(.leading, 4)
+                            .disabled(isUnder18)
+                            
+                            if isUnder18 {
+                                Text("Compatibility matching is only available for individuals over 18")
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
+                                    .padding(.leading, 4)
+                            }
                         }
                         
                         // City of Birth
@@ -343,6 +361,9 @@ struct PartnerFormView: View {
         HapticManager.shared.play(.medium)
         isSaving = true
         
+        // Force forCompatibility to false for under-18 (cannot be used for matching)
+        let finalForCompatibility = isUnder18 ? false : forCompatibility
+        
         // Format date
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -368,7 +389,7 @@ struct PartnerFormView: View {
             birthTimeUnknown: birthTimeUnknown,
             consentGiven: true,
             guardianConsentGiven: guardianConsentGiven,
-            forCompatibility: forCompatibility
+            forCompatibility: finalForCompatibility
         )
         
         onSave(partner)

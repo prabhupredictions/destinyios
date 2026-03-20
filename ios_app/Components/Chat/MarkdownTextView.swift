@@ -381,11 +381,14 @@ struct MarkdownTextView: View {
         case .blockquote(let text):
             renderInlineMarkdown(text)
                 .italic()
+                .padding(.vertical, 8)
                 .padding(.leading, 16)
                 .overlay(alignment: .leading) {
                     Rectangle()
                         .fill(AppTheme.Colors.gold)
                         .frame(width: 3)
+                        .alignmentGuide(.top) { $0[.top] }
+                        .alignmentGuide(.bottom) { $0[.bottom] }
                 }
             
         case .table(let headers, let rows):

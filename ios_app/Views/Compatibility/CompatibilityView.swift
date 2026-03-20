@@ -291,6 +291,8 @@ struct CompatibilityView: View {
         // Handle initial match loading
         .onChange(of: initialMatchItem) { oldValue, newValue in
             if let item = newValue {
+                savePartnerForFuture = false
+                partnerFromSavedChart = true
                 viewModel.loadFromHistory(item)
             }
         }
@@ -298,6 +300,8 @@ struct CompatibilityView: View {
             if let item = initialMatchItem, !hasHandledInitialMatch {
                 hasHandledInitialMatch = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    savePartnerForFuture = false
+                    partnerFromSavedChart = true
                     viewModel.loadFromHistory(item)
                 }
             }
@@ -309,10 +313,13 @@ struct CompatibilityView: View {
             }
             
             // Pre-check "Save birth chart" for paid users (hide + unchecked for free users)
-            if !quotaManager.isFreePlan {
-                savePartnerForFuture = true
+            // Only if not loading from history/picker (already saved)
+            if initialMatchItem == nil && initialMatchGroup == nil {
+                if !quotaManager.isFreePlan {
+                    savePartnerForFuture = true
+                }
+                partnerFromSavedChart = false
             }
-            partnerFromSavedChart = false
         }
         .onChange(of: initialMatchGroup) { oldValue, newValue in
             if let group = newValue {
@@ -557,8 +564,24 @@ struct CompatibilityView: View {
             }
             
             // Analyze Button (Fixed at bottom, above tab bar)
-            VStack {
+            VStack(spacing: 8) {
+                // Age restriction warning
+                if let ageMsg = viewModel.ageBlockMessage {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 13))
+                            .foregroundColor(AppTheme.Colors.gold)
+                        Text(ageMsg)
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 4)
+                }
                 analyzeButton
+                    .disabled(viewModel.ageBlockMessage != nil)
+                    .opacity(viewModel.ageBlockMessage != nil ? 0.5 : 1)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 90) // Clear tab bar completely (tab bar + safe area + margin)

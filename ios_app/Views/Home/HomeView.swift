@@ -157,6 +157,9 @@ struct HomeView: View {
                                     Text("syncing_cosmic_data".localized)
                                         .font(AppTheme.Fonts.title(size: 18))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
+                                    Text("Almost there")
+                                        .font(AppTheme.Fonts.caption(size: 14))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
                                 
                                 ProgressView()
@@ -760,10 +763,9 @@ struct HomeView: View {
     private var timeBasedGreeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 5..<12: return "good_morning".localized
-        case 12..<17: return "good_afternoon".localized
-        case 17..<21: return "good_evening".localized
-        default: return "good_night".localized
+        case 0..<12: return "good_morning".localized      // Until noon (12:00)
+        case 12..<18: return "good_afternoon".localized    // Noon to 6pm
+        default: return "good_evening".localized          // 6pm onward through the night
         }
     }
     
