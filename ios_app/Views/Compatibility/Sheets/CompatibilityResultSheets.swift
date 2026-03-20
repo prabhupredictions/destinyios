@@ -922,6 +922,7 @@ struct AskDestinySheet: View {
     @State private var quotaMessage: String = ""
     @State private var showSubscription: Bool = false
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
+    @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
     
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -956,19 +957,27 @@ struct AskDestinySheet: View {
                     .padding(.vertical, 12)
                     
                     // Messages List
-                    GeometryReader { scrollGeo in
                     ScrollViewReader { proxy in
                         ScrollView {
                             LazyVStack(spacing: 16) {
-                                // Welcome message — vertically centered
+                                // Welcome message — centered with spacers (no GeometryReader)
                                 if messages.isEmpty && !isLoading {
+                                    Spacer(minLength: 80)
                                     welcomeView
-                                        .frame(minHeight: scrollGeo.size.height - 32)
+                                    Spacer(minLength: 80)
                                 }
                                 
-                                ForEach(messages) { message in
-                                    CompatChatBubble(message: message)
-                                        .id(message.id)
+                                ForEach(messages.indices, id: \.self) { index in
+                                    let message = messages[index]
+                                    let isLast = index == messages.count - 1
+                                    let isLastAI = isLast && !message.isUser && message.type == .ai
+                                    CompatChatBubble(
+                                        message: message,
+                                        enableTypewriter: isLastAI,
+                                        onTypewriterFinished: isLastAI ? { requestCompatScroll() } : nil,
+                                        onTypewriterProgress: isLastAI ? { requestCompatScroll() } : nil
+                                    )
+                                    .id(message.id)
                                 }
                                 
                                 // Loading indicator
@@ -984,39 +993,30 @@ struct AskDestinySheet: View {
                                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                                 }
                             }
-                            .padding(.horizontal, 12)  // Match ChatView padding
+                            .padding(.horizontal, 12)
                             .padding(.vertical, 16)
+                            
+                            Color.clear
+                                .frame(height: 1)
+                                .id("bottomAnchor")
                         }
-                        .defaultScrollAnchor(.bottom)
                         .scrollDismissesKeyboard(.interactively)
+                        // Single consolidated scroll handler
+                        .onChange(of: compatScrollTrigger) { _, _ in
+                            withAnimation(.easeOut(duration: 0.25)) {
+                                proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                            }
+                        }
                         .onChange(of: messages.count) { _, _ in
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                withAnimation(.easeOut(duration: 0.25)) {
-                                    if let lastId = messages.last?.id {
-                                        proxy.scrollTo(lastId, anchor: .bottom)
-                                    }
-                                }
-                            }
+                            requestCompatScroll()
                         }
-                        .onChange(of: isLoading) { _, _ in
-                            withAnimation {
-                                if isLoading {
-                                    proxy.scrollTo("loading", anchor: .bottom)
-                                }
-                            }
+                        .onChange(of: isLoading) { _, loading in
+                            if loading { requestCompatScroll() }
                         }
-                        // Scroll smoothly when suggested questions appear
-                        .onChange(of: suggestedQuestions) { _, newQuestions in
-                            if !newQuestions.isEmpty {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        proxy.scrollTo("suggestions", anchor: .bottom)
-                                    }
-                                }
-                            }
+                        .onChange(of: suggestedQuestions) { _, q in
+                            if !q.isEmpty { requestCompatScroll() }
                         }
                     }
-                    } // GeometryReader
                     
                     // Error Banner
                     if let error = errorMessage {
@@ -1135,6 +1135,13 @@ struct AskDestinySheet: View {
         
         print("[AskDestiny] Navigating to Auth (guest data preserved for carry-forward)")
         dismiss()
+    }
+    
+    /// Debounced scroll request for compat chat
+    private func requestCompatScroll(delay: Double = 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            compatScrollTrigger = UUID()
+        }
     }
     
     // MARK: - Welcome View
@@ -1426,7 +1433,9 @@ struct AskDestinySheet: View {
         
         guard let details = birthDetails else {
             // Remove redirect message and show error
-            messages.removeAll { $0.id == redirectMsgId }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                messages.removeAll { $0.id == redirectMsgId }
+            }
             let errorMsg = CompatChatMessage(
                 content: "Could not retrieve \(target)'s birth data for individual analysis.",
                 isUser: false,
@@ -1466,7 +1475,9 @@ struct AskDestinySheet: View {
             let predictResponse = try await predictionService.predict(request: predictRequest)
             
             // Remove redirect message and display individual analysis
-            messages.removeAll { $0.id == redirectMsgId }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                messages.removeAll { $0.id == redirectMsgId }
+            }
             let analysisContent = "**Individual Analysis (\(target)):**\n\n\(predictResponse.answer)"
             let aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
             messages.append(aiMessage)
@@ -1479,7 +1490,9 @@ struct AskDestinySheet: View {
             
         } catch let error as NetworkError {
             // Remove redirect message
-            messages.removeAll { $0.id == redirectMsgId }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                messages.removeAll { $0.id == redirectMsgId }
+            }
             
             // Check if it's a quota error
             let errorString = String(describing: error)
@@ -1502,7 +1515,9 @@ struct AskDestinySheet: View {
             }
         } catch {
             // Remove redirect message
-            messages.removeAll { $0.id == redirectMsgId }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                messages.removeAll { $0.id == redirectMsgId }
+            }
             
             // Check for quota-related errors in the error message
             let errorString = error.localizedDescription.lowercased()
@@ -1526,9 +1541,17 @@ struct AskDestinySheet: View {
     }
 }
 
-// MARK: - Chat Bubble View (Follows ChatView Pattern)
+// MARK: - Chat Bubble View (Follows ChatView Pattern with Typewriter)
 private struct CompatChatBubble: View {
     let message: CompatChatMessage
+    var enableTypewriter: Bool = false
+    var onTypewriterFinished: (() -> Void)? = nil
+    var onTypewriterProgress: (() -> Void)? = nil
+    
+    // Local typewriter state (only this bubble re-renders, no parent jitter)
+    @State private var revealedContent: String = ""
+    @State private var typewriterFinished = false
+    @State private var typewriterTimer: Timer?
     
     private var isUser: Bool { message.isUser }
     
@@ -1547,6 +1570,60 @@ private struct CompatChatBubble: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+        .onAppear {
+            if enableTypewriter {
+                startTypewriter()
+            }
+        }
+        .onDisappear {
+            typewriterTimer?.invalidate()
+            typewriterTimer = nil
+        }
+    }
+    
+    // MARK: - Typewriter Effect (local @State, no parent re-renders)
+    private func startTypewriter() {
+        let fullText = message.content
+        let words = fullText.components(separatedBy: " ")
+        guard !words.isEmpty else {
+            typewriterFinished = true
+            return
+        }
+        
+        var wordIndex = 0
+        revealedContent = ""
+        
+        // Reveal 1 word every 50ms (~20 words/sec for faster smooth reading pace)
+        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
+            let batchEnd = min(wordIndex + 1, words.count)
+            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
+            
+            if revealedContent.isEmpty {
+                revealedContent = batch
+            } else {
+                revealedContent += " " + batch
+            }
+            
+            wordIndex = batchEnd
+            
+            // Scroll follows typewriter every ~10 words
+            if wordIndex % 10 == 0 {
+                onTypewriterProgress?()
+            }
+            
+            if wordIndex >= words.count {
+                timer.invalidate()
+                typewriterFinished = true
+                onTypewriterFinished?()
+            }
+        }
+    }
+    
+    private var displayContent: String {
+        if enableTypewriter && !typewriterFinished {
+            return revealedContent
+        }
+        return message.content
     }
     
     @ViewBuilder
@@ -1576,9 +1653,9 @@ private struct CompatChatBubble: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.error)
             } else {
-                // AI message - use MarkdownTextView for proper rendering
+                // AI message - always use MarkdownTextView (formatted from start during typewriter)
                 MarkdownTextView(
-                    content: message.content,
+                    content: displayContent,
                     textColor: AppTheme.Colors.textPrimary,
                     fontSize: 16
                 )

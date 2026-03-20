@@ -11,19 +11,21 @@ struct MarkdownTextView: View {
     
     @State private var blocks: [MarkdownBlock] = []
     
+    // Cache for expensive AttributedString parsing (shared across all instances)
+    private static let attrCache = NSCache<NSString, CachedAttrString>()
+    
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 6) {
             ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 renderBlock(block)
             }
         }
-        .onAppear {
-            if blocks.isEmpty {
-                blocks = parseBlocks()
-            }
-        }
-        .onChange(of: content) { _, _ in
-            blocks = parseBlocks()
+        .task(id: content) {
+            let text = content
+            let parsed = await Task.detached(priority: .userInitiated) {
+                Self.parseBlocksStatic(from: text)
+            }.value
+            blocks = parsed
         }
     }
     
@@ -43,7 +45,8 @@ struct MarkdownTextView: View {
     
     // MARK: - Block Parser (No Regex - Performance Optimized)
     
-    private func parseBlocks() -> [MarkdownBlock] {
+    /// Static parser that can run off main thread
+    private static func parseBlocksStatic(from content: String) -> [MarkdownBlock] {
         var blocks: [MarkdownBlock] = []
         let lines = content.components(separatedBy: "\n")
         var i = 0
@@ -79,15 +82,15 @@ struct MarkdownTextView: View {
             }
             
             // Header (## or ### or ####)
-            if let headerMatch = parseHeader(trimmed) {
+            if let headerMatch = parseHeaderStatic(trimmed) {
                 blocks.append(headerMatch)
                 i += 1
                 continue
             }
             
             // Table detection: line contains | and next line is separator (|---|)
-            if trimmed.contains("|") && isTableStart(lines: lines, at: i) {
-                let tableBlock = parseTable(lines: lines, at: &i)
+            if trimmed.contains("|") && isTableStartStatic(lines: lines, at: i) {
+                let tableBlock = parseTableStatic(lines: lines, at: &i)
                 if let table = tableBlock {
                     blocks.append(table)
                 }
@@ -156,7 +159,7 @@ struct MarkdownTextView: View {
                 let pLine = lines[i].trimmingCharacters(in: .whitespaces)
                 if pLine.isEmpty || pLine.hasPrefix("#") || pLine.hasPrefix("> ") || pLine.hasPrefix("```") ||
                    isNumberedListItem(pLine) || isDivider(pLine) ||
-                   (pLine.contains("|") && i + 1 < lines.count && isTableSeparator(lines[i + 1].trimmingCharacters(in: .whitespaces))) {
+                   (pLine.contains("|") && i + 1 < lines.count && isTableSeparatorStatic(lines[i + 1].trimmingCharacters(in: .whitespaces))) {
                     break
                 }
                 // Bullet check (but not --- which is already caught by isDivider)
@@ -175,7 +178,7 @@ struct MarkdownTextView: View {
             }
             if !paragraphLines.isEmpty {
                 let joined = paragraphLines.joined(separator: " ")
-                if let labelBlock = parseBoldLabel(joined) {
+                if let labelBlock = parseBoldLabelStatic(joined) {
                     blocks.append(labelBlock)
                 } else {
                     blocks.append(.paragraph(text: joined))
@@ -186,11 +189,15 @@ struct MarkdownTextView: View {
         return blocks
     }
     
-    // MARK: - Divider Detection
+    // Instance wrappers for use in view body (call static versions)
+    private func parseBlocks() -> [MarkdownBlock] {
+        Self.parseBlocksStatic(from: content)
+    }
     
-    private func isDivider(_ line: String) -> Bool {
+    // MARK: - Divider Detection (static for background parsing)
+    
+    private static func isDivider(_ line: String) -> Bool {
         let stripped = line.replacingOccurrences(of: " ", with: "")
-        // ---  ***  ___  (3 or more of the same character)
         if stripped.count >= 3 {
             if stripped.allSatisfy({ $0 == "-" }) { return true }
             if stripped.allSatisfy({ $0 == "*" }) { return true }
@@ -199,10 +206,12 @@ struct MarkdownTextView: View {
         return false
     }
     
-    // MARK: - Table Parsing
+    // Instance wrapper
+    private func isDivider(_ line: String) -> Bool { Self.isDivider(line) }
     
-    private func isTableSeparator(_ line: String) -> Bool {
-        // A table separator line looks like: |---|---|---| or |:---:|:---|
+    // MARK: - Table Parsing (static for background parsing)
+    
+    private static func isTableSeparatorStatic(_ line: String) -> Bool {
         let stripped = line.replacingOccurrences(of: " ", with: "")
         return stripped.contains("|") && stripped.contains("-") &&
                stripped.replacingOccurrences(of: "|", with: "")
@@ -211,42 +220,37 @@ struct MarkdownTextView: View {
                        .isEmpty
     }
     
-    private func isTableStart(lines: [String], at index: Int) -> Bool {
+    private static func isTableStartStatic(lines: [String], at index: Int) -> Bool {
         guard index + 1 < lines.count else { return false }
         let nextLine = lines[index + 1].trimmingCharacters(in: .whitespaces)
-        return isTableSeparator(nextLine)
+        return isTableSeparatorStatic(nextLine)
     }
     
-    private func parseTableRow(_ line: String) -> [String] {
+    private static func parseTableRowStatic(_ line: String) -> [String] {
         var trimmed = line.trimmingCharacters(in: .whitespaces)
-        // Remove leading/trailing pipes
         if trimmed.hasPrefix("|") { trimmed = String(trimmed.dropFirst()) }
         if trimmed.hasSuffix("|") { trimmed = String(trimmed.dropLast()) }
         return trimmed.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
     }
     
-    private func parseTable(lines: [String], at index: inout Int) -> MarkdownBlock? {
-        // Line 1: headers
-        let headers = parseTableRow(lines[index])
+    private static func parseTableStatic(lines: [String], at index: inout Int) -> MarkdownBlock? {
+        let headers = parseTableRowStatic(lines[index])
         index += 1
         
-        // Line 2: separator (skip)
         if index < lines.count {
             index += 1
         }
         
-        // Remaining lines: data rows
         var rows: [[String]] = []
         while index < lines.count {
             let rowLine = lines[index].trimmingCharacters(in: .whitespaces)
             if rowLine.isEmpty || !rowLine.contains("|") {
                 break
             }
-            // Don't consume lines that look like next section's table header
-            if index + 1 < lines.count && isTableSeparator(lines[index + 1].trimmingCharacters(in: .whitespaces)) {
+            if index + 1 < lines.count && isTableSeparatorStatic(lines[index + 1].trimmingCharacters(in: .whitespaces)) {
                 break
             }
-            let cells = parseTableRow(rowLine)
+            let cells = parseTableRowStatic(rowLine)
             rows.append(cells)
             index += 1
         }
@@ -255,16 +259,12 @@ struct MarkdownTextView: View {
         return .table(headers: headers, rows: rows)
     }
     
-    // MARK: - Numbered List Helpers
+    // MARK: - Numbered List Helpers (static for background parsing)
     
-    // Check if line starts with number followed by dot and space (e.g., "1. ", "10. ")
-    private func isNumberedListItem(_ line: String) -> Bool {
+    private static func isNumberedListItem(_ line: String) -> Bool {
         guard line.count >= 3 else { return false }
-        
-        // Find the first dot
         if let dotIndex = line.firstIndex(of: ".") {
             let prefix = String(line[..<dotIndex])
-            // Check if prefix is all digits and followed by ". "
             if !prefix.isEmpty && prefix.allSatisfy({ $0.isNumber }) {
                 let afterDot = line.index(dotIndex, offsetBy: 1)
                 if afterDot < line.endIndex && line[afterDot] == " " {
@@ -275,12 +275,10 @@ struct MarkdownTextView: View {
         return false
     }
     
-    // Extract the text after "N. " from a numbered list item
-    private func extractNumberedListItem(_ line: String) -> String? {
+    private static func extractNumberedListItem(_ line: String) -> String? {
         guard isNumberedListItem(line) else { return nil }
-        
         if let dotIndex = line.firstIndex(of: ".") {
-            let afterDot = line.index(dotIndex, offsetBy: 2) // Skip ". "
+            let afterDot = line.index(dotIndex, offsetBy: 2)
             if afterDot < line.endIndex {
                 return String(line[afterDot...])
             }
@@ -288,7 +286,7 @@ struct MarkdownTextView: View {
         return nil
     }
     
-    private func parseHeader(_ line: String) -> MarkdownBlock? {
+    private static func parseHeaderStatic(_ line: String) -> MarkdownBlock? {
         if line.hasPrefix("#### ") {
             return .header(level: 4, text: String(line.dropFirst(5)))
         } else if line.hasPrefix("### ") {
@@ -301,14 +299,11 @@ struct MarkdownTextView: View {
         return nil
     }
     
-    // MARK: - Bold Label Detection
+    // MARK: - Bold Label Detection (static for background parsing)
     
-    /// Detect **Label:** Content pattern (ChatGPT-style section labels)
-    /// Returns a boldLabel block if the text starts with **SomeLabel:**
-    private func parseBoldLabel(_ text: String) -> MarkdownBlock? {
+    private static func parseBoldLabelStatic(_ text: String) -> MarkdownBlock? {
         guard text.hasPrefix("**") else { return nil }
         
-        // Find the closing ** after the label
         let afterOpen = text.index(text.startIndex, offsetBy: 2)
         guard let closeRange = text.range(of: "**", range: afterOpen..<text.endIndex) else {
             return nil
@@ -316,10 +311,7 @@ struct MarkdownTextView: View {
         
         let label = String(text[afterOpen..<closeRange.lowerBound])
         
-        // Label must end with : (e.g. "Verdict:", "Best Window:", "Chart Promise:")
         guard label.hasSuffix(":") || label.hasSuffix(": ") else {
-            // Also accept labels WITHOUT colon if the rest is short (like **Verdict** Favorable)
-            // But primary pattern is **Label:** content
             return nil
         }
         
@@ -387,14 +379,14 @@ struct MarkdownTextView: View {
                 )
             
         case .blockquote(let text):
-            HStack(spacing: 12) {
-                Rectangle()
-                    .fill(AppTheme.Colors.gold)
-                    .frame(width: 3)
-                renderInlineMarkdown(text)
-                    .italic()
-            }
-            .padding(.vertical, 4)
+            renderInlineMarkdown(text)
+                .italic()
+                .padding(.leading, 16)
+                .overlay(alignment: .leading) {
+                    Rectangle()
+                        .fill(AppTheme.Colors.gold)
+                        .frame(width: 3)
+                }
             
         case .table(let headers, let rows):
             renderTable(headers: headers, rows: rows)
@@ -413,7 +405,7 @@ struct MarkdownTextView: View {
                     )
                 )
                 .frame(height: 1)
-                .padding(.vertical, 8)
+                .padding(.vertical, 4)
         }
     }
     
@@ -542,10 +534,7 @@ struct MarkdownTextView: View {
     /// Build an AttributedString for inline content (used by bold label renderer)
     private func renderInlineAttributedString(_ text: String) -> Text {
         let sanitized = sanitizeForInlineParsing(text)
-        if let attrString = try? AttributedString(
-            markdown: sanitized,
-            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
-        ) {
+        if let attrString = cachedAttributedString(for: sanitized) {
             return Text(attrString)
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
@@ -555,29 +544,40 @@ struct MarkdownTextView: View {
             .foregroundColor(textColor)
     }
     
-    // MARK: - Inline Markdown
+    // MARK: - Inline Markdown (cached)
     
     @ViewBuilder
     private func renderInlineMarkdown(_ text: String) -> some View {
-        // Sanitize: remove pipe chars that cause AttributedString parser to hang
         let sanitized = sanitizeForInlineParsing(text)
         
-        if let attrString = try? AttributedString(
-            markdown: sanitized,
-            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
-        ) {
+        if let attrString = cachedAttributedString(for: sanitized) {
             Text(attrString)
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
                 .lineSpacing(5)
                 .textSelection(.enabled)
         } else {
-            // Fallback: strip markdown markers and render as plain text
             Text(stripMarkdownBold(sanitized))
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
                 .lineSpacing(5)
         }
+    }
+    
+    /// Cached AttributedString lookup — avoids re-parsing identical text
+    private func cachedAttributedString(for sanitized: String) -> AttributedString? {
+        let key = sanitized as NSString
+        if let cached = Self.attrCache.object(forKey: key) {
+            return cached.value
+        }
+        if let attrString = try? AttributedString(
+            markdown: sanitized,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        ) {
+            Self.attrCache.setObject(CachedAttrString(attrString), forKey: key)
+            return attrString
+        }
+        return nil
     }
     
     /// Sanitize text for safe inline markdown parsing.
@@ -601,6 +601,12 @@ struct MarkdownTextView: View {
         
         return result
     }
+}
+
+// MARK: - AttributedString Cache Wrapper (NSCache requires reference type)
+private final class CachedAttrString: NSObject {
+    let value: AttributedString
+    init(_ value: AttributedString) { self.value = value }
 }
 
 // MARK: - Preview

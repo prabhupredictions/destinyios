@@ -8,12 +8,20 @@ struct MessageBubble: View {
     var thinkingSteps: [ThinkingStep] = []  // For streaming progress
     var enableTypewriter: Bool = false
     var onTypewriterFinished: (() -> Void)? = nil
+    var onTypewriterProgress: (() -> Void)? = nil
     
     // Local typewriter state (only this bubble re-renders, no parent jitter)
     @State private var revealedContent: String = ""
     @State private var typewriterFinished = false
     @State private var typewriterTimer: Timer?
     @State private var showCopiedConfirmation = false
+    
+    // Cached formatter (DateFormatter is expensive to create)
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
     
     private var isUser: Bool {
         message.messageRole == .user
@@ -81,9 +89,9 @@ struct MessageBubble: View {
         var wordIndex = 0
         revealedContent = ""
         
-        // Reveal 4 words every 50ms (~80 words/sec for smooth fast reveal)
+        // Reveal 1 word every 50ms (~20 words/sec for faster smooth reading pace)
         typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-            let batchEnd = min(wordIndex + 4, words.count)
+            let batchEnd = min(wordIndex + 1, words.count)
             let batch = words[wordIndex..<batchEnd].joined(separator: " ")
             
             if revealedContent.isEmpty {
@@ -93,6 +101,11 @@ struct MessageBubble: View {
             }
             
             wordIndex = batchEnd
+            
+            // Scroll follows typewriter every ~10 words
+            if wordIndex % 10 == 0 {
+                onTypewriterProgress?()
+            }
             
             if wordIndex >= words.count {
                 timer.invalidate()
@@ -115,11 +128,13 @@ struct MessageBubble: View {
                 // AI loading state - show progress inside bubble
                 streamingProgressView
             } else if !displayContent.isEmpty {
-                // AI message with content
+                // AI message — always rendered with MarkdownTextView (formatted from the start)
+                // During typewriter: displayContent grows word-by-word (already formatted)
+                // After typewriter: displayContent = full message content
                 MarkdownTextView(
                     content: displayContent,
                     textColor: AppTheme.Colors.textPrimary,
-                    fontSize: 16 // HIG standard body text
+                    fontSize: 16
                 )
             }
             
@@ -285,9 +300,7 @@ struct MessageBubble: View {
     
     // MARK: - Helpers
     private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+        Self.timeFormatter.string(from: date)
     }
     
     private func formatExecutionTime(_ ms: Double) -> String {

@@ -268,28 +268,6 @@ class ChatViewModel {
         return toolNames[tool] ?? "🔮 Analyzing your chart..."
     }
     
-    // MARK: - Word-by-Word Streaming
-    private func streamWords(_ text: String, messageId: String) async {
-        let words = text.components(separatedBy: " ")
-        streamingContent = ""  // Reset
-        
-        for (index, word) in words.enumerated() {
-            // Small delay between words (30-50ms)
-            try? await Task.sleep(nanoseconds: UInt64.random(in: 25_000_000...45_000_000))
-            
-            // Update streaming content - this triggers @Observable UI update
-            if index < words.count - 1 {
-                streamingContent += word + " "
-            } else {
-                streamingContent += word
-            }
-        }
-        
-        // After streaming, update the actual message
-        if let msgIndex = messages.firstIndex(where: { $0.id == messageId }) {
-            messages[msgIndex].content = streamingContent
-        }
-    }
     
     // MARK: - Helpers
     private func loadBirthData() -> BirthData? {

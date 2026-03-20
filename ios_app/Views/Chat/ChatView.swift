@@ -309,6 +309,28 @@ struct ChatView: View {
         .padding(.top, 4)
     }
     
+    // MARK: - Visible Messages (computed once per render, not inside ForEach)
+    private var visibleMessages: [LocalChatMessage] {
+        viewModel.messages.filter { !$0.content.isEmpty }
+    }
+    
+    // MARK: - User Query Lookup (pre-computed, avoids O(n²) per-message scan)
+    private var userQueryLookup: [String: String] {
+        var lookup: [String: String] = [:]
+        var lastUserQuery = "General question"
+        for msg in viewModel.messages {
+            if msg.messageRole == .user {
+                lastUserQuery = msg.content
+            } else {
+                lookup[msg.id] = lastUserQuery
+            }
+        }
+        return lookup
+    }
+    
+    // MARK: - Scroll State (single debounced trigger replaces 5 competing handlers)
+    @State private var scrollTrigger = UUID()
+    
     // MARK: - Messages View (matches compat chat scroll pattern exactly)
     private var messagesView: some View {
         ScrollViewReader { proxy in
@@ -317,15 +339,18 @@ struct ChatView: View {
                     starterQuestionsView
                 } else {
                     LazyVStack(spacing: 16) {
-                        ForEach(viewModel.messages.filter { !$0.content.isEmpty }) { message in
+                        ForEach(visibleMessages) { message in
                             MessageBubble(
                                 message: message,
-                                userQuery: getUserQuery(for: message),
+                                userQuery: userQueryLookup[message.id] ?? "",
                                 streamingContent: nil,
                                 thinkingSteps: [],
                                 enableTypewriter: message.id == viewModel.typewriterMessageId,
                                 onTypewriterFinished: {
                                     viewModel.typewriterMessageId = nil
+                                },
+                                onTypewriterProgress: {
+                                    requestScrollToBottom()
                                 }
                             )
                             .id(message.id)
@@ -352,54 +377,36 @@ struct ChatView: View {
                     .frame(height: 1)
                     .id("bottomAnchor")
             }
-            .defaultScrollAnchor(.bottom)
             .scrollDismissesKeyboard(.interactively)
-            // Scroll when a new message is added (user msg or AI response)
+            // Single consolidated scroll handler — debounced to prevent racing animations
+            .onChange(of: scrollTrigger) { _, _ in
+                withAnimation(.easeOut(duration: 0.25)) {
+                    proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                }
+            }
+            // Coalesce all state changes into one scroll trigger
             .onChange(of: viewModel.messages.count) { _, _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        proxy.scrollTo("bottomAnchor", anchor: .bottom)
-                    }
-                }
+                requestScrollToBottom()
             }
-            // Scroll when loading starts (show thinking indicator)
-            .onChange(of: viewModel.isLoading) { _, isLoading in
-                withAnimation {
-                    if isLoading {
-                        proxy.scrollTo("loading", anchor: .bottom)
-                    }
-                }
+            .onChange(of: viewModel.isLoading) { _, loading in
+                if loading { requestScrollToBottom() }
             }
-            // Scroll smoothly when suggested questions appear
-            .onChange(of: viewModel.suggestedQuestions) { _, newQuestions in
-                if !newQuestions.isEmpty && viewModel.typewriterMessageId == nil {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            proxy.scrollTo("suggestions", anchor: .bottom)
-                        }
-                    }
-                }
+            .onChange(of: viewModel.suggestedQuestions) { _, q in
+                if !q.isEmpty { requestScrollToBottom() }
             }
-            // Scroll when typewriter finishes (suggestions may already be loaded)
             .onChange(of: viewModel.typewriterMessageId) { _, newId in
-                if newId == nil && !viewModel.suggestedQuestions.isEmpty {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            proxy.scrollTo("suggestions", anchor: .bottom)
-                        }
-                    }
-                }
+                if newId == nil { requestScrollToBottom() }
             }
-            // Scroll when keyboard appears
             .onChange(of: isInputFocused) { _, focused in
-                if focused {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        withAnimation {
-                            proxy.scrollTo("bottomAnchor", anchor: .bottom)
-                        }
-                    }
-                }
+                if focused { requestScrollToBottom(delay: 0.3) }
             }
+        }
+    }
+    
+    /// Debounced scroll request — coalesces rapid state changes into a single scroll
+    private func requestScrollToBottom(delay: Double = 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            scrollTrigger = UUID()
         }
     }
     
@@ -425,27 +432,7 @@ struct ChatView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
-    // Pre-compute user query outside of ForEach body
-    private func getUserQuery(for message: LocalChatMessage) -> String {
-        guard message.messageRole != .user else { return "" }
-        
-        // Find the previous user message
-        guard let index = viewModel.messages.firstIndex(where: { $0.id == message.id }) else {
-            return ""
-        }
-        return findPreviousUserQuery(before: index)
-    }
-    
-    
-    /// Find the user's question that precedes an AI message (for feedback)
-    private func findPreviousUserQuery(before index: Int) -> String {
-        for i in stride(from: index - 1, through: 0, by: -1) {
-            if viewModel.messages[i].messageRole == .user {
-                return viewModel.messages[i].content
-            }
-        }
-        return "General question"
-    }
+    // getUserQuery replaced by pre-computed userQueryLookup dictionary above
     
     // MARK: - Error Banner
     private func errorBanner(_ message: String) -> some View {
