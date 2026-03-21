@@ -2052,6 +2052,21 @@
 "pending_label" = "प्रतीक्षित";
 "overridden_due_to_dosha" = "दोष असंगति के कारण बदला गया";
 "active_doshas" = "सक्रिय दोष:";
+"dosha_label" = "दोष";
+"rejection_reason_label" = "चिंता";
+"additional_notes" = "अतिरिक्त नोट्स:";
+"house_positions_label" = "भाव स्थिति";
+
+"koota_label" = "कूट";
+"tooltip_determined_by" = "%@ की अनुकूलता %@ अष्टकूट द्वारा निर्धारित होती है";
+"tooltip_partner_values" = "साथी के मान";
+"tooltip_score_label" = "अंक";
+"dosha_present_label" = "दोष उपस्थित";
+"tooltip_type_label" = "प्रकार";
+"tooltip_no_dosha" = "इस कूट में कोई दोष नहीं पाया गया";
+"tooltip_dosha_exempted" = "दोष निरस्त (रद्द)";
+"tooltip_adjusted_score" = "अंक %@/%@ तक बहाल हुए";
+"tooltip_no_exemption" = "कोई छूट नहीं — दोष सक्रिय है";
 
 // MARK: - Profile Settings & Account Management
 "history_section" = "हिस्ट्री";
@@ -2293,3 +2308,101 @@
 "yoga_outcome_label" = "यह आपके लिए क्या लाता है";
 "yoga_formation_label" = "यह कैसे बनता है";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "दोष निरस्त";
+"nadi_dosha_active" = "सक्रिय दोष";
+"nadi_type_format" = "प्रकार: %@";
+"nadi_boy_const" = "वर: %@";
+"nadi_girl_const" = "वधू: %@";
+"nadi_type_aadi" = "आदि (वात)";
+"nadi_type_madhya" = "मध्य (पित्त)";
+"nadi_type_antya" = "अन्त्य (कफ)";
+"nadi_effect_aadi" = "आदि-आदि: शास्त्रों के अनुसार पति के स्वास्थ्य पर प्रभाव";
+"nadi_effect_madhya" = "मध्य-मध्य: शास्त्रों के अनुसार दोनों पर प्रभाव";
+"nadi_effect_antya" = "अन्त्य-अन्त्य: शास्त्रों के अनुसार पत्नी के स्वास्थ्य पर प्रभाव";
+"nadi_constitution_vata" = "वात — वायु और आकाश: गति, रचनात्मकता, तंत्रिका तंत्र";
+"nadi_constitution_pitta" = "पित्त — अग्नि और जल: चयापचय, पाचन, बुद्धि";
+"nadi_constitution_kapha" = "कफ — जल और पृथ्वी: संरचना, प्रतिरक्षा, स्थिरता";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "दोष निरस्त";
+"bhakoot_dosha_active" = "सक्रिय दोष";
+"bhakoot_type_format" = "प्रकार: %@";
+"bhakoot_type_shadashtaka" = "षडाष्टक (6-8)";
+"bhakoot_type_nav_pancham" = "नवम पंचम (5-9)";
+"bhakoot_type_dwirdwadash" = "द्विर्द्वादश (2-12)";
+"bhakoot_effect_68" = "6/8: शास्त्रों के अनुसार स्वास्थ्य जोखिम और दुर्घटना की चेतावनी";
+"bhakoot_effect_59" = "5/9: शास्त्रों के अनुसार संतान पर प्रभाव";
+"bhakoot_effect_212" = "2/12: शास्त्रों के अनुसार आर्थिक कठिनाई";
+"bhakoot_severity_label" = "गंभीरता: %@";
+"bhakoot_severity_high" = "उच्च (अध्ययन: 54% अच्छे परिणाम)";
+"bhakoot_severity_medium" = "मध्यम (अध्ययन: 77% अच्छे परिणाम)";
+"bhakoot_severity_low" = "निम्न (अध्ययन: 74% अच्छे परिणाम)";
+"bhakoot_sadbhakoot_warning" = "सावधानी: इस जोड़ी में शास्त्रीय वैधव्य चेतावनी है";
+"bhakoot_nav_pancham_auspicious" = "नवम पंचम: वधू वर से पांचवें स्थान पर — संतान के लिए शुभ";
+"bhakoot_house_positions" = "भाव स्थिति: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "दोष निरस्त";
+"gana_dosha_active" = "सक्रिय दोष";
+"gana_type_format" = "प्रकार: %@";
+"gana_type_dev_rakshash" = "देव-राक्षस (देव बनाम राक्षस)";
+"gana_type_manushya_rakshash" = "मनुष्य-राक्षस (मनुष्य बनाम राक्षस)";
+"gana_effect_dev_rakshash" = "देव-राक्षस: शास्त्र शत्रुता और आजीवन कलह की चेतावनी देते हैं";
+"gana_effect_manushya_rakshash" = "मनुष्य-राक्षस: शास्त्र मनुष्य गण साथी के लिए अत्यधिक कष्ट की चेतावनी देते हैं";
+"gana_severity_label" = "गंभीरता: %@";
+"gana_severity_high" = "उच्च (अध्ययन: 71.43% अच्छे परिणाम, औसत सहित 83.67%)";
+"gana_severity_medium" = "मध्यम (अध्ययन: 65.91% अच्छे परिणाम, औसत सहित 90.91%)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "दोष निरस्त";
+"maitri_dosha_active" = "सक्रिय दोष";
+"maitri_type_format" = "प्रकार: %@";
+"maitri_type_mutual_enemies" = "परस्पर शत्रु (E-E) — पूर्ण मानसिक असंगतता";
+"maitri_type_neutral_enemy" = "तटस्थ-शत्रु (N-E) — महत्वपूर्ण एकतरफा घर्षण";
+"maitri_type_friend_enemy" = "मित्र-शत्रु (F-E) — असंतुलित समझ";
+"maitri_effect_label" = "ग्रह मैत्री चंद्र राशि स्वामियों पर आधारित मानसिक अनुकूलता दर्शाती है";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "योनि दोष निरस्त";
+"yoni_dosha_active" = "योनि दोष सक्रिय";
+"yoni_type_format" = "प्रकार: %@";
+"yoni_type_intensely_inimical" = "अत्यंत शत्रु (0/4) — 7 निषिद्ध पशु जोड़ों में से एक";
+"yoni_type_enemy" = "शत्रु (1/4) — चुनौतीपूर्ण शारीरिक अनुकूलता";
+"yoni_effect_label" = "योनि कूट पशु प्रकृति पर आधारित शारीरिक/यौन अनुकूलता दर्शाता है";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "तारा दोष निरस्त";
+"tara_dosha_active" = "तारा दोष सक्रिय";
+"tara_type_format" = "प्रकार: %@";
+"tara_type_vipat_vipat" = "विपट-विपट (दोनों दिशाओं में स्थिति 3)";
+"tara_type_pratyak_pratyak" = "प्रत्यक-प्रत्यक (दोनों दिशाओं में स्थिति 5)";
+"tara_type_vadha_vadha" = "वध-वध (दोनों दिशाओं में स्थिति 7)";
+"tara_type_vipat_pratyak" = "विपट-प्रत्यक (स्थिति 3 और 5)";
+"tara_type_vipat_vadha" = "विपट-वध (स्थिति 3 और 7)";
+"tara_type_pratyak_vadha" = "प्रत्यक-वध (स्थिति 5 और 7)";
+"tara_severity_label" = "गंभीरता: %@";
+"tara_severity_high" = "उच्च — वध स्थितियाँ गंभीर शास्त्रीय चेतावनी दर्शाती हैं";
+"tara_severity_medium" = "मध्यम — विपट/प्रत्यक स्थितियाँ मध्यम चुनौतियाँ दर्शाती हैं";
+"tara_positions_format" = "तारा स्थिति: वर→वधू %d, वधू→वर %d";
+"tara_effect_label" = "तारा कूट नक्षत्र स्थितियों पर आधारित स्वास्थ्य और भाग्य अनुकूलता दर्शाता है";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "वश्य दोष निरस्त";
+"vashya_dosha_active" = "वश्य दोष सक्रिय";
+"vashya_type_format" = "प्रकार: %@";
+"vashya_severity_label" = "गंभीरता: %@";
+"vashya_severity_high" = "उच्च — कोई चुंबकीय आकर्षण नहीं, शक्ति संघर्ष संकेत";
+"vashya_severity_medium" = "मध्यम — भक्ष अनुपातित खाद्य संबंध";
+"vashya_groups_format" = "वश्य: वर %@, वधू %@";
+"vashya_scores_format" = "स्कोर: वर→वधू %.1f, वधू→वर %.1f";
+"vashya_effect_label" = "वश्य कूट पारस्परिक आकर्षण और नियंत्रण गतिकी का प्रतिनिधित्व करता है";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "वर्ण दोष रद्द";
+"varna_dosha_active" = "वर्ण दोष सक्रिय";
+"varna_type_format" = "प्रकार: %@";
+"varna_severity_low" = "कम — अष्टकूट में सबसे हल्का दोष (1/36 अंक)";
+"varna_values_format" = "वर्ण: वर %@, वधू %@";
+"varna_effect_label" = "वर्ण कूट चंद्र राशि तत्वों के आधार पर आध्यात्मिक और मनोवैज्ञानिक अनुकूलता का प्रतिनिधित्व करता है";
+"varna_complementarity_note" = "पारंपरिक पूरक जोड़ी — प्राकृतिक सामंजस्य मान्यता प्राप्त";

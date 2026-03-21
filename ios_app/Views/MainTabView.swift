@@ -15,47 +15,53 @@ struct MainTabView: View {
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
     @State private var isKeyboardVisible = false  // Track keyboard for tab bar hiding
     
+    @State private var hasVisitedChat = false
+    @State private var hasVisitedMatch = false
+    
     /// Reactive guest user check - uses @AppStorage for automatic UI updates
     @AppStorage("isGuest") private var isGuestUser = false
-
     
     var body: some View {
         ZStack(alignment: .bottom) {
             // Tab Content
-            Group {
-                switch selectedTab {
-                case 0:
-                    HomeView(
-                        onQuestionSelected: { question in
-                            pendingQuestion = question
-                            selectedTab = 1  // Navigate to chat
-                        },
-                        onChatHistorySelected: { threadId in
-                            pendingThreadId = threadId
-                            selectedTab = 1 // Navigate to chat
-                        },
-                        onMatchHistorySelected: { matchItem in
-                            // Guest cannot view match history - show sign in
-                            if isGuestUser {
-                                showGuestSignInSheet = true
-                            } else {
-                                pendingMatchItem = matchItem
-                                pendingMatchGroup = nil  // Clear any pending group
-                                selectedTab = 2 // Navigate to match
-                            }
-                        },
-                        onMatchGroupHistorySelected: { group in
-                            if isGuestUser {
-                                showGuestSignInSheet = true
-                            } else {
-                                pendingMatchGroup = group
-                                pendingMatchItem = nil  // Clear any pending single item
-                                selectedTab = 2 // Navigate to match
-                            }
+            ZStack {
+                // HOME TAB - Always loaded, kept alive
+                HomeView(
+                    viewModel: homeViewModel,
+                    onQuestionSelected: { question in
+                        pendingQuestion = question
+                        selectedTab = 1  // Navigate to chat
+                    },
+                    onChatHistorySelected: { threadId in
+                        pendingThreadId = threadId
+                        selectedTab = 1 // Navigate to chat
+                    },
+                    onMatchHistorySelected: { matchItem in
+                        // Guest cannot view match history - show sign in
+                        if isGuestUser {
+                            showGuestSignInSheet = true
+                        } else {
+                            pendingMatchItem = matchItem
+                            pendingMatchGroup = nil  // Clear any pending group
+                            selectedTab = 2 // Navigate to match
                         }
-                    )
-                    .ignoresSafeArea(.keyboard)
-                case 1:
+                    },
+                    onMatchGroupHistorySelected: { group in
+                        if isGuestUser {
+                            showGuestSignInSheet = true
+                        } else {
+                            pendingMatchGroup = group
+                            pendingMatchItem = nil  // Clear any pending single item
+                            selectedTab = 2 // Navigate to match
+                        }
+                    }
+                )
+                .ignoresSafeArea(.keyboard)
+                .opacity(selectedTab == 0 ? 1 : 0)
+                .allowsHitTesting(selectedTab == 0)
+                
+                // CHAT TAB - Lazily loaded on first visit
+                if hasVisitedChat || selectedTab == 1 {
                     ChatView(
                         onBack: { 
                             selectedTab = 0 
@@ -66,30 +72,35 @@ struct MainTabView: View {
                         initialThreadId: pendingThreadId,
                         starterQuestions: homeViewModel.suggestedQuestions
                     )
-                case 2:
-                    // Guest users cannot access Match tab - show sign-in prompt
-                    if isGuestUser {
-                        GuestSignInPromptView(
-                            message: "sign_in_to_check_compatibility".localized,
-                            onBack: { selectedTab = 0 }
-                        )
-                        .ignoresSafeArea(.keyboard)
-                    } else {
-                        CompatibilityView(
-                            initialMatchItem: pendingMatchItem,
-                            initialMatchGroup: pendingMatchGroup,
-                            onShowResultChange: { isShowing in
-                                withAnimation(.easeInOut(duration: 0.25)) {
-                                    showMatchResult = isShowing
+                    .opacity(selectedTab == 1 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 1)
+                }
+                
+                // MATCH TAB - Lazily loaded on first visit
+                if hasVisitedMatch || selectedTab == 2 {
+                    Group {
+                        if isGuestUser {
+                            GuestSignInPromptView(
+                                message: "sign_in_to_check_compatibility".localized,
+                                onBack: { selectedTab = 0 }
+                            )
+                            .ignoresSafeArea(.keyboard)
+                        } else {
+                            CompatibilityView(
+                                initialMatchItem: pendingMatchItem,
+                                initialMatchGroup: pendingMatchGroup,
+                                onShowResultChange: { isShowing in
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        showMatchResult = isShowing
+                                    }
                                 }
-                            }
-                        )
-                        .id(ProfileContextManager.shared.activeProfileId) // Force recreation on profile switch
-                        .ignoresSafeArea(.keyboard)
+                            )
+                            .id(ProfileContextManager.shared.activeProfileId) // Force recreation on profile switch
+                            .ignoresSafeArea(.keyboard)
+                        }
                     }
-                default:
-                    HomeView(onQuestionSelected: { _ in })
-                        .ignoresSafeArea(.keyboard)
+                    .opacity(selectedTab == 2 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 2)
                 }
             }
             
@@ -114,6 +125,10 @@ struct MainTabView: View {
         }
         // Clear pending match state when navigating away from Match tab
         .onChange(of: selectedTab) { oldTab, newTab in
+            // Mark tabs as visited for lazy internal loading
+            if newTab == 1 { hasVisitedChat = true }
+            if newTab == 2 { hasVisitedMatch = true }
+            
             if oldTab == 2 && newTab != 2 {
                 pendingMatchItem = nil
                 pendingMatchGroup = nil
@@ -137,9 +152,12 @@ struct MainTabView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
-        .task {
-            // Load home data to have life areas available for Ask sheet
-            await homeViewModel.loadHomeData()
+        .onAppear {
+            // Load home data for Ask sheet instead of .task
+            // This prevents duplicate .task loads since HomeView also calls this
+            Task {
+                await homeViewModel.loadHomeData()
+            }
         }
     }
 }

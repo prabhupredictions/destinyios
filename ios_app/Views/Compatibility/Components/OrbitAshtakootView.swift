@@ -35,7 +35,9 @@ struct OrbitAshtakootView: View {
             let doshaPresent = detail?.present ?? false
             let doshaCancelled = detail?.cancelled ?? false
             let reason = detail?.reasonShort
+            let reasonsAll = detail?.reasonsAll
             
+                        
             // Adjusted score: if cancelled → max points restored, if active dosha → stays 0
             let adjustedScore: Double? = doshaPresent
                 ? (doshaCancelled ? Double(kuta.maxPoints) : 0)
@@ -51,7 +53,27 @@ struct OrbitAshtakootView: View {
                 doshaPresent: doshaPresent,
                 doshaCancelled: doshaCancelled,
                 cancellationReason: reason,
-                adjustedScore: adjustedScore
+                cancellationReasons: reasonsAll,
+                adjustedScore: adjustedScore,
+                doshaType: detail?.doshaType,
+                classicalEffect: detail?.classicalEffect,
+                boyConstitution: detail?.boyConstitution,
+                girlConstitution: detail?.girlConstitution,
+                severity: detail?.severity,
+                fieldStudy: detail?.fieldStudy,
+                housePositions: detail?.housePositions,
+                sadbhakootWarning: detail?.sadbhakootWarning,
+                taraBoyToGirl: detail?.taraBoyToGirl,
+                taraGirlToBoy: detail?.taraGirlToBoy,
+                boyVashya: detail?.boyVashya,
+                girlVashya: detail?.girlVashya,
+                boyToGirlScore: detail?.boyToGirlScore,
+                girlToBoyScore: detail?.girlToBoyScore,
+                boyVarna: detail?.boyVarna,
+                girlVarna: detail?.girlVarna,
+                complementarityNote: detail?.complementarityNote,
+                boyValue: detail?.boyValue,
+                girlValue: detail?.girlValue
             )
         }
     }
@@ -125,140 +147,37 @@ struct OrbitAshtakootView: View {
         }
     }
     
-    // MARK: - Tooltip View
+    // MARK: - Tooltip View (6-Point Structured Format)
     @ViewBuilder
     private func kutaTooltipView(kuta: AshtakootData) -> some View {
-        VStack(spacing: 12) {
-            // Header
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: kuta.icon)
-                    .font(.system(size: 24))
-                    .foregroundColor(kuta.statusColor)
-                    .shadow(color: kuta.statusColor.opacity(0.6), radius: 8)
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(kuta.label)
-                        .font(AppTheme.Fonts.title(size: 18))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                    
-                    // Score line — show original + adjusted if different
-                    if kuta.doshaPresent, let adj = kuta.adjustedScore, Int(adj) != Int(kuta.score) {
-                        HStack(spacing: 6) {
-                            Text("\(format(kuta.score))")
-                                .strikethrough(true, color: AppTheme.Colors.textTertiary)
-                                .foregroundColor(AppTheme.Colors.textTertiary)
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 10))
-                                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                            Text("\(format(adj)) / \(format(kuta.maxScore))")
-                                .foregroundColor(kuta.statusColor)
-                                .bold()
-                        }
-                        .font(AppTheme.Fonts.body(size: 14))
-                    } else {
-                        Text("\(format(kuta.score)) / \(format(kuta.maxScore))")
-                            .font(AppTheme.Fonts.body(size: 14).bold())
-                            .foregroundColor(kuta.statusColor)
-                    }
-                }
-                
-                Spacer()
-                
-                // Close Button
-                Button(action: {
-                    withAnimation { selectedKuta = nil }
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .font(.system(size: 22))
-                }
-            }
-            
-            // Cancellation Badge (if dosha present)
-            if kuta.doshaPresent {
-                HStack(spacing: 8) {
-                    Image(systemName: kuta.doshaCancelled ? "checkmark.shield.fill" : "exclamationmark.triangle.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(kuta.doshaCancelled ? AppTheme.Colors.success : AppTheme.Colors.error)
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(kuta.doshaCancelled ? "Dosha Cancelled" : "Active Dosha")
-                            .font(AppTheme.Fonts.caption(size: 12).weight(.semibold))
-                            .foregroundColor(kuta.doshaCancelled ? AppTheme.Colors.success : AppTheme.Colors.error)
-                        
-                        if let reason = kuta.cancellationReason, !reason.isEmpty {
-                            Text(replaceNames(in: reason))
-                                .font(AppTheme.Fonts.caption(size: 11))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                        }
-                    }
-                    
-                    Spacer()
-                }
-                .padding(10)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(
-                            kuta.doshaCancelled
-                                ? AppTheme.Colors.success.opacity(0.1)
-                                : AppTheme.Colors.error.opacity(0.1)
-                        )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(
-                            kuta.doshaCancelled
-                                ? AppTheme.Colors.success.opacity(0.3)
-                                : AppTheme.Colors.error.opacity(0.3),
-                            lineWidth: 1
-                        )
-                )
-            }
-            
-            Divider().background(AppTheme.Colors.gold.opacity(0.3))
-            
-            // Description
-            if !kuta.description.isEmpty {
-                Text(replaceNames(in: enhanceDescription(kuta.description, for: kuta.key)))
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                Text("description_not_available".localized)
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .italic()
-                    .foregroundColor(AppTheme.Colors.textTertiary)
-            }
+        let kutaName = kutaDisplayName(for: kuta.key)
+        
+        VStack(alignment: .leading, spacing: 10) {
+            tooltipHeader(kuta: kuta, kutaName: kutaName)
+            tooltipPoints1to3(kuta: kuta, kutaName: kutaName)
+            tooltipPoints4to6(kuta: kuta, kutaName: kutaName)
+            tooltipComplementarity(kuta: kuta)
         }
-        .padding(16)
-        .frame(width: 270)
+        .padding(14)
+        .frame(width: 280, alignment: .topLeading)
+        .fixedSize(horizontal: false, vertical: true)
         .background(
             ZStack {
                 AppTheme.Colors.mainBackground
-                
-                // Subtle cosmic glow
                 RadialGradient(
-                    colors: [
-                        AppTheme.Colors.gold.opacity(0.1),
-                        Color.clear
-                    ],
+                    colors: [AppTheme.Colors.gold.opacity(0.08), Color.clear],
                     center: .topLeading,
                     startRadius: 0,
                     endRadius: 150
                 )
             }
-            .clipShape(RoundedRectangle(cornerRadius: 16))
         )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
                     LinearGradient(
-                        colors: [
-                            AppTheme.Colors.gold.opacity(0.6),
-                            AppTheme.Colors.gold.opacity(0.2)
-                        ],
+                        colors: [AppTheme.Colors.gold.opacity(0.6), AppTheme.Colors.gold.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -268,110 +187,332 @@ struct OrbitAshtakootView: View {
         .shadow(color: AppTheme.Colors.gold.opacity(0.25), radius: 15, x: 0, y: 8)
     }
     
+    // MARK: - Tooltip Sub-sections (split for type-checker)
+    
+    @ViewBuilder
+    private func tooltipHeader(kuta: AshtakootData, kutaName: String) -> some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: kuta.icon)
+                .font(.system(size: 22))
+                .foregroundColor(kuta.statusColor)
+                .shadow(color: kuta.statusColor.opacity(0.6), radius: 6)
+            
+            VStack(alignment: .leading, spacing: 1) {
+                Text(kuta.label)
+                    .font(AppTheme.Fonts.title(size: 17))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                Text(kutaName + " " + "koota_label".localized)
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.gold)
+            }
+            
+            Spacer()
+            
+            Button(action: { withAnimation { selectedKuta = nil } }) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .font(.system(size: 20))
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipPoints1to3(kuta: AshtakootData, kutaName: String) -> some View {
+        // ─── 1. What determines it ───
+        tooltipRow(
+            number: "1",
+            icon: "doc.text.magnifyingglass",
+            text: String(format: "tooltip_determined_by".localized, kuta.label, kutaName)
+        )
+        
+        // ─── 2. Partner values ───
+        if let bv = kuta.boyValue, !bv.isEmpty, let gv = kuta.girlValue, !gv.isEmpty {
+            VStack(alignment: .leading, spacing: 4) {
+                tooltipRow(
+                    number: "2",
+                    icon: "person.2.fill",
+                    text: "tooltip_partner_values".localized
+                )
+                partnerValueLine(name: boyName, value: bv)
+                partnerValueLine(name: girlName, value: gv)
+            }
+        }
+        
+        // ─── 3. Score ───
+        tooltipScoreRow(kuta: kuta, kutaName: kutaName)
+    }
+    
+    @ViewBuilder
+    private func tooltipScoreRow(kuta: AshtakootData, kutaName: String) -> some View {
+        let scoreLabel = kutaName + " " + "tooltip_score_label".localized + ": "
+        HStack(alignment: .top, spacing: 6) {
+            tooltipNumberBadge("3")
+            Image(systemName: "chart.bar.fill")
+                .font(.system(size: 10))
+                .foregroundColor(AppTheme.Colors.gold)
+                .frame(width: 14)
+            
+            if kuta.doshaPresent, let adj = kuta.adjustedScore, Int(adj) != Int(kuta.score) {
+                HStack(spacing: 4) {
+                    Text(scoreLabel)
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                    Text(format(kuta.score))
+                        .strikethrough(true)
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 8))
+                        .foregroundColor(AppTheme.Colors.gold)
+                    Text("\(format(adj))/\(format(kuta.maxScore))")
+                        .font(AppTheme.Fonts.caption(size: 11).bold())
+                        .foregroundColor(kuta.statusColor)
+                }
+            } else {
+                Text(scoreLabel + "\(format(kuta.score))/\(format(kuta.maxScore))")
+                    .font(AppTheme.Fonts.caption(size: 11))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipPoints4to6(kuta: AshtakootData, kutaName: String) -> some View {
+        // ─── 4. Dosha present ───
+        tooltipDoshaStatus(kuta: kuta, kutaName: kutaName)
+        
+        // ─── 5. Impact ───
+        tooltipImpact(kuta: kuta)
+        
+        // ─── 6. Exemption / Cancellation ───
+        if kuta.doshaPresent {
+            tooltipExemption(kuta: kuta)
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipDoshaStatus(kuta: AshtakootData, kutaName: String) -> some View {
+        if kuta.doshaPresent {
+            HStack(alignment: .top, spacing: 6) {
+                tooltipNumberBadge("4")
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.error)
+                    .frame(width: 14)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(kutaName + " " + "dosha_present_label".localized)
+                        .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.error)
+                    if let dt = kuta.doshaType, !dt.isEmpty {
+                        Text("tooltip_type_label".localized + ": " + dt)
+                            .font(AppTheme.Fonts.caption(size: 10))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                }
+            }
+        } else {
+            tooltipRow(
+                number: "4",
+                icon: "checkmark.circle.fill",
+                text: "tooltip_no_dosha".localized,
+                color: AppTheme.Colors.success
+            )
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipImpact(kuta: AshtakootData) -> some View {
+        if kuta.doshaPresent, let effect = kuta.classicalEffect, !effect.isEmpty {
+            HStack(alignment: .top, spacing: 6) {
+                tooltipNumberBadge("5")
+                Image(systemName: "bolt.heart.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.warning)
+                    .frame(width: 14)
+                Text(replaceNames(in: effect))
+                    .font(AppTheme.Fonts.caption(size: 10).italic())
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if let study = kuta.fieldStudy, !study.isEmpty {
+                HStack(alignment: .top, spacing: 6) {
+                    Color.clear.frame(width: 18, height: 1)
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.system(size: 9))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
+                        .frame(width: 14)
+                    Text(study)
+                        .font(AppTheme.Fonts.caption(size: 9).italic())
+                        .foregroundColor(AppTheme.Colors.textTertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipExemption(kuta: AshtakootData) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if kuta.doshaCancelled {
+                HStack(alignment: .top, spacing: 6) {
+                    tooltipNumberBadge("6")
+                    Image(systemName: "checkmark.shield.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(AppTheme.Colors.success)
+                        .frame(width: 14)
+                    Text("tooltip_dosha_exempted".localized)
+                        .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
+                        .foregroundColor(AppTheme.Colors.success)
+                }
+                tooltipCancellationReasons(kuta: kuta)
+                tooltipAdjustedScore(kuta: kuta)
+            } else {
+                HStack(alignment: .top, spacing: 6) {
+                    tooltipNumberBadge("6")
+                    Image(systemName: "xmark.shield.fill")
+                        .font(.system(size: 10))
+                        .foregroundColor(AppTheme.Colors.error.opacity(0.7))
+                        .frame(width: 14)
+                    Text("tooltip_no_exemption".localized)
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .foregroundColor(AppTheme.Colors.error.opacity(0.8))
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipCancellationReasons(kuta: AshtakootData) -> some View {
+        if let reasons = kuta.cancellationReasons, !reasons.isEmpty {
+            ForEach(reasons, id: \.self) { reason in
+                HStack(alignment: .top, spacing: 6) {
+                    Color.clear.frame(width: 18, height: 1)
+                    Image(systemName: "arrow.turn.down.right")
+                        .font(.system(size: 8))
+                        .foregroundColor(AppTheme.Colors.success.opacity(0.6))
+                        .frame(width: 14)
+                    Text(replaceNames(in: reason))
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        } else if let reason = kuta.cancellationReason, !reason.isEmpty {
+            HStack(alignment: .top, spacing: 6) {
+                Color.clear.frame(width: 18, height: 1)
+                Image(systemName: "arrow.turn.down.right")
+                    .font(.system(size: 8))
+                    .foregroundColor(AppTheme.Colors.success.opacity(0.6))
+                    .frame(width: 14)
+                Text(replaceNames(in: reason))
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipAdjustedScore(kuta: AshtakootData) -> some View {
+        if let adj = kuta.adjustedScore {
+            HStack(alignment: .top, spacing: 6) {
+                Color.clear.frame(width: 18, height: 1)
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 9))
+                    .foregroundColor(AppTheme.Colors.success)
+                    .frame(width: 14)
+                Text(String(format: "tooltip_adjusted_score".localized, format(adj), format(kuta.maxScore)))
+                    .font(AppTheme.Fonts.caption(size: 10).weight(.medium))
+                    .foregroundColor(AppTheme.Colors.success)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func tooltipComplementarity(kuta: AshtakootData) -> some View {
+        if let note = kuta.complementarityNote, !note.isEmpty {
+            HStack(alignment: .top, spacing: 6) {
+                Color.clear.frame(width: 18, height: 1)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 9))
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .frame(width: 14)
+                Text(note)
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+    
+    // MARK: - Tooltip Helper Views
+    
+    private func tooltipNumberBadge(_ num: String) -> some View {
+        Text(num)
+            .font(.system(size: 8, weight: .bold, design: .rounded))
+            .foregroundColor(AppTheme.Colors.gold)
+            .frame(width: 16, height: 16)
+            .background(Circle().fill(AppTheme.Colors.gold.opacity(0.15)))
+    }
+    
+    @ViewBuilder
+    private func tooltipRow(number: String, icon: String, text: String, color: Color = AppTheme.Colors.textSecondary) -> some View {
+        HStack(alignment: .top, spacing: 6) {
+            tooltipNumberBadge(number)
+            Image(systemName: icon)
+                .font(.system(size: 10))
+                .foregroundColor(color == AppTheme.Colors.textSecondary ? AppTheme.Colors.gold : color)
+                .frame(width: 14)
+            Text(text)
+                .font(AppTheme.Fonts.caption(size: 11))
+                .foregroundColor(color)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+    
+    private func partnerValueLine(name: String, value: String) -> some View {
+        HStack(spacing: 6) {
+            Color.clear.frame(width: 18, height: 1) // indent to align with text
+            Image(systemName: "person.fill")
+                .font(.system(size: 9))
+                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+                .frame(width: 14)
+            Text(name)
+                .font(AppTheme.Fonts.caption(size: 10).weight(.semibold))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+            Text(value)
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+            Spacer()
+        }
+    }
+    
+    private func kutaDisplayName(for key: String) -> String {
+        let names: [String: String] = [
+            "varna": "Varna", "vashya": "Vashya", "tara": "Tara",
+            "yoni": "Yoni", "maitri": "Maitri", "gana": "Gana",
+            "bhakoot": "Bhakoot", "nadi": "Nadi"
+        ]
+        return names[key] ?? key.capitalized
+    }
+    
     private func format(_ value: Double) -> String {
         return value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
     }
     
-    /// Enhance description with astrological context and score-based interpretation
-    private func enhanceDescription(_ desc: String, for key: String) -> String {
-        // Find the matching kuta to get score information
-        guard let kuta = orbitItems.first(where: { $0.key == key }) else {
-            return desc
-        }
-        
-        let statusColor = kuta.statusColor
-        
-        // Determine compatibility level based on score
-        let compatibilityLevel: String
-        if kuta.doshaPresent && kuta.doshaCancelled {
-            compatibilityLevel = "dosha was found but has been cancelled by astrological exceptions"
-        } else if kuta.doshaPresent && !kuta.doshaCancelled {
-            compatibilityLevel = "active dosha that requires attention and remedial measures"
-        } else if statusColor == .green {
-            compatibilityLevel = "excellent compatibility"
-        } else if statusColor == .yellow {
-            compatibilityLevel = "moderate compatibility"
-        } else {
-            compatibilityLevel = "challenging area that requires understanding and effort"
-        }
-        
-        // Clean up API description if present
-        let cleanedDesc = desc
-            .replacingOccurrences(
-                of: "(\\w+) lord: (\\w+)",
-                with: "$1's ruling planet $2",
-                options: .regularExpression
-            )
-            .trimmingCharacters(in: .punctuationCharacters.union(.whitespaces))
-        
-        // Build comprehensive description based on kuta type
-        var result = ""
-        
-        switch key {
-        case "varna":
-            result = "Work compatibility is determined using Varna Ashtakoot property which focuses on the Varna categories of both partners (Brahmin, Kshatriya, Vaishya, Shudra);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "vashya":
-            result = "Dominance compatibility is determined using Vashya Ashtakoot property which focuses on the Vashya groups of both partners (Manava, Vanachara, Keeta...);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "tara":
-            result = "Destiny alignment is determined using Tara Ashtakoot property which focuses on the birth stars (Nakshatras) and Tara groups of both partners (Janma, Sampat, Vipat...);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "yoni":
-            result = "Physical and intimate compatibility is determined using Yoni Ashtakoot property which focuses on the animal symbols (Yoni types) of both partners (Aswa, Vanara, Sarpa...);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "maitri":
-            result = "Friendship and mental compatibility is determined using Maitri Ashtakoot property which focuses on the ruling sign lords (Moon sign lords) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "gana":
-            result = "Temperament compatibility is determined using Gana Ashtakoot property which focuses on the temperament categories (Deva, Manushya, Rakshasa) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "bhakoot":
-            result = "Emotional bonding and love compatibility is determined using Bhakoot Ashtakoot property which focuses on the Moon sign positions (Rashis) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "nadi":
-            result = "Health and genetic compatibility is determined using Nadi Ashtakoot property which focuses on the Nadi types (Aadi, Madhya, Antya) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        default:
-            result = desc
-        }
-        
-        // Add score-based interpretation
-        if kuta.doshaPresent && kuta.doshaCancelled, let adj = kuta.adjustedScore {
-            let reasonText = kuta.cancellationReason ?? "astrological exceptions"
-            result += " — Since the dosha was cancelled due to \(reasonText), the score has been adjusted from \(Int(kuta.score))/\(Int(kuta.maxScore)) to \(Int(adj))/\(Int(kuta.maxScore))."
-        } else if kuta.doshaPresent && !kuta.doshaCancelled {
-            result += " — Score: \(Int(kuta.score))/\(Int(kuta.maxScore)) — This is an active dosha that requires attention and remedial measures."
-        } else {
-            result += " — Score: \(Int(kuta.score))/\(Int(kuta.maxScore)) — This indicates \(compatibilityLevel)."
-        }
-        
-        return result
-    }
-    
-    /// Replace generic "Boy"/"Girl" with actual partner names
+    /// Replace generic "Boy"/"Girl"/"Groom"/"Bride" with actual partner names
     private func replaceNames(in text: String) -> String {
         text
-            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
-            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
+            .replacingOccurrences(of: "Groom's", with: "\(boyName)'s")
+            .replacingOccurrences(of: "Bride's", with: "\(girlName)'s")
+            .replacingOccurrences(of: "Groom:", with: "\(boyName):")
+            .replacingOccurrences(of: "Bride:", with: "\(girlName):")
+            .replacingOccurrences(of: "Groom ", with: "\(boyName) ")
+            .replacingOccurrences(of: "Bride ", with: "\(girlName) ")
             .replacingOccurrences(of: "Boy's", with: "\(boyName)'s")
             .replacingOccurrences(of: "Girl's", with: "\(girlName)'s")
+            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
+            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
             .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
             .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
     }

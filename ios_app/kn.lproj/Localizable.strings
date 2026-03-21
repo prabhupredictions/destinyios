@@ -2151,6 +2151,21 @@
 "pending_label" = "ಬಾಕಿಯಿದೆ";
 "overridden_due_to_dosha" = "ದೋಷದ ಅಸಾಮರಸ್ಯದಿಂದಾಗಿ ಅತಿಕ್ರಮಿಸಲಾಗಿದೆ";
 "active_doshas" = "ಸಕ್ರಿಯ ದೋಷಗಳು:";
+"dosha_label" = "ದೋಷ";
+"rejection_reason_label" = "ಕಾಳಜಿ";
+"additional_notes" = "ಹೆಚ್ಚಿನ ಟಿಪ್ಪಣಿಗಳು:";
+"house_positions_label" = "ಭಾವ ಸ್ಥಾನಗಳು";
+
+"koota_label" = "ಕೂಟ";
+"tooltip_determined_by" = "%@ ಹೊಂದಾಣಿಕೆಯನ್ನು %@ ಅಷ್ಟಕೂಟ ನಿರ್ಧರಿಸುತ್ತದೆ";
+"tooltip_partner_values" = "ಸಹಭಾಗಿಯ ಮೌಲ್ಯಗಳು";
+"tooltip_score_label" = "ಅಂಕ";
+"dosha_present_label" = "ದೋಷ ಇದೆ";
+"tooltip_type_label" = "ಪ್ರಕಾರ";
+"tooltip_no_dosha" = "ಈ ಕೂಟದಲ್ಲಿ ಯಾವುದೇ ದೋಷ ಕಂಡುಬಂದಿಲ್ಲ";
+"tooltip_dosha_exempted" = "ದೋಷ ವಿನಾಯಿತಿ (ರದ್ದು)";
+"tooltip_adjusted_score" = "ಅಂಕ %@/%@ ಗೆ ಮರುಸ್ಥಾಪಿಸಲಾಯಿತು";
+"tooltip_no_exemption" = "ಯಾವುದೇ ವಿನಾಯಿತಿ ಇಲ್ಲ — ದೋಷ ಸಕ್ರಿಯವಾಗಿದೆ";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2435,3 +2450,101 @@
 "yoga_outcome_label" = "ಇದು ನಿಮಗೆ ಏನು ತರುತ್ತದೆ";
 "yoga_formation_label" = "ಇದು ಹೇಗೆ ರೂಪುಗೊಳ್ಳುತ್ತದೆ";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "ದೋಷ ರದ್ದು";
+"nadi_dosha_active" = "ಸಕ್ರಿಯ ದೋಷ";
+"nadi_type_format" = "ವಿಧ: %@";
+"nadi_boy_const" = "ವರ: %@";
+"nadi_girl_const" = "ವಧು: %@";
+"nadi_type_aadi" = "ಆದಿ (ವಾತ)";
+"nadi_type_madhya" = "ಮಧ್ಯ (ಪಿತ್ತ)";
+"nadi_type_antya" = "ಅಂತ್ಯ (ಕಫ)";
+"nadi_effect_aadi" = "ಆದಿ-ಆದಿ: ಶಾಸ್ತ್ರಗಳ ಪ್ರಕಾರ ಪತಿಯ ಆರೋಗ್ಯದ ಮೇಲೆ ಪರಿಣಾಮ";
+"nadi_effect_madhya" = "ಮಧ್ಯ-ಮಧ್ಯ: ಶಾಸ್ತ್ರಗಳ ಪ್ರಕಾರ ಇಬ್ಬರ ಮೇಲೆ ಪರಿಣಾಮ";
+"nadi_effect_antya" = "ಅಂತ್ಯ-ಅಂತ್ಯ: ಶಾಸ್ತ್ರಗಳ ಪ್ರಕಾರ ಪತ್ನಿಯ ಆರೋಗ್ಯದ ಮೇಲೆ ಪರಿಣಾಮ";
+"nadi_constitution_vata" = "ವಾತ — ಗಾಳಿ & ಆಕಾಶ: ಚಲನೆ, ಸೃಜನಶೀಲತೆ, ನರಮಂಡಲ";
+"nadi_constitution_pitta" = "ಪಿತ್ತ — ಬೆಂಕಿ & ನೀರು: ಚಯಾಪಚಯ, ಜೀರ್ಣಕ್ರಿಯೆ, ಬುದ್ಧಿ";
+"nadi_constitution_kapha" = "ಕಫ — ನೀರು & ಭೂಮಿ: ರಚನೆ, ರೋಗನಿರೋಧಕತೆ, ಸ್ಥಿರತೆ";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "ದೋಷ ರದ್ದು";
+"bhakoot_dosha_active" = "ಸಕ್ರಿಯ ದೋಷ";
+"bhakoot_type_format" = "ವಿಧ: %@";
+"bhakoot_type_shadashtaka" = "ಷಡಾಷ್ಟಕ (6-8)";
+"bhakoot_type_nav_pancham" = "ನವಮ ಪಂಚಮ (5-9)";
+"bhakoot_type_dwirdwadash" = "ದ್ವಿರ್ದ್ವಾದಶ (2-12)";
+"bhakoot_effect_68" = "6/8: ಶಾಸ್ತ್ರಗಳು ಆರೋಗ್ಯ ಅಪಾಯ ಮತ್ತು ಅಪಘಾತಗಳ ಬಗ್ಗೆ ಎಚ್ಚರಿಸುತ್ತವೆ";
+"bhakoot_effect_59" = "5/9: ಶಾಸ್ತ್ರಗಳು ಸಂತಾನದ ಬಗ್ಗೆ ಕಳವಳ ಸೂಚಿಸುತ್ತವೆ";
+"bhakoot_effect_212" = "2/12: ಶಾಸ್ತ್ರಗಳು ಆರ್ಥಿಕ ಕಷ್ಟ ಸೂಚಿಸುತ್ತವೆ";
+"bhakoot_severity_label" = "ತೀವ್ರತೆ: %@";
+"bhakoot_severity_high" = "ಹೆಚ್ಚು (ಅಧ್ಯಯನ: 54% ಉತ್ತಮ ಫಲಿತಾಂಶ)";
+"bhakoot_severity_medium" = "ಮಧ್ಯಮ (ಅಧ್ಯಯನ: 77% ಉತ್ತಮ ಫಲಿತಾಂಶ)";
+"bhakoot_severity_low" = "ಕಡಿಮೆ (ಅಧ್ಯಯನ: 74% ಉತ್ತಮ ಫಲಿತಾಂಶ)";
+"bhakoot_sadbhakoot_warning" = "ಎಚ್ಚರಿಕೆ: ಈ ಜೋಡಿಗೆ ಶಾಸ್ತ್ರೀಯ ವೈಧವ್ಯ ಎಚ್ಚರಿಕೆ ಇದೆ";
+"bhakoot_nav_pancham_auspicious" = "ನವಮ ಪಂಚಮ: ವಧುವು ವರನಿಂದ 5ನೇ ಸ್ಥಾನ — ಸಂತಾನಕ್ಕೆ ಶುಭ";
+"bhakoot_house_positions" = "ಭಾವ ಸ್ಥಾನಗಳು: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "ದೋಷ ರದ್ದು";
+"gana_dosha_active" = "ಸಕ್ರಿಯ ದೋಷ";
+"gana_type_format" = "ವಿಧ: %@";
+"gana_type_dev_rakshash" = "ದೇವ-ರಾಕ್ಷಸ (ದೇವ ವಿರುದ್ಧ ರಾಕ್ಷಸ)";
+"gana_type_manushya_rakshash" = "ಮನುಷ್ಯ-ರಾಕ್ಷಸ (ಮನುಷ್ಯ ವಿರುದ್ಧ ರಾಕ್ಷಸ)";
+"gana_effect_dev_rakshash" = "ದೇವ-ರಾಕ್ಷಸ: ಶಾಸ್ತ್ರಗಳು ಶತ್ರುತ್ವ ಮತ್ತು ಜೀವಮಾನದ ಕಲಹವನ್ನು ಎಚ್ಚರಿಸುತ್ತವೆ";
+"gana_effect_manushya_rakshash" = "ಮನುಷ್ಯ-ರಾಕ್ಷಸ: ಶಾಸ್ತ್ರಗಳು ಮನುಷ್ಯ ಗಣ ಸಂಗಾತಿಗೆ ತೀವ್ರ ಕಷ್ಟವನ್ನು ಎಚ್ಚರಿಸುತ್ತವೆ";
+"gana_severity_label" = "ತೀವ್ರತೆ: %@";
+"gana_severity_high" = "ಹೆಚ್ಚು (ಅಧ್ಯಯನ: 71.43% ಉತ್ತಮ, ಸರಾಸರಿ ಸೇರಿ 83.67%)";
+"gana_severity_medium" = "ಮಧ್ಯಮ (ಅಧ್ಯಯನ: 65.91% ಉತ್ತಮ, ಸರಾಸರಿ ಸೇರಿ 90.91%)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "ದೋಷ ರದ್ದು";
+"maitri_dosha_active" = "ಸಕ್ರಿಯ ದೋಷ";
+"maitri_type_format" = "ವಿಧ: %@";
+"maitri_type_mutual_enemies" = "ಪರಸ್ಪರ ಶತ್ರು (E-E) — ಸಂಪೂರ್ಣ ಮಾನಸಿಕ ಅಸಾಮರಸ್ಯ";
+"maitri_type_neutral_enemy" = "ತಟಸ್ಥ-ಶತ್ರು (N-E) — ಗಮನಾರ್ಹ ಏಕಪಕ್ಷೀಯ ಘರ್ಷಣೆ";
+"maitri_type_friend_enemy" = "ಮಿತ್ರ-ಶತ್ರು (F-E) — ಅಸಮತೋಲಿತ ಅರಿವು";
+"maitri_effect_label" = "ಗ್ರಹ ಮೈತ್ರಿ ಚಂದ್ರ ರಾಶಿ ಅಧಿಪತಿಗಳ ಆಧಾರದ ಮೇಲೆ ಮಾನಸಿಕ ಹೊಂದಾಣಿಕೆಯನ್ನು ಪ್ರತಿನಿಧಿಸುತ್ತದೆ";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "ಯೋನಿ ದೋಷ ರದ್ದು";
+"yoni_dosha_active" = "ಯೋನಿ ದೋಷ ಸಕ್ರಿಯ";
+"yoni_type_format" = "ಪ್ರಕಾರ: %@";
+"yoni_type_intensely_inimical" = "ತೀವ್ರವಾದ ಶತ್ರು (0/4) — 7 ನಿಷೇಧಿತ ಪ್ರಾಣಿ ಜೋಡಿಗಳಲ್ಲಿ ಒಂದು";
+"yoni_type_enemy" = "ಶತ್ರು (1/4) — ಸವಾಲಿನ ದೈಹಿಕ ಹೊಂದಾಣಿಕೆ";
+"yoni_effect_label" = "ಯೋನಿ ಕೂಟ ಪ್ರಾಣಿ ಸ್ವಭಾವದ ಆಧಾರದ ಮೇಲೆ ದೈಹಿಕ/ಲೈಂಗಿಕ ಹೊಂದಾಣಿಕೆಯನ್ನು ಪ್ರತಿನಿಧಿಸುತ್ತದೆ";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "ತಾರಾ ದೋಷ ರದ್ದು";
+"tara_dosha_active" = "ತಾರಾ ದೋಷ ಸಕ್ರಿಯ";
+"tara_type_format" = "ಪ್ರಕಾರ: %@";
+"tara_type_vipat_vipat" = "ವಿಪಟ್-ವಿಪಟ್ (ಎರಡೂ ದಿಕ್ಕುಗಳಲ್ಲಿ ಸ್ಥಾನ 3)";
+"tara_type_pratyak_pratyak" = "ಪ್ರತ್ಯಕ್-ಪ್ರತ್ಯಕ್ (ಎರಡೂ ದಿಕ್ಕುಗಳಲ್ಲಿ ಸ್ಥಾನ 5)";
+"tara_type_vadha_vadha" = "ವಧ-ವಧ (ಎರಡೂ ದಿಕ್ಕುಗಳಲ್ಲಿ ಸ್ಥಾನ 7)";
+"tara_type_vipat_pratyak" = "ವಿಪಟ್-ಪ್ರತ್ಯಕ್ (ಸ್ಥಾನಗಳು 3 ಮತ್ತು 5)";
+"tara_type_vipat_vadha" = "ವಿಪಟ್-ವಧ (ಸ್ಥಾನಗಳು 3 ಮತ್ತು 7)";
+"tara_type_pratyak_vadha" = "ಪ್ರತ್ಯಕ್-ವಧ (ಸ್ಥಾನಗಳು 5 ಮತ್ತು 7)";
+"tara_severity_label" = "ತೀವ್ರತೆ: %@";
+"tara_severity_high" = "ಹೆಚ್ಚು — ವಧ ಸ್ಥಾನಗಳು ತೀವ್ರ ಶಾಸ್ತ್ರೀಯ ಎಚ್ಚರಿಕೆಗಳನ್ನು ಸೂಚಿಸುತ್ತವೆ";
+"tara_severity_medium" = "ಮಧ್ಯಮ — ವಿಪಟ್/ಪ್ರತ್ಯಕ್ ಸ್ಥಾನಗಳು ಮಧ್ಯಮ ಸವಾಲುಗಳನ್ನು ಸೂಚಿಸುತ್ತವೆ";
+"tara_positions_format" = "ತಾರಾ ಸ್ಥಾನಗಳು: ವರ→ವಧು %d, ವಧು→ವರ %d";
+"tara_effect_label" = "ತಾರಾ ಕೂಟ ನಕ್ಷತ್ರ ಸ್ಥಾನಗಳ ಆಧಾರದ ಮೇಲೆ ಆರೋಗ್ಯ ಮತ್ತು ಭಾಗ್ಯ ಹೊಂದಾಣಿಕೆಯನ್ನು ಪ್ರತಿನಿಧಿಸುತ್ತದೆ";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "ವಶ್ಯ ದೋಷ ರದ್ದುಗೊಂಡಿದೆ";
+"vashya_dosha_active" = "ವಶ್ಯ ದೋಷ ಸಕ್ರಿಯ";
+"vashya_type_format" = "ಪ್ರಕಾರ: %@";
+"vashya_severity_label" = "ತೀವ್ರತೆ: %@";
+"vashya_severity_high" = "ಹೆಚ್ಚು — ಯಾವುದೇ ಚುಂಬಕೀಯ ಆಕರ್ಷಣೆ ಇಲ್ಲ, ಶಕ್ತಿ ಸಂಘರ್ಷ ಸೂಚಿತ";
+"vashya_severity_medium" = "ಮಧ್ಯಮ — ಭಕ್ಷ ಆಹಾರ ಸಂಬಂಧದ ಅಸಮತೋಲನ";
+"vashya_groups_format" = "ವಶ್ಯ: ವರ %@, ವಧು %@";
+"vashya_scores_format" = "ಅಂಕಗಳು: ವರ→ವಧು %.1f, ವಧು→ವರ %.1f";
+"vashya_effect_label" = "ವಶ್ಯ ಕೂಟ ಪರಸ್ಪರ ಆಕರ್ಷಣೆ ಮತ್ತು ನಿಯಂತ್ರಣ ಗತಿಶಾಸ್ತ್ರವನ್ನು ಪ್ರತಿನಿಧಿಸುತ್ತದೆ";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "ವರ್ಣ ದೋಷ ರದ್ದುಗೊಂಡಿದೆ";
+"varna_dosha_active" = "ವರ್ಣ ದೋಷ ಸಕ್ರಿಯ";
+"varna_type_format" = "ಪ್ರಕಾರ: %@";
+"varna_severity_low" = "ಕಡಿಮೆ — ಅಷ್ಟಕೂಟದಲ್ಲಿ ಅತ್ಯಂತ ಹಗುರವಾದ ದೋಷ (1/36 ಅಂಕಗಳು)";
+"varna_values_format" = "ವರ್ಣ: ವರ %@, ವಧು %@";
+"varna_effect_label" = "ವರ್ಣ ಕೂಟ ಚಂದ್ರ ರಾಶಿ ಘಟಕಗಳ ಆಧಾರದಲ್ಲಿ ಆಧ್ಯಾತ್ಮಿಕ ಮತ್ತು ಮಾನಸಿಕ ಹೊಂದಾಣಿಕೆಯನ್ನು ಪ್ರತಿನಿಧಿಸುತ್ತದೆ";
+"varna_complementarity_note" = "ಸಾಂಪ್ರದಾಯಿಕ ಪೂರಕ ಜೋಡಿ — ಸ್ವಾಭಾವಿಕ ಸಾಮರಸ್ಯವು ಗುರುತಿಸಲ್ಪಟ್ಟಿದೆ";

@@ -2111,6 +2111,22 @@
 "pending_label" = "Pending";
 "overridden_due_to_dosha" = "Overridden due to dosha incompatibility";
 "active_doshas" = "Active Doshas:";
+"dosha_label" = "Dosha";
+"rejection_reason_label" = "Concern";
+"additional_notes" = "Additional Notes:";
+"house_positions_label" = "House Positions";
+
+// Tooltip 6-point format (V2.4)
+"koota_label" = "Koota";
+"tooltip_determined_by" = "%@ compatibility is determined by %@ Ashtakoot";
+"tooltip_partner_values" = "Partner Values";
+"tooltip_score_label" = "Score";
+"dosha_present_label" = "Dosha Present";
+"tooltip_type_label" = "Type";
+"tooltip_no_dosha" = "No dosha detected for this Koota";
+"tooltip_dosha_exempted" = "Dosha Exempted (Cancelled)";
+"tooltip_adjusted_score" = "Score restored to %@/%@";
+"tooltip_no_exemption" = "No exemption — dosha remains active";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2393,3 +2409,103 @@
 "yoga_outcome_label" = "What this brings you";
 "yoga_formation_label" = "How this forms";
 
+// ════════════════════════════════════════════════════════════════════════════
+// MARK: - Nadi Dosha Transparency (V2.2)
+// ════════════════════════════════════════════════════════════════════════════
+"nadi_dosha_cancelled" = "Dosha Cancelled";
+"nadi_dosha_active" = "Active Dosha";
+"nadi_type_format" = "Type: %@";
+"nadi_boy_const" = "Boy: %@";
+"nadi_girl_const" = "Girl: %@";
+"nadi_type_aadi" = "Aadi (Vata)";
+"nadi_type_madhya" = "Madhya (Pitta)";
+"nadi_type_antya" = "Antya (Kapha)";
+"nadi_effect_aadi" = "Aadi-Aadi: Classical texts indicate concern for husband's health";
+"nadi_effect_madhya" = "Madhya-Madhya: Classical texts indicate concern for both partners";
+"nadi_effect_antya" = "Antya-Antya: Classical texts indicate concern for wife's health";
+"nadi_constitution_vata" = "Vata — Air & Ether: Movement, creativity, nervous system";
+"nadi_constitution_pitta" = "Pitta — Fire & Water: Metabolism, digestion, intellect";
+"nadi_constitution_kapha" = "Kapha — Water & Earth: Structure, immunity, stability";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "Dosha Cancelled";
+"bhakoot_dosha_active" = "Active Dosha";
+"bhakoot_type_format" = "Type: %@";
+"bhakoot_type_shadashtaka" = "Shadashtaka (6-8)";
+"bhakoot_type_nav_pancham" = "Nav Pancham (5-9)";
+"bhakoot_type_dwirdwadash" = "Dwirdwadash (2-12)";
+"bhakoot_effect_68" = "6/8: Classical texts warn of health risks and accidents";
+"bhakoot_effect_59" = "5/9: Classical texts indicate concern for progeny";
+"bhakoot_effect_212" = "2/12: Classical texts indicate financial strain";
+"bhakoot_severity_label" = "Severity: %@";
+"bhakoot_severity_high" = "High (field study: 54% good outcomes)";
+"bhakoot_severity_medium" = "Medium (field study: 77% good outcomes)";
+"bhakoot_severity_low" = "Low (field study: 74% good outcomes)";
+"bhakoot_sadbhakoot_warning" = "Caution: This pair carries a classical widowhood advisory";
+"bhakoot_nav_pancham_auspicious" = "Nav Pancham: Bride 5th from groom — traditionally auspicious for progeny";
+"bhakoot_house_positions" = "House positions: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "Dosha Cancelled";
+"gana_dosha_active" = "Active Dosha";
+"gana_type_format" = "Type: %@";
+"gana_type_dev_rakshash" = "Dev-Rakshash (Deva vs Rakshasa)";
+"gana_type_manushya_rakshash" = "Manushya-Rakshash (Manushya vs Rakshasa)";
+"gana_effect_dev_rakshash" = "Dev-Rakshash: Classical texts warn of inimical relations and lifelong strife";
+"gana_effect_manushya_rakshash" = "Manushya-Rakshash: Classical texts warn of extreme misery for the Manushya partner";
+"gana_severity_label" = "Severity: %@";
+"gana_severity_high" = "High (study: 71.43% good outcomes, 83.67% including average)";
+"gana_severity_medium" = "Medium (study: 65.91% good outcomes, 90.91% including average)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "Dosha Cancelled";
+"maitri_dosha_active" = "Active Dosha";
+"maitri_type_format" = "Type: %@";
+"maitri_type_mutual_enemies" = "Mutual Enemies (E-E) — complete mental incompatibility";
+"maitri_type_neutral_enemy" = "Neutral-Enemy (N-E) — significant one-sided friction";
+"maitri_type_friend_enemy" = "Friend-Enemy (F-E) — imbalanced understanding";
+"maitri_effect_label" = "Graha Maitri represents mental compatibility based on Moon sign lords";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "Yoni Dosha Cancelled";
+"yoni_dosha_active" = "Yoni Dosha Active";
+"yoni_type_format" = "Type: %@";
+"yoni_type_intensely_inimical" = "Intensely Inimical (0/4) — one of 7 forbidden animal pairs";
+"yoni_type_enemy" = "Enemy (1/4) — challenging physical compatibility";
+"yoni_effect_label" = "Yoni Koota represents physical/sexual compatibility based on animal nature";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "Tara Dosha Cancelled";
+"tara_dosha_active" = "Tara Dosha Active";
+"tara_type_format" = "Type: %@";
+"tara_type_vipat_vipat" = "Vipat-Vipat (position 3 both directions)";
+"tara_type_pratyak_pratyak" = "Pratyak-Pratyak (position 5 both directions)";
+"tara_type_vadha_vadha" = "Vadha-Vadha (position 7 both directions)";
+"tara_type_vipat_pratyak" = "Vipat-Pratyak (positions 3 & 5)";
+"tara_type_vipat_vadha" = "Vipat-Vadha (positions 3 & 7)";
+"tara_type_pratyak_vadha" = "Pratyak-Vadha (positions 5 & 7)";
+"tara_severity_label" = "Severity: %@";
+"tara_severity_high" = "High — Vadha positions indicate severe classical warnings";
+"tara_severity_medium" = "Medium — Vipat/Pratyak positions indicate moderate challenges";
+"tara_positions_format" = "Tara positions: Boy→Girl %d, Girl→Boy %d";
+"tara_effect_label" = "Tara Koota represents health and fortune compatibility based on nakshatra positions";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "Vashya Dosha Cancelled";
+"vashya_dosha_active" = "Vashya Dosha Active";
+"vashya_type_format" = "Type: %@";
+"vashya_severity_label" = "Severity: %@";
+"vashya_severity_high" = "High — No magnetic pull, power struggles indicated";
+"vashya_severity_medium" = "Medium — Bhaksha food relationship with imbalance";
+"vashya_groups_format" = "Vashya: Boy %@, Girl %@";
+"vashya_scores_format" = "Scores: Boy→Girl %.1f, Girl→Boy %.1f";
+"vashya_effect_label" = "Vashya Koota represents mutual attraction and control dynamics";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "Varna Dosha Cancelled";
+"varna_dosha_active" = "Varna Dosha Active";
+"varna_type_format" = "Type: %@";
+"varna_severity_low" = "Low — Mildest Dosha in Ashtakoot (1/36 points)";
+"varna_values_format" = "Varna: Groom %@, Bride %@";
+"varna_effect_label" = "Varna Koota represents spiritual and psychological compatibility based on Moon sign elements";
+"varna_complementarity_note" = "Traditional complementary pair — natural affinity recognized";

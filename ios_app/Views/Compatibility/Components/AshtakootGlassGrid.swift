@@ -12,7 +12,39 @@ struct AshtakootData {
     var doshaPresent: Bool = false
     var doshaCancelled: Bool = false
     var cancellationReason: String? = nil
+    var cancellationReasons: [String]? = nil
     var adjustedScore: Double? = nil
+    
+    // V2.2 — Nadi transparency fields
+    var doshaType: String? = nil
+    var classicalEffect: String? = nil
+    var boyConstitution: NadiConstitution? = nil
+    var girlConstitution: NadiConstitution? = nil
+    
+    // V2.2 — Bhakoot transparency fields
+    var severity: String? = nil
+    var fieldStudy: String? = nil
+    var housePositions: String? = nil
+    var sadbhakootWarning: String? = nil
+    
+    // V2.2 — Tara transparency fields
+    var taraBoyToGirl: Int? = nil
+    var taraGirlToBoy: Int? = nil
+    
+    // V2.2 — Vashya transparency fields
+    var boyVashya: String? = nil
+    var girlVashya: String? = nil
+    var boyToGirlScore: Double? = nil
+    var girlToBoyScore: Double? = nil
+    
+    // V2.3 — Varna transparency fields
+    var boyVarna: String? = nil
+    var girlVarna: String? = nil
+    var complementarityNote: String? = nil
+    
+    // V2.4 — Universal partner values
+    var boyValue: String? = nil
+    var girlValue: String? = nil
     
     /// Effective score after cancellation (adjusted if available, else raw)
     var effectiveScore: Double {

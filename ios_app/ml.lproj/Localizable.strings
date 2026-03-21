@@ -2151,6 +2151,21 @@
 "pending_label" = "തീർപ്പാക്കാത്തത്";
 "overridden_due_to_dosha" = "ദോഷ പൊരുത്തക്കേട് കാരണം അസാധുവാക്കപ്പെട്ടു";
 "active_doshas" = "സജീവ ദോഷങ്ങൾ:";
+"dosha_label" = "ദോഷം";
+"rejection_reason_label" = "കൺസൺ";
+"additional_notes" = "അധിക കുറിപ്പുകൾ:";
+"house_positions_label" = "ഭാവ സ്ഥാനങ്ങൾ";
+
+"koota_label" = "കൂടം";
+"tooltip_determined_by" = "%@ അനുയോജ്യത %@ അഷ്ടകൂടം വഴി നിർണയിക്കപ്പെടുന്നു";
+"tooltip_partner_values" = "പങ്കാളി മൂല്യങ്ങൾ";
+"tooltip_score_label" = "സ്കോർ";
+"dosha_present_label" = "ദോഷം നിലവിലുണ്ട്";
+"tooltip_type_label" = "തരം";
+"tooltip_no_dosha" = "ഈ കൂടത്തിൽ ദോഷം കണ്ടെത്തിയില്ല";
+"tooltip_dosha_exempted" = "ദോഷം ഒഴിവാക്കി (റദ്ദാക്കി)";
+"tooltip_adjusted_score" = "സ്കോർ %@/%@ ആയി പുനഃസ്ഥാപിച്ചു";
+"tooltip_no_exemption" = "വിലക്ക് ഇല്ല — ദോഷം സജീവമാണ്";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2434,4 +2449,103 @@
 "cancel_action" = "റദ്ദാക്കുക";
 "yoga_outcome_label" = "ഇത് നിങ്ങൾക്ക് എന്ത് നൽകുന്നു";
 "yoga_formation_label" = "ഇത് എങ്ങനെ രൂപപ്പെടുന്നു";
+
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "ദോഷം റദ്ദാക്കി";
+"nadi_dosha_active" = "സജീവ ദോഷം";
+"nadi_type_format" = "തരം: %@";
+"nadi_boy_const" = "വരൻ: %@";
+"nadi_girl_const" = "വധു: %@";
+"nadi_type_aadi" = "ആദി (വാതം)";
+"nadi_type_madhya" = "മധ്യ (പിത്തം)";
+"nadi_type_antya" = "അന്ത്യ (കഫം)";
+"nadi_effect_aadi" = "ആദി-ആദി: ശാസ്ത്രങ്ങൾ ഭർത്താവിന്റെ ആരോഗ്യത്തിൽ ആശങ്ക സൂചിപ്പിക്കുന്നു";
+"nadi_effect_madhya" = "മധ്യ-മധ്യ: ശാസ്ത്രങ്ങൾ ഇരുവരിലും ആശങ്ക സൂചിപ്പിക്കുന്നു";
+"nadi_effect_antya" = "അന്ത്യ-അന്ത്യ: ശാസ്ത്രങ്ങൾ ഭാര്യയുടെ ആരോഗ്യത്തിൽ ആശങ്ക സൂചിപ്പിക്കുന്നു";
+"nadi_constitution_vata" = "വാതം — വായു & ആകാശം: ചലനം, സർഗ്ഗാത്മകത, നാഡീവ്യൂഹം";
+"nadi_constitution_pitta" = "പിത്തം — അഗ്നി & ജലം: ഉപാപചയം, ദഹനം, ബുദ്ധി";
+"nadi_constitution_kapha" = "കഫം — ജലം & ഭൂമി: ഘടന, രോഗപ്രതിരോധം, സ്ഥിരത";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "ദോഷം റദ്ദാക്കി";
+"bhakoot_dosha_active" = "സജീവ ദോഷം";
+"bhakoot_type_format" = "തരം: %@";
+"bhakoot_type_shadashtaka" = "ഷഡാഷ്ടക (6-8)";
+"bhakoot_type_nav_pancham" = "നവം പഞ്ചമം (5-9)";
+"bhakoot_type_dwirdwadash" = "ദ്വിർദ്വാദശ (2-12)";
+"bhakoot_effect_68" = "6/8: ശാസ്ത്രങ്ങൾ ആരോഗ്യ അപകടവും അപകടങ്ങളും മുന്നറിയിപ്പ് നൽകുന്നു";
+"bhakoot_effect_59" = "5/9: ശാസ്ത്രങ്ങൾ സന്താനത്തിൽ ആശങ്ക സൂചിപ്പിക്കുന്നു";
+"bhakoot_effect_212" = "2/12: ശാസ്ത്രങ്ങൾ സാമ്പത്തിക ബുദ്ധിമുട്ട് സൂചിപ്പിക്കുന്നു";
+"bhakoot_severity_label" = "തീവ്രത: %@";
+"bhakoot_severity_high" = "ഉയർന്നത് (പഠനം: 54% നല്ല ഫലങ്ങൾ)";
+"bhakoot_severity_medium" = "മധ്യമം (പഠനം: 77% നല്ല ഫലങ്ങൾ)";
+"bhakoot_severity_low" = "കുറവ് (പഠനം: 74% നല്ല ഫലങ്ങൾ)";
+"bhakoot_sadbhakoot_warning" = "ജാഗ്രത: ഈ ജോഡിക്ക് ശാസ്ത്രീയ വൈധവ്യ മുന്നറിയിപ്പ് ഉണ്ട്";
+"bhakoot_nav_pancham_auspicious" = "നവം പഞ്ചമം: വധു വരനിൽ നിന്ന് 5-ാം സ്ഥാനം — സന്താനത്തിന് ശുഭം";
+"bhakoot_house_positions" = "ഭാവ സ്ഥാനങ്ങൾ: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "ദോഷം റദ്ദാക്കി";
+"gana_dosha_active" = "സജീവ ദോഷം";
+"gana_type_format" = "തരം: %@";
+"gana_type_dev_rakshash" = "ദേവ-രാക്ഷസ (ദേവ vs രാക്ഷസ)";
+"gana_type_manushya_rakshash" = "മനുഷ്യ-രാക്ഷസ (മനുഷ്യ vs രാക്ഷസ)";
+"gana_effect_dev_rakshash" = "ദേവ-രാക്ഷസ: ശാസ്ത്രങ്ങൾ ശത്രുത്വവും ആജീവനാന്ത കലഹവും മുന്നറിയിപ്പ് നൽകുന്നു";
+"gana_effect_manushya_rakshash" = "മനുഷ്യ-രാക്ഷസ: ശാസ്ത്രങ്ങൾ മനുഷ്യ ഗണ പങ്കാളിക്ക് കടുത്ത കഷ്ടം മുന്നറിയിപ്പ് നൽകുന്നു";
+"gana_severity_label" = "തീവ്രത: %@";
+"gana_severity_high" = "ഉയർന്നത് (പഠനം: 71.43% നല്ല ഫലം, ശരാശരി ഉൾപ്പെടെ 83.67%)";
+"gana_severity_medium" = "മധ്യമം (പഠനം: 65.91% നല്ല ഫലം, ശരാശരി ഉൾപ്പെടെ 90.91%)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "ദോഷം റദ്ദാക്കി";
+"maitri_dosha_active" = "സജീവ ദോഷം";
+"maitri_type_format" = "തരം: %@";
+"maitri_type_mutual_enemies" = "പരസ്പര ശത്രുക്കൾ (E-E) — സമ്പൂർണ മാനസിക അനുയോജ്യതയില്ലായ്മ";
+"maitri_type_neutral_enemy" = "നിഷ്പക്ഷ-ശത്രു (N-E) — ഗണ്യമായ ഏകപക്ഷീയ ഘർഷണം";
+"maitri_type_friend_enemy" = "മിത്ര-ശത്രു (F-E) — അസന്തുലിത ധാരണ";
+"maitri_effect_label" = "ഗ്രഹ മൈത്രി ചന്ദ്ര രാശി അധിപന്മാരെ അടിസ്ഥാനമാക്കി മാനസിക അനുയോജ്യത പ്രതിനിധാനം ചെയ്യുന്നു";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "യോനി ദോഷം റദ്ദാക്കി";
+"yoni_dosha_active" = "യോനി ദോഷം സജീവം";
+"yoni_type_format" = "തരം: %@";
+"yoni_type_intensely_inimical" = "തീവ്രമായ ശത്രുത (0/4) — 7 നിരോധിത മൃഗ ജോഡികളിലൊന്ന്";
+"yoni_type_enemy" = "ശത്രു (1/4) — വെല്ലുവിളിയായ ശാരീരിക യോജ്യത";
+"yoni_effect_label" = "യോനി കൂട്ട് മൃഗസ്വഭാവത്തെ അടിസ്ഥാനമാക്കിയുള്ള ശാരീരിക/ലൈംഗിക അനുയോജ്യത പ്രതിനിധാനം ചെയ്യുന്നു";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "താരാ ദോഷം റദ്ദാക്കി";
+"tara_dosha_active" = "താരാ ദോഷം സജീവം";
+"tara_type_format" = "തരം: %@";
+"tara_type_vipat_vipat" = "വിപത്-വിപത് (രണ്ട് ദിശകളിലും സ്ഥാനം 3)";
+"tara_type_pratyak_pratyak" = "പ്രത്യക്-പ്രത്യക് (രണ്ട് ദിശകളിലും സ്ഥാനം 5)";
+"tara_type_vadha_vadha" = "വധ്-വധ് (രണ്ട് ദിശകളിലും സ്ഥാനം 7)";
+"tara_type_vipat_pratyak" = "വിപത്-പ്രത്യക് (സ്ഥാനങ്ങൾ 3, 5)";
+"tara_type_vipat_vadha" = "വിപത്-വധ് (സ്ഥാനങ്ങൾ 3, 7)";
+"tara_type_pratyak_vadha" = "പ്രത്യക്-വധ് (സ്ഥാനങ്ങൾ 5, 7)";
+"tara_severity_label" = "തീവ്രത: %@";
+"tara_severity_high" = "ഉയർന്ന — വധ് സ്ഥാനങ്ങൾ ഗുരുതരമായ ശാസ്ത്രീയ മുന്നറിയിപ്പുകൾ സൂചിപ്പിക്കുന്നു";
+"tara_severity_medium" = "ഇടത്തരം — വിപത്/പ്രത്യക് സ്ഥാനങ്ങൾ മിതമായ വെല്ലുവിളികൾ സൂചിപ്പിക്കുന്നു";
+"tara_positions_format" = "താരാ സ്ഥാനങ്ങൾ: വരൻ→വധു %d, വധു→വരൻ %d";
+"tara_effect_label" = "താരാ കൂട്ട് നക്ഷത്ര സ്ഥാനങ്ങളെ അടിസ്ഥാനമാക്കിയുള്ള ആരോഗ്യവും ഭാഗ്യവും അനുയോജ്യത പ്രതിനിധാനം ചെയ്യുന്നു";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "വശ്യ ദോഷം റദ്ദാക്കി";
+"vashya_dosha_active" = "വശ്യ ദോഷം സജീവം";
+"vashya_type_format" = "തരം: %@";
+"vashya_severity_label" = "ഗുരുതരം: %@";
+"vashya_severity_high" = "ഉയര്‍ന്ന — കാന്തക ആകര്‍ഷണമില്ല, ശക്തി പോരാട്ടങ്ങള്‍ സൂചിപ്പിക്കുന്നു";
+"vashya_severity_medium" = "ഇടത്തരം — ഭക്ഷ ആഹാര ബന്ധത്തിലെ അസന്തുലനം";
+"vashya_groups_format" = "വശ്യ: വരന്‍ %@, വധു %@";
+"vashya_scores_format" = "സ്കോറുകൾ: വരന്‍→വധു %.1f, വധു→വരന്‍ %.1f";
+"vashya_effect_label" = "വശ്യ കൂട്ട് പരസ്പര ആകർഷണവും നിയന്ത്രണ ഗതിശാസ്ത്രവും പ്രതിനിധീകരിക്കുന്നു";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "വര്‍ണ്ണ ദോഷം റദ്ദാക്കി";
+"varna_dosha_active" = "വര്‍ണ്ണ ദോഷം സജീവം";
+"varna_type_format" = "തരം: %@";
+"varna_severity_low" = "കുറഞ്ഞ — അഷ്ടകൂട്ടത്തിലെ ഏറ്റവും ഭാരമുള്ള ദോഷം (1/36 പോയിന്റ്)";
+"varna_values_format" = "വര്‍ണ്ണ: വരന്‍ %@, വധു %@";
+"varna_effect_label" = "വര്‍ണ്ണ കൂട്ട് ചന്ദ്ര രാശി ഘടകങ്ങളെ അടിസ്ഥാനമാക്കിയുള്ള ആത്മീയവും മാനസികവുമായ അനുയോജ്യത പ്രതിനിധീകരിക്കുന്നു";
+"varna_complementarity_note" = "പരമ്പരാഗത പൂരക ജോഡി — സ്വാഭാവിക സാമ്യം അംഗീകരിച്ചു";
 

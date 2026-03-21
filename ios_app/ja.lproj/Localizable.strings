@@ -482,6 +482,7 @@
 "tail_of_serpent" = "Tail of Serpent";
 "analysis_notes" = "Analysis Notes";
 "no_kalsarpa_data" = "No Kalsarpa data available";
+"tara_effect_label" = "タラ・クータはナクシャトラ位置に基づく健康と運命の相性を表します";
 
 /* Streaming Progress */
 "processing" = "処理...";
@@ -2151,6 +2152,21 @@
 "pending_label" = "保留中";
 "overridden_due_to_dosha" = "Dosha の非互換性のためオーバーライドされました";
 "active_doshas" = "活動的なドーシャ:";
+"dosha_label" = "ドーシャ";
+"rejection_reason_label" = "懸念事項";
+"additional_notes" = "追加メモ:";
+"house_positions_label" = "ハウス位置";
+
+"koota_label" = "クータ";
+"tooltip_determined_by" = "%@ の相性は %@ アシュタクートによって決まります";
+"tooltip_partner_values" = "相手の値";
+"tooltip_score_label" = "スコア";
+"dosha_present_label" = "ドーシャあり";
+"tooltip_type_label" = "種類";
+"tooltip_no_dosha" = "このクータではドーシャは検出されませんでした";
+"tooltip_dosha_exempted" = "ドーシャ免除（解除済み）";
+"tooltip_adjusted_score" = "スコアが %@/%@ に回復されました";
+"tooltip_no_exemption" = "免除なし — ドーシャは有効です";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2435,3 +2451,101 @@
 "yoga_outcome_label" = "これがもたらすもの";
 "yoga_formation_label" = "形成の仕組み";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "ドーシャ解消";
+"nadi_dosha_active" = "活性ドーシャ";
+"nadi_type_format" = "タイプ: %@";
+"nadi_boy_const" = "男性: %@";
+"nadi_girl_const" = "女性: %@";
+"nadi_type_aadi" = "アーディ（ヴァータ）";
+"nadi_type_madhya" = "マディヤ（ピッタ）";
+"nadi_type_antya" = "アンティヤ（カパ）";
+"nadi_effect_aadi" = "アーディ-アーディ: 古典文献は夫の健康への懸念を示唆";
+"nadi_effect_madhya" = "マディヤ-マディヤ: 古典文献は両者への懸念を示唆";
+"nadi_effect_antya" = "アンティヤ-アンティヤ: 古典文献は妻の健康への懸念を示唆";
+"nadi_constitution_vata" = "ヴァータ — 風と空: 動き、創造性、神経系";
+"nadi_constitution_pitta" = "ピッタ — 火と水: 代謝、消化、知性";
+"nadi_constitution_kapha" = "カパ — 水と地: 構造、免疫、安定";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "ドーシャ解消";
+"bhakoot_dosha_active" = "活性ドーシャ";
+"bhakoot_type_format" = "タイプ: %@";
+"bhakoot_type_shadashtaka" = "シャダシュタカ (6-8)";
+"bhakoot_type_nav_pancham" = "ナヴ・パンチャム (5-9)";
+"bhakoot_type_dwirdwadash" = "ドゥイルドゥワダシュ (2-12)";
+"bhakoot_effect_68" = "6/8: 古典文献は健康リスクと事故を警告";
+"bhakoot_effect_59" = "5/9: 古典文献は子孫への懸念を示唆";
+"bhakoot_effect_212" = "2/12: 古典文献は財政的困難を示唆";
+"bhakoot_severity_label" = "重症度: %@";
+"bhakoot_severity_high" = "高 (研究: 54%良好な結果)";
+"bhakoot_severity_medium" = "中 (研究: 77%良好な結果)";
+"bhakoot_severity_low" = "低 (研究: 74%良好な結果)";
+"bhakoot_sadbhakoot_warning" = "注意: このペアには古典的な寡婦警告があります";
+"bhakoot_nav_pancham_auspicious" = "ナヴ・パンチャム: 花嫁が花婿から5番目 — 子孫に吉";
+"bhakoot_house_positions" = "ハウス位置: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "ドーシャ解消";
+"gana_dosha_active" = "活性ドーシャ";
+"gana_type_format" = "タイプ: %@";
+"gana_type_dev_rakshash" = "デーヴァ・ラークシャサ (神 対 羅刹)";
+"gana_type_manushya_rakshash" = "マヌシャ・ラークシャサ (人間 対 羅刹)";
+"gana_effect_dev_rakshash" = "デーヴァ・ラークシャサ: 古典文献は敵対関係と生涯にわたる争いを警告";
+"gana_effect_manushya_rakshash" = "マヌシャ・ラークシャサ: 古典文献はマヌシャ側のパートナーへの極度の苦難を警告";
+"gana_severity_label" = "重症度: %@";
+"gana_severity_high" = "高 (研究: 71.43%良好、平均含め83.67%)";
+"gana_severity_medium" = "中 (研究: 65.91%良好、平均含め90.91%)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "ドーシャ解消";
+"maitri_dosha_active" = "活性ドーシャ";
+"maitri_type_format" = "タイプ: %@";
+"maitri_type_mutual_enemies" = "相互敵対 (E-E) — 完全な精神的不適合";
+"maitri_type_neutral_enemy" = "中立-敵対 (N-E) — 重大な一方的摩擦";
+"maitri_type_friend_enemy" = "友好-敵対 (F-E) — 不均衡な理解";
+"maitri_effect_label" = "グラハ・マイトリは月星座の支配星に基づく精神的相性を表します";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "ヨニ・ドシャ解除済み";
+"yoni_dosha_active" = "ヨニ・ドシャ発生中";
+"yoni_type_format" = "タイプ: %@";
+"yoni_type_intensely_inimical" = "激しい相克 (0/4) — 7つの禁止動物ペアの1つ";
+"yoni_type_enemy" = "相克 (1/4) — 困難な身体的相性";
+"yoni_effect_label" = "ヨニ・クータは動物の性質に基づく身体的/性的相性を表します";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "タラ・ドーシャ解除";
+"tara_dosha_active" = "タラ・ドーシャ有効";
+"tara_type_format" = "タイプ: %@";
+"tara_type_vipat_vipat" = "ヴィパット-ヴィパット (両方向で位置3)";
+"tara_type_pratyak_pratyak" = "プラティヤック-プラティヤック (両方向で位置5)";
+"tara_type_vadha_vadha" = "ヴァドハ-ヴァドハ (両方向で位置7)";
+"tara_type_vipat_pratyak" = "ヴィパット-プラティヤック (位置3と5)";
+"tara_type_vipat_vadha" = "ヴィパット-ヴァドハ (位置3と7)";
+"tara_type_pratyak_vadha" = "プラティヤック-ヴァドハ (位置5と7)";
+"tara_severity_label" = "深刻度: %@";
+"tara_severity_high" = "高 — ヴァドハ位置は深刻な古典的警告を示します";
+"tara_severity_medium" = "中 — ヴィパット/プラティヤック位置は中程度の課題を示します";
+"tara_positions_format" = "タラ位置: 新郎→新婦 %d, 新婦→新郎 %d";
+"tara_effect_label" = "タラ・クータはナクシャトラ位置に基づく健康と運命の相性を表します";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "ヴァシュヤ・ドーシャ解除";
+"vashya_dosha_active" = "ヴァシュヤ・ドーシャ有効";
+"vashya_type_format" = "タイプ: %@";
+"vashya_severity_label" = "深刻度: %@";
+"vashya_severity_high" = "高 — 磁気的吸引力なし、権力争いを示唆";
+"vashya_severity_medium" = "中 — バクシャ食料関係に不均衡";
+"vashya_groups_format" = "ヴァシュヤ: 新郎 %@, 新婦 %@";
+"vashya_scores_format" = "スコア: 新郎→新婦 %.1f, 新婦→新郎 %.1f";
+"vashya_effect_label" = "ヴァシュヤ・クータは相互の吸引と支配力のダイナミクスを表します";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "ヴァルナ・ドーシャ解除";
+"varna_dosha_active" = "ヴァルナ・ドーシャ有効";
+"varna_type_format" = "タイプ: %@";
+"varna_severity_low" = "低 — アシュタクートで最も軽いドーシャ (1/36点)";
+"varna_values_format" = "ヴァルナ: 新郎 %@, 新婦 %@";
+"varna_effect_label" = "ヴァルナ・クータは月星座の要素に基づく精神的・心理的適合性を表します";
+"varna_complementarity_note" = "伝統的な相補的ペア — 自然な親和性が認められています";

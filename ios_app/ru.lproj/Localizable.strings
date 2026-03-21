@@ -2151,6 +2151,21 @@
 "pending_label" = "В ожидании";
 "overridden_due_to_dosha" = "Отменено из-за несовместимости дош.";
 "active_doshas" = "Активные Доши:";
+"dosha_label" = "Доша";
+"rejection_reason_label" = "Беспокойство";
+"additional_notes" = "Дополнительные заметки:";
+"house_positions_label" = "Положения Домов";
+
+"koota_label" = "Кута";
+"tooltip_determined_by" = "Совместимость %@ определяется %@ Аштакутом";
+"tooltip_partner_values" = "Значения партнёров";
+"tooltip_score_label" = "Баллы";
+"dosha_present_label" = "Доша присутствует";
+"tooltip_type_label" = "Тип";
+"tooltip_no_dosha" = "Для этой Куты дошa не обнаружена";
+"tooltip_dosha_exempted" = "Доша отменена (снята)";
+"tooltip_adjusted_score" = "Баллы восстановлены до %@/%@";
+"tooltip_no_exemption" = "Исключения нет — дошa остаётся активной";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2435,3 +2450,101 @@
 "yoga_outcome_label" = "Что это вам даёт";
 "yoga_formation_label" = "Как это формируется";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "Доша отменена";
+"nadi_dosha_active" = "Активная доша";
+"nadi_type_format" = "Тип: %@";
+"nadi_boy_const" = "Жених: %@";
+"nadi_girl_const" = "Невеста: %@";
+"nadi_type_aadi" = "Аади (Вата)";
+"nadi_type_madhya" = "Мадхья (Питта)";
+"nadi_type_antya" = "Антья (Капха)";
+"nadi_effect_aadi" = "Аади-Аади: Классические тексты указывают на риски для здоровья мужа";
+"nadi_effect_madhya" = "Мадхья-Мадхья: Классические тексты указывают на риски для обоих партнёров";
+"nadi_effect_antya" = "Антья-Антья: Классические тексты указывают на риски для здоровья жены";
+"nadi_constitution_vata" = "Вата — Воздух и Эфир: Движение, творчество, нервная система";
+"nadi_constitution_pitta" = "Питта — Огонь и Вода: Обмен веществ, пищеварение, интеллект";
+"nadi_constitution_kapha" = "Капха — Вода и Земля: Структура, иммунитет, стабильность";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "Доша отменена";
+"bhakoot_dosha_active" = "Активная доша";
+"bhakoot_type_format" = "Тип: %@";
+"bhakoot_type_shadashtaka" = "Шадаштака (6-8)";
+"bhakoot_type_nav_pancham" = "Нав Панчам (5-9)";
+"bhakoot_type_dwirdwadash" = "Двирдвадаш (2-12)";
+"bhakoot_effect_68" = "6/8: Классические тексты предупреждают о рисках здоровья и несчастных случаях";
+"bhakoot_effect_59" = "5/9: Классические тексты указывают на проблемы с потомством";
+"bhakoot_effect_212" = "2/12: Классические тексты указывают на финансовые трудности";
+"bhakoot_severity_label" = "Тяжесть: %@";
+"bhakoot_severity_high" = "Высокая (исследование: 54% хороших результатов)";
+"bhakoot_severity_medium" = "Средняя (исследование: 77% хороших результатов)";
+"bhakoot_severity_low" = "Низкая (исследование: 74% хороших результатов)";
+"bhakoot_sadbhakoot_warning" = "Внимание: Эта пара имеет классическое предупреждение о вдовстве";
+"bhakoot_nav_pancham_auspicious" = "Нав Панчам: Невеста 5-я от жениха — традиционно благоприятно для потомства";
+"bhakoot_house_positions" = "Позиции домов: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "Доша отменена";
+"gana_dosha_active" = "Активная доша";
+"gana_type_format" = "Тип: %@";
+"gana_type_dev_rakshash" = "Дев-Ракшас (Дева против Ракшаса)";
+"gana_type_manushya_rakshash" = "Манушья-Ракшас (Манушья против Ракшаса)";
+"gana_effect_dev_rakshash" = "Дев-Ракшас: Классические тексты предупреждают о враждебных отношениях и пожизненных конфликтах";
+"gana_effect_manushya_rakshash" = "Манушья-Ракшас: Классические тексты предупреждают о крайних страданиях партнёра Манушья";
+"gana_severity_label" = "Тяжесть: %@";
+"gana_severity_high" = "Высокая (исследование: 71,43% хороших результатов, 83,67% включая средние)";
+"gana_severity_medium" = "Средняя (исследование: 65,91% хороших результатов, 90,91% включая средние)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "Доша отменена";
+"maitri_dosha_active" = "Активная доша";
+"maitri_type_format" = "Тип: %@";
+"maitri_type_mutual_enemies" = "Взаимные враги (E-E) — полная ментальная несовместимость";
+"maitri_type_neutral_enemy" = "Нейтральный-Враг (N-E) — значительное одностороннее трение";
+"maitri_type_friend_enemy" = "Друг-Враг (F-E) — несбалансированное понимание";
+"maitri_effect_label" = "Граха Майтри представляет ментальную совместимость на основе управителей лунного знака";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "Йони Доша Отменена";
+"yoni_dosha_active" = "Йони Доша Активна";
+"yoni_type_format" = "Тип: %@";
+"yoni_type_intensely_inimical" = "Интенсивно Враждебно (0/4) — одна из 7 запрещенных пар животных";
+"yoni_type_enemy" = "Враг (1/4) — сложная физическая совместимость";
+"yoni_effect_label" = "Йони Кута представляет физическую/сексуальную совместимость на основе природы животных";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "Тара Доша Отменена";
+"tara_dosha_active" = "Тара Доша Активна";
+"tara_type_format" = "Тип: %@";
+"tara_type_vipat_vipat" = "Випат-Випат (позиция 3 в обоих направлениях)";
+"tara_type_pratyak_pratyak" = "Пратьяк-Пратьяк (позиция 5 в обоих направлениях)";
+"tara_type_vadha_vadha" = "Вадха-Вадха (позиция 7 в обоих направлениях)";
+"tara_type_vipat_pratyak" = "Випат-Пратьяк (позиции 3 и 5)";
+"tara_type_vipat_vadha" = "Випат-Вадха (позиции 3 и 7)";
+"tara_type_pratyak_vadha" = "Пратьяк-Вадха (позиции 5 и 7)";
+"tara_severity_label" = "Серьёзность: %@";
+"tara_severity_high" = "Высокая — Позиции Вадха указывают на серьёзные классические предупреждения";
+"tara_severity_medium" = "Средняя — Позиции Випат/Пратьяк указывают на умеренные трудности";
+"tara_positions_format" = "Позиции Тара: Жених→Невеста %d, Невеста→Жених %d";
+"tara_effect_label" = "Тара Кута представляет совместимость здоровья и судьбы на основе позиций накшатры";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "Вашья Доша Отменена";
+"vashya_dosha_active" = "Вашья Доша Активна";
+"vashya_type_format" = "Тип: %@";
+"vashya_severity_label" = "Серьёзность: %@";
+"vashya_severity_high" = "Высокая — Отсутствие магнитного притяжения, указаны борьба за власть";
+"vashya_severity_medium" = "Средняя — Пищевая отношение Бхакша с дисбалансом";
+"vashya_groups_format" = "Вашья: Жених %@, Невеста %@";
+"vashya_scores_format" = "Очки: Жених→Невеста %.1f, Невеста→Жених %.1f";
+"vashya_effect_label" = "Вашья Кута представляет динамику взаимного притяжения и контроля";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "Варна Доша отменена";
+"varna_dosha_active" = "Варна Доша активна";
+"varna_type_format" = "Тип: %@";
+"varna_severity_low" = "Низкая — Самая лёгкая Доша в Аштакуте (1/36 баллов)";
+"varna_values_format" = "Варна: Жених %@, Невеста %@";
+"varna_effect_label" = "Варна Кута представляет духовную и психологическую совместимость на основе элементов лунных знаков";
+"varna_complementarity_note" = "Традиционная дополняющая пара — признанное естественное сродство";

@@ -2151,6 +2151,21 @@
 "pending_label" = "நிலுவையில் உள்ளது";
 "overridden_due_to_dosha" = "தோஷம் பொருந்தாமையால் மேலெழுதப்பட்டது";
 "active_doshas" = "செயலில் உள்ள தோஷங்கள்:";
+"dosha_label" = "தோஷம்";
+"rejection_reason_label" = "கவலை";
+"additional_notes" = "கூடுதல் குறிப்புகள்:";
+"house_positions_label" = "வீட்டு நிலைகள்";
+
+"koota_label" = "கூடம்";
+"tooltip_determined_by" = "%@ இணக்கம் %@ அஷ்டகூடத்தால் தீர்மானிக்கப்படுகிறது";
+"tooltip_partner_values" = "துணை மதிப்புகள்";
+"tooltip_score_label" = "மதிப்பெண்";
+"dosha_present_label" = "தோஷம் உள்ளது";
+"tooltip_type_label" = "வகை";
+"tooltip_no_dosha" = "இந்த கூடத்தில் தோஷம் எதுவும் கண்டறியப்படவில்லை";
+"tooltip_dosha_exempted" = "தோஷம் நீக்கப்பட்டது (ரத்து செய்யப்பட்டது)";
+"tooltip_adjusted_score" = "மதிப்பெண் %@/%@ ஆக மீட்டமைக்கப்பட்டது";
+"tooltip_no_exemption" = "விலக்கு இல்லை — தோஷம் செயலில் உள்ளது";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2435,3 +2450,90 @@
 "yoga_outcome_label" = "இது உங்களுக்கு என்ன தருகிறது";
 "yoga_formation_label" = "இது எவ்வாறு உருவாகிறது";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "தோஷம் நிவர்த்தி";
+"nadi_dosha_active" = "செயலில் உள்ள தோஷம்";
+"nadi_type_format" = "வகை: %@";
+"nadi_boy_const" = "மணமகன்: %@";
+"nadi_girl_const" = "மணமகள்: %@";
+"nadi_type_aadi" = "ஆதி (வாதம்)";
+"nadi_type_madhya" = "மத்திய (பித்தம்)";
+"nadi_type_antya" = "அந்திய (கபம்)";
+"nadi_effect_aadi" = "ஆதி-ஆதி: சாஸ்திரங்கள் கணவனின் ஆரோக்கியத்தில் கவலை குறிக்கின்றன";
+"nadi_effect_madhya" = "மத்திய-மத்திய: சாஸ்திரங்கள் இருவர் மீதும் கவலை குறிக்கின்றன";
+"nadi_effect_antya" = "அந்திய-அந்திய: சாஸ்திரங்கள் மனைவியின் ஆரோக்கியத்தில் கவலை குறிக்கின்றன";
+"nadi_constitution_vata" = "வாதம் — காற்று & ஆகாயம்: இயக்கம், படைப்பாற்றல், நரம்பு மண்டலம்";
+"nadi_constitution_pitta" = "பித்தம் — நெருப்பு & நீர்: வளர்சிதை மாற்றம், செரிமானம், அறிவு";
+"nadi_constitution_kapha" = "கபம் — நீர் & பூமி: அமைப்பு, நோய் எதிர்ப்பு, நிலைத்தன்மை";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "தோஷம் ரத்து";
+"bhakoot_dosha_active" = "செயலில் தோஷம்";
+"bhakoot_type_format" = "வகை: %@";
+"bhakoot_type_shadashtaka" = "ஷடாஷ்டக (6-8)";
+"bhakoot_type_nav_pancham" = "நவம் பஞ்சமம் (5-9)";
+"bhakoot_type_dwirdwadash" = "த்விர்த்வாதஷ் (2-12)";
+"bhakoot_effect_68" = "6/8: சாஸ்திரங்கள் உடல்நலம் மற்றும் விபத்து அபாயம் எச்சரிக்கின்றன";
+"bhakoot_effect_59" = "5/9: சாஸ்திரங்கள் சந்ததி குறித்து கவலை சுட்டிக்காட்டுகின்றன";
+"bhakoot_effect_212" = "2/12: சாஸ்திரங்கள் நிதி சிரமம் சுட்டிக்காட்டுகின்றன";
+"bhakoot_severity_label" = "தீவிரம்: %@";
+"bhakoot_severity_high" = "அதிகம் (ஆய்வு: 54% நல்ல முடிவுகள்)";
+"bhakoot_severity_medium" = "நடுத்தரம் (ஆய்வு: 77% நல்ல முடிவுகள்)";
+"bhakoot_severity_low" = "குறைவு (ஆய்வு: 74% நல்ல முடிவுகள்)";
+"bhakoot_sadbhakoot_warning" = "எச்சரிக்கை: இந்த ஜோடிக்கு சாஸ்திரப்படி விதவை எச்சரிக்கை உள்ளது";
+"bhakoot_nav_pancham_auspicious" = "நவம் பஞ்சமம்: மணமகள் மணமகனிலிருந்து 5வது — சந்ததிக்கு சுபம்";
+"bhakoot_house_positions" = "பாவ நிலைகள்: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "தோஷம் ரத்து";
+"gana_dosha_active" = "செயலில் தோஷம்";
+"gana_type_format" = "வகை: %@";
+"gana_type_dev_rakshash" = "தேவ-ராட்சச (தேவ எதிர் ராட்சச)";
+"gana_type_manushya_rakshash" = "மனுஷ்ய-ராட்சச (மனுஷ்ய எதிர் ராட்சச)";
+"gana_effect_dev_rakshash" = "தேவ-ராட்சச: சாஸ்திரங்கள் பகைமை மற்றும் வாழ்நாள் முழுவதும் சண்டை எச்சரிக்கின்றன";
+"gana_effect_manushya_rakshash" = "மனுஷ்ய-ராட்சச: சாஸ்திரங்கள் மனுஷ்ய கண துணைக்கு கடும் கஷ்டம் எச்சரிக்கின்றன";
+"gana_severity_label" = "தீவிரம்: %@";
+"gana_severity_high" = "அதிகம் (ஆய்வு: 71.43% நல்ல முடிவு, சராசரி உட்பட 83.67%)";
+"gana_severity_medium" = "நடுத்தரம் (ஆய்வு: 65.91% நல்ல முடிவு, சராசரி உட்பட 90.91%)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "தோஷம் ரத்து";
+"maitri_dosha_active" = "செயலில் தோஷம்";
+"maitri_type_format" = "வகை: %@";
+"maitri_type_mutual_enemies" = "பரஸ்பர விரோதிகள் (E-E) — முழுமையான மன பொருந்தாமை";
+"maitri_type_neutral_enemy" = "நடுநிலை-விரோதி (N-E) — குறிப்பிடத்தக்க ஒருதலை உராய்வு";
+"maitri_type_friend_enemy" = "நண்பன்-விரோதி (F-E) — சமநிலையற்ற புரிதல்";
+"maitri_effect_label" = "கிரஹ மைத்ரி சந்திர ராசி அதிபர்களின் அடிப்படையில் மன ஒத்திசைவை குறிக்கிறது";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "வர்ண தோஷம் ரத்து செய்யப்பட்டது";
+"varna_dosha_active" = "வர்ண தோஷம் செயலில் உள்ளது";
+"varna_type_format" = "வகை: %@";
+"varna_severity_low" = "குறைந்த — அஷ்டகூட்டில் மிகவும் இலேசான தோஷம் (1/36 புள்ளிகள்)";
+"varna_values_format" = "வர்ண: மணமகன் %@, மணமகள் %@";
+"varna_effect_label" = "வர்ண கூட்டு சந்திர ராசி கூறுகளின் அடிப்படையில் ஆன்மீக மற்றும் உளவியல் பொருத்தத்தைக் குறிக்கிறது";
+"varna_complementarity_note" = "பாரம்பரிய பூரக ஜோடி — இயற்கையான ஒற்றுமை அங்கீகரிக்கப்பட்டது";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "யோனி தோஷம் ரத்து";
+"yoni_dosha_active" = "யோனி தோஷம் செயலில்";
+"yoni_type_format" = "வகை: %@";
+"yoni_type_intensely_inimical" = "தீவிர விரோதம் (0/4) — 7 தடைசெய்யப்பட்ட விலங்கு ஜோடிகளில் ஒன்று";
+"yoni_type_enemy" = "எதிரி (1/4) — சவாலான உடல் பொருத்தம்";
+"yoni_effect_label" = "யோனி கூட விலங்கின் இயற்கையின் அடிப்படையில் உடல்/பாலின பொருத்தத்தை குறிக்கிறது";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "தாரா தோஷம் ரத்து";
+"tara_dosha_active" = "தாரா தோஷம் செயலில்";
+"tara_type_format" = "வகை: %@";
+"tara_type_vipat_vipat" = "விபட்-விபட் (இரு திசைகளிலும் நிலை 3)";
+"tara_type_pratyak_pratyak" = "பிரத்யக்-பிரத்யக் (இரு திசைகளிலும் நிலை 5)";
+"tara_type_vadha_vadha" = "வத-வத (இரு திசைகளிலும் நிலை 7)";
+"tara_type_vipat_pratyak" = "விபட்-பிரத்யக் (நிலைகள் 3, 5)";
+"tara_type_vipat_vadha" = "விபட்-வத (நிலைகள் 3, 7)";
+"tara_type_pratyak_vadha" = "பிரத்யக்-வத (நிலைகள் 5, 7)";
+"tara_severity_label" = "தீவிரம்: %@";
+"tara_severity_high" = "உயர் — வத நிலைகள் கடுமையான சாஸ்திர எச்சரிக்கைகளை குறிக்கின்றன";
+"tara_severity_medium" = "நடுத்தரம் — விபட்/பிரத்யக் நிலைகள் மிதமான சவால்களை குறிக்கின்றன";
+"tara_positions_format" = "தாரா நிலைகள்: மணமகன்→மணமகள் %d, மணமகள்→மணமகன் %d";
+"tara_effect_label" = "தாரா கூட நட்சத்திர நிலைகளின் அடிப்படையில் உடல்நலம் மற்றும் அதிர்ஷ்ட பொருத்தத்தை குறிக்கிறது";

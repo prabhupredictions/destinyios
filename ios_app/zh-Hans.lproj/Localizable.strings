@@ -2151,6 +2151,21 @@
 "pending_label" = "待办的";
 "overridden_due_to_dosha" = "由于 dosha 不兼容而被覆盖";
 "active_doshas" = "主动能量：";
+"dosha_label" = "能量";
+"rejection_reason_label" = "担忧";
+"additional_notes" = "附加说明：";
+"house_positions_label" = "宫位";
+
+"koota_label" = "Koota";
+"tooltip_determined_by" = "%@ 的匹配由 %@ 阿什塔库塔决定";
+"tooltip_partner_values" = "伴侣数值";
+"tooltip_score_label" = "得分";
+"dosha_present_label" = "存在能量";
+"tooltip_type_label" = "类型";
+"tooltip_no_dosha" = "此 Koota 未检测到任何能量";
+"tooltip_dosha_exempted" = "能量已豁免（取消）";
+"tooltip_adjusted_score" = "得分已恢复为 %@/%@";
+"tooltip_no_exemption" = "无豁免 — 能量仍然有效";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2435,3 +2450,101 @@
 "yoga_outcome_label" = "这为您带来什么";
 "yoga_formation_label" = "如何形成";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "缺陷已消除";
+"nadi_dosha_active" = "活跃缺陷";
+"nadi_type_format" = "类型：%@";
+"nadi_boy_const" = "男方：%@";
+"nadi_girl_const" = "女方：%@";
+"nadi_type_aadi" = "阿迪（风型）";
+"nadi_type_madhya" = "马迪亚（火型）";
+"nadi_type_antya" = "安提亚（水型）";
+"nadi_effect_aadi" = "阿迪-阿迪：经典文献指出对丈夫健康的担忧";
+"nadi_effect_madhya" = "马迪亚-马迪亚：经典文献指出对双方的担忧";
+"nadi_effect_antya" = "安提亚-安提亚：经典文献指出对妻子健康的担忧";
+"nadi_constitution_vata" = "风型 — 风与空：运动、创造力、神经系统";
+"nadi_constitution_pitta" = "火型 — 火与水：新陈代谢、消化、智力";
+"nadi_constitution_kapha" = "水型 — 水与土：结构、免疫力、稳定性";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "缺陷已消除";
+"bhakoot_dosha_active" = "活跃缺陷";
+"bhakoot_type_format" = "类型：%@";
+"bhakoot_type_shadashtaka" = "六八配 (6-8)";
+"bhakoot_type_nav_pancham" = "五九配 (5-9)";
+"bhakoot_type_dwirdwadash" = "二十二配 (2-12)";
+"bhakoot_effect_68" = "6/8：经典文献警告健康风险和意外事故";
+"bhakoot_effect_59" = "5/9：经典文献指出对后代的担忧";
+"bhakoot_effect_212" = "2/12：经典文献指出财务困难";
+"bhakoot_severity_label" = "严重程度：%@";
+"bhakoot_severity_high" = "高（研究：54%良好结果）";
+"bhakoot_severity_medium" = "中（研究：77%良好结果）";
+"bhakoot_severity_low" = "低（研究：74%良好结果）";
+"bhakoot_sadbhakoot_warning" = "注意：此配对有经典的丧偶警告";
+"bhakoot_nav_pancham_auspicious" = "五九配：新娘在新郎第5位 — 传统上对后代吉利";
+"bhakoot_house_positions" = "宫位：%@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "缺陷已消除";
+"gana_dosha_active" = "活跃缺陷";
+"gana_type_format" = "类型：%@";
+"gana_type_dev_rakshash" = "天神-罗刹 (天神 对 罗刹)";
+"gana_type_manushya_rakshash" = "人类-罗刹 (人类 对 罗刹)";
+"gana_effect_dev_rakshash" = "天神-罗刹：经典文献警告敌对关系和终身冲突";
+"gana_effect_manushya_rakshash" = "人类-罗刹：经典文献警告人类属性伴侣将遭受极端痛苦";
+"gana_severity_label" = "严重程度：%@";
+"gana_severity_high" = "高（研究：71.43%良好结果，含平均83.67%）";
+"gana_severity_medium" = "中（研究：65.91%良好结果，含平均90.91%）";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "缺陷已消除";
+"maitri_dosha_active" = "活跃缺陷";
+"maitri_type_format" = "类型：%@";
+"maitri_type_mutual_enemies" = "相互敌对 (E-E) — 完全的心理不兼容";
+"maitri_type_neutral_enemy" = "中立-敌对 (N-E) — 显著的单方面摩擦";
+"maitri_type_friend_enemy" = "友好-敌对 (F-E) — 不平衡的理解";
+"maitri_effect_label" = "格拉哈·迈特里代表基于月亮星座主宰星的心理兼容性";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "约尼能量点已取消";
+"yoni_dosha_active" = "约尼能量点活跃中";
+"yoni_type_format" = "类型: %@";
+"yoni_type_intensely_inimical" = "强烈敌对 (0/4) — 7个禁忌动物配对之一";
+"yoni_type_enemy" = "敌对 (1/4) — 具有挑战性的身体兼容性";
+"yoni_effect_label" = "约尼库塔代表基于动物本性的身体/性兼容性";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "塔拉多沙已取消";
+"tara_dosha_active" = "塔拉多沙活跃";
+"tara_type_format" = "类型: %@";
+"tara_type_vipat_vipat" = "维帕特-维帕特 (双向位置3)";
+"tara_type_pratyak_pratyak" = "普拉蒂亚克-普拉蒂亚克 (双向位置5)";
+"tara_type_vadha_vadha" = "瓦达-瓦达 (双向位置7)";
+"tara_type_vipat_pratyak" = "维帕特-普拉蒂亚克 (位置3和5)";
+"tara_type_vipat_vadha" = "维帕特-瓦达 (位置3和7)";
+"tara_type_pratyak_vadha" = "普拉蒂亚克-瓦达 (位置5和7)";
+"tara_severity_label" = "严重程度: %@";
+"tara_severity_high" = "高 — 瓦达位置表示严重的古典警告";
+"tara_severity_medium" = "中 — 维帕特/普拉蒂亚克位置表示中等挑战";
+"tara_positions_format" = "塔拉位置: 新郎→新娘 %d, 新娘→新郎 %d";
+"tara_effect_label" = "塔拉库塔代表基于宿曜位置的健康和命运兼容性";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "瓦希亚多沙已解除";
+"vashya_dosha_active" = "瓦希亚多沙生效中";
+"vashya_type_format" = "类型: %@";
+"vashya_severity_label" = "严重度: %@";
+"vashya_severity_high" = "高 — 无磁力吸引，存在权力斗争";
+"vashya_severity_medium" = "中 — 巴克沙食物关系失衡";
+"vashya_groups_format" = "瓦希亚: 新郎 %@, 新娘 %@";
+"vashya_scores_format" = "分数: 新郎→新娘 %.1f, 新娘→新郎 %.1f";
+"vashya_effect_label" = "瓦希亚库塔代表相互吸引与控制动态";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "瓦尔纳多沙已解除";
+"varna_dosha_active" = "瓦尔纳多沙生效中";
+"varna_type_format" = "类型: %@";
+"varna_severity_low" = "低 — 阿什塔库塔中最轻的多沙 (1/36分)";
+"varna_values_format" = "瓦尔纳: 新郎 %@, 新娘 %@";
+"varna_effect_label" = "瓦尔纳库塔代表基于月亮星座元素的精神和心理兼容性";
+"varna_complementarity_note" = "传统互补配对 — 公认的自然亲和力";

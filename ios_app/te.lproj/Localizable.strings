@@ -2151,6 +2151,21 @@
 "pending_label" = "పెండింగ్‌లో ఉంది";
 "overridden_due_to_dosha" = "దోష అననుకూలత కారణంగా భర్తీ చేయబడింది";
 "active_doshas" = "క్రియాశీల దోషాలు:";
+"dosha_label" = "దోషం";
+"rejection_reason_label" = "ఆందోళన";
+"additional_notes" = "అదనపు గమనికలు:";
+"house_positions_label" = "భావ స్థానాలు";
+
+"koota_label" = "కూట";
+"tooltip_determined_by" = "%@ అనుకూలత %@ అష్టకూటం ద్వారా నిర్ణయించబడుతుంది";
+"tooltip_partner_values" = "భాగస్వామి విలువలు";
+"tooltip_score_label" = "స్కోరు";
+"dosha_present_label" = "దోషం ఉంది";
+"tooltip_type_label" = "రకం";
+"tooltip_no_dosha" = "ఈ కూటంలో ఎటువంటి దోషం గుర్తించబడలేదు";
+"tooltip_dosha_exempted" = "దోషం మినహాయింపు (రద్దు చేయబడింది)";
+"tooltip_adjusted_score" = "స్కోరు %@/%@ కు పునరుద్ధరించబడింది";
+"tooltip_no_exemption" = "మినహాయింపు లేదు — దోషం క్రియాశీలంగా ఉంది";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2435,3 +2450,81 @@
 "yoga_outcome_label" = "ఇది మీకు ఏమి తెస్తుంది";
 "yoga_formation_label" = "ఇది ఎలా ఏర్పడుతుంది";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "దోషం రద్దు";
+"nadi_dosha_active" = "చురుకైన దోషం";
+"nadi_type_format" = "రకం: %@";
+"nadi_boy_const" = "వరుడు: %@";
+"nadi_girl_const" = "వధువు: %@";
+"nadi_type_aadi" = "ఆది (వాత)";
+"nadi_type_madhya" = "మధ్య (పిత్త)";
+"nadi_type_antya" = "అంత్య (కఫ)";
+"nadi_effect_aadi" = "ఆది-ఆది: శాస్త్రాల ప్రకారం భర్త ఆరోగ్యంపై ప్రభావం";
+"nadi_effect_madhya" = "మధ్య-మధ్య: శాస్త్రాల ప్రకారం ఇద్దరిపై ప్రభావం";
+"nadi_effect_antya" = "అంత్య-అంత్య: శాస్త్రాల ప్రకారం భార్య ఆరోగ్యంపై ప్రభావం";
+"nadi_constitution_vata" = "వాత — గాలి & ఆకాశం: కదలిక, సృజనాత్మకత, నాడీ వ్యవస్థ";
+"nadi_constitution_pitta" = "పిత్త — అగ్ని & నీరు: జీవక్రియ, జీర్ణక్రియ, బుద్ధి";
+"nadi_constitution_kapha" = "కఫ — నీరు & భూమి: నిర్మాణం, రోగ నిరోధకత, స్థిరత్వం";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "దోషం రద్దు";
+"bhakoot_dosha_active" = "సక్రియ దోషం";
+"bhakoot_type_format" = "రకం: %@";
+"bhakoot_type_shadashtaka" = "షడాష్టక (6-8)";
+"bhakoot_type_nav_pancham" = "నవమ పంచమ (5-9)";
+"bhakoot_type_dwirdwadash" = "ద్విర్ద్వాదశ (2-12)";
+"bhakoot_effect_68" = "6/8: శాస్త్రాలు ఆరోగ్య ప్రమాదం మరియు ప్రమాదాల గురించి హెచ్చరిస్తాయి";
+"bhakoot_effect_59" = "5/9: శాస్త్రాలు సంతానంపై ఆందోళన సూచిస్తాయి";
+"bhakoot_effect_212" = "2/12: శాస్త్రాలు ఆర్థిక కష్టాలను సూచిస్తాయి";
+"bhakoot_severity_label" = "తీవ్రత: %@";
+"bhakoot_severity_high" = "అధికం (అధ్యయనం: 54% మంచి ఫలితాలు)";
+"bhakoot_severity_medium" = "మధ్యస్థం (అధ్యయనం: 77% మంచి ఫలితాలు)";
+"bhakoot_severity_low" = "తక్కువ (అధ్యయనం: 74% మంచి ఫలితాలు)";
+"bhakoot_sadbhakoot_warning" = "జాగ్రత్త: ఈ జంటకు శాస్త్రీయ వైధవ్య హెచ్చరిక ఉంది";
+"bhakoot_nav_pancham_auspicious" = "నవమ పంచమ: వధువు వరుని నుండి 5వ స్థానం — సంతానానికి శుభం";
+"bhakoot_house_positions" = "భావ స్థానాలు: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "దోషం రద్దు";
+"gana_dosha_active" = "సక్రియ దోషం";
+"gana_type_format" = "రకం: %@";
+"gana_type_dev_rakshash" = "దేవ-రాక్షస (దేవ vs రాక్షస)";
+"gana_type_manushya_rakshash" = "మనుష్య-రాక్షస (మనుష్య vs రాక్షస)";
+"gana_effect_dev_rakshash" = "దేవ-రాక్షస: శాస్త్రాలు శత్రుత్వం మరియు జీవితకాల కలహం గురించి హెచ్చరిస్తాయి";
+"gana_effect_manushya_rakshash" = "మనుష్య-రాక్షస: శాస్త్రాలు మనుష్య గణ భాగస్వామికి తీవ్ర కష్టం గురించి హెచ్చరిస్తాయి";
+"gana_severity_label" = "తీవ్రత: %@";
+"gana_severity_high" = "అధికం (అధ్యయనం: 71.43% మంచి ఫలితం, సగటు కలిపి 83.67%)";
+"gana_severity_medium" = "మధ్యస్థం (అధ్యయనం: 65.91% మంచి ఫలితం, సగటు కలిపి 90.91%)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "దోషం రద్దు";
+"maitri_dosha_active" = "సక్రియ దోషం";
+"maitri_type_format" = "రకం: %@";
+"maitri_type_mutual_enemies" = "పరస్పర శత్రువులు (E-E) — సంపూర్ణ మానసిక అననుకూలత";
+"maitri_type_neutral_enemy" = "తటస్థ-శత్రువు (N-E) — గణనీయ ఏకపక్ష ఘర్షణ";
+"maitri_type_friend_enemy" = "మిత్ర-శత్రువు (F-E) — అసమతుల్య అవగాహన";
+"maitri_effect_label" = "గ్రహ మైత్రి చంద్ర రాశి అధిపతుల ఆధారంగా మానసిక అనుకూలతను సూచిస్తుంది";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "యోని దోషం రద్దు";
+"yoni_dosha_active" = "యోని దోషం సక్రియం";
+"yoni_type_format" = "రకం: %@";
+"yoni_type_intensely_inimical" = "తీవ్ర శత్రువు (0/4) — 7 నిషేధిత జంటలలో ఒకటి";
+"yoni_type_enemy" = "శత్రువు (1/4) — సవాలుగా ఉండే శారీరక అనుకూలత";
+"yoni_effect_label" = "యోని కూట జంతు స్వభావం ఆధారంగా శారీరక/లైంగిక అనుకూలతను సూచిస్తుంది";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "తారా దోషం రద్దు";
+"tara_dosha_active" = "తారా దోషం క్రియాశీలం";
+"tara_type_format" = "రకం: %@";
+"tara_type_vipat_vipat" = "విపట్-విపట్ (రెండు దిశలలో స్థానం 3)";
+"tara_type_pratyak_pratyak" = "ప్రత్యక్-ప్రత్యక్ (రెండు దిశలలో స్థానం 5)";
+"tara_type_vadha_vadha" = "వధ-వధ (రెండు దిశలలో స్థానం 7)";
+"tara_type_vipat_pratyak" = "విపట్-ప్రత్యక్ (స్థానాలు 3, 5)";
+"tara_type_vipat_vadha" = "విపట్-వధ (స్థానాలు 3, 7)";
+"tara_type_pratyak_vadha" = "ప్రత్యక్-వధ (స్థానాలు 5, 7)";
+"tara_severity_label" = "తీవ్రత: %@";
+"tara_severity_high" = "అధికం — వధ స్థానాలు తీవ్రమైన శాస్త్రీయ హెచ్చరికలను సూచిస్తాయి";
+"tara_severity_medium" = "మధ్యస్థం — విపట్/ప్రత్యక్ స్థానాలు మితమైన సవాళ్లను సూచిస్తాయి";
+"tara_positions_format" = "తారా స్థానాలు: వరుడు→వధువు %d, వధువు→వరుడు %d";
+"tara_effect_label" = "తారా కూట నక్షత్ర స్థానాల ఆధారంగా ఆరోగ్యం మరియు భాగ్య అనుకూలతను సూచిస్తుంది";

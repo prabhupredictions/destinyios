@@ -69,7 +69,7 @@ class ProfileContextManager {
             latitude: profile.latitude ?? 0,
             longitude: profile.longitude ?? 0,
             ayanamsa: UserDefaults.standard.string(forKey: "ayanamsa") ?? "lahiri",
-            houseSystem: UserDefaults.standard.string(forKey: "houseSystem") ?? "placidus",
+            houseSystem: UserDefaults.standard.string(forKey: "houseSystem") ?? "whole_sign",
             cityOfBirth: profile.cityOfBirth ?? "",
             gender: profile.gender,
             birthTimeUnknown: profile.birthTimeUnknown

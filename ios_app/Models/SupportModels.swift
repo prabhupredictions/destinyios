@@ -84,14 +84,70 @@ struct DoshaSummary: Codable, Sendable {
     }
 }
 
+struct NadiConstitution: Codable, Sendable {
+    let dosha: String?
+    let qualities: String?
+}
+
 struct DoshaDetail: Codable, Sendable {
     let present: Bool?
     let cancelled: Bool?
     let reasonShort: String?
+    let reasonsAll: [String]?
+    
+    // Nadi-specific transparency fields
+    let doshaType: String?
+    let classicalEffect: String?
+    let boyConstitution: NadiConstitution?
+    let girlConstitution: NadiConstitution?
+    
+    // Bhakoot-specific transparency fields
+    let severity: String?
+    let fieldStudy: String?
+    let housePositions: String?
+    let sadbhakootWarning: String?
+    
+    // Tara-specific transparency fields
+    let taraBoyToGirl: Int?
+    let taraGirlToBoy: Int?
+    
+    // Vashya-specific transparency fields
+    let boyVashya: String?
+    let girlVashya: String?
+    let boyToGirlScore: Double?
+    let girlToBoyScore: Double?
+    
+    // Varna-specific transparency fields (V2.3)
+    let boyVarna: String?
+    let girlVarna: String?
+    let complementarityNote: String?
+    
+    // Universal partner values (V2.4)
+    let boyValue: String?
+    let girlValue: String?
     
     enum CodingKeys: String, CodingKey {
-        case present, cancelled
+        case present, cancelled, severity
         case reasonShort = "reason_short"
+        case reasonsAll = "reasons_all"
+        case doshaType = "dosha_type"
+        case classicalEffect = "classical_effect"
+        case boyConstitution = "boy_constitution"
+        case girlConstitution = "girl_constitution"
+        case fieldStudy = "field_study"
+        case housePositions = "house_positions"
+        case sadbhakootWarning = "sadbhakoot_warning"
+        case taraBoyToGirl = "tara_boy_to_girl"
+        case taraGirlToBoy = "tara_girl_to_boy"
+        case boyVashya = "boy_vashya"
+        case girlVashya = "girl_vashya"
+        case boyToGirlScore = "boy_to_girl_score"
+        case girlToBoyScore = "girl_to_boy_score"
+        case boyVarna = "boy_varna"
+        case girlVarna = "girl_varna"
+        case complementarityNote = "complementarity_note"
+        case boyValue = "boy_value"
+        case girlValue = "girl_value"
     }
 }
 

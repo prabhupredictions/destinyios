@@ -35,8 +35,16 @@ class HomeViewModel {
     var dashaInsight: DashaInsight?
     var transitInfluences: [TransitInfluence] = []
     
+    /// Profile-scoped key for the 24h chart data cache guard
+    private var lastFullLoadDateKey: String {
+        "lastFullLoadDate_\\(ProfileContextManager.shared.activeProfileId)"
+    }
+    
     /// Timestamp of last successful full data load (for 24-hour cache guard)
-    private var lastFullLoadDate: Date?
+    private var lastFullLoadDate: Date? {
+        get { UserDefaults.standard.object(forKey: lastFullLoadDateKey) as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: lastFullLoadDateKey) }
+    }
     
     /// Reset cached state when switching profiles so fresh data is fetched
     @MainActor
@@ -128,16 +136,43 @@ class HomeViewModel {
     }
     
     // MARK: - Load Home Data
-    func loadHomeData() async {
+    func loadHomeData(force: Bool = false) async {
         // Prevent concurrent calls (e.g., .task + profile switch firing close together)
         guard !isLoading else {
             print("[HomeViewModel] loadHomeData already in progress — skipping")
             return
         }
         
+        let currentConfigLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        let lastLoadedLang = UserDefaults.standard.string(forKey: "lastLoadedLanguage")
+        let languageChanged = currentConfigLang != lastLoadedLang
+        
+        let shouldBypassCache = force || languageChanged
+        
+        if !shouldBypassCache {
+            // Fast path for returning to HomeView in same session
+            let hasCachedPrediction = TodaysPredictionCache.shared.get() != nil
+            let hasChartData = fullAstroData != nil
+            if hasCachedPrediction && hasChartData && !dailyInsight.isEmpty {
+                print("[HomeViewModel] Same session cache hit — skipping network calls")
+                errorMessage = nil // Clear any stale error from a previous failed attempt
+                return
+            }
+        }
+        
+        if languageChanged {
+            UserDefaults.standard.set(currentConfigLang, forKey: "lastLoadedLanguage")
+        }
+        
         await MainActor.run {
             isLoading = true
             errorMessage = nil
+            
+            // Clear in-memory state briefly if language changed to force redraw
+            if languageChanged {
+                dailyInsight = ""
+                fullAstroData = nil
+            }
         }
         
         // Sync quota
@@ -156,7 +191,10 @@ class HomeViewModel {
         // Create a task group to fetch all data concurrently
         // Check if full chart/dasha data needs refreshing (24-hour guard)
         let needsFullRefresh: Bool
-        if let lastLoad = lastFullLoadDate,
+        if shouldBypassCache {
+            needsFullRefresh = true
+            print("[HomeViewModel] Full data refresh forced (Bypass: \\(shouldBypassCache))")
+        } else if let lastLoad = lastFullLoadDate,
            Date().timeIntervalSince(lastLoad) < 86400, // 24 hours
            fullAstroData != nil,
            dashaResponse != nil {
@@ -169,7 +207,7 @@ class HomeViewModel {
         await withTaskGroup(of: Void.self) { group in
             // 1. Fetch Todays Prediction (uses TodaysPredictionCache internally)
             group.addTask {
-                await self.fetchTodaysPrediction(birthData: birthData)
+                await self.fetchTodaysPrediction(birthData: birthData, force: shouldBypassCache)
             }
             
             if needsFullRefresh {
@@ -194,7 +232,7 @@ class HomeViewModel {
         }
     }
     
-    private func fetchTodaysPrediction(birthData: UserBirthData) async {
+    private func fetchTodaysPrediction(birthData: UserBirthData, force: Bool = false) async {
         let profileId = ProfileContextManager.shared.activeProfileId
         let profileName = ProfileContextManager.shared.activeProfileName
         
@@ -202,7 +240,7 @@ class HomeViewModel {
         print("[HomeViewModel] Birth data DOB: \(birthData.dob)")
         
         // Check local cache first (profile-scoped via TodaysPredictionCache)
-        if let cached = TodaysPredictionCache.shared.get() {
+        if !force, let cached = TodaysPredictionCache.shared.get() {
             print("[HomeViewModel] Cache HIT for profile: \(profileId)")
             await MainActor.run {
                 self.applyPredictionResponse(cached)
@@ -230,8 +268,13 @@ class HomeViewModel {
         } catch {
             print("[HomeViewModel] Prediction error for \(profileId): \(error)")
             await MainActor.run {
-                // Show user-friendly error — never expose raw server messages
-                self.errorMessage = Self.friendlyError(from: error)
+                // Only show error banner if there's no cached data displayed
+                // If user already sees valid predictions, a silent refresh failure is fine
+                if self.dailyInsight.isEmpty {
+                    self.errorMessage = Self.friendlyError(from: error)
+                } else {
+                    print("[HomeViewModel] Refresh failed but cached data is displayed — suppressing error banner")
+                }
             }
         }
     }

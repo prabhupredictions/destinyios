@@ -3,14 +3,16 @@ import Combine
 
 /// Premium "Sensory Home" Screen (Divine Luxury Edition)
 struct HomeView: View {
+    // MARK: - State & Dependencies
+    var viewModel: HomeViewModel
+    
     // MARK: - Callbacks
     var onQuestionSelected: ((String) -> Void)? = nil
     var onChatHistorySelected: ((String) -> Void)? = nil
     var onMatchHistorySelected: ((CompatibilityHistoryItem) -> Void)? = nil
     var onMatchGroupHistorySelected: ((ComparisonGroup) -> Void)? = nil
     
-    // MARK: - State
-    @State private var viewModel = HomeViewModel()
+    // Local UI State
     @State private var showProfile = false
     @State private var contentOpacity: Double = 0
     @State private var headerOffset: CGFloat = -20
@@ -112,7 +114,7 @@ struct HomeView: View {
                                 Button(action: {
                                     HapticManager.shared.play(.light)
                                     Task {
-                                        await viewModel.loadHomeData()
+                                        await viewModel.loadHomeData(force: true)
                                     }
                                 }) {
                                     HStack(spacing: 6) {
@@ -224,7 +226,7 @@ struct HomeView: View {
                 }
                 .padding(.bottom, 90) // Reserve space for Transparent Tab Bar (Content won't scroll behind it)
                 .refreshable {
-                    await viewModel.loadHomeData()
+                    await viewModel.loadHomeData(force: true)
                 }
             }
             .opacity(contentOpacity)
@@ -334,11 +336,41 @@ struct HomeView: View {
                 await notificationService.fetchUnreadCount()
             }
         }
-        .onChange(of: scenePhase) { oldPhase, newPhase in
+        .onChange(of: scenePhase) {
             // Refresh notification badge when app returns to foreground
-            if newPhase == .active && oldPhase == .background {
+            if scenePhase == .active {
                 Task {
                     await notificationService.fetchUnreadCount()
+                    
+                    // Smart foreground refresh: reload if day changed across midnight
+                    let needsRefresh: Bool
+                    if let cached = TodaysPredictionCache.shared.get() {
+                        let fmt = DateFormatter()
+                        fmt.dateFormat = "yyyy-MM-dd"
+                        if let cachedDate = fmt.date(from: String(cached.targetDate.prefix(10))) {
+                            needsRefresh = !Calendar.current.isDateInToday(cachedDate)
+                        } else {
+                            needsRefresh = true
+                        }
+                    } else {
+                        needsRefresh = true
+                    }
+                    if needsRefresh {
+                        print("[HomeView] App foregrounded on a new day. Refreshing predictions.")
+                        await viewModel.loadHomeData(force: true)
+                    } else {
+                        // Standard soft reload (resolves quotas/state without burning cache)
+                        await viewModel.loadHomeData(force: false)
+                    }
+                }
+            }
+        }
+        .onChange(of: quotaManager.isPremium) { newStatus in
+            // Listen for subscription purchases: instantly unlock UI
+            if newStatus {
+                print("[HomeView] User upgraded to premium! Refreshing limits.")
+                Task {
+                    await viewModel.loadHomeData(force: true)
                 }
             }
         }
@@ -1038,7 +1070,7 @@ struct LifeAreaLuxuryTile: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(viewModel: HomeViewModel())
 }
 
 /// Standalone Quick Question Card — battery-optimized (static border, no pulse)

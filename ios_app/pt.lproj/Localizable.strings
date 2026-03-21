@@ -2151,6 +2151,21 @@
 "pending_label" = "Pendente";
 "overridden_due_to_dosha" = "Substituído devido à incompatibilidade do dosha";
 "active_doshas" = "Doshas ativos:";
+"dosha_label" = "Dosha";
+"rejection_reason_label" = "Preocupação";
+"additional_notes" = "Notas adicionais:";
+"house_positions_label" = "Posições das Casas";
+
+"koota_label" = "Koota";
+"tooltip_determined_by" = "A compatibilidade de %@ é determinada por %@ Ashtakoot";
+"tooltip_partner_values" = "Valores do parceiro";
+"tooltip_score_label" = "Pontuação";
+"dosha_present_label" = "Dosha presente";
+"tooltip_type_label" = "Tipo";
+"tooltip_no_dosha" = "Nenhum dosha foi detectado para este Koota";
+"tooltip_dosha_exempted" = "Dosha isento (cancelado)";
+"tooltip_adjusted_score" = "Pontuação restaurada para %@/%@";
+"tooltip_no_exemption" = "Sem isenção — o dosha permanece ativo";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - Profile — Settings, History & Account Management
@@ -2435,3 +2450,101 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "yoga_outcome_label" = "O que isso traz para você";
 "yoga_formation_label" = "Como isso se forma";
 
+// MARK: - Nadi Dosha Transparency (V2.2)
+"nadi_dosha_cancelled" = "Dosha cancelado";
+"nadi_dosha_active" = "Dosha ativo";
+"nadi_type_format" = "Tipo: %@";
+"nadi_boy_const" = "Noivo: %@";
+"nadi_girl_const" = "Noiva: %@";
+"nadi_type_aadi" = "Aadi (Vata)";
+"nadi_type_madhya" = "Madhya (Pitta)";
+"nadi_type_antya" = "Antya (Kapha)";
+"nadi_effect_aadi" = "Aadi-Aadi: Textos clássicos indicam preocupação com a saúde do marido";
+"nadi_effect_madhya" = "Madhya-Madhya: Textos clássicos indicam preocupação para ambos";
+"nadi_effect_antya" = "Antya-Antya: Textos clássicos indicam preocupação com a saúde da esposa";
+"nadi_constitution_vata" = "Vata — Ar & Éter: Movimento, criatividade, sistema nervoso";
+"nadi_constitution_pitta" = "Pitta — Fogo & Água: Metabolismo, digestão, intelecto";
+"nadi_constitution_kapha" = "Kapha — Água & Terra: Estrutura, imunidade, estabilidade";
+
+// MARK: - Bhakoot Dosha Transparency (V2.2)
+"bhakoot_dosha_cancelled" = "Dosha cancelado";
+"bhakoot_dosha_active" = "Dosha ativo";
+"bhakoot_type_format" = "Tipo: %@";
+"bhakoot_type_shadashtaka" = "Shadashtaka (6-8)";
+"bhakoot_type_nav_pancham" = "Nav Pancham (5-9)";
+"bhakoot_type_dwirdwadash" = "Dwirdwadash (2-12)";
+"bhakoot_effect_68" = "6/8: Textos clássicos alertam sobre riscos de saúde e acidentes";
+"bhakoot_effect_59" = "5/9: Textos clássicos indicam preocupação com descendência";
+"bhakoot_effect_212" = "2/12: Textos clássicos indicam dificuldades financeiras";
+"bhakoot_severity_label" = "Gravidade: %@";
+"bhakoot_severity_high" = "Alta (estudo: 54% bons resultados)";
+"bhakoot_severity_medium" = "Média (estudo: 77% bons resultados)";
+"bhakoot_severity_low" = "Baixa (estudo: 74% bons resultados)";
+"bhakoot_sadbhakoot_warning" = "Atenção: Este par tem um aviso clássico de viuvez";
+"bhakoot_nav_pancham_auspicious" = "Nav Pancham: Noiva 5ª do noivo — tradicionalmente auspicioso para descendência";
+"bhakoot_house_positions" = "Posições das casas: %@";
+
+// MARK: - Gana Dosha Transparency (V2.2)
+"gana_dosha_cancelled" = "Dosha cancelado";
+"gana_dosha_active" = "Dosha ativo";
+"gana_type_format" = "Tipo: %@";
+"gana_type_dev_rakshash" = "Dev-Rakshash (Deva vs Rakshasa)";
+"gana_type_manushya_rakshash" = "Manushya-Rakshash (Manushya vs Rakshasa)";
+"gana_effect_dev_rakshash" = "Dev-Rakshash: Textos clássicos alertam sobre relações hostis e conflitos vitalícios";
+"gana_effect_manushya_rakshash" = "Manushya-Rakshash: Textos clássicos alertam sobre sofrimento extremo para o parceiro Manushya";
+"gana_severity_label" = "Gravidade: %@";
+"gana_severity_high" = "Alta (estudo: 71,43% bons resultados, 83,67% incluindo média)";
+"gana_severity_medium" = "Média (estudo: 65,91% bons resultados, 90,91% incluindo média)";
+
+// MARK: - Graha Maitri Dosha Transparency (V2.2)
+"maitri_dosha_cancelled" = "Dosha cancelado";
+"maitri_dosha_active" = "Dosha ativo";
+"maitri_type_format" = "Tipo: %@";
+"maitri_type_mutual_enemies" = "Inimigos mútuos (E-E) — incompatibilidade mental completa";
+"maitri_type_neutral_enemy" = "Neutro-Inimigo (N-E) — fricção unilateral significativa";
+"maitri_type_friend_enemy" = "Amigo-Inimigo (F-E) — compreensão desequilibrada";
+"maitri_effect_label" = "Graha Maitri representa a compatibilidade mental baseada nos senhores do signo lunar";
+
+// MARK: - Yoni Koota Transparency (V2.3)
+"yoni_dosha_cancelled" = "Dosha Yoni Cancelado";
+"yoni_dosha_active" = "Dosha Yoni Ativo";
+"yoni_type_format" = "Tipo: %@";
+"yoni_type_intensely_inimical" = "Intensamente Inimical (0/4) — um dos 7 pares de animais proibidos";
+"yoni_type_enemy" = "Inimigo (1/4) — compatibilidade física desafiadora";
+"yoni_effect_label" = "Yoni Koota representa a compatibilidade física/sexual baseada na natureza animal";
+
+// MARK: - Tara Koota Transparency (V2.3)
+"tara_dosha_cancelled" = "Tara Dosha Cancelado";
+"tara_dosha_active" = "Tara Dosha Ativo";
+"tara_type_format" = "Tipo: %@";
+"tara_type_vipat_vipat" = "Vipat-Vipat (posição 3 ambas direções)";
+"tara_type_pratyak_pratyak" = "Pratyak-Pratyak (posição 5 ambas direções)";
+"tara_type_vadha_vadha" = "Vadha-Vadha (posição 7 ambas direções)";
+"tara_type_vipat_pratyak" = "Vipat-Pratyak (posições 3 e 5)";
+"tara_type_vipat_vadha" = "Vipat-Vadha (posições 3 e 7)";
+"tara_type_pratyak_vadha" = "Pratyak-Vadha (posições 5 e 7)";
+"tara_severity_label" = "Severidade: %@";
+"tara_severity_high" = "Alta — Posições Vadha indicam avisos clássicos severos";
+"tara_severity_medium" = "Média — Posições Vipat/Pratyak indicam desafios moderados";
+"tara_positions_format" = "Posições Tara: Noivo→Noiva %d, Noiva→Noivo %d";
+"tara_effect_label" = "Tara Koota representa a compatibilidade de saúde e destino baseada em posições nakshatra";
+
+// MARK: - Vashya Koota Transparency (V2.3)
+"vashya_dosha_cancelled" = "Vashya Dosha Cancelado";
+"vashya_dosha_active" = "Vashya Dosha Ativo";
+"vashya_type_format" = "Tipo: %@";
+"vashya_severity_label" = "Severidade: %@";
+"vashya_severity_high" = "Alta — Sem atração magnética, lutas de poder indicadas";
+"vashya_severity_medium" = "Média — Relação Bhaksha alimentar com desequilíbrio";
+"vashya_groups_format" = "Vashya: Noivo %@, Noiva %@";
+"vashya_scores_format" = "Pontuações: Noivo→Noiva %.1f, Noiva→Noivo %.1f";
+"vashya_effect_label" = "Vashya Koota representa a dinâmica de atração e controle mútuo";
+
+// MARK: - Varna Koota Transparency (V2.3)
+"varna_dosha_cancelled" = "Varna Dosha Cancelado";
+"varna_dosha_active" = "Varna Dosha Ativo";
+"varna_type_format" = "Tipo: %@";
+"varna_severity_low" = "Baixa — Dosha mais suave em Ashtakoot (1/36 pontos)";
+"varna_values_format" = "Varna: Noivo %@, Noiva %@";
+"varna_effect_label" = "Varna Koota representa compatibilidade espiritual e psicológica baseada nos elementos do signo lunar";
+"varna_complementarity_note" = "Par complementar tradicional — afinidade natural reconhecida";
