@@ -2176,8 +2176,8 @@
 "house_positions_label" = "Positions des Maisons";
 
 "koota_label" = "Koota";
-"tooltip_determined_by" = "La compatibilité de %@ est déterminée par %@ Ashtakoot";
-"tooltip_partner_values" = "Valeurs du partenaire";
+"tooltip_determined_by" = "La compatibilité %@ est déterminée par %@ Koota";
+"tooltip_partner_values" = "Valeur Koota";
 "tooltip_score_label" = "Score";
 "dosha_present_label" = "Dosha présent";
 "tooltip_type_label" = "Taper";
@@ -2496,9 +2496,9 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "bhakoot_effect_59" = "5/9 : Les textes classiques indiquent des préoccupations pour la descendance";
 "bhakoot_effect_212" = "2/12 : Les textes classiques indiquent des difficultés financières";
 "bhakoot_severity_label" = "Gravité : %@";
-"bhakoot_severity_high" = "Élevée (étude : 54% de bons résultats)";
-"bhakoot_severity_medium" = "Moyenne (étude : 77% de bons résultats)";
-"bhakoot_severity_low" = "Faible (étude : 74% de bons résultats)";
+"bhakoot_severity_high" = "Élevée ";
+"bhakoot_severity_medium" = "Moyenne ";
+"bhakoot_severity_low" = "Faible ";
 "bhakoot_sadbhakoot_warning" = "Attention : Ce couple porte un avertissement classique de veuvage";
 "bhakoot_nav_pancham_auspicious" = "Nav Pancham : Mariée 5e du marié — traditionnellement auspicieux pour la descendance";
 "bhakoot_house_positions" = "Positions des maisons : %@";
@@ -2512,8 +2512,8 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "gana_effect_dev_rakshash" = "Dev-Rakshash : Les textes classiques mettent en garde contre les relations hostiles et les conflits permanents";
 "gana_effect_manushya_rakshash" = "Manushya-Rakshash : Les textes classiques mettent en garde contre une souffrance extrême pour le partenaire Manushya";
 "gana_severity_label" = "Gravité : %@";
-"gana_severity_high" = "Élevée (étude : 71,43% bons résultats, 83,67% y compris moyenne)";
-"gana_severity_medium" = "Moyenne (étude : 65,91% bons résultats, 90,91% y compris moyenne)";
+"gana_severity_high" = "Élevée ";
+"gana_severity_medium" = "Moyenne ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "Dosha annulé";

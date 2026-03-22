@@ -2177,8 +2177,8 @@
 "house_positions_label" = "ハウス位置";
 
 "koota_label" = "クータ";
-"tooltip_determined_by" = "%@ の相性は %@ アシュタクートによって決まります";
-"tooltip_partner_values" = "相手の値";
+"tooltip_determined_by" = "%@ 互換性は %@ Koota によって決定されます";
+"tooltip_partner_values" = "クータ値";
 "tooltip_score_label" = "スコア";
 "dosha_present_label" = "ドーシャあり";
 "tooltip_type_label" = "種類";
@@ -2497,9 +2497,9 @@
 "bhakoot_effect_59" = "5/9: 古典文献は子孫への懸念を示唆";
 "bhakoot_effect_212" = "2/12: 古典文献は財政的困難を示唆";
 "bhakoot_severity_label" = "重症度: %@";
-"bhakoot_severity_high" = "高 (研究: 54%良好な結果)";
-"bhakoot_severity_medium" = "中 (研究: 77%良好な結果)";
-"bhakoot_severity_low" = "低 (研究: 74%良好な結果)";
+"bhakoot_severity_high" = "高 ";
+"bhakoot_severity_medium" = "中 ";
+"bhakoot_severity_low" = "低 ";
 "bhakoot_sadbhakoot_warning" = "注意: このペアには古典的な寡婦警告があります";
 "bhakoot_nav_pancham_auspicious" = "ナヴ・パンチャム: 花嫁が花婿から5番目 — 子孫に吉";
 "bhakoot_house_positions" = "ハウス位置: %@";
@@ -2513,8 +2513,8 @@
 "gana_effect_dev_rakshash" = "デーヴァ・ラークシャサ: 古典文献は敵対関係と生涯にわたる争いを警告";
 "gana_effect_manushya_rakshash" = "マヌシャ・ラークシャサ: 古典文献はマヌシャ側のパートナーへの極度の苦難を警告";
 "gana_severity_label" = "重症度: %@";
-"gana_severity_high" = "高 (研究: 71.43%良好、平均含め83.67%)";
-"gana_severity_medium" = "中 (研究: 65.91%良好、平均含め90.91%)";
+"gana_severity_high" = "高 ";
+"gana_severity_medium" = "中 ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "ドーシャ解消";

@@ -2176,8 +2176,8 @@
 "house_positions_label" = "宫位";
 
 "koota_label" = "库塔";
-"tooltip_determined_by" = "%@ 的匹配由 %@ 阿什塔库塔决定";
-"tooltip_partner_values" = "伴侣数值";
+"tooltip_determined_by" = "%@ 兼容性由 %@ Koota 决定";
+"tooltip_partner_values" = "库塔价值";
 "tooltip_score_label" = "得分";
 "dosha_present_label" = "存在能量";
 "tooltip_type_label" = "类型";

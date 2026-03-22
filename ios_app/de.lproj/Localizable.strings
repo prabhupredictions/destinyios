@@ -2176,8 +2176,8 @@
 "house_positions_label" = "Hauspositionen";
 
 "koota_label" = "Kuta";
-"tooltip_determined_by" = "%@-Kompatibilität wird durch %@ Ashtakoot bestimmt";
-"tooltip_partner_values" = "Partnerwerte";
+"tooltip_determined_by" = "Die %@-Kompatibilität wird von %@ Koota bestimmt";
+"tooltip_partner_values" = "Koota-Wert";
 "tooltip_score_label" = "Punkte";
 "dosha_present_label" = "Dosha vorhanden";
 "tooltip_type_label" = "Typ";
@@ -2491,9 +2491,9 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "bhakoot_effect_59" = "5/9: Klassische Texte weisen auf Bedenken bezüglich Nachkommen hin";
 "bhakoot_effect_212" = "2/12: Klassische Texte weisen auf finanzielle Belastung hin";
 "bhakoot_severity_label" = "Schweregrad: %@";
-"bhakoot_severity_high" = "Hoch (Studie: 54% gute Ergebnisse)";
-"bhakoot_severity_medium" = "Mittel (Studie: 77% gute Ergebnisse)";
-"bhakoot_severity_low" = "Niedrig (Studie: 74% gute Ergebnisse)";
+"bhakoot_severity_high" = "Hoch ";
+"bhakoot_severity_medium" = "Mittel ";
+"bhakoot_severity_low" = "Niedrig ";
 "bhakoot_sadbhakoot_warning" = "Vorsicht: Dieses Paar trägt eine klassische Witwenschaftswarnung";
 "bhakoot_nav_pancham_auspicious" = "Nav Pancham: Braut 5. vom Bräutigam — traditionell günstig für Nachkommen";
 "bhakoot_house_positions" = "Hauspositionen: %@";
@@ -2507,8 +2507,8 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "gana_effect_dev_rakshash" = "Dev-Rakshash: Klassische Texte warnen vor feindseligen Beziehungen und lebenslangem Streit";
 "gana_effect_manushya_rakshash" = "Manushya-Rakshash: Klassische Texte warnen vor extremem Leid für den Manushya-Partner";
 "gana_severity_label" = "Schweregrad: %@";
-"gana_severity_high" = "Hoch (Studie: 71,43% gute Ergebnisse, 83,67% einschl. Durchschnitt)";
-"gana_severity_medium" = "Mittel (Studie: 65,91% gute Ergebnisse, 90,91% einschl. Durchschnitt)";
+"gana_severity_high" = "Hoch ";
+"gana_severity_medium" = "Mittel ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "Dosha aufgehoben";

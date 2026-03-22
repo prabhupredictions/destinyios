@@ -2137,8 +2137,8 @@
 
 // Tooltip 6-point format (V2.4)
 "koota_label" = "Koota";
-"tooltip_determined_by" = "%@ compatibility is determined by %@ Ashtakoot";
-"tooltip_partner_values" = "Partner Values";
+"tooltip_determined_by" = "%@ compatibility is determined by %@ Koota";
+"tooltip_partner_values" = "Koota Value";
 "tooltip_score_label" = "Score";
 "dosha_present_label" = "Dosha Present";
 "tooltip_type_label" = "Type";
@@ -2457,9 +2457,9 @@
 "bhakoot_effect_59" = "5/9: Classical texts indicate concern for progeny";
 "bhakoot_effect_212" = "2/12: Classical texts indicate financial strain";
 "bhakoot_severity_label" = "Severity: %@";
-"bhakoot_severity_high" = "High (field study: 54% good outcomes)";
-"bhakoot_severity_medium" = "Medium (field study: 77% good outcomes)";
-"bhakoot_severity_low" = "Low (field study: 74% good outcomes)";
+"bhakoot_severity_high" = "High";
+"bhakoot_severity_medium" = "Medium";
+"bhakoot_severity_low" = "Low";
 "bhakoot_sadbhakoot_warning" = "Caution: This pair carries a classical widowhood advisory";
 "bhakoot_nav_pancham_auspicious" = "Nav Pancham: Bride 5th from groom — traditionally auspicious for progeny";
 "bhakoot_house_positions" = "House positions: %@";
@@ -2473,8 +2473,8 @@
 "gana_effect_dev_rakshash" = "Dev-Rakshash: Classical texts warn of inimical relations and lifelong strife";
 "gana_effect_manushya_rakshash" = "Manushya-Rakshash: Classical texts warn of extreme misery for the Manushya partner";
 "gana_severity_label" = "Severity: %@";
-"gana_severity_high" = "High (study: 71.43% good outcomes, 83.67% including average)";
-"gana_severity_medium" = "Medium (study: 65.91% good outcomes, 90.91% including average)";
+"gana_severity_high" = "High";
+"gana_severity_medium" = "Medium";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "Dosha Cancelled";

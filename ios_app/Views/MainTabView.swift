@@ -125,6 +125,9 @@ struct MainTabView: View {
         }
         // Clear pending match state when navigating away from Match tab
         .onChange(of: selectedTab) { oldTab, newTab in
+            // Dismiss keyboard explicitly when leaving any tab
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            
             // Mark tabs as visited for lazy internal loading
             if newTab == 1 { hasVisitedChat = true }
             if newTab == 2 { hasVisitedMatch = true }

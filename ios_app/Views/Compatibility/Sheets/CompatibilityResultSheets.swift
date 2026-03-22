@@ -919,6 +919,7 @@ struct AskDestinySheet: View {
     // Chat State
     @State private var messages: [CompatChatMessage] = []
     @State private var inputText: String = ""
+    @FocusState private var isInputFocused: Bool
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     @State private var showQuotaSheet: Bool = false
@@ -1186,6 +1187,8 @@ struct AskDestinySheet: View {
     
     private func quickQuestionButton(_ text: String) -> some View {
         Button {
+            isInputFocused = false
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             inputText = text
             Task { await sendMessage() }
         } label: {
@@ -1217,6 +1220,8 @@ struct AskDestinySheet: View {
                     ForEach(suggestedQuestions, id: \.self) { question in
                         Button(action: {
                             HapticManager.shared.play(.light)
+                            isInputFocused = false
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                             inputText = question
                             suggestedQuestions = []
                             Task { await sendMessage() }
@@ -1250,6 +1255,7 @@ struct AskDestinySheet: View {
             TextField(NSLocalizedString("ask_question_placeholder", comment: ""), text: $inputText)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textPrimary)
+                .focused($isInputFocused)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 .background(
@@ -1297,6 +1303,9 @@ struct AskDestinySheet: View {
     private func sendMessage() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
+        
+        isInputFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         
         inputText = ""
         errorMessage = nil

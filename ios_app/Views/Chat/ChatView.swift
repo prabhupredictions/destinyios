@@ -64,6 +64,7 @@ struct ChatView: View {
                     // Check quota before sending
                     if viewModel.canAskQuestion {
                         isInputFocused = false  // Dismiss keyboard on send
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                         Task { await viewModel.sendMessage() }
                     } else {
                         showQuotaExhausted = true
@@ -155,6 +156,7 @@ struct ChatView: View {
         // Dismiss keyboard when leaving the view (fixes keyboard persistence bug)
         .onDisappear {
             isInputFocused = false
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
     
@@ -241,6 +243,7 @@ struct ChatView: View {
                     Button(action: {
                         HapticManager.shared.play(.light)
                         isInputFocused = false  // Dismiss keyboard
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                         viewModel.inputText = question
                         if viewModel.canAskQuestion {
                             Task { await viewModel.sendMessage() }
@@ -286,6 +289,7 @@ struct ChatView: View {
                         Button(action: {
                             HapticManager.shared.play(.light)
                             isInputFocused = false  // Dismiss keyboard
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                             viewModel.inputText = question
                             viewModel.suggestedQuestions = []
                             if viewModel.canAskQuestion {

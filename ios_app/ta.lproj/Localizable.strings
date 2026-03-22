@@ -2176,8 +2176,8 @@
 "house_positions_label" = "வீட்டு நிலைகள்";
 
 "koota_label" = "கூடம்";
-"tooltip_determined_by" = "%@ இணக்கம் %@ அஷ்டகூடத்தால் தீர்மானிக்கப்படுகிறது";
-"tooltip_partner_values" = "துணை மதிப்புகள்";
+"tooltip_determined_by" = "%@ இணக்கத்தன்மை %@ Koota ஆல் தீர்மானிக்கப்படுகிறது";
+"tooltip_partner_values" = "கூடா மதிப்பு";
 "tooltip_score_label" = "மதிப்பெண்";
 "dosha_present_label" = "தோஷம் உள்ளது";
 "tooltip_type_label" = "வகை";
@@ -2496,9 +2496,9 @@
 "bhakoot_effect_59" = "5/9: சாஸ்திரங்கள் சந்ததி குறித்து கவலை சுட்டிக்காட்டுகின்றன";
 "bhakoot_effect_212" = "2/12: சாஸ்திரங்கள் நிதி சிரமம் சுட்டிக்காட்டுகின்றன";
 "bhakoot_severity_label" = "தீவிரம்: %@";
-"bhakoot_severity_high" = "அதிகம் (ஆய்வு: 54% நல்ல முடிவுகள்)";
-"bhakoot_severity_medium" = "நடுத்தரம் (ஆய்வு: 77% நல்ல முடிவுகள்)";
-"bhakoot_severity_low" = "குறைவு (ஆய்வு: 74% நல்ல முடிவுகள்)";
+"bhakoot_severity_high" = "அதிகம் ";
+"bhakoot_severity_medium" = "நடுத்தரம் ";
+"bhakoot_severity_low" = "குறைவு ";
 "bhakoot_sadbhakoot_warning" = "எச்சரிக்கை: இந்த ஜோடிக்கு சாஸ்திரப்படி விதவை எச்சரிக்கை உள்ளது";
 "bhakoot_nav_pancham_auspicious" = "நவம் பஞ்சமம்: மணமகள் மணமகனிலிருந்து 5வது — சந்ததிக்கு சுபம்";
 "bhakoot_house_positions" = "பாவ நிலைகள்: %@";
@@ -2512,8 +2512,8 @@
 "gana_effect_dev_rakshash" = "தேவ-ராட்சச: சாஸ்திரங்கள் பகைமை மற்றும் வாழ்நாள் முழுவதும் சண்டை எச்சரிக்கின்றன";
 "gana_effect_manushya_rakshash" = "மனுஷ்ய-ராட்சச: சாஸ்திரங்கள் மனுஷ்ய கண துணைக்கு கடும் கஷ்டம் எச்சரிக்கின்றன";
 "gana_severity_label" = "தீவிரம்: %@";
-"gana_severity_high" = "அதிகம் (ஆய்வு: 71.43% நல்ல முடிவு, சராசரி உட்பட 83.67%)";
-"gana_severity_medium" = "நடுத்தரம் (ஆய்வு: 65.91% நல்ல முடிவு, சராசரி உட்பட 90.91%)";
+"gana_severity_high" = "அதிகம் ";
+"gana_severity_medium" = "நடுத்தரம் ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "தோஷம் ரத்து";

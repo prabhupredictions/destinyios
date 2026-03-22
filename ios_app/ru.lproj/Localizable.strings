@@ -2176,8 +2176,8 @@
 "house_positions_label" = "Положения Домов";
 
 "koota_label" = "Кута";
-"tooltip_determined_by" = "Совместимость %@ определяется %@ Аштакутом";
-"tooltip_partner_values" = "Значения партнёров";
+"tooltip_determined_by" = "Совместимость %@ определяется %@ Koota";
+"tooltip_partner_values" = "Кута Значение";
 "tooltip_score_label" = "Баллы";
 "dosha_present_label" = "Доша присутствует";
 "tooltip_type_label" = "Тип";
@@ -2496,9 +2496,9 @@
 "bhakoot_effect_59" = "5/9: Классические тексты указывают на проблемы с потомством";
 "bhakoot_effect_212" = "2/12: Классические тексты указывают на финансовые трудности";
 "bhakoot_severity_label" = "Тяжесть: %@";
-"bhakoot_severity_high" = "Высокая (исследование: 54% хороших результатов)";
-"bhakoot_severity_medium" = "Средняя (исследование: 77% хороших результатов)";
-"bhakoot_severity_low" = "Низкая (исследование: 74% хороших результатов)";
+"bhakoot_severity_high" = "Высокая ";
+"bhakoot_severity_medium" = "Средняя ";
+"bhakoot_severity_low" = "Низкая ";
 "bhakoot_sadbhakoot_warning" = "Внимание: Эта пара имеет классическое предупреждение о вдовстве";
 "bhakoot_nav_pancham_auspicious" = "Нав Панчам: Невеста 5-я от жениха — традиционно благоприятно для потомства";
 "bhakoot_house_positions" = "Позиции домов: %@";
@@ -2512,8 +2512,8 @@
 "gana_effect_dev_rakshash" = "Дев-Ракшас: Классические тексты предупреждают о враждебных отношениях и пожизненных конфликтах";
 "gana_effect_manushya_rakshash" = "Манушья-Ракшас: Классические тексты предупреждают о крайних страданиях партнёра Манушья";
 "gana_severity_label" = "Тяжесть: %@";
-"gana_severity_high" = "Высокая (исследование: 71,43% хороших результатов, 83,67% включая средние)";
-"gana_severity_medium" = "Средняя (исследование: 65,91% хороших результатов, 90,91% включая средние)";
+"gana_severity_high" = "Высокая ";
+"gana_severity_medium" = "Средняя ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "Доша отменена";

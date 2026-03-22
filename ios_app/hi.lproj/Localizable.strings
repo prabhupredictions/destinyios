@@ -2077,8 +2077,8 @@
 "house_positions_label" = "भाव स्थिति";
 
 "koota_label" = "कूट";
-"tooltip_determined_by" = "%@ की अनुकूलता %@ अष्टकूट द्वारा निर्धारित होती है";
-"tooltip_partner_values" = "साथी के मान";
+"tooltip_determined_by" = "%@ अनुकूलता %@ कूटा द्वारा निर्धारित की जाती है";
+"tooltip_partner_values" = "कूटा मूल्य";
 "tooltip_score_label" = "अंक";
 "dosha_present_label" = "दोष उपस्थित";
 "tooltip_type_label" = "प्रकार";
@@ -2354,9 +2354,9 @@
 "bhakoot_effect_59" = "5/9: शास्त्रों के अनुसार संतान पर प्रभाव";
 "bhakoot_effect_212" = "2/12: शास्त्रों के अनुसार आर्थिक कठिनाई";
 "bhakoot_severity_label" = "गंभीरता: %@";
-"bhakoot_severity_high" = "उच्च (अध्ययन: 54% अच्छे परिणाम)";
-"bhakoot_severity_medium" = "मध्यम (अध्ययन: 77% अच्छे परिणाम)";
-"bhakoot_severity_low" = "निम्न (अध्ययन: 74% अच्छे परिणाम)";
+"bhakoot_severity_high" = "उच्च ";
+"bhakoot_severity_medium" = "मध्यम ";
+"bhakoot_severity_low" = "निम्न ";
 "bhakoot_sadbhakoot_warning" = "सावधानी: इस जोड़ी में शास्त्रीय वैधव्य चेतावनी है";
 "bhakoot_nav_pancham_auspicious" = "नवम पंचम: वधू वर से पांचवें स्थान पर — संतान के लिए शुभ";
 "bhakoot_house_positions" = "भाव स्थिति: %@";
@@ -2370,8 +2370,8 @@
 "gana_effect_dev_rakshash" = "देव-राक्षस: शास्त्र शत्रुता और आजीवन कलह की चेतावनी देते हैं";
 "gana_effect_manushya_rakshash" = "मनुष्य-राक्षस: शास्त्र मनुष्य गण साथी के लिए अत्यधिक कष्ट की चेतावनी देते हैं";
 "gana_severity_label" = "गंभीरता: %@";
-"gana_severity_high" = "उच्च (अध्ययन: 71.43% अच्छे परिणाम, औसत सहित 83.67%)";
-"gana_severity_medium" = "मध्यम (अध्ययन: 65.91% अच्छे परिणाम, औसत सहित 90.91%)";
+"gana_severity_high" = "उच्च ";
+"gana_severity_medium" = "मध्यम ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "दोष निरस्त";

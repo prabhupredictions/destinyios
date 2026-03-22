@@ -2176,8 +2176,8 @@
 "house_positions_label" = "భావ స్థానాలు";
 
 "koota_label" = "కూట";
-"tooltip_determined_by" = "%@ అనుకూలత %@ అష్టకూటం ద్వారా నిర్ణయించబడుతుంది";
-"tooltip_partner_values" = "భాగస్వామి విలువలు";
+"tooltip_determined_by" = "%@ అనుకూలత %@ కూటా ద్వారా నిర్ణయించబడుతుంది";
+"tooltip_partner_values" = "కూటా విలువ";
 "tooltip_score_label" = "స్కోరు";
 "dosha_present_label" = "దోషం ఉంది";
 "tooltip_type_label" = "రకం";
@@ -2496,9 +2496,9 @@
 "bhakoot_effect_59" = "5/9: శాస్త్రాలు సంతానంపై ఆందోళన సూచిస్తాయి";
 "bhakoot_effect_212" = "2/12: శాస్త్రాలు ఆర్థిక కష్టాలను సూచిస్తాయి";
 "bhakoot_severity_label" = "తీవ్రత: %@";
-"bhakoot_severity_high" = "అధికం (అధ్యయనం: 54% మంచి ఫలితాలు)";
-"bhakoot_severity_medium" = "మధ్యస్థం (అధ్యయనం: 77% మంచి ఫలితాలు)";
-"bhakoot_severity_low" = "తక్కువ (అధ్యయనం: 74% మంచి ఫలితాలు)";
+"bhakoot_severity_high" = "అధికం ";
+"bhakoot_severity_medium" = "మధ్యస్థం ";
+"bhakoot_severity_low" = "తక్కువ ";
 "bhakoot_sadbhakoot_warning" = "జాగ్రత్త: ఈ జంటకు శాస్త్రీయ వైధవ్య హెచ్చరిక ఉంది";
 "bhakoot_nav_pancham_auspicious" = "నవమ పంచమ: వధువు వరుని నుండి 5వ స్థానం — సంతానానికి శుభం";
 "bhakoot_house_positions" = "భావ స్థానాలు: %@";
@@ -2512,8 +2512,8 @@
 "gana_effect_dev_rakshash" = "దేవ-రాక్షస: శాస్త్రాలు శత్రుత్వం మరియు జీవితకాల కలహం గురించి హెచ్చరిస్తాయి";
 "gana_effect_manushya_rakshash" = "మనుష్య-రాక్షస: శాస్త్రాలు మనుష్య గణ భాగస్వామికి తీవ్ర కష్టం గురించి హెచ్చరిస్తాయి";
 "gana_severity_label" = "తీవ్రత: %@";
-"gana_severity_high" = "అధికం (అధ్యయనం: 71.43% మంచి ఫలితం, సగటు కలిపి 83.67%)";
-"gana_severity_medium" = "మధ్యస్థం (అధ్యయనం: 65.91% మంచి ఫలితం, సగటు కలిపి 90.91%)";
+"gana_severity_high" = "అధికం ";
+"gana_severity_medium" = "మధ్యస్థం ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "దోషం రద్దు";

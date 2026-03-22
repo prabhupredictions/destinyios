@@ -2176,8 +2176,8 @@
 "house_positions_label" = "ഭാവ സ്ഥാനങ്ങൾ";
 
 "koota_label" = "കൂടം";
-"tooltip_determined_by" = "%@ അനുയോജ്യത %@ അഷ്ടകൂടം വഴി നിർണയിക്കപ്പെടുന്നു";
-"tooltip_partner_values" = "പങ്കാളി മൂല്യങ്ങൾ";
+"tooltip_determined_by" = "%@ അനുയോജ്യത നിർണ്ണയിക്കുന്നത് %@ Koota ആണ്";
+"tooltip_partner_values" = "കൂട്ട മൂല്യം";
 "tooltip_score_label" = "സ്കോർ";
 "dosha_present_label" = "ദോഷം നിലവിലുണ്ട്";
 "tooltip_type_label" = "തരം";
@@ -2496,9 +2496,9 @@
 "bhakoot_effect_59" = "5/9: ശാസ്ത്രങ്ങൾ സന്താനത്തിൽ ആശങ്ക സൂചിപ്പിക്കുന്നു";
 "bhakoot_effect_212" = "2/12: ശാസ്ത്രങ്ങൾ സാമ്പത്തിക ബുദ്ധിമുട്ട് സൂചിപ്പിക്കുന്നു";
 "bhakoot_severity_label" = "തീവ്രത: %@";
-"bhakoot_severity_high" = "ഉയർന്നത് (പഠനം: 54% നല്ല ഫലങ്ങൾ)";
-"bhakoot_severity_medium" = "മധ്യമം (പഠനം: 77% നല്ല ഫലങ്ങൾ)";
-"bhakoot_severity_low" = "കുറവ് (പഠനം: 74% നല്ല ഫലങ്ങൾ)";
+"bhakoot_severity_high" = "ഉയർന്നത് ";
+"bhakoot_severity_medium" = "മധ്യമം ";
+"bhakoot_severity_low" = "കുറവ് ";
 "bhakoot_sadbhakoot_warning" = "ജാഗ്രത: ഈ ജോഡിക്ക് ശാസ്ത്രീയ വൈധവ്യ മുന്നറിയിപ്പ് ഉണ്ട്";
 "bhakoot_nav_pancham_auspicious" = "നവം പഞ്ചമം: വധു വരനിൽ നിന്ന് 5-ാം സ്ഥാനം — സന്താനത്തിന് ശുഭം";
 "bhakoot_house_positions" = "ഭാവ സ്ഥാനങ്ങൾ: %@";
@@ -2512,8 +2512,8 @@
 "gana_effect_dev_rakshash" = "ദേവ-രാക്ഷസ: ശാസ്ത്രങ്ങൾ ശത്രുത്വവും ആജീവനാന്ത കലഹവും മുന്നറിയിപ്പ് നൽകുന്നു";
 "gana_effect_manushya_rakshash" = "മനുഷ്യ-രാക്ഷസ: ശാസ്ത്രങ്ങൾ മനുഷ്യ ഗണ പങ്കാളിക്ക് കടുത്ത കഷ്ടം മുന്നറിയിപ്പ് നൽകുന്നു";
 "gana_severity_label" = "തീവ്രത: %@";
-"gana_severity_high" = "ഉയർന്നത് (പഠനം: 71.43% നല്ല ഫലം, ശരാശരി ഉൾപ്പെടെ 83.67%)";
-"gana_severity_medium" = "മധ്യമം (പഠനം: 65.91% നല്ല ഫലം, ശരാശരി ഉൾപ്പെടെ 90.91%)";
+"gana_severity_high" = "ഉയർന്നത് ";
+"gana_severity_medium" = "മധ്യമം ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "ദോഷം റദ്ദാക്കി";

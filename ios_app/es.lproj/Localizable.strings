@@ -2176,8 +2176,8 @@
 "house_positions_label" = "Posiciones de Casas";
 
 "koota_label" = "Koota";
-"tooltip_determined_by" = "La compatibilidad de %@ se determina por %@ Ashtakoot";
-"tooltip_partner_values" = "Valores de la pareja";
+"tooltip_determined_by" = "%@ la compatibilidad está determinada por %@ Koota";
+"tooltip_partner_values" = "Valor de Koota";
 "tooltip_score_label" = "Puntuación";
 "dosha_present_label" = "Hay dosha";
 "tooltip_type_label" = "Tipo";
@@ -2496,9 +2496,9 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "bhakoot_effect_59" = "5/9: Los textos clásicos indican preocupación por la descendencia";
 "bhakoot_effect_212" = "2/12: Los textos clásicos indican dificultades financieras";
 "bhakoot_severity_label" = "Severidad: %@";
-"bhakoot_severity_high" = "Alta (estudio: 54% buenos resultados)";
-"bhakoot_severity_medium" = "Media (estudio: 77% buenos resultados)";
-"bhakoot_severity_low" = "Baja (estudio: 74% buenos resultados)";
+"bhakoot_severity_high" = "Alta ";
+"bhakoot_severity_medium" = "Media ";
+"bhakoot_severity_low" = "Baja ";
 "bhakoot_sadbhakoot_warning" = "Precaución: Esta pareja tiene una advertencia clásica de viudez";
 "bhakoot_nav_pancham_auspicious" = "Nav Pancham: Novia 5ª del novio — tradicionalmente auspicioso para descendencia";
 "bhakoot_house_positions" = "Posiciones de casa: %@";
@@ -2512,8 +2512,8 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "gana_effect_dev_rakshash" = "Dev-Rakshash: Los textos clásicos advierten de relaciones hostiles y conflictos de por vida";
 "gana_effect_manushya_rakshash" = "Manushya-Rakshash: Los textos clásicos advierten de sufrimiento extremo para el compañero Manushya";
 "gana_severity_label" = "Gravedad: %@";
-"gana_severity_high" = "Alta (estudio: 71,43% buenos resultados, 83,67% incluyendo promedio)";
-"gana_severity_medium" = "Media (estudio: 65,91% buenos resultados, 90,91% incluyendo promedio)";
+"gana_severity_high" = "Alta ";
+"gana_severity_medium" = "Media ";
 
 // MARK: - Graha Maitri Dosha Transparency (V2.2)
 "maitri_dosha_cancelled" = "Dosha cancelado";
