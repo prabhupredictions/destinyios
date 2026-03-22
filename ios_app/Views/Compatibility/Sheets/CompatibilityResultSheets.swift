@@ -162,7 +162,7 @@ struct FullReportSheet: View {
                     .font(.system(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
-                Text("Save to Files")
+                Text(NSLocalizedString("save_to_files", comment: ""))
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
@@ -197,7 +197,7 @@ struct FullReportSheet: View {
                 .scaledToFit()
                 .frame(height: 44)
             
-            Text("DESTINY AI ASTROLOGY")
+            Text(NSLocalizedString("destiny_ai_astrology_brand", comment: ""))
                 .font(.system(size: 10, weight: .medium, design: .serif))
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                 .tracking(4)
@@ -225,7 +225,7 @@ struct FullReportSheet: View {
             
             // Date info
             if let bDob = boyDob, let gDob = girlDob {
-                Text("Born: \(bDob) · \(gDob)")
+            Text(String(format: "born_date_format".localized, bDob, gDob))
                     .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
@@ -283,12 +283,12 @@ struct FullReportSheet: View {
             
             // Transparency: show original vs adjusted score for all cases
             if let adjScore = result.adjustedScore, adjScore != result.totalScore {
-                Text("Ashtakoot: \(result.totalScore)/\(result.maxScore) · Adjusted: \(adjScore)/\(result.maxScore)")
+                Text(String(format: "ashtakoot_adjusted_score_format".localized, result.totalScore, result.maxScore, adjScore, result.maxScore))
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
                     .padding(.top, 2)
             } else {
-                Text("Ashtakoot Score: \(result.totalScore)/\(result.maxScore)")
+                Text(String(format: "ashtakoot_score_format".localized, result.totalScore, result.maxScore))
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
                     .padding(.top, 2)
@@ -297,7 +297,7 @@ struct FullReportSheet: View {
             // Rejection reasons for Not Recommended
             if !result.isRecommended {
                 VStack(spacing: 6) {
-                    Text("Overridden due to compatibility issues:")
+                    Text("overridden_due_to_issues".localized)
                         .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                         .multilineTextAlignment(.center)
@@ -326,7 +326,7 @@ struct FullReportSheet: View {
             }
             
             // Report date
-            Text("Report generated: \(formattedDate)")
+            Text(String(format: "report_generated_format".localized, formattedDate))
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
                 .padding(.top, 4)
@@ -442,12 +442,12 @@ struct FullReportSheet: View {
                 Image(systemName: "info.circle.fill")
                     .font(.system(size: 11))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                Text("AI-Generated Analysis")
+                Text(NSLocalizedString("ai_generated_analysis", comment: ""))
                     .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             }
             
-            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
+            Text(NSLocalizedString("ai_disclaimer_text", comment: ""))
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
                 .lineSpacing(3)
@@ -633,12 +633,12 @@ struct FullReportSheet: View {
         
         // 1. Header
         let header = VStack(spacing: 12) {
-            Text("DESTINY AI ASTROLOGY")
+            Text("destiny_ai_astrology_title".localized)
                 .font(.system(size: 14, weight: .medium, design: .serif))
                 .foregroundColor(gold)
                 .tracking(4)
             
-            Text("COMPATIBILITY REPORT")
+            Text(NSLocalizedString("compatibility_report_title", comment: ""))
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(gold.opacity(0.6))
                 .tracking(3)
@@ -648,7 +648,7 @@ struct FullReportSheet: View {
                 .foregroundColor(.white)
             
             if let bDob = boyDob, let gDob = girlDob {
-                Text("Born: \(bDob) · \(gDob)")
+                Text(String(format: "born_date_format".localized, bDob, gDob))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.5))
             }
@@ -723,11 +723,11 @@ struct FullReportSheet: View {
                 .frame(height: 1)
                 .padding(.horizontal, 40)
             
-            Text("ⓘ AI-Generated Analysis")
+            Text("ai_generated_analysis_info".localized)
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(gold.opacity(0.5))
             
-            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only.")
+            Text(NSLocalizedString("ai_disclaimer_text", comment: ""))
                 .font(.system(size: 8))
                 .foregroundColor(.white.opacity(0.3))
                 .multilineTextAlignment(.center)
@@ -797,12 +797,12 @@ private struct PremiumReportPDFView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
             VStack(spacing: 12) {
-                Text("DESTINY AI ASTROLOGY")
+                Text("destiny_ai_astrology_title".localized)
                     .font(.system(size: 14, weight: .medium, design: .serif))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(4)
                 
-                Text("COMPATIBILITY REPORT")
+                Text(NSLocalizedString("compatibility_report_title", comment: ""))
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.6))
                     .tracking(3)
@@ -812,7 +812,7 @@ private struct PremiumReportPDFView: View {
                     .foregroundColor(.white)
                 
                 if let bDob = boyDob, let gDob = girlDob {
-                    Text("Born: \(bDob) · \(gDob)")
+                    Text(String(format: "born_date_format".localized, bDob, gDob))
                         .font(.system(size: 11))
                         .foregroundColor(.white.opacity(0.5))
                 }
@@ -884,11 +884,11 @@ private struct PremiumReportPDFView: View {
                     .frame(height: 1)
                     .padding(.horizontal, 40)
                 
-                Text("ⓘ AI-Generated Analysis")
+                Text("ai_generated_analysis_info".localized)
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.5))
                 
-                Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
+                Text(NSLocalizedString("ai_disclaimer_text", comment: ""))
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.3))
                     .multilineTextAlignment(.center)
@@ -949,11 +949,11 @@ struct AskDestinySheet: View {
                     // Custom transparent header
                     HStack {
                         Spacer()
-                        Text("Ask Destiny")
+                        Text("ask_destiny_title".localized)
                             .font(AppTheme.Fonts.title(size: 17))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         Spacer()
-                        Button("Done") { dismiss() }
+                        Button("done_action".localized) { dismiss() }
                             .font(AppTheme.Fonts.title(size: 17))
                             .foregroundColor(AppTheme.Colors.gold)
                     }
@@ -1163,11 +1163,11 @@ struct AskDestinySheet: View {
                     .foregroundColor(AppTheme.Colors.gold)
             }
             
-            Text("Ask about \(boyName) & \(girlName)")
+            Text(String(format: NSLocalizedString("ask_about_match_title", comment: ""), boyName, girlName))
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("I can answer questions about this compatibility match, their relationship dynamics, or individual insights.")
+            Text(NSLocalizedString("ask_destiny_welcome", comment: ""))
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -1175,9 +1175,9 @@ struct AskDestinySheet: View {
             
             // Quick Questions
             VStack(spacing: 8) {
-                quickQuestionButton("Key strengths of this match?")
-                quickQuestionButton("Key challenges of this match?")
-                quickQuestionButton("Best timing for relationship harmony?")
+                quickQuestionButton("suggested_q_strengths".localized)
+                quickQuestionButton("suggested_q_challenges".localized)
+                quickQuestionButton("suggested_q_timing".localized)
             }
             .padding(.top, 8)
         }
@@ -1208,7 +1208,7 @@ struct AskDestinySheet: View {
     // MARK: - Inline Suggested Questions (horizontal scrollable pills)
     private var inlineSuggestedQuestionsView: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Suggested questions")
+            Text("suggested_questions_title".localized)
                 .font(AppTheme.Fonts.caption())
                 .foregroundColor(AppTheme.Colors.textSecondary)
             
@@ -1247,7 +1247,7 @@ struct AskDestinySheet: View {
     // MARK: - Input Bar
     private var inputBar: some View {
         HStack(spacing: 12) {
-            TextField("Ask a question...", text: $inputText)
+            TextField(NSLocalizedString("ask_question_placeholder", comment: ""), text: $inputText)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .padding(.horizontal, 16)
@@ -1272,7 +1272,7 @@ struct AskDestinySheet: View {
                     .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
             }
             .disabled(!canSend)
-            .accessibilityLabel("Send question")
+            .accessibilityLabel("a11y_send_question".localized)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -1516,7 +1516,7 @@ struct AskDestinySheet: View {
                 if email.contains("guest") || email.contains("@gen.com") || isGuest {
                     quotaMessage = "sign_in_to_continue_asking".localized
                 } else {
-                    quotaMessage = "free_limit_reached".localized
+                    quotaMessage = "create_account_to_continue".localized
                 }
                 showQuotaSheet = true
             } else {
@@ -1540,7 +1540,7 @@ struct AskDestinySheet: View {
                 if email.contains("guest") || email.contains("@gen.com") || isGuest {
                     quotaMessage = "sign_in_to_continue_asking".localized
                 } else {
-                    quotaMessage = "free_limit_reached".localized
+                    quotaMessage = "create_account_to_continue".localized
                 }
                 showQuotaSheet = true
             } else {
@@ -1717,7 +1717,7 @@ private struct CompatTypingIndicator: View {
                         .offset(y: animateThird ? -4 : 0)
                 }
                 
-                Text("Thinking...")
+                Text(NSLocalizedString("ai_thinking", comment: ""))
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }

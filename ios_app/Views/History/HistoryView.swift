@@ -29,19 +29,19 @@ struct HistoryView: View {
                     historyListView
                 }
             }
-            .navigationTitle("History")
+            .navigationTitle("history_title".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 #if os(iOS)
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #else
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #endif
@@ -49,10 +49,10 @@ struct HistoryView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
             .alert("Delete", isPresented: $viewModel.showDeleteConfirmation) {
-                Button("Cancel", role: .cancel) { viewModel.itemToDelete = nil }
-                Button("Delete", role: .destructive) { viewModel.confirmDelete() }
+                Button("cancel_action".localized, role: .cancel) { viewModel.itemToDelete = nil }
+                Button("delete_action".localized, role: .destructive) { viewModel.confirmDelete() }
             } message: {
-                Text("Are you sure you want to delete \"\(viewModel.deleteItemTitle)\"?")
+                Text(String(format: "delete_item_confirm_format".localized, viewModel.deleteItemTitle))
             }
             .task {
                 await viewModel.loadHistory()
@@ -74,11 +74,11 @@ struct HistoryView: View {
                 .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
             
-            Text("History is turned off")
+            Text("history_turned_off".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Your conversations and matches aren't being saved.")
+            Text("history_not_saved_desc".localized)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -92,7 +92,7 @@ struct HistoryView: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "gearshape")
-                    Text("Open Settings")
+                    Text("open_settings".localized)
                 }
                 .font(AppTheme.Fonts.title(size: 15))
                 .foregroundColor(AppTheme.Colors.mainBackground)
@@ -304,7 +304,7 @@ struct HistoryRowView: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label("delete_action".localized, systemImage: "trash")
             }
             .tint(AppTheme.Colors.error)
             
@@ -325,7 +325,7 @@ struct HistoryRowView: View {
             }
             
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label("delete_action".localized, systemImage: "trash")
             }
         }
     }
@@ -402,7 +402,7 @@ struct HistoryRowView: View {
             // Display score clearly with context
             VStack(alignment: .trailing, spacing: 2) {
                 // Raw score (e.g., "15/36")
-                Text("\(match.totalScore)/\(match.maxScore)")
+                Text(String(format: "score_fraction_format".localized, match.totalScore, match.maxScore))
                     .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(matchScoreColor(match.scorePercentage / 100))
                 
@@ -428,7 +428,7 @@ struct HistoryRowView: View {
                 // Best score in the group
                 let bestItem = group.items.max(by: { $0.totalScore < $1.totalScore })
                 if let best = bestItem {
-                    Text("Best: \(best.totalScore)/\(best.maxScore)")
+                    Text(String(format: "best_score_format".localized, best.totalScore, best.maxScore))
                         .font(AppTheme.Fonts.title(size: 13))
                         .foregroundColor(matchScoreColor(best.scorePercentage / 100))
                 }

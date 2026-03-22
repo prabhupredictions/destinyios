@@ -120,7 +120,7 @@ struct HomeView: View {
                                     HStack(spacing: 6) {
                                         Image(systemName: "arrow.clockwise")
                                             .font(.system(size: 12, weight: .semibold))
-                                        Text("Retry")
+                                        Text("retry_action".localized)
                                             .font(AppTheme.Fonts.caption(size: 13))
                                     }
                                     .foregroundColor(AppTheme.Colors.textOnGold)
@@ -159,7 +159,7 @@ struct HomeView: View {
                                     Text("syncing_cosmic_data".localized)
                                         .font(AppTheme.Fonts.title(size: 18))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
-                                    Text("Almost there")
+                                    Text("almost_there".localized)
                                         .font(AppTheme.Fonts.caption(size: 14))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
@@ -443,7 +443,7 @@ struct HomeView: View {
                                 .foregroundColor(AppTheme.Colors.gold)
                         }
                     }
-                    .accessibilityLabel("History")
+                    .accessibilityLabel("history_title".localized)
                     
                     Spacer()
                     
@@ -520,7 +520,7 @@ struct HomeView: View {
                                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.2))
                             }
                         }
-                        .accessibilityLabel("Profile, \(profileContext.activeProfileName)")
+                        .accessibilityLabel(String(format: "a11y_profile_name_format".localized, profileContext.activeProfileName))
                     }
                 }
             }
@@ -534,7 +534,7 @@ struct HomeView: View {
             // Card Content
             VStack(alignment: .leading, spacing: 8) {
                 // Title - needs extra padding to clear orb
-                Text("Today's Cosmic Vibe")
+                Text("todays_cosmic_vibe".localized)
                     .font(.system(size: 20, weight: .semibold, design: .serif))
                     .foregroundStyle(
                         LinearGradient(

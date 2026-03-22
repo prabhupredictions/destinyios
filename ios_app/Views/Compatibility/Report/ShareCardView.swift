@@ -174,7 +174,7 @@ struct ShareCardView: View {
                 
                 // Transparency: show original & adjusted scores
                 if let adj = adjustedScore, adj != totalScore {
-                    Text("Ashtakoot: \(totalScore)/\(maxScore) · Adjusted: \(adj)/\(maxScore)")
+                    Text(String(format: "ashtakoot_adjusted_score_format".localized, totalScore, maxScore, adj, maxScore))
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.4))
                         .padding(.top, 4)
@@ -186,7 +186,7 @@ struct ShareCardView: View {
                             .padding(.top, 2)
                     }
                 } else {
-                    Text("Ashtakoot Score: \(totalScore)/\(maxScore)")
+                    Text(String(format: "ashtakoot_score_format".localized, totalScore, maxScore))
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.4))
                         .padding(.top, 4)

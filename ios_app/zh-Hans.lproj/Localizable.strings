@@ -94,27 +94,27 @@
 "sign_out_guest_message" = "作为访客，您的出生数据将被删除。使用 Apple 或 Google 登录以保存您的数据。";
 
 // MARK: - Astrology Settings
-"ayanamsa" = "岁差制";
+"ayanamsa" = "阿亚南萨";
 "ayanamsa_desc" = "黄道计算方法";
 "house_system" = "宫位制";
 "house_system_desc" = "宫位划分方式";
-"lahiri" = "Lahiri（常用）";
-"raman" = "Raman";
-"krishnamurti" = "Krishnamurti (KP)";
-"fagan_bradley" = "Fagan-Bradley";
+"lahiri" = "拉希里（最常见）";
+"raman" = "拉曼";
+"krishnamurti" = "克里希那穆提 (KP)";
+"fagan_bradley" = "费根-布拉德利";
 "equal_houses" = "等宫制";
 "whole_sign" = "整宫制";
-"placidus" = "Placidus";
-"koch" = "Koch";
-"regiomontanus" = "Regiomontanus";
-"campanus" = "Campanus";
-"morinus" = "Morinus";
-"alcabitus" = "Alcabitus";
-"porphyrius" = "Porphyrius";
+"placidus" = "普拉西德斯";
+"koch" = "科赫";
+"regiomontanus" = "雷吉奥蒙塔努斯";
+"campanus" = "风铃草属";
+"morinus" = "桑属";
+"alcabitus" = "阿尔卡比图斯";
+"porphyrius" = "卟啉属";
 
 // MARK: - Language Selection
 "select_language" = "选择语言";
-"english" = "English";
+"english" = "英语";
 "hindi" = "Hindi";
 "language_note" = "App 将以所选语言重启";
 
@@ -224,9 +224,30 @@
 "continue_with_google" = "通过 Google 继续";
 "continue_with_email" = "通过邮箱继续";
 "i_dont_know_birth_time" = "我不知道出生时间";
+"profile_data_refreshed" = "您的个人资料已在服务器上刷新。请重新输入您的出生详情。";
+"sign_up" = "注册";
+"account_deleted_error" = "此帳户已永久删除，无法再使用。相关的電子邮件地址不可重複使用。如果您认为这是错誤，请联系客服。";
+"sign_in_failed" = "登录失败。请再试一次。";
+"failed_save_profile" = "保存个人资料失败";
+"birth_data_linked_apple" = "您的出生数据已链接到您的 Apple 帳户。请使用 Apple 登录。";
+"birth_data_linked_google" = "您的出生数据已链接到您的 Google 帳户。请使用 Google 登录。";
+"birth_data_linked_google_email" = "您的出生数据已链接到 %@。请使用 Google 登录。";
+"birth_data_linked_email" = "您的出生数据已链接到 %@。请使用该帳户登录。";
+"account_upgraded_to_email" = "此帳户已升级至 %@。请登录。";
+"already_have_account" = "您已经拥有一个注册帳户。请登录。";
+"conflict_apple" = "已存在具有您的出生数据的帳户。请使用 Apple 登录以继续。";
+"conflict_google_email" = "已存在具有您的出生数据的帳户。请使用 Google (%@) 登录。";
+"conflict_google" = "已存在具有您的出生数据的帳户。请使用 Google 登录。";
+"conflict_email" = "已存在具有您的出生数据的帳户。请使用 %@ 登录。";
+"conflict_generic" = "已存在具有您的出生数据的帳户。请登录。";
+"a_registered_account" = "一个注册帳户";
+"daily_limit_reached" = "已达到每日限制。午夜重置。";
+"overall_limit_reached" = "您已经用完了所有问题。";
+"feature_not_available" = "升级您的计划以访问此功能。";
+"unable_access_feature" = "无法访问此功能。";
 
 // MARK: - Splash
-"destiny_app_title" = "DESTINY";
+"destiny_app_title" = "命运";
 "ai_astrology_subtitle" = "AI 星座";
 "worlds_advanced_ai" = "全球最先进的 AI 占星师";
 
@@ -247,8 +268,8 @@
 "select_birth_city" = "选择你的出生城市";
 
 // MARK: - Match Result Screen Redesign
-"kundali_match" = "Chart Match";
-"ashtakoot_analysis" = "Birth Chart Compatibility";
+"kundali_match" = "图表匹配";
+"ashtakoot_analysis" = "出生图兼容性";
 "out_of" = "共";
 "compatible" = "相合";
 "excellent_match" = "绝佳匹配";
@@ -261,13 +282,13 @@
 // Kuta Grid
 "ashtakoot_grid" = "八宫详情";
 "varna" = "瓦尔纳";
-"vashya" = "瓦希亚";
+"vashya" = "瓦夏";
 "tara" = "塔拉";
-"yoni" = "约尼";
-"graha_maitri" = "玛特里";
-"gana" = "甘纳";
+"yoni" = "尤尼";
+"graha_maitri" = "迈特里";
+"gana" = "加纳";
 "bhakoot" = "巴库特";
-"nadi" = "纳迪";
+"nadi" = "楠迪";
 
 // View Full Report
 "view_full_report" = "查看完整报告";
@@ -309,9 +330,9 @@
 "ask_more_match" = "询问更多关于此配对...";
 
 // Dosha & Yoga
-"mangal_dosha" = "火星缺陷";
+"mangal_dosha" = "曼加尔·多沙";
 "mangal_dosha_desc" = "火星位置分析";
-"kalsarpa_dosha" = "Kalsarpa Yoga";
+"kalsarpa_dosha" = "迦萨巴多夏";
 "kalsarpa_dosha_desc" = "罗睺-计都轴线分析";
 "additional_yoga" = "其他瑜伽与多沙";
 "additional_yoga_desc" = "其他吉利组合";
@@ -377,10 +398,10 @@
 
 // MARK: - Severity Levels
 "severity_none" = "无";
-"severity_mild" = "轻微";
-"severity_moderate" = "中等";
+"severity_mild" = "温和的";
+"severity_moderate" = "缓和";
 "severity_high" = "严重";
-"severity_severe" = "非常严重";
+"severity_severe" = "严重";
 
 // MARK: - Status Labels
 "status_active" = "有效";
@@ -409,33 +430,33 @@
 "strength" = "强度";
 
 // MARK: - Nakshatra Names (27)
-"nakshatra_ashwini" = "阿须毗尼";
-"nakshatra_bharani" = "婆罗尼";
-"nakshatra_krittika" = "昴宿";
-"nakshatra_rohini" = "毕宿";
-"nakshatra_mrigashira" = "参宿";
-"nakshatra_ardra" = "觜宿";
-"nakshatra_punarvasu" = "井宿";
-"nakshatra_pushya" = "鬼宿";
-"nakshatra_ashlesha" = "柳宿";
-"nakshatra_magha" = "星宿";
-"nakshatra_purva_phalguni" = "张宿";
-"nakshatra_uttara_phalguni" = "翼宿";
-"nakshatra_hasta" = "轸宿";
-"nakshatra_chitra" = "角宿";
-"nakshatra_swati" = "亢宿";
-"nakshatra_vishakha" = "氐宿";
-"nakshatra_anuradha" = "房宿";
-"nakshatra_jyeshtha" = "心宿";
-"nakshatra_moola" = "尾宿";
-"nakshatra_purva_ashadha" = "箕宿";
-"nakshatra_uttara_ashadha" = "斗宿";
-"nakshatra_shravana" = "牛宿";
-"nakshatra_dhanishtha" = "女宿";
-"nakshatra_shatabhisha" = "虚宿";
-"nakshatra_purva_bhadrapada" = "危宿";
-"nakshatra_uttara_bhadrapada" = "室宿";
-"nakshatra_revati" = "壁宿";
+"nakshatra_ashwini" = "阿什维尼";
+"nakshatra_bharani" = "巴拉尼";
+"nakshatra_krittika" = "克里蒂卡";
+"nakshatra_rohini" = "罗希尼";
+"nakshatra_mrigashira" = "姆里头";
+"nakshatra_ardra" = "阿德拉";
+"nakshatra_punarvasu" = "普纳尔瓦苏";
+"nakshatra_pushya" = "普什亚";
+"nakshatra_ashlesha" = "阿什莱莎";
+"nakshatra_magha" = "玛格哈";
+"nakshatra_purva_phalguni" = "普尔瓦·帕尔古尼";
+"nakshatra_uttara_phalguni" = "乌塔拉帕尔古尼";
+"nakshatra_hasta" = "哈斯塔";
+"nakshatra_chitra" = "奇特拉";
+"nakshatra_swati" = "斯瓦蒂";
+"nakshatra_vishakha" = "维沙卡";
+"nakshatra_anuradha" = "阿努拉达";
+"nakshatra_jyeshtha" = "杰什塔";
+"nakshatra_moola" = "穆拉";
+"nakshatra_purva_ashadha" = "普瓦·阿沙达";
+"nakshatra_uttara_ashadha" = "乌塔拉·阿沙达";
+"nakshatra_shravana" = "沙瓦那";
+"nakshatra_dhanishtha" = "达尼什塔";
+"nakshatra_shatabhisha" = "沙塔比沙";
+"nakshatra_purva_bhadrapada" = "普瓦·巴德拉帕达";
+"nakshatra_uttara_bhadrapada" = "乌塔拉·巴德拉帕达";
+"nakshatra_revati" = "雷瓦蒂";
 
 // MARK: - New Exception Keys (8)
 "exception_mars_yoga_karaka" = "火星是此上升点的瑜伽因子";
@@ -455,7 +476,7 @@
 "mars_position" = "火星位置";
 "house_label" = "宫位";
 "sign_lord" = "星座主宰";
-"nakshatra_lord" = "星宿主宰";
+"nakshatra_lord" = "星宿主";
 "dosha_calculation" = "灾厄计算";
 "base_strength" = "基础强度";
 "mitigation" = "缓解";
@@ -463,25 +484,25 @@
 "final_score" = "最终得分";
 "explanation_label" = "计算详情";
 
-"combined" = "Combined";
-"synastry_aspects" = "Synastry Aspects";
-"beneficial" = "Beneficial";
-"challenging" = "Challenging";
-"recommendations" = "Recommendations";
+"combined" = "组合";
+"synastry_aspects" = "联盘方面";
+"beneficial" = "有利";
+"challenging" = "具有挑战性的";
+"recommendations" = "建议";
 "present" = "存在";
 "absent" = "不存在";
-"no_data" = "No Data";
-"dosha_cancelled" = "Dosha Cancelled";
+"no_data" = "无数据";
+"dosha_cancelled" = "多夏取消";
 
 // MARK: - Kala Sarpa Premium UI
 "dosha_details" = "Yoga Details";
-"rahu_ketu_axis" = "Rahu-Ketu Axis";
-"planets" = "Planets";
-"planets_trapped" = "planets trapped";
-"head_of_serpent" = "Head of Serpent";
-"tail_of_serpent" = "Tail of Serpent";
-"analysis_notes" = "Analysis Notes";
-"no_kalsarpa_data" = "No Kalsarpa data available";
+"rahu_ketu_axis" = "罗胡-克图轴";
+"planets" = "行星";
+"planets_trapped" = "行星被困";
+"head_of_serpent" = "蛇头";
+"tail_of_serpent" = "蛇尾";
+"analysis_notes" = "分析笔记";
+"no_kalsarpa_data" = "没有可用的卡尔萨帕数据";
 
 /* Streaming Progress */
 "processing" = "加工...";
@@ -577,7 +598,6 @@
 "sign_in_to_switch_profiles" = "登录以切换配置文件";
 "sign_in_to_save_profiles" = "登录以保存和管理配置文件";
 "create_account_to_continue" = "创建账户以继续并保存您的进度";
-"free_limit_reached" = "创建账户以继续并保存您的进度";
 "birth_data_registered" = "此出生数据已注册。请登录以继续。";
 "age_requirement" = "您必须年满13岁才能创建账户";
 "back" = "返回";
@@ -600,7 +620,6 @@
 
 // Protection Messages - Active Chart
 "profile_edit_blocked_active" = "此出生图表当前处于活跃状态。请先切换到其他档案，或联系 support@destinyaiastrology.com。";
-"profile_delete_blocked_active" = "此出生图表当前处于活跃状态。请先切换到其他档案，或联系 support@destinyaiastrology.com。";
 
 // Protection Messages - Used Profile
 "profile_edit_blocked_used" = "此出生图表已用于解读，无法修改。如需帮助，请联系 support@destinyaiastrology.com。";
@@ -648,1414 +667,1414 @@
 // [−] Kala Sarpa Dosha
 // Additional Kala Sarpa variants
 // [+] Bandhu Pujya 194
-"kalsarpa_divine_protection_title" = "Divine Protection";
-"kalsarpa_divine_protection_message" = "Both charts are free from the Serpent Curse. This indicates a natural balance and fewer karmic obstacles in your journey together.";
-"kalsarpa_relationship_benefits" = "Relationship Benefits";
-"kalsarpa_emotional_harmony" = "Emotional Harmony";
-"kalsarpa_smooth_progression" = "Smooth Progression";
-"kalsarpa_positive_energy" = "Positive Energy";
-"kalsarpa_has_dosha" = "Has Dosha";
-"kalsarpa_protected" = "Protected";
-"kalsarpa_analysis_title" = "%@'s Analysis";
-"kalsarpa_mutual_kalsarpa" = "Mutual Kalsarpa";
-"kalsarpa_dosha_samya" = "Dosha Samya Detected";
-"kalsarpa_mutual_message" = "Since both charts have Kalsarpa Dosha, the intensity is balanced. This mutual presence often cancels out the negative effects, leading to a unique shared destiny.";
-"kalsarpa_remedies_for" = "Remedies for %@";
+"kalsarpa_divine_protection_title" = "神圣保护";
+"kalsarpa_divine_protection_message" = "两张图表均不受毒蛇诅咒的影响。这表明你们在一起的旅程中存在自然的平衡和更少的业力障碍。";
+"kalsarpa_relationship_benefits" = "关系的好处";
+"kalsarpa_emotional_harmony" = "情感和谐";
+"kalsarpa_smooth_progression" = "顺利进展";
+"kalsarpa_positive_energy" = "正能量";
+"kalsarpa_has_dosha" = "有Dosha";
+"kalsarpa_protected" = "受保护";
+"kalsarpa_analysis_title" = "%@的分析";
+"kalsarpa_mutual_kalsarpa" = "互助劫";
+"kalsarpa_dosha_samya" = "检测到 Dosha Samya";
+"kalsarpa_mutual_message" = "由于两张星盘都有 Kalsarpa Dosha，强度是平衡的。这种共同存在往往可以抵消负面影响，从而形成独特的共同命运。";
+"kalsarpa_remedies_for" = "%@ 的补救措施";
 
-"mangal_mutual_cancellation" = "Mutual Cancellation: Since both partners have Mangal Dosha, they neutralize each other's effects.";
-"mangal_exceptions_title" = "%@'s exceptions:";
+"mangal_mutual_cancellation" = "相互抵消：由于双方都有Mangal Dosha，因此他们可以抵消彼此的影响。";
+"mangal_exceptions_title" = "%@ 的例外情况：";
 
 // MARK: - Yoga Catalog (278 Yogas - Auto-generated from yoga_catalog.json)
 
 // [+] Adhi Yoga
-"yoga_name_adhi_yoga" = "Adhi Yoga";
-"yoga_outcome_adhi_yoga" = "Confers leadership, royal comforts, political success, and widespread respect.";
-"yoga_formation_adhi_yoga" = "Benefics (Jupiter, Venus, Mercury) in the 6th, 7th, and 8th from Moon.";
+"yoga_name_adhi_yoga" = "阿迪瑜伽";
+"yoga_outcome_adhi_yoga" = "赋予领导力、皇室的舒适、政治上的成功和广泛的尊重。";
+"yoga_formation_adhi_yoga" = "吉星（木星、金星、水星）位于月亮的第六、第七和第八宫。";
 
 // [+] Amala Yoga
-"yoga_name_amala_yoga" = "Amala Yoga";
-"yoga_outcome_amala_yoga" = "Bestows unblemished reputation and ethical prosperity through virtuous deeds.";
-"yoga_formation_amala_yoga" = "Natural benefic in 10th from Lagna or Moon.";
+"yoga_name_amala_yoga" = "阿玛拉瑜伽";
+"yoga_outcome_amala_yoga" = "通过善行赋予无瑕的声誉和道德繁荣。";
+"yoga_formation_amala_yoga" = "自然吉利在 10 宫，来自 Lagna 或月亮。";
 
 // [+] Amaranantha Dhana Yoga
-"yoga_name_amaranantha_dhana_yoga" = "Amaranantha Dhana Yoga";
-"yoga_outcome_amaranantha_dhana_yoga" = "Grants perpetual, undiminishing wealth maintained across generations.";
-"yoga_formation_amaranantha_dhana_yoga" = "Strong unafflicted 2nd and 11th lords in mutual support.";
+"yoga_name_amaranantha_dhana_yoga" = "阿玛兰塔瑜伽";
+"yoga_outcome_amaranantha_dhana_yoga" = "授予代代相传的永久、不减的财富。";
+"yoga_formation_amaranantha_dhana_yoga" = "坚强不受影响的第二和第十一领主相互支持。";
 
 // [+] Amsavatara Yoga
-"yoga_name_amsavatara_yoga" = "Amsavatara Yoga";
-"yoga_outcome_amsavatara_yoga" = "Divine incarnation qualities; the individual carries a special spiritual mission or purpose.";
-"yoga_formation_amsavatara_yoga" = "Venus in Kendra from Lagna lord, Jupiter in Trikona.";
+"yoga_name_amsavatara_yoga" = "阿姆萨瓦塔拉瑜伽";
+"yoga_outcome_amsavatara_yoga" = "神圣化身品质；个人肩负着特殊的精神使命或目的。";
+"yoga_formation_amsavatara_yoga" = "金星位于来自拉格纳主星的肯德拉，木星位于特里科纳。";
 
 // [−] Anapathya Yoga
-"yoga_name_anapathya_yoga" = "Anapathya Yoga";
-"yoga_outcome_anapathya_yoga" = "Complete absence of progeny; adoption or spiritual sublimation of parental instincts.";
-"yoga_formation_anapathya_yoga" = "5th lord, Jupiter, and 5th house all severely afflicted.";
+"yoga_name_anapathya_yoga" = "心灵瑜伽";
+"yoga_outcome_anapathya_yoga" = "完全没有后代；收养或父母本能的精神升华。";
+"yoga_formation_anapathya_yoga" = "第五宫主、木星和第五宫都受到严重影响。";
 
 // [+] Anapha Yoga
-"yoga_name_anapha_yoga" = "Anapha Yoga";
-"yoga_outcome_anapha_yoga" = "Bestows good physique, strong character, and comfortable lifestyle free from major adversity.";
-"yoga_formation_anapha_yoga" = "Planet (excl. Sun/Rahu/Ketu) in 12th house from Moon.";
+"yoga_name_anapha_yoga" = "阿纳法瑜伽";
+"yoga_outcome_anapha_yoga" = "赋予良好的体格、坚强的性格和远离重大逆境的舒适的生活方式。";
+"yoga_formation_anapha_yoga" = "行星（不包括太阳/拉胡/克图）位于月亮第 12 宫。";
 
 // [−] Andha Yoga
-"yoga_name_andha_yoga" = "Andha Yoga";
-"yoga_outcome_andha_yoga" = "Serious eye-related health concerns; early and regular intervention critical.";
-"yoga_formation_andha_yoga" = "Luminaries and 2nd/12th houses severely afflicted (var. 3).";
+"yoga_name_andha_yoga" = "安达瑜伽";
+"yoga_outcome_andha_yoga" = "严重的与眼睛相关的健康问题；早期和定期干预至关重要。";
+"yoga_formation_andha_yoga" = "发光体和第 2/第 12 宫受到严重影响（第 3 种）。";
 
 // [−] Andha Yoga (288)
-"yoga_name_andha_yoga_288" = "Andha Yoga (288)";
-"yoga_outcome_andha_yoga_288" = "Significant vision challenges; prioritize eye health and preventive measures.";
-"yoga_formation_andha_yoga_288" = "Sun/Moon afflicted by malefics in 6th/8th/12th (var. 1).";
+"yoga_name_andha_yoga_288" = "安达瑜伽 (288)";
+"yoga_outcome_andha_yoga_288" = "严重的视力挑战；优先考虑眼睛健康和预防措施。";
+"yoga_formation_andha_yoga_288" = "太阳/月亮在 6 宫/8 宫/12 宫（变量 1）受到凶星的影响。";
 
 // [−] Andha Yoga (289)
-"yoga_name_andha_yoga_289" = "Andha Yoga (289)";
-"yoga_outcome_andha_yoga_289" = "Vulnerability to progressive vision loss; ophthalmological care recommended.";
-"yoga_formation_andha_yoga_289" = "Venus and 2nd lord weakened with malefic aspects (var. 2).";
+"yoga_name_andha_yoga_289" = "安达瑜伽 (289)";
+"yoga_outcome_andha_yoga_289" = "容易出现进行性视力丧失；建议进行眼科护理。";
+"yoga_formation_andha_yoga_289" = "金星和第二宫主因凶星相位而减弱（var.2）。";
 
 // [−] Angaheena Yoga
-"yoga_name_angaheena_yoga" = "Angaheena Yoga";
-"yoga_outcome_angaheena_yoga" = "Physical challenges or disability; overcoming bodily limitations requires determination.";
-"yoga_formation_angaheena_yoga" = "Malefics in Lagna with Lagna lord afflicted in Dusthana.";
+"yoga_name_angaheena_yoga" = "安加希纳瑜伽";
+"yoga_outcome_angaheena_yoga" = "身体挑战或残疾；克服身体的限制需要决心。";
+"yoga_formation_angaheena_yoga" = "凶星在拉格纳，拉格纳领主在杜斯塔纳受苦。";
 
 // [+] Annadana Yoga
-"yoga_name_annadana_yoga" = "Annadana Yoga";
-"yoga_outcome_annadana_yoga" = "Generous food donor; the individual feeds others and is known for charitable hospitality.";
-"yoga_formation_annadana_yoga" = "2nd lord in Kendra/Trikona with Jupiter's aspect.";
+"yoga_name_annadana_yoga" = "安达那瑜伽";
+"yoga_outcome_annadana_yoga" = "慷慨的食物捐赠者；该人为他人提供食物并以慈善款待而闻名。";
+"yoga_formation_annadana_yoga" = "肯德拉/特里科纳的第二位主宰，具有木星相位。";
 
 // [+] Anthya Vayasi Dhana Yoga
-"yoga_name_anthya_vayasi_dhana_yoga" = "Anthya Vayasi Dhana Yoga";
-"yoga_outcome_anthya_vayasi_dhana_yoga" = "Indicates prosperity in later life (55+ years); retirement brings comfort.";
-"yoga_formation_anthya_vayasi_dhana_yoga" = "Wealth significators activate during later Dasha periods.";
+"yoga_name_anthya_vayasi_dhana_yoga" = "Anthya Vayasi 达纳瑜伽";
+"yoga_outcome_anthya_vayasi_dhana_yoga" = "预示晚年生活繁荣（55岁以上）；退休带来安慰。";
+"yoga_formation_anthya_vayasi_dhana_yoga" = "财富星在大煞后期激活。";
 
 // [−] Apakeerti Yoga
-"yoga_name_apakeerti_yoga" = "Apakeerti Yoga";
-"yoga_outcome_apakeerti_yoga" = "Indicates risk of notoriety or damaged reputation; mindful conduct is essential.";
-"yoga_formation_apakeerti_yoga" = "Malefic influences on Lagna and 10th house.";
+"yoga_name_apakeerti_yoga" = "阿帕基尔蒂瑜伽";
+"yoga_outcome_apakeerti_yoga" = "表明有恶名或名誉受损的风险；正念行为至关重要。";
+"yoga_formation_apakeerti_yoga" = "凶星对拉格纳和第十宫的影响。";
 
 // [−] Aputra Yoga
-"yoga_name_aputra_yoga" = "Aputra Yoga";
-"yoga_outcome_aputra_yoga" = "Childlessness or extreme difficulty in having progeny; remedial measures advised.";
-"yoga_formation_aputra_yoga" = "5th lord and Jupiter severely afflicted in Dusthana.";
+"yoga_name_aputra_yoga" = "阿普特拉瑜伽";
+"yoga_outcome_aputra_yoga" = "无子女或极难生育后代；建议采取补救措施。";
+"yoga_formation_aputra_yoga" = "第五主和朱庇特在杜斯塔纳遭受严重折磨。";
 
 // [−] Asatyavadi Yoga
-"yoga_name_asatyavadi_yoga" = "Asatyavadi Yoga";
-"yoga_outcome_asatyavadi_yoga" = "Tendency toward untruthfulness or exaggeration; conscious honesty practice needed.";
-"yoga_formation_asatyavadi_yoga" = "Mercury afflicted with malefics in 2nd house.";
+"yoga_name_asatyavadi_yoga" = "阿萨蒂亚瓦迪瑜伽";
+"yoga_outcome_asatyavadi_yoga" = "有不真实或夸大的倾向；需要有意识的诚实实践。";
+"yoga_formation_asatyavadi_yoga" = "水星在第二宫受到凶星的影响。";
 
 // [+] Ayatna Griha Prapta (189)
-"yoga_name_ayatna_griha_prapta_yoga_189" = "Ayatna Griha Prapta (189)";
-"yoga_outcome_ayatna_griha_prapta_yoga_189" = "Property acquisition without effort — through inheritance, gifts, or fortunate deals.";
-"yoga_formation_ayatna_griha_prapta_yoga_189" = "4th lord well-placed with benefic aspects (var. 1).";
+"yoga_name_ayatna_griha_prapta_yoga_189" = "阿亚特纳·格里哈·普拉塔 (189)";
+"yoga_outcome_ayatna_griha_prapta_yoga_189" = "毫不费力地获得财产——通过继承、礼物或幸运的交易。";
+"yoga_formation_ayatna_griha_prapta_yoga_189" = "第四宫主位置优越，具有有利的相位（变量 1）。";
 
 // [+] Ayatna Griha Prapta (190)
-"yoga_name_ayatna_griha_prapta_yoga_190" = "Ayatna Griha Prapta (190)";
-"yoga_outcome_ayatna_griha_prapta_yoga_190" = "Effortless acquisition of homes and real estate through favorable circumstances.";
-"yoga_formation_ayatna_griha_prapta_yoga_190" = "Benefic influence on 4th house from strong planets (var. 2).";
+"yoga_name_ayatna_griha_prapta_yoga_190" = "阿亚特纳·格里哈·普拉塔 (190)";
+"yoga_outcome_ayatna_griha_prapta_yoga_190" = "通过有利的环境轻松购买房屋和房地产。";
+"yoga_formation_ayatna_griha_prapta_yoga_190" = "强大的行星对第四宫产生有利影响（变量2）。";
 
 // [+] Ayatnadhanalabha Yoga
-"yoga_name_ayatnadhanalabha_yoga" = "Ayatnadhanalabha Yoga";
-"yoga_outcome_ayatnadhanalabha_yoga" = "Bestows effortless wealth — windfall, inheritance, or fortunate opportunities.";
-"yoga_formation_ayatnadhanalabha_yoga" = "2nd lord in 11th or vice versa, with Jupiter/Venus aspects.";
+"yoga_name_ayatnadhanalabha_yoga" = "阿亚特那达那拉巴瑜伽";
+"yoga_outcome_ayatnadhanalabha_yoga" = "毫不费力地赐予财富——意外之财、遗产或幸运的机会。";
+"yoga_formation_ayatnadhanalabha_yoga" = "第二宫主位于第十一宫，反之亦然，具有木星/金星相位。";
 
 // [+] Bahu Stree Yoga
-"yoga_name_bahu_stree_yoga" = "Bahu Stree Yoga";
-"yoga_outcome_bahu_stree_yoga" = "Multiple significant relationships or strong attraction from opposite sex; magnetic romantic presence.";
-"yoga_formation_bahu_stree_yoga" = "Lagna lord and 7th lord in conjunction or mutual aspect.";
+"yoga_name_bahu_stree_yoga" = "巴胡瑜伽";
+"yoga_outcome_bahu_stree_yoga" = "多重重要关系或来自异性的强烈吸引力；磁性浪漫的存在。";
+"yoga_formation_bahu_stree_yoga" = "拉格纳主星和第七主星合相或相互相位。";
 
 // [+] Bahudravyarjana Yoga
-"yoga_name_bahudravyarjana_yoga" = "Bahudravyarjana Yoga";
-"yoga_outcome_bahudravyarjana_yoga" = "Ensures acquisition of diverse assets and wealth from multiple sources throughout life.";
-"yoga_formation_bahudravyarjana_yoga" = "Multiple wealth-significators in strong mutual positions.";
+"yoga_name_bahudravyarjana_yoga" = "巴胡德拉维亚瑜伽";
+"yoga_outcome_bahudravyarjana_yoga" = "确保一生从多个来源获得多样化的资产和财富。";
+"yoga_formation_bahudravyarjana_yoga" = "多个财富象征具有强大的共同地位。";
 
 // [+] Bahuputra Yoga (220)
-"yoga_name_bahuputra_yoga_220" = "Bahuputra Yoga (220)";
-"yoga_outcome_bahuputra_yoga_220" = "Blessed with many children who bring joy and family continuity.";
-"yoga_formation_bahuputra_yoga_220" = "5th lord strong in Kendra/Trikona with Jupiter's aspect (var. 1).";
+"yoga_name_bahuputra_yoga_220" = "巴胡普特拉瑜伽 (220)";
+"yoga_outcome_bahuputra_yoga_220" = "幸运的是，有很多孩子，他们带来了欢乐和家庭的延续。";
+"yoga_formation_bahuputra_yoga_220" = "肯德拉/特里科纳第五位主宰，木星相位（var.1）。";
 
 // [+] Bahuputra Yoga (221)
-"yoga_name_bahuputra_yoga_221" = "Bahuputra Yoga (221)";
-"yoga_outcome_bahuputra_yoga_221" = "Multiple progeny with good health and character; family grows.";
-"yoga_formation_bahuputra_yoga_221" = "Jupiter and 5th lord in mutual support with benefic connections (var. 2).";
+"yoga_name_bahuputra_yoga_221" = "巴胡普特拉瑜伽 (221)";
+"yoga_outcome_bahuputra_yoga_221" = "多子女，身体健康，品行良好；家庭成长。";
+"yoga_formation_bahuputra_yoga_221" = "木星和第五宫主相互支持并有良好的联系（var.2）。";
 
 // [+] Balya Dhana Yoga
-"yoga_name_balya_dhana_yoga" = "Balya Dhana Yoga";
-"yoga_outcome_balya_dhana_yoga" = "Grants early financial advantage through family wealth or inheritance.";
-"yoga_formation_balya_dhana_yoga" = "Wealth significators active from birth through early Dasha.";
+"yoga_name_balya_dhana_yoga" = "巴利亚达纳瑜伽";
+"yoga_outcome_balya_dhana_yoga" = "通过家庭财富或继承赋予早期经济优势。";
+"yoga_formation_balya_dhana_yoga" = "财富象征从出生到达莎早期都很活跃。";
 
 // [−] Bandhana Yoga
-"yoga_name_bandhana_yoga" = "Bandhana Yoga";
-"yoga_outcome_bandhana_yoga" = "Risk of confinement, imprisonment, or involuntary restriction of freedom.";
-"yoga_formation_bandhana_yoga" = "Lagna lord and 6th lord connected with Saturn/Rahu.";
+"yoga_name_bandhana_yoga" = "班达纳瑜伽";
+"yoga_outcome_bandhana_yoga" = "监禁、监禁或非自愿限制自由的风险。";
+"yoga_formation_bandhana_yoga" = "拉格纳主星和第六主星与土星/罗睺有关。";
 
 // [+] Bandhu Pujya Yoga (193)
-"yoga_name_bandhu_pujya_yoga_193" = "Bandhu Pujya Yoga (193)";
-"yoga_outcome_bandhu_pujya_yoga_193" = "Grants respect and affection from family and relatives; individual is a family anchor.";
-"yoga_formation_bandhu_pujya_yoga_193" = "4th lord in benefic position with benefic aspects and Mercury in Lagna.";
+"yoga_name_bandhu_pujya_yoga_193" = "Bandhu Pujya瑜伽 (193)";
+"yoga_outcome_bandhu_pujya_yoga_193" = "获得家人和亲戚的尊重和爱戴；个人是家庭的支柱。";
+"yoga_formation_bandhu_pujya_yoga_193" = "第四宫主处于有利位置，具有有利相位且水星位于拉格纳。";
 
 // [+] Bandhu Pujya Yoga (194)
-"yoga_name_bandhu_pujya_yoga_194" = "Bandhu Pujya Yoga (194)";
-"yoga_outcome_bandhu_pujya_yoga_194" = "Strengthens family bonds and brings honor through kinship and trusted counsel.";
-"yoga_formation_bandhu_pujya_yoga_194" = "Jupiter connected to 4th house through aspect or occupation.";
+"yoga_name_bandhu_pujya_yoga_194" = "Bandhu Pujya瑜伽 (194)";
+"yoga_outcome_bandhu_pujya_yoga_194" = "通过亲属关系和值得信赖的建议加强家庭纽带并带来荣誉。";
+"yoga_formation_bandhu_pujya_yoga_194" = "木星通过相位或职业与第四宫相连。";
 
 // [−] Bandhubhisthyaktha Yoga
-"yoga_name_bandhubhisthyaktha_yoga" = "Bandhubhisthyaktha Yoga";
-"yoga_outcome_bandhubhisthyaktha_yoga" = "Indicates estrangement from relatives and potential family conflicts or isolation.";
-"yoga_formation_bandhubhisthyaktha_yoga" = "Malefic affliction to 4th house and lord with no benefic support.";
+"yoga_name_bandhubhisthyaktha_yoga" = "班胡希斯提亚克塔瑜伽";
+"yoga_outcome_bandhubhisthyaktha_yoga" = "表示与亲戚的疏远以及潜在的家庭冲突或孤立。";
+"yoga_formation_bandhubhisthyaktha_yoga" = "第四宫和主宰有凶星的折磨，没有吉利的支持。";
 
 // [+] Bhadra Yoga
-"yoga_name_bhadra_yoga" = "Bhadra Yoga";
-"yoga_outcome_bhadra_yoga" = "Bestows sharp intellect, eloquent speech, business acumen, and excellence in analytical professions.";
-"yoga_formation_bhadra_yoga" = "Mercury in a Kendra (1/4/7/10) in own sign (Gemini/Virgo) or exaltation (Virgo).";
+"yoga_name_bhadra_yoga" = "巴德拉瑜伽";
+"yoga_outcome_bhadra_yoga" = "赋予敏锐的智慧、雄辩的演讲、商业头脑和卓越的分析专业能力。";
+"yoga_formation_bhadra_yoga" = "水星位于肯德拉宫（1/4/7/10），位于自己的星座（双子座/处女座）或擢升（处女座）。";
 
 // [+] Bhaga Chumbana Yoga
-"yoga_name_bhaga_chumbana_yoga" = "Bhaga Chumbana Yoga";
-"yoga_outcome_bhaga_chumbana_yoga" = "Intense, passionate romantic life with heightened physical magnetism and intimate fulfillment.";
-"yoga_formation_bhaga_chumbana_yoga" = "Venus and 7th lord in specific combinations indicating physical attraction.";
+"yoga_name_bhaga_chumbana_yoga" = "巴嘎楚巴纳瑜伽";
+"yoga_outcome_bhaga_chumbana_yoga" = "强烈、充满激情的浪漫生活，具有增强的身体吸引力和亲密的满足感。";
+"yoga_formation_bhaga_chumbana_yoga" = "金星和第七宫主的特定组合表明身体吸引力。";
 
 // [+] Bhagya Yoga
-"yoga_name_bhagya_yoga" = "Bhagya Yoga";
-"yoga_outcome_bhagya_yoga" = "Exceptional fortune, luck, and divine grace; blessed with timely opportunities.";
-"yoga_formation_bhagya_yoga" = "9th lord strong in Kendra/Trikona with benefic influences.";
+"yoga_name_bhagya_yoga" = "巴伽瑜伽";
+"yoga_outcome_bhagya_yoga" = "非凡的财富、运气和神圣的恩典；幸运的是及时的机会。";
+"yoga_formation_bhagya_yoga" = "肯德拉/特里科纳的第九位领主，具有良好的影响力。";
 
 // [+] Bharathi Yoga
-"yoga_name_bharathi_yoga" = "Bharathi Yoga";
-"yoga_outcome_bharathi_yoga" = "Grants exceptional scholarship, eloquence, fame in learning, and mastery of arts and sciences.";
-"yoga_formation_bharathi_yoga" = "Navamsa lord of 2nd/5th/11th lord is exalted and conjoined with 9th lord.";
+"yoga_name_bharathi_yoga" = "巴拉地瑜伽";
+"yoga_outcome_bharathi_yoga" = "授予卓越的学识、口才、学习声誉以及对艺术和科学的掌握。";
+"yoga_formation_bharathi_yoga" = "第二/第五/第十一主的纳瓦姆萨主被提升并与第九主结合。";
 
 // [−] Bharyasahavyabhicharya Yoga
-"yoga_name_bharyasahavyabhicharya_yoga" = "Bharyasahavyabhicharya Yoga";
-"yoga_outcome_bharyasahavyabhicharya_yoga" = "Trust issues in marriage; transparency and emotional connection should be prioritized.";
-"yoga_formation_bharyasahavyabhicharya_yoga" = "Venus and 7th house afflictions indicating infidelity.";
+"yoga_name_bharyasahavyabhicharya_yoga" = "瑜伽";
+"yoga_outcome_bharyasahavyabhicharya_yoga" = "婚姻中的信任问题；应优先考虑透明度和情感联系。";
+"yoga_formation_bharyasahavyabhicharya_yoga" = "金星和第七宫的痛苦表明不忠。";
 
 // [+] Bhaskara Yoga
-"yoga_name_bhaskara_yoga" = "Bhaskara Yoga";
-"yoga_outcome_bhaskara_yoga" = "Solar-like brilliance in learning; illuminates others through teaching.";
-"yoga_formation_bhaskara_yoga" = "Mercury in 2nd from Sun, Moon in 11th, Jupiter in Trikona from Mercury.";
+"yoga_name_bhaskara_yoga" = "巴斯卡拉瑜伽";
+"yoga_outcome_bhaskara_yoga" = "学习中阳光般的才华；通过教导照亮他人。";
+"yoga_formation_bhaskara_yoga" = "水星在太阳的第二宫，月亮在第十一宫，木星在水星的特里科纳。";
 
 // [+] Bheri Yoga
-"yoga_name_bheri_yoga" = "Bheri Yoga";
-"yoga_outcome_bheri_yoga" = "Drum-like fame; prosperity, courage, enduring reputation, and royal status.";
-"yoga_formation_bheri_yoga" = "Venus, Jupiter, and Lagna lord in mutual Kendras from 9th lord.";
+"yoga_name_bheri_yoga" = "贝里瑜伽";
+"yoga_outcome_bheri_yoga" = "名声如鼓；繁荣、勇气、持久的声誉和皇室地位。";
+"yoga_formation_bheri_yoga" = "金星、木星和拉格纳从第九宫主星开始，在共同的肯德拉星上主宰。";
 
 // [+] Bhojana Soukhya Yoga
-"yoga_name_bhojana_soukhya_yoga" = "Bhojana Soukhya Yoga";
-"yoga_outcome_bhojana_soukhya_yoga" = "Enjoys fine food, culinary pleasures, and a comfortable dining lifestyle.";
-"yoga_formation_bhojana_soukhya_yoga" = "2nd lord strong with benefic aspects on the 2nd house.";
+"yoga_name_bhojana_soukhya_yoga" = "博佳纳苏基亚瑜伽";
+"yoga_outcome_bhojana_soukhya_yoga" = "享受精致的食物、烹饪的乐趣和舒适的用餐生活方式。";
+"yoga_formation_bhojana_soukhya_yoga" = "第二宫主强势，在第二宫有有利的相位。";
 
 // [+] Bhratrumoola Dhanaprapti (136)
-"yoga_name_bhratrumoola_dhanaprapti_yoga_136" = "Bhratrumoola Dhanaprapti (136)";
-"yoga_outcome_bhratrumoola_dhanaprapti_yoga_136" = "Wealth through siblings, courage, or communication; siblings aid prosperity.";
-"yoga_formation_bhratrumoola_dhanaprapti_yoga_136" = "3rd lord connected to 2nd and 11th houses (var. 1).";
+"yoga_name_bhratrumoola_dhanaprapti_yoga_136" = "婆罗多穆拉·达那帕提 (136)";
+"yoga_outcome_bhratrumoola_dhanaprapti_yoga_136" = "通过兄弟姐妹、勇气或沟通获得财富；兄弟姐妹帮助繁荣。";
+"yoga_formation_bhratrumoola_dhanaprapti_yoga_136" = "第三宫主与第二宫和第十一宫相连（变量 1）。";
 
 // [+] Bhratrumoola Dhanaprapti (137)
-"yoga_name_bhratrumoola_dhanaprapti_yoga_137" = "Bhratrumoola Dhanaprapti (137)";
-"yoga_outcome_bhratrumoola_dhanaprapti_yoga_137" = "Financial gains through sibling partnerships or collaborative ventures.";
-"yoga_formation_bhratrumoola_dhanaprapti_yoga_137" = "3rd lord connected to 2nd and 11th houses (var. 2).";
+"yoga_name_bhratrumoola_dhanaprapti_yoga_137" = "婆罗多穆拉·达那帕提 (137)";
+"yoga_outcome_bhratrumoola_dhanaprapti_yoga_137" = "通过兄弟伙伴关系或合作企业获得经济收益。";
+"yoga_formation_bhratrumoola_dhanaprapti_yoga_137" = "第三宫主与第二宫和第十一宫相连（变量2）。";
 
 // [−] Bhratrusapa Sutakshaya Yoga
-"yoga_name_bhratrusapa_sutakshaya_yoga" = "Bhratrusapa Sutakshaya Yoga";
-"yoga_outcome_bhratrusapa_sutakshaya_yoga" = "Sibling's curse affecting progeny; unresolved fraternal karma impacts children.";
-"yoga_formation_bhratrusapa_sutakshaya_yoga" = "Mars afflicted with 5th lord in malefic combinations.";
+"yoga_name_bhratrusapa_sutakshaya_yoga" = "婆罗多萨帕 Sutakshaya 瑜伽";
+"yoga_outcome_bhratrusapa_sutakshaya_yoga" = "Sibling's curse affecting progeny;未解决的兄弟业力会影响儿童。";
+"yoga_formation_bhratrusapa_sutakshaya_yoga" = "火星与第五宫主有凶相相位。";
 
 // [+] Brahma Yoga
-"yoga_name_brahma_yoga" = "Brahma Yoga";
-"yoga_outcome_brahma_yoga" = "Grants profound wisdom, scholarly pursuits, and divine protection in knowledge-based professions.";
-"yoga_formation_brahma_yoga" = "Benefics in Kendras from 5th and 11th lords with specific requirements.";
+"yoga_name_brahma_yoga" = "梵天瑜伽";
+"yoga_outcome_brahma_yoga" = "赋予知识型职业深刻的智慧、学术追求和神圣的保护。";
+"yoga_formation_brahma_yoga" = "第五和第十一任领主对肯德拉斯的祝福有特定要求。";
 
 // [−] Buddhi Jada Yoga
-"yoga_name_buddhi_jada_yoga" = "Buddhi Jada Yoga";
-"yoga_outcome_buddhi_jada_yoga" = "Slow learning or intellectual dullness; extra effort needed to grasp complex concepts.";
-"yoga_formation_buddhi_jada_yoga" = "Saturn afflicting Mercury and 5th house, no benefic relief.";
+"yoga_name_buddhi_jada_yoga" = "菩提伽达瑜伽";
+"yoga_outcome_buddhi_jada_yoga" = "学习缓慢或智力迟钝；需要额外的努力来掌握复杂的概念。";
+"yoga_formation_buddhi_jada_yoga" = "土星刑克水星和第五宫，没有有利的缓解。";
 
 // [+] Buddhimaturya Yoga
-"yoga_name_buddhimaturya_yoga" = "Buddhimaturya Yoga";
-"yoga_outcome_buddhimaturya_yoga" = "Mature intellect beyond one's years; wisdom, analytical depth, and scholarly temperament.";
-"yoga_formation_buddhimaturya_yoga" = "Mercury and Jupiter in mutual Kendra, 5th lord strong.";
+"yoga_name_buddhimaturya_yoga" = "佛教瑜伽";
+"yoga_outcome_buddhimaturya_yoga" = "超越年龄的成熟智力；智慧、分析深度和学者气质。";
+"yoga_formation_buddhimaturya_yoga" = "水星和木星在共同的肯德拉，第五宫主强。";
 
 // [+] Budha Aditya Yoga
-"yoga_name_budha_aditya_yoga" = "Budha Aditya Yoga";
-"yoga_outcome_budha_aditya_yoga" = "Intellectual brilliance combined with leadership; brilliant communicator with executive ability.";
-"yoga_formation_budha_aditya_yoga" = "Mercury conjoined with Sun in same house.";
+"yoga_name_budha_aditya_yoga" = "佛陀阿迪亚瑜伽";
+"yoga_outcome_budha_aditya_yoga" = "才智与领导力相结合；具有执行能力的出色沟通者。";
+"yoga_formation_budha_aditya_yoga" = "水星与太阳在同一宫位合相。";
 
 // [+] Budha Yoga
-"yoga_name_budha_yoga" = "Budha Yoga";
-"yoga_outcome_budha_yoga" = "Mercurial intelligence — quick wit, mathematical skill, and commercial proficiency.";
-"yoga_formation_budha_yoga" = "Mercury strong in Kendra with benefic aspects connected to 5th.";
+"yoga_name_budha_yoga" = "佛陀瑜伽";
+"yoga_outcome_budha_yoga" = "善变的智力——机智、数学技能和商业能力。";
+"yoga_formation_budha_yoga" = "水星在肯德拉很强，与第五宫有吉相。";
 
 // [+] Chandika Yoga
-"yoga_name_chandika_yoga" = "Chandika Yoga";
-"yoga_outcome_chandika_yoga" = "Fierce determination and divine protection in leadership roles.";
-"yoga_formation_chandika_yoga" = "Lagna lord exalted aspecting Moon, Jupiter in Kendra.";
+"yoga_name_chandika_yoga" = "昌迪卡瑜伽";
+"yoga_outcome_chandika_yoga" = "领导角色的坚定决心和神圣保护。";
+"yoga_formation_chandika_yoga" = "拉格纳主在肯德拉与月亮、木星成相位。";
 
 // [−] Chandra Mangala Yoga
-"yoga_name_chandra_mangala_yoga" = "Chandra Mangala Yoga";
-"yoga_outcome_chandra_mangala_yoga" = "Creates emotional intensity and impulsive tendencies. May bring gains through unconventional means but causes relationship friction.";
-"yoga_formation_chandra_mangala_yoga" = "Moon and Mars in conjunction (same house).";
+"yoga_name_chandra_mangala_yoga" = "钱德拉曼加拉瑜伽";
+"yoga_outcome_chandra_mangala_yoga" = "造成情绪强度和冲动倾向。可能会通过非常规手段带来收益，但却会造成关系摩擦。";
+"yoga_formation_chandra_mangala_yoga" = "月亮和火星合相（同一宫位）。";
 
 // [+] Chapa Yoga
-"yoga_name_chapa_yoga" = "Chapa Yoga";
-"yoga_outcome_chapa_yoga" = "Confers royal comforts, prosperity, truthful courage, and dignified social position.";
-"yoga_formation_chapa_yoga" = "Lagna lord exalted, 4th and 10th lords in mutual exchange.";
+"yoga_name_chapa_yoga" = "查帕瑜伽";
+"yoga_outcome_chapa_yoga" = "赋予皇室舒适、繁荣、诚实的勇气和尊严的社会地位。";
+"yoga_formation_chapa_yoga" = "拉格纳领主晋升，第四领主和第十领主相互交换。";
 
 // [+] Chatussagara Yoga
-"yoga_name_chatussagara_yoga" = "Chatussagara Yoga";
-"yoga_outcome_chatussagara_yoga" = "Grants fame, prosperity, and an influential life known across regions.";
-"yoga_formation_chatussagara_yoga" = "All four Kendra houses (1/4/7/10) occupied by planets.";
+"yoga_name_chatussagara_yoga" = "查图萨加拉瑜伽";
+"yoga_outcome_chatussagara_yoga" = "赋予名誉、繁荣和跨地区有影响力的生活。";
+"yoga_formation_chatussagara_yoga" = "所有四个肯德拉宫 (1/4/7/10) 都被行星占据。";
 
 // [−] Daridra Yoga
-"yoga_name_daridra_yoga" = "Daridra Yoga";
-"yoga_outcome_daridra_yoga" = "Periods of financial hardship; careful planning and remedial measures advisable.";
-"yoga_formation_daridra_yoga" = "2nd and 11th lords in 6th/8th/12th houses.";
+"yoga_name_daridra_yoga" = "达里德拉瑜伽";
+"yoga_outcome_daridra_yoga" = "经济困难时期；建议仔细规划和采取补救措施。";
+"yoga_formation_daridra_yoga" = "第 2 和第 11 宫主位于第 6/8/12 宫。";
 
 // [−] Daridra Yoga (144)
-"yoga_name_daridra_yoga_144" = "Daridra Yoga (144)";
-"yoga_outcome_daridra_yoga_144" = "Financial drain through partnerships, legal issues, or overexpenditure.";
-"yoga_formation_daridra_yoga_144" = "Lagna-12th lord exchange with 7th lord aspects.";
+"yoga_name_daridra_yoga_144" = "达里德拉瑜伽 (144)";
+"yoga_outcome_daridra_yoga_144" = "由于合作伙伴关系、法律问题或超支而导致财务流失。";
+"yoga_formation_daridra_yoga_144" = "Lagna-第 12 宫主与第 7 宫主相位交换。";
 
 // [−] Daridra Yoga (145)
-"yoga_name_daridra_yoga_145" = "Daridra Yoga (145)";
-"yoga_outcome_daridra_yoga_145" = "Income instability and difficulty saving wealth.";
-"yoga_formation_daridra_yoga_145" = "Malefic combinations on 2nd and 11th houses (var. 2).";
+"yoga_name_daridra_yoga_145" = "达里德拉瑜伽 (145)";
+"yoga_outcome_daridra_yoga_145" = "收入不稳定，储蓄财富困难。";
+"yoga_formation_daridra_yoga_145" = "第 2 宫和第 11 宫的凶星组合（变量 2）。";
 
 // [−] Daridra Yoga (146)
-"yoga_name_daridra_yoga_146" = "Daridra Yoga (146)";
-"yoga_outcome_daridra_yoga_146" = "Poverty through wasteful spending or unfortunate financial decisions.";
-"yoga_formation_daridra_yoga_146" = "Malefic combinations on 2nd and 11th houses (var. 3).";
+"yoga_name_daridra_yoga_146" = "达里德拉瑜伽 (146)";
+"yoga_outcome_daridra_yoga_146" = "浪费性支出或不幸的财务决策导致贫困。";
+"yoga_formation_daridra_yoga_146" = "第 2 宫和第 11 宫的凶星组合（变量 3）。";
 
 // [−] Daridra Yoga (147)
-"yoga_name_daridra_yoga_147" = "Daridra Yoga (147)";
-"yoga_outcome_daridra_yoga_147" = "Financial struggles due to family obligations or inherited debts.";
-"yoga_formation_daridra_yoga_147" = "Malefic combinations on 2nd and 11th houses (var. 4).";
+"yoga_name_daridra_yoga_147" = "达里德拉瑜伽 (147)";
+"yoga_outcome_daridra_yoga_147" = "由于家庭义务或继承的债务而陷入财务困境。";
+"yoga_formation_daridra_yoga_147" = "第 2 宫和第 11 宫的凶星组合（变体 4）。";
 
 // [−] Daridra Yoga (148)
-"yoga_name_daridra_yoga_148" = "Daridra Yoga (148)";
-"yoga_outcome_daridra_yoga_148" = "Loss of wealth through enemies, litigation, or health expenses.";
-"yoga_formation_daridra_yoga_148" = "Malefic combinations on 2nd and 11th houses (var. 5).";
+"yoga_name_daridra_yoga_148" = "达里德拉瑜伽 (148)";
+"yoga_outcome_daridra_yoga_148" = "由于敌人、诉讼或医疗费用而造成的财富损失。";
+"yoga_formation_daridra_yoga_148" = "第 2 宫和第 11 宫的凶星组合（变量 5）。";
 
 // [−] Daridra Yoga (149)
-"yoga_name_daridra_yoga_149" = "Daridra Yoga (149)";
-"yoga_outcome_daridra_yoga_149" = "Difficulty maintaining stable employment or consistent income.";
-"yoga_formation_daridra_yoga_149" = "Malefic combinations on 2nd and 11th houses (var. 6).";
+"yoga_name_daridra_yoga_149" = "达里德拉瑜伽 (149)";
+"yoga_outcome_daridra_yoga_149" = "难以维持稳定的就业或持续的收入。";
+"yoga_formation_daridra_yoga_149" = "第 2 宫和第 11 宫的凶星组合（变量 6）。";
 
 // [−] Daridra Yoga (150)
-"yoga_name_daridra_yoga_150" = "Daridra Yoga (150)";
-"yoga_outcome_daridra_yoga_150" = "Poverty due to lack of initiative or motivation in financial matters.";
-"yoga_formation_daridra_yoga_150" = "Malefic combinations on 2nd and 11th houses (var. 7).";
+"yoga_name_daridra_yoga_150" = "达里德拉瑜伽 (150)";
+"yoga_outcome_daridra_yoga_150" = "由于在财务问题上缺乏主动性或动力而导致贫困。";
+"yoga_formation_daridra_yoga_150" = "第 2 宫和第 11 宫的凶星组合（变量 7）。";
 
 // [−] Daridra Yoga (151)
-"yoga_name_daridra_yoga_151" = "Daridra Yoga (151)";
-"yoga_outcome_daridra_yoga_151" = "Financial losses through speculation or risky ventures.";
-"yoga_formation_daridra_yoga_151" = "Malefic combinations on 2nd and 11th houses (var. 8).";
+"yoga_name_daridra_yoga_151" = "达里德拉瑜伽 (151)";
+"yoga_outcome_daridra_yoga_151" = "投机或冒险活动造成的经济损失。";
+"yoga_formation_daridra_yoga_151" = "第 2 宫和第 11 宫的凶星组合（变量 8）。";
 
 // [−] Daridra Yoga (152)
-"yoga_name_daridra_yoga_152" = "Daridra Yoga (152)";
-"yoga_outcome_daridra_yoga_152" = "Chronic financial challenges requiring disciplined money management.";
-"yoga_formation_daridra_yoga_152" = "Malefic combinations on 2nd and 11th houses (var. 9).";
+"yoga_name_daridra_yoga_152" = "达里德拉瑜伽 (152)";
+"yoga_outcome_daridra_yoga_152" = "长期的财务挑战需要严格的资金管理。";
+"yoga_formation_daridra_yoga_152" = "第 2 宫和第 11 宫的凶星组合（变量 9）。";
 
 // [−] Daridra Yoga (153)
-"yoga_name_daridra_yoga_153" = "Daridra Yoga (153)";
-"yoga_outcome_daridra_yoga_153" = "Financial ruin through external circumstances beyond personal control.";
-"yoga_formation_daridra_yoga_153" = "Malefic combinations on 2nd and 11th houses (var. 10).";
+"yoga_name_daridra_yoga_153" = "达里德拉瑜伽 (153)";
+"yoga_outcome_daridra_yoga_153" = "由于个人无法控制的外部环境而造成的财务损失。";
+"yoga_formation_daridra_yoga_153" = "第 2 宫和第 11 宫的凶星组合（变量 10）。";
 
 // [+] Dattaputra Yoga (222)
-"yoga_name_dattaputra_yoga_222" = "Dattaputra Yoga (222)";
-"yoga_outcome_dattaputra_yoga_222" = "Happiness through adopted children or non-biological heirs.";
-"yoga_formation_dattaputra_yoga_222" = "5th lord connected to 8th/12th with Saturn's involvement (var. 1).";
+"yoga_name_dattaputra_yoga_222" = "达塔普特拉瑜伽 (222)";
+"yoga_outcome_dattaputra_yoga_222" = "通过收养的孩子或非亲生继承人获得幸福。";
+"yoga_formation_dattaputra_yoga_222" = "第五宫主在土星的参与下与第八宫/第十二宫相连（变量 1）。";
 
 // [+] Dattaputra Yoga (223)
-"yoga_name_dattaputra_yoga_223" = "Dattaputra Yoga (223)";
-"yoga_outcome_dattaputra_yoga_223" = "Family expansion through adoption; adopted child brings fulfillment.";
-"yoga_formation_dattaputra_yoga_223" = "Specific 5th house configurations indicating adoption (var. 2).";
+"yoga_name_dattaputra_yoga_223" = "达塔普特拉瑜伽 (223)";
+"yoga_outcome_dattaputra_yoga_223" = "通过收养扩大家庭规模；领养的孩子带来了满足。";
+"yoga_formation_dattaputra_yoga_223" = "表明采用的特定第五宫配置（变量 2）。";
 
 // [−] Dehakashta Yoga
-"yoga_name_dehakashta_yoga" = "Dehakashta Yoga";
-"yoga_outcome_dehakashta_yoga" = "Chronic bodily discomfort, physical suffering, or persistent health complaints.";
-"yoga_formation_dehakashta_yoga" = "Lagna lord in Dusthana with malefic aspects, no benefic relief.";
+"yoga_name_dehakashta_yoga" = "德哈卡什塔瑜伽";
+"yoga_outcome_dehakashta_yoga" = "慢性身体不适、身体痛苦或持续的健康问题。";
+"yoga_formation_dehakashta_yoga" = "杜斯塔纳的拉格纳主有凶相，没有吉利的缓解。";
 
 // [+] Dehapushti Yoga
-"yoga_name_dehapushti_yoga" = "Dehapushti Yoga";
-"yoga_outcome_dehapushti_yoga" = "Well-developed physique, exceptional stamina, and physical vitality.";
-"yoga_formation_dehapushti_yoga" = "Mars and Lagna lord strong with Jupiter's aspect.";
+"yoga_name_dehapushti_yoga" = "德哈普斯蒂瑜伽";
+"yoga_outcome_dehapushti_yoga" = "体格发达，体力超群，体力旺盛。";
+"yoga_formation_dehapushti_yoga" = "火星和拉格纳与木星形成相位，形成强大的主宰。";
 
 // [+] Dehasthoulya Yoga
-"yoga_name_dehasthoulya_yoga" = "Dehasthoulya Yoga";
-"yoga_outcome_dehasthoulya_yoga" = "Robust body, healthy appetite, and strong digestive system.";
-"yoga_formation_dehasthoulya_yoga" = "Jupiter and Moon in positions indicating well-nourished constitution.";
+"yoga_name_dehasthoulya_yoga" = "德哈斯托利亚瑜伽";
+"yoga_outcome_dehasthoulya_yoga" = "身体强健，食欲健康，消化系统强健。";
+"yoga_formation_dehasthoulya_yoga" = "木星和月亮的位置表明营养良好的体质。";
 
 // [+] Devendra Yoga
-"yoga_name_devendra_yoga" = "Devendra Yoga";
-"yoga_outcome_devendra_yoga" = "Divine favor and lordship; treated like royalty with benevolent authority.";
-"yoga_formation_devendra_yoga" = "Lagna lord in 9th, 9th lord in Kendra, aspected by benefics.";
+"yoga_name_devendra_yoga" = "德文德拉瑜伽";
+"yoga_outcome_devendra_yoga" = "神圣的恩宠和主权；受到仁慈权威的皇室待遇。";
+"yoga_formation_devendra_yoga" = "拉格纳主星在第九宫，第九宫主星在肯德拉，有吉相。";
 
 // [+] Dhana Yoga (118)
-"yoga_name_dhana_yoga_118" = "Dhana Yoga (118)";
-"yoga_outcome_dhana_yoga_118" = "Ensures steady income and wealth accumulation through professional channels.";
-"yoga_formation_dhana_yoga_118" = "2nd and 11th lords in mutual Kendra or Trikona positions.";
+"yoga_name_dhana_yoga_118" = "禅修瑜伽 (118)";
+"yoga_outcome_dhana_yoga_118" = "通过专业渠道确保稳定的收入和财富积累。";
+"yoga_formation_dhana_yoga_118" = "第二和第十一领主共同担任肯德拉或特里科纳职位。";
 
 // [+] Dhana Yoga (119)
-"yoga_name_dhana_yoga_119" = "Dhana Yoga (119)";
-"yoga_outcome_dhana_yoga_119" = "Grants personal wealth through individual effort and enterprise.";
-"yoga_formation_dhana_yoga_119" = "Lagna lord connected with 2nd and 11th lords via conjunction or aspect.";
+"yoga_name_dhana_yoga_119" = "禅修瑜伽 (119)";
+"yoga_outcome_dhana_yoga_119" = "通过个人努力和事业赋予个人财富。";
+"yoga_formation_dhana_yoga_119" = "拉格纳主宰通过合相或相位与第二和第十一主宰相连。";
 
 // [+] Dhana Yoga (120)
-"yoga_name_dhana_yoga_120" = "Dhana Yoga (120)";
-"yoga_outcome_dhana_yoga_120" = "Bestows fortune through speculation, inheritance, or past-life merit.";
-"yoga_formation_dhana_yoga_120" = "5th and 9th lords connected with 2nd and 11th lords.";
+"yoga_name_dhana_yoga_120" = "禅修瑜伽 (120)";
+"yoga_outcome_dhana_yoga_120" = "通过投机、继承或前世功德来赐予财富。";
+"yoga_formation_dhana_yoga_120" = "第五和第九领主与第二和第十一领主有联系。";
 
 // [+] Dhana Yoga (121)
-"yoga_name_dhana_yoga_121" = "Dhana Yoga (121)";
-"yoga_outcome_dhana_yoga_121" = "Creates consistent wealth flow from multiple sources throughout life.";
-"yoga_formation_dhana_yoga_121" = "Benefics in 2nd and 11th houses with strong dignity.";
+"yoga_name_dhana_yoga_121" = "禅修瑜伽 (121)";
+"yoga_outcome_dhana_yoga_121" = "在一生中从多个来源创造持续的财富流。";
+"yoga_formation_dhana_yoga_121" = "2宫和11宫的吉利有很强的尊严。";
 
 // [+] Dhana Yoga (122)
-"yoga_name_dhana_yoga_122" = "Dhana Yoga (122)";
-"yoga_outcome_dhana_yoga_122" = "Amplifies earning potential and substantial asset accumulation.";
-"yoga_formation_dhana_yoga_122" = "2nd lord exalted or in own sign, connected to 11th house.";
+"yoga_name_dhana_yoga_122" = "禅修瑜伽 (122)";
+"yoga_outcome_dhana_yoga_122" = "放大盈利潜力和大量资产积累。";
+"yoga_formation_dhana_yoga_122" = "第二宫主被提升或处于自己的星座，与第十一宫相关。";
 
 // [+] Dhana Yoga (123)
-"yoga_name_dhana_yoga_123" = "Dhana Yoga (123)";
-"yoga_outcome_dhana_yoga_123" = "Ensures gains from professional networks, associations, and social connections.";
-"yoga_formation_dhana_yoga_123" = "11th lord in Kendra or Trikona with benefic aspects.";
+"yoga_name_dhana_yoga_123" = "禅修瑜伽 (123)";
+"yoga_outcome_dhana_yoga_123" = "确保从专业网络、协会和社会关系中获益。";
+"yoga_formation_dhana_yoga_123" = "肯德拉或特里科纳的第 11 宫主，具有吉相。";
 
 // [+] Dhana Yoga (124)
-"yoga_name_dhana_yoga_124" = "Dhana Yoga (124)";
-"yoga_outcome_dhana_yoga_124" = "Grants wealth through paternal lineage, luck, and righteous earnings.";
-"yoga_formation_dhana_yoga_124" = "9th and Lagna lords in mutual connection with 2nd house support.";
+"yoga_name_dhana_yoga_124" = "禅修瑜伽 (124)";
+"yoga_outcome_dhana_yoga_124" = "通过父系血统、运气和正义的收入来赋予财富。";
+"yoga_formation_dhana_yoga_124" = "第九宫和拉格纳宫主与第二宫相互支持。";
 
 // [+] Dhana Yoga (125)
-"yoga_name_dhana_yoga_125" = "Dhana Yoga (125)";
-"yoga_outcome_dhana_yoga_125" = "Creates exceptional capacity for wealth generation and financial management.";
-"yoga_formation_dhana_yoga_125" = "Strong 2nd and 11th houses with lords in dignified positions.";
+"yoga_name_dhana_yoga_125" = "禅修瑜伽 (125)";
+"yoga_outcome_dhana_yoga_125" = "创造非凡的财富创造和财务管理能力。";
+"yoga_formation_dhana_yoga_125" = "强大的第二宫和第十一宫，领主地位尊贵。";
 
 // [+] Dhana Yoga (126)
-"yoga_name_dhana_yoga_126" = "Dhana Yoga (126)";
-"yoga_outcome_dhana_yoga_126" = "Bestows wealth through intelligence, speculation, and creative ventures.";
-"yoga_formation_dhana_yoga_126" = "2nd, 5th, and 11th lords interconnected via aspect or conjunction.";
+"yoga_name_dhana_yoga_126" = "禅修瑜伽 (126)";
+"yoga_outcome_dhana_yoga_126" = "通过智慧、投机和创造性的冒险赋予财富。";
+"yoga_formation_dhana_yoga_126" = "第二、第五和第十一宫主通过相位或合相相互联系。";
 
 // [+] Dhana Yoga (127)
-"yoga_name_dhana_yoga_127" = "Dhana Yoga (127)";
-"yoga_outcome_dhana_yoga_127" = "Grants wealth on ethical foundations; prosperity through righteous means.";
-"yoga_formation_dhana_yoga_127" = "Jupiter aspecting or conjoining 2nd and 11th lords.";
+"yoga_name_dhana_yoga_127" = "禅修瑜伽 (127)";
+"yoga_outcome_dhana_yoga_127" = "在道德基础上授予财富；通过正义手段实现繁荣。";
+"yoga_formation_dhana_yoga_127" = "木星与第二宫和第十一宫主形成相位或合相。";
 
 // [+] Dhana Yoga (128)
-"yoga_name_dhana_yoga_128" = "Dhana Yoga (128)";
-"yoga_outcome_dhana_yoga_128" = "Brings wealth through luxury, arts, entertainment, or beauty industries.";
-"yoga_formation_dhana_yoga_128" = "Venus connected to 2nd and 11th houses with strong dignity.";
+"yoga_name_dhana_yoga_128" = "禅修瑜伽 (128)";
+"yoga_outcome_dhana_yoga_128" = "通过奢侈品、艺术、娱乐或美容行业带来财富。";
+"yoga_formation_dhana_yoga_128" = "金星与第二宫和第十一宫相连，具有强烈的尊严。";
 
 // [−] Dhatrutwa Yoga
-"yoga_name_dhatrutwa_yoga" = "Dhatrutwa Yoga";
-"yoga_outcome_dhatrutwa_yoga" = "Indicates challenges in nurturing relationships and expressing familial affection.";
-"yoga_formation_dhatrutwa_yoga" = "Specific planetary afflictions to Lagna lord and 4th house.";
+"yoga_name_dhatrutwa_yoga" = "达特鲁瓦瑜伽";
+"yoga_outcome_dhatrutwa_yoga" = "表示在培养人际关系和表达家庭感情方面面临的挑战。";
+"yoga_formation_dhatrutwa_yoga" = "对拉格纳主星和第四宫有特定的行星苦难。";
 
 // [+] Dhurdhura Yoga
-"yoga_name_dhurdhura_yoga" = "Dhurdhura Yoga";
-"yoga_outcome_dhurdhura_yoga" = "Grants generous disposition, wealth, conveyances, and philanthropic nature.";
-"yoga_formation_dhurdhura_yoga" = "Planets (excl. Sun/Rahu/Ketu) in both 2nd and 12th from Moon.";
+"yoga_name_dhurdhura_yoga" = "杜杜拉瑜伽";
+"yoga_outcome_dhurdhura_yoga" = "赋予慷慨的性格、财富、交通工具和慈善性质。";
+"yoga_formation_dhurdhura_yoga" = "行星（不包括太阳/罗睺/克图）位于月亮的第 2 宫和第 12 宫。";
 
 // [−] Dur Yoga
-"yoga_name_dur_yoga" = "Dur Yoga";
-"yoga_outcome_dur_yoga" = "Career-related financial difficulties; effort fails to convert to proportional income.";
-"yoga_formation_dur_yoga" = "10th lord in 6th/8th/12th without cancellation.";
+"yoga_name_dur_yoga" = "杜尔瑜伽";
+"yoga_outcome_dur_yoga" = "与职业相关的经济困难；努力未能转化为相应的收入。";
+"yoga_formation_dur_yoga" = "第10位领主在第6/8/12位没有取消。";
 
 // [−] Durmarana Yoga
-"yoga_name_durmarana_yoga" = "Durmarana Yoga";
-"yoga_outcome_durmarana_yoga" = "Indicates unnatural or difficult end of life; spiritual practices provide protection.";
-"yoga_formation_durmarana_yoga" = "Multiple malefics in Kendras/Marakas with no benefic intervention.";
+"yoga_name_durmarana_yoga" = "杜玛拉纳瑜伽";
+"yoga_outcome_durmarana_yoga" = "表示生命的非自然或困难的结束；精神实践提供保护。";
+"yoga_formation_durmarana_yoga" = "肯德拉斯/马拉卡斯有多个凶星，没有任何有益的干预。";
 
 // [−] Durmukha Yoga (168)
-"yoga_name_durmukha_yoga_168" = "Durmukha Yoga (168)";
-"yoga_outcome_durmukha_yoga_168" = "Unattractive facial features or dental issues; cosmetic and health care advisable.";
-"yoga_formation_durmukha_yoga_168" = "Malefics in 2nd house afflicting facial appearance (var. 1).";
+"yoga_name_durmukha_yoga_168" = "杜穆卡瑜伽 (168)";
+"yoga_outcome_durmukha_yoga_168" = "面部特征不美观或牙齿有问题；美容和保健建议。";
+"yoga_formation_durmukha_yoga_168" = "凶星在第二宫影响面部外观（变量 1）。";
 
 // [−] Durmukha Yoga (169)
-"yoga_name_durmukha_yoga_169" = "Durmukha Yoga (169)";
-"yoga_outcome_durmukha_yoga_169" = "Unpleasant appearance or chronic facial health issues.";
-"yoga_formation_durmukha_yoga_169" = "Moon and 2nd lord afflicted by malefics (var. 2).";
+"yoga_name_durmukha_yoga_169" = "杜穆卡瑜伽 (169)";
+"yoga_outcome_durmukha_yoga_169" = "不愉快的外观或慢性面部健康问题。";
+"yoga_formation_durmukha_yoga_169" = "月亮和第二宫主受到凶星的折磨（var.2）。";
 
 // [+] Ekaputra Yoga
-"yoga_name_ekaputra_yoga" = "Ekaputra Yoga";
-"yoga_outcome_ekaputra_yoga" = "One child who is exceptionally devoted and successful; quality over quantity.";
-"yoga_formation_ekaputra_yoga" = "5th lord in specific limited configurations.";
+"yoga_name_ekaputra_yoga" = "埃卡普特拉瑜伽";
+"yoga_outcome_ekaputra_yoga" = "一个特别忠诚且成功的孩子；质量重于数量。";
+"yoga_formation_ekaputra_yoga" = "特定有限配置中的第五领主。";
 
 // [+] Gaja Yoga
-"yoga_name_gaja_yoga" = "Gaja Yoga";
-"yoga_outcome_gaja_yoga" = "Immense prosperity, philanthropy, and dignified, elephant-like authority.";
-"yoga_formation_gaja_yoga" = "Strong 9th and 10th lords with benefic aspects.";
+"yoga_name_gaja_yoga" = "加亚瑜伽";
+"yoga_outcome_gaja_yoga" = "巨大的繁荣、慈善事业和大象般的尊严权威。";
+"yoga_formation_gaja_yoga" = "第九宫和第十宫主强势，有吉相。";
 
 // [+] Gajakesari Yoga
-"yoga_name_gajakesari_yoga" = "Gajakesari Yoga";
-"yoga_outcome_gajakesari_yoga" = "Confers intelligence, eloquence, lasting reputation, and virtuous, wealthy character.";
-"yoga_formation_gajakesari_yoga" = "Jupiter in a Kendra (1/4/7/10) from Moon.";
+"yoga_name_gajakesari_yoga" = "加贾克萨里瑜伽";
+"yoga_outcome_gajakesari_yoga" = "赋予聪明才智、口才、持久的声誉以及高尚、富有的品格。";
+"yoga_formation_gajakesari_yoga" = "木星位于来自月球的肯德拉 (1/4/7/10)。";
 
 // [−] Galakarna Yoga
-"yoga_name_galakarna_yoga" = "Galakarna Yoga";
-"yoga_outcome_galakarna_yoga" = "Hearing impairment or ear-related health problems; auditory care needed.";
-"yoga_formation_galakarna_yoga" = "Malefics in 3rd and 11th houses afflicting Mercury.";
+"yoga_name_galakarna_yoga" = "加拉卡纳瑜伽";
+"yoga_outcome_galakarna_yoga" = "听力障碍或与耳朵相关的健康问题；需要听力护理。";
+"yoga_formation_galakarna_yoga" = "凶星在第三宫和第十一宫与水星相克。";
 
 // [+] Gandharva Yoga
-"yoga_name_gandharva_yoga" = "Gandharva Yoga";
-"yoga_outcome_gandharva_yoga" = "Celestial artistic talent; excellence in music, dance, performing arts, and creative expression.";
-"yoga_formation_gandharva_yoga" = "10th lord in Kama Trikona with Venus strong and Moon in Trikona.";
+"yoga_name_gandharva_yoga" = "干闼婆瑜伽";
+"yoga_outcome_gandharva_yoga" = "天赐的艺术天赋；在音乐、舞蹈、表演艺术和创意表达方面表现出色。";
+"yoga_formation_gandharva_yoga" = "卡玛·特里科纳 (Kama Trikona) 第十宫主，金星强劲，月亮在特里科纳 (Trikona)。";
 
 // [+] Garuda Yoga
-"yoga_name_garuda_yoga" = "Garuda Yoga";
-"yoga_outcome_garuda_yoga" = "Eagle-like vision; destroys adversaries and rises above competition.";
-"yoga_formation_garuda_yoga" = "Moon strong with Jupiter and 9th lord benefic aspects.";
+"yoga_name_garuda_yoga" = "嘉鲁达瑜伽";
+"yoga_outcome_garuda_yoga" = "鹰般的视野；摧毁对手并超越竞争。";
+"yoga_formation_garuda_yoga" = "月亮与木星和第九宫主的吉相形成强大相位。";
 
 // [+] Gauri Yoga
-"yoga_name_gauri_yoga" = "Gauri Yoga";
-"yoga_outcome_gauri_yoga" = "Bestows beauty, virtue, refined character, maternal grace, and domestic happiness.";
-"yoga_formation_gauri_yoga" = "9th lord and Moon in own/exalted signs in Kendra/Trikona; or Navamsa lord of 10th lord exalted in 10th with Lagna lord.";
+"yoga_name_gauri_yoga" = "高丽瑜伽";
+"yoga_outcome_gauri_yoga" = "赋予美丽、美德、优雅的品格、母性的优雅和家庭幸福。";
+"yoga_formation_gauri_yoga" = "第九宫主和月亮位于肯德拉/特里科纳的自己/尊贵星座；或第十宫主的纳瓦姆萨主与拉格纳主一起晋升为第十宫。";
 
 // [+] Go Yoga
-"yoga_name_go_yoga" = "Go Yoga";
-"yoga_outcome_go_yoga" = "Prosperity through agriculture, land, or nurturing enterprises.";
-"yoga_formation_go_yoga" = "Jupiter in Trikona, Lagna lord in benefic Navamsa.";
+"yoga_name_go_yoga" = "去瑜伽";
+"yoga_outcome_go_yoga" = "通过农业、土地或培育企业实现繁荣。";
+"yoga_formation_go_yoga" = "木星在 Trikona，Lagna 主星在吉利的 Navamsa。";
 
 // [−] Gohanta Yoga
-"yoga_name_gohanta_yoga" = "Gohanta Yoga";
-"yoga_outcome_gohanta_yoga" = "Cruel tendencies toward animals; karmic consequences from violent actions against creatures.";
-"yoga_formation_gohanta_yoga" = "Mars and Rahu afflicting specific houses with no benefic protection.";
+"yoga_name_gohanta_yoga" = "古汉塔瑜伽";
+"yoga_outcome_gohanta_yoga" = "对动物有残忍倾向；针对生物的暴力行为所带来的业力后果。";
+"yoga_formation_gohanta_yoga" = "火星和罗睺会影响特定的房屋，没有任何有利的保护。";
 
 // [+] Gola Yoga
-"yoga_name_gola_yoga" = "Gola Yoga";
-"yoga_outcome_gola_yoga" = "Spiritual wholeness and cosmic understanding; the individual perceives universal truths.";
-"yoga_formation_gola_yoga" = "Specific planetary configuration creating spherical completeness.";
+"yoga_name_gola_yoga" = "古拉瑜伽";
+"yoga_outcome_gola_yoga" = "精神的完整性和宇宙的理解；个人感知普遍真理。";
+"yoga_formation_gola_yoga" = "特定的行星配置创造了球形完整性。";
 
 // [−] Grihanasa Yoga (191)
-"yoga_name_grihanasa_yoga_191" = "Grihanasa Yoga (191)";
-"yoga_outcome_grihanasa_yoga_191" = "Loss of property through unfortunate events or legal disputes.";
-"yoga_formation_grihanasa_yoga_191" = "4th lord afflicted by malefics in Dusthana (var. 1).";
+"yoga_name_grihanasa_yoga_191" = "格里哈纳瑜伽 (191)";
+"yoga_outcome_grihanasa_yoga_191" = "由于不幸事件或法律纠纷而造成的财产损失。";
+"yoga_formation_grihanasa_yoga_191" = "第四位领主在杜萨纳 (Dusthana) 遭受恶星折磨 (var. 1)。";
 
 // [−] Grihanasa Yoga (192)
-"yoga_name_grihanasa_yoga_192" = "Grihanasa Yoga (192)";
-"yoga_outcome_grihanasa_yoga_192" = "Destruction or forced sale of property; housing instability.";
-"yoga_formation_grihanasa_yoga_192" = "Malefics in 4th house, 4th lord weakened (var. 2).";
+"yoga_name_grihanasa_yoga_192" = "格里哈纳瑜伽 (192)";
+"yoga_outcome_grihanasa_yoga_192" = "毁坏或强迫出售财产；住房不稳定。";
+"yoga_formation_grihanasa_yoga_192" = "凶星在第四宫，第四宫主被削弱（var.2）。";
 
 // [−] Guhyaroga Yoga
-"yoga_name_guhyaroga_yoga" = "Guhyaroga Yoga";
-"yoga_outcome_guhyaroga_yoga" = "Susceptibility to private health issues affecting intimate life; preventive care advised.";
-"yoga_formation_guhyaroga_yoga" = "Malefic affliction to Venus, 7th and 8th houses.";
+"yoga_name_guhyaroga_yoga" = "古希罗伽瑜伽";
+"yoga_outcome_guhyaroga_yoga" = "容易受到影响亲密生活的私人健康问题的影响；建议进行预防性护理。";
+"yoga_formation_guhyaroga_yoga" = "金星、第七宫和第八宫有凶兆。";
 
 // [+] Hamsa Yoga
-"yoga_name_hamsa_yoga" = "Hamsa Yoga";
-"yoga_outcome_hamsa_yoga" = "Bestows exceptional wisdom, moral integrity, spiritual inclinations, and a respected position in society.";
-"yoga_formation_hamsa_yoga" = "Jupiter in a Kendra (1/4/7/10) in own sign (Sagittarius/Pisces) or exaltation (Cancer).";
+"yoga_name_hamsa_yoga" = "哈姆萨瑜伽";
+"yoga_outcome_hamsa_yoga" = "赋予非凡的智慧、道德操守、精神倾向和受人尊敬的社会地位。";
+"yoga_formation_hamsa_yoga" = "木星位于肯德拉宫（1/4/7/10），位于自己的星座（射手座/双鱼座）或擢升（巨蟹座）。";
 
 // [+] Harihara Brahma Yoga
-"yoga_name_harihara_brahma_yoga" = "Harihara Brahma Yoga";
-"yoga_outcome_harihara_brahma_yoga" = "Supreme divine blessing of the Holy Trinity; exceptional spiritual authority and cosmic connection.";
-"yoga_formation_harihara_brahma_yoga" = "Benefics in specific houses from 2nd and 12th lords, or from 7th/Lagna lords.";
+"yoga_name_harihara_brahma_yoga" = "哈里哈拉梵天瑜伽";
+"yoga_outcome_harihara_brahma_yoga" = "神圣三位一体的至高神圣祝福；非凡的精神权威和宇宙联系。";
+"yoga_formation_harihara_brahma_yoga" = "第二和第十二领主或第七/拉格纳领主在特定房屋中的好处。";
 
 // [+] Harsha Yoga
-"yoga_name_harsha_yoga" = "Harsha Yoga";
-"yoga_outcome_harsha_yoga" = "Transforms adversity into advantage; overcomes enemies and emerges stronger.";
-"yoga_formation_harsha_yoga" = "6th lord in 6th, 8th, or 12th house (Dusthana in Dusthana).";
+"yoga_name_harsha_yoga" = "戒律瑜伽";
+"yoga_outcome_harsha_yoga" = "化逆境为优势；战胜敌人并变得更强大。";
+"yoga_formation_harsha_yoga" = "第六宫主在第六宫、第八宫或第十二宫（杜斯塔纳中的杜斯塔纳）。";
 
 // [+] Indra Yoga
-"yoga_name_indra_yoga" = "Indra Yoga";
-"yoga_outcome_indra_yoga" = "Indra-like power; commands armies, organizations, or large enterprises.";
-"yoga_formation_indra_yoga" = "5th and 11th lords in mutual Kendras with benefic Mars.";
+"yoga_name_indra_yoga" = "因陀罗瑜伽";
+"yoga_outcome_indra_yoga" = "因陀罗般的力量；指挥军队、组织或大型企业。";
+"yoga_formation_indra_yoga" = "第 5 宫和第 11 宫主在共同的肯德拉星，与吉星火星。";
 
 // [−] Jada Yoga
-"yoga_name_jada_yoga" = "Jada Yoga";
-"yoga_outcome_jada_yoga" = "Mental lethargy, dullness, or depressive tendencies; active lifestyle and stimulation help.";
-"yoga_formation_jada_yoga" = "Moon aspected by Saturn with no benefic influence.";
+"yoga_name_jada_yoga" = "贾达瑜伽";
+"yoga_outcome_jada_yoga" = "精神萎靡、迟钝或抑郁倾向；积极的生活方式和刺激有帮助。";
+"yoga_formation_jada_yoga" = "月亮与土星成相位，没有任何有利影响。";
 
 // [−] Jananatpurvam Pitru Marana Yoga
-"yoga_name_jananatpurvam_pitru_marana_yoga" = "Jananatpurvam Pitru Marana Yoga";
-"yoga_outcome_jananatpurvam_pitru_marana_yoga" = "Early loss of paternal influence; individual must develop self-reliance from a young age.";
-"yoga_formation_jananatpurvam_pitru_marana_yoga" = "Specific Sun afflictions indicating early paternal loss.";
+"yoga_name_jananatpurvam_pitru_marana_yoga" = "Jananatpurvam Pitru Marana 瑜伽";
+"yoga_outcome_jananatpurvam_pitru_marana_yoga" = "过早失去父亲的影响力；个人必须从小培养自力更生的能力。";
+"yoga_formation_jananatpurvam_pitru_marana_yoga" = "特定的太阳苦难表明父亲早逝。";
 
 // [−] Jara Yoga
-"yoga_name_jara_yoga" = "Jara Yoga";
-"yoga_outcome_jara_yoga" = "Premature aging, old-age hardships, or decline in vitality in later years.";
-"yoga_formation_jara_yoga" = "Lagna lord and 7th lord afflicted with Saturn's influence.";
+"yoga_name_jara_yoga" = "贾拉瑜伽";
+"yoga_outcome_jara_yoga" = "早衰、晚年困苦、或晚年元气衰退。";
+"yoga_formation_jara_yoga" = "拉格纳主星和第七主星受到土星的影响。";
 
 // [−] Jarajaputra Yoga
-"yoga_name_jarajaputra_yoga" = "Jarajaputra Yoga";
-"yoga_outcome_jarajaputra_yoga" = "Children born very late in life; delayed parenthood with associated challenges.";
-"yoga_formation_jarajaputra_yoga" = "5th lord connected to Saturn with late-activation Dasha.";
+"yoga_name_jarajaputra_yoga" = "贾拉贾普特拉瑜伽";
+"yoga_outcome_jarajaputra_yoga" = "孩子出生得很晚；延迟生育并带来相关挑战。";
+"yoga_formation_jarajaputra_yoga" = "第五位领主通过后期激活的 Dasha 连接到土星。";
 
 // [+] Jaya Yoga
-"yoga_name_jaya_yoga" = "Jaya Yoga";
-"yoga_outcome_jaya_yoga" = "Victory over competitors; triumphs in competitive and legal matters.";
-"yoga_formation_jaya_yoga" = "6th lord debilitated, Lagna lord strong.";
+"yoga_name_jaya_yoga" = "贾亚瑜伽";
+"yoga_outcome_jaya_yoga" = "战胜竞争对手；在竞争和法律事务中取得胜利。";
+"yoga_formation_jaya_yoga" = "第六主衰弱，拉格纳主强。";
 
 // [+] Kahala Yoga
-"yoga_name_kahala_yoga" = "Kahala Yoga";
-"yoga_outcome_kahala_yoga" = "Bold determination and authority through sheer willpower.";
-"yoga_formation_kahala_yoga" = "4th lord and Jupiter in mutual Kendras, Lagna lord strong.";
+"yoga_name_kahala_yoga" = "卡哈拉瑜伽";
+"yoga_outcome_kahala_yoga" = "纯粹的意志力带来的大胆决心和权威。";
+"yoga_formation_kahala_yoga" = "第四宫主与木星相互坎德拉，拉格纳主强。";
 
 // [+] Kalanidhi Yoga
-"yoga_name_kalanidhi_yoga" = "Kalanidhi Yoga";
-"yoga_outcome_kalanidhi_yoga" = "Treasure of arts and learning; mastery in fine arts, music, and cultural accomplishments.";
-"yoga_formation_kalanidhi_yoga" = "Jupiter in 2nd or 5th aspected by Mercury and Venus.";
+"yoga_name_kalanidhi_yoga" = "卡拉尼迪瑜伽";
+"yoga_outcome_kalanidhi_yoga" = "艺术和学习的宝藏；精通美术、音乐和文化成就。";
+"yoga_formation_kalanidhi_yoga" = "木星在第二宫或第五宫与水星和金星形成相位。";
 
 // [+] Kalanirdesat Putra Yoga (227)
-"yoga_name_kalanirdesat_putra_yoga_227" = "Kalanirdesat Putra Yoga (227)";
-"yoga_outcome_kalanirdesat_putra_yoga_227" = "Children arrive at a specific, astrologically favorable time period.";
-"yoga_formation_kalanirdesat_putra_yoga_227" = "5th lord activated in specific Dasha timing (var. 1).";
+"yoga_name_kalanirdesat_putra_yoga_227" = "Kalanirdesat 布特拉瑜伽 (227)";
+"yoga_outcome_kalanirdesat_putra_yoga_227" = "孩子们到达了一个特定的、占星学有利的时期。";
+"yoga_formation_kalanirdesat_putra_yoga_227" = "第 5 个领主在特定的 Dasha 时间激活（变量 1）。";
 
 // [+] Kalanirdesat Putra Yoga (228)
-"yoga_name_kalanirdesat_putra_yoga_228" = "Kalanirdesat Putra Yoga (228)";
-"yoga_outcome_kalanirdesat_putra_yoga_228" = "Timing of childbirth linked to planetary periods; children during favorable dashas.";
-"yoga_formation_kalanirdesat_putra_yoga_228" = "5th lord activated in specific Dasha timing (var. 2).";
+"yoga_name_kalanirdesat_putra_yoga_228" = "Kalanirdesat 布特拉瑜伽 (228)";
+"yoga_outcome_kalanirdesat_putra_yoga_228" = "分娩时间与行星周期有关；孩子们在有利的达夏期间。";
+"yoga_formation_kalanirdesat_putra_yoga_228" = "第 5 个领主在特定的 Dasha 时间激活（变量 2）。";
 
 // [−] Kalanirdesat Putranasa Yoga (229)
-"yoga_name_kalanirdesat_putranasa_yoga_229" = "Kalanirdesat Putranasa Yoga (229)";
-"yoga_outcome_kalanirdesat_putranasa_yoga_229" = "Loss of child during specific adverse planetary period.";
-"yoga_formation_kalanirdesat_putranasa_yoga_229" = "5th lord afflicted during specific malefic Dasha (var. 1).";
+"yoga_name_kalanirdesat_putranasa_yoga_229" = "Kalanirdesat Putranasa 瑜伽 (229)";
+"yoga_outcome_kalanirdesat_putranasa_yoga_229" = "在特定的不利行星时期失去孩子。";
+"yoga_formation_kalanirdesat_putranasa_yoga_229" = "第五位领主在特定的凶星 Dasha (var. 1) 期间受到折磨。";
 
 // [−] Kalanirdesat Putranasa Yoga (230)
-"yoga_name_kalanirdesat_putranasa_yoga_230" = "Kalanirdesat Putranasa Yoga (230)";
-"yoga_outcome_kalanirdesat_putranasa_yoga_230" = "Child-related sorrow linked to timing of malefic planetary periods.";
-"yoga_formation_kalanirdesat_putranasa_yoga_230" = "5th lord afflicted during specific malefic Dasha (var. 2).";
+"yoga_name_kalanirdesat_putranasa_yoga_230" = "Kalanirdesat Putranasa 瑜伽 (230)";
+"yoga_outcome_kalanirdesat_putranasa_yoga_230" = "与孩子有关的悲伤与凶星周期的时间有关。";
+"yoga_formation_kalanirdesat_putranasa_yoga_230" = "第五位领主在特定的凶星 Dasha (var. 2) 期间受到折磨。";
 
 // [+] Kalatramooladhana Yoga
-"yoga_name_kalatramooladhana_yoga" = "Kalatramooladhana Yoga";
-"yoga_outcome_kalatramooladhana_yoga" = "Wealth through marriage, business partnerships, or spouse's earnings.";
-"yoga_formation_kalatramooladhana_yoga" = "7th lord connected to 2nd and 11th houses.";
+"yoga_name_kalatramooladhana_yoga" = "卡拉特拉穆达纳瑜伽";
+"yoga_outcome_kalatramooladhana_yoga" = "通过婚姻、商业伙伴关系或配偶的收入获得的财富。";
+"yoga_formation_kalatramooladhana_yoga" = "第七宫主与第二宫和第十一宫相连。";
 
 // [−] Kalatrashanda Yoga
-"yoga_name_kalatrashanda_yoga" = "Kalatrashanda Yoga";
-"yoga_outcome_kalatrashanda_yoga" = "Sexual dysfunction or reproductive challenges; medical consultation recommended.";
-"yoga_formation_kalatrashanda_yoga" = "Venus severely afflicted with 7th lord in debilitation.";
+"yoga_name_kalatrashanda_yoga" = "卡拉塔山达瑜伽";
+"yoga_outcome_kalatrashanda_yoga" = "性功能障碍或生殖障碍；建议就医。";
+"yoga_formation_kalatrashanda_yoga" = "金星与第七宫主严重衰弱。";
 
 // [−] Kapata Yoga (202)
-"yoga_name_kapata_yoga_202" = "Kapata Yoga (202)";
-"yoga_outcome_kapata_yoga_202" = "Suggests inclination toward cunning behavior; cultivating transparency is advised.";
-"yoga_formation_kapata_yoga_202" = "Specific malefic combinations indicating deceptive tendencies (var. 1).";
+"yoga_name_kapata_yoga_202" = "卡帕塔瑜伽 (202)";
+"yoga_outcome_kapata_yoga_202" = "暗示有狡猾行为的倾向；建议培养透明度。";
+"yoga_formation_kapata_yoga_202" = "表明欺骗倾向的特定凶星组合（变量 1）。";
 
 // [−] Kapata Yoga (203)
-"yoga_name_kapata_yoga_203" = "Kapata Yoga (203)";
-"yoga_outcome_kapata_yoga_203" = "Indicates potential for manipulative behavior; moral discipline can mitigate this.";
-"yoga_formation_kapata_yoga_203" = "Specific malefic combinations indicating deceptive tendencies (var. 2).";
+"yoga_name_kapata_yoga_203" = "卡帕塔瑜伽 (203)";
+"yoga_outcome_kapata_yoga_203" = "表明有潜在的操纵行为；道德纪律可以减轻这种情况。";
+"yoga_formation_kapata_yoga_203" = "表明欺骗倾向的特定凶星组合（变量 2）。";
 
 // [−] Kapata Yoga (204)
-"yoga_name_kapata_yoga_204" = "Kapata Yoga (204)";
-"yoga_outcome_kapata_yoga_204" = "Suggests propensity for duplicity; integrity practices and self-awareness recommended.";
-"yoga_formation_kapata_yoga_204" = "Specific malefic combinations indicating deceptive tendencies (var. 3).";
+"yoga_name_kapata_yoga_204" = "卡帕塔瑜伽 (204)";
+"yoga_outcome_kapata_yoga_204" = "暗示有口是心非的倾向；建议采取诚信做法和自我意识。";
+"yoga_formation_kapata_yoga_204" = "表明欺骗倾向的特定凶星组合（变体 3）。";
 
 // [−] Karascheda Yoga
-"yoga_name_karascheda_yoga" = "Karascheda Yoga";
-"yoga_outcome_karascheda_yoga" = "Risk of hand/arm injuries or surgical procedures involving limbs.";
-"yoga_formation_karascheda_yoga" = "Mars and Saturn afflicting 3rd house and Lagna severely.";
+"yoga_name_karascheda_yoga" = "卡拉什达瑜伽";
+"yoga_outcome_karascheda_yoga" = "手/手臂受伤或涉及四肢的外科手术的风险。";
+"yoga_formation_karascheda_yoga" = "火星和土星严重影响第三宫和拉格纳。";
 
 // [−] Kemadruma Yoga
-"yoga_name_kemadruma_yoga" = "Kemadruma Yoga";
-"yoga_outcome_kemadruma_yoga" = "Indicates emotional loneliness, financial fluctuations, and struggles despite inherent capabilities.";
-"yoga_formation_kemadruma_yoga" = "No planets in 2nd or 12th from Moon (Moon isolated).";
+"yoga_name_kemadruma_yoga" = "凯马鲁玛瑜伽";
+"yoga_outcome_kemadruma_yoga" = "表示情感上的孤独、财务上的波动以及尽管有内在能力的挣扎。";
+"yoga_formation_kemadruma_yoga" = "没有行星位于月亮的第 2 宫或第 12 宫（月亮被孤立）。";
 
 // [−] Khalawata Yoga
-"yoga_name_khalawata_yoga" = "Khalawata Yoga";
-"yoga_outcome_khalawata_yoga" = "Suggests harsh or uncultured demeanor; refinement in social interactions needed.";
-"yoga_formation_khalawata_yoga" = "Lagna lord functionally malefic with Saturn's aspect or conjunction.";
+"yoga_name_khalawata_yoga" = "卡拉瓦塔瑜伽";
+"yoga_outcome_khalawata_yoga" = "暗示粗鲁或不文明的举止；需要改进社交互动。";
+"yoga_formation_khalawata_yoga" = "拉格纳主星与土星的相位或合相在功能上是凶星。";
 
 // [−] Krisanga Yoga
-"yoga_name_krisanga_yoga" = "Krisanga Yoga";
-"yoga_outcome_krisanga_yoga" = "Thin, emaciated physique; difficulty gaining weight or maintaining vitality.";
-"yoga_formation_krisanga_yoga" = "Saturn afflicting Lagna and Moon with no Jupiter aspect.";
+"yoga_name_krisanga_yoga" = "克里桑加瑜伽";
+"yoga_outcome_krisanga_yoga" = "体质瘦弱、消瘦；体重增加或保持活力困难。";
+"yoga_formation_krisanga_yoga" = "土星刑克拉格纳和月亮，没有木星相位。";
 
 // [−] Kshayaroga Yoga
-"yoga_name_kshayaroga_yoga" = "Kshayaroga Yoga";
-"yoga_outcome_kshayaroga_yoga" = "Susceptibility to wasting diseases or consumption; respiratory health monitoring advised.";
-"yoga_formation_kshayaroga_yoga" = "Malefics in Lagna/6th with Moon and Mercury weakened.";
+"yoga_name_kshayaroga_yoga" = "克沙亚罗伽瑜伽";
+"yoga_outcome_kshayaroga_yoga" = "易患消耗性疾病或消耗性疾病；建议进行呼吸系统健康监测。";
+"yoga_formation_kshayaroga_yoga" = "第六宫的凶星与月亮和水星减弱。";
 
 // [+] Kurma Yoga
-"yoga_name_kurma_yoga" = "Kurma Yoga";
-"yoga_outcome_kurma_yoga" = "Tortoise-like patience and enduring wisdom; famous, virtuous, and supportive of others.";
-"yoga_formation_kurma_yoga" = "Benefics in 5th/6th/7th with specific dignity conditions.";
+"yoga_name_kurma_yoga" = "库尔玛瑜伽";
+"yoga_outcome_kurma_yoga" = "乌龟般的耐心和恒久的智慧； famous, virtuous, and supportive of others.";
+"yoga_formation_kurma_yoga" = "第五/第六/第七位的好处具有特定的尊严条件。";
 
 // [−] Kushtarog Yoga (268)
-"yoga_name_kushtarog_yoga_268" = "Kushtarog Yoga (268)";
-"yoga_outcome_kushtarog_yoga_268" = "Vulnerability to severe skin diseases; dermatological monitoring essential.";
-"yoga_formation_kushtarog_yoga_268" = "Specific malefic combinations affecting skin houses (var. 1).";
+"yoga_name_kushtarog_yoga_268" = "库什塔罗格瑜伽 (268)";
+"yoga_outcome_kushtarog_yoga_268" = "容易患严重皮肤病；皮肤科监测必不可少。";
+"yoga_formation_kushtarog_yoga_268" = "影响皮肤房屋的特定有害组合（变量 1）。";
 
 // [−] Kushtarog Yoga (269)
-"yoga_name_kushtarog_yoga_269" = "Kushtarog Yoga (269)";
-"yoga_outcome_kushtarog_yoga_269" = "Chronic skin afflictions requiring sustained treatment and care.";
-"yoga_formation_kushtarog_yoga_269" = "Specific malefic combinations affecting skin houses (var. 2).";
+"yoga_name_kushtarog_yoga_269" = "库什塔罗格瑜伽 (269)";
+"yoga_outcome_kushtarog_yoga_269" = "慢性皮肤病需要持续的治疗和护理。";
+"yoga_formation_kushtarog_yoga_269" = "影响皮肤房屋的特定有害组合（变量 2）。";
 
 // [+] Kusuma Yoga
-"yoga_name_kusuma_yoga" = "Kusuma Yoga";
-"yoga_outcome_kusuma_yoga" = "Pure, flower-like character; the individual radiates grace, beauty, and spiritual purity.";
-"yoga_formation_kusuma_yoga" = "Venus in Lagna, Moon in Kendra, Jupiter and Saturn in Trikonas.";
+"yoga_name_kusuma_yoga" = "库苏玛瑜伽";
+"yoga_outcome_kusuma_yoga" = "纯洁、花朵般的品格；个人散发出优雅、美丽和精神纯洁。";
+"yoga_formation_kusuma_yoga" = "金星在Lagna，月亮在Kendra，木星和土星在Trikonas。";
 
 // [+] Lakshmi Yoga
-"yoga_name_lakshmi_yoga" = "Lakshmi Yoga";
-"yoga_outcome_lakshmi_yoga" = "Grants abundant wealth, divine grace, and all-round prosperity blessed by Goddess Lakshmi.";
-"yoga_formation_lakshmi_yoga" = "9th lord in Kendra in own/exalted sign, Lagna lord strong.";
+"yoga_name_lakshmi_yoga" = "拉克希米瑜伽";
+"yoga_outcome_lakshmi_yoga" = "赐予拉克希米女神祝福的丰富财富、神圣恩典和全面繁荣。";
+"yoga_formation_lakshmi_yoga" = "肯德拉的第九位领主位于自己/崇高的标志中，拉格纳领主坚强。";
 
 // [+] Madhya Vayasi Dhana Yoga
-"yoga_name_madhya_vayasi_dhana_yoga" = "Madhya Vayasi Dhana Yoga";
-"yoga_outcome_madhya_vayasi_dhana_yoga" = "Indicates wealth accumulation during mid-life (30-55 years).";
-"yoga_formation_madhya_vayasi_dhana_yoga" = "Wealth significators activate during middle-age Dasha periods.";
+"yoga_name_madhya_vayasi_dhana_yoga" = "中央瓦亚西禅修瑜伽";
+"yoga_outcome_madhya_vayasi_dhana_yoga" = "表示中年（30-55岁）财富积累。";
+"yoga_formation_madhya_vayasi_dhana_yoga" = "财富星在中年大煞时期激活。";
 
 // [+] Mahabhagya Yoga
-"yoga_name_mahabhagya_yoga" = "Mahabhagya Yoga";
-"yoga_outcome_mahabhagya_yoga" = "Exceptional fortune and great destiny; the individual leads a remarkably blessed life.";
-"yoga_formation_mahabhagya_yoga" = "Male: day birth, Sun/Moon/Lagna in odd signs. Female: night birth, all in even signs.";
+"yoga_name_mahabhagya_yoga" = "摩诃婆迦瑜伽";
+"yoga_outcome_mahabhagya_yoga" = "非凡的运气和伟大的命运；这个人过着非常幸福的生活。";
+"yoga_formation_mahabhagya_yoga" = "男性：日生，太阳/月亮/拉格纳处于奇怪的星座。女：夜生，皆偶征。";
 
 // [+] Makuta Yoga
-"yoga_name_makuta_yoga" = "Makuta Yoga";
-"yoga_outcome_makuta_yoga" = "Crown-like authority; heads institutions or governs with distinction.";
-"yoga_formation_makuta_yoga" = "Jupiter in 9th/10th with Lagna lord exalted.";
+"yoga_name_makuta_yoga" = "幕田瑜伽";
+"yoga_outcome_makuta_yoga" = "皇冠般的权威；领导机构或以杰出的方式进行治理。";
+"yoga_formation_makuta_yoga" = "木星在 9 宫/10 宫，Lagna 领主受到提升。";
 
 // [+] Malavya Yoga
-"yoga_name_malavya_yoga" = "Malavya Yoga";
-"yoga_outcome_malavya_yoga" = "Grants artistic talents, material prosperity, refined tastes, strong family bonds, and success in creative fields.";
-"yoga_formation_malavya_yoga" = "Venus in a Kendra (1/4/7/10) in own sign (Taurus/Libra) or exaltation (Pisces).";
+"yoga_name_malavya_yoga" = "马拉维亚瑜伽";
+"yoga_outcome_malavya_yoga" = "赋予艺术天赋、物质繁荣、高雅品味、牢固的家庭纽带以及创意领域的成功。";
+"yoga_formation_malavya_yoga" = "金星位于肯德拉宫（1/4/7/10），位于自己的星座（金牛座/天秤座）或擢升（双鱼座）。";
 
 // [+] Malika Yoga
-"yoga_name_malika_yoga" = "Malika Yoga";
-"yoga_outcome_malika_yoga" = "Garland of planetary blessings; outcomes depend on the starting house of the chain.";
-"yoga_formation_malika_yoga" = "Seven or more planets in continuous houses forming a garland pattern.";
+"yoga_name_malika_yoga" = "玛莉卡瑜伽";
+"yoga_outcome_malika_yoga" = "行星祝福的花环；结果取决于链条的起始公司。";
+"yoga_formation_malika_yoga" = "七个或更多行星位于连续的宫位中，形成花环图案。";
 
 // [+] Marud Yoga
-"yoga_name_marud_yoga" = "Marud Yoga";
-"yoga_outcome_marud_yoga" = "Wind-like speed in learning; absorbs knowledge rapidly across diverse disciplines.";
-"yoga_formation_marud_yoga" = "Jupiter in Kendra from Venus, Moon in Trikona, benefics on 5th.";
+"yoga_name_marud_yoga" = "马鲁德瑜伽";
+"yoga_outcome_marud_yoga" = "学习速度如风；快速吸收不同学科的知识。";
+"yoga_formation_marud_yoga" = "木星在肯德拉，来自金星，月亮在特里科纳，5日有吉星。";
 
 // [−] Matibhramana Yoga (291)
-"yoga_name_matibhramana_yoga_291" = "Matibhramana Yoga (291)";
-"yoga_outcome_matibhramana_yoga_291" = "Mental confusion or erratic thinking; mental discipline and stability routines advised.";
-"yoga_formation_matibhramana_yoga_291" = "Moon afflicted by Saturn with Rahu in specific positions (var. 1).";
+"yoga_name_matibhramana_yoga_291" = "马蒂婆罗门瑜伽 (291)";
+"yoga_outcome_matibhramana_yoga_291" = "精神混乱或思维飘忽不定；建议进行精神纪律和稳定常规。";
+"yoga_formation_matibhramana_yoga_291" = "月亮受到土星的影响，罗睺处于特定位置（var. 1）。";
 
 // [−] Matibhramana Yoga (292)
-"yoga_name_matibhramana_yoga_292" = "Matibhramana Yoga (292)";
-"yoga_outcome_matibhramana_yoga_292" = "Impulsive thinking and poor judgment; anger management and reflective practices help.";
-"yoga_formation_matibhramana_yoga_292" = "Moon afflicted by Mars with Rahu in specific positions (var. 2).";
+"yoga_name_matibhramana_yoga_292" = "马蒂婆罗门瑜伽 (292)";
+"yoga_outcome_matibhramana_yoga_292" = "思维冲动、判断力差；愤怒管理和反思实践会有所帮助。";
+"yoga_formation_matibhramana_yoga_292" = "月亮受到火星的影响，罗睺处于特定位置（var. 2）。";
 
 // [−] Matibhramana Yoga (293)
-"yoga_name_matibhramana_yoga_293" = "Matibhramana Yoga (293)";
-"yoga_outcome_matibhramana_yoga_293" = "Communication disorders or learning difficulties; early intervention recommended.";
-"yoga_formation_matibhramana_yoga_293" = "Mercury afflicted by malefics, no benefic aspects (var. 3).";
+"yoga_name_matibhramana_yoga_293" = "马蒂婆罗门瑜伽 (293)";
+"yoga_outcome_matibhramana_yoga_293" = "沟通障碍或学习困难；建议早期干预。";
+"yoga_formation_matibhramana_yoga_293" = "水星受到凶星的影响，没有吉相（var. 3）。";
 
 // [−] Matibhramana Yoga (294)
-"yoga_name_matibhramana_yoga_294" = "Matibhramana Yoga (294)";
-"yoga_outcome_matibhramana_yoga_294" = "Potential for severe mental health challenges; professional care essential.";
-"yoga_formation_matibhramana_yoga_294" = "5th lord debilitated with malefic aspects on Moon (var. 4).";
+"yoga_name_matibhramana_yoga_294" = "马蒂婆罗门瑜伽 (294)";
+"yoga_outcome_matibhramana_yoga_294" = "可能面临严重的心理健康挑战；专业护理必不可少。";
+"yoga_formation_matibhramana_yoga_294" = "第五位领主因月亮上的凶星相位而衰弱（var.4）。";
 
 // [−] Matru Satrutwa Yoga
-"yoga_name_matru_satrutwa_yoga" = "Matru Satrutwa Yoga";
-"yoga_outcome_matru_satrutwa_yoga" = "Suggests tension with the mother; the maternal relationship requires conscious healing.";
-"yoga_formation_matru_satrutwa_yoga" = "Malefic influences on 4th house and Moon creating adversarial dynamics.";
+"yoga_name_matru_satrutwa_yoga" = "马特鲁萨特鲁瓦瑜伽";
+"yoga_outcome_matru_satrutwa_yoga" = "暗示与母亲关系紧张；母性关系需要有意识的治愈。";
+"yoga_formation_matru_satrutwa_yoga" = "凶星对第四宫和月亮的影响创造了对抗性的动态。";
 
 // [+] Matru Sneha Yoga
-"yoga_name_matru_sneha_yoga" = "Matru Sneha Yoga";
-"yoga_outcome_matru_sneha_yoga" = "Indicates a deep, loving relationship with the mother and unwavering maternal support.";
-"yoga_formation_matru_sneha_yoga" = "4th lord well-placed with benefic influences on maternal indicators.";
+"yoga_name_matru_sneha_yoga" = "马特鲁斯内哈瑜伽";
+"yoga_outcome_matru_sneha_yoga" = "表明与母亲的深厚、充满爱的关系和坚定不移的母性支持。";
+"yoga_formation_matru_sneha_yoga" = "第四宫主位置优越，对母性指标有有利影响。";
 
 // [+] Matrudeerghayur Yoga (196)
-"yoga_name_matrudeerghayur_yoga_196" = "Matrudeerghayur Yoga (196)";
-"yoga_outcome_matrudeerghayur_yoga_196" = "Long life for mother; individual enjoys extended maternal presence and support.";
-"yoga_formation_matrudeerghayur_yoga_196" = "4th lord strong with benefic aspects, Moon well-placed (var. 1).";
+"yoga_name_matrudeerghayur_yoga_196" = "马特鲁迪加尤尔瑜伽 (196)";
+"yoga_outcome_matrudeerghayur_yoga_196" = "祝母亲长寿；个人享有长期的母亲陪伴和支持。";
+"yoga_formation_matrudeerghayur_yoga_196" = "第四宫主强大且有利，月亮位置良好（var.1）。";
 
 // [+] Matrudeerghayur Yoga (197)
-"yoga_name_matrudeerghayur_yoga_197" = "Matrudeerghayur Yoga (197)";
-"yoga_outcome_matrudeerghayur_yoga_197" = "Maternal longevity and nurturing family environment confirmed.";
-"yoga_formation_matrudeerghayur_yoga_197" = "Venus and Moon supportive, 4th house protected (var. 2).";
+"yoga_name_matrudeerghayur_yoga_197" = "马特鲁迪加尤尔瑜伽 (197)";
+"yoga_outcome_matrudeerghayur_yoga_197" = "母亲的长寿与养育家庭环境得到证实。";
+"yoga_formation_matrudeerghayur_yoga_197" = "金星和月亮支持，第四宫受到保护（变量2）。";
 
 // [−] Matrugami Yoga
-"yoga_name_matrugami_yoga" = "Matrugami Yoga";
-"yoga_outcome_matrugami_yoga" = "Unhealthy or inappropriate attachment patterns in maternal relationships.";
-"yoga_formation_matrugami_yoga" = "Venus and 4th lord in specific taboo combinations.";
+"yoga_name_matrugami_yoga" = "马图加米瑜伽";
+"yoga_outcome_matrugami_yoga" = "母性关系中不健康或不适当的依恋模式。";
+"yoga_formation_matrugami_yoga" = "金星和第四宫主有特定的禁忌组合。";
 
 // [+] Matrumooladhana Yoga
-"yoga_name_matrumooladhana_yoga" = "Matrumooladhana Yoga";
-"yoga_outcome_matrumooladhana_yoga" = "Wealth through maternal inheritance, real estate, or homeland connections.";
-"yoga_formation_matrumooladhana_yoga" = "4th lord connected to 2nd and 11th with benefic support.";
+"yoga_name_matrumooladhana_yoga" = "马鲁穆拉达纳瑜伽";
+"yoga_outcome_matrumooladhana_yoga" = "通过母系继承、房地产或家乡关系获得财富。";
+"yoga_formation_matrumooladhana_yoga" = "第四位领主与第二位和第十一位领主有良好的支持。";
 
 // [−] Matrunasa Yoga (198)
-"yoga_name_matrunasa_yoga_198" = "Matrunasa Yoga (198)";
-"yoga_outcome_matrunasa_yoga_198" = "Early loss of mother or severe maternal health crisis.";
-"yoga_formation_matrunasa_yoga_198" = "4th lord and Moon severely afflicted by malefics (var. 1).";
+"yoga_name_matrunasa_yoga_198" = "松树瑜伽 (198)";
+"yoga_outcome_matrunasa_yoga_198" = "过早失去母亲或严重的孕产妇健康危机。";
+"yoga_formation_matrunasa_yoga_198" = "第四位领主和月亮受到凶星的严重折磨（第 1 种）。";
 
 // [−] Matrunasa Yoga (199)
-"yoga_name_matrunasa_yoga_199" = "Matrunasa Yoga (199)";
-"yoga_outcome_matrunasa_yoga_199" = "Mother faces life-threatening circumstances; maternal welfare at risk.";
-"yoga_formation_matrunasa_yoga_199" = "Mars and Saturn afflicting 4th house and Moon (var. 2).";
+"yoga_name_matrunasa_yoga_199" = "松树瑜伽 (199)";
+"yoga_outcome_matrunasa_yoga_199" = "母亲面临生命危险；孕产妇福利面临风险。";
+"yoga_formation_matrunasa_yoga_199" = "火星和土星刑克第四宫和月亮（var.2）。";
 
 // [−] Matrusapa Sutakshaya Yoga
-"yoga_name_matrusapa_sutakshaya_yoga" = "Matrusapa Sutakshaya Yoga";
-"yoga_outcome_matrusapa_sutakshaya_yoga" = "Mother's curse affecting progeny; unresolved maternal karma impacts children.";
-"yoga_formation_matrusapa_sutakshaya_yoga" = "Moon afflicted with 5th lord in malefic combinations.";
+"yoga_name_matrusapa_sutakshaya_yoga" = "Matrusapa Sutakshaya 瑜伽";
+"yoga_outcome_matrusapa_sutakshaya_yoga" = "母亲的诅咒影响子孙；未解决的母亲业力会影响儿童。";
+"yoga_formation_matrusapa_sutakshaya_yoga" = "月亮与第五宫主有凶相组合。";
 
 // [+] Matsya Yoga
-"yoga_name_matsya_yoga" = "Matsya Yoga";
-"yoga_outcome_matsya_yoga" = "Deep, ocean-like wisdom and spiritual knowledge; learned, compassionate, widely traveled.";
-"yoga_formation_matsya_yoga" = "Malefics in Lagna/9th, benefics in 5th, mixture in 4th/8th.";
+"yoga_name_matsya_yoga" = "玛莎瑜伽";
+"yoga_outcome_matsya_yoga" = "深邃的、海洋般的智慧和精神知识；博学多才，富有同情心，游历广泛。";
+"yoga_formation_matsya_yoga" = "凶星在拉格纳/第九宫，吉星在第五宫，混合在第四/第八宫。";
 
 // [−] Mooka Yoga
-"yoga_name_mooka_yoga" = "Mooka Yoga";
-"yoga_outcome_mooka_yoga" = "Speech impediments or communication difficulties; therapy and remedies may help.";
-"yoga_formation_mooka_yoga" = "Mercury severely afflicted, 2nd lord debilitated with malefics.";
+"yoga_name_mooka_yoga" = "穆卡瑜伽";
+"yoga_outcome_mooka_yoga" = "言语障碍或沟通困难；治疗和补救措施可能会有所帮助。";
+"yoga_formation_mooka_yoga" = "水星严重受克，第二宫主因恶星而衰弱。";
 
 // [+] Mridanga Yoga
-"yoga_name_mridanga_yoga" = "Mridanga Yoga";
-"yoga_outcome_mridanga_yoga" = "Supreme royal status like a ceremonial drum; fame resounds across the land.";
-"yoga_formation_mridanga_yoga" = "Lagna lord strong, all planets in Kendras/Trikonas.";
+"yoga_name_mridanga_yoga" = "姆里丹加瑜伽";
+"yoga_outcome_mridanga_yoga" = "至高无上的皇室地位如礼鼓；名声响彻大地。";
+"yoga_formation_mridanga_yoga" = "拉格纳主强，所有行星都在肯德拉斯/特里科纳斯。";
 
 // [+] Ardha Chandra Yoga
-"yoga_name_nabhasa_ardha_chandra" = "Ardha Chandra Yoga";
-"yoga_outcome_nabhasa_ardha_chandra" = "Half-moon formation; army commander, physically strong, attractive, and wealthy.";
-"yoga_formation_nabhasa_ardha_chandra" = "All planets in seven successive houses from a Kendra.";
+"yoga_name_nabhasa_ardha_chandra" = "阿达·钱德拉瑜伽";
+"yoga_outcome_nabhasa_ardha_chandra" = "半月形；军队指挥官，身体强壮，有吸引力，而且富有。";
+"yoga_formation_nabhasa_ardha_chandra" = "所有行星都来自肯德拉连续七个宫位。";
 
 // [+] Chandra Yoga (Nabhasa)
-"yoga_name_nabhasa_chandra" = "Chandra Yoga (Nabhasa)";
-"yoga_outcome_nabhasa_chandra" = "Lunar formation; pleasing appearance, commanding stature, royal advisors.";
-"yoga_formation_nabhasa_chandra" = "All planets in upper half of zodiac (7th-12th houses).";
+"yoga_name_nabhasa_chandra" = "钱德拉瑜伽（那巴萨）";
+"yoga_outcome_nabhasa_chandra" = "月球形成；俊美的外表，威严的身材，皇家顾问。";
+"yoga_formation_nabhasa_chandra" = "所有行星都位于黄道带上半部分（第七宫至第十二宫）。";
 
 // [+] Chapa Yoga (Nabhasa)
-"yoga_name_nabhasa_chapa" = "Chapa Yoga (Nabhasa)";
-"yoga_outcome_nabhasa_chapa" = "Bow formation; truthful, guards treasure, happiness in early and late life.";
-"yoga_formation_nabhasa_chapa" = "All planets in houses 10-4 (10th to 4th span).";
+"yoga_name_nabhasa_chapa" = "查帕瑜伽（纳巴萨）";
+"yoga_outcome_nabhasa_chapa" = "弓形；诚实，守护宝藏，早晚幸福。";
+"yoga_formation_nabhasa_chapa" = "所有行星都在 10-4 宫（第 10 到第 4 跨度）。";
 
 // [+] Chhatra Yoga
-"yoga_name_nabhasa_chhatra" = "Chhatra Yoga";
-"yoga_outcome_nabhasa_chhatra" = "Umbrella formation; protector of others, helpful to all, comfortable old age.";
-"yoga_formation_nabhasa_chhatra" = "All planets in houses 7-1 (7th to 1st span).";
+"yoga_name_nabhasa_chhatra" = "查特拉瑜伽";
+"yoga_outcome_nabhasa_chhatra" = "伞形形成；他人的保护者，对所有人的帮助，安逸的晚年。";
+"yoga_formation_nabhasa_chhatra" = "所有行星都位于 7-1 宫（第 7 宫到第 1 宫）。";
 
 // [+] Damini Yoga
-"yoga_name_nabhasa_damini" = "Damini Yoga";
-"yoga_outcome_nabhasa_damini" = "Lightning formation; generous, helpful, wealthy, and philanthropic nature.";
-"yoga_formation_nabhasa_damini" = "All planets in six successive houses.";
+"yoga_name_nabhasa_damini" = "达米尼瑜伽";
+"yoga_outcome_nabhasa_damini" = "闪电形成；慷慨、乐于助人、富有和慈善的天性。";
+"yoga_formation_nabhasa_damini" = "所有行星都位于连续的六个宫位。";
 
 // [+] Danda Yoga
-"yoga_name_nabhasa_danda" = "Danda Yoga";
-"yoga_outcome_nabhasa_danda" = "Staff formation; loss of family or isolation; service-oriented life.";
-"yoga_formation_nabhasa_danda" = "Planets in four consecutive houses starting from 10th.";
+"yoga_name_nabhasa_danda" = "丹达瑜伽";
+"yoga_outcome_nabhasa_danda" = "人员组建；失去家人或孤立；服务型生活。";
+"yoga_formation_nabhasa_danda" = "从第 10 宫开始，行星位于连续的四个宫位。";
 
 // [+] Gada Yoga
-"yoga_name_nabhasa_gada" = "Gada Yoga";
-"yoga_outcome_nabhasa_gada" = "Mace-like strength; wealth through rituals, religious activities, or traditional pursuits.";
-"yoga_formation_nabhasa_gada" = "Planets in two successive Kendra houses.";
+"yoga_name_nabhasa_gada" = "嘎达瑜伽";
+"yoga_outcome_nabhasa_gada" = "狼牙棒般的力量；通过仪式、宗教活动或传统追求获得财富。";
+"yoga_formation_nabhasa_gada" = "连续两个肯德拉宫中的行星。";
 
 // [+] Gola Yoga (Nabhasa)
-"yoga_name_nabhasa_gola" = "Gola Yoga (Nabhasa)";
-"yoga_outcome_nabhasa_gola" = "Sphere formation; poor, dirty, ignorant, but strong and wandering nature.";
-"yoga_formation_nabhasa_gola" = "All planets in one single house.";
+"yoga_name_nabhasa_gola" = "古拉瑜伽（纳巴萨）";
+"yoga_outcome_nabhasa_gola" = "球体形成；贫穷、肮脏、无知，但本性坚强而流浪。";
+"yoga_formation_nabhasa_gola" = "所有行星都在一个房子里。";
 
 // [+] Hala Yoga
-"yoga_name_nabhasa_hala" = "Hala Yoga";
-"yoga_outcome_nabhasa_hala" = "Agricultural prosperity; hard-working nature with middle-class comforts.";
-"yoga_formation_nabhasa_hala" = "Planets in houses other than Kendras, forming plow shape.";
+"yoga_name_nabhasa_hala" = "哈拉瑜伽";
+"yoga_outcome_nabhasa_hala" = "农业繁荣；勤劳的天性和中产阶级的舒适生活。";
+"yoga_formation_nabhasa_hala" = "行星在肯德拉斯以外的宫位，形成犁形。";
 
 // [+] Ishu Yoga
-"yoga_name_nabhasa_ishu" = "Ishu Yoga";
-"yoga_outcome_nabhasa_ishu" = "Arrow formation; connected to military, police, or prison administration.";
-"yoga_formation_nabhasa_ishu" = "Planets in four consecutive houses starting from 4th.";
+"yoga_name_nabhasa_ishu" = "伊修瑜伽";
+"yoga_outcome_nabhasa_ishu" = "箭头形成；与军队、警察或监狱管理部门有关。";
+"yoga_formation_nabhasa_ishu" = "从第四宫开始，行星连续四个宫位。";
 
 // [+] Kamala Yoga
-"yoga_name_nabhasa_kamala" = "Kamala Yoga";
-"yoga_outcome_nabhasa_kamala" = "Lotus formation; enduring fame, virtuous life, and hundred years of prosperity.";
-"yoga_formation_nabhasa_kamala" = "All planets in four Kendra houses (1/4/7/10).";
+"yoga_name_nabhasa_kamala" = "卡马拉瑜伽";
+"yoga_outcome_nabhasa_kamala" = "莲花形成；功名不衰，生活德行，百年富贵。";
+"yoga_formation_nabhasa_kamala" = "所有行星都位于四个肯德拉宫（1/4/7/10）。";
 
 // [+] Kedara Yoga
-"yoga_name_nabhasa_kedara" = "Kedara Yoga";
-"yoga_outcome_nabhasa_kedara" = "Field formation; agricultural wealth, helpful to many, truthful character.";
-"yoga_formation_nabhasa_kedara" = "All planets in five successive houses.";
+"yoga_name_nabhasa_kedara" = "科达拉瑜伽";
+"yoga_outcome_nabhasa_kedara" = "场形成；农业财富，助人为乐，品格诚实。";
+"yoga_formation_nabhasa_kedara" = "所有行星都位于五个连续的宫位。";
 
 // [+] Kuta Yoga
-"yoga_name_nabhasa_kuta" = "Kuta Yoga";
-"yoga_outcome_nabhasa_kuta" = "Fortress formation; liar or diplomat, connected to prisons or confinement roles.";
-"yoga_formation_nabhasa_kuta" = "All planets in houses 4-10.";
+"yoga_name_nabhasa_kuta" = "库塔瑜伽";
+"yoga_outcome_nabhasa_kuta" = "要塞阵型；骗子或外交官，与监狱或监禁角色有关。";
+"yoga_formation_nabhasa_kuta" = "所有行星都在 4-10 宫。";
 
 // [+] Mala Yoga
-"yoga_name_nabhasa_mala" = "Mala Yoga";
-"yoga_outcome_nabhasa_mala" = "Garland formation; comfortable life with vehicles, property, and lasting happiness.";
-"yoga_formation_nabhasa_mala" = "Planets in three successive Trikonas (1-5-9, 2-6-10, or 3-7-11).";
+"yoga_name_nabhasa_mala" = "马拉瑜伽";
+"yoga_outcome_nabhasa_mala" = "花环形成；有车、有财产，生活舒适，幸福持久。";
+"yoga_formation_nabhasa_mala" = "三个连续三角星系（1-5-9、2-6-10 或 3-7-11）中的行星。";
 
 // [+] Musala Yoga
-"yoga_name_nabhasa_musala" = "Musala Yoga";
-"yoga_outcome_nabhasa_musala" = "Firm resolve, fame, and wealth; steady, determined character.";
-"yoga_formation_nabhasa_musala" = "All planets in fixed signs (Taurus, Leo, Scorpio, Aquarius).";
+"yoga_name_nabhasa_musala" = "穆萨拉瑜伽";
+"yoga_outcome_nabhasa_musala" = "坚定的决心、名誉和财富；性格沉稳、果断。";
+"yoga_formation_nabhasa_musala" = "所有行星都位于固定星座（金牛座、狮子座、天蝎座、水瓶座）。";
 
 // [+] Nala Yoga
-"yoga_name_nabhasa_nala" = "Nala Yoga";
-"yoga_outcome_nabhasa_nala" = "Versatile, skilled in many fields; handsome appearance with fluctuating fortune.";
-"yoga_formation_nabhasa_nala" = "All planets in dual signs (Gemini, Virgo, Sagittarius, Pisces).";
+"yoga_name_nabhasa_nala" = "那拉瑜伽";
+"yoga_outcome_nabhasa_nala" = "多才多艺，精通多个领域；外表英俊，财运波动。";
+"yoga_formation_nabhasa_nala" = "所有行星都在双子座（双子座、处女座、射手座、双鱼座）。";
 
 // [+] Nauka Yoga
-"yoga_name_nabhasa_nauka" = "Nauka Yoga";
-"yoga_outcome_nabhasa_nauka" = "Boat formation; wealth through water-related pursuits, fame on seas.";
-"yoga_formation_nabhasa_nauka" = "All planets in houses 1-7 (one half of zodiac).";
+"yoga_name_nabhasa_nauka" = "瑙卡瑜伽";
+"yoga_outcome_nabhasa_nauka" = "船队编队；因水而富，因水而名。";
+"yoga_formation_nabhasa_nauka" = "所有行星都位于 1-7 宫（黄道十二宫的一半）。";
 
 // [−] Pasa Yoga
-"yoga_name_nabhasa_pasa" = "Pasa Yoga";
-"yoga_outcome_nabhasa_pasa" = "Noose formation; entangled in difficulties, imprisoned, or servant-like existence.";
-"yoga_formation_nabhasa_pasa" = "Planets only in specific bound patterns.";
+"yoga_name_nabhasa_pasa" = "帕萨瑜伽";
+"yoga_outcome_nabhasa_pasa" = "套索形成；陷入困境，被囚禁，或者像仆人一样存在。";
+"yoga_formation_nabhasa_pasa" = "行星仅以特定的束缚模式存在。";
 
 // [+] Rajju Yoga
-"yoga_name_nabhasa_rajju" = "Rajju Yoga";
-"yoga_outcome_nabhasa_rajju" = "Love of travel, wandering nature; success through mobility and adaptability.";
-"yoga_formation_nabhasa_rajju" = "All planets in movable signs (Aries, Cancer, Libra, Capricorn).";
+"yoga_name_nabhasa_rajju" = "拉吉瑜伽";
+"yoga_outcome_nabhasa_rajju" = "热爱旅行，流浪大自然；通过流动性和适应性取得成功。";
+"yoga_formation_nabhasa_rajju" = "所有行星都位于活动星座（白羊座、巨蟹座、天秤座、摩羯座）。";
 
 // [+] Samudra Yoga
-"yoga_name_nabhasa_samudra" = "Samudra Yoga";
-"yoga_outcome_nabhasa_samudra" = "Ocean formation; wealthy, many pleasures, equal to a king in enjoyment.";
-"yoga_formation_nabhasa_samudra" = "Planets evenly distributed in all Kendra groups.";
+"yoga_name_nabhasa_samudra" = "萨穆德拉瑜伽";
+"yoga_outcome_nabhasa_samudra" = "海洋的形成；富有，享乐众多，堪比国王的享受。";
+"yoga_formation_nabhasa_samudra" = "行星均匀分布在所有肯德拉族中。";
 
 // [−] Sarpa Yoga
-"yoga_name_nabhasa_sarpa" = "Sarpa Yoga";
-"yoga_outcome_nabhasa_sarpa" = "Misery, poverty, and serpent-like suffering; dependent on others for livelihood.";
-"yoga_formation_nabhasa_sarpa" = "All planets in cardinal houses (4th/8th/12th from Lagna).";
+"yoga_name_nabhasa_sarpa" = "萨帕瑜伽";
+"yoga_outcome_nabhasa_sarpa" = "痛苦、贫穷和蛇般的痛苦；依赖他人维持生计。";
+"yoga_formation_nabhasa_sarpa" = "所有行星都位于基本宫（来自拉格纳的第 4 宫/第 8 宫/第 12 宫）。";
 
 // [−] Shakata Yoga
-"yoga_name_nabhasa_shakata" = "Shakata Yoga";
-"yoga_outcome_nabhasa_shakata" = "Cart-like life — ups and downs; wealth followed by poverty in cycles.";
-"yoga_formation_nabhasa_shakata" = "Planets only in 1st and 7th houses.";
+"yoga_name_nabhasa_shakata" = "释卡塔瑜伽";
+"yoga_outcome_nabhasa_shakata" = "人生如车，有起有落；富裕之后贫穷循环往复。";
+"yoga_formation_nabhasa_shakata" = "行星仅位于第一宫和第七宫。";
 
 // [+] Shakti Yoga
-"yoga_name_nabhasa_shakti" = "Shakti Yoga";
-"yoga_outcome_nabhasa_shakti" = "Spear formation; lazy disposition but gains wealth through perseverance.";
-"yoga_formation_nabhasa_shakti" = "Planets in four consecutive houses starting from 7th.";
+"yoga_name_nabhasa_shakti" = "性力瑜伽";
+"yoga_outcome_nabhasa_shakti" = "矛队形；性情懒惰，但通过坚持而获得财富。";
+"yoga_formation_nabhasa_shakti" = "从第七宫开始，行星连续四个宫位。";
 
 // [+] Shringataka Yoga
-"yoga_name_nabhasa_shringataka" = "Shringataka Yoga";
-"yoga_outcome_nabhasa_shringataka" = "Peak formation; contentment, philanthropy, and amiable disposition.";
-"yoga_formation_nabhasa_shringataka" = "Planets in Trikona houses (1st, 5th, 9th).";
+"yoga_name_nabhasa_shringataka" = "辛伽塔卡瑜伽";
+"yoga_outcome_nabhasa_shringataka" = "峰形成；知足、博爱、和蔼可亲。";
+"yoga_formation_nabhasa_shringataka" = "行星位于 Trikona 宫位（第一宫、第五宫、第九宫）。";
 
 // [−] Shula Yoga
-"yoga_name_nabhasa_shula" = "Shula Yoga";
-"yoga_outcome_nabhasa_shula" = "Trident formation; sharp, valorous, but poor; illness-prone and confrontational.";
-"yoga_formation_nabhasa_shula" = "Planets in three successive houses.";
+"yoga_name_nabhasa_shula" = "舒拉瑜伽";
+"yoga_outcome_nabhasa_shula" = "三叉戟队形；敏锐、勇敢，但贫穷；容易生病且具有对抗性。";
+"yoga_formation_nabhasa_shula" = "行星位于连续的三个宫位。";
 
 // [+] Vajra Yoga
-"yoga_name_nabhasa_vajra" = "Vajra Yoga";
-"yoga_outcome_nabhasa_vajra" = "Diamond-like brilliance; handsome, happy in youth and old age, martial valor.";
-"yoga_formation_nabhasa_vajra" = "Benefics in 1st/7th, malefics in 4th/10th.";
+"yoga_name_nabhasa_vajra" = "金刚瑜伽";
+"yoga_outcome_nabhasa_vajra" = "钻石般的光彩；英俊潇洒，年少乐福，武功勇猛。";
+"yoga_formation_nabhasa_vajra" = "吉星在 1 宫/7 宫，凶星在 4 宫/10 宫。";
 
 // [+] Vapi Yoga
-"yoga_name_nabhasa_vapi" = "Vapi Yoga";
-"yoga_outcome_nabhasa_vapi" = "Well formation; wealth accumulation, hoarding tendency, lasting fortune.";
-"yoga_formation_nabhasa_vapi" = "All planets in non-Kendra houses (Panapara/Apoklima).";
+"yoga_name_nabhasa_vapi" = "瓦皮瑜伽";
+"yoga_outcome_nabhasa_vapi" = "井形成；财富积累、囤积倾向、持久财富。";
+"yoga_formation_nabhasa_vapi" = "所有行星都位于非肯德拉宫（Panapara/Apoklima）。";
 
 // [+] Veena Yoga
-"yoga_name_nabhasa_veena" = "Veena Yoga";
-"yoga_outcome_nabhasa_veena" = "Lute formation; lover of music, dance, and arts; skilled and happy disposition.";
-"yoga_formation_nabhasa_veena" = "All seven planets in seven successive houses.";
+"yoga_name_nabhasa_veena" = "维纳瑜伽";
+"yoga_outcome_nabhasa_veena" = "琵琶的形成；音乐、舞蹈和艺术爱好者；熟练且快乐的性格。";
+"yoga_formation_nabhasa_veena" = "所有七颗行星都位于连续的七个宫位。";
 
 // [+] Vihaga Yoga
-"yoga_name_nabhasa_vihaga" = "Vihaga Yoga";
-"yoga_outcome_nabhasa_vihaga" = "Bird-like freedom; ambassador nature, wandering, and message-carrying roles.";
-"yoga_formation_nabhasa_vihaga" = "Planets only in 4th and 10th houses.";
+"yoga_name_nabhasa_vihaga" = "毗哈嘎瑜伽";
+"yoga_outcome_nabhasa_vihaga" = "像鸟儿一样的自由；大使自然、漫游和传递信息的角色。";
+"yoga_formation_nabhasa_vihaga" = "行星只在第四宫和第十宫。";
 
 // [+] Yava Yoga
-"yoga_name_nabhasa_yava" = "Yava Yoga";
-"yoga_outcome_nabhasa_yava" = "Barley-grain pattern; charitable nature, happiness in middle age.";
-"yoga_formation_nabhasa_yava" = "Benefics in 4th/10th, malefics in 1st/7th.";
+"yoga_name_nabhasa_yava" = "亚瓦瑜伽";
+"yoga_outcome_nabhasa_yava" = "大麦粒图案；慈善本性，中年幸福。";
+"yoga_formation_nabhasa_yava" = "吉星在4宫/10宫，凶星在1宫/7宫。";
 
 // [+] Yuga Yoga
-"yoga_name_nabhasa_yuga" = "Yuga Yoga";
-"yoga_outcome_nabhasa_yuga" = "Yoke formation; heretical, poor, outcast tendencies; unconventional path.";
-"yoga_formation_nabhasa_yuga" = "All planets in two successive houses.";
+"yoga_name_nabhasa_yuga" = "瑜伽瑜伽";
+"yoga_outcome_nabhasa_yuga" = "轭形成；异端、贫穷、被排斥的倾向；非常规路径。";
+"yoga_formation_nabhasa_yuga" = "所有行星都位于两个连续的宫位。";
 
 // [+] Yupa Yoga
-"yoga_name_nabhasa_yupa" = "Yupa Yoga";
-"yoga_outcome_nabhasa_yupa" = "Sacrificial post; generous, learned, religious, and focused disposition.";
-"yoga_formation_nabhasa_yupa" = "Planets in four consecutive houses starting from Lagna.";
+"yoga_name_nabhasa_yupa" = "尤帕瑜伽";
+"yoga_outcome_nabhasa_yupa" = "牺牲岗位；性格慷慨、博学、虔诚、专注。";
+"yoga_formation_nabhasa_yupa" = "行星位于从 Lagna 开始的连续四个宫位。";
 
 // [−] Netranasa Yoga
-"yoga_name_netranasa_yoga" = "Netranasa Yoga";
-"yoga_outcome_netranasa_yoga" = "Susceptibility to eye problems or vision impairment; regular eye care essential.";
-"yoga_formation_netranasa_yoga" = "2nd/12th lords afflicted by malefics, Sun/Moon weakened.";
+"yoga_name_netranasa_yoga" = "内特拉纳萨瑜伽";
+"yoga_outcome_netranasa_yoga" = "容易出现眼部问题或视力障碍；定期的眼部护理必不可少。";
+"yoga_formation_netranasa_yoga" = "第2/第12位领主受到凶星的影响，太阳/月亮被削弱。";
 
 // [+] Nishkapata Yoga (205)
-"yoga_name_nishkapata_yoga_205" = "Nishkapata Yoga (205)";
-"yoga_outcome_nishkapata_yoga_205" = "Grants transparent, guileless nature; naturally honest and earns respect through integrity.";
-"yoga_formation_nishkapata_yoga_205" = "Benefic planetary combinations indicating sincerity (var. 1).";
+"yoga_name_nishkapata_yoga_205" = "尼什卡帕塔瑜伽 (205)";
+"yoga_outcome_nishkapata_yoga_205" = "赋予透明、朴实的本性；天生诚实，并通过正直赢得尊重。";
+"yoga_formation_nishkapata_yoga_205" = "有利的行星组合表明真诚（var.1）。";
 
 // [+] Nishkapata Yoga (206)
-"yoga_name_nishkapata_yoga_206" = "Nishkapata Yoga (206)";
-"yoga_outcome_nishkapata_yoga_206" = "Bestows straightforward character and moral purity; thrives through honest dealings.";
-"yoga_formation_nishkapata_yoga_206" = "Benefic planetary combinations indicating sincerity (var. 2).";
+"yoga_name_nishkapata_yoga_206" = "尼什卡帕塔瑜伽 (206)";
+"yoga_outcome_nishkapata_yoga_206" = "赋予品格正直和道德纯洁；通过诚实的交易而蓬勃发展。";
+"yoga_formation_nishkapata_yoga_206" = "有利的行星组合表明真诚（var.2）。";
 
 // [−] Nishturabhashi Yoga
-"yoga_name_nishturabhashi_yoga" = "Nishturabhashi Yoga";
-"yoga_outcome_nishturabhashi_yoga" = "Indicates tendency toward harsh speech; mindful communication advised.";
-"yoga_formation_nishturabhashi_yoga" = "Malefics influence Mercury and 2nd house.";
+"yoga_name_nishturabhashi_yoga" = "尼什图拉巴什瑜伽";
+"yoga_outcome_nishturabhashi_yoga" = "表示有粗暴言语的倾向；建议谨慎沟通。";
+"yoga_formation_nishturabhashi_yoga" = "凶星影响水星和第二宫。";
 
 // [+] Obhayachari Yoga
-"yoga_name_obhayachari_yoga" = "Obhayachari Yoga";
-"yoga_outcome_obhayachari_yoga" = "Bestows eloquence, handsome appearance, royal bearing, and distinction in life.";
-"yoga_formation_obhayachari_yoga" = "Planets (excl. Moon/Rahu/Ketu) in both 2nd and 12th from Sun.";
+"yoga_name_obhayachari_yoga" = "奥巴亚查里瑜伽";
+"yoga_outcome_obhayachari_yoga" = "拥有雄辩的口才、英俊的外表、王者的气度和显赫的人生。";
+"yoga_formation_obhayachari_yoga" = "行星（不包括月亮/罗睺/克图）位于太阳的第 2 宫和第 12 宫。";
 
 // [+] Parakrama Yoga
-"yoga_name_parakrama_yoga" = "Parakrama Yoga";
-"yoga_outcome_parakrama_yoga" = "Grants exceptional courage, physical strength, and adventurous spirit in pursuits requiring bravery.";
-"yoga_formation_parakrama_yoga" = "3rd lord in benefic Navamsa with benefic influences; Mars in favorable dignity.";
+"yoga_name_parakrama_yoga" = "帕拉克拉玛瑜伽";
+"yoga_outcome_parakrama_yoga" = "在需要勇敢的追求中赋予非凡的勇气、体力和冒险精神。";
+"yoga_formation_parakrama_yoga" = "第三位主在吉利的纳瓦姆萨，具有吉利的影响；火星处于有利的尊严状态。";
 
 // [−] Parannabhojana Yoga
-"yoga_name_parannabhojana_yoga" = "Parannabhojana Yoga";
-"yoga_outcome_parannabhojana_yoga" = "Depends on others for food; financial constraints force reliance on charity or patronage.";
-"yoga_formation_parannabhojana_yoga" = "2nd lord weak, 6th lord influencing food houses.";
+"yoga_name_parannabhojana_yoga" = "帕拉纳布贾纳瑜伽";
+"yoga_outcome_parannabhojana_yoga" = "依赖他人吃饭；财务限制迫使人们依赖慈善机构或赞助。";
+"yoga_formation_parannabhojana_yoga" = "第二位领主较弱，第六位领主影响食品屋。";
 
 // [+] Parihasaka Yoga
-"yoga_name_parihasaka_yoga" = "Parihasaka Yoga";
-"yoga_outcome_parihasaka_yoga" = "Natural wit, humor, and entertaining personality; brings joy to social gatherings.";
-"yoga_formation_parihasaka_yoga" = "Benefics in specific houses creating humorous disposition.";
+"yoga_name_parihasaka_yoga" = "帕里哈萨卡瑜伽";
+"yoga_outcome_parihasaka_yoga" = "自然机智、幽默、风趣的个性；给社交聚会带来欢乐。";
+"yoga_formation_parihasaka_yoga" = "特定宫位的好处可以创造幽默的性格。";
 
 // [+] Parijatha Yoga
-"yoga_name_parijatha_yoga" = "Parijatha Yoga";
-"yoga_outcome_parijatha_yoga" = "Gradual but unstoppable rise to authority through merit and perseverance.";
-"yoga_formation_parijatha_yoga" = "Lagna lord's dispositor chain leads to planet in own/exalted in Kendra/Trikona.";
+"yoga_name_parijatha_yoga" = "帕里贾塔瑜伽";
+"yoga_outcome_parijatha_yoga" = "通过功绩和毅力，逐渐但不可阻挡地上升到权威。";
+"yoga_formation_parijatha_yoga" = "拉格纳领主的定位子链通向肯德拉/特里科纳中自己/崇高的行星。";
 
 // [+] Parvata Yoga
-"yoga_name_parvata_yoga" = "Parvata Yoga";
-"yoga_outcome_parvata_yoga" = "Mountain-like career stability, wealth, fame, and generosity.";
-"yoga_formation_parvata_yoga" = "Benefics in Kendras; 6th and 8th houses empty/unafflicted.";
+"yoga_name_parvata_yoga" = "帕瓦塔瑜伽";
+"yoga_outcome_parvata_yoga" = "山般的事业稳定、财富、名誉、慷慨。";
+"yoga_formation_parvata_yoga" = "肯德拉斯的好处；第六宫和第八宫空着/未受影响。";
 
 // [−] Peenasaroga Yoga
-"yoga_name_peenasaroga_yoga" = "Peenasaroga Yoga";
-"yoga_outcome_peenasaroga_yoga" = "Chronic sinusitis, nasal disorders, or respiratory allergies.";
-"yoga_formation_peenasaroga_yoga" = "Moon and 4th lord afflicted by Saturn and Rahu.";
+"yoga_name_peenasaroga_yoga" = "皮纳罗加瑜伽";
+"yoga_outcome_peenasaroga_yoga" = "慢性鼻窦炎、鼻部疾病或呼吸道过敏。";
+"yoga_formation_peenasaroga_yoga" = "月亮和第四宫主受到土星和罗睺的折磨。";
 
 // [−] Pisacha Grastha Yoga
-"yoga_name_pisacha_grastha_yoga" = "Pisacha Grastha Yoga";
-"yoga_outcome_pisacha_grastha_yoga" = "Psychological disturbances or irrational fears; mental wellness practices provide relief.";
-"yoga_formation_pisacha_grastha_yoga" = "Rahu/Ketu conjunct Moon or Lagna lord with no benefic relief.";
+"yoga_name_pisacha_grastha_yoga" = "皮萨查格拉斯塔瑜伽";
+"yoga_outcome_pisacha_grastha_yoga" = "心理障碍或非理性恐惧；心理健康实践可以缓解压力。";
+"yoga_formation_pisacha_grastha_yoga" = "罗睺/克图与月亮或拉格纳主星合相，没有任何有利的缓解。";
 
 // [−] Pitrusapa Sutakshaya Yoga
-"yoga_name_pitrusapa_sutakshaya_yoga" = "Pitrusapa Sutakshaya Yoga";
-"yoga_outcome_pitrusapa_sutakshaya_yoga" = "Father's curse affecting progeny; unresolved paternal karma impacts children.";
-"yoga_formation_pitrusapa_sutakshaya_yoga" = "Sun afflicted with 5th lord in malefic combinations.";
+"yoga_name_pitrusapa_sutakshaya_yoga" = "Pitrusapa Sutakshaya 瑜伽";
+"yoga_outcome_pitrusapa_sutakshaya_yoga" = "父亲的诅咒影响子孙；未解决的父亲业力会影响孩子。";
+"yoga_formation_pitrusapa_sutakshaya_yoga" = "太阳与第五宫主有凶星组合。";
 
 // [−] Pittaroga Yoga
-"yoga_name_pittaroga_yoga" = "Pittaroga Yoga";
-"yoga_outcome_pittaroga_yoga" = "Susceptibility to Pitta-related ailments (inflammation, acidity, liver issues).";
-"yoga_formation_pittaroga_yoga" = "Sun and Mars afflicting Lagna/6th with fire-element imbalance.";
+"yoga_name_pittaroga_yoga" = "皮塔罗加瑜伽";
+"yoga_outcome_pittaroga_yoga" = "易患 Pitta 相关疾病（炎症、胃酸过多、肝脏问题）。";
+"yoga_formation_pittaroga_yoga" = "太阳和火星因火元素不平衡而影响拉格纳/第六宫。";
 
 // [−] Pretasapa Yoga
-"yoga_name_pretasapa_yoga" = "Pretasapa Yoga";
-"yoga_outcome_pretasapa_yoga" = "Ancestral spirit affliction affecting family; spiritual cleansing recommended.";
-"yoga_formation_pretasapa_yoga" = "Saturn and Rahu afflicting 5th with no benefic aspects.";
+"yoga_name_pretasapa_yoga" = "普雷塔萨帕瑜伽";
+"yoga_outcome_pretasapa_yoga" = "影响家庭的祖先精神疾病；建议进行精神净化。";
+"yoga_formation_pretasapa_yoga" = "土星和罗睺与第五宫有相位，没有吉相。";
 
 // [+] Pushkala Yoga
-"yoga_name_pushkala_yoga" = "Pushkala Yoga";
-"yoga_outcome_pushkala_yoga" = "Grants abundant prosperity, sweet speech, fame, and royal honor.";
-"yoga_formation_pushkala_yoga" = "Lagna lord conjunct Moon, aspected by strong Lagna dispositor.";
+"yoga_name_pushkala_yoga" = "普什卡拉瑜伽";
+"yoga_outcome_pushkala_yoga" = "赐予丰盛的繁荣、甜言蜜语、名声和皇室荣誉。";
+"yoga_formation_pushkala_yoga" = "拉格纳主星与月亮合相，与强大的拉格纳定位星形成相位。";
 
 // [+] Putra Sukha Yoga
-"yoga_name_putra_sukha_yoga" = "Putra Sukha Yoga";
-"yoga_outcome_putra_sukha_yoga" = "Deep happiness and satisfaction through children; strong parent-child bond.";
-"yoga_formation_putra_sukha_yoga" = "5th lord and Jupiter in mutual Kendra with benefic aspects.";
+"yoga_name_putra_sukha_yoga" = "普特拉苏卡瑜伽";
+"yoga_outcome_putra_sukha_yoga" = "通过孩子获得深深的幸福和满足；牢固的亲子关系。";
+"yoga_formation_putra_sukha_yoga" = "第五宫主与木星处于相互肯德拉相位，具有有利的相位。";
 
 // [−] Putrakalatraheena Yoga
-"yoga_name_putrakalatraheena_yoga" = "Putrakalatraheena Yoga";
-"yoga_outcome_putrakalatraheena_yoga" = "Challenges in having children and maintaining marriage; extra effort in relationships needed.";
-"yoga_formation_putrakalatraheena_yoga" = "5th and 7th lords severely afflicted in Dusthana.";
+"yoga_name_putrakalatraheena_yoga" = "普特拉卡拉特拉哈那瑜伽";
+"yoga_outcome_putrakalatraheena_yoga" = "生孩子和维持婚姻的挑战；需要在人际关系上付出额外的努力。";
+"yoga_formation_putrakalatraheena_yoga" = "第五和第七领主在杜斯塔纳遭受了严重的折磨。";
 
 // [+] Putramooladhana Yoga
-"yoga_name_putramooladhana_yoga" = "Putramooladhana Yoga";
-"yoga_outcome_putramooladhana_yoga" = "Wealth through children, creative endeavors, or speculative gains.";
-"yoga_formation_putramooladhana_yoga" = "5th lord connected to 2nd and 11th houses.";
+"yoga_name_putramooladhana_yoga" = "普特拉穆达纳瑜伽";
+"yoga_outcome_putramooladhana_yoga" = "通过孩子、创造性的努力或投机收益获得财富。";
+"yoga_formation_putramooladhana_yoga" = "第五宫主与第二宫和第十一宫相连。";
 
 // [+] Raja Yoga (245)
-"yoga_name_raja_yoga_245" = "Raja Yoga (245)";
-"yoga_outcome_raja_yoga_245" = "Confers kingly status, authority, and rise to positions of great power.";
-"yoga_formation_raja_yoga_245" = "3+ planets exalted/own-house in Kendras/Trikonas.";
+"yoga_name_raja_yoga_245" = "王王瑜伽 (245)";
+"yoga_outcome_raja_yoga_245" = "授予国王地位、权威并晋升至权力大位。";
+"yoga_formation_raja_yoga_245" = "3+ 行星在肯德拉斯/特里科纳斯被提升/拥有自己的房子。";
 
 // [+] Raja Yoga (246)
-"yoga_name_raja_yoga_246" = "Raja Yoga (246)";
-"yoga_outcome_raja_yoga_246" = "Political success and administrative authority through intelligence.";
-"yoga_formation_raja_yoga_246" = "Lagna lord and 5th lord in mutual Kendra with benefic aspects.";
+"yoga_name_raja_yoga_246" = "王王瑜伽 (246)";
+"yoga_outcome_raja_yoga_246" = "通过情报获得政治成功和行政权威。";
+"yoga_formation_raja_yoga_246" = "拉格纳主和第五主在相互肯德拉，具有有利的方面。";
 
 // [+] Raja Yoga (247)
-"yoga_name_raja_yoga_247" = "Raja Yoga (247)";
-"yoga_outcome_raja_yoga_247" = "Fortune aligns with career for spectacular professional success.";
-"yoga_formation_raja_yoga_247" = "9th and 10th lords in conjunction or mutual aspect (Dharma-Karma Adhipati).";
+"yoga_name_raja_yoga_247" = "王王瑜伽 (247)";
+"yoga_outcome_raja_yoga_247" = "财富与事业相结合，取得令人瞩目的职业成功。";
+"yoga_formation_raja_yoga_247" = "第九和第十宫主合相或相互相位（Dharma-Karma Adhipati）。";
 
 // [+] Raja Yoga (248)
-"yoga_name_raja_yoga_248" = "Raja Yoga (248)";
-"yoga_outcome_raja_yoga_248" = "Rise to power through structural advantages and systemic support.";
-"yoga_formation_raja_yoga_248" = "Kendra and Trikona lords in mutual exchange (Parivarthana).";
+"yoga_name_raja_yoga_248" = "王王瑜伽 (248)";
+"yoga_outcome_raja_yoga_248" = "通过结构性优势和系统性支持崛起。";
+"yoga_formation_raja_yoga_248" = "Kendra 和 Trikona 领主相互交换（Parivarthana）。";
 
 // [+] Raja Yoga (249)
-"yoga_name_raja_yoga_249" = "Raja Yoga (249)";
-"yoga_outcome_raja_yoga_249" = "Comprehensive authority — leads with wisdom, ethics, and popular support.";
-"yoga_formation_raja_yoga_249" = "1st, 5th, 9th lords interconnected with Kendra support.";
+"yoga_name_raja_yoga_249" = "王王瑜伽 (249)";
+"yoga_outcome_raja_yoga_249" = "综合权威——以智慧、道德和民众支持来领导。";
+"yoga_formation_raja_yoga_249" = "第一、第五、第九位领主与肯德拉的支持相互联系。";
 
 // [+] Raja Yoga (250)
-"yoga_name_raja_yoga_250" = "Raja Yoga (250)";
-"yoga_outcome_raja_yoga_250" = "Career excellence and highest professional distinctions.";
-"yoga_formation_raja_yoga_250" = "10th lord exalted with 9th lord strong.";
+"yoga_name_raja_yoga_250" = "王王瑜伽 (250)";
+"yoga_outcome_raja_yoga_250" = "职业卓越和最高专业荣誉。";
+"yoga_formation_raja_yoga_250" = "第十位领主与第九位领主一样强大。";
 
 // [+] Raja Yoga (251)
-"yoga_name_raja_yoga_251" = "Raja Yoga (251)";
-"yoga_outcome_raja_yoga_251" = "Sustained authority and progressive career growth throughout life.";
-"yoga_formation_raja_yoga_251" = "Multiple Kendra lords in Trikonas or vice versa.";
+"yoga_name_raja_yoga_251" = "王王瑜伽 (251)";
+"yoga_outcome_raja_yoga_251" = "终生持续的权威和不断进步的职业发展。";
+"yoga_formation_raja_yoga_251" = "特里科纳斯有多个肯德拉领主，反之亦然。";
 
 // [+] Raja Yoga (252)
-"yoga_name_raja_yoga_252" = "Raja Yoga (252)";
-"yoga_outcome_raja_yoga_252" = "Powerful self-made leader; identity inseparable from achievements.";
-"yoga_formation_raja_yoga_252" = "Lagna lord in 10th, 10th lord in Lagna (exchange).";
+"yoga_name_raja_yoga_252" = "王王瑜伽 (252)";
+"yoga_outcome_raja_yoga_252" = "强大的白手起家的领导者；身份与成就密不可分。";
+"yoga_formation_raja_yoga_252" = "Lagna主在10宫，10宫主在Lagna（交换）。";
 
 // [+] Raja Yoga (253)
-"yoga_name_raja_yoga_253" = "Raja Yoga (253)";
-"yoga_outcome_raja_yoga_253" = "Authority through divine favor, past-life merit, and intellectual superiority.";
-"yoga_formation_raja_yoga_253" = "5th lord in 9th or 9th lord in 5th with benefic aspects.";
+"yoga_name_raja_yoga_253" = "王王瑜伽 (253)";
+"yoga_outcome_raja_yoga_253" = "权威来自神圣的恩惠、前世的功德和智力的优越性。";
+"yoga_formation_raja_yoga_253" = "第五宫主在第九宫或第九宫主在第五宫有吉相。";
 
 // [+] Raja Yoga (254)
-"yoga_name_raja_yoga_254" = "Raja Yoga (254)";
-"yoga_outcome_raja_yoga_254" = "Benevolent leadership, diplomatic success, and cultural authority.";
-"yoga_formation_raja_yoga_254" = "Jupiter and Venus in Kendras with strong Lagna lord.";
+"yoga_name_raja_yoga_254" = "王王瑜伽 (254)";
+"yoga_outcome_raja_yoga_254" = "仁慈的领导、外交的成功和文化的权威。";
+"yoga_formation_raja_yoga_254" = "木星和金星位于肯德拉斯，有强大的拉格纳主星。";
 
 // [+] Raja Yoga (255)
-"yoga_name_raja_yoga_255" = "Raja Yoga (255)";
-"yoga_outcome_raja_yoga_255" = "Authority rooted in popular support, property, and institutional power.";
-"yoga_formation_raja_yoga_255" = "4th and 10th lords in mutual support with strong dignity.";
+"yoga_name_raja_yoga_255" = "王王瑜伽 (255)";
+"yoga_outcome_raja_yoga_255" = "权威植根于民众的支持、财产和机构权力。";
+"yoga_formation_raja_yoga_255" = "第四任领主和第十任领主相互支持，威严极强。";
 
 // [+] Raja Yoga (256)
-"yoga_name_raja_yoga_256" = "Raja Yoga (256)";
-"yoga_outcome_raja_yoga_256" = "Governmental authority, administrative success, and public leadership.";
-"yoga_formation_raja_yoga_256" = "Sun strong in 10th with Jupiter's aspect.";
+"yoga_name_raja_yoga_256" = "王王瑜伽 (256)";
+"yoga_outcome_raja_yoga_256" = "政府权威、行政成功和公共领导。";
+"yoga_formation_raja_yoga_256" = "太阳与木星形成相位，在第十位表现强劲。";
 
 // [+] Raja Yoga (257)
-"yoga_name_raja_yoga_257" = "Raja Yoga (257)";
-"yoga_outcome_raja_yoga_257" = "Popular leadership — loved by masses and rises through public support.";
-"yoga_formation_raja_yoga_257" = "Moon strong, connected to multiple Kendra/Trikona lords.";
+"yoga_name_raja_yoga_257" = "王王瑜伽 (257)";
+"yoga_outcome_raja_yoga_257" = "受欢迎的领导力——受到群众的喜爱并通过公众的支持而上升。";
+"yoga_formation_raja_yoga_257" = "月亮强大，与多个肯德拉/特里科纳领主有联系。";
 
 // [+] Raja Yoga (258)
-"yoga_name_raja_yoga_258" = "Raja Yoga (258)";
-"yoga_outcome_raja_yoga_258" = "Military/executive authority; commands large organizations.";
-"yoga_formation_raja_yoga_258" = "Mars in own/exalted sign in Kendra with 10th lord.";
+"yoga_name_raja_yoga_258" = "王王瑜伽 (258)";
+"yoga_outcome_raja_yoga_258" = "军事/行政当局；指挥大型组织。";
+"yoga_formation_raja_yoga_258" = "火星位于肯德拉的本宫/尊贵宫，与第十宫主。";
 
 // [+] Raja Yoga (259)
-"yoga_name_raja_yoga_259" = "Raja Yoga (259)";
-"yoga_outcome_raja_yoga_259" = "Authority in intellectual, commercial, or communication fields.";
-"yoga_formation_raja_yoga_259" = "Mercury strong in 10th connected to 2nd and 11th lords.";
+"yoga_name_raja_yoga_259" = "王王瑜伽 (259)";
+"yoga_outcome_raja_yoga_259" = "知识、商业或传播领域的权威。";
+"yoga_formation_raja_yoga_259" = "水星在第 10 宫强势，与第 2 宫和第 11 宫主相连。";
 
 // [+] Raja Yoga (260)
-"yoga_name_raja_yoga_260" = "Raja Yoga (260)";
-"yoga_outcome_raja_yoga_260" = "Lasting authority through disciplined governance and institutional leadership.";
-"yoga_formation_raja_yoga_260" = "Saturn in own/exalted in 10th with benefic aspects.";
+"yoga_name_raja_yoga_260" = "王王瑜伽 (260)";
+"yoga_outcome_raja_yoga_260" = "通过严格的治理和机构领导来保持持久的权威。";
+"yoga_formation_raja_yoga_260" = "土星位于第十宫，具有有利的相位。";
 
 // [+] Raja Yoga (261)
-"yoga_name_raja_yoga_261" = "Raja Yoga (261)";
-"yoga_outcome_raja_yoga_261" = "Success in diplomacy, arts, or luxury industries with authority.";
-"yoga_formation_raja_yoga_261" = "Venus in 10th connected to 9th and Lagna lords.";
+"yoga_name_raja_yoga_261" = "王王瑜伽 (261)";
+"yoga_outcome_raja_yoga_261" = "在外交、艺术或奢侈品行业取得成功并拥有权威。";
+"yoga_formation_raja_yoga_261" = "金星在第 10 宫与第 9 宫和拉格纳宫主相连。";
 
 // [+] Raja Yoga (262)
-"yoga_name_raja_yoga_262" = "Raja Yoga (262)";
-"yoga_outcome_raja_yoga_262" = "All-round professional success with authority, wealth, and recognition.";
-"yoga_formation_raja_yoga_262" = "Multiple benefics in Kendras with dignified 10th lord.";
+"yoga_name_raja_yoga_262" = "王王瑜伽 (262)";
+"yoga_outcome_raja_yoga_262" = "获得权威、财富和认可的全面职业成功。";
+"yoga_formation_raja_yoga_262" = "肯德拉斯拥有尊贵的第十位领主的多重祝福。";
 
 // [+] Raja Yoga (263)
-"yoga_name_raja_yoga_263" = "Raja Yoga (263)";
-"yoga_outcome_raja_yoga_263" = "Supreme Raja Yoga — extraordinary power and lasting legacy.";
-"yoga_formation_raja_yoga_263" = "All Trikona and Kendra lords mutually supportive (rare).";
+"yoga_name_raja_yoga_263" = "王王瑜伽 (263)";
+"yoga_outcome_raja_yoga_263" = "至尊王瑜伽——非凡的力量和持久的遗产。";
+"yoga_formation_raja_yoga_263" = "所有 Trikona 和 Kendra 领主都相互支持（罕见）。";
 
 // [−] Raja Yoga Bhanga (298)
-"yoga_name_raja_yoga_bhanga_298" = "Raja Yoga Bhanga (298)";
-"yoga_outcome_raja_yoga_bhanga_298" = "Cancels Raja Yoga effects; success undermined by hidden adversaries.";
-"yoga_formation_raja_yoga_bhanga_298" = "Raja Yoga planets afflicted by strong malefics (var. 1).";
+"yoga_name_raja_yoga_bhanga_298" = "王王瑜伽班加 (298)";
+"yoga_outcome_raja_yoga_bhanga_298" = "取消王王瑜伽效果；隐藏的对手破坏了成功。";
+"yoga_formation_raja_yoga_bhanga_298" = "Raja Yoga 行星受到强烈凶星的影响（var. 1）。";
 
 // [−] Raja Yoga Bhanga (299)
-"yoga_name_raja_yoga_bhanga_299" = "Raja Yoga Bhanga (299)";
-"yoga_outcome_raja_yoga_bhanga_299" = "Destroys career progress; external forces derail professional advancement.";
-"yoga_formation_raja_yoga_bhanga_299" = "Raja Yoga planets debilitated or combust (var. 2).";
+"yoga_name_raja_yoga_bhanga_299" = "王王瑜伽班加 (299)";
+"yoga_outcome_raja_yoga_bhanga_299" = "破坏职业进步；外部力量阻碍职业进步。";
+"yoga_formation_raja_yoga_bhanga_299" = "Raja Yoga 行星衰弱或燃烧（var. 2）。";
 
 // [−] Rajabhrashta Yoga
-"yoga_name_rajabhrashta_yoga" = "Rajabhrashta Yoga";
-"yoga_outcome_rajabhrashta_yoga" = "Fall from high position; sudden loss of authority or public disgrace.";
-"yoga_formation_rajabhrashta_yoga" = "Aroodha Lagna lord and Aroodha 12th lord in conjunction.";
+"yoga_name_rajabhrashta_yoga" = "王王瑜伽";
+"yoga_outcome_rajabhrashta_yoga" = "从高处坠落；突然失去权威或公众耻辱。";
+"yoga_formation_rajabhrashta_yoga" = "阿鲁达拉格纳领主和阿鲁达第十二领主联合。";
 
 // [+] Rajalakshana Yoga
-"yoga_name_rajalakshana_yoga" = "Rajalakshana Yoga";
-"yoga_outcome_rajalakshana_yoga" = "Bestows noble bearing, aristocratic demeanor, and natural leadership qualities.";
-"yoga_formation_rajalakshana_yoga" = "Strong planets in Ascendant or Kendras with specific dignity conditions.";
+"yoga_name_rajalakshana_yoga" = "拉贾拉克沙纳瑜伽";
+"yoga_outcome_rajalakshana_yoga" = "赋予高贵的气度、贵族的风范和天生的领导气质。";
+"yoga_formation_rajalakshana_yoga" = "强大的行星位于上升或肯德拉，具有特定的尊严条件。";
 
 // [+] Ravi Yoga
-"yoga_name_ravi_yoga" = "Ravi Yoga";
-"yoga_outcome_ravi_yoga" = "Solar authority — shines in public life and government with confidence.";
-"yoga_formation_ravi_yoga" = "Sun in 10th in own/exalted, 9th lord strong.";
+"yoga_name_ravi_yoga" = "拉维瑜伽";
+"yoga_outcome_ravi_yoga" = "太阳能权威——在公共生活和政府中充满信心地闪耀。";
+"yoga_formation_ravi_yoga" = "太阳在第 10 宫，自己/尊贵，第 9 宫主强。";
 
 // [−] Rogagrastha Yoga
-"yoga_name_rogagrastha_yoga" = "Rogagrastha Yoga";
-"yoga_outcome_rogagrastha_yoga" = "Chronic disease susceptibility; individual prone to recurring health issues.";
-"yoga_formation_rogagrastha_yoga" = "6th lord strong, Lagna lord weak, malefics aspecting Lagna.";
+"yoga_name_rogagrastha_yoga" = "罗加格拉斯塔瑜伽";
+"yoga_outcome_rogagrastha_yoga" = "慢性病易感性；个人容易出现反复出现的健康问题。";
+"yoga_formation_rogagrastha_yoga" = "第六宫主强，拉格纳主弱，凶星与拉格纳有关。";
 
 // [+] Ruchaka Yoga
-"yoga_name_ruchaka_yoga" = "Ruchaka Yoga";
-"yoga_outcome_ruchaka_yoga" = "Grants courage, physical vitality, commanding presence, and success in competitive or military fields.";
-"yoga_formation_ruchaka_yoga" = "Mars in a Kendra (1/4/7/10) in own sign (Aries/Scorpio) or exaltation (Capricorn).";
+"yoga_name_ruchaka_yoga" = "鲁查卡瑜伽";
+"yoga_outcome_ruchaka_yoga" = "赋予勇气、体力、领导力以及在竞争或军事领域的成功。";
+"yoga_formation_ruchaka_yoga" = "火星位于肯德拉宫（1/4/7/10），位于本宫（白羊座/天蝎座）或擢升（摩羯座）。";
 
 // [+] Sada Sanchara Yoga
-"yoga_name_sada_sanchara_yoga" = "Sada Sanchara Yoga";
-"yoga_outcome_sada_sanchara_yoga" = "Career involving constant travel — diplomacy, consulting, or international business.";
-"yoga_formation_sada_sanchara_yoga" = "10th lord in movable sign connected to 3rd/7th/12th houses.";
+"yoga_name_sada_sanchara_yoga" = "萨达桑查拉瑜伽";
+"yoga_outcome_sada_sanchara_yoga" = "涉及经常出差的职业——外交、咨询或国际商务。";
+"yoga_formation_sada_sanchara_yoga" = "第十宫主位于可动星座，与第三/七/十二宫相连。";
 
 // [−] Sahodareesangama Yoga
-"yoga_name_sahodareesangama_yoga" = "Sahodareesangama Yoga";
-"yoga_outcome_sahodareesangama_yoga" = "Inappropriate dynamics in sibling relationships requiring conscious boundaries.";
-"yoga_formation_sahodareesangama_yoga" = "3rd lord and Venus in afflicted combinations.";
+"yoga_name_sahodareesangama_yoga" = "萨霍达里桑伽玛瑜伽";
+"yoga_outcome_sahodareesangama_yoga" = "兄弟姐妹关系中的不适当动态需要有意识的界限。";
+"yoga_formation_sahodareesangama_yoga" = "第三宫主与金星处于受苦组合。";
 
 // [−] Sakata Yoga
-"yoga_name_sakata_yoga" = "Sakata Yoga";
-"yoga_outcome_sakata_yoga" = "Fluctuating fortune — prosperity alternates with setbacks; stability requires effort.";
-"yoga_formation_sakata_yoga" = "Moon in 6th/8th/12th from Jupiter.";
+"yoga_name_sakata_yoga" = "坂田瑜伽";
+"yoga_outcome_sakata_yoga" = "运势起伏——顺境与逆境交替；稳定需要努力。";
+"yoga_formation_sakata_yoga" = "月亮位于木星的第六/八/十二宫。";
 
 // [−] Sanghataka Marana Yoga (276)
-"yoga_name_sanghataka_marana_yoga_276" = "Sanghataka Marana Yoga (276)";
-"yoga_outcome_sanghataka_marana_yoga_276" = "Collective tragedy or mass-incident vulnerability; caution during malefic transits.";
-"yoga_formation_sanghataka_marana_yoga_276" = "Specific malefic groupings in death-inflicting houses (var. 1).";
+"yoga_name_sanghataka_marana_yoga_276" = "桑哈塔卡马拉那瑜伽 (276)";
+"yoga_outcome_sanghataka_marana_yoga_276" = "集体悲剧或群体性事件的脆弱性；凶星过境时要小心。";
+"yoga_formation_sanghataka_marana_yoga_276" = "造成死亡的房屋中的特定凶星群体（第 1 种）。";
 
 // [−] Sanghataka Marana Yoga (277)
-"yoga_name_sanghataka_marana_yoga_277" = "Sanghataka Marana Yoga (277)";
-"yoga_outcome_sanghataka_marana_yoga_277" = "Risk during group activities or travel; heightened awareness during danger periods.";
-"yoga_formation_sanghataka_marana_yoga_277" = "Specific malefic groupings in death-inflicting houses (var. 2).";
+"yoga_name_sanghataka_marana_yoga_277" = "桑哈塔卡马拉那瑜伽 (277)";
+"yoga_outcome_sanghataka_marana_yoga_277" = "团体活动或旅行期间的风险；提高危险时期的意识。";
+"yoga_formation_sanghataka_marana_yoga_277" = "导致死亡的房屋中的特定凶星群体（第 2 种）。";
 
 // [+] Sankha Yoga
-"yoga_name_sankha_yoga" = "Sankha Yoga";
-"yoga_outcome_sankha_yoga" = "Conch-like royal authority; wealth, longevity, and humanitarian leadership.";
-"yoga_formation_sankha_yoga" = "5th and 6th lords in mutual Kendras with strong Lagna lord.";
+"yoga_name_sankha_yoga" = "桑卡瑜伽";
+"yoga_outcome_sankha_yoga" = "海螺般的王权；财富、长寿和人道主义领导力。";
+"yoga_formation_sankha_yoga" = "第五和第六位领主在共同的肯德拉斯与强大的拉格纳领主。";
 
 // [+] Sarala Yoga
-"yoga_name_sarala_yoga" = "Sarala Yoga";
-"yoga_outcome_sarala_yoga" = "Grants fearlessness and longevity; conquers hidden dangers through resilience.";
-"yoga_formation_sarala_yoga" = "8th lord in 6th, 8th, or 12th house (Dusthana in Dusthana).";
+"yoga_name_sarala_yoga" = "萨拉拉瑜伽";
+"yoga_outcome_sarala_yoga" = "赐予无畏和长寿；通过韧性克服隐患。";
+"yoga_formation_sarala_yoga" = "第八宫主在第六宫、第八宫或第十二宫（杜斯塔纳中的杜斯塔纳）。";
 
 // [+] Saraswathi Yoga Education
-"yoga_name_saraswathi_yoga_education" = "Saraswathi Yoga Education";
-"yoga_outcome_saraswathi_yoga_education" = "Outcome details to be added";
-"yoga_formation_saraswathi_yoga_education" = "Formation details to be added";
+"yoga_name_saraswathi_yoga_education" = "萨拉斯瓦蒂瑜伽教育";
+"yoga_outcome_saraswathi_yoga_education" = "待添加结果详细信息";
+"yoga_formation_saraswathi_yoga_education" = "阵型详情待补充";
 
 // [+] Sareera Soukhya Yoga
-"yoga_name_sareera_soukhya_yoga" = "Sareera Soukhya Yoga";
-"yoga_outcome_sareera_soukhya_yoga" = "Physical comfort, good health, and robust constitution throughout life.";
-"yoga_formation_sareera_soukhya_yoga" = "Lagna lord in own/exalted sign with benefic aspects on Lagna.";
+"yoga_name_sareera_soukhya_yoga" = "萨里拉·苏基亚瑜伽";
+"yoga_outcome_sareera_soukhya_yoga" = "终生身体舒适、身体健康、体质强健。";
+"yoga_formation_sareera_soukhya_yoga" = "拉格纳领主位于自己/尊贵的星座，对拉格纳有吉利的相位。";
 
 // [−] Sarpaganda Yoga
-"yoga_name_sarpaganda_yoga" = "Sarpaganda Yoga";
-"yoga_outcome_sarpaganda_yoga" = "Susceptibility to snake bites or reptile-related dangers; caution near serpents.";
-"yoga_formation_sarpaganda_yoga" = "Rahu in specific positions with malefic aspects on Lagna.";
+"yoga_name_sarpaganda_yoga" = "萨尔帕甘达瑜伽";
+"yoga_outcome_sarpaganda_yoga" = "容易受到蛇咬伤或爬行动物相关危险的影响；小心靠近蛇。";
+"yoga_formation_sarpaganda_yoga" = "罗睺 (Rahu) 位于拉格纳 (Lagna) 的特定位置，具有凶相。";
 
 // [−] Sarpasapa Yoga (212)
-"yoga_name_sarpasapa_yoga_212" = "Sarpasapa Yoga (212)";
-"yoga_outcome_sarpasapa_yoga_212" = "Serpent curse affecting progeny; karmic obstacles to childbearing.";
-"yoga_formation_sarpasapa_yoga_212" = "Rahu in 5th with malefic aspects, no benefic relief (var. 1).";
+"yoga_name_sarpasapa_yoga_212" = "萨帕沙帕瑜伽 (212)";
+"yoga_outcome_sarpasapa_yoga_212" = "影响后代的蛇咒；生育的业障。";
+"yoga_formation_sarpasapa_yoga_212" = "罗睺在第五宫有凶相，没有吉利的缓解（变量1）。";
 
 // [−] Sarpasapa Yoga (213)
-"yoga_name_sarpasapa_yoga_213" = "Sarpasapa Yoga (213)";
-"yoga_outcome_sarpasapa_yoga_213" = "Ancestral karmic debt manifesting as fertility challenges.";
-"yoga_formation_sarpasapa_yoga_213" = "Rahu/Ketu axis on 5th-11th with afflicted 5th lord (var. 2).";
+"yoga_name_sarpasapa_yoga_213" = "萨帕沙帕瑜伽 (213)";
+"yoga_outcome_sarpasapa_yoga_213" = "祖先的业债表现为生育挑战。";
+"yoga_formation_sarpasapa_yoga_213" = "罗睺/克图轴位于 5 日至 11 日，第五宫主受折磨（变量 2）。";
 
 // [−] Sarpasapa Yoga (214)
-"yoga_name_sarpasapa_yoga_214" = "Sarpasapa Yoga (214)";
-"yoga_outcome_sarpasapa_yoga_214" = "Deep-rooted karmic blocks to having children; spiritual remedies essential.";
-"yoga_formation_sarpasapa_yoga_214" = "Specific Rahu combinations in 5th with Saturn (var. 3).";
+"yoga_name_sarpasapa_yoga_214" = "萨帕沙帕瑜伽 (214)";
+"yoga_outcome_sarpasapa_yoga_214" = "根深蒂固的业力阻碍生儿育女；精神疗法必不可少。";
+"yoga_formation_sarpasapa_yoga_214" = "特定的罗胡与土星在第五宫的组合（变种3）。";
 
 // [−] Sarpasapa Yoga (215)
-"yoga_name_sarpasapa_yoga_215" = "Sarpasapa Yoga (215)";
-"yoga_outcome_sarpasapa_yoga_215" = "Severe serpent curse impact on family lineage; ritual purification recommended.";
-"yoga_formation_sarpasapa_yoga_215" = "Rahu in 5th with 5th lord in 6th/8th/12th (var. 4).";
+"yoga_name_sarpasapa_yoga_215" = "萨帕沙帕瑜伽 (215)";
+"yoga_outcome_sarpasapa_yoga_215" = "蛇咒对家族血统造成严重影响；建议进行仪式净化。";
+"yoga_formation_sarpasapa_yoga_215" = "罗睺在第五宫，第五宫主在第六/八/十二宫（变体4）。";
 
 // [+] Sasa Yoga
-"yoga_name_sasa_yoga" = "Sasa Yoga";
-"yoga_outcome_sasa_yoga" = "Confers discipline, leadership in governance, and success through perseverance and methodical effort.";
-"yoga_formation_sasa_yoga" = "Saturn in a Kendra (1/4/7/10) in own sign (Capricorn/Aquarius) or exaltation (Libra).";
+"yoga_name_sasa_yoga" = "莎莎瑜伽";
+"yoga_outcome_sasa_yoga" = "赋予纪律、治理领导力以及通过坚持不懈和有条不紊的努力取得成功。";
+"yoga_formation_sasa_yoga" = "土星位于肯德拉宫（1/4/7/10），位于自己的星座（摩羯座/水瓶座）或擢升（天秤座）。";
 
 // [+] Satkalatra Yoga
-"yoga_name_satkalatra_yoga" = "Satkalatra Yoga";
-"yoga_outcome_satkalatra_yoga" = "Noble, virtuous spouse and harmonious marriage; life partner brings fortune and happiness.";
-"yoga_formation_satkalatra_yoga" = "7th lord well-placed with Venus strong and benefic aspects.";
+"yoga_name_satkalatra_yoga" = "萨卡拉特拉瑜伽";
+"yoga_outcome_satkalatra_yoga" = "配偶高贵贤惠，婚姻和谐；生活伴侣带来财富和幸福。";
+"yoga_formation_satkalatra_yoga" = "第七宫主与金星形成强大而有利的相位。";
 
 // [+] Satkathadisravana Yoga
-"yoga_name_satkathadisravana_yoga" = "Satkathadisravana Yoga";
-"yoga_outcome_satkathadisravana_yoga" = "Grants deep love for sacred knowledge, philosophical learning, and higher wisdom.";
-"yoga_formation_satkathadisravana_yoga" = "3rd house aspected by benefics, 3rd lord in benefic Navamsa with natural benefic aspects.";
+"yoga_name_satkathadisravana_yoga" = "萨卡塔迪斯拉瓦那瑜伽";
+"yoga_outcome_satkathadisravana_yoga" = "赋予对神圣知识、哲学学习和更高智慧的热爱。";
+"yoga_formation_satkathadisravana_yoga" = "第三宫有吉利相位，第三宫主在吉利纳瓦姆萨，具有自然吉利相位。";
 
 // [+] Satrumooladhana Yoga
-"yoga_name_satrumooladhana_yoga" = "Satrumooladhana Yoga";
-"yoga_outcome_satrumooladhana_yoga" = "Wealth through defeating competition, legal victories, or service income.";
-"yoga_formation_satrumooladhana_yoga" = "6th lord connected to 2nd and 11th houses.";
+"yoga_name_satrumooladhana_yoga" = "萨鲁穆拉达纳瑜伽";
+"yoga_outcome_satrumooladhana_yoga" = "通过击败竞争、法律胜利或服务收入而获得财富。";
+"yoga_formation_satrumooladhana_yoga" = "第六宫主与第二宫和第十一宫相连。";
 
 // [−] Sirachcheda Yoga
-"yoga_name_sirachcheda_yoga" = "Sirachcheda Yoga";
-"yoga_outcome_sirachcheda_yoga" = "Risk of head injuries or severe trauma; protective measures and caution advised.";
-"yoga_formation_sirachcheda_yoga" = "Mars and Ketu afflicting Lagna with no benefic protection.";
+"yoga_name_sirachcheda_yoga" = "西拉其达瑜伽";
+"yoga_outcome_sirachcheda_yoga" = "头部受伤或严重外伤的风险；建议采取保护措施并谨慎行事。";
+"yoga_formation_sirachcheda_yoga" = "火星和克图在没有有利保护的情况下折磨着拉格纳。";
 
 // [−] Sisnavyadhi Yoga
-"yoga_name_sisnavyadhi_yoga" = "Sisnavyadhi Yoga";
-"yoga_outcome_sisnavyadhi_yoga" = "Genital or reproductive health disorders; specialized medical attention advisable.";
-"yoga_formation_sisnavyadhi_yoga" = "Venus and 7th lord afflicted by malefics in 8th house.";
+"yoga_name_sisnavyadhi_yoga" = "西斯那维亚瑜伽";
+"yoga_outcome_sisnavyadhi_yoga" = "生殖器或生殖健康障碍；建议进行专门的医疗护理。";
+"yoga_formation_sisnavyadhi_yoga" = "金星和第七宫主在第八宫受到凶星的折磨。";
 
 // [+] Siva Yoga
-"yoga_name_siva_yoga" = "Siva Yoga";
-"yoga_outcome_siva_yoga" = "Lord Shiva's blessing; profound meditative abilities, ascetic wisdom, and transformative spiritual power.";
-"yoga_formation_siva_yoga" = "5th lord in 9th, 9th lord in 10th, 10th lord in 5th.";
+"yoga_name_siva_yoga" = "湿婆瑜伽";
+"yoga_outcome_siva_yoga" = "湿婆神的祝福；深奥的冥想能力、苦行智慧和变革的精神力量。";
+"yoga_formation_siva_yoga" = "5号领主在9号，9号领主在10号，10号领主在5号。";
 
 // [−] Sraddhannabhuktha Yoga
-"yoga_name_sraddhannabhuktha_yoga" = "Sraddhannabhuktha Yoga";
-"yoga_outcome_sraddhannabhuktha_yoga" = "Eats food intended for rituals or ceremonies; dependent on funeral/ritual offerings.";
-"yoga_formation_sraddhannabhuktha_yoga" = "Specific afflictions to 2nd house indicating impure food sources.";
+"yoga_name_sraddhannabhuktha_yoga" = "纯粹瑜伽";
+"yoga_outcome_sraddhannabhuktha_yoga" = "吃用于仪式或典礼的食物；依赖葬礼/仪式祭品。";
+"yoga_formation_sraddhannabhuktha_yoga" = "第二宫的特殊痛苦表明食物来源不纯。";
 
 // [+] Sreenatha Yoga
-"yoga_name_sreenatha_yoga" = "Sreenatha Yoga";
-"yoga_outcome_sreenatha_yoga" = "Bestows divine favor, prosperity after marriage, and fortune through partnerships.";
-"yoga_formation_sreenatha_yoga" = "7th lord exalted in 10th, 9th and 10th lords in conjunction.";
+"yoga_name_sreenatha_yoga" = "斯里纳塔瑜伽";
+"yoga_outcome_sreenatha_yoga" = "赐予神圣的恩惠、婚后的繁荣以及通过伙伴关系获得的财富。";
+"yoga_formation_sreenatha_yoga" = "第七位领主与第十位、第九位和第十位领主一起晋升。";
 
 // [+] Sumukha Yoga (166)
-"yoga_name_sumukha_yoga_166" = "Sumukha Yoga (166)";
-"yoga_outcome_sumukha_yoga_166" = "Attractive face and pleasant appearance; magnetic personality and charming demeanor.";
-"yoga_formation_sumukha_yoga_166" = "Benefics in 2nd from Lagna, Lagna lord strong (var. 1).";
+"yoga_name_sumukha_yoga_166" = "苏穆哈瑜伽 (166)";
+"yoga_outcome_sumukha_yoga_166" = "迷人的面孔和宜人的外表；磁性的个性和迷人的风度。";
+"yoga_formation_sumukha_yoga_166" = "来自 Lagna 的第二个增益，Lagna 领主强者（var. 1）。";
 
 // [+] Sumukha Yoga (167)
-"yoga_name_sumukha_yoga_167" = "Sumukha Yoga (167)";
-"yoga_outcome_sumukha_yoga_167" = "Handsome features and graceful bearing; naturally appealing and socially admired.";
-"yoga_formation_sumukha_yoga_167" = "Venus and Jupiter aspecting Lagna or 2nd house (var. 2).";
+"yoga_name_sumukha_yoga_167" = "苏穆哈瑜伽 (167)";
+"yoga_outcome_sumukha_yoga_167" = "眉清目秀，风度翩翩；天生具有吸引力并受到社会的钦佩。";
+"yoga_formation_sumukha_yoga_167" = "金星和木星与第二宫（var.2）成相位。";
 
 // [+] Sunapha Yoga
-"yoga_name_sunapha_yoga" = "Sunapha Yoga";
-"yoga_outcome_sunapha_yoga" = "Grants self-earned wealth, intelligence, and prosperity through personal merit.";
-"yoga_formation_sunapha_yoga" = "Planet (excl. Sun/Rahu/Ketu) in 2nd house from Moon.";
+"yoga_name_sunapha_yoga" = "苏纳法瑜伽";
+"yoga_outcome_sunapha_yoga" = "通过个人功绩授予自力更生的财富、智慧和繁荣。";
+"yoga_formation_sunapha_yoga" = "行星（不包括太阳/罗胡/克图）位于月亮第二宫。";
 
 // [+] Suputra Yoga
-"yoga_name_suputra_yoga" = "Suputra Yoga";
-"yoga_outcome_suputra_yoga" = "Blessed with a worthy, virtuous child who brings great pride and family honor.";
-"yoga_formation_suputra_yoga" = "Jupiter strong aspecting 5th house, 5th lord dignified.";
+"yoga_name_suputra_yoga" = "上瑜伽";
+"yoga_outcome_suputra_yoga" = "有幸拥有一个值得尊敬、有道德的孩子，他给家庭带来了巨大的自豪感和荣誉。";
+"yoga_formation_suputra_yoga" = "木星与第五宫形成强势相位，第五宫主庄严。";
 
 // [+] Swaveeryadhana Yoga
-"yoga_name_swaveeryadhana_yoga" = "Swaveeryadhana Yoga";
-"yoga_outcome_swaveeryadhana_yoga" = "Grants wealth entirely through self-effort; the individual is a self-made achiever.";
-"yoga_formation_swaveeryadhana_yoga" = "Lagna lord and 2nd lord strong without external house dependence.";
+"yoga_name_swaveeryadhana_yoga" = "斯瓦维亚丹瑜伽";
+"yoga_outcome_swaveeryadhana_yoga" = "完全靠自己的努力获得财富；个人是一个白手起家的成功者。";
+"yoga_formation_swaveeryadhana_yoga" = "拉格纳领主和第二领主强大，没有外部房屋依赖。";
 
 // [−] Swetakushta Yoga
-"yoga_name_swetakushta_yoga" = "Swetakushta Yoga";
-"yoga_outcome_swetakushta_yoga" = "Susceptibility to chronic skin conditions; holistic health practices recommended.";
-"yoga_formation_swetakushta_yoga" = "Specific combinations affecting skin and vitality houses.";
+"yoga_name_swetakushta_yoga" = "斯维塔库什塔瑜伽";
+"yoga_outcome_swetakushta_yoga" = "易患慢性皮肤病；推荐整体健康实践。";
+"yoga_formation_swetakushta_yoga" = "影响皮肤和活力之家的特定组合。";
 
 // [+] Theevrabuddhi Yoga
-"yoga_name_theevrabuddhi_yoga" = "Theevrabuddhi Yoga";
-"yoga_outcome_theevrabuddhi_yoga" = "Razor-sharp intelligence and quick comprehension; excels in logic and analytics.";
-"yoga_formation_theevrabuddhi_yoga" = "Mercury exalted/own sign in Kendra with Jupiter's aspect.";
+"yoga_name_theevrabuddhi_yoga" = "提佛菩提瑜伽";
+"yoga_outcome_theevrabuddhi_yoga" = "敏锐的智力和快速的理解力；擅长逻辑和分析。";
+"yoga_formation_theevrabuddhi_yoga" = "水星在肯德拉与木星形成相位。";
 
 // [+] Thrikalagnana Yoga
-"yoga_name_thrikalagnana_yoga" = "Thrikalagnana Yoga";
-"yoga_outcome_thrikalagnana_yoga" = "Prophetic intuition and extraordinary foresight; uncanny predictive abilities.";
-"yoga_formation_thrikalagnana_yoga" = "Jupiter strong in Navamsa with specific Lagna connections.";
+"yoga_name_thrikalagnana_yoga" = "特里卡拉格纳瑜伽";
+"yoga_outcome_thrikalagnana_yoga" = "先知般的直觉和非凡的远见；不可思议的预测能力。";
+"yoga_formation_thrikalagnana_yoga" = "木星在九分命盘中强势，与特定的拉格纳（Lagna）联系。";
 
 // [+] Thrilochana Yoga
-"yoga_name_thrilochana_yoga" = "Thrilochana Yoga";
-"yoga_outcome_thrilochana_yoga" = "Grants immense wealth, fearlessness, and a commanding, prosperous presence.";
-"yoga_formation_thrilochana_yoga" = "Sun, Moon, and Mars in mutual trines (1-5-9 triangle).";
+"yoga_name_thrilochana_yoga" = "斯罗查纳瑜伽";
+"yoga_outcome_thrilochana_yoga" = "赋予巨大的财富、无所畏惧以及威严、繁荣的存在。";
+"yoga_formation_thrilochana_yoga" = "太阳、月亮和火星相互成三分相（1-5-9 三角形）。";
 
 // [+] Uttama Griha Yoga
-"yoga_name_uttama_griha_yoga" = "Uttama Griha Yoga";
-"yoga_outcome_uttama_griha_yoga" = "Grants ownership of excellent homes; individual lives in comfort with fine dwellings.";
-"yoga_formation_uttama_griha_yoga" = "4th lord strong in Kendra/Trikona with benefic influences.";
+"yoga_name_uttama_griha_yoga" = "乌塔玛格里哈瑜伽";
+"yoga_outcome_uttama_griha_yoga" = "授予优秀住宅的所有权；个人生活舒适，拥有精美的住宅。";
+"yoga_formation_uttama_griha_yoga" = "肯德拉/特里科纳的第四位领主，具有良好的影响力。";
 
 // [+] Vahana Yoga (209)
-"yoga_name_vahana_yoga_209" = "Vahana Yoga (209)";
-"yoga_outcome_vahana_yoga_209" = "Grants fine vehicles, conveyances, and luxury transportation.";
-"yoga_formation_vahana_yoga_209" = "4th lord connected with benefics and Venus strong (var. 1).";
+"yoga_name_vahana_yoga_209" = "瓦哈纳瑜伽 (209)";
+"yoga_outcome_vahana_yoga_209" = "提供优质车辆、交通工具和豪华交通。";
+"yoga_formation_vahana_yoga_209" = "第四宫主与吉星和强势金星有关（var.1）。";
 
 // [+] Vahana Yoga (210)
-"yoga_name_vahana_yoga_210" = "Vahana Yoga (210)";
-"yoga_outcome_vahana_yoga_210" = "Ensures premium vehicles and comfortable travel throughout life.";
-"yoga_formation_vahana_yoga_210" = "Benefics in 4th house with Venus well-placed (var. 2).";
+"yoga_name_vahana_yoga_210" = "瓦哈纳瑜伽 (210)";
+"yoga_outcome_vahana_yoga_210" = "确保优质车辆和终生舒适旅行。";
+"yoga_formation_vahana_yoga_210" = "吉星在第四宫，金星处于良好位置（变量2）。";
 
 // [−] Vakchalana Yoga
-"yoga_name_vakchalana_yoga" = "Vakchalana Yoga";
-"yoga_outcome_vakchalana_yoga" = "Speech defects, stammering, or language impediments; speech therapy beneficial.";
-"yoga_formation_vakchalana_yoga" = "Mercury severely afflicted with malefics, 2nd lord weak.";
+"yoga_name_vakchalana_yoga" = "瓦克查拉纳瑜伽";
+"yoga_outcome_vakchalana_yoga" = "言语缺陷、结巴或语言障碍；言语治疗有益。";
+"yoga_formation_vakchalana_yoga" = "水星受到凶星的严重困扰，第二主星虚弱。";
 
 // [−] Vamsacheda Yoga
-"yoga_name_vamsacheda_yoga" = "Vamsacheda Yoga";
-"yoga_outcome_vamsacheda_yoga" = "Challenges in continuing family lineage; alternative family building may be considered.";
-"yoga_formation_vamsacheda_yoga" = "5th lord and Jupiter severely afflicted.";
+"yoga_name_vamsacheda_yoga" = "瓦姆萨赫达瑜伽";
+"yoga_outcome_vamsacheda_yoga" = "延续家族血统的挑战；可以考虑替代性的家庭建设。";
+"yoga_formation_vamsacheda_yoga" = "第五宫主与木星严重受克。";
 
 // [−] Vanchanachorabheethi Yoga
-"yoga_name_vanchanachorabheethi_yoga" = "Vanchanachorabheethi Yoga";
-"yoga_outcome_vanchanachorabheethi_yoga" = "Suggests vulnerability to deception or theft; caution in trusting others advised.";
-"yoga_formation_vanchanachorabheethi_yoga" = "Malefic influences on Lagna lord with Rahu/Ketu involvement.";
+"yoga_name_vanchanachorabheethi_yoga" = "万查那克拉比蒂瑜伽";
+"yoga_outcome_vanchanachorabheethi_yoga" = "表明容易受到欺骗或盗窃；谨慎信任他人的建议。";
+"yoga_formation_vanchanachorabheethi_yoga" = "凶星对拉格纳领主的影响与罗睺/克图的参与有关。";
 
 // [+] Vasi Yoga
-"yoga_name_vasi_yoga" = "Vasi Yoga";
-"yoga_outcome_vasi_yoga" = "Grants charitable disposition, influence, good fortune, and social standing.";
-"yoga_formation_vasi_yoga" = "Planet (excl. Moon/Rahu/Ketu) in 12th house from Sun.";
+"yoga_name_vasi_yoga" = "瓦西瑜伽";
+"yoga_outcome_vasi_yoga" = "赋予慈善气质、影响力、好运和社会地位。";
+"yoga_formation_vasi_yoga" = "行星（不包括月亮/罗睺/克图）位于太阳第12宫。";
 
 // [+] Vasumathi Yoga
-"yoga_name_vasumathi_yoga" = "Vasumathi Yoga";
-"yoga_outcome_vasumathi_yoga" = "Ensures steady wealth accumulation and financial stability through consistent effort.";
-"yoga_formation_vasumathi_yoga" = "Benefics in Upachaya houses (3/6/10/11) from Moon or Ascendant.";
+"yoga_name_vasumathi_yoga" = "瓦苏玛蒂瑜伽";
+"yoga_outcome_vasumathi_yoga" = "通过坚持不懈的努力，确保稳定的财富积累和财务稳定。";
+"yoga_formation_vasumathi_yoga" = "月亮或上升对 Upachaya 宫（3/6/10/11）有利。";
 
 // [−] Vatharoga Yoga
-"yoga_name_vatharoga_yoga" = "Vatharoga Yoga";
-"yoga_outcome_vatharoga_yoga" = "Susceptibility to Vata-related ailments (joint pain, nervous disorders, gas).";
-"yoga_formation_vatharoga_yoga" = "Saturn afflicting Lagna/6th house with wind-element imbalance.";
+"yoga_name_vatharoga_yoga" = "瓦塔罗伽瑜伽";
+"yoga_outcome_vatharoga_yoga" = "容易患瓦塔相关疾病（关节疼痛、神经紊乱、胀气）。";
+"yoga_formation_vatharoga_yoga" = "土星影响拉格纳/第六宫，导致风元素失衡。";
 
 // [+] Vesi Yoga
-"yoga_name_vesi_yoga" = "Vesi Yoga";
-"yoga_outcome_vesi_yoga" = "Enhances truthfulness, industrious nature, and credibility through honest effort.";
-"yoga_formation_vesi_yoga" = "Planet (excl. Moon/Rahu/Ketu) in 2nd house from Sun.";
+"yoga_name_vesi_yoga" = "维西瑜伽";
+"yoga_outcome_vesi_yoga" = "通过诚实的努力增强诚实、勤奋的本性和信誉。";
+"yoga_formation_vesi_yoga" = "行星（不包括月亮/罗睺/克图）位于太阳第二宫。";
 
 // [+] Vichitra Saudha Prakara Yoga
-"yoga_name_vichitra_saudha_prakara_yoga" = "Vichitra Saudha Prakara Yoga";
-"yoga_outcome_vichitra_saudha_prakara_yoga" = "Bestows palatial residences and ownership of remarkable properties.";
-"yoga_formation_vichitra_saudha_prakara_yoga" = "Multiple planets supporting 4th house with dignified positions.";
+"yoga_name_vichitra_saudha_prakara_yoga" = "维奇特拉·萨达·普拉卡拉瑜伽";
+"yoga_outcome_vichitra_saudha_prakara_yoga" = "授予富丽堂皇的住宅和非凡财产的所有权。";
+"yoga_formation_vichitra_saudha_prakara_yoga" = "多个行星以尊贵的位置支持第四宫。";
 
 // [+] Vidyut Yoga
-"yoga_name_vidyut_yoga" = "Vidyut Yoga";
-"yoga_outcome_vidyut_yoga" = "Lightning-like brilliance; sudden, spectacular professional success.";
-"yoga_formation_vidyut_yoga" = "Venus as 11th lord conjunct Lagna lord in exalted Navamsa.";
+"yoga_name_vidyut_yoga" = "维尤特瑜伽";
+"yoga_outcome_vidyut_yoga" = "闪电般的光彩；突然的、惊人的职业成功。";
+"yoga_formation_vidyut_yoga" = "金星作为第 11 宫主与拉格纳主星在崇高的纳瓦姆萨 (Navamsa) 相合。";
 
 // [−] Vikalangapatni Yoga
-"yoga_name_vikalangapatni_yoga" = "Vikalangapatni Yoga";
-"yoga_outcome_vikalangapatni_yoga" = "Spouse may face health challenges or physical disabilities.";
-"yoga_formation_vikalangapatni_yoga" = "7th lord and Venus afflicted by malefics in Dusthana.";
+"yoga_name_vikalangapatni_yoga" = "维卡兰加帕特尼瑜伽";
+"yoga_outcome_vikalangapatni_yoga" = "配偶可能面临健康挑战或身体残疾。";
+"yoga_formation_vikalangapatni_yoga" = "第七宫主和金星在杜斯塔纳受到凶星的折磨。";
 
 // [+] Vimala Yoga
-"yoga_name_vimala_yoga" = "Vimala Yoga";
-"yoga_outcome_vimala_yoga" = "Reduces losses and waste; individual achieves independence through detachment.";
-"yoga_formation_vimala_yoga" = "12th lord in 6th, 8th, or 12th house (Dusthana in Dusthana).";
+"yoga_name_vimala_yoga" = "维摩罗瑜伽";
+"yoga_outcome_vimala_yoga" = "减少损失和浪费；个人通过超然获得独立。";
+"yoga_formation_vimala_yoga" = "第 12 宫主在第 6、8 或 12 宫（Dusthana 中的 Dusthana）。";
 
 // [−] Vishaprayoga Yoga
-"yoga_name_vishaprayoga_yoga" = "Vishaprayoga Yoga";
-"yoga_outcome_vishaprayoga_yoga" = "Risk of poisoning or toxin-related health issues; dietary vigilance needed.";
-"yoga_formation_vishaprayoga_yoga" = "Specific malefic combinations involving Rahu and 2nd house.";
+"yoga_name_vishaprayoga_yoga" = "维沙帕瑜伽瑜伽";
+"yoga_outcome_vishaprayoga_yoga" = "中毒或毒素相关健康问题的风险；需要饮食警惕。";
+"yoga_formation_vishaprayoga_yoga" = "涉及罗睺和第二宫的特定凶星组合。";
 
 // [+] Vishnu Yoga
-"yoga_name_vishnu_yoga" = "Vishnu Yoga";
-"yoga_outcome_vishnu_yoga" = "Lord Vishnu's blessing; divine preservation, prosperity, and righteous worldly success through spiritual merit.";
-"yoga_formation_vishnu_yoga" = "9th lord in 10th, 10th lord in 9th (exchange).";
+"yoga_name_vishnu_yoga" = "毗湿奴瑜伽";
+"yoga_outcome_vishnu_yoga" = "毗湿奴神的祝福；通过精神功德获得神圣的保存、繁荣和正义的世俗成功。";
+"yoga_formation_vishnu_yoga" = "9 宫主在 10 宫，10 宫主在 9 宫（交换）。";
 
 // [−] Vrana Yoga
-"yoga_name_vrana_yoga" = "Vrana Yoga";
-"yoga_outcome_vrana_yoga" = "Susceptibility to wounds, boils, or surgical conditions; injury-prone constitution.";
-"yoga_formation_vrana_yoga" = "Mars and Ketu afflicting Lagna or 6th house.";
+"yoga_name_vrana_yoga" = "弗拉纳瑜伽";
+"yoga_outcome_vrana_yoga" = "对伤口、疖子或手术状况敏感；容易受伤的体质。";
+"yoga_formation_vrana_yoga" = "火星和 Ketu 影响 Lagna 或第六宫。";
 
 // [−] Yuddha Marana Yoga
-"yoga_name_yuddha_marana_yoga" = "Yuddha Marana Yoga";
-"yoga_outcome_yuddha_marana_yoga" = "Risk of death through conflict, accidents, or violent circumstances.";
-"yoga_formation_yuddha_marana_yoga" = "Mars in 6th/8th afflicting Lagna with Ketu involvement.";
+"yoga_name_yuddha_marana_yoga" = "尤达马拉纳瑜伽";
+"yoga_outcome_yuddha_marana_yoga" = "因冲突、事故或暴力情况而死亡的风险。";
+"yoga_formation_yuddha_marana_yoga" = "火星位于第六/第八宫，与克图的影响有关。";
 
 // [+] Yuddha Praveena Yoga
-"yoga_name_yuddha_praveena_yoga" = "Yuddha Praveena Yoga";
-"yoga_outcome_yuddha_praveena_yoga" = "Bestows strategic prowess in warfare, debate, or competitive professions.";
-"yoga_formation_yuddha_praveena_yoga" = "Navamsa lord of 3rd lord traced through chain ending in planet in own Vargas.";
+"yoga_name_yuddha_praveena_yoga" = "尤达普拉维纳瑜伽";
+"yoga_outcome_yuddha_praveena_yoga" = "在战争、辩论或竞争性职业中赋予战略能力。";
+"yoga_formation_yuddha_praveena_yoga" = "第三领主的纳瓦姆萨领主通过链条追踪到了自己的瓦尔加斯星球。";
 
 // [+] Yuddhatpaschaddrudha Yoga
-"yoga_name_yuddhatpaschaddrudha_yoga" = "Yuddhatpaschaddrudha Yoga";
-"yoga_outcome_yuddhatpaschaddrudha_yoga" = "Indicates resilience after setbacks — the individual recovers with tenacity from defeats.";
-"yoga_formation_yuddhatpaschaddrudha_yoga" = "3rd lord in fixed signs in D1 and D9, cruel D60, Rasi lord debilitated.";
+"yoga_name_yuddhatpaschaddrudha_yoga" = "尤达帕查德鲁达瑜伽";
+"yoga_outcome_yuddhatpaschaddrudha_yoga" = "表示挫折后的韧性——个人从失败中顽强地恢复过来。";
+"yoga_formation_yuddhatpaschaddrudha_yoga" = "D1和D9中固定星座的第三位领主，残酷的D60，拉西领主衰弱。";
 
 // [+] Yuddhatpoorvadridhachitta Yoga
-"yoga_name_yuddhatpoorvadridhachitta_yoga" = "Yuddhatpoorvadridhachitta Yoga";
-"yoga_outcome_yuddhatpoorvadridhachitta_yoga" = "Grants unwavering determination and mental fortitude before undertaking challenges.";
-"yoga_formation_yuddhatpoorvadridhachitta_yoga" = "3rd lord exalted, conjoined with malefics in movable sign.";
+"yoga_name_yuddhatpoorvadridhachitta_yoga" = "瑜伽";
+"yoga_outcome_yuddhatpoorvadridhachitta_yoga" = "在接受挑战之前赋予坚定不移的决心和精神毅力。";
+"yoga_formation_yuddhatpoorvadridhachitta_yoga" = "第三位主被提升，与移动星座中的凶星相结合。";
 
 // [+] Yukthi Samanwithavagmi (154)
-"yoga_name_yukthi_samanwithavagmi_yoga_154" = "Yukthi Samanwithavagmi (154)";
-"yoga_outcome_yukthi_samanwithavagmi_yoga_154" = "Logical eloquence and persuasive speech; excels in debate, law, or diplomacy.";
-"yoga_formation_yukthi_samanwithavagmi_yoga_154" = "Mercury strong with 2nd lord in benefic combinations (var. 1).";
+"yoga_name_yukthi_samanwithavagmi_yoga_154" = "尤提·萨曼维塔瓦米 (154)";
+"yoga_outcome_yukthi_samanwithavagmi_yoga_154" = "逻辑性的口才和有说服力的演讲；擅长辩论、法律或外交。";
+"yoga_formation_yukthi_samanwithavagmi_yoga_154" = "水星与第二宫主形成有利的组合（var.1）。";
 
 // [+] Yukthi Samanwithavagmi (155)
-"yoga_name_yukthi_samanwithavagmi_yoga_155" = "Yukthi Samanwithavagmi (155)";
-"yoga_outcome_yukthi_samanwithavagmi_yoga_155" = "Articulate expression and intellectual communication; compelling writer or orator.";
-"yoga_formation_yukthi_samanwithavagmi_yoga_155" = "Mercury strong with 2nd lord in benefic combinations (var. 2).";
+"yoga_name_yukthi_samanwithavagmi_yoga_155" = "尤克蒂·萨曼维塔瓦米 (155)";
+"yoga_outcome_yukthi_samanwithavagmi_yoga_155" = "清晰的表达和智力的交流；引人注目的作家或演说家。";
+"yoga_formation_yukthi_samanwithavagmi_yoga_155" = "水星与第二宫主形成有利的组合（var.2）。";
 
 // MARK: - Compatibility Result Labels
 "marriage_recommended" = "推荐结婚";
@@ -2141,22 +2160,22 @@
 "manglik_label" = "曼利克";
 "none_label" = "没有任何";
 "view_label" = "看法";
-"no_profiles_meet_threshold" = "所有配置文件均不符合建议的兼容性阈值。";
+"no_profiles_meet_threshold" = "没有配置文件符合建议的阈值。";
 "review_individual_analyses" = "查看下面的个别分析以获取详细见解。";
 "destiny_ai_astrology_brand" = "命运人工智能占星术";
 "compatibility_comparison" = "兼容性比较";
-"copyright_notice" = "©2026 命运人工智能占星术·destinyaiastrology.com";
+"copyright_notice" = "© 2026 命运人工智能占星术。版权所有。";
 "description_not_available" = "描述不可用";
 "this_may_take_moments" = "这可能需要一些时间...";
 "pending_label" = "待办的";
 "overridden_due_to_dosha" = "由于 dosha 不兼容而被覆盖";
 "active_doshas" = "主动能量：";
-"dosha_label" = "能量";
+"dosha_label" = "多沙";
 "rejection_reason_label" = "担忧";
 "additional_notes" = "附加说明：";
 "house_positions_label" = "宫位";
 
-"koota_label" = "Koota";
+"koota_label" = "库塔";
 "tooltip_determined_by" = "%@ 的匹配由 %@ 阿什塔库塔决定";
 "tooltip_partner_values" = "伴侣数值";
 "tooltip_score_label" = "得分";
@@ -2190,7 +2209,7 @@
 "no_profiles_found" = "未找到个人资料";
 "add_partner_to_start" = "添加合作伙伴资料以开始使用";
 "manage_birth_charts" = "管理出生图";
-"you_label" = "YOU";
+"you_label" = "你";
 "active_profile" = "活动档案";
 
 // Delete Account
@@ -2548,3 +2567,303 @@
 "varna_values_format" = "瓦尔纳: 新郎 %@, 新娘 %@";
 "varna_effect_label" = "瓦尔纳库塔代表基于月亮星座元素的精神和心理兼容性";
 "varna_complementarity_note" = "传统互补配对 — 公认的自然亲和力";
+
+// MARK: - Charts (V2.3)
+"birth_chart" = "出生图";
+"birth_charts" = "出生图";
+"north_indian" = "北印度式";
+"south_indian" = "南印度式";
+"d1_rashi" = "D1 (签)";
+"d9_navamsa" = "D9 (分盘)";
+"house_num_label" = "第 %@ 宫";
+"pada_num_label" = "第 %@ 步";
+"vimshottari_dasha_year" = "维姆索塔里大运 (%@)";
+"transits_year" = "行运 (%@)";
+"house_short" = "%@宫";
+
+/* Compatibility Components */
+"ashtakoot_analysis_title" = "Ashtakoot 分析";
+"kuta_varna_label" = "工作";
+"kuta_vashya_label" = "支配力";
+"kuta_tara_label" = "命运";
+"kuta_yoni_label" = "亲密度";
+"kuta_maitri_label" = "友谊";
+"kuta_gana_label" = "气质";
+"kuta_bhakoot_label" = "爱情";
+"kuta_nadi_label" = "健康";
+"analysis_step_mapping_charts" = "绘制出生图";
+"analysis_step_ashtakoot" = "计算占星兼容性";
+"analysis_step_mangal" = "检查 Manglik 兼容性";
+"analysis_step_yogas" = "评估瑜伽和 doshas";
+"analysis_step_generating" = "准备您的兼容性见解";
+"analysis_step_ready" = "您的兼容性见解已准备就绪 ✨";
+"active_factors_title" = "活跃因素";
+"inactive_factors_title" = "非活跃因素";
+"status_reduced" = "已减少";
+"no_yogas_in_category" = "此类别中没有瑜伽";
+"adjusted_label" = "已调整";
+"compatibility_label" = "兼容性";
+"tap_orbs_hint" = "点击圆体查看详情";
+"ai_analysis_label" = "AI 分析";
+"tile_wealth_label" = "财富";
+"tile_career_label" = "事业";
+"tile_love_label" = "爱情";
+"tile_family_label" = "家庭";
+"tile_wisdom_label" = "智慧";
+"tile_health_label" = "健康";
+"tile_challenges_label" = "挑战";
+"tile_wealth_title" = "财富与资产";
+"tile_career_title" = "事业与权力";
+"tile_love_title" = "爱情与婚姻";
+"tile_family_title" = "家庭与家园";
+"tile_wisdom_title" = "智慧与心灵";
+"tile_health_title" = "健康与支持";
+"tile_challenges_title" = "业力挑战";
+
+// MARK: - Compatibility Sheets & Shared
+"compatibility_report_title" = "兼容性报告";
+"ai_generated_analysis" = "人工智能生成的分析";
+"ai_disclaimer_text" = "该报告由 Destiny AI 生成。占星学见解基于传统原理。请咨询专业占星家以做出严肃的人生决定。";
+"copyright_notice" = "© 2026 命运人工智能占星术。版权所有。";
+"ask_about_match_title" = "询问%@ 和%@";
+"ask_destiny_welcome" = "问我关于这段关系的任何事情......";
+"ask_question_placeholder" = "问一个问题...";
+"ai_thinking" = "命运在思考...";
+"mars_compatibility_title" = "火星兼容性";
+"perfectly_safe" = "万无一失";
+"no_mangal_dosha_detected" = "在两张图表中均未检测到 Mangal Dosha。";
+"why_is_this_good" = "为什么这样好呢？";
+"non_manglik_explanation" = "由于双方都不是“Manglik”，因此不存在影响婚姻的火星相关冲突的风险。这方面对长期和平做出了重大贡献。";
+"non_manglik" = "非曼利克";
+"dosha_cancelled_title" = "多夏取消";
+"neutralized_effects_desc" = "任何潜在的负面影响都会被抵消。";
+"why_cancelled" = "为什么被取消";
+"mutual_neutralization_desc" = "双方的Mangal Dosha处于同一水平，导致相互抵消。";
+"attention_required" = "需要注意";
+"mangal_friction_desc" = "Mangal Dosha 很有效，但可能会引起摩擦。";
+"mitigating_exceptions_title" = "减少异常情况";
+"vedic_exceptions_desc" = "吠陀占星学认识到减少或中和曼加尔能量的行星状况。以下是每个图表中发现的例外情况。";
+"suggested_remedies_title" = "建议的补救措施";
+"intensifying_factor_singular" = "强化因素";
+"intensifying_factor_plural" = "强化因素";
+"mild_manglik" = "轻度曼利克";
+"moderate_manglik" = "中度曼利克";
+"high_manglik" = "高曼利克";
+"severe_manglik" = "严重曼利克病";
+"manglik" = "曼利克";
+"mars_in_house" = "火星在宫%@";
+"safe_status" = "安全的";
+"dosha_cancellation_title" = "Dosha 取消";
+"astrological_exceptions_subtitle" = "占星学例外情况适用";
+"low_score_warning_title" = "低分警告";
+"attention_required_subtitle" = "可能需要注意";
+"analysis_with_partner" = "ANALYSIS (%@)";
+"no_profiles_meet_threshold" = "没有配置文件符合建议的阈值。";
+"review_individual_analyses_hint" = "查看下面的个别分析以获取详细见解。";
+"final_recommendation_label" = "最终推荐：%@ (%@/36)";
+"all_doshas_safe_fallback" = "所有能量都是安全的。最高的兼容性。";
+"compatibility_comparison_pdf" = "兼容性比较";
+"generated_date_label" = "生成：%@";
+"kalsarpa_clear" = "清除";
+"kalsarpa_both_present" = "两人都在场";
+"kalsarpa_moderate" = "缓和";
+"mangal_dosha_full" = "曼加尔·多沙 (Manglik/Kuja)";
+"view_action" = "看法";
+"kaal_sarp_dosha_full" = "卡尔萨普多沙 (Kalasarpa)";
+"additional_yogas_title" = "额外的瑜伽";
+"view_all_action" = "查看全部";
+"view_full_report_action" = "查看完整报告";
+"accessibility_menu" = "菜单";
+"accessibility_profile" = "轮廓";
+"viewing_as_label" = "以 %@ 的身份查看";
+"accessibility_history_chat" = "聊天记录";
+"accessibility_history_match" = "比赛历史";
+"accessibility_reset_form" = "重置表格";
+"accessibility_new_analysis" = "新分析";
+"accessibility_new_conversation" = "新对话";
+"kalsarpa_shankhapal_desc" = "影响家庭和谐及母子关系";
+"kalsarpa_ananta_desc" = "影响精神成长和解放";
+"kalsarpa_kulik_desc" = "给职业生涯和职业生活制造障碍";
+"kalsarpa_vasuki_desc" = "影响财富和金融稳定";
+"kalsarpa_padam_desc" = "影响婚姻和伴侣关系";
+"kalsarpa_mahapadam_desc" = "影响整体人生方向";
+"kalsarpa_takshak_desc" = "创造突然的变化和转变";
+"kalsarpa_karkotak_desc" = "影响健康和活力";
+"kalsarpa_sheshnag_desc" = "影响长寿和深层潜意识";
+"kalsarpa_ghatak_desc" = "创建隐藏的敌人和障碍";
+"kalsarpa_vishdhar_desc" = "影响沟通和表达";
+"kalsarpa_shankachood_desc" = "影响父亲和佛法";
+"kalsarpa_default_desc" = "影响生命之路的强大蛇体能量";
+"severity_mild" = "温和的";
+"severity_moderate" = "缓和";
+"severity_severe" = "严重";
+"severity_unknown" = "未知";
+"detailed_breakdown_title" = "详细分类";
+"area_health" = "健康";
+"area_love" = "爱";
+"area_temperament" = "气质";
+"area_friendship" = "友谊";
+"area_intimacy" = "亲密感";
+"area_dominance" = "统治力";
+"area_destiny" = "命运";
+"area_work" = "工作";
+"active_label" = "积极的";
+"low_score_warning_desc" = "%@ 兼容性得分为 0。这方面需要相互理解和努力。";
+"accessibility_back" = "后退";
+"accessibility_birth_chart" = "出生图";
+"accessibility_birth_charts" = "出生图";
+"dosha_label" = "多沙";
+
+// MARK: - Compatibility Main & History (V2.5)
+"partner_label" = "伙伴";
+"duplicate_birth_chart_title" = "重复的出生图";
+"ok_action" = "好的";
+"partner_index_label" = "合作伙伴%d";
+"accessibility_add_partner" = "添加合作伙伴";
+"gender_label" = "性别";
+"select_gender_a11y" = "选择性别";
+"gender_value_a11y" = "Gender: %@";
+"select_date_action" = "选择日期";
+"select_dob_a11y" = "选择出生日期";
+"dob_value_a11y" = "出生日期：%@";
+"unknown_label" = "未知";
+"select_time_action" = "选择时间";
+"select_tob_a11y" = "选择出生时间";
+"tob_value_a11y" = "出生时间：%@";
+"tob_unknown_a11y" = "出生时间：未知";
+"select_birth_city_a11y" = "选择出生城市";
+"birth_city_value_a11y" = "出生城市：%@";
+"daily_limit_reset_time" = "每日限额已达。重置于%@。";
+"daily_limit_reached_tomorrow" = "每日限额已达。明天重置。";
+"upgrade_to_unlock" = "升级即可解锁此功能。";
+"quota_check_failed" = "无法检查兼容性访问。";
+"comparing_partners_count" = "比较 %d 个合作伙伴";
+"partners_complete_count" = "%d/%d 已完成";
+"search_matches_placeholder" = "搜索匹配...";
+"match_history_title" = "比赛历史";
+"group_match_title" = "%@ + %@";
+"best_match_score" = "最佳：%d/%d";
+"unpin" = "取消固定";
+"pin" = "别针";
+
+// MARK: - Missed Compatibility Keys
+"born_date_format" = "出生：%@·%@";
+"ashtakoot_adjusted_score_format" = "阿什塔库特：%d/%d · 调整：%d/%d";
+"ashtakoot_score_format" = "阿什塔库特得分：%d/%d";
+"overridden_due_to_issues" = "由于兼容性问题而被覆盖：";
+"report_generated_format" = "生成的报告：%@";
+"destiny_ai_astrology_title" = "命运人工智能占星术";
+"ai_generated_analysis_info" = "ⓘ AI 生成分析";
+"ask_destiny_title" = "问命运";
+"suggested_q_strengths" = "这场比赛的主要优势是什么？";
+"suggested_q_challenges" = "这场比赛的主要挑战是什么？";
+"suggested_q_timing" = "关系和谐的最佳时机？";
+"suggested_questions_title" = "建议问题";
+
+// MARK: - Chat Module Fixes
+"done_action" = "完毕";
+"delete_action" = "删除";
+"chat_history_title" = "聊天记录";
+"chat_delete_thread_confirm" = "Are you sure you want to delete \"%@\"?";
+
+// MARK: - Components Missing Keys
+"out_of_max_score_format" = "共 %d 个";
+"viewing_as_profile_format" = "以 %@ 的身份查看";
+"questions_left_format" = "还剩 %d/%d 个问题";
+"renews_date_format" = "续订%@";
+"select_city_title" = "选择城市";
+"rated_status" = "额定";
+"rate_action" = "速度";
+"a11y_star_rating" = "%d 颗星，共 5 颗星";
+"a11y_rate_helpful" = "评价有帮助";
+"a11y_rate_unhelpful" = "评价无益";
+"a11y_destiny_thinking" = "命运在思考";
+"a11y_send_message" = "发送消息";
+"a11y_copy_response" = "复制回复";
+
+// MARK: - Views/Components Missing Keys
+"a11y_orb_status_format" = "%@: %@";
+
+// MARK: - History Module Keys
+"history_title" = "历史";
+"delete_item_confirm_format" = "Are you sure you want to delete \"%@\"?";
+"history_not_saved_desc" = "您的对话和匹配不会被保存。";
+"score_fraction_format" = "%d/%d";
+"best_score_format" = "最佳：%d/%d";
+
+// MARK: - Home Module Keys
+"retry_action" = "重试";
+"almost_there" = "快到了";
+"todays_cosmic_vibe" = "今天的宇宙氛围";
+"a11y_profile_name_format" = "Profile, %@";
+"ask_more_ellipsis" = "询问更多...";
+"percentage_format" = "%d%%";
+"hyphen_format" = "- %@";
+"until_date_format" = "Until %@";
+"no_combinations_found" = "未找到该类别的组合。";
+"whats_on_your_mind" = "今天你在想什么？";
+"or_ask_your_own" = "或者问你自己的";
+
+// MARK: - Notifications Module Keys
+"unread_count_format" = "%d 未读";
+"a11y_notification_detail_format" = "%@, %@, %@%@";
+"a11y_unread_suffix" = ", 未读";
+
+// MARK: - Partners Module Keys
+"partner_consent_text" = "添加此出生图即表示您确认您是父母或法定监护人并有权提供此信息";
+"for_compatibility_matching" = "用于兼容性匹配";
+"compatibility_age_restriction" = "兼容性匹配仅适用于 18 岁以上的个人";
+"delete_partner_action_format" = "Delete %@";
+"delete_partner_confirm_format" = "这将从您保存的出生图表中永久删除%@。";
+"saved_birth_charts_title" = "保存的出生图";
+"loading_birth_charts" = "正在加载出生图表...";
+"no_saved_birth_charts" = "没有保存出生图表";
+"save_birth_charts_desc" = "保存出生图表以便快速匹配";
+"add_birth_chart_action" = "添加出生图";
+"no_saved_birth_charts_yet" = "尚未保存出生图表";
+"no_matches_found" = "未找到匹配项";
+"add_new_birth_chart_action" = "添加新的出生图";
+"select_birth_chart_title" = "选择出生图";
+"upgrade_action" = "升级";
+"add_action" = "添加";
+
+// MARK: - Profile Module Keys
+"profile_title" = "轮廓";
+"preferences_menu" = "偏好设置";
+"support_menu" = "支持";
+"app_version_format" = "Version %@";
+"faq_and_help" = "常见问题与帮助";
+"turn_off_action" = "关";
+"clear_action" = "清除";
+"deleted_conversation_singular" = "已成功删除 %d 个对话。";
+"deleted_conversation_plural" = "已成功删除 %d 个对话。";
+"viewing_birth_chart_format" = "查看出生图：%@";
+"a11y_gender_format" = "Gender: %@";
+"a11y_active_profile_format" = "活动个人资料：%@%@";
+"a11y_you_suffix" = "， 你";
+"a11y_switch_profile_format" = "切换到%@%@";
+"a11y_your_profile_suffix" = "，你的个人资料";
+
+// MARK: - Settings Module Keys
+"add_first_personalized_alert" = "在下面添加您的第一个个性化提醒";
+"remove_alert_confirm_format" = "Remove \"%@...\"?";
+"remove_this_alert" = "删除此警报吗？";
+"enable_notifications_instruction" = "在 iOS 设置 → 应用程序 → 命运 → 通知中启用";
+"alert_about_question" = "您想要关于什么的警报？";
+"character_count_format" = "%d/200";
+"personalized_alerts_title" = "个性化提醒";
+"chart_style_title" = "图表样式";
+"astrology_settings_title" = "占星设置";
+"save_action" = "节省";
+
+// MARK: - Subscription Module Keys
+"choose_plan_title" = "选择一个计划";
+"lets_go_action" = "我们走吧！";
+"fair_use_notice" = "无限制访问须遵守合理使用原则。";
+"apple_subscription_notice" = "购买费用通过您的 Apple ID 进行计费。在“设置”→“Apple ID”→“订阅”中管理。";
+"price_monthly_format" = "$%@";
+"subscription_starts_format" = "开始%@";
+
+
+// Auto-translated Additions
+"context_transit_question" = "%@ 目前正在我第 %d 个房子的 %@ 中转。关键指示是：“%@”。\n\n请分享关于这次行运如何影响我的生活的更深入的见解以及这一时期的任何实际指导。";

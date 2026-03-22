@@ -50,7 +50,7 @@ struct CompatibilityView: View {
             if viewModel.showComparisonOverview && !viewModel.comparisonResults.isEmpty {
                 ComparisonOverviewView(
                     results: viewModel.comparisonResults,
-                    userName: viewModel.boyName.isEmpty ? "You" : viewModel.boyName,
+                    userName: viewModel.boyName.isEmpty ? "you_label".localized : viewModel.boyName,
                     onSelectPartner: { index in
                         // Navigate to individual result
                         if viewModel.comparisonResults.indices.contains(index) {
@@ -174,8 +174,8 @@ struct CompatibilityView: View {
                 let boyAsc = result.analysisData?.boy?.chartData?.d1["Ascendant"]?.sign
                 let girlAsc = result.analysisData?.girl?.chartData?.d1["Ascendant"]?.sign
                 ChartComparisonSheet(
-                    boyName: viewModel.boyName.isEmpty ? "You" : viewModel.boyName,
-                    girlName: viewModel.girlName.isEmpty ? "Partner" : viewModel.girlName,
+                    boyName: viewModel.boyName.isEmpty ? "you_label".localized : viewModel.boyName,
+                    girlName: viewModel.girlName.isEmpty ? "partner_label".localized : viewModel.girlName,
                     boyChartData: result.analysisData?.boy?.chartData,
                     girlChartData: result.analysisData?.girl?.chartData,
                     boyAscendant: boyAsc,
@@ -203,11 +203,11 @@ struct CompatibilityView: View {
             SubscriptionView()
         }
         // Duplicate birth chart alert (suppress when partner came from saved charts)
-        .alert("Duplicate Birth Chart", isPresented: .init(
+        .alert("duplicate_birth_chart_title".localized, isPresented: .init(
             get: { viewModel.duplicateMessage != nil && !partnerFromSavedChart },
             set: { if !$0 { viewModel.duplicateMessage = nil } }
         )) {
-            Button("OK", role: .cancel) { viewModel.duplicateMessage = nil }
+            Button("ok_action".localized, role: .cancel) { viewModel.duplicateMessage = nil }
         } message: {
             Text(viewModel.duplicateMessage ?? "")
         }
@@ -315,9 +315,8 @@ struct CompatibilityView: View {
             // Pre-check "Save birth chart" for paid users (hide + unchecked for free users)
             // Only if not loading from history/picker (already saved)
             if initialMatchItem == nil && initialMatchGroup == nil {
-                if !quotaManager.isFreePlan {
-                    savePartnerForFuture = true
-                }
+                // Default to unchecked - user must explicitly choose to save
+                savePartnerForFuture = false
                 partnerFromSavedChart = false
             }
         }
@@ -556,8 +555,8 @@ struct CompatibilityView: View {
                         .padding(.horizontal, 8)
                     }
                     
-                    // Bottom padding for scrolling
-                    Spacer(minLength: 100) 
+                    // Bottom padding for scrolling - increased to prevent checkbox being hidden by button
+                    Spacer(minLength: 140) 
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
@@ -602,7 +601,7 @@ struct CompatibilityView: View {
                             }
                         }) {
                             HStack(spacing: 4) {
-                                Text("Partner \(index + 1)")
+                                Text(String(format: "partner_index_label".localized, index + 1))
                                     .font(AppTheme.Fonts.caption(size: 11))
                                 if partner.isComplete {
                                     Image(systemName: "checkmark")
@@ -662,7 +661,7 @@ struct CompatibilityView: View {
                         }
                     }
                     .disabled(isPlus && !canAddMore)  // Only disable at max for Plus users; non-Plus always tappable (opens paywall)
-                    .accessibilityLabel(isPlus ? "Add partner" : "Upgrade to Plus to add multiple partners")
+                    .accessibilityLabel("accessibility_add_partner".localized)
                     
                     Spacer()
                     
@@ -678,7 +677,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                                 .padding(6)
                         }
-                        .accessibilityLabel("Remove partner")
+                        .accessibilityLabel("a11y_remove_partner".localized)
                     }
                 }
                 .padding(.bottom, 4)
@@ -711,8 +710,8 @@ struct CompatibilityView: View {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
+                            .accessibilityLabel("a11y_search_saved_partners".localized)
                     }
-                    .accessibilityLabel("Search saved partners")
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 11)
@@ -733,7 +732,7 @@ struct CompatibilityView: View {
                         Image(systemName: "person")
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
-                        Text(viewModel.partnerGender.isEmpty ? "Gender" : viewModel.partnerGender.localized)
+                        Text(viewModel.partnerGender.isEmpty ? "gender_label".localized : viewModel.partnerGender.localized)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(viewModel.partnerGender.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                             .lineLimit(1)
@@ -752,7 +751,7 @@ struct CompatibilityView: View {
                     )
                 }
                 .frame(width: 140)
-                .accessibilityLabel(viewModel.partnerGender.isEmpty ? "Select gender" : "Gender: \(viewModel.partnerGender)")
+                .accessibilityLabel(viewModel.partnerGender.isEmpty ? "select_gender_a11y".localized : String(format: "gender_value_a11y".localized, viewModel.partnerGender))
             }
             
             // Date & Time Row
@@ -766,7 +765,7 @@ struct CompatibilityView: View {
                         Image(systemName: "calendar")
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
-                        Text(viewModel.currentPartner.birthDateSet ? viewModel.formattedGirlDob : "Select Date")
+                        Text(viewModel.currentPartner.birthDateSet ? viewModel.formattedGirlDob : "select_date_action".localized)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(viewModel.currentPartner.birthDateSet ? AppTheme.Colors.textPrimary : AppTheme.Colors.textTertiary)
                             .lineLimit(1)
@@ -781,7 +780,7 @@ struct CompatibilityView: View {
                             .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                     )
                 }
-                .accessibilityLabel(viewModel.currentPartner.birthDateSet ? "Date of birth: \(viewModel.formattedGirlDob)" : "Select date of birth")
+                .accessibilityLabel(viewModel.currentPartner.birthDateSet ? String(format: "dob_value_a11y".localized, viewModel.formattedGirlDob) : "select_dob_a11y".localized)
                 
                 // Time Button
                 Button(action: { 
@@ -794,7 +793,7 @@ struct CompatibilityView: View {
                         Image(systemName: "clock")
                             .font(.system(size: 12))
                             .foregroundColor(viewModel.partnerTimeUnknown ? AppTheme.Colors.textTertiary : AppTheme.Colors.gold.opacity(0.7))
-                        Text(viewModel.partnerTimeUnknown ? "Unknown" : (viewModel.currentPartner.birthTimeSet ? viewModel.formattedGirlTime : "Select Time"))
+                        Text(viewModel.partnerTimeUnknown ? "unknown_label".localized : (viewModel.currentPartner.birthTimeSet ? viewModel.formattedGirlTime : "select_time_action".localized))
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor((viewModel.partnerTimeUnknown || !viewModel.currentPartner.birthTimeSet) ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                             .lineLimit(1)
@@ -811,7 +810,7 @@ struct CompatibilityView: View {
                 }
                 .frame(width: 140)
                 .disabled(viewModel.partnerTimeUnknown)
-                .accessibilityLabel(viewModel.partnerTimeUnknown ? "Time of birth: unknown" : (viewModel.currentPartner.birthTimeSet ? "Time of birth: \(viewModel.formattedGirlTime)" : "Select time of birth"))
+                .accessibilityLabel(viewModel.partnerTimeUnknown ? "tob_unknown_a11y".localized : (viewModel.currentPartner.birthTimeSet ? String(format: "tob_value_a11y".localized, viewModel.formattedGirlTime) : "select_tob_a11y".localized))
             }
             
             // Place Button (full width) - Moved UP for better vertical flow
@@ -841,7 +840,7 @@ struct CompatibilityView: View {
                         .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                 )
             }
-            .accessibilityLabel(viewModel.girlCity.isEmpty ? "Select birth city" : "Birth city: \(viewModel.girlCity)")
+            .accessibilityLabel(viewModel.girlCity.isEmpty ? "select_birth_city_a11y".localized : String(format: "birth_city_value_a11y".localized, viewModel.girlCity))
             
             // Time Unknown & Save Row (Moved to Bottom)
             VStack(alignment: .leading, spacing: 4) {
@@ -861,7 +860,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
-                    .accessibilityLabel("Birth time unknown")
+                    .accessibilityLabel("a11y_birth_time_unknown".localized)
                     .accessibilityAddTraits(viewModel.partnerTimeUnknown ? .isSelected : [])
                     
                     // Save Partner Toggle (hidden for free plan users, disabled when picked from saved charts)
@@ -881,7 +880,7 @@ struct CompatibilityView: View {
                             }
                         }
                         .disabled(partnerFromSavedChart)
-                        .accessibilityLabel("Save partner for future")
+                        .accessibilityLabel("a11y_save_partner".localized)
                         .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     }
                     
@@ -991,9 +990,9 @@ struct CompatibilityView: View {
                                 let timeFormatter = DateFormatter()
                                 timeFormatter.timeStyle = .short
                                 let timeStr = timeFormatter.string(from: date)
-                                viewModel.errorMessage = "Daily limit reached. Resets at \(timeStr)."
+                                viewModel.errorMessage = String(format: "daily_limit_reset_time".localized, timeStr)
                             } else {
-                                viewModel.errorMessage = "Daily limit reached. Resets tomorrow."
+                                viewModel.errorMessage = "daily_limit_reached_tomorrow".localized
                             }
                             // No sheet for daily limit
                         } else if accessResponse.reason == "overall_limit_reached" {
@@ -1002,12 +1001,12 @@ struct CompatibilityView: View {
                                 // Guest users should only see Sign In option (no subscribe)
                                 quotaErrorMessage = "sign_in_to_continue_matching".localized
                             } else {
-                                quotaErrorMessage = "free_limit_reached".localized
+                                quotaErrorMessage = "create_account_to_continue".localized
                             }
                             showQuotaExhausted = true
                         } else {
                             // FEATURE NOT AVAILABLE: Show sheet only
-                            quotaErrorMessage = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
+                            quotaErrorMessage = accessResponse.upgradeCta?.message ?? "upgrade_to_unlock".localized
                             showQuotaExhausted = true
                         }
                     }
@@ -1015,7 +1014,7 @@ struct CompatibilityView: View {
             } catch {
                 print("❌ Quota check failed: \(error)")
                 await MainActor.run {
-                    quotaErrorMessage = "Unable to check compatibility access."
+                    quotaErrorMessage = "quota_check_failed".localized
                     showQuotaExhausted = true
                 }
             }

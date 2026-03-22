@@ -50,7 +50,7 @@ struct QuotaWidget: View {
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(Color("GoldAccent"))
                 
-                Text("\(remaining)/\(total) questions left")
+                Text(String(format: "questions_left_format".localized, remaining, total))
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color("NavyPrimary"))
                 
@@ -134,7 +134,7 @@ struct QuotaWidget: View {
                 .padding(.top, 4)
             } else {
                 // Renewal text when not showing upgrade
-                Text("Renews \(renewalDate)")
+                Text(String(format: "renews_date_format".localized, renewalDate))
                     .font(.system(size: 12))
                     .foregroundColor(Color("TextDark").opacity(0.5))
             }

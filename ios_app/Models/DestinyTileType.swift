@@ -19,16 +19,29 @@ enum DestinyTileType: String, CaseIterable, Identifiable {
     
     var id: String { rawValue }
     
+    /// Short label for tabs
+    var localizedLabel: String {
+        switch self {
+        case .wealth: return "tile_wealth_label".localized
+        case .career: return "tile_career_label".localized
+        case .love: return "tile_love_label".localized
+        case .family: return "tile_family_label".localized
+        case .wisdom: return "tile_wisdom_label".localized
+        case .health: return "tile_health_label".localized
+        case .dosha: return "tile_challenges_label".localized
+        }
+    }
+    
     /// Display title for the tile
     var displayTitle: String {
         switch self {
-        case .wealth: return "Wealth & Assets"
-        case .career: return "Career & Power"
-        case .love: return "Love & Marriage"
-        case .family: return "Family & Home"
-        case .wisdom: return "Wisdom & Spirit"
-        case .health: return "Health & Support"
-        case .dosha: return "Karmic Challenges"
+        case .wealth: return "tile_wealth_title".localized
+        case .career: return "tile_career_title".localized
+        case .love: return "tile_love_title".localized
+        case .family: return "tile_family_title".localized
+        case .wisdom: return "tile_wisdom_title".localized
+        case .health: return "tile_health_title".localized
+        case .dosha: return "tile_challenges_title".localized
         }
     }
     

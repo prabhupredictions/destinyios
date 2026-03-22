@@ -111,13 +111,13 @@ struct ProfileView: View {
                     .padding(.vertical, 20)
                 }
             }
-            .navigationTitle("Profile")
+            .navigationTitle("profile_title".localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                     Button("Done") { dismiss() }
+                     Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -190,11 +190,11 @@ struct ProfileView: View {
                 checkNotificationStatus()
             }
             .alert("Turn off history?", isPresented: $showTurnOffHistoryAlert) {
-                Button("Cancel", role: .cancel) {
+                Button("cancel_action".localized, role: .cancel) {
                     // Revert toggle back to ON
                     historySettings.isHistoryEnabled = true
                 }
-                Button("Turn Off", role: .destructive) {
+                Button("turn_off_action".localized, role: .destructive) {
                     historySettings.isHistoryEnabled = false
                     HapticManager.shared.play(.heavy)
                 }
@@ -203,8 +203,8 @@ struct ProfileView: View {
                     .font(AppTheme.Fonts.body(size: 15))
             }
             .alert("Clear history?", isPresented: $showClearHistoryAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Clear", role: .destructive) {
+                Button("cancel_action".localized, role: .cancel) {}
+                Button("clear_action".localized, role: .destructive) {
                     Task {
                         let count = await historySettings.clearAllHistory(dataManager: DataManager.shared)
                         await MainActor.run {
@@ -219,9 +219,9 @@ struct ProfileView: View {
                     .font(AppTheme.Fonts.body(size: 15))
             }
             .alert("History Cleared", isPresented: $showClearSuccessAlert) {
-                Button("OK", role: .cancel) {}
+                Button("ok_action".localized, role: .cancel) {}
             } message: {
-                Text("Successfully deleted \(clearedThreadCount) conversation\(clearedThreadCount == 1 ? "" : "s").")
+                Text(String(format: clearedThreadCount == 1 ? "deleted_conversation_singular".localized : "deleted_conversation_plural".localized, clearedThreadCount))
             }
         }
     }
@@ -259,7 +259,7 @@ struct ProfileView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "person.text.rectangle")
                             .font(AppTheme.Fonts.caption(size: 11))
-                        Text("Viewing Birth Chart : \(profileContext.activeProfileName)")
+                        Text(String(format: "viewing_birth_chart_format".localized, profileContext.activeProfileName))
                             .font(AppTheme.Fonts.caption(size: 11))
                     }
                     .foregroundColor(AppTheme.Colors.gold)
@@ -292,7 +292,7 @@ struct ProfileView: View {
     // MARK: - Profile Settings
     private var profileSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Profile")
+            Text("profile_title".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
@@ -351,7 +351,7 @@ struct ProfileView: View {
     // MARK: - Astrology Settings
     private var astrologySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Preferences")
+            Text("preferences_menu".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
@@ -684,7 +684,7 @@ struct ProfileView: View {
     // MARK: - Support Section
     private var supportSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Support")
+            Text("support_menu".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
@@ -741,7 +741,7 @@ struct ProfileView: View {
                 .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Version \(appVersion)")
+            Text(String(format: "app_version_format".localized, appVersion))
                 .font(AppTheme.Fonts.body(size: 12))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             
@@ -999,7 +999,7 @@ struct FAQHelpView: View {
                 .padding(.vertical)
             }
         }
-        .navigationTitle("FAQ & Help")
+        .navigationTitle("faq_and_help".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
     

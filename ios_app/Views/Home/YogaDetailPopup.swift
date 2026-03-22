@@ -194,7 +194,7 @@ struct YogaDetailPopup: View {
                     HStack(spacing: 6) {
                         Image(systemName: "sparkles")
                             .font(.system(size: 12))
-                        Text("Ask More...")
+                        Text("ask_more_ellipsis".localized)
                             .font(AppTheme.Fonts.body(size: 13))
                     }
                     .foregroundColor(AppTheme.Colors.gold)

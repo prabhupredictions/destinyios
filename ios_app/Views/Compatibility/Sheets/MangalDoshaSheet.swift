@@ -110,7 +110,7 @@ struct MangalDoshaSheet: View {
                 .padding(.bottom, 40)
             }
         }
-        .navigationTitle("Mars Compatibility")
+        .navigationTitle("mars_compatibility_title".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbarBackground(.hidden, for: .navigationBar)
@@ -143,11 +143,11 @@ struct SafeAnalysisView: View {
                 }
                 
                 VStack(spacing: 8) {
-                    Text("Perfectly Safe")
+                    Text("perfectly_safe".localized)
                         .font(AppTheme.Fonts.display(size: 24))
                         .foregroundColor(AppTheme.Colors.success)
                     
-                    Text("No Mangal Dosha detected in either chart.")
+                    Text("no_mangal_dosha_detected".localized)
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -164,12 +164,12 @@ struct SafeAnalysisView: View {
             
             // 3. Educational Note
             VStack(spacing: 12) {
-                Text("Why is this good?")
+                Text("why_is_this_good".localized)
                     .font(AppTheme.Fonts.title(size: 16))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Text("Since neither partner is 'Manglik', there is no risk of Mars-related conflicts affecting the marriage. This aspect contributes significantly to long-term peace.")
+                Text("non_manglik_explanation".localized)
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .lineSpacing(4)
@@ -232,7 +232,7 @@ struct SafePersonCard: View {
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .lineLimit(1)
             
-            Text("Non-Manglik")
+            Text("non_manglik".localized)
                 .font(AppTheme.Fonts.caption(size: 12).bold())
                 .foregroundColor(AppTheme.Colors.success)
                 .padding(.horizontal, 10)
@@ -303,7 +303,7 @@ struct CancelledAnalysisView: View {
                 }
                 
                 VStack(spacing: 4) {
-                    Text("Dosha Cancelled")
+                    Text("dosha_cancelled_title".localized)
                         .font(AppTheme.Fonts.display(size: 22))
                         .foregroundColor(.blue)
                     
@@ -313,7 +313,7 @@ struct CancelledAnalysisView: View {
                            let first = factors.first {
                             return first
                         }
-                        return "Any potential negative effects are neutralized."
+                        return "neutralized_effects_desc".localized
                     }())
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
@@ -326,7 +326,7 @@ struct CancelledAnalysisView: View {
                 HStack {
                     Image(systemName: "info.circle.fill")
                         .foregroundColor(AppTheme.Colors.gold)
-                    Text("Why it's cancelled")
+                    Text("why_cancelled".localized)
                         .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
@@ -337,7 +337,7 @@ struct CancelledAnalysisView: View {
                     
                     if boyHasExc || girlHasExc {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Both partners' Mangal Dosha is at the same level, causing mutual neutralisation.")
+                            Text("mutual_neutralization_desc".localized)
                                 .font(AppTheme.Fonts.body(size: 13))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -430,7 +430,7 @@ struct EffectiveAnalysisView: View {
                 }
                 
                 VStack(spacing: 4) {
-                    Text("Attention Required")
+                    Text("attention_required".localized)
                         .font(AppTheme.Fonts.display(size: 22))
                         .foregroundColor(.orange)
                     
@@ -441,7 +441,7 @@ struct EffectiveAnalysisView: View {
                                 .replacingOccurrences(of: "Girl", with: girlName)
                                 .replacingOccurrences(of: "Boy", with: boyName)
                         }
-                        return "Mangal Dosha is effective and may cause friction."
+                        return "mangal_friction_desc".localized
                     }())
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
@@ -464,13 +464,13 @@ struct EffectiveAnalysisView: View {
                     HStack {
                         Image(systemName: "shield.checkered")
                             .foregroundColor(AppTheme.Colors.gold)
-                        Text("Mitigating Exceptions")
+                        Text("mitigating_exceptions_title".localized)
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         Spacer()
                     }
                     
-                    Text("Vedic astrology recognises planetary conditions that reduce or neutralise Mangal Dosha. Below are the exceptions found in each chart.")
+                    Text("vedic_exceptions_desc".localized)
                         .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -534,7 +534,7 @@ struct EffectiveAnalysisView: View {
                     HStack {
                         Image(systemName: "sparkles")
                             .foregroundColor(.green)
-                        Text("Suggested Remedies")
+                        Text("suggested_remedies_title".localized)
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         Spacer()
@@ -639,7 +639,7 @@ struct ExceptionPersonBlock: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 12))
                         .foregroundColor(.orange.opacity(0.8))
-                    Text("\(data.activeIntensityFactors.count) intensifying factor\(data.activeIntensityFactors.count == 1 ? "" : "s")")
+                    Text(String(format: NSLocalizedString(data.activeIntensityFactors.count == 1 ? "intensifying_factor_singular" : "intensifying_factor_plural", comment: ""), data.activeIntensityFactors.count))
                         .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(.orange.opacity(0.8))
                 }
@@ -686,7 +686,7 @@ struct StatusPersonCard: View {
                     VStack(spacing: 6) {
                         // Severity Badge
                         if data.isCancelled {
-                            Text("Cancelled")
+                            Text("dosha_cancelled_title".localized)
                                 .font(AppTheme.Fonts.caption(size: 12).bold())
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 10)
@@ -696,11 +696,11 @@ struct StatusPersonCard: View {
                         } else {
                             Text({
                                 let sev = data.severity.lowercased()
-                                if sev == "mild" { return "Mild Manglik" }
-                                else if sev == "moderate" { return "Moderate Manglik" }
-                                else if sev == "high" { return "High Manglik" }
-                                else if sev == "severe" { return "Severe Manglik" }
-                                return "Manglik"
+                                if sev == "mild" { return "mild_manglik".localized }
+                                else if sev == "moderate" { return "moderate_manglik".localized }
+                                else if sev == "high" { return "high_manglik".localized }
+                                else if sev == "severe" { return "severe_manglik".localized }
+                                return "manglik".localized
                             }())
                                 .font(AppTheme.Fonts.caption(size: 12).bold())
                                 .foregroundColor(.white)
@@ -727,7 +727,7 @@ struct StatusPersonCard: View {
                            let houseValue = pos["house"]?.value,
                            let houseNum = extractHouseNumber(from: houseValue),
                            houseNum > 0 {
-                            Text("Mars in House \(houseNum)")
+                            Text(String(format: "mars_in_house".localized, "\(houseNum)"))
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
@@ -742,7 +742,7 @@ struct StatusPersonCard: View {
                         }
                     }
                 } else {
-                    Text("Safe")
+                    Text("safe_status".localized)
                         .font(AppTheme.Fonts.caption(size: 12).bold())
                         .foregroundColor(AppTheme.Colors.success)
                         .padding(.horizontal, 10)

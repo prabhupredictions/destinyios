@@ -45,7 +45,7 @@ struct BirthDataView: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: "exclamationmark.triangle.fill")
                                         .foregroundColor(AppTheme.Colors.warning)
-                                    Text("Your profile data was refreshed on the server. Please re-enter your birth details.")
+                                    Text("profile_data_refreshed".localized)
                                         .font(AppTheme.Fonts.caption())
                                         .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
@@ -88,7 +88,7 @@ struct BirthDataView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "chevron.left")
                                         .font(.system(size: 14, weight: .medium))
-                                    Text("Sign up")
+                                    Text("sign_up".localized)
                                         .font(AppTheme.Fonts.body(size: 14))
                                 }
                                 .foregroundColor(AppTheme.Colors.gold)
@@ -475,7 +475,7 @@ struct BirthDataView: View {
             // Account was soft-deleted — block all access
             print("🚫 Account deleted: \(error.message)")
             await MainActor.run {
-                viewModel.errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support."
+                viewModel.errorMessage = "account_deleted_error".localized
             }
             return false // Don't proceed - account deleted
         } catch {
@@ -498,15 +498,15 @@ struct BirthDataView: View {
                     // Show friendly message based on provider
                     switch provider {
                     case "apple":
-                        viewModel.errorMessage = "Your birth data is already linked to your Apple account. Please sign in with Apple."
+                        viewModel.errorMessage = "birth_data_linked_apple".localized
                     case "google":
                         if let email = maskedEmail {
-                            viewModel.errorMessage = "Your birth data is already linked to \(email). Please sign in with Google."
+                            viewModel.errorMessage = String(format: "birth_data_linked_google_email".localized, email)
                         } else {
-                            viewModel.errorMessage = "Your birth data is already linked to your Google account. Please sign in with Google."
+                            viewModel.errorMessage = "birth_data_linked_google".localized
                         }
                     default:
-                        viewModel.errorMessage = "Your birth data is already linked to \(maskedEmail ?? "a registered account"). Please sign in with that account."
+                        viewModel.errorMessage = String(format: "birth_data_linked_email".localized, maskedEmail ?? "a_registered_account".localized)
                     }
                     showSignInPrompt = true
                 }

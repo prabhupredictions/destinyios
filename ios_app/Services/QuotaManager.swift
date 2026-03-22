@@ -12,9 +12,9 @@ struct ArchivedGuestError: Error, LocalizedError {
     
     var errorDescription: String? {
         if let email = upgradedToEmail {
-            return "This account was upgraded to \(email). Please sign in."
+            return String(format: "account_upgraded_to_email".localized, email)
         }
-        return "You already have a registered account. Please sign in."
+        return "already_have_account".localized
     }
 }
 
@@ -28,17 +28,17 @@ struct RegisteredUserConflictError: Error, LocalizedError {
         // Show friendly message based on provider - don't confuse users with relay emails
         switch provider {
         case "apple":
-            return "An account already exists with your birth data. Please sign in with Apple to continue."
+            return "conflict_apple".localized
         case "google":
             if let email = maskedEmail {
-                return "An account already exists with your birth data. Please sign in with Google (\(email))."
+                return String(format: "conflict_google_email".localized, email)
             }
-            return "An account already exists with your birth data. Please sign in with Google."
+            return "conflict_google".localized
         default:
             if let email = maskedEmail {
-                return "An account already exists with your birth data. Please sign in with \(email)."
+                return String(format: "conflict_email".localized, email)
             }
-            return "An account already exists with your birth data. Please sign in."
+            return "conflict_generic".localized
         }
     }
 }
@@ -63,17 +63,14 @@ struct BirthDataTakenError: Error, LocalizedError {
         // Show friendly message based on provider - don't confuse users with relay emails
         switch provider {
         case "apple":
-            return "Your birth data is already linked to your Apple account. Please sign in with Apple to continue."
+            return "birth_data_linked_apple".localized
         case "google":
             if let email = existingEmail {
-                return "Your birth data is already linked to \(email). Please sign in with Google."
+                return String(format: "birth_data_linked_google_email".localized, email)
             }
-            return "Your birth data is already linked to your Google account. Please sign in with Google."
+            return "birth_data_linked_google".localized
         default:
-            if let email = existingEmail {
-                return "Your birth data is already linked to \(email). Please sign in with that account to continue."
-            }
-            return "Your birth data is already linked to a registered account. Please sign in to continue."
+            return String(format: "birth_data_linked_email".localized, existingEmail ?? "a_registered_account".localized)
         }
     }
 }
@@ -205,10 +202,10 @@ struct FeatureAccessResponse: Codable, Sendable {
     /// User-friendly denial reason
     var denialMessage: String {
         switch reason {
-        case "daily_limit_reached": return "Daily limit reached. Resets at midnight."
-        case "overall_limit_reached": return "You've used all your questions."
-        case "feature_not_available": return upgradeCta?.message ?? "Upgrade to access this feature."
-        default: return "Unable to access this feature."
+        case "daily_limit_reached": return "daily_limit_reached".localized
+        case "overall_limit_reached": return "overall_limit_reached".localized
+        case "feature_not_available": return upgradeCta?.message ?? "feature_not_available".localized
+        default: return "unable_access_feature".localized
         }
     }
 }

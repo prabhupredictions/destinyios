@@ -26,7 +26,7 @@ struct PlanetaryPositionsSheet: View {
                         ProgressView()
                             .tint(Color("GoldAccent"))
                             .scaleEffect(1.5)
-                        Text("Calculating Chart...")
+                        Text("calculating_chart".localized)
                             .foregroundColor(.white.opacity(0.8))
                     }
                 } else if let error = errorMessage {
@@ -41,7 +41,7 @@ struct PlanetaryPositionsSheet: View {
                             .font(.caption)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.white.opacity(0.7))
-                        Button("Retry") { loadData() }
+                        Button("retry".localized) { loadData() }
                             .buttonStyle(.borderedProminent)
                             .tint(Color("GoldAccent"))
                     }
@@ -70,7 +70,7 @@ struct PlanetaryPositionsSheet: View {
                     }
                 }
             }
-            .navigationTitle("Birth Chart")
+            .navigationTitle("birth_chart".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -80,10 +80,10 @@ struct PlanetaryPositionsSheet: View {
                     // Chart Style Toggles
                     Menu {
                         Button(action: { chartStyle = "north" }) {
-                            Label("North Indian", systemImage: chartStyle == "north" ? "checkmark" : "")
+                            Label("north_indian".localized, systemImage: chartStyle == "north" ? "checkmark" : "")
                         }
                         Button(action: { chartStyle = "south" }) {
-                            Label("South Indian", systemImage: chartStyle == "south" ? "checkmark" : "")
+                            Label("south_indian".localized, systemImage: chartStyle == "south" ? "checkmark" : "")
                         }
                     } label: {
                         Image(systemName: "slider.horizontal.3")
@@ -92,7 +92,7 @@ struct PlanetaryPositionsSheet: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -196,7 +196,7 @@ struct PlanetaryPositionsSheet: View {
             Text("•")
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             
-            Text("Asc: \(ascendant)")
+            Text(String(format: "asc_label".localized, ascendant))
                 .font(AppTheme.Fonts.title(size: 14)) // Slightly bolder
                 .foregroundColor(AppTheme.Colors.gold) // Gold color to stand out
         }
@@ -406,7 +406,7 @@ struct PremiumPlanetRow: View {
                 // Main Info Column
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
-                    Text(name.localized)
+                    Text("planet_\(name.lowercased())".localized)
                         .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
@@ -423,7 +423,7 @@ struct PremiumPlanetRow: View {
                 }
                 
                 HStack(spacing: 6) {
-                    Text(data.sign)
+                    Text(ChartConstants.signFullNames[data.sign] ?? data.sign)
                         .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(AppTheme.Colors.gold)
                     
@@ -441,7 +441,7 @@ struct PremiumPlanetRow: View {
             
             // Detailed Right Column (House & Nakshatra)
             VStack(alignment: .trailing, spacing: 4) {
-                Text("House \(data.house)")
+                Text(String(format: "house_num_label".localized, "\(data.house)"))
                     .font(AppTheme.Fonts.title(size: 12))
                     .foregroundColor(AppTheme.Colors.gold)
                     .padding(.horizontal, 8)
@@ -457,7 +457,7 @@ struct PremiumPlanetRow: View {
                         Text(nak.nakshatra)
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textSecondary)
-                        Text("Pada \(nak.pada)")
+                        Text(String(format: "pada_num_label".localized, "\(nak.pada)"))
                             .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }

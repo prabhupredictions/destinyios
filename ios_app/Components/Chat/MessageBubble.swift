@@ -283,7 +283,7 @@ struct MessageBubble: View {
                 }
                 .buttonStyle(.plain)
                 .animation(.easeInOut(duration: 0.2), value: showCopiedConfirmation)
-                .accessibilityLabel("Copy response")
+                .accessibilityLabel("a11y_copy_response".localized)
             }
             
             // Inline rating (only for substantial AI messages)

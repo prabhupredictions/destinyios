@@ -60,7 +60,7 @@ struct MultiPartnerStreamingView: View {
                 .font(.system(size: 20))
                 .foregroundColor(AppTheme.Colors.gold)
             
-            Text("Comparing \(totalPartners) Partners")
+            Text(String(format: "comparing_partners_count".localized, totalPartners))
                 .font(AppTheme.Fonts.premiumDisplay(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
         }
@@ -91,7 +91,7 @@ struct MultiPartnerStreamingView: View {
             }
             .frame(height: 8)
             
-            Text("\(completedResults.count)/\(totalPartners) Complete")
+            Text(String(format: "partners_complete_count".localized, completedResults.count, totalPartners))
                 .font(AppTheme.Fonts.caption(size: 12))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -136,7 +136,7 @@ struct MultiPartnerStreamingView: View {
             
             // Name + Status
             VStack(alignment: .leading, spacing: 4) {
-                Text(partner.name.isEmpty ? "Partner \(index + 1)" : partner.name)
+                Text(partner.name.isEmpty ? String(format: "partner_index_label".localized, index + 1) : partner.name)
                     .font(AppTheme.Fonts.body(size: 15))
                     .fontWeight(.medium)
                     .foregroundColor(isPending ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)

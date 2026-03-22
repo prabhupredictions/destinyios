@@ -69,7 +69,7 @@ struct ChatInputBar: View {
                 }
             }
             .disabled(!canSend)
-            .accessibilityLabel("Send message")
+            .accessibilityLabel("a11y_send_message".localized)
             .animation(.spring(response: 0.3), value: canSend)
         }
         .padding(.horizontal, 16)

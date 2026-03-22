@@ -29,7 +29,7 @@ struct AppHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 44, height: 44)
                 }
-                .accessibilityLabel("Menu")
+                .accessibilityLabel("accessibility_menu".localized)
             } else {
                 Spacer()
                     .frame(width: 44)
@@ -75,7 +75,7 @@ struct AppHeader: View {
                             .frame(width: 44, height: 44)
                     }
                 }
-                .accessibilityLabel("Profile")
+                .accessibilityLabel("accessibility_profile".localized)
             } else {
                 Spacer()
                     .frame(width: 44)
@@ -124,7 +124,7 @@ struct ChatHeader: View {
                     Image(systemName: "person.crop.circle.badge.checkmark")
                         .font(.caption)
                     
-                    Text("Viewing as \(profileContext.activeProfileName)")
+                    Text(String(format: "viewing_as_label".localized, profileContext.activeProfileName))
                         .font(AppTheme.Fonts.caption())
                 }
                 .foregroundColor(AppTheme.Colors.gold)
@@ -146,7 +146,7 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 44, height: 44)
                 }
-                .accessibilityLabel("Back")
+                .accessibilityLabel("accessibility_back".localized)
                 
                 // History button
                 Button(action: { onHistoryTap?() }) {
@@ -155,7 +155,7 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
-                .accessibilityLabel("Chat history")
+                .accessibilityLabel("accessibility_history_chat".localized)
                 
                 Spacer()
                 
@@ -171,7 +171,7 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
-                .accessibilityLabel("Birth chart")
+                .accessibilityLabel("accessibility_birth_chart".localized)
                 
                 // New chat button
                 Button(action: { onNewChatTap?() }) {
@@ -180,7 +180,7 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
-                .accessibilityLabel("New conversation")
+                .accessibilityLabel("accessibility_new_conversation".localized)
             }
         }
         .padding(.horizontal, 12)
@@ -206,7 +206,7 @@ struct MatchInputHeader: View {
                     Image(systemName: "person.crop.circle.badge.checkmark")
                         .font(.caption)
                     
-                    Text("Viewing as \(profileContext.activeProfileName)")
+                    Text(String(format: "viewing_as_profile_format".localized, profileContext.activeProfileName))
                         .font(AppTheme.Fonts.caption())
                 }
                 .foregroundColor(AppTheme.Colors.gold)
@@ -234,7 +234,7 @@ struct MatchInputHeader: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
-                .accessibilityLabel("Match history")
+                .accessibilityLabel("accessibility_history_match".localized)
                 
                 Spacer()
                 
@@ -256,7 +256,7 @@ struct MatchInputHeader: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
-                .accessibilityLabel("Reset form")
+                .accessibilityLabel("accessibility_reset_form".localized)
             }
         }
         .padding(.horizontal, 12)
@@ -289,7 +289,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("Back")
+            .accessibilityLabel("accessibility_back".localized)
             
             // History button
             Button(action: { onHistoryTap?() }) {
@@ -298,7 +298,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityLabel("Match history")
+            .accessibilityLabel("accessibility_history_match".localized)
             
             Spacer()
             
@@ -331,7 +331,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityLabel("Birth charts")
+            .accessibilityLabel("accessibility_birth_charts".localized)
             
             // New match button
             Button(action: { onNewMatchTap?() }) {
@@ -340,7 +340,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityLabel("New analysis")
+            .accessibilityLabel("accessibility_new_analysis".localized)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)

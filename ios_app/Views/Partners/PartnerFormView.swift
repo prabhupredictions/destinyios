@@ -194,7 +194,7 @@ struct PartnerFormView: View {
                                             .foregroundColor(guardianConsentGiven ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                             .padding(.top, 2)
                                         
-                                        Text("By adding this birth chart, you confirm that you are the parent or legal guardian and have the authority to provide this information")
+                                        Text("partner_consent_text".localized)
                                             .font(AppTheme.Fonts.caption(size: 13))
                                             .foregroundColor(AppTheme.Colors.textSecondary)
                                             .multilineTextAlignment(.leading)
@@ -217,7 +217,7 @@ struct PartnerFormView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor((forCompatibility && !isUnder18) ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                     
-                                    Text("For compatibility matching")
+                                    Text("for_compatibility_matching".localized)
                                         .font(AppTheme.Fonts.body(size: 14))
                                         .foregroundColor(isUnder18 ? AppTheme.Colors.textTertiary : AppTheme.Colors.textSecondary)
                                     
@@ -228,7 +228,7 @@ struct PartnerFormView: View {
                             .disabled(isUnder18)
                             
                             if isUnder18 {
-                                Text("Compatibility matching is only available for individuals over 18")
+                                Text("compatibility_age_restriction".localized)
                                     .font(AppTheme.Fonts.caption(size: 11))
                                     .foregroundColor(AppTheme.Colors.textTertiary)
                                     .padding(.leading, 4)
@@ -266,7 +266,7 @@ struct PartnerFormView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("cancel_action".localized) {
                         HapticManager.shared.play(.light)
                         dismiss()
                     }

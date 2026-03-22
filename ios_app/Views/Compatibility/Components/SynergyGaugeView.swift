@@ -117,7 +117,7 @@ struct SynergyGaugeView: View {
                     }
                     
                     VStack(spacing: 0) {
-                        Text(hasAdjustment ? "Adjusted" : "Compatibility")
+                        Text(hasAdjustment ? "adjusted_label".localized : "compatibility_label".localized)
                             .font(AppTheme.Fonts.caption(size: size * 0.05))
                             .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
                             .textCase(.uppercase)
@@ -136,7 +136,7 @@ struct SynergyGaugeView: View {
                     Image(systemName: "hand.tap.fill")
                         .font(.system(size: 11))
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                    Text("Tap orbs for detailed insights")
+                    Text("tap_orbs_hint".localized)
                         .font(AppTheme.Fonts.caption(size: 11))
                         .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.8))
                         .italic()

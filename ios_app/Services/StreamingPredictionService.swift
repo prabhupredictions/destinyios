@@ -186,7 +186,7 @@ class StreamingPredictionService {
                 case "daily_limit_reached":
                     return .error(message: "Daily limit reached. Try again tomorrow.")
                 case "overall_limit_reached":
-                    return .error(message: "free_limit_reached".localized)
+                    return .error(message: "create_account_to_continue".localized)
                 default:
                     return .error(message: errorMsg)
                 }

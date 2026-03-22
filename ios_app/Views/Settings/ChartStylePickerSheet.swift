@@ -76,11 +76,11 @@ struct ChartStylePickerSheet: View {
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Chart Style")
+            .navigationTitle("chart_style_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }

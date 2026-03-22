@@ -243,7 +243,7 @@ class PartnerProfileViewModel {
             case .mainUser:
                 return "profile_delete_blocked_main_user".localized
             case .activeChart:
-                return "profile_delete_blocked_active".localized
+                return "profile_edit_blocked_active".localized
             case .usedProfile:
                 return "profile_delete_blocked_used".localized
             }
@@ -278,7 +278,7 @@ class PartnerProfileViewModel {
         case "PROTECTED_ACTIVE_CHART":
             return action == "edit"
                 ? "profile_edit_blocked_active".localized
-                : "profile_delete_blocked_active".localized
+                : "profile_edit_blocked_active".localized
         case "PROTECTED_USED_PROFILE":
             return action == "edit"
                 ? "profile_edit_blocked_used".localized

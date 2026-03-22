@@ -78,7 +78,7 @@ struct ProfileSwitcherSheet: View {
                                         .background(Color.white.opacity(0.1))
                                         .clipShape(Circle())
                                 }
-                                .accessibilityLabel("Close")
+                                .accessibilityLabel("a11y_close".localized)
                             }
                         }
                         .padding(.horizontal)
@@ -199,7 +199,7 @@ struct ProfileSwitcherSheet: View {
             }
         }
         .alert("Profile Switch Failed", isPresented: $showError) {
-            Button("OK", role: .cancel) { }
+            Button("ok_action".localized, role: .cancel) { }
         } message: {
             Text(errorMessage ?? "Unknown error")
         }
@@ -229,11 +229,11 @@ struct ProfileSwitcherSheet: View {
             }
         }
         .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
-            Button("Upgrade") {
+            Button("upgrade_action".localized) {
                 limitMessage = nil
                 showUpgradePrompt = true
             }
-            Button("OK", role: .cancel) {
+            Button("ok_action".localized, role: .cancel) {
                 limitMessage = nil
             }
         } message: {
@@ -355,7 +355,7 @@ private struct ActiveProfileCard: View {
         .cornerRadius(16)
         .padding(.horizontal)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Active profile: \(profile.name)\(profile.isSelf ? ", you" : "")")
+        .accessibilityLabel(String(format: "a11y_active_profile_format".localized, profile.name, profile.isSelf ? "a11y_you_suffix".localized : ""))
     }
 }
 
@@ -417,7 +417,7 @@ struct ProfileRow: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Switch to \(profile.name)\(profile.isSelf ? ", your profile" : "")")
+        .accessibilityLabel(String(format: "a11y_switch_profile_format".localized, profile.name, profile.isSelf ? "a11y_your_profile_suffix".localized : ""))
         .accessibilityHint("Double tap to switch")
     }
 }

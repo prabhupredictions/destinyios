@@ -40,7 +40,7 @@ struct MessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
-                        .accessibilityLabel("\(star) of 5 stars")
+                        .accessibilityLabel(String(format: "a11y_star_rating".localized, star))
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -157,14 +157,14 @@ struct InlineMessageRating: View {
                         }
                     }
                 } else {
-                    Text("Rated")
+                    Text("rated_status".localized)
                         .font(.system(size: 10))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .fixedSize()
                 }
             } else {
                 // Rate label
-                Text("Rate")
+                Text("rate_action".localized)
                     .font(.system(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .fixedSize()
@@ -181,7 +181,7 @@ struct InlineMessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
-                        .accessibilityLabel("\(star) of 5 stars")
+                        .accessibilityLabel(String(format: "a11y_star_rating".localized, star))
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -258,7 +258,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .up ? .green : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Rate helpful")
+            .accessibilityLabel("a11y_rate_helpful".localized)
             
             Button {
                 selected = .down
@@ -269,7 +269,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .down ? .orange : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Rate unhelpful")
+            .accessibilityLabel("a11y_rate_unhelpful".localized)
         }
     }
 }
@@ -289,7 +289,7 @@ struct CompactRating: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 12))
                 .foregroundColor(.green)
-            Text("Thanks for your feedback!")
+            Text("thanks_for_feedback".localized)
                 .font(.system(size: 11))
                 .foregroundColor(Color("NavyPrimary").opacity(0.6))
             Spacer()

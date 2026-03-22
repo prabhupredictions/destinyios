@@ -183,7 +183,7 @@ struct AuthView: View {
             AuthButton(
                 icon: "apple.logo",
                 iconImage: nil,
-                title: "Continue with Apple",
+                title: "continue_with_apple".localized,
                 style: .goldSlab,
                 iconScale: 1.15  // Apple logo has more whitespace
             ) {
@@ -194,7 +194,7 @@ struct AuthView: View {
             AuthButton(
                 icon: nil,
                 iconImage: "google_logo",
-                title: "Continue with Google",
+                title: "continue_with_google".localized,
                 style: .glassSlab,
                 iconScale: 1.0   // Image asset - no scaling needed
             ) {

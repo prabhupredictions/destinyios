@@ -30,11 +30,11 @@ struct AskDestinyQuestionsSheet: View {
                                 .font(AppTheme.Fonts.title(size: 28))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
-                            Text("Ask Destiny")
+                            Text("ask_destiny_title".localized)
                                 .font(AppTheme.Fonts.premiumDisplay(size: 24))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
-                            Text("What's on your mind today?")
+                            Text("whats_on_your_mind".localized)
                                 .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
@@ -62,7 +62,7 @@ struct AskDestinyQuestionsSheet: View {
                             Rectangle()
                                 .fill(AppTheme.Colors.textSecondary.opacity(0.3))
                                 .frame(height: 1)
-                            Text("or ask your own")
+                            Text("or_ask_your_own".localized)
                                 .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                             Rectangle()
@@ -131,6 +131,9 @@ struct AskDestinyQuestionsSheet: View {
             withAnimation(.easeOut(duration: 0.3)) {
                 isAppearing = true
             }
+        }
+        .onDisappear {
+            isInputFocused = false  // Dismiss keyboard when sheet closes
         }
     }
 }

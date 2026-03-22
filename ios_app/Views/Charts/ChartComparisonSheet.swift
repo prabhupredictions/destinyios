@@ -42,7 +42,7 @@ struct ChartComparisonSheet: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle("Birth Charts")
+            .navigationTitle("birth_charts".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -61,7 +61,7 @@ struct ChartComparisonSheet: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                     Button("Done") { dismiss() }
+                        Button("done".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -74,8 +74,8 @@ struct ChartComparisonSheet: View {
     
     private var tabSelector: some View {
         HStack(spacing: 0) {
-            tabButton(title: "D1 (Rashi)", index: 0)
-            tabButton(title: "D9 (Navamsa)", index: 1)
+            tabButton(title: "d1_rashi".localized, index: 0)
+            tabButton(title: "d9_navamsa".localized, index: 1)
         }
         .background(Color.black.opacity(0.3)) // Dark Glass
         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -183,7 +183,7 @@ struct ChartComparisonSheet: View {
                     .foregroundColor(AppTheme.Colors.gold)
                 
                 if let asc = ascendant {
-                    Text("• Asc: \(ChartConstants.signFullNames[asc] ?? asc)")
+                    Text("• " + String(format: "asc_label".localized, ChartConstants.signFullNames[asc] ?? asc))
                         .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(.white.opacity(0.7))
                 }

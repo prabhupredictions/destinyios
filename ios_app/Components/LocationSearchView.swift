@@ -34,13 +34,13 @@ struct LocationSearchView: View {
                     }
                 }
             }
-            .navigationTitle("Select City")
+            .navigationTitle("select_city_title".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("cancel_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
             }

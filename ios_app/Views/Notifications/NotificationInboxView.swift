@@ -72,7 +72,7 @@ struct NotificationInboxView: View {
                     .background(AppTheme.Colors.cardBackground)
                     .clipShape(Circle())
             }
-            .accessibilityLabel("Close")
+            .accessibilityLabel("a11y_close".localized)
             
             Spacer()
             
@@ -83,7 +83,7 @@ struct NotificationInboxView: View {
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
                 if service.unreadCount > 0 {
-                    Text("\(service.unreadCount) unread")
+                    Text(String(format: "unread_count_format".localized, service.unreadCount))
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
@@ -103,7 +103,7 @@ struct NotificationInboxView: View {
                     .clipShape(Circle())
             }
             .disabled(service.unreadCount == 0)
-            .accessibilityLabel("Mark all as read")
+            .accessibilityLabel("a11y_mark_all_read".localized)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
@@ -280,7 +280,7 @@ struct NotificationRow: View {
                 )
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(notification.displayTitle), \(notification.displayBody), \(notification.timeAgo)\(notification.read ? "" : ", unread")")
+        .accessibilityLabel(String(format: "a11y_notification_detail_format".localized, notification.displayTitle, notification.displayBody, notification.timeAgo, notification.read ? "" : "a11y_unread_suffix".localized))
     }
 }
 

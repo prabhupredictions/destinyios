@@ -147,11 +147,11 @@ struct AstrologySettingsSheet: View {
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Astrology Settings")
+            .navigationTitle("astrology_settings_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }

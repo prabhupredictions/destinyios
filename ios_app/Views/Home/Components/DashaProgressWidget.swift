@@ -22,7 +22,7 @@ struct DashaProgressWidget: View {
                         .rotationEffect(.degrees(-90))
                         .frame(width: 60, height: 60)
                     
-                    Text("\(Int(progress * 100))%")
+                    Text(String(format: "percentage_format".localized, Int(progress * 100)))
                         .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
@@ -37,14 +37,14 @@ struct DashaProgressWidget: View {
                         Text(localizedPlanetName(period.mahadasha))
                             .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(AppTheme.Colors.textPrimary)
-                        Text("- \(localizedPlanetName(period.antardasha))")
+                        Text(String(format: "hyphen_format".localized, localizedPlanetName(period.antardasha)))
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .padding(.bottom, 2)
                     }
                     
                     if let end = formatDate(period.end) {
-                        Text("Until \(end)")
+                        Text(String(format: "until_date_format".localized, end))
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }

@@ -391,7 +391,7 @@ struct KalsarpaDoshaSheet: View {
                     .foregroundColor(AppTheme.Colors.gold)
             }
             Spacer()
-            statusBadge(text: data.severity?.capitalized ?? "Unknown", color: severityColor(data.severity ?? ""))
+            statusBadge(text: NSLocalizedString("severity_\((data.severity ?? "unknown").lowercased())", comment: ""), color: severityColor(data.severity ?? ""))
         }
         .padding()
         .background(AppTheme.Colors.inputBackground)
@@ -440,11 +440,11 @@ struct KalsarpaDoshaSheet: View {
                     .font(AppTheme.Fonts.title(size: 24))
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(data.displayName + " Kala Sarpa")
+                    Text(data.displayName + " " + "kaal_sarp_dosha_full".localized)
                         .font(AppTheme.Fonts.body(size: 16).weight(.bold))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
-                    Text(doshaDescription(data.doshaName ?? data.type ?? ""))
+                    Text(doshaDescription(data.doshaName ?? data.type ?? "").localized)
                         .font(AppTheme.Fonts.caption())
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .lineLimit(2)
@@ -702,13 +702,15 @@ struct KalsarpaDoshaSheet: View {
     
     private func planetFullName(_ abbr: String) -> String {
         switch abbr.lowercased() {
-        case "su", "sun": return "Sun"
-        case "mo", "moon": return "Moon"
-        case "ma", "mars": return "Mars"
-        case "me", "mercury": return "Mercury"
-        case "ju", "jupiter": return "Jupiter"
-        case "ve", "venus": return "Venus"
-        case "sa", "saturn": return "Saturn"
+        case "su", "sun": return "planet_sun".localized
+        case "mo", "moon": return "planet_moon".localized
+        case "ma", "mars": return "planet_mars".localized
+        case "me", "mercury": return "planet_mercury".localized
+        case "ju", "jupiter": return "planet_jupiter".localized
+        case "ve", "venus": return "planet_venus".localized
+        case "sa", "saturn": return "planet_saturn".localized
+        case "ra", "rahu": return "planet_rahu".localized
+        case "ke", "ketu": return "planet_ketu".localized
         default: return abbr
         }
     }
@@ -730,19 +732,19 @@ struct KalsarpaDoshaSheet: View {
     
     private func doshaDescription(_ name: String) -> String {
         switch name.lowercased() {
-        case "shankhapal", "shankhpal": return "Affects family harmony and maternal relationships"
-        case "ananta", "anant": return "Influences spiritual growth and liberation"
-        case "kulik": return "Creates obstacles in career and professional life"
-        case "vasuki": return "Impacts wealth and financial stability"
-        case "padam", "padma": return "Affects marriage and partnerships"
-        case "mahapadam", "maha padma": return "Influences overall life direction"
-        case "takshak": return "Creates sudden changes and transformations"
-        case "karkotak": return "Impacts health and vitality"
-        case "sheshnag", "shesh": return "Affects longevity and deep subconscious"
-        case "ghatak": return "Creates hidden enemies and obstacles"
-        case "vishdhar": return "Influences communication and expression"
-        case "shankachood": return "Affects father and dharma"
-        default: return "A powerful serpent dosha affecting life path"
+        case "shankhapal", "shankhpal": return "kalsarpa_shankhapal_desc"
+        case "ananta", "anant": return "kalsarpa_ananta_desc"
+        case "kulik": return "kalsarpa_kulik_desc"
+        case "vasuki": return "kalsarpa_vasuki_desc"
+        case "padam", "padma": return "kalsarpa_padam_desc"
+        case "mahapadam", "maha padma": return "kalsarpa_mahapadam_desc"
+        case "takshak": return "kalsarpa_takshak_desc"
+        case "karkotak": return "kalsarpa_karkotak_desc"
+        case "sheshnag", "shesh": return "kalsarpa_sheshnag_desc"
+        case "ghatak": return "kalsarpa_ghatak_desc"
+        case "vishdhar": return "kalsarpa_vishdhar_desc"
+        case "shankachood": return "kalsarpa_shankachood_desc"
+        default: return "kalsarpa_default_desc"
         }
     }
 }

@@ -61,7 +61,7 @@ struct SubscriptionView: View {
                 .padding(.bottom, 40)
             }
             .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
-            .navigationTitle("Choose a plan")
+            .navigationTitle("choose_plan_title".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -82,21 +82,21 @@ struct SubscriptionView: View {
                         }
                     }
                     .disabled(isRefreshing)
-                    .accessibilityLabel("Refresh subscription status")
+                    .accessibilityLabel("a11y_refresh_subscription".localized)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #endif
             }
             .alert("Error", isPresented: $showError) {
-                Button("OK", role: .cancel) {}
+                Button("ok_action".localized, role: .cancel) {}
             } message: {
                 Text(errorMessage)
             }
             .alert("Welcome to \(successPlanName)! 🎉", isPresented: $showSuccess) {
-                Button("Let's Go!") {
+                Button("lets_go_action".localized) {
                     dismiss()
                 }
             } message: {
@@ -250,7 +250,7 @@ struct SubscriptionView: View {
                 .foregroundColor(AppTheme.Colors.textTertiary)
                 .multilineTextAlignment(.center)
             
-            Text("Unlimited access is subject to fair use.")
+            Text("fair_use_notice".localized)
                 .font(AppTheme.Fonts.caption(size: 11))
                 .italic()
                 .foregroundColor(AppTheme.Colors.textTertiary)
@@ -264,7 +264,7 @@ struct SubscriptionView: View {
         HStack(spacing: 6) {
             Image(systemName: "apple.logo")
                 .font(.system(size: 12))
-            Text("Purchases are billed through your Apple ID. Manage in Settings → Apple ID → Subscriptions.")
+            Text("apple_subscription_notice".localized)
                 .font(AppTheme.Fonts.caption(size: 11))
         }
         .foregroundColor(AppTheme.Colors.textTertiary)
@@ -435,7 +435,7 @@ struct PlanCardWithFeatures: View {
                             .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     } else {
-                        Text("$\(String(format: "%.2f", plan.priceMonthly ?? 0))")
+                        Text(String(format: "price_monthly_format".localized, String(format: "%.2f", plan.priceMonthly ?? 0)))
                             .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     }
@@ -490,7 +490,7 @@ struct PlanCardWithFeatures: View {
             
             // Show pending upgrade effective date below button
             if isPendingUpgrade, let dateText = pendingUpgradeDateText {
-                Text("Starts \(dateText)")
+                Text(String(format: "subscription_starts_format".localized, dateText))
                     .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(Color.orange)
                     .frame(maxWidth: .infinity)

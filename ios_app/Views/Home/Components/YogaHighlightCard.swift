@@ -129,7 +129,7 @@ struct YogaHighlightCard: View {
                 
                 // Content
                 if filteredYogas.isEmpty {
-                    Text("No combinations found for this category.")
+                    Text("no_combinations_found".localized)
                         .font(AppTheme.Fonts.caption(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .center)

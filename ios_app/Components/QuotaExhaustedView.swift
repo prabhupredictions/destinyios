@@ -113,7 +113,7 @@ struct QuotaExhaustedView: View {
                             .font(.system(size: 24))
                             .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.8))
                     }
-                    .accessibilityLabel("Close")
+                    .accessibilityLabel("a11y_close".localized)
                     .padding(.trailing, 16)
                     .padding(.top, 16)
                 }

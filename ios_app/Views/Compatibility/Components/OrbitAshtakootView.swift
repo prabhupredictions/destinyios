@@ -12,14 +12,14 @@ struct OrbitAshtakootView: View {
     
     // Semantic Map (v5)
     private let semantics: [String: (label: String, icon: String)] = [
-        "varna": ("Work", "briefcase.fill"),
-        "vashya": ("Dominance", "bolt.heart.fill"),
-        "tara": ("Destiny", "star.fill"),
-        "yoni": ("Intimacy", "flame.fill"),
-        "maitri": ("Friendship", "person.2.fill"),
-        "gana": ("Temperament", "theatermasks.fill"),
-        "bhakoot": ("Love", "heart.circle.fill"),
-        "nadi": ("Health", "waveform.path.ecg")
+        "varna": ("kuta_varna_label".localized, "briefcase.fill"),
+        "vashya": ("kuta_vashya_label".localized, "bolt.heart.fill"),
+        "tara": ("kuta_tara_label".localized, "star.fill"),
+        "yoni": ("kuta_yoni_label".localized, "flame.fill"),
+        "maitri": ("kuta_maitri_label".localized, "person.2.fill"),
+        "gana": ("kuta_gana_label".localized, "theatermasks.fill"),
+        "bhakoot": ("kuta_bhakoot_label".localized, "heart.circle.fill"),
+        "nadi": ("kuta_nadi_label".localized, "waveform.path.ecg")
     ]
     
     // Convert dictionary to ordered array, enriched with cancellation data
@@ -489,9 +489,14 @@ struct OrbitAshtakootView: View {
     
     private func kutaDisplayName(for key: String) -> String {
         let names: [String: String] = [
-            "varna": "Varna", "vashya": "Vashya", "tara": "Tara",
-            "yoni": "Yoni", "maitri": "Maitri", "gana": "Gana",
-            "bhakoot": "Bhakoot", "nadi": "Nadi"
+            "varna": "kuta_varna_label".localized,
+            "vashya": "kuta_vashya_label".localized,
+            "tara": "kuta_tara_label".localized,
+            "yoni": "kuta_yoni_label".localized,
+            "maitri": "kuta_maitri_label".localized,
+            "gana": "kuta_gana_label".localized,
+            "bhakoot": "kuta_bhakoot_label".localized,
+            "nadi": "kuta_nadi_label".localized
         ]
         return names[key] ?? key.capitalized
     }

@@ -43,11 +43,11 @@ struct CompatibilityResultView: View {
         let girlPresent = result.analysisData?.girl?.raw?.kalaSarpa?.present ?? false
         
         if !boyPresent && !girlPresent {
-            return "Clear"
+            return "kalsarpa_clear".localized
         } else if boyPresent && girlPresent {
-            return "Both Present"
+            return "kalsarpa_both_present".localized
         } else {
-            return "Moderate"
+            return "kalsarpa_moderate".localized
         }
     }
     
@@ -111,6 +111,8 @@ struct CompatibilityResultView: View {
                     onNewMatchTap: onNewAnalysis,
                     transparent: true
                 )
+                .accessibilityLabel("accessibility_birth_chart".localized)
+                .accessibilityLabel("accessibility_new_analysis".localized)
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 8) { // Reduced spacing to compact layout
@@ -152,9 +154,9 @@ struct CompatibilityResultView: View {
                                     mangalDoshaDestination
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Mangal Dosha (Manglik/Kuja)",
+                                        title: "mangal_dosha_full".localized,
                                         icon: "flame.fill",
-                                        statusText: result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String ?? "View",
+                                        statusText: result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String ?? "view_action".localized,
                                         statusColor: (result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String)?.lowercased() == "excellent" ? AppTheme.Colors.success : .orange
                                     )
                                 }
@@ -170,7 +172,7 @@ struct CompatibilityResultView: View {
                                     )
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Kaal Sarp Dosha (Kalasarpa)",
+                                        title: "kaal_sarp_dosha_full".localized,
                                         icon: "tornado",
                                         statusText: kalsarpaStatusText,
                                         statusColor: kalsarpaStatusColor
@@ -188,9 +190,9 @@ struct CompatibilityResultView: View {
                                     )
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Additional Yogas",
+                                        title: "additional_yogas_title".localized,
                                         icon: "sparkles",
-                                        statusText: "View All",
+                                        statusText: "view_all_action".localized,
                                         statusColor: AppTheme.Colors.textSecondary
                                     )
                                 }
@@ -201,7 +203,7 @@ struct CompatibilityResultView: View {
                         .padding(.top, 20)
                         
                         ShimmerButton(
-                            title: "View Full Report",
+                            title: "view_full_report_action".localized,
                             icon: nil
                         ) {
                             HapticManager.shared.play(.medium)
@@ -252,6 +254,7 @@ struct CompatibilityResultView: View {
                 showHistorySheet = false
                 onLoadHistory?(selectedItem)
             }
+            .accessibilityLabel("accessibility_history_match".localized)
         }
         .sheet(isPresented: $showProfile) {
             ProfileView()

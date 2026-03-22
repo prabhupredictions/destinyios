@@ -106,7 +106,7 @@ struct AdditionalYogasSheet: View {
                 .font(.system(size: 48))
                 .foregroundColor(AppTheme.Colors.textTertiary)
             
-            Text("No yoga data available")
+            Text("yoga_no_data".localized)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }

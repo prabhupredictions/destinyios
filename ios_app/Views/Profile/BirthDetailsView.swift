@@ -166,7 +166,7 @@ struct BirthDetailsView: View {
                                     .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
                             )
                         }
-                        .accessibilityLabel("Gender: \(genderDisplayText)")
+                        .accessibilityLabel(String(format: "a11y_gender_format".localized, genderDisplayText))
                     }
                 }
             }

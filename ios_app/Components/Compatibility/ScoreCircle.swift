@@ -53,7 +53,7 @@ struct ScoreCircle: View {
                     .font(.system(size: 44, weight: .bold))
                     .foregroundColor(Color("NavyPrimary"))
                 
-                Text("out of \(maxScore)")
+                Text(String(format: "out_of_max_score_format".localized, maxScore))
                     .font(.system(size: 12))
                     .foregroundColor(Color("TextDark").opacity(0.5))
             }

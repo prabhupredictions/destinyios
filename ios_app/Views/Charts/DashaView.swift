@@ -10,7 +10,7 @@ struct DashaView: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(Color("GoldAccent"))
                 
-                Text("Vimshottari Dasha (\(dashaResponse?.year ?? 2024))")
+                Text(String(format: "vimshottari_dasha_year".localized, dashaResponse?.year ?? 2024))
                     .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(AppTheme.Colors.textPrimary)
             }
@@ -50,7 +50,7 @@ struct DashaRow: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(period.mahadasha) - \(period.antardasha)")
+                Text("\("planet_\(period.mahadasha.lowercased())".localized) - \("planet_\(period.antardasha.lowercased())".localized)")
                     .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(Color("NavyPrimary"))
                 Text(period.pratyantardasha)

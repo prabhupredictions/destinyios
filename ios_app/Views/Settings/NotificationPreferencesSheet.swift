@@ -69,7 +69,7 @@ struct NotificationPreferencesSheet: View {
                                         Text("no_alerts_yet".localized)
                                             .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                                             .foregroundColor(AppTheme.Colors.textTertiary)
-                                        Text("Add your first personalized alert below")
+                                        Text("add_first_personalized_alert".localized)
                                             .font(AppTheme.Fonts.caption(size: 12))
                                             .foregroundColor(AppTheme.Colors.textTertiary)
                                     }
@@ -86,14 +86,13 @@ struct NotificationPreferencesSheet: View {
                             // Add button
                             if viewModel.canAddMore {
                                 Button {
-                                    editingAlert = nil
                                     showAddEditSheet = true
                                     HapticManager.shared.play(.light)
                                 } label: {
                                     HStack(spacing: 8) {
                                         Image(systemName: "plus")
                                             .font(.system(size: 14, weight: .semibold))
-                                        Text("Add new alert")
+                                        Text("add_new_alert".localized)
                                             .font(AppTheme.Fonts.body(size: 15))
                                     }
                                     .foregroundColor(AppTheme.Colors.gold)
@@ -168,7 +167,7 @@ struct NotificationPreferencesSheet: View {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundColor(AppTheme.Colors.success)
-                            Text("Alerts saved")
+                            Text("alerts_saved".localized)
                                 .font(AppTheme.Fonts.body(size: 14))
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                         }
@@ -184,11 +183,11 @@ struct NotificationPreferencesSheet: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .navigationTitle("Personalized alerts")
+            .navigationTitle("personalized_alerts_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button("cancel_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -205,7 +204,7 @@ struct NotificationPreferencesSheet: View {
                             ProgressView()
                                 .tint(AppTheme.Colors.gold)
                         } else {
-                            Text("Save")
+                            Text("save_action".localized)
                                 .fontWeight(.semibold)
                                 .foregroundColor(AppTheme.Colors.gold)
                         }
@@ -219,13 +218,13 @@ struct NotificationPreferencesSheet: View {
                 get: { viewModel.errorMessage != nil },
                 set: { if !$0 { viewModel.errorMessage = nil } }
             )) {
-                Button("OK") { viewModel.errorMessage = nil }
+                Button("ok_action".localized) { viewModel.errorMessage = nil }
             } message: {
                 Text(viewModel.errorMessage ?? "")
             }
             .alert("Delete Alert", isPresented: $showDeleteConfirmation) {
-                Button("Cancel", role: .cancel) { alertToDelete = nil }
-                Button("Delete", role: .destructive) {
+                Button("cancel_action".localized, role: .cancel) { alertToDelete = nil }
+                Button("delete_action".localized, role: .destructive) {
                     if let item = alertToDelete {
                         withAnimation { viewModel.deleteAlert(id: item.id) }
                         alertToDelete = nil
@@ -233,22 +232,27 @@ struct NotificationPreferencesSheet: View {
                 }
             } message: {
                 if let item = alertToDelete {
-                    Text("Remove \"\(item.text.prefix(50))...\"?")
+                    Text(String(format: "remove_alert_confirm_format".localized, String(item.text.prefix(50))))
                 } else {
-                    Text("Remove this alert?")
+                    Text("remove_this_alert".localized)
+                }
+            }
+            .sheet(item: $editingAlert, onDismiss: { editingAlert = nil }) { item in
+                AddEditAlertSheet(
+                    editingItem: item,
+                    suggestions: suggestions,
+                    canAddMore: viewModel.canAddMore
+                ) { savedItem in
+                    viewModel.updateAlert(savedItem)
                 }
             }
             .sheet(isPresented: $showAddEditSheet) {
                 AddEditAlertSheet(
-                    editingItem: editingAlert,
+                    editingItem: nil,
                     suggestions: suggestions,
                     canAddMore: viewModel.canAddMore
                 ) { savedItem in
-                    if editingAlert != nil {
-                        viewModel.updateAlert(savedItem)
-                    } else {
-                        viewModel.addAlert(savedItem)
-                    }
+                    viewModel.addAlert(savedItem)
                 }
             }
             .task {
@@ -292,7 +296,6 @@ struct NotificationPreferencesSheet: View {
             // Edit button
             Button {
                 editingAlert = item
-                showAddEditSheet = true
             } label: {
                 Image(systemName: "pencil")
                     .font(.system(size: 14))
@@ -394,7 +397,7 @@ struct NotificationPreferencesSheet: View {
                     
                     // Only show error text if we've checked permission and it's not authorized
                     if hasCheckedNotificationPermission && !iOSNotificationsAuthorized {
-                        Text("Permission required in iOS Settings")
+                        Text("permission_required_ios".localized)
                             .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.error)
                     }
@@ -424,7 +427,7 @@ struct NotificationPreferencesSheet: View {
                             .foregroundColor(AppTheme.Colors.error)
                             .font(.system(size: 14))
                         
-                        Text("Enable in iOS Settings → Apps → Destiny → Notifications")
+                        Text("enable_notifications_instruction".localized)
                             .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.error)
                             .multilineTextAlignment(.leading)
@@ -502,7 +505,7 @@ struct AddEditAlertSheet: View {
                     VStack(spacing: 24) {
                         // MARK: - Text Input
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("What do you want alerts about?")
+                            Text("alert_about_question".localized)
                                 .font(AppTheme.Fonts.title(size: 14))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
@@ -517,7 +520,7 @@ struct AddEditAlertSheet: View {
                                 )
                                 .focused($isTextFocused)
                             
-                            Text("\(text.count)/200")
+                            Text(String(format: "character_count_format".localized, text.count))
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -526,7 +529,7 @@ struct AddEditAlertSheet: View {
                         
                         // MARK: - Frequency Picker
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Alert frequency")
+                            Text("alert_frequency".localized)
                                 .font(AppTheme.Fonts.title(size: 14))
                                 .foregroundColor(AppTheme.Colors.gold)
                             
@@ -634,7 +637,7 @@ struct AddEditAlertSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button("cancel_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {

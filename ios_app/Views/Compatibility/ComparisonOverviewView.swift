@@ -12,8 +12,8 @@ struct ComparisonOverviewView: View {
     
     @State private var showCancellationAlert: Bool = false
     @State private var selectedCancellationReason: String = ""
-    @State private var overlayTitle = "Dosha Cancellation"
-    @State private var overlaySubtitle = "Astrological exceptions applied"
+    @State private var overlayTitle = "dosha_cancellation_title".localized
+    @State private var overlaySubtitle = "astrological_exceptions_subtitle".localized
     @State private var isGeneratingPDF = false
     
     // Viability-sorted: recommended first (by adjustedScore DESC), then not-recommended
@@ -299,7 +299,7 @@ struct ComparisonOverviewView: View {
     private var detailedBreakdownTable: some View {
         VStack(alignment: .leading, spacing: 10) {
             // Section Divider
-            sectionDivider(title: "DETAILED BREAKDOWN")
+            sectionDivider(title: "detailed_breakdown_title".localized)
             
             DivineGlassCard(cornerRadius: 14) {
                 VStack(spacing: 0) {
@@ -328,14 +328,14 @@ struct ComparisonOverviewView: View {
                     
                     // Guna rows — user-friendly names matching orbit view
                     let kutaRows: [(key: String, label: String)] = [
-                        ("Nadi", "Health"),
-                        ("Bhakoot", "Love"),
-                        ("Gana", "Temperament"),
-                        ("Maitri", "Friendship"),
-                        ("Yoni", "Intimacy"),
-                        ("Vashya", "Dominance"),
-                        ("Tara", "Destiny"),
-                        ("Varna", "Work")
+                        ("Nadi", "area_health".localized),
+                        ("Bhakoot", "area_love".localized),
+                        ("Gana", "area_temperament".localized),
+                        ("Maitri", "area_friendship".localized),
+                        ("Yoni", "area_intimacy".localized),
+                        ("Vashya", "area_dominance".localized),
+                        ("Tara", "area_destiny".localized),
+                        ("Varna", "area_work".localized)
                     ]
                     ForEach(kutaRows, id: \.key) { kuta in
                         kutaRow(key: kuta.key, label: kuta.label)
@@ -433,8 +433,8 @@ struct ComparisonOverviewView: View {
                         .foregroundColor(AppTheme.Colors.success)
                     
                     Button {
-                        overlayTitle = "Dosha Cancellation"
-                        overlaySubtitle = "Astrological exceptions applied"
+                        overlayTitle = "dosha_cancellation_title".localized
+                        overlaySubtitle = "astrological_exceptions_subtitle".localized
                         selectedCancellationReason = formatRejectionReason(cancelReason ?? "", partnerName: result.partner.name)
                         showCancellationAlert = true
                     } label: {
@@ -475,9 +475,9 @@ struct ComparisonOverviewView: View {
                         .foregroundColor(Color.orange)
                     
                     Button {
-                        overlayTitle = "Low Score Warning"
-                        overlaySubtitle = "Attention may be required"
-                        let desc = k.description.isEmpty ? "\(kutaName) compatibility score is 0. This area requires mutual understanding and effort." : k.description
+                        overlayTitle = "low_score_warning_title".localized
+                        overlaySubtitle = "attention_required_subtitle".localized
+                        let desc = k.description.isEmpty ? String(format: "low_score_warning_desc".localized, kutaName) : k.description
                         selectedCancellationReason = formatRejectionReason(desc, partnerName: result.partner.name)
                         showCancellationAlert = true
                     } label: {
@@ -517,14 +517,14 @@ struct ComparisonOverviewView: View {
                 
                 HStack(spacing: 1) {
                     if hasMangalRejection {
-                        Text("Active")
+                        Text("active_label".localized)
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.error)
                         Text("🚫")
                             .font(.system(size: 8))
                     } else if cancellationOccurs == true {
                         // Structured data: cancellation confirmed
-                        Text("Cancelled")
+                        Text("dosha_cancelled_title".localized)
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.success)
                         Text("✅")
@@ -564,7 +564,7 @@ struct ComparisonOverviewView: View {
     private func analysisSection(for result: ComparisonResult) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionDivider(
-                title: "ANALYSIS (\(result.partner.name.uppercased()))",
+                title: String(format: "analysis_with_partner".localized, result.partner.name.uppercased()),
                 color: AppTheme.Colors.gold
             )
             
@@ -607,11 +607,11 @@ struct ComparisonOverviewView: View {
                         Text("⚠️")
                             .font(.system(size: 18))
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("no_profiles_meet_threshold".localized)
-                                .font(AppTheme.Fonts.body(size: 14))
-                                .foregroundColor(AppTheme.Colors.warning)
-                                .fixedSize(horizontal: false, vertical: true)
-                            Text("Review individual analyses below for detailed insights.")
+                                Text("no_profiles_meet_threshold".localized)
+                                    .font(AppTheme.Fonts.body(size: 14))
+                                    .foregroundColor(AppTheme.Colors.warning)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Text("review_individual_analyses_hint".localized)
                                 .font(AppTheme.Fonts.caption(size: 11))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -623,10 +623,10 @@ struct ComparisonOverviewView: View {
                         Text("🏆")
                             .font(.system(size: 18))
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("Final Recommendation: \(best.partner.name) (\(best.adjustedScore)/36)")
+                            Text(String(format: "final_recommendation_label".localized, best.partner.name, "\(best.adjustedScore)"))
                                 .font(AppTheme.Fonts.title(size: 15))
                                 .foregroundColor(AppTheme.Colors.gold)
-                            Text(best.oneLiner ?? "All doshas safe. Highest compatibility.")
+                            Text(best.oneLiner ?? "all_doshas_safe_fallback".localized)
                                 .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -723,7 +723,7 @@ struct ComparisonOverviewView: View {
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(4)
                 
-                Text("compatibility_comparison".localized)
+                Text("compatibility_comparison_pdf".localized)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.6))
                     .tracking(3)
@@ -789,10 +789,10 @@ struct ComparisonOverviewView: View {
                     f.dateFormat = "yyyy-MM-dd"
                     return f
                 }()
-                Text("Generated: \(dateFormatter.string(from: Date()))")
+                Text(String(format: "generated_date_label".localized, dateFormatter.string(from: Date())))
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.3))
-                Text("© 2026 Destiny AI Astrology · destinyaiastrology.com")
+                Text(NSLocalizedString("copyright_notice", comment: ""))
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.25))
             }

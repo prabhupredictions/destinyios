@@ -465,7 +465,7 @@ class AuthViewModel {
         } catch let error as ProfileError where error.isAccountDeleted {
             print("🚫 [AuthViewModel] Account deleted — blocking sign-in: \(error)")
             await MainActor.run {
-                errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support at support@destinyaiastrology.com."
+                errorMessage = "account_deleted_error".localized
             }
         } catch let error as BirthDataTakenError {
             print("🚫 [AuthViewModel] Birth data conflict: \(error)")
@@ -475,7 +475,7 @@ class AuthViewModel {
         } catch {
             print("❌ [AuthViewModel] Sign in error: \(error)")
             await MainActor.run {
-                errorMessage = "Sign in failed. Please try again. (\(error.localizedDescription))"
+                errorMessage = "sign_in_failed".localized + " (\(error.localizedDescription))"
             }
         }
         
@@ -700,7 +700,7 @@ class AuthViewModel {
             )
             print("✅ [AuthViewModel] Self partner profile created")
         } else {
-            throw NSError(domain: "AuthViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to save profile"])
+            throw NSError(domain: "AuthViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "failed_save_profile".localized])
         }
     }
 }

@@ -100,7 +100,7 @@ struct TopicListView: View {
                         }
                     } header: {
                         sectionHeader(
-                            title: "Active factors",
+                            title: "active_factors_title".localized,
                             icon: "sparkles",
                             count: activeItems.count,
                             color: tile.accentColor
@@ -122,7 +122,7 @@ struct TopicListView: View {
                         }
                     } header: {
                         sectionHeader(
-                            title: "Inactive factors",
+                            title: "inactive_factors_title".localized,
                             icon: "circle.slash",
                             count: blockedItems.count,
                             color: AppTheme.Colors.textTertiary
@@ -159,7 +159,7 @@ struct TopicListView: View {
             
             // Counts
             HStack(spacing: 8) {
-                Text("\(activeItems.count) Active")
+                Text("\(activeItems.count) \("status_active".localized)")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(tile.accentColor)
                 
@@ -167,7 +167,7 @@ struct TopicListView: View {
                     Text("•")
                         .foregroundColor(AppTheme.Colors.textTertiary)
                     
-                    Text("\(blockedItems.count) Inactive")
+                    Text("\(blockedItems.count) \("status_inactive".localized)")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -213,7 +213,7 @@ struct TopicListView: View {
                 .font(.system(size: 48))
                 .opacity(0.5)
             
-            Text("No yogas in this category")
+            Text("no_yogas_in_category".localized)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -326,8 +326,8 @@ struct ActiveYogaCard: View {
     
     private var statusInfo: (String, Color) {
         switch item.status.uppercased() {
-        case "A": return ("Active", AppTheme.Colors.success)
-        case "R": return ("REDUCED", AppTheme.Colors.gold)
+        case "A": return ("status_active".localized, AppTheme.Colors.success)
+        case "R": return ("status_reduced".localized, AppTheme.Colors.gold)
         default: return (item.status, AppTheme.Colors.textTertiary)
         }
     }
@@ -502,7 +502,7 @@ struct BlockedYogaCard: View {
                     Spacer()
                     
                     // Inactive Badge
-                    Text("Inactive")
+                    Text("status_inactive".localized)
                         .font(.system(size: 10, weight: .semibold))
                         .tracking(0.5)
                         .foregroundColor(AppTheme.Colors.textTertiary)

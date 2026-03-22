@@ -63,6 +63,7 @@ struct ChatView: View {
                 ) {
                     // Check quota before sending
                     if viewModel.canAskQuestion {
+                        isInputFocused = false  // Dismiss keyboard on send
                         Task { await viewModel.sendMessage() }
                     } else {
                         showQuotaExhausted = true
@@ -151,6 +152,10 @@ struct ChatView: View {
                  viewModel.showQuotaSheet = false
              }
         }
+        // Dismiss keyboard when leaving the view (fixes keyboard persistence bug)
+        .onDisappear {
+            isInputFocused = false
+        }
     }
     
     // MARK: - Sign Out and Re-auth (for guest → sign in flow)
@@ -235,6 +240,7 @@ struct ChatView: View {
                 ForEach(activeStarterQuestions, id: \.self) { question in
                     Button(action: {
                         HapticManager.shared.play(.light)
+                        isInputFocused = false  // Dismiss keyboard
                         viewModel.inputText = question
                         if viewModel.canAskQuestion {
                             Task { await viewModel.sendMessage() }
@@ -279,6 +285,7 @@ struct ChatView: View {
                     ForEach(viewModel.suggestedQuestions, id: \.self) { question in
                         Button(action: {
                             HapticManager.shared.play(.light)
+                            isInputFocused = false  // Dismiss keyboard
                             viewModel.inputText = question
                             viewModel.suggestedQuestions = []
                             if viewModel.canAskQuestion {
@@ -486,7 +493,7 @@ struct ChatHistorySidebar: View {
                     historyList
                 }
             }
-            .navigationTitle("Chat History")
+            .navigationTitle("chat_history_title".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -501,7 +508,7 @@ struct ChatHistorySidebar: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { onDismiss() }
+                    Button("done_action".localized) { onDismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #else
@@ -513,7 +520,7 @@ struct ChatHistorySidebar: View {
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { onDismiss() }
+                    Button("done_action".localized) { onDismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #endif
@@ -522,8 +529,8 @@ struct ChatHistorySidebar: View {
                 loadFirstPage()
             }
             .alert("Delete", isPresented: $showDeleteConfirmation) {
-                Button("Cancel", role: .cancel) { threadToDelete = nil }
-                Button("Delete", role: .destructive) {
+                Button("cancel_action".localized, role: .cancel) { threadToDelete = nil }
+                Button("delete_action".localized, role: .destructive) {
                     if let thread = threadToDelete {
                         viewModel.deleteThread(thread)
                         loadedThreads.removeAll { $0.id == thread.id }
@@ -531,7 +538,7 @@ struct ChatHistorySidebar: View {
                     }
                 }
             } message: {
-                Text("Are you sure you want to delete \"\(threadToDelete?.title ?? "")\"?")
+                Text(String(format: "chat_delete_thread_confirm".localized, threadToDelete?.title ?? ""))
             }
         }
     }
@@ -776,7 +783,7 @@ struct HistoryRow: View {
         .buttonStyle(.plain)
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label("delete_action".localized, systemImage: "trash")
             }
             .tint(AppTheme.Colors.error)
             
@@ -797,7 +804,7 @@ struct HistoryRow: View {
             }
             
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label("delete_action".localized, systemImage: "trash")
             }
         }
     }

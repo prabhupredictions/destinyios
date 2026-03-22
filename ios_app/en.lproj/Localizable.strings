@@ -224,6 +224,27 @@
 "continue_with_google" = "Continue with Google";
 "continue_with_email" = "Continue with Email";
 "i_dont_know_birth_time" = "I don't know my birth time";
+"profile_data_refreshed" = "Your profile data was refreshed on the server. Please re-enter your birth details.";
+"sign_up" = "Sign up";
+"account_deleted_error" = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support.";
+"sign_in_failed" = "Sign in failed. Please try again.";
+"failed_save_profile" = "Failed to save profile";
+"birth_data_linked_apple" = "Your birth data is already linked to your Apple account. Please sign in with Apple.";
+"birth_data_linked_google" = "Your birth data is already linked to your Google account. Please sign in with Google.";
+"birth_data_linked_google_email" = "Your birth data is already linked to %@. Please sign in with Google.";
+"birth_data_linked_email" = "Your birth data is already linked to %@. Please sign in with that account.";
+"account_upgraded_to_email" = "This account was upgraded to %@. Please sign in.";
+"already_have_account" = "You already have a registered account. Please sign in.";
+"conflict_apple" = "An account already exists with your birth data. Please sign in with Apple to continue.";
+"conflict_google_email" = "An account already exists with your birth data. Please sign in with Google (%@).";
+"conflict_google" = "An account already exists with your birth data. Please sign in with Google.";
+"conflict_email" = "An account already exists with your birth data. Please sign in with %@.";
+"conflict_generic" = "An account already exists with your birth data. Please sign in.";
+"a_registered_account" = "a registered account";
+"daily_limit_reached" = "Daily limit reached. Resets at midnight.";
+"overall_limit_reached" = "You've used all your questions.";
+"feature_not_available" = "Upgrade to access this feature.";
+"unable_access_feature" = "Unable to access this feature.";
 
 // MARK: - Splash
 "destiny_app_title" = "DESTINY";
@@ -537,7 +558,6 @@
 "sign_in_to_switch_profiles" = "Sign in to switch between profiles";
 "sign_in_to_save_profiles" = "Sign in to save and manage profiles";
 "create_account_to_continue" = "Create an account to keep going and save your progress";
-"free_limit_reached" = "Create an account to keep going and save your progress";
 "birth_data_registered" = "This birth data is already registered. Please sign in to continue.";
 "age_requirement" = "You must be at least 13 years old to create an account";
 "back" = "Back";
@@ -560,7 +580,6 @@
 
 // Protection Messages - Active Chart
 "profile_edit_blocked_active" = "This birth chart is currently active. Please switch to a different profile first, or contact support@destinyaiastrology.com for assistance.";
-"profile_delete_blocked_active" = "This birth chart is currently active. Please switch to a different profile first, or contact support@destinyaiastrology.com for assistance.";
 
 // Protection Messages - Used Profile
 "profile_edit_blocked_used" = "This birth chart has been used for readings and cannot be modified. For assistance, contact support@destinyaiastrology.com.";
@@ -2509,3 +2528,306 @@
 "varna_values_format" = "Varna: Groom %@, Bride %@";
 "varna_effect_label" = "Varna Koota represents spiritual and psychological compatibility based on Moon sign elements";
 "varna_complementarity_note" = "Traditional complementary pair — natural affinity recognized";
+
+// MARK: - Charts (V2.3)
+"calculating_chart" = "Calculating Chart...";
+"birth_chart" = "Birth Chart";
+"birth_charts" = "Birth Charts";
+"north_indian" = "North Indian";
+"south_indian" = "South Indian";
+"d1_rashi" = "D1 (Rashi)";
+"d9_navamsa" = "D9 (Navamsa)";
+"asc_label" = "Asc: %@";
+"house_num_label" = "House %@";
+"pada_num_label" = "Pada %@";
+"vimshottari_dasha_year" = "Vimshottari Dasha (%@)";
+"transits_year" = "Transits (%@)";
+"house_short" = "H%@";
+
+// Signs
+
+// Planets
+
+
+/* Compatibility Components */
+"ashtakoot_analysis_title" = "Ashtakoot Analysis";
+"kuta_varna_label" = "Work";
+"kuta_vashya_label" = "Dominance";
+"kuta_tara_label" = "Destiny";
+"kuta_yoni_label" = "Intimacy";
+"kuta_maitri_label" = "Friendship";
+"kuta_gana_label" = "Temperament";
+"kuta_bhakoot_label" = "Love";
+"kuta_nadi_label" = "Health";
+"analysis_step_mapping_charts" = "Mapping birth charts";
+"analysis_step_ashtakoot" = "Calculating astrological compatibility";
+"analysis_step_mangal" = "Checking Manglik compatibility";
+"analysis_step_yogas" = "Evaluating yogas and doshas";
+"analysis_step_generating" = "Preparing your compatibility insights";
+"analysis_step_ready" = "Your compatibility insights are ready ✨";
+"active_factors_title" = "Active factors";
+"inactive_factors_title" = "Inactive factors";
+"status_reduced" = "REDUCED";
+"no_yogas_in_category" = "No yogas in this category";
+"adjusted_label" = "Adjusted";
+"compatibility_label" = "Compatibility";
+"tap_orbs_hint" = "Tap orbs for detailed insights";
+"ai_analysis_label" = "AI Analysis";
+"tile_wealth_label" = "Wealth";
+"tile_career_label" = "Career";
+"tile_love_label" = "Love";
+"tile_family_label" = "Family";
+"tile_wisdom_label" = "Wisdom";
+"tile_health_label" = "Health";
+"tile_challenges_label" = "Challenges";
+"tile_wealth_title" = "Wealth & Assets";
+"tile_career_title" = "Career & Power";
+"tile_love_title" = "Love & Marriage";
+"tile_family_title" = "Family & Home";
+"tile_wisdom_title" = "Wisdom & Spirit";
+"tile_health_title" = "Health & Support";
+"tile_challenges_title" = "Karmic Challenges";
+
+// MARK: - Compatibility Sheets & Shared
+"compatibility_report_title" = "COMPATIBILITY REPORT";
+"ai_generated_analysis" = "AI-Generated Analysis";
+"ai_disclaimer_text" = "This report is generated by Destiny AI. Astrological insights are based on traditional principles. Please consult a professional astrologer for serious life decisions.";
+"copyright_notice" = "© 2026 Destiny AI Astrology. All rights reserved.";
+"ask_about_match_title" = "Ask about %@ & %@";
+"ask_destiny_welcome" = "Ask me anything about this relationship...";
+"ask_question_placeholder" = "Ask a question...";
+"ai_thinking" = "Destiny is thinking...";
+"mars_compatibility_title" = "Mars Compatibility";
+"perfectly_safe" = "Perfectly Safe";
+"no_mangal_dosha_detected" = "No Mangal Dosha detected in either chart.";
+"why_is_this_good" = "Why is this good?";
+"non_manglik_explanation" = "Since neither partner is 'Manglik', there is no risk of Mars-related conflicts affecting the marriage. This aspect contributes significantly to long-term peace.";
+"non_manglik" = "Non-Manglik";
+"dosha_cancelled_title" = "Dosha Cancelled";
+"neutralized_effects_desc" = "Any potential negative effects are neutralized.";
+"why_cancelled" = "Why it's cancelled";
+"mutual_neutralization_desc" = "Both partners' Mangal Dosha is at the same level, causing mutual neutralisation.";
+"attention_required" = "Attention Required";
+"mangal_friction_desc" = "Mangal Dosha is effective and may cause friction.";
+"mitigating_exceptions_title" = "Mitigating Exceptions";
+"vedic_exceptions_desc" = "Vedic astrology recognises planetary conditions that reduce or neutralise Mangal Dosha. Below are the exceptions found in each chart.";
+"suggested_remedies_title" = "Suggested Remedies";
+"intensifying_factor_singular" = "intensifying factor";
+"intensifying_factor_plural" = "intensifying factors";
+"mild_manglik" = "Mild Manglik";
+"moderate_manglik" = "Moderate Manglik";
+"high_manglik" = "High Manglik";
+"severe_manglik" = "Severe Manglik";
+"manglik" = "Manglik";
+"mars_in_house" = "Mars in House %@";
+"safe_status" = "Safe";
+"dosha_cancellation_title" = "Dosha Cancellation";
+"astrological_exceptions_subtitle" = "Astrological exceptions applied";
+"low_score_warning_title" = "Low Score Warning";
+"attention_required_subtitle" = "Attention may be required";
+"analysis_with_partner" = "ANALYSIS (%@)";
+"no_profiles_meet_threshold" = "No profiles meet the recommended threshold.";
+"review_individual_analyses_hint" = "Review individual analyses below for detailed insights.";
+"final_recommendation_label" = "Final Recommendation: %@ (%@/36)";
+"all_doshas_safe_fallback" = "All doshas safe. Highest compatibility.";
+"compatibility_comparison_pdf" = "COMPATIBILITY COMPARISON";
+"generated_date_label" = "Generated: %@";
+"kalsarpa_clear" = "Clear";
+"kalsarpa_both_present" = "Both Present";
+"kalsarpa_moderate" = "Moderate";
+"mangal_dosha_full" = "Mangal Dosha (Manglik/Kuja)";
+"view_action" = "View";
+"kaal_sarp_dosha_full" = "Kaal Sarp Dosha (Kalasarpa)";
+"additional_yogas_title" = "Additional Yogas";
+"view_all_action" = "View All";
+"view_full_report_action" = "View Full Report";
+"accessibility_menu" = "Menu";
+"accessibility_profile" = "Profile";
+"viewing_as_label" = "Viewing as %@";
+"accessibility_history_chat" = "Chat history";
+"accessibility_history_match" = "Match history";
+"accessibility_reset_form" = "Reset form";
+"accessibility_new_analysis" = "New analysis";
+"accessibility_new_conversation" = "New conversation";
+"kalsarpa_shankhapal_desc" = "Affects family harmony and maternal relationships";
+"kalsarpa_ananta_desc" = "Influences spiritual growth and liberation";
+"kalsarpa_kulik_desc" = "Creates obstacles in career and professional life";
+"kalsarpa_vasuki_desc" = "Impacts wealth and financial stability";
+"kalsarpa_padam_desc" = "Affects marriage and partnerships";
+"kalsarpa_mahapadam_desc" = "Influences overall life direction";
+"kalsarpa_takshak_desc" = "Creates sudden changes and transformations";
+"kalsarpa_karkotak_desc" = "Impacts health and vitality";
+"kalsarpa_sheshnag_desc" = "Affects longevity and deep subconscious";
+"kalsarpa_ghatak_desc" = "Creates hidden enemies and obstacles";
+"kalsarpa_vishdhar_desc" = "Influences communication and expression";
+"kalsarpa_shankachood_desc" = "Affects father and dharma";
+"kalsarpa_default_desc" = "A powerful serpent dosha affecting life path";
+"severity_mild" = "Mild";
+"severity_moderate" = "Moderate";
+"severity_severe" = "Severe";
+"severity_unknown" = "Unknown";
+"detailed_breakdown_title" = "DETAILED BREAKDOWN";
+"area_health" = "Health";
+"area_love" = "Love";
+"area_temperament" = "Temperament";
+"area_friendship" = "Friendship";
+"area_intimacy" = "Intimacy";
+"area_dominance" = "Dominance";
+"area_destiny" = "Destiny";
+"area_work" = "Work";
+"active_label" = "Active";
+"low_score_warning_desc" = "%@ compatibility score is 0. This area requires mutual understanding and effort.";
+"accessibility_back" = "Back";
+"accessibility_birth_chart" = "Birth chart";
+"accessibility_birth_charts" = "Birth charts";
+"dosha_label" = "Dosha";
+
+// MARK: - Compatibility Main & History (V2.5)
+"partner_label" = "Partner";
+"duplicate_birth_chart_title" = "Duplicate Birth Chart";
+"ok_action" = "OK";
+"partner_index_label" = "Partner %d";
+"accessibility_add_partner" = "Add partner";
+"gender_label" = "Gender";
+"select_gender_a11y" = "Select gender";
+"gender_value_a11y" = "Gender: %@";
+"select_date_action" = "Select Date";
+"select_dob_a11y" = "Select date of birth";
+"dob_value_a11y" = "Date of birth: %@";
+"unknown_label" = "Unknown";
+"select_time_action" = "Select Time";
+"select_tob_a11y" = "Select time of birth";
+"tob_value_a11y" = "Time of birth: %@";
+"tob_unknown_a11y" = "Time of birth: unknown";
+"select_birth_city_a11y" = "Select birth city";
+"birth_city_value_a11y" = "Birth city: %@";
+"daily_limit_reset_time" = "Daily limit reached. Resets at %@.";
+"daily_limit_reached_tomorrow" = "Daily limit reached. Resets tomorrow.";
+"upgrade_to_unlock" = "Upgrade to unlock this feature.";
+"quota_check_failed" = "Unable to check compatibility access.";
+"comparing_partners_count" = "Comparing %d Partners";
+"partners_complete_count" = "%d/%d Complete";
+"search_matches_placeholder" = "Search matches...";
+"match_history_title" = "Match History";
+"group_match_title" = "%@ + %@";
+"best_match_score" = "Best: %d/%d";
+"unpin" = "Unpin";
+"pin" = "Pin";
+
+// MARK: - Missed Compatibility Keys
+"born_date_format" = "Born: %@ · %@";
+"ashtakoot_adjusted_score_format" = "Ashtakoot: %d/%d · Adjusted: %d/%d";
+"ashtakoot_score_format" = "Ashtakoot Score: %d/%d";
+"overridden_due_to_issues" = "Overridden due to compatibility issues:";
+"report_generated_format" = "Report generated: %@";
+"destiny_ai_astrology_title" = "DESTINY AI ASTROLOGY";
+"ai_generated_analysis_info" = "ⓘ AI-Generated Analysis";
+"ask_destiny_title" = "Ask Destiny";
+"suggested_q_strengths" = "Key strengths of this match?";
+"suggested_q_challenges" = "Key challenges of this match?";
+"suggested_q_timing" = "Best timing for relationship harmony?";
+"suggested_questions_title" = "Suggested questions";
+
+// MARK: - Chat Module Fixes
+"done_action" = "Done";
+"delete_action" = "Delete";
+"chat_history_title" = "Chat History";
+"chat_delete_thread_confirm" = "Are you sure you want to delete \"%@\"?";
+
+// MARK: - Components Missing Keys
+"out_of_max_score_format" = "out of %d";
+"viewing_as_profile_format" = "Viewing as %@";
+"questions_left_format" = "%d/%d questions left";
+"renews_date_format" = "Renews %@";
+"select_city_title" = "Select City";
+"rated_status" = "Rated";
+"rate_action" = "Rate";
+"a11y_star_rating" = "%d of 5 stars";
+"a11y_rate_helpful" = "Rate helpful";
+"a11y_rate_unhelpful" = "Rate unhelpful";
+"a11y_destiny_thinking" = "Destiny is thinking";
+"a11y_send_message" = "Send message";
+"a11y_copy_response" = "Copy response";
+
+// MARK: - Views/Components Missing Keys
+"a11y_orb_status_format" = "%@: %@";
+
+// MARK: - History Module Keys
+"history_title" = "History";
+"delete_item_confirm_format" = "Are you sure you want to delete \"%@\"?";
+"history_not_saved_desc" = "Your conversations and matches aren't being saved.";
+"score_fraction_format" = "%d/%d";
+"best_score_format" = "Best: %d/%d";
+
+// MARK: - Home Module Keys
+"retry_action" = "Retry";
+"almost_there" = "Almost there";
+"todays_cosmic_vibe" = "Today's Cosmic Vibe";
+"a11y_profile_name_format" = "Profile, %@";
+"ask_more_ellipsis" = "Ask More...";
+"percentage_format" = "%d%%";
+"hyphen_format" = "- %@";
+"until_date_format" = "Until %@";
+"no_combinations_found" = "No combinations found for this category.";
+"whats_on_your_mind" = "What's on your mind today?";
+"or_ask_your_own" = "or ask your own";
+
+// MARK: - Notifications Module Keys
+"unread_count_format" = "%d unread";
+"a11y_notification_detail_format" = "%@, %@, %@%@";
+"a11y_unread_suffix" = ", unread";
+
+// MARK: - Partners Module Keys
+"partner_consent_text" = "By adding this birth chart, you confirm that you are the parent or legal guardian and have the authority to provide this information";
+"for_compatibility_matching" = "For compatibility matching";
+"compatibility_age_restriction" = "Compatibility matching is only available for individuals over 18";
+"delete_partner_action_format" = "Delete %@";
+"delete_partner_confirm_format" = "This will permanently remove %@ from your saved birth charts.";
+"saved_birth_charts_title" = "Saved Birth Charts";
+"loading_birth_charts" = "Loading birth charts...";
+"no_saved_birth_charts" = "No Saved Birth Charts";
+"save_birth_charts_desc" = "Save birth charts for quick matching";
+"add_birth_chart_action" = "Add Birth Chart";
+"no_saved_birth_charts_yet" = "No saved birth charts yet";
+"no_matches_found" = "No matches found";
+"add_new_birth_chart_action" = "Add New Birth Chart";
+"select_birth_chart_title" = "Select Birth Chart";
+"upgrade_action" = "Upgrade";
+"add_action" = "Add";
+
+// MARK: - Profile Module Keys
+"profile_title" = "Profile";
+"preferences_menu" = "Preferences";
+"support_menu" = "Support";
+"app_version_format" = "Version %@";
+"faq_and_help" = "FAQ & Help";
+"turn_off_action" = "Turn Off";
+"clear_action" = "Clear";
+"deleted_conversation_singular" = "Successfully deleted %d conversation.";
+"deleted_conversation_plural" = "Successfully deleted %d conversations.";
+"viewing_birth_chart_format" = "Viewing Birth Chart : %@";
+"a11y_gender_format" = "Gender: %@";
+"a11y_active_profile_format" = "Active profile: %@%@";
+"a11y_you_suffix" = ", you";
+"a11y_switch_profile_format" = "Switch to %@%@";
+"a11y_your_profile_suffix" = ", your profile";
+
+// MARK: - Settings Module Keys
+"add_first_personalized_alert" = "Add your first personalized alert below";
+"remove_alert_confirm_format" = "Remove \"%@...\"?";
+"remove_this_alert" = "Remove this alert?";
+"enable_notifications_instruction" = "Enable in iOS Settings → Apps → Destiny → Notifications";
+"alert_about_question" = "What do you want alerts about?";
+"character_count_format" = "%d/200";
+"personalized_alerts_title" = "Personalized alerts";
+"chart_style_title" = "Chart Style";
+"astrology_settings_title" = "Astrology Settings";
+"save_action" = "Save";
+
+// MARK: - Subscription Module Keys
+"choose_plan_title" = "Choose a plan";
+"lets_go_action" = "Let's Go!";
+"fair_use_notice" = "Unlimited access is subject to fair use.";
+"apple_subscription_notice" = "Purchases are billed through your Apple ID. Manage in Settings → Apple ID → Subscriptions.";
+"price_monthly_format" = "$%@";
+"subscription_starts_format" = "Starts %@";

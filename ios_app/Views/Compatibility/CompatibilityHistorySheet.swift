@@ -42,7 +42,7 @@ struct CompatibilityHistorySheet: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .font(.system(size: 15))
                             
-                            TextField("Search matches...", text: $searchText)
+                            TextField("search_matches_placeholder".localized, text: $searchText)
                                 .font(AppTheme.Fonts.body(size: 15))
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .autocorrectionDisabled()
@@ -73,14 +73,11 @@ struct CompatibilityHistorySheet: View {
                     }
                 }
             }
-            .navigationTitle("Match History")
+            .navigationTitle("match_history_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(AppTheme.Colors.gold)
-                }
+                    Button("done_action".localized) { dismiss() }
             }
             .alert("delete_match".localized, isPresented: $showDeleteConfirmation) {
                 Button("cancel".localized, role: .cancel) {}
@@ -194,7 +191,7 @@ struct CompatibilityHistorySheet: View {
                             togglePinGroup(group)
                         } label: {
                             Label(
-                                group.items.first?.isPinned == true ? "Unpin" : "Pin",
+                                (group.items.first?.isPinned == true ? "unpin" : "pin").localized,
                                 systemImage: group.items.first?.isPinned == true ? "pin.slash" : "pin"
                             )
                         }
@@ -239,7 +236,7 @@ struct CompatibilityHistorySheet: View {
                             togglePinItem(item)
                         } label: {
                             Label(
-                                item.isPinned ? "Unpin" : "Pin",
+                                (item.isPinned ? "unpin" : "pin").localized,
                                 systemImage: item.isPinned ? "pin.slash" : "pin"
                             )
                         }
@@ -347,7 +344,7 @@ struct GroupHistoryRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title: "UserName + Partner1, Partner2"
                     let partnerNames = group.items.map { $0.girlName }
-                    Text("\(group.userName) + \(partnerNames.joined(separator: ", "))")
+                    Text(String(format: "group_match_title".localized, group.userName, partnerNames.joined(separator: ", ")))
                         .font(AppTheme.Fonts.title(size: 15))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .lineLimit(1)
@@ -362,7 +359,7 @@ struct GroupHistoryRow: View {
                             HStack(spacing: 3) {
                                 Image(systemName: "star.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text("Best: \(best.totalScore)/\(best.maxScore)")
+                                Text(String(format: "best_match_score".localized, best.totalScore, best.maxScore))
                                     .font(AppTheme.Fonts.caption(size: 11))
                             }
                             .foregroundColor(accentPurple)

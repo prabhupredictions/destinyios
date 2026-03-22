@@ -62,7 +62,7 @@ struct PartnerManagerView: View {
             isPresented: $showDeleteConfirmation,
             presenting: partnerToDelete
         ) { partner in
-            Button("Delete \(partner.name)", role: .destructive) {
+            Button(String(format: "delete_partner_action_format".localized, partner.name), role: .destructive) {
                 Task {
                     let success = await viewModel.deletePartner(partner)
                     if success {
@@ -70,12 +70,12 @@ struct PartnerManagerView: View {
                     }
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            Button("cancel_action".localized, role: .cancel) {}
         } message: { partner in
-            Text("This will permanently remove \(partner.name) from your saved birth charts.")
+            Text(String(format: "delete_partner_confirm_format".localized, partner.name))
         }
         .alert("Error", isPresented: $viewModel.showError) {
-            Button("OK", role: .cancel) {}
+            Button("ok_action".localized, role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred")
         }
@@ -90,11 +90,11 @@ struct PartnerManagerView: View {
             SubscriptionView()
         }
         .alert("Birth Chart Limit Reached", isPresented: .constant(limitMessage != nil)) {
-            Button("Upgrade") {
+            Button("upgrade_action".localized) {
                 limitMessage = nil
                 showUpgradePrompt = true
             }
-            Button("OK", role: .cancel) {
+            Button("ok_action".localized, role: .cancel) {
                 limitMessage = nil
             }
         } message: {
@@ -138,7 +138,7 @@ struct PartnerManagerView: View {
             
             Spacer()
             
-            Text("Saved Birth Charts")
+            Text("saved_birth_charts_title".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
@@ -150,7 +150,7 @@ struct PartnerManagerView: View {
             }) {
                 HStack(spacing: 4) {
                     Image(systemName: "plus")
-                    Text("Add")
+                    Text("add_action".localized)
                 }
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.mainBackground)
@@ -172,7 +172,7 @@ struct PartnerManagerView: View {
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
                 .scaleEffect(1.5)
             
-            Text("Loading birth charts...")
+            Text("loading_birth_charts".localized)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -193,11 +193,11 @@ struct PartnerManagerView: View {
                 .foregroundStyle(AppTheme.Colors.premiumGradient)
                 .modifier(Tilt3DModifier())
             
-            Text("No Saved Birth Charts")
+            Text("no_saved_birth_charts".localized)
                 .font(AppTheme.Fonts.title(size: 24))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Save birth charts for quick matching")
+            Text("save_birth_charts_desc".localized)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -206,7 +206,7 @@ struct PartnerManagerView: View {
                 HapticManager.shared.play(.medium)
                 checkAndShowAddForm()
             }) {
-                Text("Add Birth Chart")
+                Text("add_birth_chart_action".localized)
                     .font(AppTheme.Fonts.title(size: 16))
                     .foregroundColor(AppTheme.Colors.mainBackground)
                     .padding(.horizontal, 32)

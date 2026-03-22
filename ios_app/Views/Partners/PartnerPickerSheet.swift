@@ -83,13 +83,13 @@ struct PartnerPickerSheet: View {
                     addNewButton
                 }
             }
-            .navigationTitle("Select Birth Chart")
+            .navigationTitle("select_birth_chart_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .preferredColorScheme(.dark)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("cancel_action".localized) {
                         HapticManager.shared.play(.light)
                         isPresented = false
                     }
@@ -117,11 +117,11 @@ struct PartnerPickerSheet: View {
                 SubscriptionView()
             }
             .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
-                Button("Upgrade") {
+                Button("upgrade_action".localized) {
                     limitMessage = nil
                     showUpgradePrompt = true
                 }
-                Button("OK", role: .cancel) {
+                Button("ok_action".localized, role: .cancel) {
                     limitMessage = nil
                 }
             } message: {
@@ -161,7 +161,7 @@ struct PartnerPickerSheet: View {
             Spacer()
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-            Text("Loading birth charts...")
+            Text("loading_birth_charts".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
@@ -179,11 +179,11 @@ struct PartnerPickerSheet: View {
                 .opacity(0.8)
             
             if viewModel.partners.isEmpty {
-                Text("No saved birth charts yet")
+                Text("no_saved_birth_charts_yet".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             } else {
-                Text("No matches found")
+                Text("no_matches_found".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
@@ -277,7 +277,7 @@ struct PartnerPickerSheet: View {
             HStack(spacing: 8) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 20))
-                Text("Add New Birth Chart")
+                Text("add_new_birth_chart_action".localized)
                     .font(AppTheme.Fonts.body(size: 16))
             }
             .foregroundStyle(AppTheme.Colors.premiumGradient)
