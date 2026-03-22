@@ -2584,13 +2584,21 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Análisis de Ashtakoot";
 "kuta_varna_label" = "Varna";
+"kuta_varna_theme" = "Trabajar";
 "kuta_vashya_label" = "Vashya";
+"kuta_vashya_theme" = "Dominio";
 "kuta_tara_label" = "Tara";
+"kuta_tara_theme" = "Destino";
 "kuta_yoni_label" = "Yoni";
+"kuta_yoni_theme" = "Intimidad";
 "kuta_maitri_label" = "Maitri";
+"kuta_maitri_theme" = "Amistad";
 "kuta_gana_label" = "Gana";
+"kuta_gana_theme" = "Temperamento";
 "kuta_bhakoot_label" = "Bhakoot";
+"kuta_bhakoot_theme" = "Amar";
 "kuta_nadi_label" = "Nadi";
+"kuta_nadi_theme" = "Salud";
 "analysis_step_mapping_charts" = "Mapeo de cartas natales";
 "analysis_step_ashtakoot" = "Calculando compatibilidad astrológica";
 "analysis_step_mangal" = "Verificando compatibilidad de Manglik";

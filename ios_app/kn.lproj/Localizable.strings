@@ -2584,13 +2584,21 @@
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "ಅಷ್ಟಕೂಟ ವಿಶ್ಲೇಷಣೆ";
 "kuta_varna_label" = "ವರ್ಣ";
+"kuta_varna_theme" = "ಕೆಲಸ";
 "kuta_vashya_label" = "ವಶ್ಯ";
+"kuta_vashya_theme" = "ಪ್ರಾಬಲ್ಯ";
 "kuta_tara_label" = "ತಾರಾ";
+"kuta_tara_theme" = "ಡೆಸ್ಟಿನಿ";
 "kuta_yoni_label" = "ಯೋನಿ";
+"kuta_yoni_theme" = "ಆತ್ಮೀಯತೆ";
 "kuta_maitri_label" = "ಮೈತ್ರಿ";
+"kuta_maitri_theme" = "ಸ್ನೇಹ";
 "kuta_gana_label" = "ಗಣ";
+"kuta_gana_theme" = "ಮನೋಧರ್ಮ";
 "kuta_bhakoot_label" = "ಭಕೂಟ";
+"kuta_bhakoot_theme" = "ಪ್ರೀತಿ";
 "kuta_nadi_label" = "ನಾಡಿ";
+"kuta_nadi_theme" = "ಆರೋಗ್ಯ";
 "analysis_step_mapping_charts" = "ಜನನ ಪಟಗಳ ಮ್ಯಾಪಿಂಗ್";
 "analysis_step_ashtakoot" = "ಜ್ಯೋತಿಷ್ಯ ಹೊಂದಾಣಿಕೆಯ ಲೆಕ್ಕಾಚಾರ";
 "analysis_step_mangal" = "ಮಾಂಗಲೀಕ ಹೊಂದಾಣಿಕೆಯ ಪರಿಶೀಲನೆ";

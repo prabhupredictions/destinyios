@@ -2449,13 +2449,21 @@
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "अष्टकूट विश्लेषण";
 "kuta_varna_label" = "वर्ण";
+"kuta_varna_theme" = "काम";
 "kuta_vashya_label" = "वश्य";
+"kuta_vashya_theme" = "प्रभाव";
 "kuta_tara_label" = "तारा";
+"kuta_tara_theme" = "तकदीर";
 "kuta_yoni_label" = "योनि";
+"kuta_yoni_theme" = "आत्मीयता";
 "kuta_maitri_label" = "मैत्री";
+"kuta_maitri_theme" = "दोस्ती";
 "kuta_gana_label" = "गण";
+"kuta_gana_theme" = "स्वभाव";
 "kuta_bhakoot_label" = "भकूट";
+"kuta_bhakoot_theme" = "प्यार";
 "kuta_nadi_label" = "नाड़ी";
+"kuta_nadi_theme" = "स्वास्थ्य";
 "analysis_step_mapping_charts" = "जन्म चार्ट का मिलान";
 "analysis_step_ashtakoot" = "ज्योतिषीय अनुकूलता की गणना";
 "analysis_step_mangal" = "मांगलिक अनुकूलता की जांच";

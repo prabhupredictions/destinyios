@@ -2584,13 +2584,21 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Analyse d'Ashtakoot";
 "kuta_varna_label" = "Varna";
+"kuta_varna_theme" = "Travail";
 "kuta_vashya_label" = "Vashya";
+"kuta_vashya_theme" = "Dominance";
 "kuta_tara_label" = "Tara";
+"kuta_tara_theme" = "Destin";
 "kuta_yoni_label" = "Yoni";
+"kuta_yoni_theme" = "Intimité";
 "kuta_maitri_label" = "Maitri";
+"kuta_maitri_theme" = "Amitié";
 "kuta_gana_label" = "Gana";
+"kuta_gana_theme" = "Tempérament";
 "kuta_bhakoot_label" = "Bhakoot";
+"kuta_bhakoot_theme" = "Amour";
 "kuta_nadi_label" = "Nadi";
+"kuta_nadi_theme" = "Santé";
 "analysis_step_mapping_charts" = "Cartographie des thèmes nataux";
 "analysis_step_ashtakoot" = "Calcul de la compatibilité astrologique";
 "analysis_step_mangal" = "Vérification de la compatibilité Manglik";

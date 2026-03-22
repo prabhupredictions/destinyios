@@ -222,7 +222,7 @@ struct OrbitAshtakootView: View {
         tooltipRow(
             number: "1",
             icon: "doc.text.magnifyingglass",
-            text: String(format: "tooltip_determined_by".localized, kuta.label, kutaName)
+            text: String(format: "tooltip_determined_by".localized, kutaThemeName(for: kuta.key), kutaName)
         )
         
         // ─── 2. Partner values ───
@@ -499,6 +499,20 @@ struct OrbitAshtakootView: View {
             "nadi": "kuta_nadi_label".localized
         ]
         return names[key] ?? key.capitalized
+    }
+    
+    private func kutaThemeName(for key: String) -> String {
+        let themes: [String: String] = [
+            "varna": "kuta_varna_theme".localized,
+            "vashya": "kuta_vashya_theme".localized,
+            "tara": "kuta_tara_theme".localized,
+            "yoni": "kuta_yoni_theme".localized,
+            "maitri": "kuta_maitri_theme".localized,
+            "gana": "kuta_gana_theme".localized,
+            "bhakoot": "kuta_bhakoot_theme".localized,
+            "nadi": "kuta_nadi_theme".localized
+        ]
+        return themes[key] ?? key.capitalized
     }
     
     private func format(_ value: Double) -> String {

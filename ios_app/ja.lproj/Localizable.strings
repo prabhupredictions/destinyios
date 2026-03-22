@@ -2585,13 +2585,21 @@
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "アシュタクート分析";
 "kuta_varna_label" = "ヴァルナ";
+"kuta_varna_theme" = "仕事";
 "kuta_vashya_label" = "ヴァシャ";
+"kuta_vashya_theme" = "支配力";
 "kuta_tara_label" = "ターラ";
+"kuta_tara_theme" = "運命";
 "kuta_yoni_label" = "ヨニ";
+"kuta_yoni_theme" = "親密";
 "kuta_maitri_label" = "マイトリ";
+"kuta_maitri_theme" = "友情";
 "kuta_gana_label" = "ガナ";
+"kuta_gana_theme" = "気質";
 "kuta_bhakoot_label" = "バクート";
+"kuta_bhakoot_theme" = "愛";
 "kuta_nadi_label" = "ナディ";
+"kuta_nadi_theme" = "健康";
 "analysis_step_mapping_charts" = "出生図のマッピング";
 "analysis_step_ashtakoot" = "占星術的相性の計算";
 "analysis_step_mangal" = "マングリック相性の確認";
