@@ -2584,14 +2584,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "アシュタクート分析";
-"kuta_varna_label" = "仕事";
-"kuta_vashya_label" = "支配力";
-"kuta_tara_label" = "運命";
-"kuta_yoni_label" = "親密度";
-"kuta_maitri_label" = "友情";
-"kuta_gana_label" = "気質";
-"kuta_bhakoot_label" = "愛";
-"kuta_nadi_label" = "健康";
+"kuta_varna_label" = "ヴァルナ";
+"kuta_vashya_label" = "ヴァシャ";
+"kuta_tara_label" = "ターラ";
+"kuta_yoni_label" = "ヨニ";
+"kuta_maitri_label" = "マイトリ";
+"kuta_gana_label" = "ガナ";
+"kuta_bhakoot_label" = "バクート";
+"kuta_nadi_label" = "ナディ";
 "analysis_step_mapping_charts" = "出生図のマッピング";
 "analysis_step_ashtakoot" = "占星術的相性の計算";
 "analysis_step_mangal" = "マングリック相性の確認";

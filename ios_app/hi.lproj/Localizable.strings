@@ -2448,14 +2448,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "अष्टकूट विश्लेषण";
-"kuta_varna_label" = "कार्य";
-"kuta_vashya_label" = "प्रभुत्व";
-"kuta_tara_label" = "भाग्य";
-"kuta_yoni_label" = "आत्मीयता";
+"kuta_varna_label" = "वर्ण";
+"kuta_vashya_label" = "वश्य";
+"kuta_tara_label" = "तारा";
+"kuta_yoni_label" = "योनि";
 "kuta_maitri_label" = "मैत्री";
-"kuta_gana_label" = "स्वभाव";
-"kuta_bhakoot_label" = "प्रेम";
-"kuta_nadi_label" = "स्वास्थ्य";
+"kuta_gana_label" = "गण";
+"kuta_bhakoot_label" = "भकूट";
+"kuta_nadi_label" = "नाड़ी";
 "analysis_step_mapping_charts" = "जन्म चार्ट का मिलान";
 "analysis_step_ashtakoot" = "ज्योतिषीय अनुकूलता की गणना";
 "analysis_step_mangal" = "मांगलिक अनुकूलता की जांच";

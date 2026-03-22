@@ -2572,14 +2572,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "அஷ்டகூட பகுப்பாய்வு";
-"kuta_varna_label" = "வேலை";
-"kuta_vashya_label" = "ஆதிக்கம்";
-"kuta_tara_label" = "விதி";
-"kuta_yoni_label" = "நெருக்கம்";
-"kuta_maitri_label" = "நட்பு";
-"kuta_gana_label" = "சுபாவம்";
-"kuta_bhakoot_label" = "காதல்";
-"kuta_nadi_label" = "ஆரோக்கியம்";
+"kuta_varna_label" = "வர்ணா";
+"kuta_vashya_label" = "வஷ்யா";
+"kuta_tara_label" = "தாரா";
+"kuta_yoni_label" = "யோனி";
+"kuta_maitri_label" = "மைத்ரி";
+"kuta_gana_label" = "கணம்";
+"kuta_bhakoot_label" = "பகூட்";
+"kuta_nadi_label" = "நாடி";
 "analysis_step_mapping_charts" = "பிறப்பு வரைபடங்களை வரிசைப்படுத்துதல்";
 "analysis_step_ashtakoot" = "ஜோதிட பொருத்தத்தை கணக்கிடுதல்";
 "analysis_step_mangal" = "மாங்கல்ய பொருத்தத்தை சரிபார்த்தல்";

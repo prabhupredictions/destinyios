@@ -2583,14 +2583,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Ashtakoot 分析";
-"kuta_varna_label" = "工作";
-"kuta_vashya_label" = "支配力";
-"kuta_tara_label" = "命运";
-"kuta_yoni_label" = "亲密度";
-"kuta_maitri_label" = "友谊";
-"kuta_gana_label" = "气质";
-"kuta_bhakoot_label" = "爱情";
-"kuta_nadi_label" = "健康";
+"kuta_varna_label" = "瓦尔纳";
+"kuta_vashya_label" = "瓦沙";
+"kuta_tara_label" = "塔拉";
+"kuta_yoni_label" = "约尼";
+"kuta_maitri_label" = "迈特里";
+"kuta_gana_label" = "加纳";
+"kuta_bhakoot_label" = "巴库特";
+"kuta_nadi_label" = "纳迪";
 "analysis_step_mapping_charts" = "绘制出生图";
 "analysis_step_ashtakoot" = "计算占星兼容性";
 "analysis_step_mangal" = "检查 Manglik 兼容性";

@@ -2563,14 +2563,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "అష్టకూట విశ్లేషణ";
-"kuta_varna_label" = "పని";
-"kuta_vashya_label" = "ఆధిపత్యం";
-"kuta_tara_label" = "విధి";
-"kuta_yoni_label" = "సాన్నిహిత్యం";
-"kuta_maitri_label" = "స్నేహం";
-"kuta_gana_label" = "స్వభావం";
-"kuta_bhakoot_label" = "ప్రేమ";
-"kuta_nadi_label" = "ఆరోగ్యం";
+"kuta_varna_label" = "వర్ణ";
+"kuta_vashya_label" = "వశ్య";
+"kuta_tara_label" = "తార";
+"kuta_yoni_label" = "యోని";
+"kuta_maitri_label" = "మైత్రి";
+"kuta_gana_label" = "గణ";
+"kuta_bhakoot_label" = "భకూట";
+"kuta_nadi_label" = "నాడి";
 "analysis_step_mapping_charts" = "జనన పటాల మ్యాపింగ్";
 "analysis_step_ashtakoot" = "జ్యోతిష్య అనుకూలత గణన";
 "analysis_step_mangal" = "మాంగళిక అనుకూలత పరిశీలన";

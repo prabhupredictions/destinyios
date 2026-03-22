@@ -2583,14 +2583,14 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Análise de Ashtakoot";
-"kuta_varna_label" = "Trabalho";
-"kuta_vashya_label" = "Domínio";
-"kuta_tara_label" = "Destino";
-"kuta_yoni_label" = "Intimidade";
-"kuta_maitri_label" = "Amizade";
-"kuta_gana_label" = "Temperamento";
-"kuta_bhakoot_label" = "Amor";
-"kuta_nadi_label" = "Saúde";
+"kuta_varna_label" = "Varna";
+"kuta_vashya_label" = "Vashya";
+"kuta_tara_label" = "Tara";
+"kuta_yoni_label" = "Yoni";
+"kuta_maitri_label" = "Maitri";
+"kuta_gana_label" = "Gana";
+"kuta_bhakoot_label" = "Bhakoot";
+"kuta_nadi_label" = "Nadi";
 "analysis_step_mapping_charts" = "Mapeando mapas natais";
 "analysis_step_ashtakoot" = "Calculando compatibilidade astrológica";
 "analysis_step_mangal" = "Verificando compatibilidade de Manglik";

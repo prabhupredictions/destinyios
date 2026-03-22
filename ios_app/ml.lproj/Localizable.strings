@@ -2584,14 +2584,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "അഷ്ടകൂട വിശകലനം";
-"kuta_varna_label" = "ജോലി";
-"kuta_vashya_label" = "മേധാവിത്വം";
-"kuta_tara_label" = "വിധി";
-"kuta_yoni_label" = "അടുപ്പം";
-"kuta_maitri_label" = "സൗഹൃദം";
-"kuta_gana_label" = "സ്വഭാവം";
-"kuta_bhakoot_label" = "സ്നേഹം";
-"kuta_nadi_label" = "ആരോഗ്യം";
+"kuta_varna_label" = "വർണ്ണ";
+"kuta_vashya_label" = "വശ്യ";
+"kuta_tara_label" = "താര";
+"kuta_yoni_label" = "യോനി";
+"kuta_maitri_label" = "മൈത്രി";
+"kuta_gana_label" = "ഗണം";
+"kuta_bhakoot_label" = "ഭകൂട";
+"kuta_nadi_label" = "നാഡി";
 "analysis_step_mapping_charts" = "ജനന ചാർട്ടുകളുടെ മാപ്പിംഗ്";
 "analysis_step_ashtakoot" = "ജ്യോതിഷപരമായ പൊരുത്തം കണക്കാക്കുന്നു";
 "analysis_step_mangal" = "മാംഗ്ലിക് പൊരുത്തം പരിശോധിക്കുന്നു";

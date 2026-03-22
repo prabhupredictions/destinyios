@@ -2551,14 +2551,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Ashtakoot Analysis";
-"kuta_varna_label" = "Work";
-"kuta_vashya_label" = "Dominance";
-"kuta_tara_label" = "Destiny";
-"kuta_yoni_label" = "Intimacy";
-"kuta_maitri_label" = "Friendship";
-"kuta_gana_label" = "Temperament";
-"kuta_bhakoot_label" = "Love";
-"kuta_nadi_label" = "Health";
+"kuta_varna_label" = "Varna";
+"kuta_vashya_label" = "Vashya";
+"kuta_tara_label" = "Tara";
+"kuta_yoni_label" = "Yoni";
+"kuta_maitri_label" = "Maitri";
+"kuta_gana_label" = "Gana";
+"kuta_bhakoot_label" = "Bhakoot";
+"kuta_nadi_label" = "Nadi";
 "analysis_step_mapping_charts" = "Mapping birth charts";
 "analysis_step_ashtakoot" = "Calculating astrological compatibility";
 "analysis_step_mangal" = "Checking Manglik compatibility";

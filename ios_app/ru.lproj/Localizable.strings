@@ -2583,14 +2583,14 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Анализ Аштакут";
-"kuta_varna_label" = "Работа";
-"kuta_vashya_label" = "Доминирование";
-"kuta_tara_label" = "Судьба";
-"kuta_yoni_label" = "Близость";
-"kuta_maitri_label" = "Дружба";
-"kuta_gana_label" = "Темперамент";
-"kuta_bhakoot_label" = "Любовь";
-"kuta_nadi_label" = "Здоровье";
+"kuta_varna_label" = "Варна";
+"kuta_vashya_label" = "Вашья";
+"kuta_tara_label" = "Тара";
+"kuta_yoni_label" = "Йони";
+"kuta_maitri_label" = "Майтри";
+"kuta_gana_label" = "Гана";
+"kuta_bhakoot_label" = "Бхакут";
+"kuta_nadi_label" = "Нади";
 "analysis_step_mapping_charts" = "Составление натальных карт";
 "analysis_step_ashtakoot" = "Расчет астрологической совместимости";
 "analysis_step_mangal" = "Проверка совместимости по Манглик";

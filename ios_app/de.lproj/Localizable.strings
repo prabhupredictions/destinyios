@@ -2579,14 +2579,14 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Ashtakoot-Analyse";
-"kuta_varna_label" = "Arbeit";
-"kuta_vashya_label" = "Dominanz";
-"kuta_tara_label" = "Schicksal";
-"kuta_yoni_label" = "Intimität";
-"kuta_maitri_label" = "Freundschaft";
-"kuta_gana_label" = "Temperament";
-"kuta_bhakoot_label" = "Liebe";
-"kuta_nadi_label" = "Gesundheit";
+"kuta_varna_label" = "Varna";
+"kuta_vashya_label" = "Vashya";
+"kuta_tara_label" = "Tara";
+"kuta_yoni_label" = "Yoni";
+"kuta_maitri_label" = "Maitri";
+"kuta_gana_label" = "Gana";
+"kuta_bhakoot_label" = "Bhakoot";
+"kuta_nadi_label" = "Nadi";
 "analysis_step_mapping_charts" = "Geburtshoroskope kartieren";
 "analysis_step_ashtakoot" = "Astrologische Kompatibilität berechnen";
 "analysis_step_mangal" = "Manglik-Kompatibilität prüfen";
