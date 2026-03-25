@@ -80,10 +80,18 @@ struct PlanetaryPositionsSheet: View {
                     // Chart Style Toggles
                     Menu {
                         Button(action: { chartStyle = "north" }) {
-                            Label("north_indian".localized, systemImage: chartStyle == "north" ? "checkmark" : "")
+                            if chartStyle == "north" {
+                                Label("north_indian".localized, systemImage: "checkmark")
+                            } else {
+                                Text("north_indian".localized)
+                            }
                         }
                         Button(action: { chartStyle = "south" }) {
-                            Label("south_indian".localized, systemImage: chartStyle == "south" ? "checkmark" : "")
+                            if chartStyle == "south" {
+                                Label("south_indian".localized, systemImage: "checkmark")
+                            } else {
+                                Text("south_indian".localized)
+                            }
                         }
                     } label: {
                         Image(systemName: "slider.horizontal.3")
@@ -121,8 +129,8 @@ struct PlanetaryPositionsSheet: View {
                     NorthIndianChartView(
                         chartData: mappedData,
                         chartType: .d1,
-                        personName: "", // Hidden in view
-                        ascendantSign: nil // Hidden in view
+                        personName: "",
+                        ascendantSign: ascendantSign
                     )
                 } else {
                     SouthIndianChartView(

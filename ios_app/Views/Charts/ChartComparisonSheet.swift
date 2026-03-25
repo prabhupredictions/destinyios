@@ -50,10 +50,18 @@ struct ChartComparisonSheet: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
                         Button(action: { chartStyle = "south" }) {
-                            Label("South Indian", systemImage: chartStyle == "south" ? "checkmark" : "")
+                            if chartStyle == "south" {
+                                Label("South Indian", systemImage: "checkmark")
+                            } else {
+                                Text("South Indian")
+                            }
                         }
                         Button(action: { chartStyle = "north" }) {
-                            Label("North Indian", systemImage: chartStyle == "north" ? "checkmark" : "")
+                            if chartStyle == "north" {
+                                Label("North Indian", systemImage: "checkmark")
+                            } else {
+                                Text("North Indian")
+                            }
                         }
                     } label: {
                         Image(systemName: "slider.horizontal.3")

@@ -164,14 +164,28 @@ class HomeViewModel {
             UserDefaults.standard.set(currentConfigLang, forKey: "lastLoadedLanguage")
         }
         
+        // On cold start, apply cached prediction immediately so user sees data
+        // instead of a loading spinner. Chart/dasha will fetch silently below.
+        if !shouldBypassCache, dailyInsight.isEmpty,
+           let cached = TodaysPredictionCache.shared.get() {
+            await MainActor.run {
+                self.applyPredictionResponse(cached)
+                print("[HomeViewModel] Applied cached prediction on cold start — no spinner needed")
+            }
+        }
+        
+        // Only show loading spinner if we have NO prediction data to display yet
+        let showSpinner = dailyInsight.isEmpty
+        
         await MainActor.run {
-            isLoading = true
+            isLoading = showSpinner
             errorMessage = nil
             
             // Clear in-memory state briefly if language changed to force redraw
             if languageChanged {
                 dailyInsight = ""
                 fullAstroData = nil
+                isLoading = true // Force spinner for language change
             }
         }
         

@@ -327,10 +327,9 @@ struct CompatibilityView: View {
         }
         .onChange(of: ProfileContextManager.shared.activeProfileId) { oldProfileId, newProfileId in
             // When profile switches, clear old match result and reload user data
+            // Note: reset() already calls loadUserDataFromProfile() internally
             if oldProfileId != newProfileId {
                 viewModel.reset()
-                // Reload user birth data for the new profile
-                viewModel.reloadUserData()
             }
         }
         // Detect any partner detail modification and re-enable save checkbox

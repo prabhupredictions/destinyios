@@ -24,6 +24,11 @@ struct CompatibilityResultView: View {
     // Animation State
     @State private var contentOpacity: Double = 0
     
+    // Cached Mangal Dosha data (avoid re-decoding on every render)
+    @State private var cachedBoyMangalDosha: MangalDoshaData?
+    @State private var cachedGirlMangalDosha: MangalDoshaData?
+    @State private var mangalDoshaCached = false
+    
     // Status Logic Helpers
     private var isMangalEffective: Bool {
         // Simple logic: if present in result data as "Present" or "Effective"
@@ -234,6 +239,13 @@ struct CompatibilityResultView: View {
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) {
                 contentOpacity = 1.0
+            }
+            // Cache Mangal Dosha data once to avoid repeated decoding
+            if !mangalDoshaCached {
+                let mangalCompat = result.analysisData?.joint?.mangalCompatibility
+                cachedBoyMangalDosha = Self.extractMangalDoshaData(from: mangalCompat?["boy_dosha"])
+                cachedGirlMangalDosha = Self.extractMangalDoshaData(from: mangalCompat?["girl_dosha"])
+                mangalDoshaCached = true
             }
         }
         // Sheets
@@ -599,58 +611,29 @@ struct CompatibilityResultView: View {
     // Helper needed for Sheet Data Extraction
     static func extractMangalDoshaData(from anyCodable: AnyCodable?) -> MangalDoshaData? {
         guard let dict = anyCodable?.value as? [String: Any] else {
-            print("[MangalDosha] ❌ anyCodable?.value is not [String: Any], type=\(type(of: anyCodable?.value)) value=\(String(describing: anyCodable?.value))")
             return nil
-        }
-        
-        // Debug: Print all keys and their types
-        print("[MangalDosha] 📋 Dictionary keys: \(Array(dict.keys).sorted())")
-        if let doshaFromVal = dict["dosha_from"] {
-            print("[MangalDosha] 📋 dosha_from value: \(String(describing: doshaFromVal)), type: \(type(of: doshaFromVal))")
-        } else {
-            print("[MangalDosha] ❌ dosha_from key NOT FOUND in dict")
         }
         
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
-            
-            // Debug: Print the JSON that was serialized
-            if let jsonStr = String(data: jsonData, encoding: .utf8) {
-                // Find dosha_from in the JSON string
-                if let range = jsonStr.range(of: "dosha_from") {
-                    let start = jsonStr.index(range.upperBound, offsetBy: 0)
-                    let end = jsonStr.index(start, offsetBy: min(200, jsonStr.distance(from: start, to: jsonStr.endIndex)))
-                    print("[MangalDosha] 📋 JSON dosha_from snippet: \(jsonStr[start..<end])")
-                } else {
-                    print("[MangalDosha] ❌ dosha_from not found in serialized JSON")
-                }
-            }
-            
             let decoder = JSONDecoder()
             // NOTE: Do NOT use .convertFromSnakeCase here — MangalDoshaData
             // already has custom CodingKeys that map snake_case to camelCase.
             // Using both causes double-conversion and key lookup failures.
-            let result = try decoder.decode(MangalDoshaData.self, from: jsonData)
-            print("[MangalDosha] ✅ Decoded successfully - doshaFrom has \(result.doshaFrom?.count ?? 0) keys")
-            return result
+            return try decoder.decode(MangalDoshaData.self, from: jsonData)
         } catch {
             print("[MangalDosha] ❌ Failed to decode: \(error)")
-            if let jsonStr = String(data: (try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)) ?? Data(), encoding: .utf8) {
-                print("[MangalDosha] 📋 Full JSON: \(jsonStr)")
-            }
             return nil
         }
     }
     
-    // Computed property for Mangal Dosha NavigationLink destination
+    // Computed property for Mangal Dosha NavigationLink destination (uses cached data)
     private var mangalDoshaDestination: some View {
         let mangalCompat = result.analysisData?.joint?.mangalCompatibility
-        let boyDosha = Self.extractMangalDoshaData(from: mangalCompat?["boy_dosha"])
-        let girlDosha = Self.extractMangalDoshaData(from: mangalCompat?["girl_dosha"])
         
         return MangalDoshaSheet(
-            boyData: boyDosha ?? result.analysisData?.boy?.raw?.mangalDosha,
-            girlData: girlDosha ?? result.analysisData?.girl?.raw?.mangalDosha,
+            boyData: cachedBoyMangalDosha ?? result.analysisData?.boy?.raw?.mangalDosha,
+            girlData: cachedGirlMangalDosha ?? result.analysisData?.girl?.raw?.mangalDosha,
             boyName: boyName,
             girlName: girlName,
             mangalCompatibility: mangalCompat

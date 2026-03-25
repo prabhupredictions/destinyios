@@ -179,13 +179,6 @@ final class DataManager {
             return emailMatch && archivedMatch
         }
         
-        print("[DataManager.fetchAllThreads] After email filter: \(threads.count)")
-        
-        // Debug: Print all thread profileIds before filtering
-        for thread in threads {
-            print("[DataManager.fetchAllThreads] Thread '\(thread.title)' has profileId: '\(thread.profileId ?? "nil")'")
-        }
-        
         // Filter by profileId if provided (Switch Profile feature)
         if let profileId = profileId {
             let beforeCount = threads.count
