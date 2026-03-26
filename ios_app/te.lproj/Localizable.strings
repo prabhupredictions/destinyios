@@ -2563,21 +2563,21 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "అష్టకూట విశ్లేషణ";
-"kuta_varna_label" = "వర్ణ";
+"kuta_varna_label" = "పని";
 "kuta_varna_theme" = "పని";
-"kuta_vashya_label" = "వశ్య";
-"kuta_vashya_theme" = "ఆధిపత్యం";
-"kuta_tara_label" = "తార";
+"kuta_vashya_label" = "ఆకర్షణ";
+"kuta_vashya_theme" = "ఆకర్షణ";
+"kuta_tara_label" = "విధి";
 "kuta_tara_theme" = "విధి";
-"kuta_yoni_label" = "యోని";
+"kuta_yoni_label" = "ఆత్మీయత";
 "kuta_yoni_theme" = "ఆత్మీయత";
-"kuta_maitri_label" = "మైత్రి";
+"kuta_maitri_label" = "స్నేహం";
 "kuta_maitri_theme" = "స్నేహం";
-"kuta_gana_label" = "గణ";
+"kuta_gana_label" = "స్వభావము";
 "kuta_gana_theme" = "స్వభావము";
-"kuta_bhakoot_label" = "భకూట";
+"kuta_bhakoot_label" = "ప్రేమ";
 "kuta_bhakoot_theme" = "ప్రేమ";
-"kuta_nadi_label" = "నాడి";
+"kuta_nadi_label" = "ఆరోగ్యం";
 "kuta_nadi_theme" = "ఆరోగ్యం";
 "analysis_step_mapping_charts" = "జనన పటాల మ్యాపింగ్";
 "analysis_step_ashtakoot" = "జ్యోతిష్య అనుకూలత గణన";

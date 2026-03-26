@@ -2551,21 +2551,21 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Ashtakoot Analysis";
-"kuta_varna_label" = "Varna";
+"kuta_varna_label" = "Work";
 "kuta_varna_theme" = "Work";
-"kuta_vashya_label" = "Vashya";
-"kuta_vashya_theme" = "Dominance";
-"kuta_tara_label" = "Tara";
+"kuta_vashya_label" = "Attraction";
+"kuta_vashya_theme" = "Attraction";
+"kuta_tara_label" = "Destiny";
 "kuta_tara_theme" = "Destiny";
-"kuta_yoni_label" = "Yoni";
+"kuta_yoni_label" = "Intimacy";
 "kuta_yoni_theme" = "Intimacy";
-"kuta_maitri_label" = "Maitri";
+"kuta_maitri_label" = "Friendship";
 "kuta_maitri_theme" = "Friendship";
-"kuta_gana_label" = "Gana";
+"kuta_gana_label" = "Temperament";
 "kuta_gana_theme" = "Temperament";
-"kuta_bhakoot_label" = "Bhakoot";
+"kuta_bhakoot_label" = "Love";
 "kuta_bhakoot_theme" = "Love";
-"kuta_nadi_label" = "Nadi";
+"kuta_nadi_label" = "Health";
 "kuta_nadi_theme" = "Health";
 "analysis_step_mapping_charts" = "Mapping birth charts";
 "analysis_step_ashtakoot" = "Calculating astrological compatibility";

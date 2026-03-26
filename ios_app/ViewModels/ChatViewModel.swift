@@ -64,6 +64,31 @@ class ChatViewModel {
         }
     }
     
+    // MARK: - Profile Switch
+    /// Called when active profile changes — isolates chat per profile
+    func handleProfileSwitch() {
+        // Clear current conversation state
+        messages = []
+        suggestedQuestions = []
+        errorMessage = nil
+        streamingContent = ""
+        typewriterMessageId = nil
+        
+        // Reload history filtered for the new profile
+        loadHistory()
+        
+        // Load the new profile's latest thread, or start a fresh chat
+        let threads = dataManager.fetchThreads(
+            for: currentSessionId,
+            profileId: ProfileContextManager.shared.activeProfileId
+        )
+        if let latestThread = threads.first {
+            loadThread(latestThread)
+        } else {
+            startNewChat()
+        }
+    }
+    
     // MARK: - History Management
     func loadHistory() {
         // Filter by active profile for Switch Profile feature

@@ -2579,21 +2579,21 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Ashtakoot-Analyse";
-"kuta_varna_label" = "Varna";
-"kuta_varna_theme" = "Arbeiten";
-"kuta_vashya_label" = "Vashya";
-"kuta_vashya_theme" = "Dominanz";
-"kuta_tara_label" = "Tara";
-"kuta_tara_theme" = "Bestimmung";
-"kuta_yoni_label" = "Yoni";
+"kuta_varna_label" = "Arbeit";
+"kuta_varna_theme" = "Arbeit";
+"kuta_vashya_label" = "Anziehung";
+"kuta_vashya_theme" = "Anziehung";
+"kuta_tara_label" = "Schicksal";
+"kuta_tara_theme" = "Schicksal";
+"kuta_yoni_label" = "Intimität";
 "kuta_yoni_theme" = "Intimität";
-"kuta_maitri_label" = "Maitri";
+"kuta_maitri_label" = "Freundschaft";
 "kuta_maitri_theme" = "Freundschaft";
-"kuta_gana_label" = "Gana";
+"kuta_gana_label" = "Temperament";
 "kuta_gana_theme" = "Temperament";
-"kuta_bhakoot_label" = "Bhakoot";
+"kuta_bhakoot_label" = "Liebe";
 "kuta_bhakoot_theme" = "Liebe";
-"kuta_nadi_label" = "Nadi";
+"kuta_nadi_label" = "Gesundheit";
 "kuta_nadi_theme" = "Gesundheit";
 "analysis_step_mapping_charts" = "Geburtshoroskope kartieren";
 "analysis_step_ashtakoot" = "Astrologische Kompatibilität berechnen";

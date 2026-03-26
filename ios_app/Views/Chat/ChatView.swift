@@ -153,6 +153,10 @@ struct ChatView: View {
                  viewModel.showQuotaSheet = false
              }
         }
+        // Switch Profile: reset chat to new profile's latest thread or new chat
+        .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
+            viewModel.handleProfileSwitch()
+        }
         // Dismiss keyboard when leaving the view (fixes keyboard persistence bug)
         .onDisappear {
             isInputFocused = false

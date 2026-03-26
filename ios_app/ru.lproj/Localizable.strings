@@ -2583,21 +2583,21 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Анализ Аштакут";
-"kuta_varna_label" = "Варна";
+"kuta_varna_label" = "Работа";
 "kuta_varna_theme" = "Работа";
-"kuta_vashya_label" = "Вашья";
-"kuta_vashya_theme" = "Доминирование";
-"kuta_tara_label" = "Тара";
+"kuta_vashya_label" = "Влечение";
+"kuta_vashya_theme" = "Влечение";
+"kuta_tara_label" = "Судьба";
 "kuta_tara_theme" = "Судьба";
-"kuta_yoni_label" = "Йони";
+"kuta_yoni_label" = "Интимность";
 "kuta_yoni_theme" = "Интимность";
-"kuta_maitri_label" = "Майтри";
+"kuta_maitri_label" = "Дружба";
 "kuta_maitri_theme" = "Дружба";
-"kuta_gana_label" = "Гана";
+"kuta_gana_label" = "Темперамент";
 "kuta_gana_theme" = "Темперамент";
-"kuta_bhakoot_label" = "Бхакут";
+"kuta_bhakoot_label" = "Любовь";
 "kuta_bhakoot_theme" = "Любовь";
-"kuta_nadi_label" = "Нади";
+"kuta_nadi_label" = "Здоровье";
 "kuta_nadi_theme" = "Здоровье";
 "analysis_step_mapping_charts" = "Составление натальных карт";
 "analysis_step_ashtakoot" = "Расчет астрологической совместимости";
