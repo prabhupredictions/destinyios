@@ -34,6 +34,15 @@ class AuthViewModel {
             self.isGuest = UserDefaults.standard.bool(forKey: "isGuest")
             self.userEmail = UserDefaults.standard.string(forKey: "userEmail")
             self.userName = UserDefaults.standard.string(forKey: "userName")
+            
+            // Register for push notifications on launch if already logged in
+            // This ensures device token is always fresh and registered
+            if let email = self.userEmail {
+                print("🔔 [AuthViewModel] Existing session found for \(email), registering for push notifications")
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
         }
     }
     
@@ -549,6 +558,16 @@ class AuthViewModel {
             // Guest - clear both
             UserDefaults.standard.removeObject(forKey: "appleUserID")
             UserDefaults.standard.removeObject(forKey: "googleUserID")
+        }
+        
+        // BEST PRACTICE: Register for remote notifications immediately on login
+        // Token will be sent to backend when APNs returns it (regardless of permission status)
+        // This ensures device token is always available when needed
+        if let email = user.email {
+            print("🔔 [AuthViewModel] Requesting remote notification registration for: \(email)")
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
         }
         
         // Note: Profile fetch is now done in performSignIn BEFORE calling this method
