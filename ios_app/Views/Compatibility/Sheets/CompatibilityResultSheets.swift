@@ -1401,7 +1401,8 @@ struct AskDestinySheet: View {
                 await handleRedirect(query: query, target: resolvedTarget, response: response)
             } else if let answer = response.answer {
                 // Normal compatibility answer
-                let aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
+                var aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
+                aiMessage.executionTimeMs = response.executionTimeMs ?? 0
                 typewriterMessageId = aiMessage.id
                 messages.append(aiMessage)
                 saveMessagesToHistory()  // Persist messages
@@ -1538,7 +1539,8 @@ struct AskDestinySheet: View {
                 messages.removeAll { $0.id == redirectMsgId }
             }
             let analysisContent = "**Individual Analysis (\(resolvedDisplayName)):**\n\n\(predictResponse.answer)"
-            let aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
+            var aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
+            aiMessage.executionTimeMs = predictResponse.executionTimeMs
             typewriterMessageId = aiMessage.id
             messages.append(aiMessage)
             saveMessagesToHistory()  // Persist messages
@@ -1620,11 +1622,16 @@ private struct CompatChatBubble: View {
             if isUser {
                 Spacer(minLength: 60)
             }
-            
+
             VStack(alignment: isUser ? .trailing : .leading, spacing: 6) {
                 messageContent
+
+                // Metadata row — only for completed AI messages (matches ChatView)
+                if !isUser && message.type == .ai && (!enableTypewriter || typewriterFinished) {
+                    metadataRow
+                }
             }
-            
+
             if !isUser {
                 Spacer(minLength: 16)  // Modern full-width AI messages
             }
@@ -1751,6 +1758,125 @@ private struct CompatChatBubble: View {
             Color.clear  // Modern: no bubble for AI messages
         }
     }
+
+    // MARK: - Metadata Row (timestamp · exec time · copy · stars)
+    @ViewBuilder
+    private var metadataRow: some View {
+        HStack(spacing: 6) {
+            // Timestamp
+            Text(formatTime(message.timestamp))
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textTertiary)
+
+            // Execution time
+            if message.executionTimeMs > 0 {
+                Text("·")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.6))
+                Text(formatExecTime(message.executionTimeMs))
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
+            }
+
+            Spacer()
+
+            // Copy button
+            if message.content.count > 50 {
+                Button(action: {
+                    UIPasteboard.general.string = displayContent
+                    HapticManager.shared.play(.light)
+                }) {
+                    Image(systemName: "doc.on.doc")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.textTertiary)
+                }
+                .buttonStyle(.plain)
+            }
+
+            // Inline star rating
+            if message.content.count > 50 {
+                CompatInlineRating(messageContent: displayContent)
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func formatTime(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f.string(from: date)
+    }
+
+    private func formatExecTime(_ ms: Double) -> String {
+        let s = ms / 1000
+        return s < 1 ? String(format: "%.0fms", ms) : String(format: "%.1fs", s)
+    }
+}
+
+// MARK: - Compact Inline Rating for Compatibility Chat
+private struct CompatInlineRating: View {
+    let messageContent: String
+
+    @State private var selectedRating: Int = 0
+    @State private var isSubmitting = false
+    @State private var hasSubmitted = false
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if hasSubmitted {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(.green)
+                Text("rated_status".localized)
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .fixedSize()
+            } else {
+                Text("rate_action".localized)
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .fixedSize()
+                HStack(spacing: 1) {
+                    ForEach(1...5, id: \.self) { star in
+                        Button {
+                            guard !isSubmitting else { return }
+                            selectedRating = star
+                            submitRating(star)
+                        } label: {
+                            Image(systemName: star <= selectedRating ? "star.fill" : "star")
+                                .font(.system(size: 12))
+                                .foregroundColor(star <= selectedRating ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.6))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isSubmitting)
+                        .accessibilityLabel(String(format: "a11y_star_rating".localized, star))
+                    }
+                }
+                .opacity(isSubmitting ? 0.5 : 1)
+            }
+        }
+    }
+
+    private func submitRating(_ stars: Int) {
+        isSubmitting = true
+        Task {
+            do {
+                try await FeedbackService.shared.submitRating(
+                    predictionId: nil,
+                    rating: stars,
+                    query: "Compatibility follow-up",
+                    predictionText: String(messageContent.prefix(500)),
+                    area: "compatibility"
+                )
+            } catch {
+                print("[CompatRating] Submit failed: \(error)")
+            }
+            await MainActor.run {
+                isSubmitting = false
+                hasSubmitted = true
+            }
+        }
+    }
 }
 
 // MARK: - Typing Indicator (Matches ChatView Style)
@@ -1820,6 +1946,7 @@ struct CompatChatMessage: Identifiable {
     let isUser: Bool
     let timestamp: Date = Date()
     let type: MessageType
+    var executionTimeMs: Double = 0
     
     enum MessageType: String, Codable {
         case user
