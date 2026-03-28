@@ -1651,44 +1651,58 @@ private struct CompatChatBubble: View {
     // MARK: - Typewriter Effect (Task-based, auto-cancels on view teardown)
     private func startTypewriter() {
         typewriterTask?.cancel()
-        
-        let fullText = message.content
-        let words = fullText.components(separatedBy: " ")
+
+        // Strip the FOLLOW_UP_QUESTIONS block — it's parsed by the backend and
+        // should never be animated character-by-character to the user
+        let rawText = message.content
+        let displayText: String
+        if let markerRange = rawText.range(of: "\nFOLLOW_UP_QUESTIONS:") {
+            displayText = String(rawText[rawText.startIndex..<markerRange.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            displayText = rawText
+        }
+
+        let words = displayText.components(separatedBy: " ")
         guard !words.isEmpty else {
             typewriterFinished = true
             onTypewriterFinished?()
             return
         }
-        
+
         revealedContent = ""
-        
+
+        // Adaptive speed: short responses animate word-by-word, long responses use batches
+        // Target ~3 seconds total animation regardless of length
+        let totalWords = words.count
+        let batchSize = max(1, totalWords / 60)          // ~60 steps per animation
+        let delayNs: UInt64 = totalWords <= 30 ? 40_000_000   // fast: 40ms/word for short
+                            : totalWords <= 80 ? 50_000_000   // normal: 50ms/batch
+                            : 30_000_000                       // quick: 30ms/batch for long
+
         typewriterTask = Task { @MainActor in
             var wordIndex = 0
-            
+
             while wordIndex < words.count {
-                // Check cancellation before each batch
                 guard !Task.isCancelled else { return }
-                
-                let batchEnd = min(wordIndex + 1, words.count)
+
+                let batchEnd = min(wordIndex + batchSize, words.count)
                 let batch = words[wordIndex..<batchEnd].joined(separator: " ")
-                
+
                 if revealedContent.isEmpty {
                     revealedContent = batch
                 } else {
                     revealedContent += " " + batch
                 }
-                
+
                 wordIndex = batchEnd
-                
-                // Scroll follows typewriter every ~10 words
+
                 if wordIndex % 10 == 0 {
                     onTypewriterProgress?()
                 }
-                
-                // ~50ms delay between words (20 words/sec)
-                try? await Task.sleep(nanoseconds: 50_000_000)
+
+                try? await Task.sleep(nanoseconds: delayNs)
             }
-            
+
             guard !Task.isCancelled else { return }
             typewriterFinished = true
             onTypewriterFinished?()
@@ -1699,7 +1713,12 @@ private struct CompatChatBubble: View {
         if enableTypewriter && !typewriterFinished {
             return revealedContent
         }
-        return message.content
+        // Strip FOLLOW_UP_QUESTIONS block from final static display too
+        let raw = message.content
+        if let markerRange = raw.range(of: "\nFOLLOW_UP_QUESTIONS:") {
+            return String(raw[raw.startIndex..<markerRange.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return raw
     }
     
     @ViewBuilder
