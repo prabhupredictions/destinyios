@@ -1106,17 +1106,12 @@ struct AskDestinySheet: View {
         print("[AskDestinySheet] Found history item with \(item.chatMessages.count) messages")
         
         // Convert stored messages to CompatChatMessage
-        // Filter out the initial compatibility report (contains markdown tables, very long)
+        // Filter out only the initial compatibility report (identified by table markers or header keywords)
         if !item.chatMessages.isEmpty {
             let filteredMessages = item.chatMessages.filter { msg in
-                // Skip if:
-                // 1. It's the first AI message with table markers (the initial report)
-                // 2. Content contains markdown table separators
-                // 3. Content is excessively long (full report typically > 2000 chars)
-                let isReportMessage = msg.content.contains("---|") || 
+                let isReportMessage = msg.content.contains("---|") ||
                                      msg.content.contains("|---") ||
-                                     msg.content.contains("KEY STRENGTHS") ||
-                                     (msg.content.count > 2000 && !msg.isUser)
+                                     msg.content.contains("KEY STRENGTHS")
                 return !isReportMessage
             }
             messages = filteredMessages.map { $0.toMessage() }
