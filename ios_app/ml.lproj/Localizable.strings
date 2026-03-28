@@ -2178,6 +2178,7 @@
 "dosha_label" = "ദോശ";
 "rejection_reason_label" = "കൺസൺ";
 "additional_notes" = "അധിക കുറിപ്പുകൾ:";
+"not_recommended_because" = "ശുപാർശ ചെയ്യാത്തതിന്റെ കാരണം:";
 "house_positions_label" = "ഭാവ സ്ഥാനങ്ങൾ";
 
 "koota_label" = "കൂടം";

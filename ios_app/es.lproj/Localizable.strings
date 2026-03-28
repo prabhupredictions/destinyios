@@ -2178,6 +2178,7 @@
 "dosha_label" = "dosha";
 "rejection_reason_label" = "Preocupación";
 "additional_notes" = "Notas adicionales:";
+"not_recommended_because" = "No recomendado porque:";
 "house_positions_label" = "Posiciones de Casas";
 
 "koota_label" = "Koota";

@@ -2178,6 +2178,7 @@
 "dosha_label" = "దోశ";
 "rejection_reason_label" = "ఆందోళన";
 "additional_notes" = "అదనపు గమనికలు:";
+"not_recommended_because" = "సిఫార్సు చేయబడలేదు, కారణం:";
 "house_positions_label" = "భావ స్థానాలు";
 
 "koota_label" = "కూట";

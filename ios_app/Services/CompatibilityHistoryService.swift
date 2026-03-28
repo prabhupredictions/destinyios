@@ -588,15 +588,18 @@ final class CompatibilityHistoryService {
                         }
                         
                         // Create CompatibilityResult from metadata using proper init
+                        let isRec = metadata.hardNoFlags?.isRecommended ?? true
                         result = CompatibilityResult(
                             totalScore: totalScore,
                             maxScore: 36,
                             kutas: kutas,  // Now populated from ashtakootMatching
                             summary: metadata.llmAnalysis ?? "",
-                            recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
+                            recommendation: isRec
+                                ? (totalScore >= 28 ? "Excellent match for marriage" : "Favorable for marriage")
+                                : "Not recommended for marriage",
                             analysisData: metadata.analysisData,
                             sessionId: metadata.sessionId,
-                            isRecommended: metadata.hardNoFlags?.isRecommended ?? true,
+                            isRecommended: isRec,
                             adjustedScore: metadata.adjustedTotalScore != nil ? Int(metadata.adjustedTotalScore!) : nil,
                             adjustedCategory: metadata.adjustedCategory,
                             doshaSummary: metadata.doshaSummary,
@@ -793,15 +796,18 @@ final class CompatibilityHistoryService {
                         }
                     }
                     
+                    let isRec2 = metadata.hardNoFlags?.isRecommended ?? true
                     result = CompatibilityResult(
                         totalScore: totalScore,
                         maxScore: 36,
                         kutas: kutas,
                         summary: metadata.llmAnalysis ?? "",
-                        recommendation: totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful",
+                        recommendation: isRec2
+                            ? (totalScore >= 28 ? "Excellent match for marriage" : "Favorable for marriage")
+                            : "Not recommended for marriage",
                         analysisData: metadata.analysisData,
                         sessionId: metadata.sessionId,
-                        isRecommended: metadata.hardNoFlags?.isRecommended ?? true,
+                        isRecommended: isRec2,
                         adjustedScore: metadata.adjustedTotalScore != nil ? Int(metadata.adjustedTotalScore!) : nil,
                         adjustedCategory: metadata.adjustedCategory,
                         doshaSummary: metadata.doshaSummary,

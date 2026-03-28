@@ -2139,6 +2139,7 @@
 "dosha_label" = "Dosha";
 "rejection_reason_label" = "Concern";
 "additional_notes" = "Additional Notes:";
+"not_recommended_because" = "Not recommended because:";
 "house_positions_label" = "House Positions";
 
 // Tooltip 6-point format (V2.4)

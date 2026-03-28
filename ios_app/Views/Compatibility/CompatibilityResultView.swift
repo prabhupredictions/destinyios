@@ -317,11 +317,13 @@ struct CompatibilityResultView: View {
                 
                 // ─── Content Area ───
                 VStack(alignment: .leading, spacing: 12) {
-                    // ─── Recommendation Text ───
-                    Text(result.recommendation.localized)
-                        .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    // ─── Recommendation Text — only show when recommended (avoids conflict) ───
+                    if result.isRecommended {
+                        Text(result.recommendation.localized)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     
                     // ─── Active Doshas (including those in rejection reasons) ───
                     if let details = result.doshaSummary?.details, activeCount > 0 {
@@ -382,22 +384,22 @@ struct CompatibilityResultView: View {
                         }
                     }
                     
-                    // ─── Additional Notes (if any) ───
+                    // ─── Rejection Reasons / Additional Notes ───
                     if !result.rejectionReasons.isEmpty {
                         Divider()
                             .background(AppTheme.Colors.textTertiary.opacity(0.2))
-                        
+
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("additional_notes".localized)
+                            Text(result.isRecommended ? "additional_notes".localized : "not_recommended_because".localized)
                                 .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                            
+                                .foregroundColor(result.isRecommended ? AppTheme.Colors.textSecondary : AppTheme.Colors.error)
+
                             ForEach(Array(result.rejectionReasons.enumerated()), id: \.offset) { _, reason in
                                 HStack(alignment: .top, spacing: 6) {
                                     Text("•")
                                         .font(AppTheme.Fonts.caption(size: 12))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
-                                    
+
                                     Text(replaceNamesInBanner(reason))
                                         .font(AppTheme.Fonts.caption(size: 12))
                                         .foregroundColor(AppTheme.Colors.textSecondary)

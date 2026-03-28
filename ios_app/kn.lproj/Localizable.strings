@@ -2178,6 +2178,7 @@
 "dosha_label" = "ದೋಷ";
 "rejection_reason_label" = "ಕಾಳಜಿ";
 "additional_notes" = "ಹೆಚ್ಚಿನ ಟಿಪ್ಪಣಿಗಳು:";
+"not_recommended_because" = "ಶಿಫಾರಸು ಮಾಡಲಾಗಿಲ್ಲ, ಕಾರಣ:";
 "house_positions_label" = "ಭಾವ ಸ್ಥಾನಗಳು";
 
 "koota_label" = "ಕೂಟ";

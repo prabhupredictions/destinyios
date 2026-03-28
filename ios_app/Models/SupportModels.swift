@@ -316,12 +316,14 @@ struct CompatibilityFollowUpRequest: Codable, Sendable {
     let sessionId: String
     let userEmail: String
     var language: String = "en"
-    
+    var responseStyle: String?
+
     enum CodingKeys: String, CodingKey {
         case query
         case sessionId = "session_id"
         case userEmail = "user_email"
         case language
+        case responseStyle = "response_style"
     }
 }
 

@@ -1354,7 +1354,8 @@ struct AskDestinySheet: View {
                 query: query,
                 sessionId: sessionId,
                 userEmail: email,
-                language: appLanguage
+                language: appLanguage,
+                responseStyle: ResponseStyleManager.shared.currentStyle.rawValue
             )
             
             let response = try await compatibilityService.followUp(request: request)

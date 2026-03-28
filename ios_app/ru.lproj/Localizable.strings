@@ -2178,6 +2178,7 @@
 "dosha_label" = "Доша";
 "rejection_reason_label" = "Беспокойство";
 "additional_notes" = "Дополнительные заметки:";
+"not_recommended_because" = "Не рекомендуется, причина:";
 "house_positions_label" = "Положения Домов";
 
 "koota_label" = "Кута";

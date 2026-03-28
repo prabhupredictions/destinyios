@@ -2178,6 +2178,7 @@
 "dosha_label" = "Dosha";
 "rejection_reason_label" = "Bedenken";
 "additional_notes" = "Zusätzliche Hinweise:";
+"not_recommended_because" = "Nicht empfohlen wegen:";
 "house_positions_label" = "Hauspositionen";
 
 "koota_label" = "Kuta";

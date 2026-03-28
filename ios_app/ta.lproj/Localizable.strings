@@ -2178,6 +2178,7 @@
 "dosha_label" = "தோசை";
 "rejection_reason_label" = "கவலை";
 "additional_notes" = "கூடுதல் குறிப்புகள்:";
+"not_recommended_because" = "பரிந்துரைக்கப்படாத காரணம்:";
 "house_positions_label" = "வீட்டு நிலைகள்";
 
 "koota_label" = "கூடம்";

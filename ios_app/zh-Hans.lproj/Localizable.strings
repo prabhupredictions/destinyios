@@ -2178,6 +2178,7 @@
 "dosha_label" = "多沙";
 "rejection_reason_label" = "担忧";
 "additional_notes" = "附加说明：";
+"not_recommended_because" = "不推荐的原因：";
 "house_positions_label" = "宫位";
 
 "koota_label" = "库塔";

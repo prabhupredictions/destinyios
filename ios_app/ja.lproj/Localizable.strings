@@ -2179,6 +2179,7 @@
 "dosha_label" = "ドーシャ";
 "rejection_reason_label" = "懸念事項";
 "additional_notes" = "追加メモ:";
+"not_recommended_because" = "おすすめしない理由：";
 "house_positions_label" = "ハウス位置";
 
 "koota_label" = "クータ";

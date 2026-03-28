@@ -2079,6 +2079,7 @@
 "dosha_label" = "दोष";
 "rejection_reason_label" = "चिंता";
 "additional_notes" = "अतिरिक्त नोट्स:";
+"not_recommended_because" = "अनुशंसित नहीं, कारण:";
 "house_positions_label" = "भाव स्थिति";
 
 "koota_label" = "कूट";

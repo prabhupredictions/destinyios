@@ -140,13 +140,13 @@ class CompatibilityViewModel {
     // MARK: - Formatted Date Strings
     var formattedBoyDob: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: boyBirthDate)
     }
-    
+
     var formattedGirlDob: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: girlBirthDate)
     }
     
@@ -1109,7 +1109,10 @@ class CompatibilityViewModel {
         } else {
             summary = "This match has some challenging aspects that require awareness and effort."
         }
-        let rec = totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful"
+        let isRecommended = response.hardNoFlags?.isRecommended ?? true
+        let rec = isRecommended
+            ? (totalScore >= 28 ? "Excellent match for marriage" : "Favorable for marriage")
+            : "Not recommended for marriage"
         
         print("[CompatibilityViewModel] STORING session_id in result: \(response.sessionId ?? "NIL")")
         print("[CompatibilityViewModel] DEBUG hardNoFlags: \(String(describing: response.hardNoFlags))")
@@ -1126,7 +1129,7 @@ class CompatibilityViewModel {
             recommendation: rec,
             analysisData: response.analysisData,
             sessionId: response.sessionId,
-            isRecommended: response.hardNoFlags?.isRecommended ?? true,
+            isRecommended: isRecommended,
             adjustedScore: response.adjustedTotalScore != nil ? Int(response.adjustedTotalScore!) : nil,
             adjustedCategory: response.adjustedCategory,
             doshaSummary: response.doshaSummary,
