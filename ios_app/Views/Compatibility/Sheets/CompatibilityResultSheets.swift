@@ -1350,10 +1350,10 @@ struct AskDestinySheet: View {
     private func sendMessage() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
-        
+
         isInputFocused = false
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        
+
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []  // Clear previous suggestions
@@ -1384,6 +1384,7 @@ struct AskDestinySheet: View {
         
         isLoading = true
         typewriterFinished = false  // Reset when loading starts
+        defer { isLoading = false }  // Always reset, even on unexpected throw
         
         // Get session ID
         guard let sessionId = result.sessionId else {
@@ -1440,8 +1441,6 @@ struct AskDestinySheet: View {
             errorMessage = "Failed to get response. Please try again."
             print("Follow-up error: \(error)")
         }
-        
-        isLoading = false
     }
     
     // MARK: - Handle Redirect With Local Data (fallback when backend has no cache)
