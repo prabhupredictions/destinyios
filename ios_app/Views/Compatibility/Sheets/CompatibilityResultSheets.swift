@@ -929,6 +929,9 @@ struct AskDestinySheet: View {
     @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
     @State private var typewriterFinished = false  // Track if typewriter effect has completed
     @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
+    @State private var isFromHistory = false  // Suppress typewriter for history-loaded messages
+    @State private var showStyleSelector = false
+    @State private var styleManager = ResponseStyleManager.shared
     
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -976,14 +979,15 @@ struct AskDestinySheet: View {
                                 ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
                                     let isLast = index == messages.count - 1
                                     let isLastAI = isLast && !message.isUser && message.type == .ai
+                                    let shouldAnimate = isLastAI && !isFromHistory
                                     CompatChatBubble(
                                         message: message,
-                                        enableTypewriter: isLastAI,
-                                        onTypewriterFinished: isLastAI ? { 
+                                        enableTypewriter: shouldAnimate,
+                                        onTypewriterFinished: shouldAnimate ? {
                                             typewriterFinished = true
-                                            requestCompatScroll() 
+                                            requestCompatScroll()
                                         } : nil,
-                                        onTypewriterProgress: isLastAI ? { requestCompatScroll() } : nil
+                                        onTypewriterProgress: shouldAnimate ? { requestCompatScroll() } : nil
                                     )
                                     .id(message.id)
                                 }
@@ -1116,6 +1120,8 @@ struct AskDestinySheet: View {
                 return !isReportMessage
             }
             messages = filteredMessages.map { $0.toMessage() }
+            isFromHistory = true  // Suppress typewriter for history-loaded messages
+            typewriterFinished = true  // Suggestions can show immediately
             print("[AskDestinySheet] Loaded \(messages.count) messages from history (filtered from \(item.chatMessages.count))")
         }
     }
@@ -1254,34 +1260,68 @@ struct AskDestinySheet: View {
     
     // MARK: - Input Bar
     private var inputBar: some View {
-        HStack(spacing: 12) {
-            TextField(NSLocalizedString("ask_question_placeholder", comment: ""), text: $inputText)
-                .font(AppTheme.Fonts.body(size: 15))
-                .foregroundColor(AppTheme.Colors.textPrimary)
-                .focused($isInputFocused)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.black.opacity(0.4))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                        )
-                )
-                .onSubmit {
+        VStack(spacing: 10) {
+            // Text field
+            HStack(spacing: 12) {
+                TextField(NSLocalizedString("ask_question_placeholder", comment: ""), text: $inputText)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .focused($isInputFocused)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(Color.black.opacity(0.4))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                            )
+                    )
+                    .onSubmit {
+                        Task { await sendMessage() }
+                    }
+
+                Button {
                     Task { await sendMessage() }
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 36))
+                        .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                 }
-            
-            Button {
-                Task { await sendMessage() }
-            } label: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 36))
-                    .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                .disabled(!canSend)
+                .accessibilityLabel("a11y_send_question".localized)
             }
-            .disabled(!canSend)
-            .accessibilityLabel("a11y_send_question".localized)
+
+            // Style selector row
+            HStack {
+                Button {
+                    showStyleSelector = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: styleManager.currentStyle.icon)
+                            .font(.system(size: 12))
+                        Text(styleManager.currentStyle.localizedLabel.isEmpty ? styleManager.currentStyle.label : styleManager.currentStyle.localizedLabel)
+                            .font(AppTheme.Fonts.body(size: 13).weight(.medium))
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 10, weight: .bold))
+                            .padding(.leading, 2)
+                    }
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(AppTheme.Colors.gold.opacity(0.1))
+                            .overlay(
+                                Capsule()
+                                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+                Spacer()
+            }
+            .padding(.horizontal, 4)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -1295,6 +1335,10 @@ struct AskDestinySheet: View {
                     alignment: .top
                 )
         )
+        .sheet(isPresented: $showStyleSelector) {
+            ResponseStyleSheet()
+                .onDisappear { styleManager = ResponseStyleManager.shared }
+        }
         .accessibilityHidden(true)
     }
     
@@ -1314,6 +1358,7 @@ struct AskDestinySheet: View {
         errorMessage = nil
         suggestedQuestions = []  // Clear previous suggestions
         typewriterFinished = false  // Reset typewriter state
+        isFromHistory = false  // New message — enable typewriter for response
         
         // Add user message
         let userMessage = CompatChatMessage(content: query, isUser: true, type: .user)
