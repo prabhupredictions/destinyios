@@ -1611,7 +1611,7 @@ private struct CompatChatBubble: View {
     // Local typewriter state (only this bubble re-renders, no parent jitter)
     @State private var revealedContent: String = ""
     @State private var typewriterFinished = false
-    @State private var typewriterTask: Task<Void, Never>?  // Cancellable async task replaces Timer
+    @State private var typewriterTimer: Timer?
     
     private var isUser: Bool { message.isUser }
     
@@ -1636,17 +1636,16 @@ private struct CompatChatBubble: View {
             }
         }
         .onDisappear {
-            typewriterTask?.cancel()
-            typewriterTask = nil
+            typewriterTimer?.invalidate()
+            typewriterTimer = nil
         }
     }
     
     // MARK: - Typewriter Effect (Task-based, auto-cancels on view teardown)
     private func startTypewriter() {
-        typewriterTask?.cancel()
+        typewriterTimer?.invalidate()
 
-        // Strip the FOLLOW_UP_QUESTIONS block — it's parsed by the backend and
-        // should never be animated character-by-character to the user
+        // Strip the FOLLOW_UP_QUESTIONS block before animating
         let rawText = message.content
         let displayText: String
         if let markerRange = rawText.range(of: "\nFOLLOW_UP_QUESTIONS:") {
@@ -1662,43 +1661,31 @@ private struct CompatChatBubble: View {
             return
         }
 
+        var wordIndex = 0
         revealedContent = ""
 
-        // Adaptive speed: short responses animate word-by-word, long responses use batches
-        // Target ~3 seconds total animation regardless of length
-        let totalWords = words.count
-        let batchSize = max(1, totalWords / 60)          // ~60 steps per animation
-        let delayNs: UInt64 = totalWords <= 30 ? 40_000_000   // fast: 40ms/word for short
-                            : totalWords <= 80 ? 50_000_000   // normal: 50ms/batch
-                            : 30_000_000                       // quick: 30ms/batch for long
+        // 1 word every 50ms — same as ChatView (MessageBubble)
+        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
+            let batchEnd = min(wordIndex + 1, words.count)
+            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
 
-        typewriterTask = Task { @MainActor in
-            var wordIndex = 0
-
-            while wordIndex < words.count {
-                guard !Task.isCancelled else { return }
-
-                let batchEnd = min(wordIndex + batchSize, words.count)
-                let batch = words[wordIndex..<batchEnd].joined(separator: " ")
-
-                if revealedContent.isEmpty {
-                    revealedContent = batch
-                } else {
-                    revealedContent += " " + batch
-                }
-
-                wordIndex = batchEnd
-
-                if wordIndex % 10 == 0 {
-                    onTypewriterProgress?()
-                }
-
-                try? await Task.sleep(nanoseconds: delayNs)
+            if revealedContent.isEmpty {
+                revealedContent = batch
+            } else {
+                revealedContent += " " + batch
             }
 
-            guard !Task.isCancelled else { return }
-            typewriterFinished = true
-            onTypewriterFinished?()
+            wordIndex = batchEnd
+
+            if wordIndex % 10 == 0 {
+                onTypewriterProgress?()
+            }
+
+            if wordIndex >= words.count {
+                timer.invalidate()
+                typewriterFinished = true
+                onTypewriterFinished?()
+            }
         }
     }
     
