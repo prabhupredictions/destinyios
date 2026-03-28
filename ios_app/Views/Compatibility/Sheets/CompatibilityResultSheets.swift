@@ -927,9 +927,8 @@ struct AskDestinySheet: View {
     @State private var showSubscription: Bool = false
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
-    @State private var typewriterFinished = false  // Track if typewriter effect has completed
+    @State private var typewriterMessageId: UUID? = nil  // ID of message currently animating; nil = done
     @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
-    @State private var isFromHistory = false  // Suppress typewriter for history-loaded messages
     @State private var showStyleSelector = false
     @State private var styleManager = ResponseStyleManager.shared
     
@@ -977,17 +976,14 @@ struct AskDestinySheet: View {
                                 }
                                 
                                 ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
-                                    let isLast = index == messages.count - 1
-                                    let isLastAI = isLast && !message.isUser && message.type == .ai
-                                    let shouldAnimate = isLastAI && !isFromHistory
                                     CompatChatBubble(
                                         message: message,
-                                        enableTypewriter: shouldAnimate,
-                                        onTypewriterFinished: shouldAnimate ? {
-                                            typewriterFinished = true
+                                        enableTypewriter: message.id == typewriterMessageId,
+                                        onTypewriterFinished: message.id == typewriterMessageId ? {
+                                            typewriterMessageId = nil
                                             requestCompatScroll()
                                         } : nil,
-                                        onTypewriterProgress: shouldAnimate ? { requestCompatScroll() } : nil
+                                        onTypewriterProgress: message.id == typewriterMessageId ? { requestCompatScroll() } : nil
                                     )
                                     .id(message.id)
                                 }
@@ -999,7 +995,7 @@ struct AskDestinySheet: View {
                                 }
                                 
                                 // Inline suggested follow-up questions
-                                if !suggestedQuestions.isEmpty && !isLoading && typewriterFinished {
+                                if !suggestedQuestions.isEmpty && !isLoading && typewriterMessageId == nil {
                                     inlineSuggestedQuestionsView
                                         .id("suggestions")
                                         .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -1115,8 +1111,6 @@ struct AskDestinySheet: View {
                 return !isReportMessage
             }
             messages = filteredMessages.map { $0.toMessage() }
-            isFromHistory = true  // Suppress typewriter for history-loaded messages
-            typewriterFinished = true  // Suggestions can show immediately
             print("[AskDestinySheet] Loaded \(messages.count) messages from history (filtered from \(item.chatMessages.count))")
         }
     }
@@ -1352,8 +1346,6 @@ struct AskDestinySheet: View {
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []  // Clear previous suggestions
-        typewriterFinished = false  // Reset typewriter state
-        isFromHistory = false  // New message — enable typewriter for response
         
         // Add user message
         let userMessage = CompatChatMessage(content: query, isUser: true, type: .user)
@@ -1378,7 +1370,6 @@ struct AskDestinySheet: View {
         }
         
         isLoading = true
-        typewriterFinished = false  // Reset when loading starts
         defer { isLoading = false }  // Always reset, even on unexpected throw
         
         // Get session ID
@@ -1411,6 +1402,7 @@ struct AskDestinySheet: View {
             } else if let answer = response.answer {
                 // Normal compatibility answer
                 let aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
+                typewriterMessageId = aiMessage.id
                 messages.append(aiMessage)
                 saveMessagesToHistory()  // Persist messages
                 
@@ -1547,6 +1539,7 @@ struct AskDestinySheet: View {
             }
             let analysisContent = "**Individual Analysis (\(resolvedDisplayName)):**\n\n\(predictResponse.answer)"
             let aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
+            typewriterMessageId = aiMessage.id
             messages.append(aiMessage)
             saveMessagesToHistory()  // Persist messages
             
