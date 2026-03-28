@@ -232,13 +232,20 @@ class ChatViewModel {
         }
         
         let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        
+        // FIX: Read response style directly from UserDefaults to avoid caching issue
+        // ResponseStyleManager may have stale cached value
+        let savedStyle = UserDefaults.standard.string(forKey: "userResponseStyle") ?? "detailed"
+        let responseStyle = savedStyle
+        
         let request = PredictionRequest(
             query: query,
             birthData: birthData,
             sessionId: currentSessionId,
             conversationId: currentThreadId,
             userEmail: userEmail,
-            language: appLanguage
+            language: appLanguage,
+            responseStyle: responseStyle
         )
         
         // Non-streaming API call (server records quota + chat history)

@@ -188,6 +188,11 @@
 // MARK: - Chat
 "suggested_questions" = "సూచించిన ప్రశ్నలు";
 "no_chat_history" = "ఇంకా చాట్ లేదు";
+"response_style_title" = "సమాధాన శైలి";
+"response_style_concise" = "క్లుప్తంగా";
+"response_style_detailed" = "వివరంగా";
+"response_style_concise_desc" = "చిన్నవి మరియు స్పష్టమైన సమాధానాలు";
+"response_style_detailed_desc" = "గ్రహాల నేపథ్యంతో కూడిన లోతైన విశ్లేషణ";
 
 // MARK: - History
 "no_conversations" = "ఇంకా సంభాషణలు లేవు";

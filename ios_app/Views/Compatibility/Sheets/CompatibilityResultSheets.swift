@@ -928,6 +928,7 @@ struct AskDestinySheet: View {
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
     @State private var typewriterFinished = false  // Track if typewriter effect has completed
+    @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
     
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -972,8 +973,7 @@ struct AskDestinySheet: View {
                                     Spacer(minLength: 80)
                                 }
                                 
-                                ForEach(messages.indices, id: \.self) { index in
-                                    let message = messages[index]
+                                ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
                                     let isLast = index == messages.count - 1
                                     let isLastAI = isLast && !message.isUser && message.type == .ai
                                     CompatChatBubble(
@@ -1145,11 +1145,14 @@ struct AskDestinySheet: View {
         dismiss()
     }
     
-    /// Debounced scroll request for compat chat
+    /// Debounced scroll request for compat chat — coalesces rapid calls
     private func requestCompatScroll(delay: Double = 0.1) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            compatScrollTrigger = UUID()
+        pendingScrollWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [self] in
+            self.compatScrollTrigger = UUID()
         }
+        pendingScrollWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
     }
     
     // MARK: - Welcome View
@@ -1322,7 +1325,7 @@ struct AskDestinySheet: View {
         do {
             let access = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: email)
             if !access.canAccess {
-                messages.removeLast() // Remove user message
+                if !messages.isEmpty { messages.removeLast() } // Remove user message (safe)
                 if access.reason == "daily_limit_reached" {
                     errorMessage = "Daily limit reached. Resets tomorrow."
                 } else {
@@ -1492,6 +1495,7 @@ struct AskDestinySheet: View {
                 conversationId: compatThreadId,
                 userEmail: email,
                 language: redirectLang,
+                responseStyle: ResponseStyleManager.shared.currentStyle.rawValue,
                 quotaContext: "compatibility"  // Marks this as coming from compatibility
             )
             
@@ -1574,7 +1578,7 @@ private struct CompatChatBubble: View {
     // Local typewriter state (only this bubble re-renders, no parent jitter)
     @State private var revealedContent: String = ""
     @State private var typewriterFinished = false
-    @State private var typewriterTimer: Timer?
+    @State private var typewriterTask: Task<Void, Never>?  // Cancellable async task replaces Timer
     
     private var isUser: Bool { message.isUser }
     
@@ -1594,51 +1598,60 @@ private struct CompatChatBubble: View {
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
         .onAppear {
-            if enableTypewriter {
+            if enableTypewriter && !typewriterFinished {
                 startTypewriter()
             }
         }
         .onDisappear {
-            typewriterTimer?.invalidate()
-            typewriterTimer = nil
+            typewriterTask?.cancel()
+            typewriterTask = nil
         }
     }
     
-    // MARK: - Typewriter Effect (local @State, no parent re-renders)
+    // MARK: - Typewriter Effect (Task-based, auto-cancels on view teardown)
     private func startTypewriter() {
+        typewriterTask?.cancel()
+        
         let fullText = message.content
         let words = fullText.components(separatedBy: " ")
         guard !words.isEmpty else {
             typewriterFinished = true
+            onTypewriterFinished?()
             return
         }
         
-        var wordIndex = 0
         revealedContent = ""
         
-        // Reveal 1 word every 50ms (~20 words/sec for faster smooth reading pace)
-        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-            let batchEnd = min(wordIndex + 1, words.count)
-            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
+        typewriterTask = Task { @MainActor in
+            var wordIndex = 0
             
-            if revealedContent.isEmpty {
-                revealedContent = batch
-            } else {
-                revealedContent += " " + batch
+            while wordIndex < words.count {
+                // Check cancellation before each batch
+                guard !Task.isCancelled else { return }
+                
+                let batchEnd = min(wordIndex + 1, words.count)
+                let batch = words[wordIndex..<batchEnd].joined(separator: " ")
+                
+                if revealedContent.isEmpty {
+                    revealedContent = batch
+                } else {
+                    revealedContent += " " + batch
+                }
+                
+                wordIndex = batchEnd
+                
+                // Scroll follows typewriter every ~10 words
+                if wordIndex % 10 == 0 {
+                    onTypewriterProgress?()
+                }
+                
+                // ~50ms delay between words (20 words/sec)
+                try? await Task.sleep(nanoseconds: 50_000_000)
             }
             
-            wordIndex = batchEnd
-            
-            // Scroll follows typewriter every ~10 words
-            if wordIndex % 10 == 0 {
-                onTypewriterProgress?()
-            }
-            
-            if wordIndex >= words.count {
-                timer.invalidate()
-                typewriterFinished = true
-                onTypewriterFinished?()
-            }
+            guard !Task.isCancelled else { return }
+            typewriterFinished = true
+            onTypewriterFinished?()
         }
     }
     

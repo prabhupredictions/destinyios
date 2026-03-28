@@ -6,15 +6,18 @@ struct ChatInputBar: View {
     @FocusState.Binding var isFocused: Bool
     let isLoading: Bool
     let isStreaming: Bool
-    let isTyping: Bool  // New: disable during typewriter effect
+    let isTyping: Bool  // disable during typewriter effect
     let onSend: () -> Void
+    
+    @State private var showStyleSelector = false
+    @State private var styleManager = ResponseStyleManager.shared
     
     private var canSend: Bool {
         !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming && !isTyping
     }
     
     var body: some View {
-        HStack(spacing: 12) {
+        VStack(spacing: 10) {
             // Text field
             TextField("Ask anything...", text: $text, axis: .vertical)
                 .font(AppTheme.Fonts.body(size: 16))
@@ -38,43 +41,79 @@ struct ChatInputBar: View {
                     }
                 }
             
-            // Send button
-            Button(action: onSend) {
-                ZStack {
-                    Group {
-                        if canSend {
-                            Circle()
-                                .fill(AppTheme.Colors.premiumGradient)
-                        } else {
-                            Circle()
-                                .fill(AppTheme.Colors.surfaceBackground)
-                        }
+            // Bottom Controls Row
+            HStack {
+                // Style Selector Capsule
+                Button {
+                    showStyleSelector = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: styleManager.currentStyle.icon)
+                            .font(.system(size: 12))
+                        Text(styleManager.currentStyle.localizedLabel.isEmpty ? styleManager.currentStyle.label : styleManager.currentStyle.localizedLabel)
+                            .font(AppTheme.Fonts.body(size: 13).weight(.medium))
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 10, weight: .bold))
+                            .padding(.leading, 2)
                     }
-                        .frame(width: 48, height: 48)
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(AppTheme.Colors.gold.opacity(0.1))
+                            .overlay(
+                                Capsule()
+                                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                // Send button
+                Button(action: onSend) {
+                    ZStack {
+                        Group {
+                            if canSend {
+                                Circle()
+                                    .fill(AppTheme.Colors.premiumGradient)
+                            } else {
+                                Circle()
+                                    .fill(AppTheme.Colors.surfaceBackground)
+                            }
+                        }
+                        .frame(width: 44, height: 44) // slightly smaller in row layout
                         .shadow(
                             color: canSend ? AppTheme.Colors.gold.opacity(0.3) : Color.clear,
                             radius: 8,
                             y: 4
                         )
-                    
-                    if isLoading || isStreaming {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-                            .scaleEffect(0.9)
-                    } else {
-                        Image(systemName: "arrow.up")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(canSend ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
+                        
+                        if isLoading || isStreaming {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(canSend ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
+                        }
                     }
                 }
+                .disabled(!canSend)
+                .accessibilityLabel("a11y_send_message".localized)
+                .animation(.spring(response: 0.3), value: canSend)
             }
-            .disabled(!canSend)
-            .accessibilityLabel("a11y_send_message".localized)
-            .animation(.spring(response: 0.3), value: canSend)
+            .padding(.horizontal, 4)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(AppTheme.Colors.mainBackground)
+        .sheet(isPresented: $showStyleSelector) {
+            ResponseStyleSheet()
+        }
     }
 }
 

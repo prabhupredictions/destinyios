@@ -188,6 +188,11 @@
 // MARK: - Chat
 "suggested_questions" = "Perguntas sugeridas";
 "no_chat_history" = "Nenhum chat ainda";
+"response_style_title" = "Estilo de resposta";
+"response_style_concise" = "Conciso";
+"response_style_detailed" = "Detalhado";
+"response_style_concise_desc" = "Dicas curtas e focadas";
+"response_style_detailed_desc" = "Análise profunda com contexto planetário";
 
 // MARK: - History
 "no_conversations" = "Nenhuma conversa ainda";

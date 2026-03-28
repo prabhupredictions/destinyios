@@ -51,6 +51,11 @@
 "rate" = "रेटिंग दें";
 "rated" = "रेटिंग दी गई";
 "welcome_message" = "नमस्ते! मैं डेस्टिनी हूं, आपका अपना ज्योतिष गाइड। अपनी जिंदगी, रिश्ते, करियर या किसी भी चीज़ के बारे में मुझसे पूछें।";
+"response_style_title" = "जवाब का तरीका";
+"response_style_concise" = "संक्षिप्त";
+"response_style_detailed" = "विस्तृत";
+"response_style_concise_desc" = "छोटे और स्पष्ट जवाब";
+"response_style_detailed_desc" = "ग्रहों के संदर्भ के साथ गहरा विश्लेषण";
 
 // MARK: - Profile
 "profile" = "प्रोफाइल";

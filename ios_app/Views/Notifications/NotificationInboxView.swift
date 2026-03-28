@@ -3,7 +3,7 @@ import SwiftUI
 /// Professional In-App Notification Inbox
 /// Premium design matching app theme with grouped notifications
 struct NotificationInboxView: View {
-    
+
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var service = NotificationInboxService.shared
     @StateObject private var quotaManager = QuotaManager.shared
@@ -11,6 +11,8 @@ struct NotificationInboxView: View {
     @State private var showNotificationPreferences = false
     @State private var showUpgradePrompt = false
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for alerts
+
+    var onNavigateToHome: (() -> Void)? = nil
     
     var body: some View {
         NavigationView {
@@ -41,7 +43,10 @@ struct NotificationInboxView: View {
                 await service.fetchUnreadCount()
             }
             .sheet(item: $selectedNotification) { notification in
-                NotificationDetailSheet(notification: notification)
+                NotificationDetailSheet(notification: notification) {
+                    dismiss()
+                    onNavigateToHome?()
+                }
             }
             .sheet(isPresented: $showNotificationPreferences) {
                 if let email = DataManager.shared.getCurrentUserProfile()?.email {
@@ -288,60 +293,90 @@ struct NotificationRow: View {
 struct NotificationDetailSheet: View {
     let notification: NotificationItem
     @Environment(\.dismiss) private var dismiss
-    
+    var onNavigateToHome: (() -> Void)? = nil
+
+    private var isDailyPrediction: Bool {
+        let t = notification.type.uppercased()
+        return t == "DAILY_PREDICTION" || t == "DAILY_PREDICTION_READY"
+    }
+
     var body: some View {
         ZStack {
             AppTheme.Colors.mainBackground.ignoresSafeArea()
-            
+
             VStack(spacing: 24) {
                 // Pull indicator
                 RoundedRectangle(cornerRadius: 3)
                     .fill(AppTheme.Colors.separator)
                     .frame(width: 40, height: 5)
                     .padding(.top, 12)
-                
+
                 // Icon
                 ZStack {
                     Circle()
                         .fill(AppTheme.Colors.gold.opacity(0.15))
                         .frame(width: 80, height: 80)
-                    
+
                     Image(systemName: notification.iconName)
                         .font(.system(size: 36, weight: .medium))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
-                
+
                 // Content
                 VStack(spacing: 12) {
                     Text(notification.displayTitle)
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .multilineTextAlignment(.center)
-                    
+
                     Text(notification.displayBody)
                         .font(.system(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 20)
-                    
+
                     // Timestamp
                     Label(notification.timeAgo, systemImage: "clock")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(AppTheme.Colors.goldDim)
                         .padding(.top, 8)
                 }
-                
+
                 Spacer()
-                
-                // Dismiss button
-                Button(action: { dismiss() }) {
-                    Text("done_button".localized)
-                        .font(AppTheme.Fonts.caption(size: 16))
-                        .foregroundColor(AppTheme.Colors.mainBackground)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(AppTheme.Colors.gold)
-                        .cornerRadius(14)
+
+                // Action buttons
+                VStack(spacing: 12) {
+                    if isDailyPrediction {
+                        Button(action: {
+                            onNavigateToHome?()
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 15, weight: .semibold))
+                                Text("view_daily_update".localized)
+                                    .font(AppTheme.Fonts.caption(size: 16))
+                            }
+                            .foregroundColor(AppTheme.Colors.mainBackground)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
+                            .background(AppTheme.Colors.gold)
+                            .cornerRadius(14)
+                        }
+                    }
+
+                    Button(action: { dismiss() }) {
+                        Text("done".localized)
+                            .font(AppTheme.Fonts.caption(size: 16))
+                            .foregroundColor(isDailyPrediction ? AppTheme.Colors.gold : AppTheme.Colors.mainBackground)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
+                            .background(isDailyPrediction ? Color.clear : AppTheme.Colors.gold)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(isDailyPrediction ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
+                            )
+                            .cornerRadius(14)
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 32)

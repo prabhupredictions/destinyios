@@ -17,3 +17,4 @@ PROVISIONING_PROFILE_SPECIFIER = match AppStore com.destinyai.astrology
 // App Name Settings
 INFOPLIST_KEY_CFBundleDisplayName = Destiny
 INFOPLIST_KEY_CFBundleName = Destiny
+

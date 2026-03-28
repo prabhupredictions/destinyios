@@ -188,6 +188,11 @@
 // MARK: - Chat
 "suggested_questions" = "おすすめの質問";
 "no_chat_history" = "まだ履歴がありません";
+"response_style_title" = "回答スタイル";
+"response_style_concise" = "簡潔";
+"response_style_detailed" = "詳細";
+"response_style_concise_desc" = "短く簡潔なインサイト";
+"response_style_detailed_desc" = "惑星の背景を含めた詳細な分析";
 
 // MARK: - History
 "no_conversations" = "まだ会話がありません";

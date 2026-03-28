@@ -188,6 +188,11 @@
 // MARK: - Chat
 "suggested_questions" = "നിർദ്ദേശിച്ച ചോദ്യങ്ങൾ";
 "no_chat_history" = "ഇതുവരെ ചാറ്റ് ഇല്ല";
+"response_style_title" = "മറുപടി ശൈലി";
+"response_style_concise" = "ചുരുക്കത്തിലുള്ളത്";
+"response_style_detailed" = "വിശദമായത്";
+"response_style_concise_desc" = "ഹ്രസ്വവും വ്യക്തവുമായ ഉൾക്കാഴ്ചകൾ";
+"response_style_detailed_desc" = "ഗ്രഹങ്ങളുടെ പശ്ചാത്തലത്തിലുള്ള ആഴത്തിലുള്ള വിശകലനം";
 
 // MARK: - History
 "no_conversations" = "ഇതുവരെ സംഭാഷണങ്ങൾ ഇല്ല";

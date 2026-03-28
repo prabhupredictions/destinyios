@@ -6,6 +6,7 @@
 // MARK: - Common
 "app_name" = "Destiny";
 "done" = "Done";
+"view_daily_update" = "View Today's Update";
 "cancel" = "Cancel";
 "save" = "Save";
 "close" = "Close";
@@ -188,6 +189,11 @@
 // MARK: - Chat
 "suggested_questions" = "Suggested questions";
 "no_chat_history" = "Your conversations will appear here";
+"response_style_title" = "Response Style";
+"response_style_concise" = "Concise";
+"response_style_detailed" = "Detailed";
+"response_style_concise_desc" = "Short, focused insights";
+"response_style_detailed_desc" = "In-depth analysis with planetary context";
 
 // MARK: - History
 "no_conversations" = "No conversations yet";

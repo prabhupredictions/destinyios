@@ -188,6 +188,11 @@
 // MARK: - Chat
 "suggested_questions" = "Популярные вопросы";
 "no_chat_history" = "Пока нет чатов";
+"response_style_title" = "Стиль ответа";
+"response_style_concise" = "Краткий";
+"response_style_detailed" = "Подробный";
+"response_style_concise_desc" = "Краткие целевые данные";
+"response_style_detailed_desc" = "Глубокий анализ с планетным контекстом";
 
 // MARK: - History
 "no_conversations" = "Пока нет диалогов";

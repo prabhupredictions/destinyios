@@ -368,7 +368,10 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showNotificationInbox) {
-            NotificationInboxView()
+            NotificationInboxView(onNavigateToHome: {
+                showNotificationInbox = false
+                Task { await viewModel.loadHomeData(force: true) }
+            })
         }
         .sheet(isPresented: $showProfile) {
             ProfileView()
