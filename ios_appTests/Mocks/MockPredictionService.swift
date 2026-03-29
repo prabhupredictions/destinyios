@@ -25,6 +25,10 @@ class MockPredictionService: PredictionServiceProtocol {
         }
     }
     
+    func getTodaysPrediction(request: UserAstroDataRequest) async throws -> TodaysPredictionResponse {
+        throw NetworkError.noData
+    }
+
     // MARK: - Test Helpers
     func reset() {
         mockResult = nil
