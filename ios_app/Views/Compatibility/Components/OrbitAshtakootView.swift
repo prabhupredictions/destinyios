@@ -214,6 +214,8 @@ struct OrbitTooltipView: View {
                 Text("\(kutaDisplayName) Koota · \(kutaScoreSubtitle)")
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -247,11 +249,14 @@ struct OrbitTooltipView: View {
                 .padding(.horizontal, 7).padding(.vertical, 3)
                 .background(Capsule().fill(AppTheme.Colors.gold.opacity(0.15)))
         } else {
-            Text("✓ \(format(kuta.score))/\(format(kuta.maxScore))")
+            // Green = perfect, gold = partial, no special colour for zero (handled by dosha branch)
+            let isPerfect = kuta.score >= kuta.maxScore
+            let color: Color = isPerfect ? AppTheme.Colors.success : AppTheme.Colors.gold
+            Text("\(isPerfect ? "✓" : "◑") \(format(kuta.score))/\(format(kuta.maxScore))")
                 .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(AppTheme.Colors.success)
+                .foregroundColor(color)
                 .padding(.horizontal, 7).padding(.vertical, 3)
-                .background(Capsule().fill(AppTheme.Colors.success.opacity(0.15)))
+                .background(Capsule().fill(color.opacity(0.15)))
         }
     }
 
