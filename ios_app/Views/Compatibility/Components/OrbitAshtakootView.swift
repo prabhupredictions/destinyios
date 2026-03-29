@@ -245,9 +245,9 @@ struct OrbitTooltipView: View {
             let adj = kuta.adjustedScore ?? kuta.maxScore
             Text("✓ Cancelled · \(format(adj))/\(format(kuta.maxScore))")
                 .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(AppTheme.Colors.gold)
+                .foregroundColor(AppTheme.Colors.success)
                 .padding(.horizontal, 7).padding(.vertical, 3)
-                .background(Capsule().fill(AppTheme.Colors.gold.opacity(0.15)))
+                .background(Capsule().fill(AppTheme.Colors.success.opacity(0.15)))
         } else {
             // Green = perfect, gold = partial, no special colour for zero (handled by dosha branch)
             let isPerfect = kuta.score >= kuta.maxScore

@@ -79,7 +79,7 @@ struct CompatibilityHistorySheet: View {
             .toolbar {
                     Button("done_action".localized) { dismiss() }
             }
-            .alert("delete_match".localized, isPresented: $showDeleteConfirmation) {
+            .alert("delete".localized, isPresented: $showDeleteConfirmation) {
                 Button("cancel".localized, role: .cancel) {}
                 Button("delete".localized, role: .destructive) {
                     if let group = groupToDelete {
@@ -88,7 +88,7 @@ struct CompatibilityHistorySheet: View {
                 }
             } message: {
                 if let group = groupToDelete {
-                    Text("delete_match_confirmation".localized + " \(group.displayTitle)?")
+                    Text(String(format: "delete_item_confirm_format".localized, group.displayTitle))
                 }
             }
         }
