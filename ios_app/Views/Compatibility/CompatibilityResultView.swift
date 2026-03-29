@@ -436,19 +436,25 @@ private struct RecommendationBannerView: View {
 
     @ViewBuilder
     private func reasonText(_ reason: String) -> some View {
-        // Backend format: "Nadi Dosha is active — affects health and progeny compatibility" (agent.py:122-124)
+        // Backend format: "Nadi Dosha is active — same biological constitution. ..." (agent.py gate 1)
         if reason.hasPrefix("Nadi Dosha") {
+            let suffix = reason.dropFirst("Nadi Dosha is active".count)
+                .trimmingCharacters(in: .init(charactersIn: " —"))
             (Text("Nadi Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
-             + Text(" — \(reason.dropFirst("Nadi Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
-        // Backend format: "Bhakoot Dosha is active — affects emotional bonding and finances" (agent.py:128-130)
+             + Text(" — \(suffix)"))
+        // Backend format: "Bhakoot Dosha is active — Moon positions create..." (agent.py gate 2)
         } else if reason.hasPrefix("Bhakoot Dosha") {
+            let suffix = reason.dropFirst("Bhakoot Dosha is active".count)
+                .trimmingCharacters(in: .init(charactersIn: " —"))
             (Text("Bhakoot Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
-             + Text(" — \(reason.dropFirst("Bhakoot Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
-        // Backend format: "Mangal Dosha incompatibility — {boy_name}: {sev} (Mars in {house}), {girl_name}: {sev} (Mars in {house}). {reason}" (agent.py:155-161)
+             + Text(" — \(suffix)"))
+        // Backend format: "Mangal Dosha incompatibility — {boy}: {sev} (Mars in {house}), ..." (agent.py:155-161)
         } else if reason.hasPrefix("Mangal Dosha") {
+            let suffix = reason.dropFirst("Mangal Dosha incompatibility — ".count)
+                .trimmingCharacters(in: .whitespaces)
             (Text("Mangal Dosha incompatibility").bold().foregroundColor(AppTheme.Colors.textPrimary)
-             + Text(" — \(reason.dropFirst("Mangal Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
-        // Backend format: "Adjusted Ashtakoot score {score}/36 — below 18 minimum threshold" (agent.py:134-136)
+             + Text(" — \(suffix)"))
+        // Backend format: "Adjusted Ashtakoot score {N}/36 — below the 18-point minimum threshold." (agent.py gate 3)
         } else if reason.hasPrefix("Adjusted Ashtakoot score") {
             scoreReasonText(reason)
         } else {
@@ -499,8 +505,28 @@ private struct RecommendationBannerView: View {
     }
 
     private func fallbackCancelledText(count: Int) -> String {
-        let doshas = count == 1 ? "dosha".localized : "doshas".localized
+        // Build a name-aware fallback from doshaSummary.details when cancelledDoshasSummary is nil
+        let keyOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "tara", "vashya", "varna"]
+        let displayNames = ["nadi": "Nadi", "bhakoot": "Bhakoot", "gana": "Gana",
+                            "maitri": "Maitri", "yoni": "Yoni", "tara": "Tara",
+                            "vashya": "Vashya", "varna": "Varna"]
+        let details = result.doshaSummary?.details ?? [:]
+        let cancelledNames = keyOrder.compactMap { key -> String? in
+            guard details[key]?.cancelled == true else { return nil }
+            return displayNames[key]
+        }
+        let names = cancelledNames.isEmpty ? nil : cancelledNames
+
+        if let names, !names.isEmpty {
+            if names.count == 1 {
+                return "\(names[0]) Dosha found and cancelled — it doesn't count against this match."
+            } else {
+                let joined = names.dropLast().joined(separator: ", ") + " and \(names.last!)"
+                return "\(joined) Doshas found and cancelled — they don't count against this match."
+            }
+        }
+        // Last resort: count-only
         let subject = count == 1 ? "it doesn't" : "they don't"
-        return "\(count) \(doshas) found and cancelled — \(subject) affect this match."
+        return "\(count) \(count == 1 ? "dosha".localized : "doshas".localized) found and cancelled — \(subject) affect this match."
     }
 }
