@@ -333,6 +333,9 @@
 "history" = "చరిత్ర";
 "report" = "నివేదిక";
 "ask_more_match" = "ఈ మ్యాచ్ గురించి మరింత అడగండి...";
+"see_classical_analysis" = "శాస్త్రీయ విశ్లేషణ చూడండి →";
+"kuta_detail_placeholder_format" = "%@ కోసం వివరణాత్మక వివరణ ఇక్కడ కనిపిస్తుంది.";
+"report_generated_label_format" = "రూపొందించబడింది: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "మంగళ దోశ";

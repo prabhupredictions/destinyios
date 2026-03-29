@@ -284,12 +284,14 @@ struct BirthDetailsView: View {
             do {
                 let birthData = try JSONDecoder().decode(BirthData.self, from: data)
                 
-                // Format date - use dd/MM/yyyy format with 4-digit year
+                // Format date — use long format (e.g. July 1, 1994) to avoid DD/MM vs MM/DD ambiguity
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 if let date = dateFormatter.date(from: birthData.dob) {
-                    dateFormatter.dateFormat = "dd/MM/yyyy"
-                    dateOfBirth = dateFormatter.string(from: date)
+                    let displayFormatter = DateFormatter()
+                    displayFormatter.dateStyle = .long
+                    displayFormatter.timeStyle = .none
+                    dateOfBirth = displayFormatter.string(from: date)
                 } else {
                     dateOfBirth = birthData.dob
                 }

@@ -333,6 +333,9 @@
 "history" = "Historique";
 "report" = "Rapport";
 "ask_more_match" = "En savoir plus sur ce match...";
+"see_classical_analysis" = "Voir l'analyse classique →";
+"kuta_detail_placeholder_format" = "L'explication détaillée pour %@ apparaîtra ici.";
+"report_generated_label_format" = "Généré : %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "Mangal Dosha";

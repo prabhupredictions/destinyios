@@ -86,7 +86,7 @@ final class PartnerProfile: Identifiable {
         formatter.dateFormat = "yyyy-MM-dd"
         if let date = formatter.date(from: dateOfBirth) {
             let displayFormatter = DateFormatter()
-            displayFormatter.dateStyle = .medium
+            displayFormatter.dateStyle = .long
             return displayFormatter.string(from: date)
         }
         return dateOfBirth

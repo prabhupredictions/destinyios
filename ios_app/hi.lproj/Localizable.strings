@@ -334,6 +334,9 @@
 "history" = "इतिहास";
 "report" = "रिपोर्ट";
 "ask_more_match" = "मिलान के बारे में और पूछें...";
+"see_classical_analysis" = "शास्त्रीय विश्लेषण देखें →";
+"kuta_detail_placeholder_format" = "%@ का विस्तृत विवरण यहाँ दिखाई देगा।";
+"report_generated_label_format" = "उत्पन्न: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "मांगलिक दोष";

@@ -12,6 +12,7 @@ struct CompatibilityView: View {
     @State private var showPartnerPicker = false
     @State private var savePartnerForFuture = false
     @State private var partnerFromSavedChart = false
+    @State private var isLoadingFromSaved = false  // guards onChange from firing during programmatic field population
     
     // Focus State for Name Field
     @FocusState private var isNameFocused: Bool
@@ -249,6 +250,9 @@ struct CompatibilityView: View {
                 excludeIds: excludeIds,
                 forCompatibilityOnly: true
             ) { partner in
+                // Suppress onChange handlers during programmatic field population
+                isLoadingFromSaved = true
+
                 // Fill form with selected partner data
                 viewModel.girlName = partner.name
                 viewModel.partnerGender = partner.gender
@@ -256,10 +260,10 @@ struct CompatibilityView: View {
                 viewModel.girlLatitude = partner.latitude ?? 0
                 viewModel.girlLongitude = partner.longitude ?? 0
                 viewModel.partnerTimeUnknown = partner.birthTimeUnknown
-                
+
                 // Store the saved profile ID for filtering
                 viewModel.currentPartner.savedProfileId = partner.id
-                
+
                 // Parse and set date
                 let dateFormatter = DateFormatter()
                 dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -267,7 +271,7 @@ struct CompatibilityView: View {
                 if let date = dateFormatter.date(from: partner.dateOfBirth) {
                     viewModel.girlBirthDate = date
                 }
-                
+
                 // Parse and set time if available
                 if let timeString = partner.timeOfBirth {
                     let timeFormatter = DateFormatter()
@@ -277,11 +281,16 @@ struct CompatibilityView: View {
                         viewModel.girlBirthTime = time
                     }
                 }
-                
+
                 // Chart is already saved — disable save checkbox
                 savePartnerForFuture = false
                 partnerFromSavedChart = true
-                
+
+                // Reset loading guard after onChange handlers have processed
+                Task { @MainActor in
+                    isLoadingFromSaved = false
+                }
+
                 HapticManager.shared.playSuccess()
             }
         }
@@ -291,9 +300,13 @@ struct CompatibilityView: View {
         // Handle initial match loading
         .onChange(of: initialMatchItem) { oldValue, newValue in
             if let item = newValue {
+                isLoadingFromSaved = true
                 savePartnerForFuture = false
                 partnerFromSavedChart = true
                 viewModel.loadFromHistory(item)
+                Task { @MainActor in
+                    isLoadingFromSaved = false
+                }
             }
         }
         .onAppear {
@@ -334,36 +347,42 @@ struct CompatibilityView: View {
         }
         // Detect any partner detail modification and re-enable save checkbox
         .onChange(of: viewModel.girlName) { _, _ in
+            guard !isLoadingFromSaved else { return }
             if partnerFromSavedChart {
                 partnerFromSavedChart = false
                 savePartnerForFuture = true
             }
         }
         .onChange(of: viewModel.girlCity) { _, _ in
+            guard !isLoadingFromSaved else { return }
             if partnerFromSavedChart {
                 partnerFromSavedChart = false
                 savePartnerForFuture = true
             }
         }
         .onChange(of: viewModel.girlBirthDate) { _, _ in
+            guard !isLoadingFromSaved else { return }
             if partnerFromSavedChart {
                 partnerFromSavedChart = false
                 savePartnerForFuture = true
             }
         }
         .onChange(of: viewModel.girlBirthTime) { _, _ in
+            guard !isLoadingFromSaved else { return }
             if partnerFromSavedChart {
                 partnerFromSavedChart = false
                 savePartnerForFuture = true
             }
         }
         .onChange(of: viewModel.partnerGender) { _, _ in
+            guard !isLoadingFromSaved else { return }
             if partnerFromSavedChart {
                 partnerFromSavedChart = false
                 savePartnerForFuture = true
             }
         }
         .onChange(of: viewModel.partnerTimeUnknown) { _, _ in
+            guard !isLoadingFromSaved else { return }
             if partnerFromSavedChart {
                 partnerFromSavedChart = false
                 savePartnerForFuture = true
@@ -870,9 +889,9 @@ struct CompatibilityView: View {
                             withAnimation { savePartnerForFuture.toggle() }
                         }) {
                             HStack(spacing: 6) {
-                                Image(systemName: (savePartnerForFuture || partnerFromSavedChart) ? "checkmark.square.fill" : "square")
+                                Image(systemName: savePartnerForFuture ? "checkmark.square.fill" : "square")
                                     .font(.system(size: 14))
-                                    .foregroundColor(partnerFromSavedChart ? AppTheme.Colors.gold.opacity(0.4) : (savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary))
+                                    .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                 Text("save_birth_chart".localized)
                                     .font(AppTheme.Fonts.caption(size: 11))
                                     .foregroundColor(partnerFromSavedChart ? AppTheme.Colors.textSecondary.opacity(0.5) : AppTheme.Colors.textSecondary)
@@ -1032,7 +1051,8 @@ struct CompatibilityView: View {
     
     private var formattedBoyDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
         return formatter.string(from: viewModel.boyBirthDate)
     }
     

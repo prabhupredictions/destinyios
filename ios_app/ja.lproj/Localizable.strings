@@ -333,6 +333,9 @@
 "history" = "履歴";
 "report" = "レポート";
 "ask_more_match" = "このマッチについてもっと聞く...";
+"see_classical_analysis" = "古典分析を見る →";
+"kuta_detail_placeholder_format" = "%@ の詳細な説明がここに表示されます。";
+"report_generated_label_format" = "生成日: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "マンガル ドーシャ";

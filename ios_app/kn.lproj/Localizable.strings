@@ -333,6 +333,9 @@
 "history" = "ಇತಿಹಾಸ";
 "report" = "ವರದಿ";
 "ask_more_match" = "ಈ ಹೊಂದಾಣಿಕೆಯ ಬಗ್ಗೆ ಇನ್ನಷ್ಟು ಕೇಳಿ...";
+"see_classical_analysis" = "ಶಾಸ್ತ್ರೀಯ ವಿಶ್ಲೇಷಣೆ ನೋಡಿ →";
+"kuta_detail_placeholder_format" = "%@ ಗಾಗಿ ವಿವರವಾದ ವಿವರಣೆ ಇಲ್ಲಿ ಕಾಣಿಸಿಕೊಳ್ಳುತ್ತದೆ.";
+"report_generated_label_format" = "ರಚಿಸಲಾಗಿದೆ: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "ಮಂಗಲ ದೋಷ";

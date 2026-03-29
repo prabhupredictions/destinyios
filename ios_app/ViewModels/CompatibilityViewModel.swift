@@ -1134,7 +1134,8 @@ class CompatibilityViewModel {
             adjustedCategory: response.adjustedCategory,
             doshaSummary: response.doshaSummary,
             rejectionReasons: response.hardNoFlags?.rejectionReasons ?? [],
-            comparisonIndicators: response.comparisonIndicators
+            comparisonIndicators: response.comparisonIndicators,
+            cancelledDoshasSummary: response.hardNoFlags?.cancelledDoshasSummary
         )
     }
     
@@ -1229,6 +1230,7 @@ struct CompatibilityResult: Identifiable, Codable {
     let doshaSummary: DoshaSummary?
     let rejectionReasons: [String]
     let comparisonIndicators: ComparisonIndicators?
+    let cancelledDoshasSummary: String?
     
     var percentage: Double {
         guard maxScore > 0 else { return 0 }
@@ -1253,7 +1255,8 @@ struct CompatibilityResult: Identifiable, Codable {
         adjustedCategory: String? = nil,
         doshaSummary: DoshaSummary? = nil,
         rejectionReasons: [String] = [],
-        comparisonIndicators: ComparisonIndicators? = nil
+        comparisonIndicators: ComparisonIndicators? = nil,
+        cancelledDoshasSummary: String? = nil
     ) {
         self.totalScore = totalScore
         self.maxScore = maxScore
@@ -1277,6 +1280,7 @@ struct CompatibilityResult: Identifiable, Codable {
         self.doshaSummary = doshaSummary
         self.rejectionReasons = rejectionReasons
         self.comparisonIndicators = comparisonIndicators
+        self.cancelledDoshasSummary = cancelledDoshasSummary
     }
 }
 

@@ -23,7 +23,6 @@ struct AshtakootData {
     
     // V2.2 — Bhakoot transparency fields
     var severity: String? = nil
-    var fieldStudy: String? = nil
     var housePositions: String? = nil
     var sadbhakootWarning: String? = nil
     
@@ -45,6 +44,11 @@ struct AshtakootData {
     // V2.4 — Universal partner values
     var boyValue: String? = nil
     var girlValue: String? = nil
+
+    // V2.5 — Sprint 3 enrichment fields
+    var plainEnglishSummary: String? = nil
+    var boyValueDescription: String? = nil
+    var girlValueDescription: String? = nil
     
     /// Effective score after cancellation (adjusted if available, else raw)
     var effectiveScore: Double {
@@ -198,7 +202,7 @@ struct GlassPill: View {
                  Text("\("score".localized): \(item.score.formatted()) / \(item.maxScore.formatted())")
                      .font(AppTheme.Fonts.title(size: 16))
                  
-                 Text("Detailed explanation for \(item.label) will appear here.")
+                 Text(String(format: "kuta_detail_placeholder_format".localized, item.label))
                      .font(AppTheme.Fonts.body(size: 14))
                      .multilineTextAlignment(.center)
                      .foregroundColor(AppTheme.Colors.textSecondary)

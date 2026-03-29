@@ -333,6 +333,9 @@
 "history" = "历史";
 "report" = "报告";
 "ask_more_match" = "询问更多关于此配对...";
+"see_classical_analysis" = "查看经典分析 →";
+"kuta_detail_placeholder_format" = "%@ 的详细说明将显示在此处。";
+"report_generated_label_format" = "生成时间：%@";
 
 // Dosha & Yoga
 "mangal_dosha" = "曼加尔·多沙";

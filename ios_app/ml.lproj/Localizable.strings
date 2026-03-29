@@ -333,6 +333,9 @@
 "history" = "ചരിത്രം";
 "report" = "റിപ്പോർട്ട്";
 "ask_more_match" = "ഈ പൊരുത്തത്തെക്കുറിച്ച് കൂടുതൽ ചോദിക്കുക...";
+"see_classical_analysis" = "ക്ലാസിക്കൽ വിശകലനം കാണുക →";
+"kuta_detail_placeholder_format" = "%@ നുള്ള വിശദമായ വിശദീകരണം ഇവിടെ കാണിക്കും.";
+"report_generated_label_format" = "സൃഷ്ടിച്ചത്: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "മംഗൾ ദോശ";

@@ -88,7 +88,7 @@ struct PartnerFormView: View {
     // Formatted helpers
     private var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: dateOfBirth)
     }
     

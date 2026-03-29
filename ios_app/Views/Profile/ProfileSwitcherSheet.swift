@@ -396,7 +396,7 @@ struct ProfileRow: View {
                         }
                     }
                     
-                    Text(profile.dateOfBirth)
+                    Text(profile.formattedDateOfBirth)
                         .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }

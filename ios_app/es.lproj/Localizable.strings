@@ -333,6 +333,9 @@
 "history" = "Historial";
 "report" = "Informe";
 "ask_more_match" = "Preguntar más sobre esta pareja...";
+"see_classical_analysis" = "Ver análisis clásico →";
+"kuta_detail_placeholder_format" = "La explicación detallada de %@ aparecerá aquí.";
+"report_generated_label_format" = "Generado: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "Mangal Dosha";

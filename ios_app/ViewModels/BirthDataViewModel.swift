@@ -60,7 +60,7 @@ class BirthDataViewModel {
     var formattedDate: String {
         guard isDateSelected else { return "select_date".localized }
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: dateOfBirth)
     }
     

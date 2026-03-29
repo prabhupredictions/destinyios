@@ -41,4 +41,5 @@ ios_app/ios_app/
 - ChartStylePickerSheet.swift
 
 ## Build: Cmd+R | Test: Cmd+U
+## Simulator: ALWAYS use "iPhone 17 Pro" for xcodebuild commands
 ## APNS: server-side APNS_SANDBOX=false for TestFlight+prod

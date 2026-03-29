@@ -333,6 +333,9 @@
 "history" = "வரலாறு";
 "report" = "அறிக்கை";
 "ask_more_match" = "இந்த பொருத்தம் பற்றி மேலும் கேட்க...";
+"see_classical_analysis" = "பாரம்பரிய பகுப்பாய்வு காண்க →";
+"kuta_detail_placeholder_format" = "%@ க்கான விரிவான விளக்கம் இங்கே தோன்றும்.";
+"report_generated_label_format" = "உருவாக்கப்பட்டது: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "மங்கள தோசை";

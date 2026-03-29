@@ -333,6 +333,9 @@
 "history" = "История";
 "report" = "Отчет";
 "ask_more_match" = "Спросить больше об этом совпадении...";
+"see_classical_analysis" = "Смотреть классический анализ →";
+"kuta_detail_placeholder_format" = "Подробное объяснение для %@ появится здесь.";
+"report_generated_label_format" = "Создано: %@";
 
 // Dosha & Yoga
 "mangal_dosha" = "Мангал Доша";

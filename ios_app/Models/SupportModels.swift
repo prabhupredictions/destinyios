@@ -103,7 +103,6 @@ struct DoshaDetail: Codable, Sendable {
     
     // Bhakoot-specific transparency fields
     let severity: String?
-    let fieldStudy: String?
     let housePositions: String?
     let sadbhakootWarning: String?
     
@@ -125,6 +124,12 @@ struct DoshaDetail: Codable, Sendable {
     // Universal partner values (V2.4)
     let boyValue: String?
     let girlValue: String?
+
+    // V2.5 — Plain English enrichment fields
+    let plainEnglishSummary: String?
+    let plainEnglishRejectionReason: String?
+    let boyValueDescription: String?
+    let girlValueDescription: String?
     
     enum CodingKeys: String, CodingKey {
         case present, cancelled, severity
@@ -134,7 +139,6 @@ struct DoshaDetail: Codable, Sendable {
         case classicalEffect = "classical_effect"
         case boyConstitution = "boy_constitution"
         case girlConstitution = "girl_constitution"
-        case fieldStudy = "field_study"
         case housePositions = "house_positions"
         case sadbhakootWarning = "sadbhakoot_warning"
         case taraBoyToGirl = "tara_boy_to_girl"
@@ -148,6 +152,10 @@ struct DoshaDetail: Codable, Sendable {
         case complementarityNote = "complementarity_note"
         case boyValue = "boy_value"
         case girlValue = "girl_value"
+        case plainEnglishSummary = "plain_english_summary"
+        case plainEnglishRejectionReason = "plain_english_rejection_reason"
+        case boyValueDescription = "boy_value_description"
+        case girlValueDescription = "girl_value_description"
     }
 }
 
@@ -270,10 +278,12 @@ struct AnyCodable: Codable, Sendable {
 struct HardNoFlags: Codable, Sendable {
     let isRecommended: Bool
     let rejectionReasons: [String]
-    
+    let cancelledDoshasSummary: String?
+
     enum CodingKeys: String, CodingKey {
         case isRecommended = "is_recommended"
         case rejectionReasons = "rejection_reasons"
+        case cancelledDoshasSummary = "cancelled_doshas_summary"
     }
 }
 

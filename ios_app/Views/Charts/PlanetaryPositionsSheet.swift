@@ -212,13 +212,14 @@ struct PlanetaryPositionsSheet: View {
     }
     
     private func formatBirthDate(_ dob: String) -> String {
-        // Convert 2013-04-22 to Apr 22, 2013
+        // Convert yyyy-MM-dd to long format (e.g. April 22, 2013) — avoids DD/MM vs MM/DD ambiguity
         let inputFormatter = DateFormatter()
         inputFormatter.dateFormat = "yyyy-MM-dd"
-        
+
         let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "MMM dd, yyyy"
-        
+        outputFormatter.dateStyle = .long
+        outputFormatter.timeStyle = .none
+
         if let date = inputFormatter.date(from: dob) {
             return outputFormatter.string(from: date)
         }
