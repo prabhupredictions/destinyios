@@ -465,7 +465,7 @@ private struct RecommendationBannerView: View {
     /// Renders "Adjusted Ashtakoot score N/36 — …" with N/36 in orange bold.
     @ViewBuilder
     private func scoreReasonText(_ reason: String) -> some View {
-        if let range = reason.range(of: #"\d+/36"#, options: .regularExpression) {
+        if let range = reason.range(of: #"\d+\.?\d*/36"#, options: .regularExpression) {
             let score = String(reason[range])
             let after = String(reason[range.upperBound...]).trimmingCharacters(in: .whitespaces)
             let before = String(reason[..<range.lowerBound])
