@@ -436,15 +436,19 @@ private struct RecommendationBannerView: View {
 
     @ViewBuilder
     private func reasonText(_ reason: String) -> some View {
+        // Backend format: "Nadi Dosha is active — affects health and progeny compatibility" (agent.py:122-124)
         if reason.hasPrefix("Nadi Dosha") {
             (Text("Nadi Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
              + Text(" — \(reason.dropFirst("Nadi Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
+        // Backend format: "Bhakoot Dosha is active — affects emotional bonding and finances" (agent.py:128-130)
         } else if reason.hasPrefix("Bhakoot Dosha") {
             (Text("Bhakoot Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
              + Text(" — \(reason.dropFirst("Bhakoot Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
+        // Backend format: "Mangal Dosha incompatibility — {boy_name}: {sev} (Mars in {house}), {girl_name}: {sev} (Mars in {house}). {reason}" (agent.py:155-161)
         } else if reason.hasPrefix("Mangal Dosha") {
             (Text("Mangal Dosha incompatibility").bold().foregroundColor(AppTheme.Colors.textPrimary)
              + Text(" — \(reason.dropFirst("Mangal Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
+        // Backend format: "Adjusted Ashtakoot score {score}/36 — below 18 minimum threshold" (agent.py:134-136)
         } else if reason.hasPrefix("Adjusted Ashtakoot score") {
             scoreReasonText(reason)
         } else {
