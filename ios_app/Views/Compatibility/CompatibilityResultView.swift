@@ -153,7 +153,7 @@ struct CompatibilityResultView: View {
                         .padding(.bottom, 0) // Removed extra padding to close gap
                         
                         // 1.5. Recommendation + Dosha Summary Banner
-                        recommendationBanner
+                        RecommendationBannerView(result: result)
                         
                         // 2. Partners (Removed - Embedded in Orbit)
                         
@@ -306,360 +306,6 @@ struct CompatibilityResultView: View {
         }
     }
     
-    // MARK: - Recommendation + Dosha Summary Banner
-    @ViewBuilder
-    private var recommendationBanner: some View {
-        let hasDosha = (result.doshaSummary?.activeCount ?? 0) > 0
-        let cancelledCount = result.doshaSummary?.cancelledCount ?? 0
-        let borderColor = result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error
-
-        if hasDosha || !result.isRecommended || !result.rejectionReasons.isEmpty {
-            VStack(spacing: 0) {
-                // ─── Header Band ───
-                HStack(spacing: 10) {
-                    Image(systemName: result.isRecommended ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
-
-                    Text(result.isRecommended ? "recommended".localized : "not_recommended".localized)
-                        .font(AppTheme.Fonts.title(size: 16).weight(.bold))
-                        .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
-
-                    Spacer()
-
-                    HStack(spacing: 4) {
-                        Text("\(result.adjustedScore ?? result.totalScore)")
-                            .font(AppTheme.Fonts.title(size: 20).weight(.bold))
-                            .foregroundColor(AppTheme.Colors.textPrimary)
-                        Text("/\(result.maxScore)")
-                            .font(AppTheme.Fonts.title(size: 16))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(result.isRecommended ? AppTheme.Colors.success.opacity(0.1) : AppTheme.Colors.error.opacity(0.1))
-                )
-
-                // ─── Content Area ───
-                VStack(alignment: .leading, spacing: 12) {
-                    if result.isRecommended {
-                        Text(result.recommendation.localized)
-                            .font(AppTheme.Fonts.body(size: 14))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    // ─── Personalized Rejection Reasons (plain English, per-dosha) ───
-                    if !result.isRecommended, let details = result.doshaSummary?.details {
-                        let doshaOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "vashya", "tara", "varna"]
-
-                        let activeWithReasons = doshaOrder.compactMap { key -> (key: String, reason: String)? in
-                            guard let detail = details[key],
-                                  detail.present == true,
-                                  detail.cancelled != true,
-                                  let reason = detail.plainEnglishRejectionReason,
-                                  !reason.isEmpty else { return nil }
-                            return (key: key, reason: reason)
-                        }
-
-                        if !activeWithReasons.isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("not_recommended_because".localized)
-                                    .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                                    .foregroundColor(AppTheme.Colors.error)
-
-                                ForEach(activeWithReasons, id: \.key) { item in
-                                    HStack(alignment: .top, spacing: 8) {
-                                        Image(systemName: "exclamationmark.triangle.fill")
-                                            .font(.system(size: 11))
-                                            .foregroundColor(AppTheme.Colors.error)
-                                            .padding(.top, 1)
-
-                                        Text(replaceNamesInBanner(item.reason))
-                                            .font(AppTheme.Fonts.caption(size: 13))
-                                            .foregroundColor(AppTheme.Colors.textSecondary)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                    }
-                                }
-                            }
-                        } else if !result.rejectionReasons.isEmpty {
-                            // Fallback: show raw rejection reasons if no personalized ones
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("not_recommended_because".localized)
-                                    .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                                    .foregroundColor(AppTheme.Colors.error)
-
-                                ForEach(Array(result.rejectionReasons.enumerated()), id: \.offset) { _, reason in
-                                    HStack(alignment: .top, spacing: 6) {
-                                        Text("•")
-                                            .font(AppTheme.Fonts.caption(size: 12))
-                                            .foregroundColor(AppTheme.Colors.textSecondary)
-                                        Text(replaceNamesInBanner(reason))
-                                            .font(AppTheme.Fonts.caption(size: 12))
-                                            .foregroundColor(AppTheme.Colors.textSecondary)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                    }
-                                }
-                            }
-                        }
-                    } else if result.isRecommended && !result.rejectionReasons.isEmpty {
-                        // Recommended but has notes
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("additional_notes".localized)
-                                .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-
-                            ForEach(Array(result.rejectionReasons.enumerated()), id: \.offset) { _, reason in
-                                HStack(alignment: .top, spacing: 6) {
-                                    Text("•")
-                                        .font(AppTheme.Fonts.caption(size: 12))
-                                        .foregroundColor(AppTheme.Colors.textSecondary)
-                                    Text(replaceNamesInBanner(reason))
-                                        .font(AppTheme.Fonts.caption(size: 12))
-                                        .foregroundColor(AppTheme.Colors.textSecondary)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                            }
-                        }
-                    }
-
-                    // ─── Cancelled Doshas Summary (one sentence at bottom) ───
-                    if cancelledCount > 0,
-                       let summary = result.cancelledDoshasSummary,
-                       !summary.isEmpty {
-                        Divider()
-                            .background(AppTheme.Colors.success.opacity(0.2))
-
-                        HStack(alignment: .top, spacing: 8) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 12))
-                                .foregroundColor(AppTheme.Colors.success)
-                                .padding(.top, 1)
-
-                            Text(replaceNamesInBanner(summary))
-                                .font(AppTheme.Fonts.caption(size: 12))
-                                .foregroundColor(AppTheme.Colors.success.opacity(0.85))
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    } else if cancelledCount > 0 {
-                        // Fallback: generic cancelled count
-                        Divider()
-                            .background(AppTheme.Colors.success.opacity(0.2))
-
-                        HStack(spacing: 6) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 11))
-                                .foregroundColor(AppTheme.Colors.success)
-                            Text("(\(cancelledCount) " + "cancelled".localized + ")")
-                                .font(AppTheme.Fonts.caption(size: 11))
-                                .foregroundColor(AppTheme.Colors.success)
-                        }
-                    }
-                }
-                .padding(14)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(borderColor.opacity(0.3), lineWidth: 1)
-            )
-            .shadow(color: borderColor.opacity(0.15), radius: 8, x: 0, y: 4)
-            .padding(.top, 8)
-        }
-    }
-    
-    // MARK: - Active Dosha Row
-    @ViewBuilder
-    private func activeDoshaRow(_ dosha: (name: String, detail: DoshaDetail)) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 11))
-                .foregroundColor(AppTheme.Colors.warning)
-            
-            Text("\(dosha.name) " + "dosha_label".localized)
-                .font(AppTheme.Fonts.caption(size: 12).weight(.semibold))
-                .foregroundColor(AppTheme.Colors.textPrimary)
-            
-            if let severity = dosha.detail.severity {
-                severityBadge(severity)
-            }
-            Spacer()
-        }
-    }
-    
-    // MARK: - Severity Badge
-    private func severityBadge(_ severity: String) -> some View {
-        let color: Color = severity.lowercased() == "high"
-            ? AppTheme.Colors.error
-            : severity.lowercased() == "medium"
-                ? AppTheme.Colors.gold
-                : AppTheme.Colors.textTertiary
-        return Text(severity.capitalized)
-            .font(AppTheme.Fonts.caption(size: 9).weight(.bold))
-            .foregroundColor(color)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(
-                Capsule().fill(color.opacity(0.12))
-            )
-            .overlay(Capsule().stroke(color.opacity(0.25), lineWidth: 0.5))
-    }
-    
-    // MARK: - Rejection Reason Card
-    @ViewBuilder
-    private func rejectionReasonCard(_ reason: String) -> some View {
-        let cleaned = replaceNamesInBanner(reason)
-        let isMangal = cleaned.localizedCaseInsensitiveContains("Mangal Dosha")
-        
-        VStack(alignment: .leading, spacing: 6) {
-            // Header: dosha name with icon
-            let doshaLabel = extractDoshaLabel(from: cleaned)
-            HStack(spacing: 6) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 12))
-                    .foregroundColor(AppTheme.Colors.error)
-                Text(doshaLabel ?? "rejection_reason_label".localized)
-                    .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                Spacer()
-            }
-            
-            // Body: format differently for Mangal vs other doshas
-            if isMangal {
-                mangalDoshaFormattedView(cleaned)
-            } else {
-                // Split into structured lines at sentence boundaries
-                let lines = splitIntoLines(cleaned)
-                ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
-                    HStack(alignment: .top, spacing: 6) {
-                        Circle()
-                            .fill(AppTheme.Colors.textTertiary.opacity(0.5))
-                            .frame(width: 4, height: 4)
-                            .padding(.top, 5)
-                        Text(line)
-                            .font(AppTheme.Fonts.caption(size: 11))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .lineSpacing(1.5)
-                    }
-                }
-            }
-        }
-        .padding(10)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(AppTheme.Colors.error.opacity(0.04))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(AppTheme.Colors.error.opacity(0.12), lineWidth: 0.5)
-        )
-    }
-    
-    // MARK: - Mangal Dosha Formatted View (separate lines per partner)
-    @ViewBuilder
-    private func mangalDoshaFormattedView(_ text: String) -> some View {
-        // Split by common delimiters: ", House:" or ". Mangal" to get per-partner info
-        // Pattern: "...Prabhu: Mild (Mars in 4th house), Smita: Cancelled (Mars in 3rd house)..."
-        let parts = text.components(separatedBy: ". ")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-        
-        ForEach(Array(parts.enumerated()), id: \.offset) { _, part in
-            // Check if this part contains per-partner info
-            let containsPartnerInfo = part.contains(boyName) || part.contains(girlName)
-            
-            if containsPartnerInfo {
-                // Try to split at partner name boundaries
-                let perPartner = splitByPartnerNames(part)
-                ForEach(Array(perPartner.enumerated()), id: \.offset) { _, partnerLine in
-                    HStack(alignment: .top, spacing: 6) {
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 9))
-                            .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
-                            .padding(.top, 3)
-                        Text(partnerLine)
-                            .font(AppTheme.Fonts.caption(size: 11))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            } else {
-                HStack(alignment: .top, spacing: 6) {
-                    Circle()
-                        .fill(AppTheme.Colors.textTertiary.opacity(0.5))
-                        .frame(width: 4, height: 4)
-                        .padding(.top, 5)
-                    Text(part)
-                        .font(AppTheme.Fonts.caption(size: 11))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
-    }
-    
-    // MARK: - Helper: Split text by partner names into separate lines
-    private func splitByPartnerNames(_ text: String) -> [String] {
-        // Try to split at ", <girlName>" or ", <boyName>" boundaries
-        var lines: [String] = []
-        let separators = [", \(girlName):", ", \(girlName) ", "), \(girlName)"]
-        
-        var remaining = text
-        for sep in separators {
-            if let range = remaining.range(of: sep) {
-                let first = String(remaining[..<range.lowerBound]).trimmingCharacters(in: .whitespaces)
-                let second = String(remaining[range.lowerBound...]).trimmingCharacters(in: CharacterSet(charactersIn: ", "))
-                if !first.isEmpty { lines.append(first) }
-                if !second.isEmpty { lines.append(second) }
-                remaining = ""
-                break
-            }
-        }
-        
-        if lines.isEmpty {
-            // Fallback: return as single line
-            return [text]
-        }
-        return lines
-    }
-    
-    // MARK: - Helpers
-    
-    private func extractDoshaLabel(from text: String) -> String? {
-        let patterns = ["Mangal Dosha", "Bhakoot Dosha", "Nadi Dosha", "Gana Dosha",
-                        "Maitri Dosha", "Yoni Dosha", "Vashya Dosha", "Tara Dosha", "Varna Dosha",
-                        "Ashtakoot"]
-        for p in patterns {
-            if text.localizedCaseInsensitiveContains(p) { return p }
-        }
-        return nil
-    }
-    
-    private func splitIntoLines(_ text: String) -> [String] {
-        text.components(separatedBy: ". ")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-            .map { $0.hasSuffix(".") ? $0 : $0 + "." }
-    }
-    
-    private func replaceNamesInBanner(_ text: String) -> String {
-        text
-            .replacingOccurrences(of: "Groom's", with: "\(boyName)'s")
-            .replacingOccurrences(of: "Bride's", with: "\(girlName)'s")
-            .replacingOccurrences(of: "Groom:", with: "\(boyName):")
-            .replacingOccurrences(of: "Bride:", with: "\(girlName):")
-            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
-            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
-            .replacingOccurrences(of: "Boy's", with: "\(boyName)'s")
-            .replacingOccurrences(of: "Girl's", with: "\(girlName)'s")
-            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
-            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
-    }
-    
     // Helper needed for Sheet Data Extraction
     static func extractMangalDoshaData(from anyCodable: AnyCodable?) -> MangalDoshaData? {
         guard let dict = anyCodable?.value as? [String: Any] else {
@@ -682,7 +328,7 @@ struct CompatibilityResultView: View {
     // Computed property for Mangal Dosha NavigationLink destination (uses cached data)
     private var mangalDoshaDestination: some View {
         let mangalCompat = result.analysisData?.joint?.mangalCompatibility
-        
+
         return MangalDoshaSheet(
             boyData: cachedBoyMangalDosha ?? result.analysisData?.boy?.raw?.mangalDosha,
             girlData: cachedGirlMangalDosha ?? result.analysisData?.girl?.raw?.mangalDosha,
@@ -690,5 +336,175 @@ struct CompatibilityResultView: View {
             girlName: girlName,
             mangalCompatibility: mangalCompat
         )
+    }
+}
+
+// MARK: - Recommendation Banner View
+
+private struct RecommendationBannerView: View {
+    let result: CompatibilityResult
+
+    var body: some View {
+        let score = result.adjustedScore ?? result.totalScore
+        let borderColor = result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error
+
+        VStack(spacing: 0) {
+            // ── Header ──
+            HStack(spacing: 10) {
+                Image(systemName: result.isRecommended ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
+
+                Text(result.isRecommended ? "recommended".localized : "not_recommended".localized)
+                    .font(AppTheme.Fonts.title(size: 16).weight(.bold))
+                    .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Text("\(score)")
+                        .font(AppTheme.Fonts.title(size: 20).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    Text("/\(result.maxScore)")
+                        .font(AppTheme.Fonts.title(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(result.isRecommended
+                          ? AppTheme.Colors.success.opacity(0.1)
+                          : AppTheme.Colors.error.opacity(0.1))
+            )
+
+            // ── Body ──
+            VStack(alignment: .leading, spacing: 12) {
+                if result.isRecommended {
+                    // Affirmation text (device-computed)
+                    let affirmation = AffirmationBuilder(
+                        kutas: result.kutas,
+                        adjustedScore: result.adjustedScore,
+                        totalScore: result.totalScore
+                    ).affirmationText()
+
+                    Text(affirmation)
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    // "Not recommended because:" bullets
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("not_recommended_because".localized)
+                            .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
+                            .foregroundColor(AppTheme.Colors.error)
+
+                        ForEach(Array(result.rejectionReasons.enumerated()), id: \.offset) { _, reason in
+                            reasonBullet(reason)
+                        }
+                    }
+                }
+
+                // ── Cancelled doshas row ──
+                cancelledDoshasRow
+            }
+            .padding(14)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(borderColor.opacity(0.3), lineWidth: 1)
+        )
+        .shadow(color: borderColor.opacity(0.15), radius: 8, x: 0, y: 4)
+        .padding(.top, 8)
+    }
+
+    // MARK: - Reason bullet
+
+    @ViewBuilder
+    private func reasonBullet(_ reason: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 11))
+                .foregroundColor(reasonIconColor(for: reason))
+                .padding(.top, 2)
+
+            reasonText(reason)
+                .font(AppTheme.Fonts.caption(size: 13))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func reasonIconColor(for reason: String) -> Color {
+        if reason.hasPrefix("Adjusted Ashtakoot score") { return .orange }
+        return AppTheme.Colors.error
+    }
+
+    @ViewBuilder
+    private func reasonText(_ reason: String) -> some View {
+        if reason.hasPrefix("Nadi Dosha") {
+            (Text("Nadi Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
+             + Text(" — \(reason.dropFirst("Nadi Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
+        } else if reason.hasPrefix("Bhakoot Dosha") {
+            (Text("Bhakoot Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
+             + Text(" — \(reason.dropFirst("Bhakoot Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
+        } else if reason.hasPrefix("Mangal Dosha") {
+            (Text("Mangal Dosha incompatibility").bold().foregroundColor(AppTheme.Colors.textPrimary)
+             + Text(" — \(reason.dropFirst("Mangal Dosha".count).trimmingCharacters(in: .init(charactersIn: " —")))"))
+        } else if reason.hasPrefix("Adjusted Ashtakoot score") {
+            scoreReasonText(reason)
+        } else {
+            Text(reason)
+        }
+    }
+
+    /// Renders "Adjusted Ashtakoot score N/36 — …" with N/36 in orange bold.
+    @ViewBuilder
+    private func scoreReasonText(_ reason: String) -> some View {
+        if let range = reason.range(of: #"\d+/36"#, options: .regularExpression) {
+            let score = String(reason[range])
+            let after = String(reason[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+            let before = String(reason[..<range.lowerBound])
+            (Text(before)
+             + Text(score).bold().foregroundColor(.orange)
+             + Text(" \(after)"))
+        } else {
+            Text(reason)
+        }
+    }
+
+    // MARK: - Cancelled doshas row
+
+    @ViewBuilder
+    private var cancelledDoshasRow: some View {
+        let cancelledCount = result.doshaSummary?.cancelledCount ?? 0
+        if cancelledCount > 0 {
+            let summaryText = result.cancelledDoshasSummary ?? fallbackCancelledText(count: cancelledCount)
+            VStack(alignment: .leading, spacing: 0) {
+                Divider()
+                    .background(AppTheme.Colors.success.opacity(0.2))
+                    .padding(.bottom, 10)
+
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.success)
+                        .padding(.top, 1)
+
+                    Text(summaryText)
+                        .font(AppTheme.Fonts.caption(size: 12))
+                        .foregroundColor(AppTheme.Colors.success.opacity(0.85))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private func fallbackCancelledText(count: Int) -> String {
+        let doshas = count == 1 ? "dosha" : "doshas"
+        let subject = count == 1 ? "it doesn't" : "they don't"
+        return "\(count) \(doshas) found and cancelled — \(subject) affect this match."
     }
 }
