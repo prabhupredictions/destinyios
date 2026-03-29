@@ -58,7 +58,14 @@ struct KutaTextBuilder {
     private var hasValues: Bool { !bv.isEmpty && !gv.isEmpty }
 
     private var cancellationReason: String {
-        kuta.cancellationReason ?? "exemption conditions in your charts"
+        expand(kuta.cancellationReason ?? "exemption conditions in your charts")
+    }
+
+    /// "Score restored to X/X — this dosha does not count against your match."
+    /// Empty string when not cancelled.
+    private var adjustedScoreNote: String {
+        guard kuta.doshaCancelled else { return "" }
+        return "Score restored to \(maxScore)/\(maxScore) — this dosha does not count against your match."
     }
 
     // MARK: - Description paragraph
@@ -134,7 +141,7 @@ struct KutaTextBuilder {
                 let gvLabel = gv.isEmpty ? girlName : gv
                 parts.append("⚠ Active Gana Dosha. When \(bvLabel) and \(gvLabel) natures pair up, the dominant nature tends to overpower the gentler one, creating friction in how you communicate, handle conflict, and show up for each other under stress. No cancellation was found in your charts.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
-                parts.append("The Gana Dosha is cancelled — \(cancellationReason). This softens the temperament clash significantly.")
+                parts.append("The Gana Dosha is cancelled — \(cancellationReason). \(adjustedScoreNote) This softens the temperament clash significantly.")
             }
 
         case "bhakoot":
@@ -165,7 +172,7 @@ struct KutaTextBuilder {
             if kuta.doshaPresent && !kuta.doshaCancelled {
                 parts.append("⚠ Active Nadi Dosha. Identical Nadis form the most serious dosha in Ashtakoot matching. Classical texts associate same-Nadi couples with health challenges, genetic incompatibility, and difficulties conceiving. No cancellation found — classical remedies are strongly recommended.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
-                parts.append("The Nadi Dosha is cancelled — \(cancellationReason). The genetic and health concerns are considered neutralised.")
+                parts.append("The Nadi Dosha is cancelled — \(cancellationReason). \(adjustedScoreNote) The genetic and health concerns are considered neutralised.")
             }
 
         default:
@@ -176,7 +183,7 @@ struct KutaTextBuilder {
             if kuta.doshaPresent && !kuta.doshaCancelled {
                 parts.append("⚠ Active \(kutaName) Dosha. No cancellation was found in your charts.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
-                parts.append("The dosha is cancelled — \(cancellationReason).")
+                parts.append("The dosha is cancelled — \(cancellationReason). \(adjustedScoreNote)")
             }
         }
 

@@ -211,7 +211,7 @@ struct OrbitTooltipView: View {
                     .font(AppTheme.Fonts.title(size: 15))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
-                Text("\(kutaDisplayName) Koota · \(format(kuta.score))/\(format(kuta.maxScore))")
+                Text("\(kutaDisplayName) Koota · \(kutaScoreSubtitle)")
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
@@ -240,7 +240,8 @@ struct OrbitTooltipView: View {
                 .padding(.horizontal, 7).padding(.vertical, 3)
                 .background(Capsule().fill(AppTheme.Colors.error.opacity(0.15)))
         } else if kuta.doshaPresent && kuta.doshaCancelled {
-            Text("✓ Cancelled")
+            let adj = kuta.adjustedScore ?? kuta.maxScore
+            Text("✓ Cancelled · \(format(adj))/\(format(kuta.maxScore))")
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.horizontal, 7).padding(.vertical, 3)
@@ -252,6 +253,14 @@ struct OrbitTooltipView: View {
                 .padding(.horizontal, 7).padding(.vertical, 3)
                 .background(Capsule().fill(AppTheme.Colors.success.opacity(0.15)))
         }
+    }
+
+    /// Subtitle score string: "0/8 → 8/8" when cancelled, raw score otherwise.
+    private var kutaScoreSubtitle: String {
+        if kuta.doshaPresent && kuta.doshaCancelled, let adj = kuta.adjustedScore {
+            return "\(format(kuta.score))/\(format(kuta.maxScore)) → \(format(adj))/\(format(kuta.maxScore))"
+        }
+        return "\(format(kuta.score))/\(format(kuta.maxScore))"
     }
 
     private var tooltipDescription: some View {
