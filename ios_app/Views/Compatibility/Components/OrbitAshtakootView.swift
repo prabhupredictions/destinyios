@@ -6,9 +6,8 @@ struct OrbitAshtakootView: View {
     var boyName: String = "Boy"
     var girlName: String = "Girl"
     var doshaSummary: DoshaSummary? = nil  // V2.1: Cancellation data
-    var onClassicalAnalysis: ((String) -> Void)? = nil
+    @Binding var selectedKuta: AshtakootData?
 
-    @State private var selectedKuta: AshtakootData?
     @State private var hintVisible: Bool = true
 
     // Semantic Map (v5)
@@ -131,12 +130,6 @@ struct OrbitAshtakootView: View {
                     )
                 }
 
-                // 4. Premium Tooltip Overlay (Center)
-                if let kuta = selectedKuta {
-                    kutaTooltipView(kuta: kuta)
-                        .transition(.scale.combined(with: .opacity))
-                        .zIndex(100)
-                }
             }
             .frame(height: (orbitRadius * 2) + bubbleSize + 20)
             .contentShape(Rectangle())
@@ -150,18 +143,30 @@ struct OrbitAshtakootView: View {
         }
     }
 
-    // MARK: - Tooltip View
+    // MARK: - Helpers
 
-    @ViewBuilder
-    private func kutaTooltipView(kuta: AshtakootData) -> some View {
-        let kutaName = kutaDisplayName(for: kuta.key)
+    private func format(_ value: Double) -> String {
+        value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
+    }
+}
 
+// MARK: - OrbitTooltipView
+
+/// Standalone tooltip card rendered at the screen level (above ScrollView) to avoid z-order clipping.
+struct OrbitTooltipView: View {
+    let kuta: AshtakootData
+    let boyName: String
+    let girlName: String
+    let onDismiss: () -> Void
+    let onClassicalAnalysis: (String) -> Void
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            tooltipHeader(kuta: kuta, kutaName: kutaName)
+            tooltipHeader
             Divider().background(AppTheme.Colors.gold.opacity(0.2))
-            tooltipDescription(kuta: kuta)
+            tooltipDescription
             Divider().background(AppTheme.Colors.gold.opacity(0.2))
-            classicalAnalysisCTA(kuta: kuta)
+            classicalAnalysisCTA
         }
         .padding(14)
         .frame(width: 300, alignment: .topLeading)
@@ -186,62 +191,70 @@ struct OrbitAshtakootView: View {
                     lineWidth: 1
                 )
         )
-        .shadow(color: AppTheme.Colors.gold.opacity(0.25), radius: 15, x: 0, y: 8)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 20, x: 0, y: 10)
     }
 
-    @ViewBuilder
-    private func tooltipHeader(kuta: AshtakootData, kutaName: String) -> some View {
-        HStack(alignment: .center, spacing: 10) {
+    // MARK: Header — icon + theme label + Sanskrit subtitle + score badge + close
+    private var tooltipHeader: some View {
+        HStack(alignment: .top, spacing: 10) {
+            // Icon
             Image(systemName: kuta.icon)
-                .font(.system(size: 22))
+                .font(.system(size: 20))
                 .foregroundColor(kuta.statusColor)
                 .shadow(color: kuta.statusColor.opacity(0.6), radius: 6)
+                .frame(width: 24, alignment: .center)
+                .padding(.top, 2)
 
+            // Theme label + Sanskrit subtitle — fills available width
             VStack(alignment: .leading, spacing: 2) {
-                Text(kutaThemeLabel(for: kuta.key))
-                    .font(AppTheme.Fonts.title(size: 17))
+                Text(kutaThemeLabel)
+                    .font(AppTheme.Fonts.title(size: 15))
                     .foregroundColor(AppTheme.Colors.textPrimary)
-                Text("\(kutaName) Koota · \(format(kuta.score))/\(format(kuta.maxScore))")
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("\(kutaDisplayName) Koota · \(format(kuta.score))/\(format(kuta.maxScore))")
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer()
-            scoreBadge(kuta: kuta)
-
-            Button(action: { withAnimation { selectedKuta = nil } }) {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .font(.system(size: 20))
+            // Badge + close grouped so they don't squeeze the title
+            HStack(spacing: 6) {
+                scoreBadge
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .font(.system(size: 18))
+                }
+                .buttonStyle(.plain)
             }
+            .fixedSize()
         }
     }
 
     @ViewBuilder
-    private func scoreBadge(kuta: AshtakootData) -> some View {
+    private var scoreBadge: some View {
         if kuta.doshaPresent && !kuta.doshaCancelled {
             Text("⚠ Dosha Active")
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(AppTheme.Colors.error)
-                .padding(.horizontal, 8).padding(.vertical, 3)
+                .padding(.horizontal, 7).padding(.vertical, 3)
                 .background(Capsule().fill(AppTheme.Colors.error.opacity(0.15)))
         } else if kuta.doshaPresent && kuta.doshaCancelled {
             Text("✓ Cancelled")
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(AppTheme.Colors.gold)
-                .padding(.horizontal, 8).padding(.vertical, 3)
+                .padding(.horizontal, 7).padding(.vertical, 3)
                 .background(Capsule().fill(AppTheme.Colors.gold.opacity(0.15)))
         } else {
             Text("✓ \(format(kuta.score))/\(format(kuta.maxScore))")
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(AppTheme.Colors.success)
-                .padding(.horizontal, 8).padding(.vertical, 3)
+                .padding(.horizontal, 7).padding(.vertical, 3)
                 .background(Capsule().fill(AppTheme.Colors.success.opacity(0.15)))
         }
     }
 
-    @ViewBuilder
-    private func tooltipDescription(kuta: AshtakootData) -> some View {
+    private var tooltipDescription: some View {
         Text(KutaTextBuilder(kuta: kuta, boyName: boyName, girlName: girlName).descriptionParagraph())
             .font(AppTheme.Fonts.body(size: 13))
             .foregroundColor(AppTheme.Colors.textSecondary)
@@ -249,11 +262,9 @@ struct OrbitAshtakootView: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    @ViewBuilder
-    private func classicalAnalysisCTA(kuta: AshtakootData) -> some View {
+    private var classicalAnalysisCTA: some View {
         Button {
-            withAnimation(.easeOut(duration: 0.2)) { selectedKuta = nil }
-            onClassicalAnalysis?(
+            onClassicalAnalysis(
                 KutaTextBuilder(kuta: kuta, boyName: boyName, girlName: girlName).classicalPrompt()
             )
         } label: {
@@ -273,54 +284,26 @@ struct OrbitAshtakootView: View {
     }
 
     // MARK: - Helpers
-
-    private func kutaDisplayName(for key: String) -> String {
+    private var kutaDisplayName: String {
         let names: [String: String] = [
-            "varna": "Varna",
-            "vashya": "Vashya",
-            "tara": "Tara",
-            "yoni": "Yoni",
-            "maitri": "Graha Maitri",
-            "gana": "Gana",
-            "bhakoot": "Bhakoot",
-            "nadi": "Nadi"
+            "varna": "Varna", "vashya": "Vashya", "tara": "Tara", "yoni": "Yoni",
+            "maitri": "Graha Maitri", "gana": "Gana", "bhakoot": "Bhakoot", "nadi": "Nadi"
         ]
-        return names[key] ?? key.capitalized
+        return names[kuta.key] ?? kuta.key.capitalized
     }
 
-    private func kutaThemeLabel(for key: String) -> String {
+    private var kutaThemeLabel: String {
         let themes: [String: String] = [
-            "varna": "Work compatibility",
-            "vashya": "Attraction and influence",
-            "tara": "Destiny and fortune",
-            "yoni": "Intimacy and physical",
-            "maitri": "Mental and friendship",
-            "gana": "Temperament",
-            "bhakoot": "Love and emotional",
-            "nadi": "Health and progeny"
+            "varna": "Work compatibility", "vashya": "Attraction and influence",
+            "tara": "Destiny and fortune", "yoni": "Intimacy and physical",
+            "maitri": "Mental and friendship", "gana": "Temperament",
+            "bhakoot": "Love and emotional", "nadi": "Health and progeny"
         ]
-        return themes[key] ?? key.capitalized
+        return themes[kuta.key] ?? kuta.key.capitalized
     }
 
     private func format(_ value: Double) -> String {
-        return value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
-    }
-
-    /// Replace generic "Boy"/"Girl"/"Groom"/"Bride" with actual partner names
-    private func replaceNames(in text: String) -> String {
-        text
-            .replacingOccurrences(of: "Groom's", with: "\(boyName)'s")
-            .replacingOccurrences(of: "Bride's", with: "\(girlName)'s")
-            .replacingOccurrences(of: "Groom:", with: "\(boyName):")
-            .replacingOccurrences(of: "Bride:", with: "\(girlName):")
-            .replacingOccurrences(of: "Groom ", with: "\(boyName) ")
-            .replacingOccurrences(of: "Bride ", with: "\(girlName) ")
-            .replacingOccurrences(of: "Boy's", with: "\(boyName)'s")
-            .replacingOccurrences(of: "Girl's", with: "\(girlName)'s")
-            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
-            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
-            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
-            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
+        value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
     }
 }
 

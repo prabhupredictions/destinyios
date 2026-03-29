@@ -736,13 +736,13 @@ struct FullReportSheet: View {
                 .font(.system(size: 8))
                 .foregroundColor(.white.opacity(0.25))
             
-            Text("Generated: \(formattedDate)")
+            Text(String(format: "report_generated_label_format".localized, formattedDate))
                 .font(.system(size: 7))
                 .foregroundColor(.white.opacity(0.2))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        
+
         pdfSections.append(AnyView(disclaimer))
         
         return pdfSections
@@ -897,7 +897,7 @@ private struct PremiumReportPDFView: View {
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.25))
                 
-                Text("Generated: \(formattedDate)")
+                Text(String(format: "report_generated_label_format".localized, formattedDate))
                     .font(.system(size: 7))
                     .foregroundColor(.white.opacity(0.2))
             }
@@ -914,6 +914,7 @@ struct AskDestinySheet: View {
     let result: CompatibilityResult
     let boyName: String
     let girlName: String
+    var initialPrompt: String? = nil  // V2.5 — pre-fill from "See classical analysis →"
     @Environment(\.dismiss) private var dismiss
     
     // Chat State
@@ -1048,6 +1049,11 @@ struct AskDestinySheet: View {
         }
         .onAppear {
             loadStoredMessages()
+            // V2.5 — auto-send classical analysis prompt regardless of existing chat history
+            if let prompt = initialPrompt, !prompt.isEmpty {
+                inputText = prompt
+                Task { await sendMessage() }
+            }
         }
         .sheet(isPresented: $showQuotaSheet) {
             QuotaExhaustedView(

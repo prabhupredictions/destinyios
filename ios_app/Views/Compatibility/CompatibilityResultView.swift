@@ -17,9 +17,16 @@ struct CompatibilityResultView: View {
     
     // Sheet States
     @State private var showFullReport = false
-    @State private var showAskDestiny = false
     @State private var showHistorySheet = false
     @State private var showProfile = false
+    // V2.5: item-based sheet so initialPrompt is always captured correctly
+    private struct AskDestinyItem: Identifiable {
+        let id = UUID()
+        let prompt: String?
+    }
+    @State private var askDestinyItem: AskDestinyItem? = nil
+    // Lifted from OrbitAshtakootView so tooltip renders above ScrollView content
+    @State private var selectedKuta: AshtakootData? = nil
     
     // Animation State
     @State private var contentOpacity: Double = 0
@@ -140,7 +147,8 @@ struct CompatibilityResultView: View {
                             },
                             boyName: boyName,
                             girlName: girlName,
-                            doshaSummary: result.doshaSummary
+                            doshaSummary: result.doshaSummary,
+                            selectedKuta: $selectedKuta
                         )
                         .padding(.bottom, 0) // Removed extra padding to close gap
                         
@@ -228,11 +236,33 @@ struct CompatibilityResultView: View {
             // 3. Floating Context Action (Ask)
             FloatingContextButton(
                 icon: "bubble.left.and.bubble.right.fill",
-                action: { showAskDestiny = true }
+                action: { askDestinyItem = AskDestinyItem(prompt: nil) }
             )
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             
+            // Kuta tooltip overlay — rendered here so it floats above the ScrollView and
+            // recommendation banner without being clipped by scroll content layout.
+            if let kuta = selectedKuta {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { withAnimation { selectedKuta = nil } }
+                    .ignoresSafeArea()
+
+                OrbitTooltipView(
+                    kuta: kuta,
+                    boyName: boyName,
+                    girlName: girlName,
+                    onDismiss: { withAnimation { selectedKuta = nil } },
+                    onClassicalAnalysis: { prompt in
+                        withAnimation(.easeOut(duration: 0.2)) { selectedKuta = nil }
+                        askDestinyItem = AskDestinyItem(prompt: prompt)
+                    }
+                )
+                .transition(.scale(scale: 0.95).combined(with: .opacity))
+                .zIndex(200)
+            }
+
             } // End ZStack
             .navigationBarHidden(true)
         } // End NavigationStack
@@ -258,8 +288,8 @@ struct CompatibilityResultView: View {
                 girlDob: girlDob
             )
         }
-        .sheet(isPresented: $showAskDestiny) {
-            AskDestinySheet(result: result, boyName: boyName, girlName: girlName)
+        .sheet(item: $askDestinyItem) { item in
+            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, initialPrompt: item.prompt)
         }
          .sheet(isPresented: $showHistorySheet) {
             CompatibilityHistorySheet { selectedItem in
@@ -281,9 +311,8 @@ struct CompatibilityResultView: View {
     private var recommendationBanner: some View {
         let hasDosha = (result.doshaSummary?.activeCount ?? 0) > 0
         let cancelledCount = result.doshaSummary?.cancelledCount ?? 0
-        let activeCount = result.doshaSummary?.activeCount ?? 0
         let borderColor = result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error
-        
+
         if hasDosha || !result.isRecommended || !result.rejectionReasons.isEmpty {
             VStack(spacing: 0) {
                 // ─── Header Band ───
@@ -291,14 +320,13 @@ struct CompatibilityResultView: View {
                     Image(systemName: result.isRecommended ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
-                    
+
                     Text(result.isRecommended ? "recommended".localized : "not_recommended".localized)
                         .font(AppTheme.Fonts.title(size: 16).weight(.bold))
                         .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
-                    
+
                     Spacer()
-                    
-                    // Score moved to header — show adjusted score when available
+
                     HStack(spacing: 4) {
                         Text("\(result.adjustedScore ?? result.totalScore)")
                             .font(AppTheme.Fonts.title(size: 20).weight(.bold))
@@ -314,98 +342,120 @@ struct CompatibilityResultView: View {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(result.isRecommended ? AppTheme.Colors.success.opacity(0.1) : AppTheme.Colors.error.opacity(0.1))
                 )
-                
+
                 // ─── Content Area ───
                 VStack(alignment: .leading, spacing: 12) {
-                    // ─── Recommendation Text — only show when recommended (avoids conflict) ───
                     if result.isRecommended {
                         Text(result.recommendation.localized)
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    
-                    // ─── Active Doshas (including those in rejection reasons) ───
-                    if let details = result.doshaSummary?.details, activeCount > 0 {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("active_doshas".localized)
+
+                    // ─── Personalized Rejection Reasons (plain English, per-dosha) ───
+                    if !result.isRecommended, let details = result.doshaSummary?.details {
+                        let doshaOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "vashya", "tara", "varna"]
+
+                        let activeWithReasons = doshaOrder.compactMap { key -> (key: String, reason: String)? in
+                            guard let detail = details[key],
+                                  detail.present == true,
+                                  detail.cancelled != true,
+                                  let reason = detail.plainEnglishRejectionReason,
+                                  !reason.isEmpty else { return nil }
+                            return (key: key, reason: reason)
+                        }
+
+                        if !activeWithReasons.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("not_recommended_because".localized)
                                     .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                                    .foregroundColor(AppTheme.Colors.warning)
-                                
-                                // Count badge
-                                Text("\(activeCount)")
-                                    .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(AppTheme.Colors.warning)
-                                    .clipShape(Capsule())
-                                
-                                if cancelledCount > 0 {
-                                    Text("(\(cancelledCount) " + "cancelled".localized + ")")
-                                        .font(AppTheme.Fonts.caption(size: 11))
-                                        .foregroundColor(AppTheme.Colors.success)
-                                }
-                                
-                                Spacer()
-                            }
-                            
-                            // Show all active doshas in order
-                            let doshaOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "vashya", "tara", "varna"]
-                            let doshaNames: [String: String] = [
-                                "nadi": "Nadi", "bhakoot": "Bhakoot", "gana": "Gana",
-                                "maitri": "Maitri", "yoni": "Yoni", "vashya": "Vashya",
-                                "tara": "Tara", "varna": "Varna"
-                            ]
-                            
-                            ForEach(doshaOrder, id: \.self) { key in
-                                if let detail = details[key],
-                                   detail.present == true {
-                                    HStack(spacing: 8) {
-                                        Image(systemName: detail.cancelled == true ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                    .foregroundColor(AppTheme.Colors.error)
+
+                                ForEach(activeWithReasons, id: \.key) { item in
+                                    HStack(alignment: .top, spacing: 8) {
+                                        Image(systemName: "exclamationmark.triangle.fill")
                                             .font(.system(size: 11))
-                                            .foregroundColor(detail.cancelled == true ? AppTheme.Colors.success : AppTheme.Colors.warning)
-                                        
-                                        Text("\(doshaNames[key] ?? key.capitalized) " + "dosha_label".localized)
-                                            .font(AppTheme.Fonts.caption(size: 12).weight(.semibold))
-                                            .foregroundColor(AppTheme.Colors.textPrimary)
-                                        
-                                        if detail.cancelled == true {
-                                            Text("cancelled".localized)
-                                                .font(AppTheme.Fonts.caption(size: 10))
-                                                .foregroundColor(AppTheme.Colors.success)
-                                        }
-                                        
-                                        Spacer()
+                                            .foregroundColor(AppTheme.Colors.error)
+                                            .padding(.top, 1)
+
+                                        Text(replaceNamesInBanner(item.reason))
+                                            .font(AppTheme.Fonts.caption(size: 13))
+                                            .foregroundColor(AppTheme.Colors.textSecondary)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                }
+                            }
+                        } else if !result.rejectionReasons.isEmpty {
+                            // Fallback: show raw rejection reasons if no personalized ones
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("not_recommended_because".localized)
+                                    .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
+                                    .foregroundColor(AppTheme.Colors.error)
+
+                                ForEach(Array(result.rejectionReasons.enumerated()), id: \.offset) { _, reason in
+                                    HStack(alignment: .top, spacing: 6) {
+                                        Text("•")
+                                            .font(AppTheme.Fonts.caption(size: 12))
+                                            .foregroundColor(AppTheme.Colors.textSecondary)
+                                        Text(replaceNamesInBanner(reason))
+                                            .font(AppTheme.Fonts.caption(size: 12))
+                                            .foregroundColor(AppTheme.Colors.textSecondary)
+                                            .fixedSize(horizontal: false, vertical: true)
                                     }
                                 }
                             }
                         }
-                    }
-                    
-                    // ─── Rejection Reasons / Additional Notes ───
-                    if !result.rejectionReasons.isEmpty {
-                        Divider()
-                            .background(AppTheme.Colors.textTertiary.opacity(0.2))
-
+                    } else if result.isRecommended && !result.rejectionReasons.isEmpty {
+                        // Recommended but has notes
                         VStack(alignment: .leading, spacing: 6) {
-                            Text(result.isRecommended ? "additional_notes".localized : "not_recommended_because".localized)
+                            Text("additional_notes".localized)
                                 .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                                .foregroundColor(result.isRecommended ? AppTheme.Colors.textSecondary : AppTheme.Colors.error)
+                                .foregroundColor(AppTheme.Colors.textSecondary)
 
                             ForEach(Array(result.rejectionReasons.enumerated()), id: \.offset) { _, reason in
                                 HStack(alignment: .top, spacing: 6) {
                                     Text("•")
                                         .font(AppTheme.Fonts.caption(size: 12))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
-
                                     Text(replaceNamesInBanner(reason))
                                         .font(AppTheme.Fonts.caption(size: 12))
                                         .foregroundColor(AppTheme.Colors.textSecondary)
                                         .fixedSize(horizontal: false, vertical: true)
                                 }
                             }
+                        }
+                    }
+
+                    // ─── Cancelled Doshas Summary (one sentence at bottom) ───
+                    if cancelledCount > 0,
+                       let summary = result.cancelledDoshasSummary,
+                       !summary.isEmpty {
+                        Divider()
+                            .background(AppTheme.Colors.success.opacity(0.2))
+
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.Colors.success)
+                                .padding(.top, 1)
+
+                            Text(replaceNamesInBanner(summary))
+                                .font(AppTheme.Fonts.caption(size: 12))
+                                .foregroundColor(AppTheme.Colors.success.opacity(0.85))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    } else if cancelledCount > 0 {
+                        // Fallback: generic cancelled count
+                        Divider()
+                            .background(AppTheme.Colors.success.opacity(0.2))
+
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundColor(AppTheme.Colors.success)
+                            Text("(\(cancelledCount) " + "cancelled".localized + ")")
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.success)
                         }
                     }
                 }
