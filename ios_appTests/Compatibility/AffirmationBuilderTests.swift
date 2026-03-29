@@ -101,6 +101,14 @@ final class AffirmationBuilderTests: XCTestCase {
         XCTAssertTrue(text.contains("21/36"), text)
     }
 
+    func test_zeroPerfect_adjustedScoreUsedOverTotalInTierFallback() {
+        let kutas = [kuta("Nadi", points: 5, max: 8)]
+        let text = AffirmationBuilder(kutas: kutas, adjustedScore: 29, totalScore: 24).affirmationText()
+        XCTAssertTrue(text.contains("29/36"), "adjusted score should be used in tier fallback: \(text)")
+        XCTAssertFalse(text.contains("24/36"), text)
+        XCTAssertTrue(text.contains("excellent tier"), text)
+    }
+
     // MARK: - Edge cases
 
     func test_varnaExcluded_maxOneNotPerfect() {
@@ -115,7 +123,7 @@ final class AffirmationBuilderTests: XCTestCase {
         XCTAssertTrue(text.contains("22/36"), text)
     }
 
-    func test_prefixMatching_grahaMaitri() {
+    func test_substringMatching_grahaMaitri() {
         // "Graha Maitri" must be matched by key "maitri"
         let kutas = [
             kuta("Graha Maitri", points: 5, max: 5),
@@ -123,7 +131,7 @@ final class AffirmationBuilderTests: XCTestCase {
         ]
         let text = AffirmationBuilder(kutas: kutas, adjustedScore: nil, totalScore: 26).affirmationText()
         // Should be in 1-perfect path with Graha Maitri as the display name
-        XCTAssertTrue(text.contains("Graha Maitri"), "Prefix match should produce display name: \(text)")
+        XCTAssertTrue(text.contains("Graha Maitri"), "Substring match should produce display name: \(text)")
         XCTAssertTrue(text.contains("mental friendship"), text)
     }
 
