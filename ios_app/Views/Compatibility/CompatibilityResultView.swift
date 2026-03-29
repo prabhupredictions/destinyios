@@ -35,15 +35,7 @@ struct CompatibilityResultView: View {
     @State private var cachedBoyMangalDosha: MangalDoshaData?
     @State private var cachedGirlMangalDosha: MangalDoshaData?
     @State private var mangalDoshaCached = false
-    
-    // Status Logic Helpers
-    private var isMangalEffective: Bool {
-        // Simple logic: if present in result data as "Present" or "Effective"
-        // For MVP, we'll check the summary text or assume based on score if data missing
-        // Better: check result.analysisData?.joint?.mangalCompatibility
-        return false // Default safe, effectively handled by sheet logic usually
-    }
-    
+
     // Computed Data for Grid
     private var ashtakootPoints: [String: Double] {
         Dictionary<String, Double>(uniqueKeysWithValues: result.kutas.map { ($0.name.lowercased(), Double($0.points)) })
@@ -503,7 +495,7 @@ private struct RecommendationBannerView: View {
     }
 
     private func fallbackCancelledText(count: Int) -> String {
-        let doshas = count == 1 ? "dosha" : "doshas"
+        let doshas = count == 1 ? "dosha".localized : "doshas".localized
         let subject = count == 1 ? "it doesn't" : "they don't"
         return "\(count) \(doshas) found and cancelled — \(subject) affect this match."
     }
