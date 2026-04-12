@@ -17,10 +17,13 @@ struct BirthDataView: View {
     @State private var showDataRefreshedBanner = false  // Backend wiped birth data
     
     @FocusState private var isNameFocused: Bool
-    
+
     // Profile setup loading - setting this triggers fullScreenCover via item binding
     @State private var savedBirthData: BirthData?
-    
+
+    // Response style picker — shown after birth data is saved, before profile setup loading
+    @State private var showResponseStylePicker = false
+
     // Sound Manager
     @ObservedObject private var soundManager = SoundManager.shared
     
@@ -180,13 +183,29 @@ struct BirthDataView: View {
                 onDismiss: { showGenderSheet = false }
             )
         }
+        .fullScreenCover(isPresented: $showResponseStylePicker) {
+            ResponseStyleOnboardingView(isSettingsMode: false) {
+                // Dismiss style picker first, then trigger ProfileSetupLoadingView after animation
+                showResponseStylePicker = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    // savedBirthData was set before showResponseStylePicker became true;
+                    // re-trigger the item cover by toggling through nil if needed.
+                    // savedBirthData is still set — setting hasBirthData drives the next cover.
+                    let bd = savedBirthData
+                    savedBirthData = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        savedBirthData = bd
+                    }
+                }
+            }
+        }
         .fullScreenCover(item: $savedBirthData) { birthData in
             ProfileSetupLoadingView(
                 onComplete: {
                     // Set hasBirthData FIRST so AppRootView transitions to MainTabView
                     // BEFORE the cover dismisses (avoids flash of BirthDataView)
                     hasBirthData = true
-                    
+
                     // Small delay to allow transition to start, then dismiss cover
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         savedBirthData = nil
@@ -414,7 +433,7 @@ struct BirthDataView: View {
                     if shouldProceed {
                         // Only proceed if registration succeeded (no conflict)
                         await MainActor.run {
-                            // Create birth data for prefetch
+                            // Store birth data, then show response style picker before profile setup
                             savedBirthData = BirthData(
                                 dob: viewModel.formattedDOB,
                                 time: viewModel.formattedTOB,
@@ -422,7 +441,9 @@ struct BirthDataView: View {
                                 longitude: viewModel.longitude,
                                 cityOfBirth: viewModel.cityOfBirth
                             )
-                            print("[DEBUG] BirthData saved, triggering ProfileSetupLoadingView via item binding")
+                            // Show response style picker; it will trigger ProfileSetupLoadingView on Continue
+                            showResponseStylePicker = true
+                            print("[DEBUG] BirthData saved, showing ResponseStylePicker before ProfileSetupLoadingView")
                         }
                     }
                 }

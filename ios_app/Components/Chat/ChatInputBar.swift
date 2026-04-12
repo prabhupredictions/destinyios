@@ -10,7 +10,7 @@ struct ChatInputBar: View {
     let onSend: () -> Void
     
     @State private var showStyleSelector = false
-    @State private var styleManager = ResponseStyleManager.shared
+    @State private var lengthManager = ResponseLengthManager.shared
     
     private var canSend: Bool {
         !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming && !isTyping
@@ -48,9 +48,9 @@ struct ChatInputBar: View {
                     showStyleSelector = true
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: styleManager.currentStyle.icon)
+                        Image(systemName: lengthManager.currentLength.icon)
                             .font(.system(size: 12))
-                        Text(styleManager.currentStyle.localizedLabel.isEmpty ? styleManager.currentStyle.label : styleManager.currentStyle.localizedLabel)
+                        Text(lengthManager.currentLength.label)
                             .font(AppTheme.Fonts.body(size: 13).weight(.medium))
                         Image(systemName: "chevron.up")
                             .font(.system(size: 10, weight: .bold))
@@ -112,7 +112,7 @@ struct ChatInputBar: View {
         .padding(.vertical, 12)
         .background(AppTheme.Colors.mainBackground)
         .sheet(isPresented: $showStyleSelector) {
-            ResponseStyleSheet()
+            ResponseLengthSheet()
         }
     }
 }

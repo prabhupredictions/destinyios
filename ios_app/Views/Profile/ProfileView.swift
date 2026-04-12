@@ -21,6 +21,7 @@ struct ProfileView: View {
     // Navigation states for settings sheets
     @State private var showBirthDetails = false
     @State private var showLanguageSettings = false
+    @State private var showResponseStyleSettings = false
     @State private var showAstrologySettings = false
     @State private var showChartStylePicker = false
     @State private var showSubscription = false
@@ -126,6 +127,9 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $showLanguageSettings) {
                 LanguageSettingsSheet()
+            }
+            .sheet(isPresented: $showResponseStyleSettings) {
+                ResponseStyleOnboardingView(isSettingsMode: true)
             }
             .sheet(isPresented: $showAstrologySettings) {
                 AstrologySettingsSheet()
@@ -362,6 +366,13 @@ struct ProfileView: View {
                     subtitle: currentLanguageDisplay,
                     icon: "globe",
                     action: { showLanguageSettings = true }
+                )
+
+                PremiumListItem(
+                    title: NSLocalizedString("response_style_setting_title", value: "Response Style", comment: ""),
+                    subtitle: ContentStyleManager.shared.currentStyle.label,
+                    icon: "sparkles",
+                    action: { showResponseStyleSettings = true }
                 )
                 
                 if AppTheme.Features.showAstrologySettings {

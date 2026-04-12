@@ -134,10 +134,20 @@ struct InlineMessageRating: View {
     let query: String
     let responseText: String
     let predictionId: String?
-    
-    @State private var selectedRating: Int = 0
+
+    @State private var selectedRating: Int
     @State private var isSubmitting = false
-    @State private var hasSubmitted = false
+    @State private var hasSubmitted: Bool
+
+    init(message: LocalChatMessage, query: String, responseText: String, predictionId: String?) {
+        self.message = message
+        self.query = query
+        self.responseText = responseText
+        self.predictionId = predictionId
+        let saved = message.rating ?? 0
+        _selectedRating = State(initialValue: saved)
+        _hasSubmitted = State(initialValue: saved > 0)
+    }
     
     var body: some View {
         HStack(spacing: 4) {

@@ -1,15 +1,15 @@
 import SwiftUI
 
-/// A bottom sheet for selecting the AI response style
-struct ResponseStyleSheet: View {
+/// Bottom sheet for selecting response length (concise vs expanded) in chat input bar.
+struct ResponseLengthSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var manager = ResponseStyleManager.shared
-    
+    @State private var manager = ResponseLengthManager.shared
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Text(NSLocalizedString("response_style_title", value: "Response Style", comment: ""))
+                Text(NSLocalizedString("response_length_title", value: "Response Length", comment: ""))
                     .font(AppTheme.Fonts.title(size: 20))
                     .foregroundColor(AppTheme.Colors.gold)
                 Spacer()
@@ -22,11 +22,11 @@ struct ResponseStyleSheet: View {
                 }
             }
             .padding(24)
-            
+
             // Options
             VStack(spacing: 16) {
-                ForEach(ResponseStyle.allCases) { style in
-                    styleOptionRow(for: style)
+                ForEach(ResponseLength.allCases) { length in
+                    lengthOptionRow(for: length)
                 }
             }
             .padding(.horizontal, 24)
@@ -37,56 +37,45 @@ struct ResponseStyleSheet: View {
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(24)
     }
-    
-    private func styleOptionRow(for style: ResponseStyle) -> some View {
-        let isSelected = manager.currentStyle == style
-        
+
+    private func lengthOptionRow(for length: ResponseLength) -> some View {
+        let isSelected = manager.currentLength == length
+
         return Button {
-            // Haptic feedback
             let impact = UIImpactFeedbackGenerator(style: .medium)
             impact.impactOccurred()
-            
-            manager.setStyle(style)
-            
-            // Dismiss automatically after a very brief delay to show selection
+            manager.setLength(length)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 dismiss()
             }
-            
         } label: {
             HStack(spacing: 16) {
-                // Icon
                 ZStack {
                     Circle()
                         .fill(isSelected ? AppTheme.Colors.gold.opacity(0.15) : AppTheme.Colors.mainBackground)
                         .frame(width: 48, height: 48)
-                    
-                    Image(systemName: style.icon)
+                    Image(systemName: length.icon)
                         .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
                         .foregroundColor(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
                 }
-                
-                // Text content
+
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(style.localizedLabel.isEmpty ? style.label : style.localizedLabel)
+                    Text(length.label)
                         .font(AppTheme.Fonts.body(size: 16).weight(isSelected ? .semibold : .regular))
                         .foregroundColor(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.textPrimary)
-                    
-                    Text(style.description)
+                    Text(length.description)
                         .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(2)
                 }
-                
+
                 Spacer()
-                
-                // Radio button
+
                 ZStack {
                     Circle()
                         .stroke(isSelected ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary, lineWidth: 2)
                         .frame(width: 22, height: 22)
-                    
                     if isSelected {
                         Circle()
                             .fill(AppTheme.Colors.gold)
@@ -109,6 +98,6 @@ struct ResponseStyleSheet: View {
 }
 
 #Preview {
-    ResponseStyleSheet()
+    ResponseLengthSheet()
         .preferredColorScheme(.dark)
 }

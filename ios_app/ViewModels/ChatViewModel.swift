@@ -233,11 +233,10 @@ class ChatViewModel {
         
         let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
         
-        // FIX: Read response style directly from UserDefaults to avoid caching issue
-        // ResponseStyleManager may have stale cached value
-        let savedStyle = UserDefaults.standard.string(forKey: "userResponseStyle") ?? "detailed"
-        let responseStyle = savedStyle
-        
+        // Read response length and content style directly from UserDefaults to avoid stale cache
+        let responseLength = UserDefaults.standard.string(forKey: "userResponseLength") ?? "detailed"
+        let responseStyle = UserDefaults.standard.string(forKey: "userContentStyle") ?? "guidance"
+
         let request = PredictionRequest(
             query: query,
             birthData: birthData,
@@ -245,7 +244,8 @@ class ChatViewModel {
             conversationId: currentThreadId,
             userEmail: userEmail,
             language: appLanguage,
-            responseStyle: responseStyle
+            responseStyle: responseStyle,
+            responseLength: responseLength
         )
         
         // Non-streaming API call (server records quota + chat history)
