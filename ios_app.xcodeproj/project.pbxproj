@@ -35,8 +35,8 @@
 		E401A9FB2F0CD77E00D75125 /* Production.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Production.xcconfig; sourceTree = "<group>"; };
 		E401A9FD2F0CD79100D75125 /* Test.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Test.xcconfig; sourceTree = "<group>"; };
 		E442EF302EF2B99700146A8B /* Destiny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Destiny.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E442EF412EF2B99C00146A8B /* Destiny.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Destiny.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E442EF4B2EF2B99C00146A8B /* Destiny.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Destiny.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E442EF412EF2B99C00146A8B /* ios_appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E444AD8C2EFCD75F00782341 /* ios_app.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ios_app.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,8 +116,8 @@
 			isa = PBXGroup;
 			children = (
 				E442EF302EF2B99700146A8B /* Destiny.app */,
-				E442EF412EF2B99C00146A8B /* Destiny.xctest */,
-				E442EF4B2EF2B99C00146A8B /* Destiny.xctest */,
+				E442EF412EF2B99C00146A8B /* ios_appTests.xctest */,
+				E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -175,7 +175,7 @@
 			packageProductDependencies = (
 			);
 			productName = ios_appTests;
-			productReference = E442EF412EF2B99C00146A8B /* Destiny.xctest */;
+			productReference = E442EF412EF2B99C00146A8B /* ios_appTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		E442EF4A2EF2B99C00146A8B /* ios_appUITests */ = {
@@ -198,7 +198,7 @@
 			packageProductDependencies = (
 			);
 			productName = ios_appUITests;
-			productReference = E442EF4B2EF2B99C00146A8B /* Destiny.xctest */;
+			productReference = E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -412,7 +412,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
-				SWIFT_MODULE_NAME = ios_app;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -420,6 +419,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_MODULE_NAME = ios_app;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -565,7 +565,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
-				SWIFT_MODULE_NAME = ios_app;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -573,6 +572,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_MODULE_NAME = ios_app;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -663,7 +663,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
-				SWIFT_MODULE_NAME = ios_app;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -671,6 +670,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_MODULE_NAME = ios_app;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -710,7 +710,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
-				SWIFT_MODULE_NAME = ios_app;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -718,6 +717,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_MODULE_NAME = ios_app;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";

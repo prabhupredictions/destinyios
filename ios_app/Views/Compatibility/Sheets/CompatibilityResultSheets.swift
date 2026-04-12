@@ -931,7 +931,7 @@ struct AskDestinySheet: View {
     @State private var typewriterMessageId: UUID? = nil  // ID of message currently animating; nil = done
     @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
     @State private var showStyleSelector = false
-    @State private var styleManager = ResponseStyleManager.shared
+    @State private var lengthManager = ResponseLengthManager.shared
     
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -1293,9 +1293,9 @@ struct AskDestinySheet: View {
                     showStyleSelector = true
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: styleManager.currentStyle.icon)
+                        Image(systemName: lengthManager.currentLength.icon)
                             .font(.system(size: 12))
-                        Text(styleManager.currentStyle.localizedLabel.isEmpty ? styleManager.currentStyle.label : styleManager.currentStyle.localizedLabel)
+                        Text(lengthManager.currentLength.label)
                             .font(AppTheme.Fonts.body(size: 13).weight(.medium))
                         Image(systemName: "chevron.up")
                             .font(.system(size: 10, weight: .bold))
@@ -1331,8 +1331,8 @@ struct AskDestinySheet: View {
                 )
         )
         .sheet(isPresented: $showStyleSelector) {
-            ResponseStyleSheet()
-                .onDisappear { styleManager = ResponseStyleManager.shared }
+            ResponseLengthSheet()
+                .onDisappear { lengthManager = ResponseLengthManager.shared }
         }
         .accessibilityHidden(true)
     }
@@ -1393,7 +1393,8 @@ struct AskDestinySheet: View {
                 sessionId: sessionId,
                 userEmail: email,
                 language: appLanguage,
-                responseStyle: ResponseStyleManager.shared.currentStyle.rawValue
+                responseStyle: ContentStyleManager.shared.currentStyle.rawValue,
+                responseLength: ResponseLengthManager.shared.currentLength.rawValue
             )
             
             let response = try await compatibilityService.followUp(request: request)
@@ -1534,7 +1535,8 @@ struct AskDestinySheet: View {
                 conversationId: compatThreadId,
                 userEmail: email,
                 language: redirectLang,
-                responseStyle: ResponseStyleManager.shared.currentStyle.rawValue,
+                responseStyle: ContentStyleManager.shared.currentStyle.rawValue,
+                responseLength: ResponseLengthManager.shared.currentLength.rawValue,
                 quotaContext: "compatibility"  // Marks this as coming from compatibility
             )
             

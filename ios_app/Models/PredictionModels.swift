@@ -11,6 +11,7 @@ struct PredictionRequest: Codable, Sendable {
     var includeReasoningTrace: Bool = false
     var language: String = "en"
     var responseStyle: String?
+    var responseLength: String?
     
     /// Quota context for server-side recording
     /// - "chat": Default for main chat screen questions
@@ -27,6 +28,7 @@ struct PredictionRequest: Codable, Sendable {
         case includeReasoningTrace = "include_reasoning_trace"
         case language
         case responseStyle = "response_style"
+        case responseLength = "response_length"
         case quotaContext = "quota_context"
     }
 }

@@ -327,6 +327,7 @@ struct CompatibilityFollowUpRequest: Codable, Sendable {
     let userEmail: String
     var language: String = "en"
     var responseStyle: String?
+    var responseLength: String?
 
     enum CodingKeys: String, CodingKey {
         case query
@@ -334,6 +335,7 @@ struct CompatibilityFollowUpRequest: Codable, Sendable {
         case userEmail = "user_email"
         case language
         case responseStyle = "response_style"
+        case responseLength = "response_length"
     }
 }
 
