@@ -12,7 +12,7 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
         session: URLSessionProtocol = {
             let config = URLSessionConfiguration.default
             config.waitsForConnectivity = true
-            config.timeoutIntervalForResource = 120
+            config.timeoutIntervalForResource = 600  // 10 min — Opus can take 3-5 min
             return URLSession(configuration: config)
         }(),
         baseURL: String = APIConfig.baseURL,

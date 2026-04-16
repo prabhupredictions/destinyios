@@ -79,13 +79,17 @@ struct MessageBubble: View {
     
     // MARK: - Typewriter Effect (local @State, no parent re-renders)
     private func startTypewriter() {
+        // Guard against double-start when LazyVStack re-appears
+        typewriterTimer?.invalidate()
+        typewriterTimer = nil
+
         let fullText = message.content
         let words = fullText.components(separatedBy: " ")
         guard !words.isEmpty else {
             typewriterFinished = true
             return
         }
-        
+
         var wordIndex = 0
         revealedContent = ""
         
@@ -93,22 +97,23 @@ struct MessageBubble: View {
         typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
             let batchEnd = min(wordIndex + 1, words.count)
             let batch = words[wordIndex..<batchEnd].joined(separator: " ")
-            
+
             if revealedContent.isEmpty {
                 revealedContent = batch
             } else {
                 revealedContent += " " + batch
             }
-            
+
             wordIndex = batchEnd
-            
+
             // Scroll follows typewriter every ~10 words
             if wordIndex % 10 == 0 {
                 onTypewriterProgress?()
             }
-            
+
             if wordIndex >= words.count {
                 timer.invalidate()
+                typewriterTimer = nil
                 typewriterFinished = true
                 onTypewriterFinished?()
             }
@@ -469,6 +474,7 @@ struct CollapsibleProgressView: View {
     }
     
     private func startTimer() {
+        timer?.invalidate()  // guard against double-start on LazyVStack re-appear
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             elapsedSeconds += 1
         }

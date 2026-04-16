@@ -34,7 +34,7 @@ class StreamingPredictionService {
         urlRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-        urlRequest.timeoutInterval = 60  // 60 second timeout for long predictions
+        urlRequest.timeoutInterval = 300  // 5 min — Opus first-token can be slow
         
         // Build request body using correct BirthData properties
         let body: [String: Any] = [
@@ -59,8 +59,8 @@ class StreamingPredictionService {
         
         // Use dedicated URLSession configuration for SSE
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 60
-        config.timeoutIntervalForResource = 120
+        config.timeoutIntervalForRequest = 300   // 5 min — Opus first-token latency
+        config.timeoutIntervalForResource = 600  // 10 min — full Opus stream
         config.waitsForConnectivity = true
         let session = URLSession(configuration: config)
         
