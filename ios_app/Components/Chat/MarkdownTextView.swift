@@ -22,8 +22,26 @@ struct MarkdownTextView: View {
         }
         .task(id: content) {
             let text = content
-            let parsed = await Task.detached(priority: .userInitiated) {
-                Self.parseBlocksStatic(from: text)
+            let (parsed, _) = await Task.detached(priority: .userInitiated) {
+                let parsedBlocks = Self.parseBlocksStatic(from: text)
+                // Pre-warm the AttributedString cache for every inline text that will
+                // be rendered. This runs off the main thread so the first body render
+                // hits the cache instead of blocking the main thread with synchronous
+                // AttributedString(markdown:) calls (which cause watchdog kills on long
+                // Opus responses with 30-50 paragraphs).
+                for block in parsedBlocks {
+                    switch block {
+                    case .paragraph(let t), .blockquote(let t):
+                        Self.prewarmAttrCache(t)
+                    case .boldLabel(_, let c):
+                        if !c.isEmpty { Self.prewarmAttrCache(c) }
+                    case .bulletList(let items), .numberedList(let items):
+                        for item in items { Self.prewarmAttrCache(item) }
+                    default:
+                        break
+                    }
+                }
+                return (parsedBlocks, ())
             }.value
             blocks = parsed
         }
@@ -567,7 +585,7 @@ struct MarkdownTextView: View {
         }
     }
     
-    /// Cached AttributedString lookup — avoids re-parsing identical text
+    /// Cached AttributedString lookup — avoids re-parsing identical text on main thread
     private func cachedAttributedString(for sanitized: String) -> AttributedString? {
         let key = sanitized as NSString
         if let cached = Self.attrCache.object(forKey: key) {
@@ -581,6 +599,25 @@ struct MarkdownTextView: View {
             return attrString
         }
         return nil
+    }
+
+    /// Pre-warm the attrCache off the main thread so body renders are cache hits.
+    /// Called from .task (background thread) before blocks are set on the main thread.
+    private static func prewarmAttrCache(_ text: String) {
+        var result = text
+        result = result.replacingOccurrences(of: "|", with: "·")
+        let boldCount = result.components(separatedBy: "**").count - 1
+        if boldCount % 2 != 0 { result += "**" }
+        let italicSingles = result.components(separatedBy: "*").count - 1 - (boldCount / 2 * 2 + boldCount % 2)
+        if italicSingles > 0 && italicSingles % 2 != 0 { result += "*" }
+        let key = result as NSString
+        guard attrCache.object(forKey: key) == nil else { return }
+        if let attrString = try? AttributedString(
+            markdown: result,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        ) {
+            attrCache.setObject(CachedAttrString(attrString), forKey: key)
+        }
     }
     
     /// Sanitize text for safe inline markdown parsing.

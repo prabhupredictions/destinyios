@@ -262,12 +262,20 @@ struct CompatibilityResultView: View {
             withAnimation(.easeOut(duration: 0.5)) {
                 contentOpacity = 1.0
             }
-            // Cache Mangal Dosha data once to avoid repeated decoding
+            // Decode Mangal Dosha off the main thread — JSONSerialization + JSONDecoder
+            // block for ~1-3s on complex Opus results, which compounds the markdown
+            // parsing cost and pushes the total past the watchdog threshold.
             if !mangalDoshaCached {
                 let mangalCompat = result.analysisData?.joint?.mangalCompatibility
-                cachedBoyMangalDosha = Self.extractMangalDoshaData(from: mangalCompat?["boy_dosha"])
-                cachedGirlMangalDosha = Self.extractMangalDoshaData(from: mangalCompat?["girl_dosha"])
-                mangalDoshaCached = true
+                Task.detached(priority: .userInitiated) {
+                    let boy = Self.extractMangalDoshaData(from: mangalCompat?["boy_dosha"])
+                    let girl = Self.extractMangalDoshaData(from: mangalCompat?["girl_dosha"])
+                    await MainActor.run {
+                        cachedBoyMangalDosha = boy
+                        cachedGirlMangalDosha = girl
+                        mangalDoshaCached = true
+                    }
+                }
             }
         }
         // Sheets
