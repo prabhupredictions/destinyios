@@ -8,12 +8,13 @@ struct MarkdownTextView: View {
     let content: String
     var textColor: Color = AppTheme.Colors.textPrimary
     var fontSize: CGFloat = 15
-    
+
     @State private var blocks: [MarkdownBlock] = []
-    
+    @State private var lastParsedContent: String = ""
+
     // Cache for expensive AttributedString parsing (shared across all instances)
     private static let attrCache = NSCache<NSString, CachedAttrString>()
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
@@ -21,7 +22,13 @@ struct MarkdownTextView: View {
             }
         }
         .task(id: content) {
+            // Debounce: skip if content is growing rapidly (typewriter animation).
+            // Only parse when content changes significantly (>20 chars) or stops changing.
             let text = content
+            if !lastParsedContent.isEmpty && text.hasPrefix(lastParsedContent) && text.count - lastParsedContent.count < 20 {
+                try? await Task.sleep(nanoseconds: 150_000_000) // 150ms debounce
+                guard !Task.isCancelled else { return }
+            }
             let (parsed, _) = await Task.detached(priority: .userInitiated) {
                 let parsedBlocks = Self.parseBlocksStatic(from: text)
                 // Pre-warm the AttributedString cache for every inline text that will
@@ -44,6 +51,7 @@ struct MarkdownTextView: View {
                 return (parsedBlocks, ())
             }.value
             blocks = parsed
+            lastParsedContent = text
         }
     }
     
@@ -296,10 +304,9 @@ struct MarkdownTextView: View {
     private static func extractNumberedListItem(_ line: String) -> String? {
         guard isNumberedListItem(line) else { return nil }
         if let dotIndex = line.firstIndex(of: ".") {
-            let afterDot = line.index(dotIndex, offsetBy: 2)
-            if afterDot < line.endIndex {
-                return String(line[afterDot...])
-            }
+            guard let afterDot = line.index(dotIndex, offsetBy: 2, limitedBy: line.endIndex),
+                  afterDot < line.endIndex else { return nil }
+            return String(line[afterDot...])
         }
         return nil
     }

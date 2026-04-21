@@ -95,27 +95,29 @@ struct MessageBubble: View {
         
         // Reveal 1 word every 50ms (~20 words/sec for faster smooth reading pace)
         typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-            let batchEnd = min(wordIndex + 1, words.count)
-            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
+            DispatchQueue.main.async {
+                let batchEnd = min(wordIndex + 1, words.count)
+                let batch = words[wordIndex..<batchEnd].joined(separator: " ")
 
-            if revealedContent.isEmpty {
-                revealedContent = batch
-            } else {
-                revealedContent += " " + batch
-            }
+                if revealedContent.isEmpty {
+                    revealedContent = batch
+                } else {
+                    revealedContent += " " + batch
+                }
 
-            wordIndex = batchEnd
+                wordIndex = batchEnd
 
-            // Scroll follows typewriter every ~10 words
-            if wordIndex % 10 == 0 {
-                onTypewriterProgress?()
-            }
+                // Scroll follows typewriter every ~10 words
+                if wordIndex % 10 == 0 {
+                    onTypewriterProgress?()
+                }
 
-            if wordIndex >= words.count {
-                timer.invalidate()
-                typewriterTimer = nil
-                typewriterFinished = true
-                onTypewriterFinished?()
+                if wordIndex >= words.count {
+                    timer.invalidate()
+                    typewriterTimer = nil
+                    typewriterFinished = true
+                    onTypewriterFinished?()
+                }
             }
         }
     }
