@@ -751,7 +751,7 @@ struct PremiumTypingIndicator: View {
     }
     
     private func startBouncingAnimation() {
-        // Continuous bouncing animation
+        bounceTimer?.invalidate()
         bounceTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
             withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                 animationPhase = (animationPhase + 1) % 3

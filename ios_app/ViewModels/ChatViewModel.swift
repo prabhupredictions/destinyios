@@ -150,6 +150,7 @@ class ChatViewModel {
         let greeting = String(format: "chat_welcome_greeting".localized, profileName)
         
         let welcome = LocalChatMessage(
+            id: "welcome",
             threadId: currentThreadId,
             role: .assistant,
             content: greeting

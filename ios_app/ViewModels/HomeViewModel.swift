@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// ViewModel for the Home screen
-@Observable
+@MainActor @Observable
 class HomeViewModel {
     // MARK: - State
     var userName: String = ""
@@ -486,10 +486,15 @@ class HomeViewModel {
         return Double(quotaTotal - quotaRemaining) / Double(quotaTotal)
     }
     
+    private static let renewalFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f
+    }()
+
     var renewalDateString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: renewalDate)
+        Self.renewalFormatter.string(from: renewalDate)
     }
     
     var greetingMessage: String {

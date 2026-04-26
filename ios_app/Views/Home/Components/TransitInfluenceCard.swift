@@ -49,7 +49,7 @@ struct TransitInfluenceCard: View {
                         .font(.system(size: 12))
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
                     
-                    Text("\(localizedSignName(for: transit.sign)) · house_label".localized + " \(transit.house)")
+                    Text("\(localizedSignName(for: transit.sign)) · \("house_label".localized) \(transit.house)")
                         .font(AppTheme.Fonts.body(size: 14))
                         .fontWeight(.medium)
                         .foregroundColor(AppTheme.Colors.goldLight)

@@ -687,7 +687,7 @@ struct HomeView: View {
             "Ar": "sign_ar", "Aries": "sign_ar",
             "Ta": "sign_ta", "Taurus": "sign_ta",
             "Ge": "sign_ge", "Gemini": "sign_ge",
-            "Cn": "sign_ca", "Cancer": "sign_ca",
+            "Cn": "sign_ca", "Ca": "sign_ca", "Cancer": "sign_ca",
             "Le": "sign_le", "Leo": "sign_le",
             "Vi": "sign_vi", "Virgo": "sign_vi",
             "Li": "sign_li", "Libra": "sign_li",
@@ -984,7 +984,7 @@ struct LifeAreaLuxuryTile: View {
     
     var body: some View {
         Button(action: {
-            action("Tell me about \(area)")
+            action("Tell me about my \(area) outlook")
         }) {
             // WRAPPER: The Deep 3D Crystal
             DivineGlassCard(cornerRadius: 16) {

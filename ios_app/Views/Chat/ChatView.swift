@@ -127,15 +127,8 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            // Handle initial question on first appear — always in a NEW chat
-            if let question = initialQuestion, !question.isEmpty, !hasHandledInitialQuestion {
-                hasHandledInitialQuestion = true
-                viewModel.startNewChat()
-                viewModel.inputText = question
-                Task {
-                    await viewModel.sendMessage()
-                }
-            }
+            // Initial question is handled by .onChange(of: initialQuestion)
+            // which fires on first presentation with the initial value
             
             if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {
                 hasHandledInitialThread = true
@@ -657,7 +650,7 @@ struct ChatHistorySidebar: View {
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .font(.system(size: 15))
                 
-                TextField("Search chats...", text: $searchText)
+                TextField("search_chats_placeholder".localized, text: $searchText)
                     .font(AppTheme.Fonts.body(size: 15))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .autocorrectionDisabled()
@@ -683,7 +676,7 @@ struct ChatHistorySidebar: View {
                         .font(AppTheme.Fonts.display(size: 48))
                         .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
                     
-                    Text(searchText.isEmpty ? "no_chat_history".localized : "No results found")
+                    Text(searchText.isEmpty ? "no_chat_history".localized : "no_results_found".localized)
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }

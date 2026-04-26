@@ -2118,6 +2118,7 @@
 "loaded_from_history" = "Loaded from history";
 "partner_name_placeholder" = "Partner Name";
 "no_results_found" = "No results found";
+"search_chats_placeholder" = "Search chats...";
 "match_results_not_saved" = "Your match results aren't being saved.";
 "after_dosha_cancellation" = "*After dosha cancellation";
 "save_to_files" = "Save to Files";
