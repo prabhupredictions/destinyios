@@ -372,7 +372,7 @@ struct OtherData: Codable {
     let upgrahas: [String: UpgrahaData]?
     let d60Amsa: [String: D60Data]?
     let ashtakavarga: AshtakavargaData?
-    let aspects: [String: String]?  // Empty dict from API - placeholder
+    let aspects: [String: AnyCodable]?
     let bhavatBhavam: [String: BhavatBhavamData]?
     
     enum CodingKeys: String, CodingKey {
