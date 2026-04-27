@@ -337,24 +337,20 @@ struct HomeView: View {
             }
         }
         .onChange(of: scenePhase) {
-            // Refresh notification badge when app returns to foreground
             if scenePhase == .active {
                 Task {
                     await notificationService.fetchUnreadCount()
-                    
-                    // Only reload if the day changed across midnight.
-                    // Same-day foreground returns rely on cached data — no network calls.
-                    // Explicit events (pull-to-refresh, profile switch, premium upgrade) handle other refreshes.
+
                     if let cached = TodaysPredictionCache.shared.get() {
                         let fmt = DateFormatter()
                         fmt.dateFormat = "yyyy-MM-dd"
                         if let cachedDate = fmt.date(from: String(cached.targetDate.prefix(10))),
                            !Calendar.current.isDateInToday(cachedDate) {
-                            print("[HomeView] App foregrounded on a new day. Refreshing predictions.")
                             await viewModel.loadHomeData(force: true)
                         }
+                    } else {
+                        await viewModel.loadHomeData(force: true)
                     }
-                    // No cache: initial .task load will handle it on cold start
                 }
             }
         }

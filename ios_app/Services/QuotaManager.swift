@@ -553,6 +553,9 @@ class QuotaManager: ObservableObject {
         UserDefaults.standard.set(status.planId, forKey: "currentPlanId")
         UserDefaults.standard.set(status.subscriptionStatus, forKey: "subscriptionStatus")
         UserDefaults.standard.set(status.subscriptionExpiresAt, forKey: "subscriptionExpiresAt")
+        if let name = status.plan?.displayName {
+            UserDefaults.standard.set(name, forKey: "currentPlanDisplayName")
+        }
         
         if let profile = dataManager.getCurrentUserProfile() {
             profile.totalQuestionsAsked = status.totalQuestionsAsked
@@ -570,7 +573,7 @@ class QuotaManager: ObservableObject {
             }
             return plan.displayName
         }
-        return "Free Plan"
+        return UserDefaults.standard.string(forKey: "currentPlanDisplayName") ?? "Free Plan"
     }
     
     /// Check if user can upgrade

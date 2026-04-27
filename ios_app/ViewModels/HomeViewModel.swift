@@ -15,7 +15,7 @@ class HomeViewModel {
     var errorMessage: String?
     var isGuest = false
     var isPremium = false
-    var planDisplayName: String = "Free"
+    var planDisplayName: String = UserDefaults.standard.string(forKey: "currentPlanDisplayName") ?? "Free"
     
     // MARK: - New Premium State
     var currentDasha: String = "Loading..."
@@ -171,6 +171,32 @@ class HomeViewModel {
             await MainActor.run {
                 self.applyPredictionResponse(cached)
                 print("[HomeViewModel] Applied cached prediction on cold start — no spinner needed")
+            }
+        }
+
+        // Pre-populate chart data (yogas, ascendant, doshas) from disk cache
+        // so the user sees them immediately instead of blank sections
+        if fullAstroData == nil, let birthData = loadBirthData() {
+            let cache = AstroDataCache.shared
+            let hash = cache.birthHash(birthData)
+            if let cached = cache.getFullChart(birthHash: hash) {
+                await MainActor.run {
+                    self.fullAstroData = cached
+                    var allCombinations: [YogaDetail] = []
+                    if let yogas = cached.analysis.yogas?.yogas {
+                        allCombinations.append(contentsOf: yogas)
+                    }
+                    if let doshas = cached.analysis.yogas?.doshas {
+                        allCombinations.append(contentsOf: doshas)
+                    }
+                    self.yogaCombinations = allCombinations.sorted {
+                        if $0.status == "A" && $1.status != "A" { return true }
+                        if $0.status != "A" && $1.status == "A" { return false }
+                        return $0.strength > $1.strength
+                    }
+                    self.doshaStatus = (cached.analysis.mangalDosha, cached.analysis.kalaSarpa)
+                    print("[HomeViewModel] Pre-populated chart/yogas from disk cache")
+                }
             }
         }
         
