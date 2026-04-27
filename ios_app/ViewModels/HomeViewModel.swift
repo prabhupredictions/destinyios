@@ -37,7 +37,7 @@ class HomeViewModel {
     
     /// Profile-scoped key for the 24h chart data cache guard
     private var lastFullLoadDateKey: String {
-        "lastFullLoadDate_\\(ProfileContextManager.shared.activeProfileId)"
+        "lastFullLoadDate_\(ProfileContextManager.shared.activeProfileId)"
     }
     
     /// Timestamp of last successful full data load (for 24-hour cache guard)

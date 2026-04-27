@@ -60,11 +60,11 @@ struct AppTheme {
         
         /// Show "Add Partner" button for multi-partner comparison
         /// When false, only one partner slot is shown in Match screen
-        static let multiPartnerComparison = true  // TESTING: Set to false before release
-        
+        static let multiPartnerComparison = true
+
         /// Allow editing user birth data from Match screen
         /// When false, "Your Details" section is read-only with no edit option
-        static let allowMatchScreenUserEdit = true  // TESTING: Set to false before release
+        static let allowMatchScreenUserEdit = true
     }
     
     // MARK: - Colors

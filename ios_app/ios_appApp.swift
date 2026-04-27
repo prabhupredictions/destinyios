@@ -31,6 +31,7 @@ struct ios_appApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()
+                .preferredColorScheme(.dark)
                 .onOpenURL { url in
                     // Handle Google Sign-In callback
                     #if canImport(GoogleSignIn)
