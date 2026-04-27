@@ -9,7 +9,7 @@ class HapticManager {
     
     /// Master switch to enable/disable ALL haptics app-wide.
     /// Set to `false` to silence all vibrations and haptic feedback.
-    var isEnabled: Bool = true
+    var isEnabled: Bool = false
     
     // Core Haptics Engine
     private var engine: CHHapticEngine?
