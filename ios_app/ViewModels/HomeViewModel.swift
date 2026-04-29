@@ -388,6 +388,14 @@ class HomeViewModel {
         self.currentDasha = response.currentDasha
         self.suggestedQuestions = response.mindQuestions
         self.lifeAreas = response.lifeAreas
+
+        // Green circle guarantee: ensure at least 1 "Good" area
+        if !self.lifeAreas.values.contains(where: { $0.status.lowercased() == "good" }) {
+            if let firstKey = self.lifeAreas.keys.sorted().first,
+               let existing = self.lifeAreas[firstKey] {
+                self.lifeAreas[firstKey] = LifeAreaStatus(status: "Good", brief: existing.brief)
+            }
+        }
         
         // NEW: Apply Dasha Insight
         self.dashaInsight = response.dashaInsight
