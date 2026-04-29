@@ -1,0 +1,232 @@
+<style>
+  .phone-row {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .phone {
+    width: 280px;
+    background: #0f0f18;
+    border-radius: 20px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-family: -apple-system, sans-serif;
+  }
+  .phone-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 10px;
+  }
+
+  /* Card base */
+  .rec-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .rec-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    background: rgba(52, 199, 89, 0.1);
+  }
+  .rec-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rec-icon { font-size: 16px; }
+  .rec-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #34c759;
+  }
+  .rec-score {
+    font-size: 13px;
+    color: #aaa;
+  }
+  .rec-score strong { color: #fff; font-size: 18px; }
+  .rec-body {
+    padding: 12px 14px;
+    background: rgba(15,15,24,0.95);
+  }
+  .rec-divider {
+    border: none;
+    border-top: 1px solid rgba(52,199,89,0.15);
+    margin: 10px 0;
+  }
+  .cancelled-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+  }
+  .cancelled-icon { font-size: 11px; color: #34c759; margin-top: 1px; }
+  .cancelled-text {
+    font-size: 11px;
+    color: rgba(52,199,89,0.85);
+    line-height: 1.5;
+  }
+
+  /* Option A — Narrative sentence */
+  .affirmation-text {
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.55;
+  }
+  .affirmation-text strong { color: #fff; }
+
+  /* Option B — Pills + short sentence */
+  .pills-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: rgba(52,199,89,0.12);
+    border: 1px solid rgba(52,199,89,0.3);
+    color: #34c759;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .pill-caption {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+  }
+
+  /* Option C — Score tier paragraph */
+  .tier-sentence {
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.55;
+    margin-bottom: 0;
+  }
+  .tier-sentence .highlight { color: #f5c842; font-weight: 600; }
+
+  .option-card {
+    cursor: pointer;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    padding: 4px;
+    transition: border-color 0.2s;
+  }
+  .option-card.selected {
+    border-color: #6f8aff;
+  }
+  .option-card:hover { border-color: rgba(111,138,255,0.4); }
+</style>
+
+<h2>Recommendation Card — 3 Approaches</h2>
+<p class="subtitle">All show the "✓ Recommended" header always. Difference is in the <strong>body text</strong> for positive matches.</p>
+
+<div class="phone-row">
+
+  <!-- OPTION A -->
+  <div class="option-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="phone">
+      <div class="phone-label">Option A — Narrative Sentence</div>
+      <div class="rec-card">
+        <div class="rec-header">
+          <div class="rec-header-left">
+            <span class="rec-icon">✅</span>
+            <span class="rec-title">Recommended</span>
+          </div>
+          <div class="rec-score"><strong>31</strong> /36</div>
+        </div>
+        <div class="rec-body">
+          <p class="affirmation-text">
+            <strong>Nadi, Bhakoot, and Yoni</strong> all score perfectly — rare together.
+            This pairing has exceptional health alignment, emotional bonding, and
+            physical compatibility as its foundation.
+          </p>
+          <hr class="rec-divider">
+          <div class="cancelled-row">
+            <span class="cancelled-icon">✓</span>
+            <span class="cancelled-text">Gana Dosha found and cancelled — temperament clash is neutralised.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content" style="padding: 8px 4px">
+      <p style="font-size:12px;color:#aaa;margin:0">Names the specific high-scoring Kootas by their theme ("health alignment"), adding context beyond just scores. One flowing sentence — no lists.</p>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="option-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="phone">
+      <div class="phone-label">Option B — Pills + Caption</div>
+      <div class="rec-card">
+        <div class="rec-header">
+          <div class="rec-header-left">
+            <span class="rec-icon">✅</span>
+            <span class="rec-title">Recommended</span>
+          </div>
+          <div class="rec-score"><strong>31</strong> /36</div>
+        </div>
+        <div class="rec-body">
+          <div class="pills-row">
+            <span class="pill">★ Nadi 8/8</span>
+            <span class="pill">★ Bhakoot 7/7</span>
+            <span class="pill">★ Yoni 4/4</span>
+          </div>
+          <p class="pill-caption">3 of 8 Kootas score perfectly — a strong foundation.</p>
+          <hr class="rec-divider">
+          <div class="cancelled-row">
+            <span class="cancelled-icon">✓</span>
+            <span class="cancelled-text">Gana Dosha found and cancelled — temperament clash is neutralised.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content" style="padding: 8px 4px">
+      <p style="font-size:12px;color:#aaa;margin:0">Scannable chips showing score/max for perfect Kootas. Quick at-a-glance. Requires a new pill component (small build cost).</p>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="option-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="phone">
+      <div class="phone-label">Option C — Score Tier Sentence</div>
+      <div class="rec-card">
+        <div class="rec-header">
+          <div class="rec-header-left">
+            <span class="rec-icon">✅</span>
+            <span class="rec-title">Recommended</span>
+          </div>
+          <div class="rec-score"><strong>31</strong> /36</div>
+        </div>
+        <div class="rec-body">
+          <p class="tier-sentence">
+            Scoring <span class="highlight">31 out of 36</span> puts this match in the
+            top tier — above the 26/36 threshold for an excellent match.
+            This is a genuinely strong pairing by Vedic standards.
+          </p>
+          <hr class="rec-divider">
+          <div class="cancelled-row">
+            <span class="cancelled-icon">✓</span>
+            <span class="cancelled-text">Gana Dosha found and cancelled — temperament clash is neutralised.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content" style="padding: 8px 4px">
+      <p style="font-size:12px;color:#aaa;margin:0">Simplest to build — score tier lookup only, no per-koota logic. Generic but always accurate. Not personalised to which Kootas are strong.</p>
+    </div>
+  </div>
+
+</div>

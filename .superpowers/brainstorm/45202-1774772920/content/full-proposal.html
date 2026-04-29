@@ -1,0 +1,273 @@
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 0 auto; }
+.section { margin-bottom: 36px; }
+h3 { color: #fff; font-size: 15px; margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 6px; }
+.grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.phone { width: 248px; background: #0f0f18; border-radius: 18px; padding: 14px; border: 1px solid rgba(255,255,255,0.08); }
+.phone-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; }
+
+/* Card */
+.card { border-radius: 12px; overflow: hidden; }
+.card.red { border: 1px solid rgba(255,59,48,0.25); }
+.card.green { border: 1px solid rgba(52,199,89,0.25); }
+
+.card-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; }
+.card-hdr.red { background: rgba(255,59,48,0.1); }
+.card-hdr.green { background: rgba(52,199,89,0.1); }
+.hdr-l { display: flex; align-items: center; gap: 7px; }
+.hdr-title { font-size: 14px; font-weight: 700; }
+.hdr-title.red { color: #ff3b30; }
+.hdr-title.green { color: #34c759; }
+.hdr-score { font-size: 12px; color: #aaa; }
+.hdr-score strong { font-size: 16px; color: #fff; }
+
+.card-body { padding: 11px 13px; background: rgba(12,12,20,0.98); }
+.reason-label { font-size: 11px; font-weight: 700; color: #ff3b30; margin-bottom: 7px; }
+.item { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 7px; }
+.item-icon { font-size: 10px; flex-shrink: 0; margin-top: 2px; }
+.item-text { font-size: 12px; color: #ccc; line-height: 1.45; }
+.item-text strong { color: #fff; }
+.item-text .num { color: #ff9f0a; font-weight: 700; }
+.divider { border: none; border-top: 1px solid rgba(52,199,89,0.18); margin: 9px 0; }
+.cancelled-row { display: flex; align-items: flex-start; gap: 6px; }
+.cancelled-text { font-size: 11px; color: rgba(52,199,89,0.82); line-height: 1.4; }
+
+/* Affirmation styles */
+.affirmation { font-size: 12px; color: #ccc; line-height: 1.5; }
+.affirmation strong { color: #f5f5f5; }
+
+/* Source map */
+.source-map { margin-top: 24px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid #2a2a3a; padding: 14px; }
+.src-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 11px; }
+.src-row:last-child { border-bottom: none; }
+.src-label { width: 220px; flex-shrink: 0; font-weight: 600; }
+.src-label.red { color: #ff3b30; }
+.src-label.green { color: #34c759; }
+.src-label.amber { color: #f5c842; }
+.src-label.grey { color: #888; }
+.src-value { color: #999; font-family: 'SF Mono', monospace; font-size: 10px; }
+
+/* Bug callout */
+.bug-box { background: rgba(255,159,10,0.08); border: 1px solid rgba(255,159,10,0.3); border-radius: 8px; padding: 10px 13px; margin-top: 16px; font-size: 11px; color: #f5c842; }
+.bug-box strong { color: #ff9f0a; }
+</style>
+
+<h2>Recommendation Banner — Complete Proposal</h2>
+<p class="subtitle">Single design for both states. All hard-no conditions covered. Source-of-truth fixed.</p>
+
+<!-- ── SECTION 1: RECOMMENDED ── -->
+<div class="section">
+<h3>✅ RECOMMENDED CARD — always shown, even on clean matches</h3>
+<div class="grid">
+
+  <div class="phone">
+    <div class="phone-label">Case R1 — Strong match, no doshas</div>
+    <div class="card green">
+      <div class="card-hdr green">
+        <div class="hdr-l"><span>✅</span><span class="hdr-title green">Recommended</span></div>
+        <div class="hdr-score"><strong>32</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <p class="affirmation"><strong>Nadi, Bhakoot, and Gana</strong> all score perfectly — exceptional health alignment, emotional depth, and temperament compatibility. A rare and strong pairing.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case R2 — Good match, 1 cancelled dosha</div>
+    <div class="card green">
+      <div class="card-hdr green">
+        <div class="hdr-l"><span>✅</span><span class="hdr-title green">Recommended</span></div>
+        <div class="hdr-score"><strong>28</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <p class="affirmation"><strong>Nadi and Bhakoot</strong> score perfectly — strong health compatibility and emotional foundation. Above-average match by Vedic standards.</p>
+        <hr class="divider">
+        <div class="cancelled-row">
+          <span style="font-size:10px;color:#34c759;flex-shrink:0;margin-top:1px">✓</span>
+          <span class="cancelled-text">Gana Dosha found and cancelled — temperament concerns are neutralised.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case R3 — No perfect kootas (borderline rec)</div>
+    <div class="card green">
+      <div class="card-hdr green">
+        <div class="hdr-l"><span>✅</span><span class="hdr-title green">Recommended</span></div>
+        <div class="hdr-score"><strong>21</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <p class="affirmation">Scoring <strong>21 out of 36</strong> — a solid match with a workable foundation. No critical doshas are active.</p>
+        <hr class="divider">
+        <div class="cancelled-row">
+          <span style="font-size:10px;color:#34c759;flex-shrink:0;margin-top:1px">✓</span>
+          <span class="cancelled-text">Two doshas (Nadi and Bhakoot) were found but cancelled — they don't count against this match.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ── SECTION 2: NOT RECOMMENDED ── -->
+<div class="section">
+<h3>⛔ NOT RECOMMENDED — all 7 hard-no conditions</h3>
+<div class="grid">
+
+  <div class="phone">
+    <div class="phone-label">Case N1 — Nadi Dosha active</div>
+    <div class="card red">
+      <div class="card-hdr red">
+        <div class="hdr-l"><span>⛔</span><span class="hdr-title red">Not Recommended</span></div>
+        <div class="hdr-score"><strong>26</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff3b30">▲</span>
+          <span class="item-text"><strong>Nadi Dosha is active</strong> — same biological constitution, long-term health and vitality concern. No cancellation found.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case N2 — Bhakoot Dosha active</div>
+    <div class="card red">
+      <div class="card-hdr red">
+        <div class="hdr-l"><span>⛔</span><span class="hdr-title red">Not Recommended</span></div>
+        <div class="hdr-score"><strong>29</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff3b30">▲</span>
+          <span class="item-text"><strong>Bhakoot Dosha is active</strong> — affects emotional bonding and finances. No cancellation found.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case N3 — Nadi + Bhakoot (worst)</div>
+    <div class="card red">
+      <div class="card-hdr red">
+        <div class="hdr-l"><span>⛔</span><span class="hdr-title red">Not Recommended</span></div>
+        <div class="hdr-score"><strong>19</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff3b30">▲</span>
+          <span class="item-text"><strong>Nadi Dosha is active</strong> — same biological constitution, long-term health concern.</span>
+        </div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff3b30">▲</span>
+          <span class="item-text"><strong>Bhakoot Dosha is active</strong> — emotional bonding and financial concern.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case N4 — Low score (< 18)</div>
+    <div class="card red">
+      <div class="card-hdr red">
+        <div class="hdr-l"><span>⛔</span><span class="hdr-title red">Not Recommended</span></div>
+        <div class="hdr-score"><strong>15</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff9f0a">▲</span>
+          <span class="item-text">Adjusted Ashtakoot score <span class="num">15/36</span> — below the 18-point minimum threshold.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case N5 — Mangal Dosha (uncancelled)</div>
+    <div class="card red">
+      <div class="card-hdr red">
+        <div class="hdr-l"><span>⛔</span><span class="hdr-title red">Not Recommended</span></div>
+        <div class="hdr-score"><strong>31</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff3b30">▲</span>
+          <span class="item-text"><strong>Mangal Dosha incompatibility</strong> — Prabhu: Mild (Mars in 4th), Smita: Cancelled (Mars in 4th). Severity mismatch not resolved.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case N6 — Nadi + Mangal + Cancelled</div>
+    <div class="card red">
+      <div class="card-hdr red">
+        <div class="hdr-l"><span>⛔</span><span class="hdr-title red">Not Recommended</span></div>
+        <div class="hdr-score"><strong>24</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff3b30">▲</span>
+          <span class="item-text"><strong>Nadi Dosha is active</strong> — same biological constitution.</span>
+        </div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff3b30">▲</span>
+          <span class="item-text"><strong>Mangal Dosha incompatibility</strong> — severity mismatch.</span>
+        </div>
+        <hr class="divider">
+        <div class="cancelled-row">
+          <span style="font-size:10px;color:#34c759;flex-shrink:0;margin-top:1px">✓</span>
+          <span class="cancelled-text">Bhakoot Dosha found and cancelled — does not count against this match.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone">
+    <div class="phone-label">Case N7 — Low score + Cancelled</div>
+    <div class="card red">
+      <div class="card-hdr red">
+        <div class="hdr-l"><span>⛔</span><span class="hdr-title red">Not Recommended</span></div>
+        <div class="hdr-score"><strong>16</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="item">
+          <span class="item-icon" style="color:#ff9f0a">▲</span>
+          <span class="item-text">Score <span class="num">16/36</span> — below the 18-point threshold, even after cancellations.</span>
+        </div>
+        <hr class="divider">
+        <div class="cancelled-row">
+          <span style="font-size:10px;color:#34c759;flex-shrink:0;margin-top:1px">✓</span>
+          <span class="cancelled-text">Two doshas (Bhakoot and Gana) found and cancelled — helped the score but could not fully recover it.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ── SOURCE MAP ── -->
+<div class="source-map">
+  <p style="font-size:12px;color:#fff;font-weight:600;margin:0 0 10px 0">Source-of-Truth Mapping (what feeds what)</p>
+  <div class="src-row"><span class="src-label red">⛔ "Not recommended because:" bullets</span><span class="src-value">hard_no_flags.rejection_reasons[] — authoritative, never re-derived</span></div>
+  <div class="src-row"><span class="src-label green">✅ Recommended affirmation text</span><span class="src-value">computed on device from result.kutas[] scores (no backend change)</span></div>
+  <div class="src-row"><span class="src-label green">✓ "X doshas cancelled" row</span><span class="src-value">hard_no_flags.cancelled_doshas_summary (+ backend fix below)</span></div>
+  <div class="src-row"><span class="src-label amber">📊 Verdict: recommended / not</span><span class="src-value">hard_no_flags.is_recommended — never re-derived on client</span></div>
+  <div class="src-row"><span class="src-label grey">🪐 Orbit tooltip details</span><span class="src-value">doshaSummary.details[key] — unchanged</span></div>
+</div>
+
+<!-- ── BACKEND BUG ── -->
+<div class="bug-box">
+  <strong>⚠ Backend fix required (1 line):</strong> <code>_compute_hard_no_flags()</code> in <code>compatibility_agent/agent.py</code> overwrites <code>hard_no_flags</code> without carrying <code>cancelled_doshas_summary</code> from the Ashtakoot calculator. iOS falls back to the generic "(2 Cancelled)" chip instead of the descriptive sentence. Fix: pass <code>cancelled_doshas_summary</code> through in the combined return dict.
+</div>

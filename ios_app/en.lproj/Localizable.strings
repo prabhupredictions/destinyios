@@ -2276,13 +2276,13 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 "personalized_guidance" = "Personalized guidance, in your language";
-"stat_questions_asked" = "2.7M+";
+"stat_questions_asked" = "3M+";
 "questions_asked" = "questions asked";
 "stat_rating" = "4/5";
 "rating_label" = "rating";
 
 // Onboarding Slide 1
-"onboarding_slide1_title" = "Trusted by 175K+ users";
+"onboarding_slide1_title" = "Trusted by 200K+ users";
 "onboarding_slide1_subtitle" = "on the ChatGPT Store";
 
 // Onboarding Slide 2

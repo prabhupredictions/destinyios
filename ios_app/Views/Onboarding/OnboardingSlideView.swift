@@ -157,7 +157,7 @@ struct OnboardingSlideView: View {
 struct StatsCard: View {
     var body: some View {
         VStack(spacing: 16) {
-            // Main stat: 2.7M+ questions
+            // Main stat: 3M+ questions
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
