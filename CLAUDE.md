@@ -98,7 +98,13 @@ ios_app/e2e/
 ├── test_11_notifications.py ← notification inbox
 ├── test_12_style_finance.py ← finance domain guardrails (no guarantees, recovery path)
 ├── test_13_style_health.py  ← health domain guardrails (no disease names, conditional lang)
-└── test_14_style_travel.py  ← travel domain guardrails (timing window, career framing)
+├── test_14_style_travel.py  ← travel domain guardrails (timing window, career framing)
+├── test_15_style_compatibility.py ← compatibility domain guardrails
+├── test_16_style_education.py  ← education domain guardrails
+├── test_17_style_self.py    ← self/identity domain guardrails (no fatalism)
+├── test_18_style_spiritual.py ← spiritual domain guardrails (no moksha guarantees)
+├── test_19_style_family.py  ← family domain guardrails (no child fatalism, no death predictions)
+└── test_20_style_property.py ← property domain guardrails (no price predictions, no property fatalism)
 ```
 
 ### How UI_TEST_MODE works
