@@ -40,6 +40,7 @@ struct ChatInputBar: View {
                         onSend()
                     }
                 }
+                .accessibilityIdentifier("chat_input")
             
             // Bottom Controls Row
             HStack {
@@ -104,6 +105,7 @@ struct ChatInputBar: View {
                 }
                 .disabled(!canSend)
                 .accessibilityLabel("a11y_send_message".localized)
+                .accessibilityIdentifier("send_button")
                 .animation(.spring(response: 0.3), value: canSend)
             }
             .padding(.horizontal, 4)

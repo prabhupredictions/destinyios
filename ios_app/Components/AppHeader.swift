@@ -147,7 +147,8 @@ struct ChatHeader: View {
                         .frame(width: 44, height: 44)
                 }
                 .accessibilityLabel("accessibility_back".localized)
-                
+                .accessibilityIdentifier("chat_back_button")
+
                 // History button
                 Button(action: { onHistoryTap?() }) {
                     Image(systemName: "clock.arrow.circlepath")
@@ -156,6 +157,7 @@ struct ChatHeader: View {
                         .frame(width: 40, height: 40)
                 }
                 .accessibilityLabel("accessibility_history_chat".localized)
+                .accessibilityIdentifier("chat_history_button")
                 
                 Spacer()
                 
@@ -172,7 +174,8 @@ struct ChatHeader: View {
                         .frame(width: 40, height: 40)
                 }
                 .accessibilityLabel("accessibility_birth_chart".localized)
-                
+                .accessibilityIdentifier("chat_chart_button")
+
                 // New chat button
                 Button(action: { onNewChatTap?() }) {
                     Image(systemName: "square.and.pencil")
@@ -181,6 +184,7 @@ struct ChatHeader: View {
                         .frame(width: 40, height: 40)
                 }
                 .accessibilityLabel("accessibility_new_conversation".localized)
+                .accessibilityIdentifier("new_chat_button")
             }
         }
         .padding(.horizontal, 12)

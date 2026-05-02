@@ -66,6 +66,7 @@ struct MessageBubble: View {
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(isUser ? "You said: \(message.content)" : "Destiny said: \(displayContent)")
+        .accessibilityIdentifier(isUser ? "" : "ai_message")
         .onAppear {
             if enableTypewriter {
                 startTypewriter()
@@ -182,7 +183,7 @@ struct MessageBubble: View {
     private var streamingProgressView: some View {
         HStack(spacing: 10) {
             AnimatedDots()
-            
+
             Text("thinking".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
@@ -197,6 +198,7 @@ struct MessageBubble: View {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
         )
+        .accessibilityIdentifier("streaming_indicator")
     }
     
     // Fallback parser for **bold** syntax
@@ -298,6 +300,7 @@ struct MessageBubble: View {
                 .buttonStyle(.plain)
                 .animation(.easeInOut(duration: 0.2), value: showCopiedConfirmation)
                 .accessibilityLabel("a11y_copy_response".localized)
+                .accessibilityIdentifier("copy_button")
             }
             
             // Inline rating (only for substantial AI messages)
