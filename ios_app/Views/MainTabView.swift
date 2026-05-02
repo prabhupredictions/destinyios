@@ -183,6 +183,7 @@ struct CustomTabBar: View {
                 }
             }
             .frame(width: 60) // Fixed width touch target
+            .accessibilityIdentifier("tab_home")
             
             Spacer()
             
@@ -194,6 +195,7 @@ struct CustomTabBar: View {
                 }
             }
             .frame(width: 80) // Fixed width for center
+            .accessibilityIdentifier("tab_chat")
             
             Spacer()
             
@@ -208,6 +210,7 @@ struct CustomTabBar: View {
                 }
             }
             .frame(width: 60) // Fixed width touch target
+            .accessibilityIdentifier("tab_match")
         }
         .padding(.horizontal, 30) // HIG: ~30pt minimum from edges
         .padding(.top, 4)        // Minimal top padding

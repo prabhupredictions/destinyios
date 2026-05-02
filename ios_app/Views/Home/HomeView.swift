@@ -194,6 +194,7 @@ struct HomeView: View {
                                         DashaInsightCard(dasha: dasha)
                                     }
                                     .buttonStyle(ScaleButtonStyle())
+                                    .accessibilityIdentifier("dasha_insight_card")
                                 }
                             }
                             
@@ -315,6 +316,7 @@ struct HomeView: View {
                 .transition(.opacity)
             }
         }
+        .accessibilityIdentifier("home_screen")
         .navigationBarHidden(true)
         .task {
             // Single entry point for initial data load (runs once when view appears)
@@ -436,6 +438,7 @@ struct HomeView: View {
                         }
                     }
                     .accessibilityLabel("history_title".localized)
+                    .accessibilityIdentifier("home_history_button")
                     
                     Spacer()
                     
@@ -474,6 +477,7 @@ struct HomeView: View {
                             )
                         }
                         .accessibilityLabel(notificationService.unreadCount > 0 ? "Notifications, \(notificationService.unreadCount) unread" : "Notifications")
+                        .accessibilityIdentifier("home_notifications_button")
                         
                         // Sound Toggle
                         if AppTheme.Features.showSoundToggle {
@@ -513,6 +517,7 @@ struct HomeView: View {
                             }
                         }
                         .accessibilityLabel(String(format: "a11y_profile_name_format".localized, profileContext.activeProfileName))
+                        .accessibilityIdentifier("home_profile_button")
                     }
                 }
             }
@@ -763,6 +768,7 @@ struct HomeView: View {
                                 selectedLifeArea = item
                             }
                         }
+                        .accessibilityIdentifier("life_area_\(item.area.lowercased().replacingOccurrences(of: " ", with: "_"))")
                     }
                 }
                 .padding(.horizontal, 4)
@@ -853,6 +859,7 @@ struct HomeView: View {
     private var transitAlertsSection: some View {
         TransitAlertCard(transits: viewModel.currentTransits)
             .padding(.horizontal, 12)
+            .accessibilityIdentifier("transit_alert_card")
     }
     
     // H. Dosha Status
@@ -874,6 +881,7 @@ struct HomeView: View {
                 }
             }
         )
+        .accessibilityIdentifier("yoga_highlight_card")
     }
     
     private func iconName(for area: String) -> String {
