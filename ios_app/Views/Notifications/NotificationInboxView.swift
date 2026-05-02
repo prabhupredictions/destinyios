@@ -38,6 +38,7 @@ struct NotificationInboxView: View {
                 }
             }
             .navigationBarHidden(true)
+            .accessibilityIdentifier("notifications_screen")
             .task {
                 await service.fetchNotifications(refresh: true)
                 await service.fetchUnreadCount()
@@ -286,6 +287,7 @@ struct NotificationRow: View {
         )
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: "a11y_notification_detail_format".localized, notification.displayTitle, notification.displayBody, notification.timeAgo, notification.read ? "" : "a11y_unread_suffix".localized))
+        .accessibilityIdentifier("notification_row")
     }
 }
 

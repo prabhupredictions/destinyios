@@ -35,6 +35,7 @@ struct PartnerManagerView: View {
             }
         }
         .navigationBarHidden(true)
+        .accessibilityIdentifier("partners_screen")
         .sheet(isPresented: $showAddForm) {
             PartnerFormView(mode: .add) { newPartner in
                 Task {
@@ -159,6 +160,7 @@ struct PartnerManagerView: View {
                 .background(AppTheme.Colors.premiumGradient)
                 .cornerRadius(8)
             }
+            .accessibilityIdentifier("partner_add_button")
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
@@ -238,6 +240,7 @@ struct PartnerManagerView: View {
                             showDeleteConfirmation = true
                         }
                     )
+                    .accessibilityIdentifier("partner_row")
                     .transition(.asymmetric(
                         insertion: .scale.combined(with: .opacity),
                         removal: .opacity

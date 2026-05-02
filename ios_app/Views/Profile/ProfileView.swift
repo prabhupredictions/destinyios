@@ -81,28 +81,28 @@ struct ProfileView: View {
                     VStack(spacing: 24) {
                         // MARK: - Account Section
                         accountSection
-                        
+
                         // MARK: - Subscription Banner
                         subscriptionSection
-                        
+
                         // MARK: - Profile Settings
                         profileSection
-                        
+
                         // MARK: - History Settings
                         historySection
-                        
+
                         // MARK: - Astrology Settings
                         astrologySection
-                        
+
                         // MARK: - Support
                         supportSection
-                        
+
                         // MARK: - App Info
                         appInfoSection
-                        
+
                         // MARK: - Sign Out
                         signOutSection
-                        
+
                         // MARK: - Delete Account (registered users only)
                         if !isGuestUser {
                             deleteAccountSection
@@ -111,6 +111,7 @@ struct ProfileView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
                 }
+                .accessibilityIdentifier("profile_screen")
             }
             .navigationTitle("profile_title".localized)
             .navigationBarTitleDisplayMode(.large)
@@ -308,6 +309,7 @@ struct ProfileView: View {
                     icon: "calendar.circle.fill",
                     action: { showBirthDetails = true }
                 )
+                .accessibilityIdentifier("profile_birth_details")
                 
                 // Manage Birth Charts (Core+)
                 // GUEST RULE: Guests must sign in first to manage birth charts
@@ -328,6 +330,7 @@ struct ProfileView: View {
                         }
                     }
                 )
+                .accessibilityIdentifier("profile_partner_manager")
                 
                 // Switch Profile/Birth Chart (Plus-only)
                 // GUEST RULE: Guests must sign in first to switch profiles
@@ -367,6 +370,7 @@ struct ProfileView: View {
                     icon: "globe",
                     action: { showLanguageSettings = true }
                 )
+                .accessibilityIdentifier("profile_language_settings")
 
                 PremiumListItem(
                     title: NSLocalizedString("response_style_setting_title", value: "Response Style", comment: ""),
@@ -374,6 +378,7 @@ struct ProfileView: View {
                     icon: "sparkles",
                     action: { showResponseStyleSettings = true }
                 )
+                .accessibilityIdentifier("profile_response_style")
                 
                 if AppTheme.Features.showAstrologySettings {
                     PremiumListItem(
@@ -382,6 +387,7 @@ struct ProfileView: View {
                         icon: "star.circle.fill",
                         action: { showAstrologySettings = true }
                     )
+                    .accessibilityIdentifier("profile_astrology_settings")
                 }
                 
                 PremiumListItem(
@@ -390,6 +396,7 @@ struct ProfileView: View {
                     icon: "square.grid.3x3.fill",
                     action: { showChartStylePicker = true }
                 )
+                .accessibilityIdentifier("profile_chart_style")
                 
                 // Notifications toggle (available to everyone)
                 PremiumListItem(
@@ -431,6 +438,7 @@ struct ProfileView: View {
                         }
                     }
                 )
+                .accessibilityIdentifier("profile_notification_prefs")
                 
                 // Analytics Consent Toggle
                 PremiumListItem(
@@ -568,7 +576,7 @@ struct ProfileView: View {
     
     /// Card for free users showing upgrade CTA
     private var freeUpgradeCard: some View {
-        Button(action: { 
+        Button(action: {
             // Guest users must sign in first to view plans
             if isGuestUser {
                 showGuestSignInSheet = true
@@ -583,24 +591,24 @@ struct ProfileView: View {
                         Circle()
                             .fill(Color.white.opacity(0.2))
                             .frame(width: 40, height: 40)
-                        
+
                         Image(systemName: "crown.fill")
                             .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(.white)
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 2) {
                         Text(isGuestUser ? "Sign Up" : "Upgrade to Premium")
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(.white)
-                        
+
                         Text(isGuestUser ? "Save your birth chart & unlock insights" : "Unlock unlimited insights")
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
-                    
+
                     Spacer()
-                    
+
                     Image(systemName: "chevron.right")
                         .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(.white.opacity(0.6))
@@ -608,6 +616,7 @@ struct ProfileView: View {
             }
         }
         .buttonStyle(ScaleButtonStyle())
+        .accessibilityIdentifier("profile_subscription")
     }
     
     /// Card for paid users showing current plan and manage option
@@ -689,6 +698,7 @@ struct ProfileView: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
+            .accessibilityIdentifier("profile_subscription")
         }
     }
     

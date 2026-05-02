@@ -14,6 +14,7 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+
                 CosmicBackgroundView()
                     .ignoresSafeArea()
                 
@@ -48,6 +49,7 @@ struct HistoryView: View {
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .accessibilityIdentifier("history_screen")
             .alert("Delete", isPresented: $viewModel.showDeleteConfirmation) {
                 Button("cancel_action".localized, role: .cancel) { viewModel.itemToDelete = nil }
                 Button("delete_action".localized, role: .destructive) { viewModel.confirmDelete() }
@@ -323,11 +325,12 @@ struct HistoryRowView: View {
                     systemImage: isPinned ? "pin.slash" : "pin"
                 )
             }
-            
+
             Button(role: .destructive, action: onDelete) {
                 Label("delete_action".localized, systemImage: "trash")
             }
         }
+        .accessibilityIdentifier("history_thread_row")
     }
     
     private var isPinned: Bool {

@@ -105,6 +105,7 @@ struct SubscriptionView: View {
             .task {
                 await loadPlans()
             }
+            .accessibilityIdentifier("subscription_screen")
         }
     }
     
@@ -179,6 +180,7 @@ struct SubscriptionView: View {
                         await purchaseSubscription(planId: plan.planId)
                     }
                 }
+                .accessibilityIdentifier("subscription_plan_card")
             }
         }
     }

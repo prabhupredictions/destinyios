@@ -317,6 +317,7 @@ struct BirthDataView: View {
                             .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                     )
                 }
+                .accessibilityIdentifier("birth_dob_field")
                 
                 // Time Button
                 Button(action: {
@@ -346,6 +347,7 @@ struct BirthDataView: View {
                     )
                 }
                 .disabled(viewModel.timeUnknown)
+                .accessibilityIdentifier("birth_time_field")
             }
             
             // Age validation message
@@ -396,6 +398,7 @@ struct BirthDataView: View {
                 isNameFocused = false
                 showLocationSearch = true
             }
+            .accessibilityIdentifier("birth_city_field")
             
             // Gender Identity (Mandatory)
             PremiumSelectionRow(
@@ -423,13 +426,13 @@ struct BirthDataView: View {
             // Play premium haptic and sound
             HapticManager.shared.premiumContinue()
             SoundManager.shared.playButtonTap()
-            
+
             if viewModel.save() {
                 // Register with backend subscription service FIRST
                 // Wait for result before proceeding to avoid race condition
                 Task {
                     let shouldProceed = await registerWithBackend()
-                    
+
                     if shouldProceed {
                         // Only proceed if registration succeeded (no conflict)
                         await MainActor.run {
@@ -449,6 +452,7 @@ struct BirthDataView: View {
                 }
             }
         }
+        .accessibilityIdentifier("birth_submit_button")
         .disabled(!viewModel.isValid)
         .opacity(viewModel.isValid ? 1 : 0.5)
     }
