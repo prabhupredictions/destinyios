@@ -16,7 +16,7 @@ struct MarkdownTextView: View {
     private static let attrCache = NSCache<NSString, CachedAttrString>()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 12) {
             ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 renderBlock(block)
             }
@@ -42,8 +42,10 @@ struct MarkdownTextView: View {
                         Self.prewarmAttrCache(t)
                     case .boldLabel(_, let c):
                         if !c.isEmpty { Self.prewarmAttrCache(c) }
-                    case .bulletList(let items), .numberedList(let items):
+                    case .bulletList(let items), .numberedList(let items), .diamondList(let items):
                         for item in items { Self.prewarmAttrCache(item) }
+                    case .takeaway(let t):
+                        Self.prewarmAttrCache(t)
                     default:
                         break
                     }
@@ -63,6 +65,8 @@ struct MarkdownTextView: View {
         case boldLabel(label: String, content: String)
         case bulletList(items: [String])
         case numberedList(items: [String])
+        case diamondList(items: [String])   // ◆ bullet items rendered in gold
+        case takeaway(text: String)          // → final takeaway line rendered in gold
         case codeBlock(code: String)
         case blockquote(text: String)
         case table(headers: [String], rows: [[String]])
@@ -157,7 +161,35 @@ struct MarkdownTextView: View {
                 }
                 continue
             }
-            
+
+            // Diamond bullet list (◆ item)
+            if trimmed.hasPrefix("◆ ") {
+                var items: [String] = []
+                while i < lines.count {
+                    let listLine = lines[i].trimmingCharacters(in: .whitespaces)
+                    if listLine.hasPrefix("◆ ") {
+                        items.append(String(listLine.dropFirst(2)))
+                        i += 1
+                    } else if listLine.isEmpty {
+                        i += 1
+                        break
+                    } else {
+                        break
+                    }
+                }
+                if !items.isEmpty {
+                    blocks.append(.diamondList(items: items))
+                }
+                continue
+            }
+
+            // Takeaway line (→ text)
+            if trimmed.hasPrefix("→ ") {
+                blocks.append(.takeaway(text: String(trimmed.dropFirst(2))))
+                i += 1
+                continue
+            }
+
             // Numbered list (1. item, 2. item, etc.) - Simple check without regex
             if isNumberedListItem(trimmed) {
                 var items: [String] = []
@@ -190,6 +222,10 @@ struct MarkdownTextView: View {
                 }
                 // Bullet check (but not --- which is already caught by isDivider)
                 if pLine.hasPrefix("- ") || pLine.hasPrefix("* ") || pLine.hasPrefix("• ") {
+                    break
+                }
+                // Diamond bullet, takeaway, or ✦ section header break the paragraph
+                if pLine.hasPrefix("◆ ") || pLine.hasPrefix("→ ") || pLine.hasPrefix("✦ ") {
                     break
                 }
                 
@@ -320,6 +356,8 @@ struct MarkdownTextView: View {
             return .header(level: 2, text: String(line.dropFirst(3)))
         } else if line.hasPrefix("# ") {
             return .header(level: 1, text: String(line.dropFirst(2)))
+        } else if line.hasPrefix("✦ ") {
+            return .header(level: 3, text: String(line.dropFirst(2)))
         }
         return nil
     }
@@ -363,7 +401,7 @@ struct MarkdownTextView: View {
             renderBoldLabel(label: label, content: content)
             
         case .bulletList(let items):
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 ForEach(Array(items.enumerated()), id: \.offset) { _, item in
                     HStack(alignment: .firstTextBaseline, spacing: 10) {
                         Circle()
@@ -375,9 +413,9 @@ struct MarkdownTextView: View {
                     .padding(.leading, 4)
                 }
             }
-            
+
         case .numberedList(let items):
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                     HStack(alignment: .firstTextBaseline, spacing: 10) {
                         Text("\(index + 1).")
@@ -389,6 +427,12 @@ struct MarkdownTextView: View {
                     .padding(.leading, 4)
                 }
             }
+
+        case .diamondList(let items):
+            renderDiamondList(items: items)
+
+        case .takeaway(let text):
+            renderTakeaway(text: text)
             
         case .codeBlock(let code):
             Text(code)
@@ -532,7 +576,7 @@ struct MarkdownTextView: View {
                 .font(.system(size: headerFontSize, weight: weight))
                 .foregroundColor(AppTheme.Colors.gold)
         }
-        .padding(.top, 8)
+        .padding(.top, 10)
         .padding(.bottom, 2)
     }
     
@@ -553,12 +597,42 @@ struct MarkdownTextView: View {
                     .foregroundColor(AppTheme.Colors.gold)
                 +
                 renderInlineAttributedString(content))
-                    .lineSpacing(5)
+                    .lineSpacing(6)
                     .textSelection(.enabled)
             }
         }
     }
     
+    // MARK: - Diamond List Renderer (◆ items in gold)
+
+    @ViewBuilder
+    private func renderDiamondList(items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("◆")
+                        .font(.system(size: fontSize - 1, weight: .semibold))
+                        .foregroundColor(AppTheme.Colors.gold)
+                    renderInlineMarkdown(item)
+                }
+                .padding(.leading, 4)
+            }
+        }
+    }
+
+    // MARK: - Takeaway Renderer (→ in gold)
+
+    @ViewBuilder
+    private func renderTakeaway(text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text("→")
+                .font(.system(size: fontSize, weight: .semibold))
+                .foregroundColor(AppTheme.Colors.gold)
+            renderInlineMarkdown(text)
+        }
+        .padding(.top, 4)
+    }
+
     /// Build an AttributedString for inline content (used by bold label renderer)
     private func renderInlineAttributedString(_ text: String) -> Text {
         let sanitized = sanitizeForInlineParsing(text)
@@ -582,13 +656,13 @@ struct MarkdownTextView: View {
             Text(attrString)
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
-                .lineSpacing(5)
+                .lineSpacing(6)
                 .textSelection(.enabled)
         } else {
             Text(stripMarkdownBold(sanitized))
                 .font(AppTheme.Fonts.body(size: fontSize))
                 .foregroundColor(textColor)
-                .lineSpacing(5)
+                .lineSpacing(6)
         }
     }
     

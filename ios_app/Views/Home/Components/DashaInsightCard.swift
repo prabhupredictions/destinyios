@@ -54,7 +54,7 @@ struct DashaInsightCard: View {
                     Text(meaning)
                         .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(Color.white.opacity(0.7))
-                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 
                 // Spacer to push arrow to bottom

@@ -113,7 +113,9 @@ struct MessageBubble: View {
             if wordIndex >= words.count {
                 timer.invalidate()
                 typewriterTimer = nil
-                typewriterFinished = true
+                withAnimation(.easeIn(duration: 0.25)) {
+                    typewriterFinished = true
+                }
                 onTypewriterFinished?()
             }
         }
@@ -122,24 +124,32 @@ struct MessageBubble: View {
     // MARK: - Message Content
     @ViewBuilder
     private var messageContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             if isUser {
                 // User message - plain text
                 Text(message.content)
-                    .font(AppTheme.Fonts.body(size: 16)) // HIG standard body text
+                    .font(AppTheme.Fonts.body(size: 17)) // HIG standard body text
                     .foregroundColor(AppTheme.Colors.mainBackground) // Dark text on gold gradient
             } else if isLoadingState {
                 // AI loading state - show progress inside bubble
                 streamingProgressView
             } else if !displayContent.isEmpty {
-                // AI message — always rendered with MarkdownTextView (formatted from the start)
-                // During typewriter: displayContent grows word-by-word (already formatted)
-                // After typewriter: displayContent = full message content
-                MarkdownTextView(
-                    content: displayContent,
-                    textColor: AppTheme.Colors.textPrimary,
-                    fontSize: 16
-                )
+                // Plain text during typewriter — avoids 600+ MarkdownTextView re-parse cycles
+                // that cause watchdog kills on long responses. Switch to full markdown after.
+                if enableTypewriter && !typewriterFinished {
+                    Text(revealedContent)
+                        .font(AppTheme.Fonts.body(size: 17))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .lineSpacing(6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    MarkdownTextView(
+                        content: streamingContent ?? message.content,
+                        textColor: AppTheme.Colors.textPrimary,
+                        fontSize: 17
+                    )
+                    .transition(.opacity)
+                }
             }
             
             // Tool calls chips (if any)

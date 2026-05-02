@@ -347,7 +347,7 @@ struct ChatView: View {
                 if isNewChat && !viewModel.isLoading {
                     starterQuestionsView
                 } else {
-                    LazyVStack(spacing: 16) {
+                    LazyVStack(spacing: 24) {
                         ForEach(visibleMessages) { message in
                             MessageBubble(
                                 message: message,
@@ -378,8 +378,8 @@ struct ChatView: View {
                                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                         }
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 16)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 20)
                 }
                 
                 Color.clear
