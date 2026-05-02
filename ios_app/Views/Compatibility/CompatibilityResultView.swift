@@ -166,6 +166,7 @@ struct CompatibilityResultView: View {
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
+                                .accessibilityIdentifier("mangal_dosha_row")
                                 
                                 // Kalsarpa Dosha - NavigationLink
                                 NavigationLink {
@@ -184,6 +185,7 @@ struct CompatibilityResultView: View {
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
+                                .accessibilityIdentifier("kalsarpa_dosha_row")
                                 
                                 // Additional Yogas - NavigationLink
                                 NavigationLink {
@@ -369,6 +371,7 @@ private struct RecommendationBannerView: View {
                         .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
+                .accessibilityIdentifier("compat_result_score")
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)

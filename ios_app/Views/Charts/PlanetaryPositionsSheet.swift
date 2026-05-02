@@ -20,7 +20,7 @@ struct PlanetaryPositionsSheet: View {
                 // Premium Cosmic Background
                 CosmicBackgroundView()
                     .ignoresSafeArea()
-                
+
                 if isLoading {
                     VStack(spacing: 16) {
                         ProgressView()
@@ -108,6 +108,7 @@ struct PlanetaryPositionsSheet: View {
                 loadData()
             }
         }
+        .accessibilityIdentifier("chart_screen")
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
@@ -158,6 +159,7 @@ struct PlanetaryPositionsSheet: View {
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
             }
+            .accessibilityIdentifier("chart_tab_planets")
             
             VStack(spacing: 12) {
                 ForEach(planetOrder, id: \.self) { planetName in
@@ -167,6 +169,7 @@ struct PlanetaryPositionsSheet: View {
                             data: pData,
                             nakshatra: chart.nakshatra[planetName]
                         )
+                        .accessibilityIdentifier("planet_position_row")
                     }
                 }
             }

@@ -41,6 +41,7 @@ struct DashaView: View {
                 .fill(Color.white)
                 .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
         )
+        .accessibilityIdentifier("chart_tab_dasha")
     }
 }
 

@@ -46,6 +46,7 @@ struct CompatibilityView: View {
         ZStack {
             // Cosmic Background (Soul of the App)
             CosmicBackgroundView()
+
             
             // Multi-Partner: Comparison Overview
             if viewModel.showComparisonOverview && !viewModel.comparisonResults.isEmpty {
@@ -126,6 +127,7 @@ struct CompatibilityView: View {
                 }
             }
         }
+        .accessibilityIdentifier("compat_screen")
         .sheet(isPresented: $showBoyLocationSearch) {
             LocationSearchView(
                 selectedCity: $viewModel.boyCity,
@@ -799,6 +801,7 @@ struct CompatibilityView: View {
                     )
                 }
                 .accessibilityLabel(viewModel.currentPartner.birthDateSet ? String(format: "dob_value_a11y".localized, viewModel.formattedGirlDob) : "select_dob_a11y".localized)
+                .accessibilityIdentifier("compat_person2_dob")
                 
                 // Time Button
                 Button(action: { 
@@ -968,6 +971,7 @@ struct CompatibilityView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
+        .accessibilityIdentifier("compat_analyze_button")
     }
     
     private func analyzeAction() {

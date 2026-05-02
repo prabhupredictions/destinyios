@@ -239,14 +239,15 @@ struct MatchInputHeader: View {
                     }
                 }
                 .accessibilityLabel("accessibility_history_match".localized)
-                
+                .accessibilityIdentifier("compat_history_button")
+
                 Spacer()
-                
+
                 // Logo
                 LogoView()
-                
+
                 Spacer()
-                
+
                 // New match button (clears form)
                 Button(action: { onNewMatchTap?() }) {
                     ZStack {
