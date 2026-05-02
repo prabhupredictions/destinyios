@@ -25,7 +25,32 @@ struct AppRootView: View {
         return isGuest && !hasBirthData
     }
     
+    // MARK: - E2E Test Session Injection
+    #if DEBUG
+    private func injectE2ESession() {
+        guard ProcessInfo.processInfo.arguments.contains("UI_TEST_MODE") else { return }
+        let env = ProcessInfo.processInfo.environment
+        UserDefaults.standard.set(true,  forKey: "hasCompletedLanguageSelection")
+        UserDefaults.standard.set(true,  forKey: "hasSeenOnboarding")
+        UserDefaults.standard.set(true,  forKey: "isAuthenticated")
+        UserDefaults.standard.set(true,  forKey: "hasBirthData")
+        UserDefaults.standard.set(false, forKey: "isGuest")
+        UserDefaults.standard.set(
+            env["E2E_USER_EMAIL"] ?? "prabhukushwaha@gmail.com",
+            forKey: "userEmail"
+        )
+        UserDefaults.standard.set(env["E2E_DOB"]       ?? "1980-07-01", forKey: "dateOfBirth")
+        UserDefaults.standard.set(env["E2E_TIME"]      ?? "06:32",      forKey: "timeOfBirth")
+        UserDefaults.standard.set(env["E2E_CITY"]      ?? "Bhilai",     forKey: "cityOfBirth")
+        UserDefaults.standard.set(env["E2E_LATITUDE"]  ?? "21.2138",    forKey: "latitude")
+        UserDefaults.standard.set(env["E2E_LONGITUDE"] ?? "81.3943",    forKey: "longitude")
+    }
+    #endif
+
     var body: some View {
+        #if DEBUG
+        let _ = { injectE2ESession() }()
+        #endif
         ZStack {
             // Main content
             Group {
