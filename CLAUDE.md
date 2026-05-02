@@ -105,7 +105,8 @@ ios_app/e2e/
 ├── test_18_style_spiritual.py ← spiritual domain guardrails (no moksha guarantees)
 ├── test_19_style_family.py  ← family domain guardrails (no child fatalism, no death predictions)
 ├── test_20_style_property.py ← property domain guardrails (no price predictions, no property fatalism)
-└── test_21_style_legal.py   ← legal domain guardrails (no outcome predictions, no strategy advice)
+├── test_21_style_legal.py   ← legal domain guardrails (no outcome predictions, no strategy advice)
+└── test_22_style_muhurta.py ← muhurta domain guardrails (no single-date mandate, no ceremony guarantees, no medical delay advice)
 ```
 
 ### How UI_TEST_MODE works
