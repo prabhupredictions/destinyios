@@ -18,9 +18,28 @@ struct ChatInputBar: View {
     
     var body: some View {
         HStack(alignment: .bottom, spacing: 8) {
+            // Style selector — "+" button on left, opens response length picker
+            if !isLoading {
+                Button { showStyleSelector = true } label: {
+                    ZStack {
+                        Circle()
+                            .fill(AppTheme.Colors.gold.opacity(0.1))
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
+                            .frame(width: 34, height: 34)
+                        Text("+")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .offset(y: -0.5)
+                    }
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("style_selector_button")
+                .accessibilityLabel(lengthManager.currentLength.label)
+            }
+
             // Text field — takes all available width
             TextField("Ask anything...", text: $text, axis: .vertical)
-                .font(AppTheme.Fonts.body(size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .lineLimit(1...5)
                 .padding(.horizontal, 14)
@@ -39,27 +58,6 @@ struct ChatInputBar: View {
                 .focused($isFocused)
                 .onSubmit { if canSend { onSend() } }
                 .accessibilityIdentifier("chat_input")
-
-            // Style capsule (hidden while loading initial request only)
-            if !isLoading {
-                Button { showStyleSelector = true } label: {
-                    HStack(spacing: 3) {
-                        Text(lengthManager.currentLength.label)
-                            .font(.system(size: 11, weight: .semibold))
-                        Image(systemName: "chevron.up")
-                            .font(.system(size: 9, weight: .bold))
-                    }
-                    .foregroundColor(AppTheme.Colors.gold)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(
-                        Capsule()
-                            .fill(AppTheme.Colors.gold.opacity(0.1))
-                            .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1))
-                    )
-                }
-                .buttonStyle(.plain)
-            }
 
             // Send / stop button
             Button(action: onSend) {
@@ -85,7 +83,7 @@ struct ChatInputBar: View {
             .accessibilityIdentifier("send_button")
             .animation(.spring(response: 0.3), value: canSend)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .padding(.bottom, 4)
         .background(AppTheme.Colors.mainBackground)

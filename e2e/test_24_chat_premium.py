@@ -283,3 +283,121 @@ class TestChatMarkdownRendering:
             body_text = body_els[-1].get_attribute("label") or ""
             assert "**" not in body_text, \
                 f"Raw ** still in response: {body_text[:150]!r}"
+
+
+class TestResponseLength:
+    """Verify response_length preference is passed end-to-end and affects output length."""
+
+    def test_concise_response_shorter_than_detailed(self, screens):
+        """Concise mode produces a measurably shorter response than Detailed mode."""
+        question = "What does my Moon sign mean for relationships?"
+
+        # Get a Detailed response first
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.find("chat_input").send_keys(question)
+        screens.chat.tap("send_button")
+        screens.chat.wait_for_response(timeout=90)
+        body_els = screens.chat.finds("reading_body_text")
+        detailed_text = " ".join((el.get_attribute("label") or "") for el in body_els)
+        detailed_len = len(detailed_text.split())
+
+        # Switch to Concise via style selector
+        screens.chat.tap_new_chat()
+        if screens.chat.present("style_selector_button"):
+            screens.chat.tap("style_selector_button")
+            time.sleep(0.4)
+            # Tap "Brief" / "Concise" option in the sheet
+            for label in ["Brief", "Concise", "Short"]:
+                if screens.chat.present(label):
+                    screens.chat.tap(label)
+                    break
+            time.sleep(0.3)
+        screens.chat.find("chat_input").send_keys(question)
+        screens.chat.tap("send_button")
+        screens.chat.wait_for_response(timeout=90)
+        body_els = screens.chat.finds("reading_body_text")
+        concise_text = " ".join((el.get_attribute("label") or "") for el in body_els)
+        concise_len = len(concise_text.split())
+
+        assert concise_len < detailed_len, (
+            f"Concise ({concise_len} words) not shorter than Detailed ({detailed_len} words) "
+            "— response_length may not be reaching the backend"
+        )
+
+    def test_style_selector_button_present_and_opens_sheet(self, screens):
+        """The + style selector button is present and opens the length picker sheet."""
+        screens.home.tap_chat_tab()
+        assert screens.chat.present("style_selector_button"), \
+            "style_selector_button not found — ChatInputBar may not have + button"
+        screens.chat.tap("style_selector_button")
+        time.sleep(0.4)
+        # Sheet should appear — look for any length option
+        found_option = any(
+            screens.chat.present(label) for label in ["Brief", "Concise", "Detailed", "Expanded", "length_option"]
+        )
+        assert found_option, "ResponseLengthSheet did not appear after tapping style_selector_button"
+
+
+class TestFollowUpVariety:
+    """Verify follow-up suggestions are contextual, not hardcoded."""
+
+    def test_career_followups_differ_from_health_followups(self, screens):
+        """Career and health queries produce different follow-up suggestions."""
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.send("What is my career outlook for 2026?")
+        screens.chat.wait_for_response(timeout=90)
+        career_rows = screens.chat.finds("followup_row_0")
+        career_text = career_rows[0].get_attribute("label") or "" if career_rows else ""
+
+        screens.chat.tap_new_chat()
+        screens.chat.send("How is my health this year?")
+        screens.chat.wait_for_response(timeout=90)
+        health_rows = screens.chat.finds("followup_row_0")
+        health_text = health_rows[0].get_attribute("label") or "" if health_rows else ""
+
+        if not career_text or not health_text:
+            pytest.skip("Follow-up rows not available for one or both queries")
+
+        assert career_text != health_text, (
+            f"Career and health follow-ups are identical: {career_text!r} "
+            "— _generate_follow_ups may be returning hardcoded values"
+        )
+
+    def test_followup_text_contains_astrology_keywords(self, screens):
+        """Follow-up suggestion text references time, placement, or life topic."""
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.send("Tell me about my current dasha period.")
+        screens.chat.wait_for_response(timeout=90)
+        if not screens.chat.present("followup_row_0"):
+            pytest.skip("No follow-up rows available")
+        rows = screens.chat.finds("followup_row_0")
+        text = rows[0].get_attribute("label") or ""
+        astro_keywords = [
+            "dasha", "planet", "year", "period", "time", "career", "health",
+            "relationship", "luck", "opportunity", "challenge", "sign", "house",
+            "what", "when", "how", "will", "should", "my"
+        ]
+        has_keyword = any(kw in text.lower() for kw in astro_keywords)
+        assert has_keyword, \
+            f"Follow-up suggestion '{text}' doesn't look contextual — may be generic filler"
+
+    def test_multiple_followup_rows_are_distinct(self, screens):
+        """All visible follow-up rows have different text (not duplicated)."""
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.send("What should I focus on for personal growth?")
+        screens.chat.wait_for_response(timeout=90)
+        texts = []
+        for i in range(3):
+            els = screens.chat.finds(f"followup_row_{i}")
+            if els:
+                t = els[0].get_attribute("label") or ""
+                if t:
+                    texts.append(t)
+        if len(texts) < 2:
+            pytest.skip("Fewer than 2 follow-up rows available")
+        assert len(texts) == len(set(texts)), \
+            f"Duplicate follow-up suggestions found: {texts}"

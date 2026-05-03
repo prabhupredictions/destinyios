@@ -52,6 +52,8 @@ class StreamingPredictionService {
             "conversation_id": request.conversationId ?? UUID().uuidString,
             "user_email": request.userEmail ?? "",
             "language": request.language,
+            "response_style": request.responseStyle ?? "",
+            "response_length": request.responseLength ?? "",
             "profile_id": ProfileContextManager.shared.activeProfileId  // Profile-scoped threads
         ]
         
