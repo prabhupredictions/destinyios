@@ -20,6 +20,9 @@ class ChatViewModel {
     var quotaDetails: String?
     var typewriterMessageId: String?  // Message currently being typewritten
     var windowManager = MessageWindowManager()
+    var currentPipelineStep: PipelineStep? = nil
+    var completedPipelineSteps: [PipelineStep] = []
+    private var streamingTask: Task<Void, Never>? = nil
 
     // Current session/thread
     var currentSessionId: String = ""
@@ -75,6 +78,9 @@ class ChatViewModel {
         errorMessage = nil
         streamingContent = ""
         typewriterMessageId = nil
+        currentPipelineStep = nil
+        completedPipelineSteps = []
+        stopStreaming()
         
         // Reload history filtered for the new profile
         loadHistory()
@@ -256,35 +262,91 @@ class ChatViewModel {
             responseLength: responseLength
         )
         
-        // Non-streaming API call (server records quota + chat history)
-        do {
-            let resp = try await predictionService.predict(request: request)
-            
-            // Add AI message with full content
-            let aiMessage = LocalChatMessage(
-                threadId: currentThreadId,
-                role: .assistant,
-                content: resp.answer,
-                area: resp.lifeArea,
-                confidence: resp.confidenceLabel,
-                traceId: resp.predictionId,
-                executionTimeMs: resp.executionTimeMs
-            )
-            typewriterMessageId = aiMessage.id  // Trigger typewriter in MessageBubble
-            messages.append(aiMessage)
-            windowManager.append(aiMessage)
-            if HistorySettingsManager.shared.isHistoryEnabled {
-                dataManager.saveMessage(aiMessage)
-            }
-            
-            suggestedQuestions = resp.followUpSuggestions
-            
-        } catch {
-            print("[Predict] Error: \(error)")
-            errorMessage = "Failed to get response. Please try again."
-        }
-        
+        // Streaming API call — replaces fake typewriter
         isLoading = false
+        isStreaming = true
+        currentPipelineStep = nil
+        completedPipelineSteps = []
+
+        let streamingMsg = LocalChatMessage(
+            threadId: currentThreadId,
+            role: .assistant,
+            content: "",
+            isStreaming: true
+        )
+        messages.append(streamingMsg)
+        windowManager.append(streamingMsg)
+
+        streamingTask = Task { [weak self] in
+            guard let self else { return }
+            var finalResponse: PredictionResponse? = nil
+            var accumulatedAnswer = ""
+
+            do {
+                try await StreamingPredictionService.shared.predictStream(
+                    request: request
+                ) { event in
+                    switch event {
+                    case .action(_, let tool, _):
+                        if let step = PipelineStep.from(tool: tool) {
+                            self.currentPipelineStep = step
+                            for s in PipelineStep.allCases where s.rawValue < step.rawValue {
+                                if !self.completedPipelineSteps.contains(s) {
+                                    self.completedPipelineSteps.append(s)
+                                }
+                            }
+                        }
+
+                    case .finalAnswer(let content):
+                        accumulatedAnswer = content
+                        if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                            self.messages[idx].content = accumulatedAnswer
+                        }
+
+                    case .answer(let response):
+                        finalResponse = response
+
+                    case .done:
+                        self.currentPipelineStep = nil
+                        self.completedPipelineSteps = PipelineStep.allCases.map { $0 }
+
+                        let answer = finalResponse?.answer ?? accumulatedAnswer
+                        if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                            self.messages[idx].content = answer
+                            self.messages[idx].isStreaming = false
+                            self.messages[idx].area = finalResponse?.lifeArea
+                            if HistorySettingsManager.shared.isHistoryEnabled {
+                                self.dataManager.saveMessage(self.messages[idx])
+                            }
+                        }
+                        self.suggestedQuestions = finalResponse?.followUpSuggestions ?? []
+                        self.isStreaming = false
+
+                    case .error(let msg):
+                        self.errorMessage = msg
+                        self.messages.removeAll { $0.id == streamingMsg.id }
+                        self.windowManager.remove(id: streamingMsg.id)
+                        self.isStreaming = false
+
+                    default: break
+                    }
+                }
+            } catch is CancellationError {
+                self.messages.removeAll { $0.id == streamingMsg.id }
+                self.windowManager.remove(id: streamingMsg.id)
+                self.isStreaming = false
+            } catch {
+                self.errorMessage = "Failed to get response. Please try again."
+                self.messages.removeAll { $0.id == streamingMsg.id }
+                self.windowManager.remove(id: streamingMsg.id)
+                self.isStreaming = false
+            }
+        }
+    }
+
+    func stopStreaming() {
+        streamingTask?.cancel()
+        streamingTask = nil
     }
     
     // Format tool names for display — user-friendly cosmic text
