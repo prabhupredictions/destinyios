@@ -449,15 +449,14 @@ struct MarkdownTextView: View {
             
         case .blockquote(let text):
             renderInlineMarkdown(text)
-                .italic()
-                .padding(.vertical, 8)
+                .font(AppTheme.Fonts.body(size: fontSize).bold().italic())
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .padding(.vertical, 10)
                 .padding(.leading, 16)
                 .overlay(alignment: .leading) {
-                    Rectangle()
+                    RoundedRectangle(cornerRadius: 1.5)
                         .fill(AppTheme.Colors.gold)
                         .frame(width: 3)
-                        .alignmentGuide(.top) { $0[.top] }
-                        .alignmentGuide(.bottom) { $0[.bottom] }
                 }
             
         case .table(let headers, let rows):
