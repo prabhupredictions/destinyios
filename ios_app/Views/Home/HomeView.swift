@@ -841,9 +841,10 @@ struct HomeView: View {
             }
             
             VStack(spacing: 10) {
-                ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                ForEach(Array(rows.enumerated()), id: \.offset) { rowIdx, row in
                     HStack(spacing: 10) {
-                        ForEach(row, id: \.self) { question in
+                        ForEach(Array(row.enumerated()), id: \.element) { colIdx, question in
+                            let qIndex = rowIdx * 2 + colIdx
                             Button(action: {
                                 HapticManager.shared.play(.light)
                                 onQuestionSelected?(question, nil)
@@ -851,6 +852,7 @@ struct HomeView: View {
                                 QuickQuestionCard(question: question)
                             }
                             .buttonStyle(ScaleButtonStyle())
+                            .accessibilityIdentifier("mind_question_\(qIndex)")
                         }
                     }
                 }

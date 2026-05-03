@@ -200,6 +200,7 @@ struct YogaDetailPopup: View {
                     .foregroundColor(AppTheme.Colors.gold)
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
+                .accessibilityIdentifier("yoga_ask_more_button")
             }
             .padding(18)
             .frame(maxWidth: 340)

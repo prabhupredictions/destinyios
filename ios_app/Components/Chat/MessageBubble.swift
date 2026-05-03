@@ -58,6 +58,7 @@ struct MessageBubble: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("You said: \(message.content)")
+            .accessibilityIdentifier("user_message")
         } else if isWelcomeMessage {
             // Welcome message — simple layout
             VStack(alignment: .leading, spacing: 6) {

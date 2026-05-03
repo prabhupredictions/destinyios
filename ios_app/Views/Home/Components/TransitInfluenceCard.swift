@@ -361,6 +361,7 @@ struct TransitInfluencesSection: View {
                             TransitOrbView(transit: transit)
                         }
                         .buttonStyle(ScaleButtonStyle())
+                        .accessibilityIdentifier("transit_card_\(transit.planet.lowercased())")
                     }
                 }
                 .padding(.horizontal, 12) // Match parent edge

@@ -137,8 +137,9 @@ struct YogaHighlightCard: View {
                 } else {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(Array(filteredYogas.enumerated()), id: \.offset) { _, yoga in
+                            ForEach(Array(filteredYogas.enumerated()), id: \.offset) { index, yoga in
                                 PremiumYogaCard(yoga: yoga)
+                                    .accessibilityIdentifier("yoga_card_\(index)")
                                     .onTapGesture {
                                         HapticManager.shared.play(.light)
                                         onYogaTapped?(yoga)

@@ -79,6 +79,7 @@ struct LifeAreaBriefPopup: View {
                     .foregroundColor(AppTheme.Colors.gold)
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
+                .accessibilityIdentifier("life_area_ask_more_button")
             }
             .padding(16)
             .frame(width: 280)
