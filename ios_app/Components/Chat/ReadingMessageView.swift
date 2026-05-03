@@ -6,8 +6,7 @@ import SwiftUI
 struct ReadingMessageView: View {
     let message: LocalChatMessage
     let userQuery: String
-    let completedSteps: [PipelineStep]
-    let activeStep: PipelineStep?
+    let cosmicProgressSteps: [CosmicProgressStep]
     let isStreaming: Bool
 
     @State private var showCopied = false
@@ -28,8 +27,8 @@ struct ReadingMessageView: View {
                     .accessibilityIdentifier("reading_question_label")
             }
 
-            // Domain tag — only after streaming completes
-            if !domainLabel.isEmpty && !isStreaming {
+            // Domain tag — only after streaming completes and no progress steps showing
+            if !domainLabel.isEmpty && !isStreaming && cosmicProgressSteps.isEmpty {
                 HStack(spacing: 5) {
                     Circle()
                         .fill(AppTheme.Colors.gold)
@@ -50,12 +49,8 @@ struct ReadingMessageView: View {
                 .accessibilityIdentifier("reading_domain_tag")
             }
 
-            // Ritual progress (fades in step by step during streaming)
-            RitualProgressView(
-                completedSteps: completedSteps,
-                activeStep: activeStep,
-                isStreaming: isStreaming
-            )
+            // Cosmic progress (fades in step by step during streaming)
+            CosmicProgressView(steps: cosmicProgressSteps)
 
             // Reading body — rendered markdown, SF Pro Text 16px
             if !message.content.isEmpty {

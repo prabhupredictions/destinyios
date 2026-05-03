@@ -10,8 +10,7 @@ struct MessageBubble: View {
     var onTypewriterFinished: (() -> Void)? = nil
     var onTypewriterProgress: (() -> Void)? = nil
     // Pipeline step state for reading layout
-    var completedSteps: [PipelineStep] = []
-    var activeStep: PipelineStep? = nil
+    var cosmicProgressSteps: [CosmicProgressStep] = []
     
     // Local typewriter state (only this bubble re-renders, no parent jitter)
     @State private var revealedContent: String = ""
@@ -76,8 +75,7 @@ struct MessageBubble: View {
             ReadingMessageView(
                 message: message,
                 userQuery: userQuery,
-                completedSteps: completedSteps,
-                activeStep: activeStep,
+                cosmicProgressSteps: cosmicProgressSteps,
                 isStreaming: message.isStreaming
             )
             .onDisappear {

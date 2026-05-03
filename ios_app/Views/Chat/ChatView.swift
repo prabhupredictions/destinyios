@@ -350,8 +350,7 @@ struct ChatView: View {
                                 streamingContent: nil,
                                 thinkingSteps: [],
                                 enableTypewriter: false,
-                                completedSteps: message.isStreaming ? viewModel.completedPipelineSteps : [],
-                                activeStep: message.isStreaming ? viewModel.currentPipelineStep : nil
+                                cosmicProgressSteps: message.isStreaming ? viewModel.cosmicProgressSteps : []
                             )
                             .id(message.id)
                         }
