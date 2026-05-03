@@ -265,7 +265,7 @@ class ChatViewModel {
         // Streaming API call — replaces fake typewriter
         isLoading = false
         isStreaming = true
-        currentPipelineStep = nil
+        currentPipelineStep = .houses   // seed first step so RitualProgressView shows immediately
         completedPipelineSteps = []
 
         let streamingMsg = LocalChatMessage(

@@ -293,7 +293,7 @@ struct ChatView: View {
     
     // MARK: - Visible Messages (from window manager, filtered for non-empty)
     private var visibleMessages: [LocalChatMessage] {
-        viewModel.windowManager.visibleMessages.filter { !$0.content.isEmpty }
+        viewModel.windowManager.visibleMessages.filter { !$0.content.isEmpty || $0.isStreaming }
     }
     
     // MARK: - User Query Lookup (pre-computed, avoids O(n²) per-message scan)

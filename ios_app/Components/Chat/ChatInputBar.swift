@@ -40,8 +40,8 @@ struct ChatInputBar: View {
                 .onSubmit { if canSend { onSend() } }
                 .accessibilityIdentifier("chat_input")
 
-            // Style capsule (hidden while loading)
-            if !isLoading && !isStreaming {
+            // Style capsule (hidden while loading initial request only)
+            if !isLoading {
                 Button { showStyleSelector = true } label: {
                     HStack(spacing: 3) {
                         Text(lengthManager.currentLength.label)

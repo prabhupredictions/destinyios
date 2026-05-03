@@ -67,15 +67,16 @@ struct ReadingMessageView: View {
                 isStreaming: isStreaming
             )
 
-            // Reading body — SF Pro Text 16px 1.85 line-height
+            // Reading body — rendered markdown, SF Pro Text 16px
             if !message.content.isEmpty {
-                Text(message.content)
-                    .font(.system(size: 16))
-                    .foregroundColor(Color.white.opacity(0.92))
-                    .lineSpacing(8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityIdentifier("reading_body_text")
-                    .padding(.bottom, 2)
+                MarkdownTextView(
+                    content: message.content,
+                    textColor: Color.white.opacity(0.92),
+                    fontSize: 16
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("reading_body_text")
+                .padding(.bottom, 2)
             }
 
             // Depth layers and footer — only once streaming is done
