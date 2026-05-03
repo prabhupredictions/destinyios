@@ -9,6 +9,9 @@ struct MessageBubble: View {
     var enableTypewriter: Bool = false
     var onTypewriterFinished: (() -> Void)? = nil
     var onTypewriterProgress: (() -> Void)? = nil
+    // Pipeline step state for reading layout
+    var completedSteps: [PipelineStep] = []
+    var activeStep: PipelineStep? = nil
     
     // Local typewriter state (only this bubble re-renders, no parent jitter)
     @State private var revealedContent: String = ""
@@ -44,37 +47,42 @@ struct MessageBubble: View {
     }
     
     var body: some View {
-        HStack(alignment: .top, spacing: 0) {
-            if isUser {
+        if isUser {
+            // User bubble (unchanged)
+            HStack(alignment: .top, spacing: 0) {
                 Spacer(minLength: 60)
+                VStack(alignment: .trailing, spacing: 6) {
+                    messageContent
+                }
             }
-            
-            VStack(alignment: isUser ? .trailing : .leading, spacing: 6) {
-                // Message content
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("You said: \(message.content)")
+        } else if isWelcomeMessage {
+            // Welcome message — simple layout
+            VStack(alignment: .leading, spacing: 6) {
                 messageContent
-                
-                // Metadata row with inline rating — hidden during typewriter
-                if !isUser && !message.isStreaming && (!enableTypewriter || typewriterFinished) {
+                if !message.isStreaming {
                     metadataRowWithRating
                 }
             }
-            
-            if !isUser {
-                Spacer(minLength: 16) // Modern full-width AI messages
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Destiny said: \(message.content)")
+            .accessibilityIdentifier("ai_message")
+        } else {
+            // Premium reading layout for all real AI predictions
+            ReadingMessageView(
+                message: message,
+                userQuery: userQuery,
+                completedSteps: completedSteps,
+                activeStep: activeStep,
+                isStreaming: message.isStreaming
+            )
+            .onDisappear {
+                typewriterTimer?.invalidate()
+                typewriterTimer = nil
             }
-        }
-        .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(isUser ? "You said: \(message.content)" : "Destiny said: \(displayContent)")
-        .accessibilityIdentifier(isUser ? "" : "ai_message")
-        .onAppear {
-            if enableTypewriter {
-                startTypewriter()
-            }
-        }
-        .onDisappear {
-            typewriterTimer?.invalidate()
-            typewriterTimer = nil
         }
     }
     

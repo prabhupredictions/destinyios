@@ -336,13 +336,9 @@ struct ChatView: View {
                                 userQuery: userQueryLookup[message.id] ?? "",
                                 streamingContent: nil,
                                 thinkingSteps: [],
-                                enableTypewriter: message.id == viewModel.typewriterMessageId,
-                                onTypewriterFinished: {
-                                    viewModel.typewriterMessageId = nil
-                                },
-                                onTypewriterProgress: {
-                                    requestScrollToBottom()
-                                }
+                                enableTypewriter: false,
+                                completedSteps: message.isStreaming ? viewModel.completedPipelineSteps : [],
+                                activeStep: message.isStreaming ? viewModel.currentPipelineStep : nil
                             )
                             .id(message.id)
                         }

@@ -16,6 +16,7 @@ final class LocalChatMessage {
     var role: String  // MessageRole raw value
     var content: String
     var area: String?  // Life area (marriage, career, etc.)
+    var advice: String?  // "Why this is happening" depth layer
     var confidence: String?  // e.g., "82%"
     var traceId: String?  // Link to reasoning trace
     var toolCalls: [String]  // Tool call previews (non-optional)
@@ -31,6 +32,7 @@ final class LocalChatMessage {
         role: MessageRole,
         content: String,
         area: String? = nil,
+        advice: String? = nil,
         confidence: String? = nil,
         traceId: String? = nil,
         toolCalls: [String] = [],
@@ -45,6 +47,7 @@ final class LocalChatMessage {
         self.role = role.rawValue
         self.content = content
         self.area = area
+        self.advice = advice
         self.confidence = confidence
         self.traceId = traceId
         self.toolCalls = toolCalls

@@ -315,6 +315,7 @@ class ChatViewModel {
                             self.messages[idx].content = answer
                             self.messages[idx].isStreaming = false
                             self.messages[idx].area = finalResponse?.lifeArea
+                            self.messages[idx].advice = finalResponse?.advice
                             if HistorySettingsManager.shared.isHistoryEnabled {
                                 self.dataManager.saveMessage(self.messages[idx])
                             }
