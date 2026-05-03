@@ -23,8 +23,8 @@ struct ChatInputBar: View {
             // + button (left, inside pill)
             if !isLoading {
                 Button { showStyleSelector = true } label: {
-                    Image(systemName: "slider.horizontal.2")
-                        .font(.system(size: 17, weight: .medium))
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 36)
                 }
