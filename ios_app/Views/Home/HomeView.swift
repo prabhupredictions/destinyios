@@ -189,7 +189,7 @@ struct HomeView: View {
                                         let localizedQuality = localizedDashaQuality(dasha.quality)
                                         let meaningPart = dasha.meaning != nil ? String(format: "context_dasha_phase_suggests".localized, dasha.meaning!) : ""
                                         let q = String(format: "context_dasha_question".localized, dasha.period, dasha.theme, localizedQuality, meaningPart)
-                                        let label = "My \(dasha.period) Dasha"
+                                        let label = "What does my current Dasha mean for me?"
                                         onQuestionSelected?(q, label)
                                     }) {
                                         DashaInsightCard(dasha: dasha)
@@ -208,7 +208,7 @@ struct HomeView: View {
                                         let signName = localizedZodiacName(for: transit.sign)
                                         let localizedPlanet = localizedPlanetName(transit.planet)
                                         let q = String(format: "context_transit_question".localized, localizedPlanet, signName, transit.house, transit.description)
-                                        let label = "\(localizedPlanet) transit"
+                                        let label = "How is the \(localizedPlanet) transit affecting me?"
                                         onQuestionSelected?(q, label)
                                     }
                                 )
@@ -242,7 +242,7 @@ struct HomeView: View {
                     iconName: iconName(for: selected.area),
                     onAskMore: {
                         let contextualQuestion = String(format: "context_life_area_question".localized, selected.status.brief, selected.area.localized)
-                        let label = "\(selected.area.capitalized) forecast"
+                        let label = "What's ahead for my \(selected.area.lowercased())?"
                         selectedLifeArea = nil
                         onQuestionSelected?(contextualQuestion, label)
                     },
@@ -306,7 +306,7 @@ struct HomeView: View {
                         }
                         
                         let contextualQuestion = contextParts.joined(separator: "\n")
-                        let label = yoga.localizedName
+                        let label = "What does \(yoga.localizedName) mean for me?"
                         selectedYogaForPopup = nil
                         onQuestionSelected?(contextualQuestion, label)
                     },
