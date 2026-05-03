@@ -401,3 +401,60 @@ class TestFollowUpVariety:
             pytest.skip("Fewer than 2 follow-up rows available")
         assert len(texts) == len(set(texts)), \
             f"Duplicate follow-up suggestions found: {texts}"
+
+    def test_followup_questions_do_not_contain_astrology_jargon(self, screens):
+        """Follow-up suggestions must not contain planets, houses, signs, or dasha terms."""
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.send("What is my career outlook?")
+        screens.chat.wait_for_response(timeout=90)
+        jargon = [
+            "saturn", "jupiter", "mars", "venus", "mercury", "sun", "moon", "rahu", "ketu",
+            "house", "lagna", "ascendant", "dasha", "transit", "conjunction", "aspect",
+            "retrograde", "nakshatra", "sign", "aries", "taurus", "gemini", "cancer",
+        ]
+        for i in range(3):
+            els = screens.chat.finds(f"followup_row_{i}")
+            if not els:
+                break
+            text = (els[0].get_attribute("label") or "").lower()
+            for term in jargon:
+                assert term not in text, (
+                    f"Follow-up row {i} contains astrology jargon '{term}': {text!r}\n"
+                    "LLM follow-up instructions may not be reaching the synthesis prompt"
+                )
+
+    def test_followup_questions_are_llm_generated_not_fallback(self, screens):
+        """Verify LLM generates contextual follow-ups (not identical runs).
+
+        Sends the same question twice in different chats and checks that at least
+        one of the three follow-up suggestions differs between runs — confirming
+        the LLM path (not a static fallback) is being used.
+        """
+        question = "Tell me about my marriage prospects."
+        all_texts = []
+
+        for _ in range(2):
+            screens.home.tap_chat_tab()
+            screens.chat.tap_new_chat()
+            screens.chat.send(question)
+            screens.chat.wait_for_response(timeout=90)
+            run_texts = []
+            for i in range(3):
+                els = screens.chat.finds(f"followup_row_{i}")
+                if els:
+                    t = els[0].get_attribute("label") or ""
+                    if t:
+                        run_texts.append(t)
+            all_texts.append(frozenset(run_texts))
+
+        if len(all_texts) < 2 or not all(all_texts):
+            pytest.skip("Could not get follow-up rows for both runs")
+
+        # If BOTH runs return the exact same set, it's very likely a static fallback
+        # (LLM output naturally varies slightly between calls)
+        assert all_texts[0] != all_texts[1] or len(all_texts[0]) == 0, (
+            f"Both runs returned identical follow-up sets: {all_texts[0]}\n"
+            "This strongly suggests static fallback (_generate_follow_ups) is firing, "
+            "not the LLM synthesis path"
+        )
