@@ -7,6 +7,7 @@ struct MainTabView: View {
     @State private var showHistory = false
     @State private var showAskSheet = false  // New: Show Ask Destiny Sheet
     @State private var pendingQuestion: String? = nil
+    @State private var pendingQuestionLabel: String? = nil
     @State private var pendingThreadId: String? = nil
     @State private var pendingMatchItem: CompatibilityHistoryItem? = nil
     @State private var pendingMatchGroup: ComparisonGroup? = nil
@@ -28,8 +29,9 @@ struct MainTabView: View {
                 // HOME TAB - Always loaded, kept alive
                 HomeView(
                     viewModel: homeViewModel,
-                    onQuestionSelected: { question in
+                    onQuestionSelected: { question, label in
                         pendingQuestion = question
+                        pendingQuestionLabel = label
                         selectedTab = 1  // Navigate to chat
                     },
                     onChatHistorySelected: { threadId in
@@ -63,12 +65,14 @@ struct MainTabView: View {
                 // CHAT TAB - Lazily loaded on first visit
                 if hasVisitedChat || selectedTab == 1 {
                     ChatView(
-                        onBack: { 
-                            selectedTab = 0 
+                        onBack: {
+                            selectedTab = 0
                             pendingQuestion = nil  // Clear pending question
+                            pendingQuestionLabel = nil
                             pendingThreadId = nil
                         },
                         initialQuestion: pendingQuestion,
+                        initialDisplayLabel: pendingQuestionLabel,
                         initialThreadId: pendingThreadId,
                         starterQuestions: homeViewModel.suggestedQuestions
                     )
@@ -149,6 +153,7 @@ struct MainTabView: View {
                 suggestedQuestions: homeViewModel.suggestedQuestions,
                 onQuestionSelected: { question in
                     pendingQuestion = question
+                    pendingQuestionLabel = nil
                     selectedTab = 1  // Navigate to chat with question
                 }
             )

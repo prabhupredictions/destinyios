@@ -7,7 +7,7 @@ struct HomeView: View {
     var viewModel: HomeViewModel
     
     // MARK: - Callbacks
-    var onQuestionSelected: ((String) -> Void)? = nil
+    var onQuestionSelected: ((String, String?) -> Void)? = nil
     var onChatHistorySelected: ((String) -> Void)? = nil
     var onMatchHistorySelected: ((CompatibilityHistoryItem) -> Void)? = nil
     var onMatchGroupHistorySelected: ((ComparisonGroup) -> Void)? = nil
@@ -189,7 +189,8 @@ struct HomeView: View {
                                         let localizedQuality = localizedDashaQuality(dasha.quality)
                                         let meaningPart = dasha.meaning != nil ? String(format: "context_dasha_phase_suggests".localized, dasha.meaning!) : ""
                                         let q = String(format: "context_dasha_question".localized, dasha.period, dasha.theme, localizedQuality, meaningPart)
-                                        onQuestionSelected?(q)
+                                        let label = "My \(dasha.period) Dasha"
+                                        onQuestionSelected?(q, label)
                                     }) {
                                         DashaInsightCard(dasha: dasha)
                                     }
@@ -207,7 +208,8 @@ struct HomeView: View {
                                         let signName = localizedZodiacName(for: transit.sign)
                                         let localizedPlanet = localizedPlanetName(transit.planet)
                                         let q = String(format: "context_transit_question".localized, localizedPlanet, signName, transit.house, transit.description)
-                                        onQuestionSelected?(q)
+                                        let label = "\(localizedPlanet) transit"
+                                        onQuestionSelected?(q, label)
                                     }
                                 )
                             }
@@ -240,8 +242,9 @@ struct HomeView: View {
                     iconName: iconName(for: selected.area),
                     onAskMore: {
                         let contextualQuestion = String(format: "context_life_area_question".localized, selected.status.brief, selected.area.localized)
+                        let label = "\(selected.area.capitalized) forecast"
                         selectedLifeArea = nil
-                        onQuestionSelected?(contextualQuestion)
+                        onQuestionSelected?(contextualQuestion, label)
                     },
                     onDismiss: {
                         selectedLifeArea = nil
@@ -303,9 +306,9 @@ struct HomeView: View {
                         }
                         
                         let contextualQuestion = contextParts.joined(separator: "\n")
-                        
+                        let label = yoga.localizedName
                         selectedYogaForPopup = nil
-                        onQuestionSelected?(contextualQuestion)
+                        onQuestionSelected?(contextualQuestion, label)
                     },
                     onDismiss: {
                         withAnimation(.spring(response: 0.3)) {
@@ -843,7 +846,7 @@ struct HomeView: View {
                         ForEach(row, id: \.self) { question in
                             Button(action: {
                                 HapticManager.shared.play(.light)
-                                onQuestionSelected?(question)
+                                onQuestionSelected?(question, nil)
                             }) {
                                 QuickQuestionCard(question: question)
                             }
@@ -874,7 +877,7 @@ struct HomeView: View {
     private var yogaHighlightsSection: some View {
         YogaHighlightCard(
             yogas: viewModel.yogaCombinations,
-            onQuestionSelected: onQuestionSelected,
+            onQuestionSelected: { q, label in onQuestionSelected?(q, label) },
             onYogaTapped: { yoga in
                 withAnimation(.spring(response: 0.35)) {
                     selectedYogaForPopup = yoga

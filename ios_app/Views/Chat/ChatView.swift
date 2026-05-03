@@ -7,6 +7,9 @@ struct ChatView: View {
     
     // Initial question passed from HomeView
     var initialQuestion: String? = nil
+
+    // Short label to show in the user bubble instead of the raw contextual query
+    var initialDisplayLabel: String? = nil
     
     // Initial thread ID passed from History
     var initialThreadId: String? = nil
@@ -106,6 +109,7 @@ struct ChatView: View {
             if let question = newValue, !question.isEmpty, question != oldValue {
                 hasHandledInitialQuestion = true
                 viewModel.startNewChat()
+                viewModel.pendingDisplayLabel = initialDisplayLabel
                 viewModel.inputText = question
                 Task {
                     await viewModel.sendMessage()
@@ -133,6 +137,7 @@ struct ChatView: View {
             if let question = initialQuestion, !question.isEmpty, !hasHandledInitialQuestion {
                 hasHandledInitialQuestion = true
                 viewModel.startNewChat()
+                viewModel.pendingDisplayLabel = initialDisplayLabel
                 viewModel.inputText = question
                 Task { await viewModel.sendMessage() }
             } else if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {

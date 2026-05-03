@@ -22,6 +22,9 @@ class ChatViewModel {
     var windowManager = MessageWindowManager()
     var currentPipelineStep: PipelineStep? = nil
     var completedPipelineSteps: [PipelineStep] = []
+    /// Short label shown in the user bubble when a home card sends a rich contextual query.
+    /// The full inputText is still sent to the LLM; this only affects what the user sees.
+    var pendingDisplayLabel: String? = nil
     private var streamingTask: Task<Void, Never>? = nil
     private var stepProgressTask: Task<Void, Never>? = nil
 
@@ -170,19 +173,23 @@ class ChatViewModel {
     func sendMessage() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
-        
+
+        // Short label for the user bubble; full query still goes to LLM
+        let displayContent = pendingDisplayLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? query
+        pendingDisplayLabel = nil
+
         // Clear input and reset state immediately
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []
-        
+
         let currentEmail = userEmail
-        
+
         // Add user message immediately for responsiveness
         let userMessage = LocalChatMessage(
             threadId: currentThreadId,
             role: .user,
-            content: query
+            content: displayContent
         )
         messages.append(userMessage)
         windowManager.append(userMessage)

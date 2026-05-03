@@ -2,7 +2,7 @@ import SwiftUI
 
 struct YogaHighlightCard: View {
     let yogas: [YogaDetail]
-    var onQuestionSelected: ((String) -> Void)?
+    var onQuestionSelected: ((String, String?) -> Void)?
     var onYogaTapped: ((YogaDetail) -> Void)?  // Callback to show popup at parent level
     
     @State private var selectedFilter: FilterType = .all
