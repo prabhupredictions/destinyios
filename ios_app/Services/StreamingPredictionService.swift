@@ -13,6 +13,7 @@ class StreamingPredictionService {
         case thought(step: Int, content: String, display: String)
         case action(step: Int, tool: String, display: String)
         case observation(step: Int, display: String)
+        case progressStep(phase: String, group: Int, groupCount: Int, isDone: Bool, displayKey: String?, elapsedMs: Int)
         case finalAnswer(content: String)
         case answer(response: PredictionResponse)
         case done(totalSteps: Int)
@@ -138,6 +139,16 @@ class StreamingPredictionService {
                 display: json["display"] as? String ?? "📊 Analyzing..."
             )
             
+        case "progress_step":
+            return .progressStep(
+                phase:      json["phase"]       as? String ?? "",
+                group:      json["group"]       as? Int    ?? 0,
+                groupCount: json["group_count"] as? Int    ?? 1,
+                isDone:     json["is_done"]     as? Bool   ?? false,
+                displayKey: json["display_key"] as? String,
+                elapsedMs:  json["elapsed_ms"]  as? Int    ?? 0
+            )
+
         case "final_answer":
             return .finalAnswer(
                 content: json["content"] as? String ?? ""
