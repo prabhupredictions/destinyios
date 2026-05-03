@@ -2767,3 +2767,14 @@
 
 // Input placeholder
 "type_your_question_placeholder" = "अपना प्रश्न लिखें...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "आपके जन्म के क्षण का आकाश मापा जा रहा है...";
+"progress_reading_planets"  = "ग्रह आपके लिए क्या लेकर आए हैं, यह पढ़ा जा रहा है...";
+"progress_planetary_voice"  = "हर ग्रह की आवाज़ का भार महसूस किया जा रहा है...";
+"progress_chart_secrets"    = "कुंडली अपने रहस्य प्रकट कर रही है...";
+"progress_deeper_patterns"  = "आपके सितारों में छुपे गहरे संकेत खोजे जा रहे हैं...";
+"progress_destiny_shaped"   = "आपकी नियति को आकार देने वाले तत्वों को समझा जा रहा है...";
+"progress_river_of_time"    = "आपके जीवन में समय की नदी का मार्ग खोजा जा रहा है...";
+"progress_cosmic_windows"   = "ब्रह्मांडीय द्वार दृश्यमान हो रहे हैं...";
+"progress_oracle_weaving"   = "ज्योतिषी आपकी कुंडली बुन रहे हैं...";

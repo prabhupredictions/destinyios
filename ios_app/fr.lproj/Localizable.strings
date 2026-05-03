@@ -2900,3 +2900,14 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 
 // Input placeholder
 "type_your_question_placeholder" = "Tapez votre question...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "Cartographier le ciel au moment de ta naissance...";
+"progress_reading_planets"  = "Lire ce que les planètes te réservent...";
+"progress_planetary_voice"  = "Ressentir le poids de chaque voix planétaire...";
+"progress_chart_secrets"    = "Le thème astral révèle ses secrets...";
+"progress_deeper_patterns"  = "Chercher les schémas profonds dans tes étoiles...";
+"progress_destiny_shaped"   = "Percevoir ce qui façonne ton destin...";
+"progress_river_of_time"    = "Tracer le fleuve du temps à travers ta vie...";
+"progress_cosmic_windows"   = "Les fenêtres cosmiques deviennent visibles...";
+"progress_oracle_weaving"   = "L'oracle tisse ta lecture...";

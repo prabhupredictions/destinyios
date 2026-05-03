@@ -2898,3 +2898,14 @@
 
 // Input placeholder
 "type_your_question_placeholder" = "உங்கள் கேள்வியை உள்ளிடுங்கள்...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "உங்கள் பிறந்த நேரத்தில் வானை வரைபடமிடுகிறோம்...";
+"progress_reading_planets"  = "கோள்கள் உங்களுக்கு என்ன வழங்குகின்றன என்று படிக்கிறோம்...";
+"progress_planetary_voice"  = "ஒவ்வொரு கோளின் குரலின் எடையை உணர்கிறோம்...";
+"progress_chart_secrets"    = "ஜாதகம் அதன் இரகசியங்களை வெளிப்படுத்துகிறது...";
+"progress_deeper_patterns"  = "உங்கள் நட்சத்திரங்களில் ஆழமான வடிவங்களை தேடுகிறோம்...";
+"progress_destiny_shaped"   = "உங்கள் விதியை வடிவமைப்பதை உணர்கிறோம்...";
+"progress_river_of_time"    = "உங்கள் வாழ்வில் காலத்தின் நதியை கண்டுபிடிக்கிறோம்...";
+"progress_cosmic_windows"   = "அண்டவெளி ஜன்னல்கள் தெரியத் தொடங்குகின்றன...";
+"progress_oracle_weaving"   = "ஜோதிடர் உங்கள் ஜோசியத்தை நெய்கிறார்...";

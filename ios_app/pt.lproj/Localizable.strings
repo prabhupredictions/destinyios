@@ -2900,3 +2900,14 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 
 // Input placeholder
 "type_your_question_placeholder" = "Digite sua pergunta...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "Mapeando o céu no momento do seu nascimento...";
+"progress_reading_planets"  = "Lendo o que os planetas reservam para você...";
+"progress_planetary_voice"  = "Sentindo o peso de cada voz planetária...";
+"progress_chart_secrets"    = "O mapa astral está revelando seus segredos...";
+"progress_deeper_patterns"  = "Procurando os padrões mais profundos em suas estrelas...";
+"progress_destiny_shaped"   = "Sentindo o que molda o seu destino...";
+"progress_river_of_time"    = "Traçando o rio do tempo pela sua vida...";
+"progress_cosmic_windows"   = "As janelas cósmicas estão se tornando visíveis...";
+"progress_oracle_weaving"   = "O oráculo está tecendo a sua leitura...";

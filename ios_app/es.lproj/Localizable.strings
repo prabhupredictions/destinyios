@@ -2900,3 +2900,14 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 
 // Input placeholder
 "type_your_question_placeholder" = "Escribe tu pregunta...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "Mapeando el cielo en el momento de tu nacimiento...";
+"progress_reading_planets"  = "Leyendo lo que los planetas tienen para ti...";
+"progress_planetary_voice"  = "Sintiendo el peso de cada voz planetaria...";
+"progress_chart_secrets"    = "La carta astral está revelando sus secretos...";
+"progress_deeper_patterns"  = "Buscando los patrones más profundos en tus estrellas...";
+"progress_destiny_shaped"   = "Percibiendo lo que moldea tu destino...";
+"progress_river_of_time"    = "Trazando el río del tiempo a través de tu vida...";
+"progress_cosmic_windows"   = "Las ventanas cósmicas se están volviendo visibles...";
+"progress_oracle_weaving"   = "El oráculo está tejiendo tu lectura...";

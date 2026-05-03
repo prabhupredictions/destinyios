@@ -2896,3 +2896,14 @@
 
 // Input placeholder
 "type_your_question_placeholder" = "మీ ప్రశ్న టైప్ చేయండి...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "మీరు పుట్టిన క్షణంలో ఆకాశాన్ని మ్యాప్ చేస్తున్నాం...";
+"progress_reading_planets"  = "గ్రహాలు మీ కోసం ఏమి అందిస్తున్నాయో చదువుతున్నాం...";
+"progress_planetary_voice"  = "ప్రతి గ్రహ స్వరం యొక్క బరువును అనుభవిస్తున్నాం...";
+"progress_chart_secrets"    = "జాతకం తన రహస్యాలను వెల్లడిస్తోంది...";
+"progress_deeper_patterns"  = "మీ నక్షత్రాలలో లోతైన నమూనాలను వెతుకుతున్నాం...";
+"progress_destiny_shaped"   = "మీ నియతిని రూపొందించేదాన్ని గ్రహిస్తున్నాం...";
+"progress_river_of_time"    = "మీ జీవితంలో కాలం యొక్క నదిని అనుసరిస్తున్నాం...";
+"progress_cosmic_windows"   = "విశ్వ జాలకాలు కనిపించడం ప్రారంభమవుతున్నాయి...";
+"progress_oracle_weaving"   = "జ్యోతిషుడు మీ పఠనాన్ని అల్లుతున్నాడు...";

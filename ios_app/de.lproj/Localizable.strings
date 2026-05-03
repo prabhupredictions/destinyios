@@ -2896,3 +2896,14 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 
 // Input placeholder
 "type_your_question_placeholder" = "Gib deine Frage ein...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "Den Himmel zum Zeitpunkt deiner Geburt kartieren...";
+"progress_reading_planets"  = "Lesen, was die Planeten für dich bereithalten...";
+"progress_planetary_voice"  = "Das Gewicht jeder planetarischen Stimme spüren...";
+"progress_chart_secrets"    = "Das Horoskop enthüllt seine Geheimnisse...";
+"progress_deeper_patterns"  = "Nach tiefen Mustern in deinen Sternen suchen...";
+"progress_destiny_shaped"   = "Spüren, was dein Schicksal formt...";
+"progress_river_of_time"    = "Den Fluss der Zeit durch dein Leben verfolgen...";
+"progress_cosmic_windows"   = "Die kosmischen Fenster werden sichtbar...";
+"progress_oracle_weaving"   = "Das Orakel webt deine Lesung...";

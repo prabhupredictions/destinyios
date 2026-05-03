@@ -2900,3 +2900,14 @@
 
 // Input placeholder
 "type_your_question_placeholder" = "Введите ваш вопрос...";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "Исследование неба в момент вашего рождения...";
+"progress_reading_planets"  = "Чтение того, что планеты несут для вас...";
+"progress_planetary_voice"  = "Ощущение веса каждого планетарного голоса...";
+"progress_chart_secrets"    = "Натальная карта раскрывает свои тайны...";
+"progress_deeper_patterns"  = "Поиск глубинных паттернов в ваших звёздах...";
+"progress_destiny_shaped"   = "Осознание того, что формирует вашу судьбу...";
+"progress_river_of_time"    = "Прослеживание реки времени через вашу жизнь...";
+"progress_cosmic_windows"   = "Космические окна становятся видимыми...";
+"progress_oracle_weaving"   = "Оракул плетёт вашу карту...";

@@ -2867,3 +2867,14 @@
 "apple_subscription_notice" = "Purchases are billed through your Apple ID. Manage in Settings → Apple ID → Subscriptions.";
 "price_monthly_format" = "$%@";
 "subscription_starts_format" = "Starts %@";
+
+/* Progress indicator — CosmicProgressView */
+"progress_mapping_sky"      = "Mapping the sky at the moment of your birth...";
+"progress_reading_planets"  = "Reading what the planets hold for you...";
+"progress_planetary_voice"  = "Feeling the weight of each planetary voice...";
+"progress_chart_secrets"    = "The chart is revealing its secrets...";
+"progress_deeper_patterns"  = "Looking for the deeper patterns in your stars...";
+"progress_destiny_shaped"   = "Sensing what your destiny is shaped by...";
+"progress_river_of_time"    = "Tracing the river of time through your life...";
+"progress_cosmic_windows"   = "The cosmic windows are becoming visible...";
+"progress_oracle_weaving"   = "The oracle is weaving your reading...";
