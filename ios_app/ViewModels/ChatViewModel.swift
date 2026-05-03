@@ -20,8 +20,6 @@ class ChatViewModel {
     var quotaDetails: String?
     var typewriterMessageId: String?  // Message currently being typewritten
     var windowManager = MessageWindowManager()
-    var currentPipelineStep: PipelineStep? = nil
-    var completedPipelineSteps: [PipelineStep] = []
     var cosmicProgressSteps: [CosmicProgressStep] = []
     /// Short label shown in the user bubble when a home card sends a rich contextual query.
     /// The full inputText is still sent to the LLM; this only affects what the user sees.
@@ -86,8 +84,6 @@ class ChatViewModel {
         errorMessage = nil
         streamingContent = ""
         typewriterMessageId = nil
-        currentPipelineStep = nil
-        completedPipelineSteps = []
         stopStreaming()
 
         // Reload history filtered for the new profile and load its latest thread
@@ -323,8 +319,6 @@ class ChatViewModel {
 
                     case .done:
                         self.stepProgressTask?.cancel()
-                        self.currentPipelineStep = nil
-                        self.completedPipelineSteps = PipelineStep.allCases.map { $0 }
                         for i in self.cosmicProgressSteps.indices {
                             self.cosmicProgressSteps[i].isCompleted = true
                             self.cosmicProgressSteps[i].isActive = false
