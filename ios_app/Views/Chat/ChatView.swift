@@ -127,14 +127,22 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            // Initial question is handled by .onChange(of: initialQuestion)
-            // which fires on first presentation with the initial value
-            
-            if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {
+            // onChange(of:) with the iOS 17 API does NOT fire on initial creation —
+            // only when the value changes while the view is already in the hierarchy.
+            // Handle the initial question here so a home-screen card tap always opens a fresh chat.
+            if let question = initialQuestion, !question.isEmpty, !hasHandledInitialQuestion {
+                hasHandledInitialQuestion = true
+                viewModel.startNewChat()
+                viewModel.inputText = question
+                Task { await viewModel.sendMessage() }
+            } else if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {
                 hasHandledInitialThread = true
                 if let thread = viewModel.dataManager.fetchThread(id: threadId) {
                     viewModel.loadThread(thread)
                 }
+            } else {
+                // Normal open — load latest thread or start new
+                viewModel.loadDefaultState()
             }
         }
         // Sync ViewModel quota state to View

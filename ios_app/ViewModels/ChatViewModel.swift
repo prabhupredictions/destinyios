@@ -48,16 +48,19 @@ class ChatViewModel {
     // MARK: - Session Management
     private func loadUserSession() {
         userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        
+
         // Get or create session
         let session = dataManager.getOrCreateSession(for: userEmail)
         currentSessionId = session.sessionId
-        
-        // Load history
+
+        // Load sidebar history only — thread loading is deferred to ChatView.onAppear
+        // so the view can decide: load latest thread OR start new (if a question is pending)
         loadHistory()
-        
-        // Start new thread or load latest for CURRENT PROFILE
-        // Must filter by profile ID to show correct thread when profile is switched
+    }
+
+    /// Load latest thread for current profile, or start a new chat if none exist.
+    /// Called from ChatView.onAppear when no initial question or thread ID is pending.
+    func loadDefaultState() {
         let threads = dataManager.fetchThreads(
             for: currentSessionId,
             profileId: ProfileContextManager.shared.activeProfileId
@@ -68,7 +71,7 @@ class ChatViewModel {
             startNewChat()
         }
     }
-    
+
     // MARK: - Profile Switch
     /// Called when active profile changes — isolates chat per profile
     func handleProfileSwitch() {
@@ -82,22 +85,12 @@ class ChatViewModel {
         currentPipelineStep = nil
         completedPipelineSteps = []
         stopStreaming()
-        
-        // Reload history filtered for the new profile
+
+        // Reload history filtered for the new profile and load its latest thread
         loadHistory()
-        
-        // Load the new profile's latest thread, or start a fresh chat
-        let threads = dataManager.fetchThreads(
-            for: currentSessionId,
-            profileId: ProfileContextManager.shared.activeProfileId
-        )
-        if let latestThread = threads.first {
-            loadThread(latestThread)
-        } else {
-            startNewChat()
-        }
+        loadDefaultState()
     }
-    
+
     // MARK: - History Management
     func loadHistory() {
         // Filter by active profile for Switch Profile feature
