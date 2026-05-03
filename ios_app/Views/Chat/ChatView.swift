@@ -355,12 +355,6 @@ struct ChatView: View {
                             .id(message.id)
                         }
                         
-                        // Loading indicator (matches compat chat's CompatTypingIndicator)
-                        if viewModel.isLoading {
-                            thinkingIndicator
-                                .id("loading")
-                        }
-                        
                         // Inline suggested questions — only after streaming finishes
                         if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && !viewModel.isStreaming {
                             inlineSuggestedQuestionsView
