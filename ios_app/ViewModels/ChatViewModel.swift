@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import SwiftUI
 
 /// ViewModel for Chat screen with streaming and history support
@@ -152,13 +153,15 @@ class ChatViewModel {
         // If viewing as another profile, greet them by that name
         let profileName = ProfileContextManager.shared.activeProfileName
         let greeting = String(format: "chat_welcome_greeting".localized, profileName)
-        
+
         let welcome = LocalChatMessage(
-            id: "welcome",
+            id: "welcome_\(currentThreadId)",
             threadId: currentThreadId,
             role: .assistant,
             content: greeting
         )
+        // Always insert into context so SwiftData backing data is valid for SwiftUI rendering
+        dataManager.context.insert(welcome)
         messages.append(welcome)
         windowManager.append(welcome)
         if HistorySettingsManager.shared.isHistoryEnabled {
@@ -188,6 +191,8 @@ class ChatViewModel {
             role: .user,
             content: displayContent
         )
+        // Always insert into context so SwiftData backing data is valid for SwiftUI rendering
+        dataManager.context.insert(userMessage)
         messages.append(userMessage)
         windowManager.append(userMessage)
         if HistorySettingsManager.shared.isHistoryEnabled {
@@ -278,6 +283,8 @@ class ChatViewModel {
             content: "",
             isStreaming: true
         )
+        // Insert into context so SwiftData backing data is valid for SwiftUI rendering
+        dataManager.context.insert(streamingMsg)
         messages.append(streamingMsg)
         windowManager.append(streamingMsg)
 
@@ -350,6 +357,7 @@ class ChatViewModel {
                         self.cosmicProgressSteps = []
                         self.messages.removeAll { $0.id == streamingMsg.id }
                         self.windowManager.remove(id: streamingMsg.id)
+                        self.dataManager.context.delete(streamingMsg)
                         self.isStreaming = false
 
                     default: break
@@ -360,6 +368,7 @@ class ChatViewModel {
                 self.cosmicProgressSteps = []
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
+                self.dataManager.context.delete(streamingMsg)
                 self.isStreaming = false
             } catch {
                 self.stepProgressTask?.cancel()
@@ -367,6 +376,7 @@ class ChatViewModel {
                 self.errorMessage = "Failed to get response. Please try again."
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
+                self.dataManager.context.delete(streamingMsg)
                 self.isStreaming = false
             }
         }

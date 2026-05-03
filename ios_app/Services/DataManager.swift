@@ -354,15 +354,14 @@ final class DataManager {
     
     /// Save a message (upsert - insert or skip if exists) - for sync from server
     func saveMessage(_ message: LocalChatMessage) {
-        // Check if message already exists to prevent duplicates
-        if getMessage(id: message.id) != nil {
-            // Message already exists, skip insert
-            return
+        // Check if message already exists in persistent store
+        let existing = getMessage(id: message.id)
+        if existing == nil {
+            context.insert(message)
         }
-        
-        context.insert(message)
+
         persistContext()
-        
+
         if let thread = getThread(id: message.threadId) {
             updateThread(thread)
         }
