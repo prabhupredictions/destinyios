@@ -273,49 +273,22 @@ struct ChatView: View {
         .padding(24)
     }
     
-    // MARK: - Inline Suggested Questions (horizontal scrollable pills)
+    // MARK: - Inline Suggested Questions (vertical full-width rows)
     private var inlineSuggestedQuestionsView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("suggested_questions".localized)
-                .font(AppTheme.Fonts.caption())
-                .foregroundColor(AppTheme.Colors.textSecondary)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(viewModel.suggestedQuestions, id: \.self) { question in
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            isInputFocused = false  // Dismiss keyboard
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                            viewModel.inputText = question
-                            viewModel.suggestedQuestions = []
-                            if viewModel.canAskQuestion {
-                                Task { await viewModel.sendMessage() }
-                            } else {
-                                showQuotaExhausted = true
-                            }
-                        }) {
-                            Text(question)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(AppTheme.Colors.gold)
-                                .lineLimit(1)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(AppTheme.Colors.gold.opacity(0.1))
-                                        .overlay(
-                                            Capsule()
-                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
-                                        )
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+        FollowUpSuggestionsView(
+            questions: viewModel.suggestedQuestions
+        ) { question in
+            HapticManager.shared.play(.light)
+            isInputFocused = false
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            viewModel.inputText = question
+            viewModel.suggestedQuestions = []
+            if viewModel.canAskQuestion {
+                Task { await viewModel.sendMessage() }
+            } else {
+                showQuotaExhausted = true
             }
         }
-        .padding(.top, 4)
     }
     
     // MARK: - Visible Messages (from window manager, filtered for non-empty)
@@ -380,8 +353,8 @@ struct ChatView: View {
                                 .id("loading")
                         }
                         
-                        // Inline suggested questions — only after typewriter finishes
-                        if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && viewModel.typewriterMessageId == nil {
+                        // Inline suggested questions — only after streaming finishes
+                        if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && !viewModel.isStreaming {
                             inlineSuggestedQuestionsView
                                 .id("suggestions")
                                 .transition(.opacity.combined(with: .move(edge: .bottom)))
