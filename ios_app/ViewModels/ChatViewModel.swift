@@ -22,6 +22,7 @@ class ChatViewModel {
     var windowManager = MessageWindowManager()
     var currentPipelineStep: PipelineStep? = nil
     var completedPipelineSteps: [PipelineStep] = []
+    var cosmicProgressSteps: [CosmicProgressStep] = []
     /// Short label shown in the user bubble when a home card sends a rich contextual query.
     /// The full inputText is still sent to the LLM; this only affects what the user sees.
     var pendingDisplayLabel: String? = nil
@@ -266,9 +267,7 @@ class ChatViewModel {
         // Streaming API call — replaces fake typewriter
         isLoading = false
         isStreaming = true
-        currentPipelineStep = .houses   // seed first step so RitualProgressView shows immediately
-        completedPipelineSteps = []
-        startStepProgressTimer()        // advance steps visually; backend sends thought events, not action events
+        cosmicProgressSteps = []
 
         let streamingMsg = LocalChatMessage(
             threadId: currentThreadId,
@@ -289,12 +288,26 @@ class ChatViewModel {
                     request: request
                 ) { event in
                     switch event {
-                    case .action(_, let tool, _):
-                        if let step = PipelineStep.from(tool: tool) {
-                            self.currentPipelineStep = step
-                            for s in PipelineStep.allCases where s.rawValue < step.rawValue {
-                                if !self.completedPipelineSteps.contains(s) {
-                                    self.completedPipelineSteps.append(s)
+                    case .action:
+                        break  // No longer used for progress tracking
+
+                    case .progressStep(_, _, _, let isDone, let displayKey, _):
+                        if !isDone {
+                            if let key = displayKey {
+                                let text = NSLocalizedString(key, comment: "")
+                                for i in self.cosmicProgressSteps.indices {
+                                    self.cosmicProgressSteps[i].isActive = false
+                                }
+                                let step = CosmicProgressStep(text: text, displayKey: key, isCompleted: false, isActive: true)
+                                withAnimation(.easeOut(duration: 0.35)) {
+                                    self.cosmicProgressSteps.append(step)
+                                }
+                            }
+                        } else {
+                            if let idx = self.cosmicProgressSteps.indices.last(where: { self.cosmicProgressSteps[$0].isActive }) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    self.cosmicProgressSteps[idx].isCompleted = true
+                                    self.cosmicProgressSteps[idx].isActive = false
                                 }
                             }
                         }
@@ -312,6 +325,10 @@ class ChatViewModel {
                         self.stepProgressTask?.cancel()
                         self.currentPipelineStep = nil
                         self.completedPipelineSteps = PipelineStep.allCases.map { $0 }
+                        for i in self.cosmicProgressSteps.indices {
+                            self.cosmicProgressSteps[i].isCompleted = true
+                            self.cosmicProgressSteps[i].isActive = false
+                        }
 
                         let answer = finalResponse?.answer ?? accumulatedAnswer
                         if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
@@ -329,6 +346,7 @@ class ChatViewModel {
                     case .error(let msg):
                         self.stepProgressTask?.cancel()
                         self.errorMessage = msg
+                        self.cosmicProgressSteps = []
                         self.messages.removeAll { $0.id == streamingMsg.id }
                         self.windowManager.remove(id: streamingMsg.id)
                         self.isStreaming = false
@@ -338,11 +356,13 @@ class ChatViewModel {
                 }
             } catch is CancellationError {
                 self.stepProgressTask?.cancel()
+                self.cosmicProgressSteps = []
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
                 self.isStreaming = false
             } catch {
                 self.stepProgressTask?.cancel()
+                self.cosmicProgressSteps = []
                 self.errorMessage = "Failed to get response. Please try again."
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
@@ -358,23 +378,6 @@ class ChatViewModel {
         stepProgressTask = nil
     }
 
-    // Advances pipeline steps on a timer since the backend sends thought events (not per-tool actions).
-    // Steps advance every 4.5 s up to manifestation; reading shows only when done.
-    private func startStepProgressTimer() {
-        stepProgressTask?.cancel()
-        stepProgressTask = Task { [weak self] in
-            let stepsToAnimate = PipelineStep.allCases.filter { $0 != .reading }
-            for (i, step) in stepsToAnimate.enumerated() where i > 0 {
-                try? await Task.sleep(nanoseconds: 4_500_000_000)
-                guard let self, self.isStreaming, !Task.isCancelled else { return }
-                if !self.completedPipelineSteps.contains(stepsToAnimate[i - 1]) {
-                    self.completedPipelineSteps.append(stepsToAnimate[i - 1])
-                }
-                self.currentPipelineStep = step
-            }
-        }
-    }
-    
     // Format tool names for display — user-friendly cosmic text
     private func friendlyToolName(_ tool: String) -> String {
         let toolNames: [String: String] = [
