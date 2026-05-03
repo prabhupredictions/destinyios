@@ -2880,3 +2880,20 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 
 // Auto-translated Additions
 "context_transit_question" = "%@ durchläuft derzeit %@ in meinem %d. Haus. Der Schlüsselindikator ist: „%@“.\n\nBitte teilen Sie mir tiefere Einblicke darüber mit, wie dieser Transit mein Leben beeinflusst, und geben Sie uns praktische Ratschläge für diesen Zeitraum.";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "Was bedeutet meine aktuelle Dasha für mich?";
+"context_transit_card_label" = "Wie beeinflusst mich der %@-Transit?";
+"context_life_area_card_label" = "Was erwartet mich im Bereich %@?";
+"context_yoga_card_label" = "Was bedeutet %@ für mich?";
+
+// Yoga detail labels
+"yoga_label_planets" = "PLANETEN";
+"yoga_label_houses" = "HÄUSER";
+"yoga_label_strength" = "STÄRKE";
+"yoga_label_reduced_because" = "REDUZIERT WEIL";
+"yoga_label_cancelled_because" = "AUFGEHOBEN WEIL";
+"yoga_label_unknown" = "Unbekannt";
+
+// Input placeholder
+"type_your_question_placeholder" = "Gib deine Frage ein...";

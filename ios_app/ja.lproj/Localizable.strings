@@ -2885,3 +2885,20 @@
 
 // Auto-translated Additions
 "context_transit_question" = "%@ は現在、%d 番目の家の %@ を通過中です。重要な指標は次のとおりです: '%@'。\n\nこの交通機関が私の生活にどのような影響を与えるかについてのより深い洞察と、この期間の実践的なガイダンスを共有してください。";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "現在のダシャーは私にとって何を意味しますか？";
+"context_transit_card_label" = "%@のトランジットは私にどう影響していますか？";
+"context_life_area_card_label" = "私の%@の分野で何が待っていますか？";
+"context_yoga_card_label" = "%@は私にとって何を意味しますか？";
+
+// Yoga detail labels
+"yoga_label_planets" = "惑星";
+"yoga_label_houses" = "ハウス";
+"yoga_label_strength" = "強度";
+"yoga_label_reduced_because" = "弱化された理由";
+"yoga_label_cancelled_because" = "無効化された理由";
+"yoga_label_unknown" = "不明";
+
+// Input placeholder
+"type_your_question_placeholder" = "質問を入力してください...";

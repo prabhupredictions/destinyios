@@ -2884,3 +2884,20 @@
 
 // Auto-translated Additions
 "context_transit_question" = "%@ 目前正在我第 %d 个房子的 %@ 中转。关键指示是：“%@”。\n\n请分享关于这次行运如何影响我的生活的更深入的见解以及这一时期的任何实际指导。";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "我当前的大运对我意味着什么？";
+"context_transit_card_label" = "%@过境如何影响我？";
+"context_life_area_card_label" = "我的%@领域前方有什么？";
+"context_yoga_card_label" = "%@对我意味着什么？";
+
+// Yoga detail labels
+"yoga_label_planets" = "行星";
+"yoga_label_houses" = "宫位";
+"yoga_label_strength" = "力量";
+"yoga_label_reduced_because" = "减弱原因";
+"yoga_label_cancelled_because" = "取消原因";
+"yoga_label_unknown" = "未知";
+
+// Input placeholder
+"type_your_question_placeholder" = "输入您的问题...";

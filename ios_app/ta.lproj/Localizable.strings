@@ -2882,3 +2882,20 @@
 "vashya_severity_label" = "தீவிரம்: %@";
 "vashya_scores_format" = "மதிப்பெண்கள்: பையன்→பெண் %.1f, பெண்→ஆண் %.1f";
 "vashya_effect_label" = "வஷ்ய கூடா பரஸ்பர ஈர்ப்பு மற்றும் கட்டுப்பாட்டு இயக்கவியலைக் குறிக்கிறது";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "என் தற்போதைய தசை எனக்கு என்ன அர்த்தம்?";
+"context_transit_card_label" = "%@ கோச்சாரம் என்னை எப்படி பாதிக்கிறது?";
+"context_life_area_card_label" = "என் %@ இல் என்ன காத்திருக்கிறது?";
+"context_yoga_card_label" = "%@ எனக்கு என்ன அர்த்தம்?";
+
+// Yoga detail labels
+"yoga_label_planets" = "கிரகங்கள்";
+"yoga_label_houses" = "பாவங்கள்";
+"yoga_label_strength" = "பலம்";
+"yoga_label_reduced_because" = "குறைந்த காரணம்";
+"yoga_label_cancelled_because" = "ரத்தான காரணம்";
+"yoga_label_unknown" = "தெரியாதது";
+
+// Input placeholder
+"type_your_question_placeholder" = "உங்கள் கேள்வியை உள்ளிடுங்கள்...";

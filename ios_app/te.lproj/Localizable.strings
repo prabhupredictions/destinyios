@@ -2880,3 +2880,20 @@
 "varna_values_format" = "వర్ణ: వరుడు %@, వధువు %@";
 "varna_complementarity_note" = "సాంప్రదాయ పరిపూరకరమైన జత — సహజ అనుబంధం గుర్తించబడింది";
 "varna_effect_label" = "వర్ణ కూట అనేది చంద్రుని సంకేత అంశాల ఆధారంగా ఆధ్యాత్మిక మరియు మానసిక అనుకూలతను సూచిస్తుంది";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "నా ప్రస్తుత దశ నాకు ఏమి అర్థమవుతుంది?";
+"context_transit_card_label" = "%@ గ్రహ గమనం నన్ను ఎలా ప్రభావితం చేస్తోంది?";
+"context_life_area_card_label" = "నా %@ లో ముందు ఏముంది?";
+"context_yoga_card_label" = "%@ నాకు ఏమి అర్థమవుతుంది?";
+
+// Yoga detail labels
+"yoga_label_planets" = "గ్రహాలు";
+"yoga_label_houses" = "భావాలు";
+"yoga_label_strength" = "బలం";
+"yoga_label_reduced_because" = "తగ్గిన కారణం";
+"yoga_label_cancelled_because" = "రద్దైన కారణం";
+"yoga_label_unknown" = "తెలియదు";
+
+// Input placeholder
+"type_your_question_placeholder" = "మీ ప్రశ్న టైప్ చేయండి...";

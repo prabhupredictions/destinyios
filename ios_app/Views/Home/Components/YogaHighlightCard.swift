@@ -246,7 +246,7 @@ struct PremiumYogaCard: View {
                             .foregroundColor(AppTheme.Colors.textTertiary)
                             .tracking(1)
                         
-                        Text(yoga.planets.isEmpty ? "Unknown" : localizedPlanets(yoga.planets))
+                        Text(yoga.planets.isEmpty ? "yoga_label_unknown".localized : localizedPlanets(yoga.planets))
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .lineLimit(1)

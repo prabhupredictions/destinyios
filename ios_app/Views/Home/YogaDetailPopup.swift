@@ -94,7 +94,7 @@ struct YogaDetailPopup: View {
                     // Planets
                     detailColumn(
                         icon: "sparkles",
-                        label: "PLANETS",
+                        label: "yoga_label_planets".localized,
                         value: yoga.planets.isEmpty ? "—" : yoga.planets
                     )
                     
@@ -105,7 +105,7 @@ struct YogaDetailPopup: View {
                     // Houses
                     detailColumn(
                         icon: "house.fill",
-                        label: "HOUSES",
+                        label: "yoga_label_houses".localized,
                         value: yoga.houses.isEmpty ? "—" : yoga.houses
                     )
                     
@@ -116,7 +116,7 @@ struct YogaDetailPopup: View {
                     // Strength
                     detailColumn(
                         icon: "bolt.fill",
-                        label: "STRENGTH",
+                        label: "yoga_label_strength".localized,
                         value: "\(Int(yoga.strength * 100))%"
                     )
                 }
@@ -167,7 +167,7 @@ struct YogaDetailPopup: View {
                         HStack(spacing: 4) {
                             Image(systemName: "info.circle.fill")
                                 .font(.system(size: 11))
-                            Text(yoga.status == "R" ? "REDUCED BECAUSE" : "CANCELLED BECAUSE")
+                            Text(yoga.status == "R" ? "yoga_label_reduced_because".localized : "yoga_label_cancelled_because".localized)
                                 .font(AppTheme.Fonts.caption(size: 10))
                         }
                         .foregroundColor(statusColor)
@@ -293,9 +293,9 @@ struct YogaDetailPopup: View {
     
     private var statusDisplayText: String {
         switch yoga.status {
-        case "A": return "Active"
-        case "R": return "Reduced"
-        case "C": return "Cancelled"
+        case "A": return "status_active".localized
+        case "R": return "status_reduced".localized
+        case "C": return "status_cancelled".localized
         default: return yoga.status
         }
     }

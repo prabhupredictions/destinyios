@@ -2750,3 +2750,20 @@
 // Auto-translated Additions (Universal Batch)
 "suggested_questions" = "सुझाए गए प्रश्न";
 "no_chat_history" = "आपकी बातचीत यहां दिखाई देगी";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "मेरी वर्तमान दशा मेरे लिए क्या मायने रखती है?";
+"context_transit_card_label" = "%@ गोचर मुझे कैसे प्रभावित कर रहा है?";
+"context_life_area_card_label" = "मेरे %@ में आगे क्या है?";
+"context_yoga_card_label" = "%@ मेरे लिए क्या मायने रखता है?";
+
+// Yoga detail labels
+"yoga_label_planets" = "ग्रह";
+"yoga_label_houses" = "भाव";
+"yoga_label_strength" = "बल";
+"yoga_label_reduced_because" = "कमज़ोर क्योंकि";
+"yoga_label_cancelled_because" = "रद्द क्योंकि";
+"yoga_label_unknown" = "अज्ञात";
+
+// Input placeholder
+"type_your_question_placeholder" = "अपना प्रश्न लिखें...";

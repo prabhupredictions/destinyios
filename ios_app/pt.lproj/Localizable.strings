@@ -2884,3 +2884,20 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 
 // Auto-translated Additions
 "context_transit_question" = "%@ está atualmente transitando por %@ na minha %désima casa. A indicação principal é: '%@'.\n\nPor favor, compartilhe insights mais profundos sobre como esse trânsito influencia minha vida e qualquer orientação prática para este período.";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "O que meu Dasha atual significa para mim?";
+"context_transit_card_label" = "Como o trânsito de %@ está me afetando?";
+"context_life_area_card_label" = "O que está à frente no meu %@?";
+"context_yoga_card_label" = "O que %@ significa para mim?";
+
+// Yoga detail labels
+"yoga_label_planets" = "PLANETAS";
+"yoga_label_houses" = "CASAS";
+"yoga_label_strength" = "FORÇA";
+"yoga_label_reduced_because" = "REDUZIDO PORQUE";
+"yoga_label_cancelled_because" = "CANCELADO PORQUE";
+"yoga_label_unknown" = "Desconhecido";
+
+// Input placeholder
+"type_your_question_placeholder" = "Digite sua pergunta...";

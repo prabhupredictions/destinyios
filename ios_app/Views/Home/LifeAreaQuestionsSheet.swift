@@ -74,7 +74,7 @@ struct AskDestinyQuestionsSheet: View {
                         
                         // Custom Input
                         HStack(spacing: 12) {
-                            TextField("Type your question...", text: $customQuestion)
+                            TextField("type_your_question_placeholder".localized, text: $customQuestion)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .font(AppTheme.Fonts.body(size: 16))
                                 .focused($isInputFocused)

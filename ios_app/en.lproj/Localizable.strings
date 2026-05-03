@@ -2371,10 +2371,27 @@
 // Transit Context Question
 "context_transit_question" = "%@ is currently transiting through %@ in my %dth house. The key indication is: '%@'.\n\nPlease share deeper insights on how this transit influences my life and any practical guidance for this period.";
 
+// Chat bubble labels for home card taps (short, natural-question form; full context sent to LLM)
+"context_dasha_card_label" = "What does my current Dasha mean for me?";
+"context_transit_card_label" = "How is the %@ transit affecting me?";
+"context_life_area_card_label" = "What's ahead for my %@?";
+"context_yoga_card_label" = "What does %@ mean for me?";
+
 // Yoga/Dosha Status
 "status_active" = "Active";
 "status_reduced" = "Reduced";
 "status_cancelled" = "Cancelled";
+
+// Yoga detail grid labels
+"yoga_label_planets" = "PLANETS";
+"yoga_label_houses" = "HOUSES";
+"yoga_label_strength" = "STRENGTH";
+"yoga_label_reduced_because" = "REDUCED BECAUSE";
+"yoga_label_cancelled_because" = "CANCELLED BECAUSE";
+"yoga_label_unknown" = "Unknown";
+
+// LifeAreaQuestionsSheet
+"type_your_question_placeholder" = "Type your question...";
 
 // Yoga/Dosha Types
 "type_dosha" = "dosha (negative combination)";

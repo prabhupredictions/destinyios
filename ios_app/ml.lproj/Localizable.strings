@@ -2885,3 +2885,20 @@
 
 // Auto-translated Additions
 "context_transit_question" = "%@ എന്നത് എൻ്റെ %dth ഹൗസിൽ %@ വഴി നിലവിൽ സഞ്ചരിക്കുന്നു. പ്രധാന സൂചന ഇതാണ്: '%@'.\n\nഈ ട്രാൻസിറ്റ് എൻ്റെ ജീവിതത്തെ എങ്ങനെ സ്വാധീനിക്കുന്നുവെന്നും ഈ കാലയളവിലെ ഏതെങ്കിലും പ്രായോഗിക മാർഗ്ഗനിർദ്ദേശത്തെക്കുറിച്ചും ആഴത്തിലുള്ള ഉൾക്കാഴ്ചകൾ പങ്കിടുക.";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "എന്റെ ഇപ്പോഴത്തെ ദശ എനിക്ക് എന്താണ് അർത്ഥമാക്കുന്നത്?";
+"context_transit_card_label" = "%@ ഗ്രഹഗതി എന്നെ എങ്ങനെ ബാധിക്കുന്നു?";
+"context_life_area_card_label" = "എന്റെ %@ ൽ മുന്നോട്ട് എന്ത് ഉണ്ട്?";
+"context_yoga_card_label" = "%@ എനിക്ക് എന്താണ് അർത്ഥമാക്കുന്നത്?";
+
+// Yoga detail labels
+"yoga_label_planets" = "ഗ്രഹങ്ങൾ";
+"yoga_label_houses" = "ഭവനങ്ങൾ";
+"yoga_label_strength" = "ശക്തി";
+"yoga_label_reduced_because" = "കുറഞ്ഞ കാരണം";
+"yoga_label_cancelled_because" = "റദ്ദാക്കിയ കാരണം";
+"yoga_label_unknown" = "അജ്ഞാതം";
+
+// Input placeholder
+"type_your_question_placeholder" = "നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യുക...";

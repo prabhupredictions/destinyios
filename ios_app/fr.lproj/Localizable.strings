@@ -2884,3 +2884,20 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 
 // Auto-translated Additions
 "context_transit_question" = "%@ transite actuellement par %@ dans ma %dième maison. L'indication clé est : '%@'.\n\nVeuillez partager des informations plus approfondies sur la façon dont ce transit influence ma vie et tout conseil pratique pour cette période.";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "Que signifie mon Dasha actuel pour moi ?";
+"context_transit_card_label" = "Comment le transit de %@ m'affecte-t-il ?";
+"context_life_area_card_label" = "Que m'attend dans mon domaine %@ ?";
+"context_yoga_card_label" = "Que signifie %@ pour moi ?";
+
+// Yoga detail labels
+"yoga_label_planets" = "PLANÈTES";
+"yoga_label_houses" = "MAISONS";
+"yoga_label_strength" = "FORCE";
+"yoga_label_reduced_because" = "RÉDUIT PARCE QUE";
+"yoga_label_cancelled_because" = "ANNULÉ PARCE QUE";
+"yoga_label_unknown" = "Inconnu";
+
+// Input placeholder
+"type_your_question_placeholder" = "Tapez votre question...";

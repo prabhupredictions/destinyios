@@ -2884,3 +2884,20 @@
 
 // Auto-translated Additions
 "context_transit_question" = "%@ в настоящее время проезжает через %@ в моем %d-м доме. Ключевое указание: '%@'.\n\nПожалуйста, поделитесь более глубоким пониманием того, как этот транзит влияет на мою жизнь, и любыми практическими рекомендациями на этот период.";
+
+// Chat bubble labels (home card taps)
+"context_dasha_card_label" = "Что означает моя текущая Даша для меня?";
+"context_transit_card_label" = "Как транзит %@ влияет на меня?";
+"context_life_area_card_label" = "Что ждёт меня в сфере %@?";
+"context_yoga_card_label" = "Что означает %@ для меня?";
+
+// Yoga detail labels
+"yoga_label_planets" = "ПЛАНЕТЫ";
+"yoga_label_houses" = "ДОМА";
+"yoga_label_strength" = "СИЛА";
+"yoga_label_reduced_because" = "ОСЛАБЛЕНО ПОТОМУ ЧТО";
+"yoga_label_cancelled_because" = "ОТМЕНЕНО ПОТОМУ ЧТО";
+"yoga_label_unknown" = "Неизвестно";
+
+// Input placeholder
+"type_your_question_placeholder" = "Введите ваш вопрос...";
