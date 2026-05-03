@@ -17,15 +17,6 @@ struct ReadingMessageView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Question label — Canela italic
-            if !userQuery.isEmpty && userQuery != "General question" {
-                Text(userQuery)
-                    .font(AppTheme.Fonts.body(size: 14).italic())
-                    .foregroundColor(AppTheme.Colors.gold.opacity(0.65))
-                    .lineLimit(3)
-                    .padding(.bottom, 12)
-                    .accessibilityIdentifier("reading_question_label")
-            }
 
             // Domain tag — only after streaming completes and no progress steps showing
             if !domainLabel.isEmpty && !isStreaming && cosmicProgressSteps.isEmpty {

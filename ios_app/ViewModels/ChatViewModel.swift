@@ -263,7 +263,14 @@ class ChatViewModel {
         // Streaming API call — replaces fake typewriter
         isLoading = false
         isStreaming = true
-        cosmicProgressSteps = []
+        cosmicProgressSteps = [
+            CosmicProgressStep(
+                text: NSLocalizedString("progress_connecting", comment: ""),
+                displayKey: "progress_connecting",
+                isCompleted: false,
+                isActive: true
+            )
+        ]
 
         let streamingMsg = LocalChatMessage(
             threadId: currentThreadId,
