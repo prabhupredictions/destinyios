@@ -10,12 +10,12 @@ enum PipelineStep: Int, CaseIterable {
 
     var label: String {
         switch self {
-        case .houses:        return "Mapping your houses and planets"
-        case .promise:       return "Checking their promise"
-        case .strength:      return "Checking their strength"
-        case .afflictions:   return "Checking their afflictions"
-        case .manifestation: return "Checking how they manifest now"
-        case .reading:       return "Preparing your reading"
+        case .houses:        return "Reading the cosmic map"
+        case .promise:       return "Decoding planetary promises"
+        case .strength:      return "Weighing celestial forces"
+        case .afflictions:   return "Sensing cosmic tensions"
+        case .manifestation: return "Tracing destiny's timing"
+        case .reading:       return "Crafting your reading"
         }
     }
 

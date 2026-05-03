@@ -28,36 +28,26 @@ struct ReadingMessageView: View {
                     .accessibilityIdentifier("reading_question_label")
             }
 
-            // Domain tag + kundali ring inline
-            if !domainLabel.isEmpty || isStreaming || !completedSteps.isEmpty {
-                HStack(spacing: 8) {
-                    if !domainLabel.isEmpty {
-                        HStack(spacing: 5) {
-                            Circle()
-                                .fill(AppTheme.Colors.gold)
-                                .frame(width: 5, height: 5)
-                            Text(domainLabel)
-                                .font(.system(size: 9, weight: .bold))
-                                .tracking(1.2)
-                                .foregroundColor(AppTheme.Colors.gold)
-                        }
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 3)
-                        .background(
-                            Capsule()
-                                .fill(AppTheme.Colors.gold.opacity(0.08))
-                                .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.18), lineWidth: 1))
-                        )
-                        .accessibilityIdentifier("reading_domain_tag")
-                    }
-
-                    KundaliRingView(
-                        completedSteps: completedSteps,
-                        activeStep: activeStep,
-                        isStreaming: isStreaming
-                    )
+            // Domain tag — only after streaming completes
+            if !domainLabel.isEmpty && !isStreaming {
+                HStack(spacing: 5) {
+                    Circle()
+                        .fill(AppTheme.Colors.gold)
+                        .frame(width: 5, height: 5)
+                    Text(domainLabel)
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(1.2)
+                        .foregroundColor(AppTheme.Colors.gold)
                 }
+                .padding(.horizontal, 9)
+                .padding(.vertical, 3)
+                .background(
+                    Capsule()
+                        .fill(AppTheme.Colors.gold.opacity(0.08))
+                        .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.18), lineWidth: 1))
+                )
                 .padding(.bottom, 12)
+                .accessibilityIdentifier("reading_domain_tag")
             }
 
             // Ritual progress (fades in step by step during streaming)
