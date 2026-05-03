@@ -318,16 +318,16 @@ struct ChatView: View {
         .padding(.top, 4)
     }
     
-    // MARK: - Visible Messages (computed once per render, not inside ForEach)
+    // MARK: - Visible Messages (from window manager, filtered for non-empty)
     private var visibleMessages: [LocalChatMessage] {
-        viewModel.messages.filter { !$0.content.isEmpty }
+        viewModel.windowManager.visibleMessages.filter { !$0.content.isEmpty }
     }
     
     // MARK: - User Query Lookup (pre-computed, avoids O(n²) per-message scan)
     private var userQueryLookup: [String: String] {
         var lookup: [String: String] = [:]
         var lastUserQuery = "General question"
-        for msg in viewModel.messages {
+        for msg in viewModel.windowManager.visibleMessages {
             if msg.messageRole == .user {
                 lastUserQuery = msg.content
             } else {
@@ -347,7 +347,16 @@ struct ChatView: View {
                 if isNewChat && !viewModel.isLoading {
                     starterQuestionsView
                 } else {
-                    LazyVStack(spacing: 24) {
+                    VStack(spacing: 24) {
+                        if viewModel.windowManager.hasOlderMessages {
+                            Button("Load earlier messages") {
+                                // Pagination: future implementation
+                            }
+                            .accessibilityIdentifier("load_older_button")
+                            .font(.system(size: 13))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .padding(.bottom, 8)
+                        }
                         ForEach(visibleMessages) { message in
                             MessageBubble(
                                 message: message,

@@ -19,7 +19,8 @@ class ChatViewModel {
     var showQuotaSheet = false
     var quotaDetails: String?
     var typewriterMessageId: String?  // Message currently being typewritten
-    
+    var windowManager = MessageWindowManager()
+
     // Current session/thread
     var currentSessionId: String = ""
     var currentThreadId: String = ""
@@ -69,6 +70,7 @@ class ChatViewModel {
     func handleProfileSwitch() {
         // Clear current conversation state
         messages = []
+        windowManager.replaceAll([])
         suggestedQuestions = []
         errorMessage = nil
         streamingContent = ""
@@ -101,6 +103,7 @@ class ChatViewModel {
     func loadThread(_ thread: LocalChatThread) {
         currentThreadId = thread.id
         messages = dataManager.fetchMessages(for: thread.id)
+        windowManager.replaceAll(messages)
         
         // Add welcome if empty
         if messages.isEmpty {
@@ -122,6 +125,7 @@ class ChatViewModel {
             currentThreadId = UUID().uuidString
         }
         messages = []
+        windowManager.replaceAll([])
         
         addWelcomeMessage()
         loadHistory()
@@ -156,6 +160,7 @@ class ChatViewModel {
             content: greeting
         )
         messages.append(welcome)
+        windowManager.append(welcome)
         if HistorySettingsManager.shared.isHistoryEnabled {
             dataManager.saveMessage(welcome)
         }
@@ -180,6 +185,7 @@ class ChatViewModel {
             content: query
         )
         messages.append(userMessage)
+        windowManager.append(userMessage)
         if HistorySettingsManager.shared.isHistoryEnabled {
             dataManager.saveMessage(userMessage)
         }
@@ -195,6 +201,7 @@ class ChatViewModel {
                 // Remove message
                 if let idx = messages.lastIndex(where: { $0.id == userMessage.id }) {
                     messages.remove(at: idx)
+                    windowManager.remove(id: userMessage.id)
                     dataManager.deleteMessage(userMessage)
                 }
                 
@@ -265,6 +272,7 @@ class ChatViewModel {
             )
             typewriterMessageId = aiMessage.id  // Trigger typewriter in MessageBubble
             messages.append(aiMessage)
+            windowManager.append(aiMessage)
             if HistorySettingsManager.shared.isHistoryEnabled {
                 dataManager.saveMessage(aiMessage)
             }
@@ -384,8 +392,9 @@ class ChatViewModel {
         for message in messages {
             dataManager.deleteMessage(message)
         }
-        
+
         messages = []
+        windowManager.replaceAll([])
         addWelcomeMessage()
     }
     
