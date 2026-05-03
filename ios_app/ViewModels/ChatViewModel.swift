@@ -23,6 +23,7 @@ class ChatViewModel {
     var currentPipelineStep: PipelineStep? = nil
     var completedPipelineSteps: [PipelineStep] = []
     private var streamingTask: Task<Void, Never>? = nil
+    private var stepProgressTask: Task<Void, Never>? = nil
 
     // Current session/thread
     var currentSessionId: String = ""
@@ -267,6 +268,7 @@ class ChatViewModel {
         isStreaming = true
         currentPipelineStep = .houses   // seed first step so RitualProgressView shows immediately
         completedPipelineSteps = []
+        startStepProgressTimer()        // advance steps visually; backend sends thought events, not action events
 
         let streamingMsg = LocalChatMessage(
             threadId: currentThreadId,
@@ -307,6 +309,7 @@ class ChatViewModel {
                         finalResponse = response
 
                     case .done:
+                        self.stepProgressTask?.cancel()
                         self.currentPipelineStep = nil
                         self.completedPipelineSteps = PipelineStep.allCases.map { $0 }
 
@@ -324,6 +327,7 @@ class ChatViewModel {
                         self.isStreaming = false
 
                     case .error(let msg):
+                        self.stepProgressTask?.cancel()
                         self.errorMessage = msg
                         self.messages.removeAll { $0.id == streamingMsg.id }
                         self.windowManager.remove(id: streamingMsg.id)
@@ -333,10 +337,12 @@ class ChatViewModel {
                     }
                 }
             } catch is CancellationError {
+                self.stepProgressTask?.cancel()
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
                 self.isStreaming = false
             } catch {
+                self.stepProgressTask?.cancel()
                 self.errorMessage = "Failed to get response. Please try again."
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
@@ -348,6 +354,25 @@ class ChatViewModel {
     func stopStreaming() {
         streamingTask?.cancel()
         streamingTask = nil
+        stepProgressTask?.cancel()
+        stepProgressTask = nil
+    }
+
+    // Advances pipeline steps on a timer since the backend sends thought events (not per-tool actions).
+    // Steps advance every 4.5 s up to manifestation; reading shows only when done.
+    private func startStepProgressTimer() {
+        stepProgressTask?.cancel()
+        stepProgressTask = Task { [weak self] in
+            let stepsToAnimate = PipelineStep.allCases.filter { $0 != .reading }
+            for (i, step) in stepsToAnimate.enumerated() where i > 0 {
+                try? await Task.sleep(nanoseconds: 4_500_000_000)
+                guard let self, self.isStreaming, !Task.isCancelled else { return }
+                if !self.completedPipelineSteps.contains(stepsToAnimate[i - 1]) {
+                    self.completedPipelineSteps.append(stepsToAnimate[i - 1])
+                }
+                self.currentPipelineStep = step
+            }
+        }
     }
     
     // Format tool names for display — user-friendly cosmic text

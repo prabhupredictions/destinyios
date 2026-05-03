@@ -229,3 +229,57 @@ class TestChatStreamingRegression:
         """Style capsule stays visible once response is complete."""
         assert screens.chat.present("chat_input"), "chat_input missing after response"
         assert screens.chat.present("send_button"), "send_button missing after response"
+
+
+class TestChatMarkdownRendering:
+    """Regression tests for markdown rendering bugs."""
+
+    def test_no_double_stars_in_headers(self, screens):
+        """Response headers must not contain ** characters (header bold markers stripped)."""
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.send("What are my challenges and opportunities for 2026?")
+        screens.chat.wait_for_response(timeout=90)
+        body_els = screens.chat.finds("reading_body_text")
+        if not body_els:
+            pytest.skip("reading_body_text not found")
+        full_text = " ".join(
+            (el.get_attribute("label") or "") for el in body_els
+        )
+        assert "**" not in full_text, \
+            f"Raw ** markdown in response — header/bold not rendered: {full_text[:200]!r}"
+
+    def test_pipeline_steps_advance_during_streaming(self, screens):
+        """ritual_progress_view shows at least 2 distinct steps during a long response."""
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.find("chat_input").send_keys("Give me a detailed career reading for 2026 and 2027.")
+        screens.chat.tap("send_button")
+
+        seen_steps = set()
+        # Poll for up to 20 seconds to catch at least 2 different active steps
+        for _ in range(20):
+            time.sleep(1)
+            if not screens.chat.is_streaming():
+                break
+            active_els = screens.chat.finds("ritual_step_active")
+            for el in active_els:
+                label = el.get_attribute("label") or ""
+                if label:
+                    seen_steps.add(label)
+
+        screens.chat.wait_for_response(timeout=90)
+        assert len(seen_steps) >= 2, \
+            f"Pipeline only showed {len(seen_steps)} step(s) during streaming: {seen_steps}. Expected ≥2 (timer not advancing steps)"
+
+    def test_bold_section_title_renders_as_gold_not_raw(self, screens):
+        """Standalone **Title** sections render as gold text, not raw stars."""
+        screens.home.tap_chat_tab()
+        screens.chat.tap_new_chat()
+        screens.chat.send("What are my current challenges?")
+        screens.chat.wait_for_response(timeout=90)
+        body_els = screens.chat.finds("reading_body_text")
+        if body_els:
+            body_text = body_els[-1].get_attribute("label") or ""
+            assert "**" not in body_text, \
+                f"Raw ** still in response: {body_text[:150]!r}"

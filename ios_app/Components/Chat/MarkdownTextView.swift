@@ -366,23 +366,23 @@ struct MarkdownTextView: View {
     
     private static func parseBoldLabelStatic(_ text: String) -> MarkdownBlock? {
         guard text.hasPrefix("**") else { return nil }
-        
+
         let afterOpen = text.index(text.startIndex, offsetBy: 2)
         guard let closeRange = text.range(of: "**", range: afterOpen..<text.endIndex) else {
             return nil
         }
-        
+
         let label = String(text[afterOpen..<closeRange.lowerBound])
-        
-        guard label.hasSuffix(":") || label.hasSuffix(": ") else {
-            return nil
-        }
-        
+
         let contentStart = closeRange.upperBound
         let content = contentStart < text.endIndex
             ? String(text[contentStart...]).trimmingCharacters(in: .whitespaces)
             : ""
-        
+
+        // Match "**Label:**" (label-content format) OR "**Standalone Title**" (section heading)
+        let isLabelWithColon = label.hasSuffix(":") || label.hasSuffix(": ")
+        guard isLabelWithColon || content.isEmpty else { return nil }
+
         return .boldLabel(label: label.trimmingCharacters(in: .whitespaces), content: content)
     }
     
@@ -552,7 +552,10 @@ struct MarkdownTextView: View {
     // MARK: - Header Renderer
     
     private func renderHeader(level: Int, text: String) -> some View {
-        let cleanText = text.replacingOccurrences(of: ":", with: "").trimmingCharacters(in: .whitespaces)
+        let cleanText = text
+            .replacingOccurrences(of: "**", with: "")
+            .replacingOccurrences(of: ":", with: "")
+            .trimmingCharacters(in: .whitespaces)
         let headerFontSize: CGFloat
         let weight: Font.Weight
         
