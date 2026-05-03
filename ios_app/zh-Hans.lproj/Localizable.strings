@@ -2883,7 +2883,6 @@
 
 
 // Auto-translated Additions
-"context_transit_question" = "%@ 目前正在我第 %d 个房子的 %@ 中转。关键指示是：“%@”。\n\n请分享关于这次行运如何影响我的生活的更深入的见解以及这一时期的任何实际指导。";
 
 // Chat bubble labels (home card taps)
 "context_dasha_card_label" = "我当前的大运对我意味着什么？";

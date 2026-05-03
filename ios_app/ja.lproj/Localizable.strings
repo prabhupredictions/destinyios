@@ -2884,7 +2884,6 @@
 
 
 // Auto-translated Additions
-"context_transit_question" = "%@ は現在、%d 番目の家の %@ を通過中です。重要な指標は次のとおりです: '%@'。\n\nこの交通機関が私の生活にどのような影響を与えるかについてのより深い洞察と、この期間の実践的なガイダンスを共有してください。";
 
 // Chat bubble labels (home card taps)
 "context_dasha_card_label" = "現在のダシャーは私にとって何を意味しますか？";
