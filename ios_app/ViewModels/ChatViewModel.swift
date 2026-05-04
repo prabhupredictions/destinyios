@@ -27,16 +27,19 @@ class ChatViewModel {
     var pendingDisplayLabel: String? = nil
     private var streamingTask: Task<Void, Never>? = nil
     private var stepProgressTask: Task<Void, Never>? = nil
+    // Tracks whether the app backgrounded mid-stream so we show retry instead of error
+    private var backgroundedWhileStreaming = false
+    nonisolated(unsafe) private var notificationObservers: [Any] = []
 
     // Current session/thread
     var currentSessionId: String = ""
     var currentThreadId: String = ""
     var userEmail: String = ""
-    
+
     // MARK: - Dependencies
     private let predictionService: PredictionServiceProtocol
     let dataManager: DataManager
-    
+
     // MARK: - Init
     init(
         predictionService: PredictionServiceProtocol? = nil,
@@ -44,8 +47,13 @@ class ChatViewModel {
     ) {
         self.predictionService = predictionService ?? PredictionService()
         self.dataManager = dataManager ?? DataManager.shared
-        
+
         loadUserSession()
+        observeAppLifecycle()
+    }
+
+    deinit {
+        notificationObservers.forEach { NotificationCenter.default.removeObserver($0) }
     }
     
     // MARK: - Session Management
@@ -59,6 +67,65 @@ class ChatViewModel {
         // Load sidebar history only — thread loading is deferred to ChatView.onAppear
         // so the view can decide: load latest thread OR start new (if a question is pending)
         loadHistory()
+    }
+
+    // MARK: - App Lifecycle
+    private func observeAppLifecycle() {
+        let resignObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.willResignActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.handleAppBackground() }
+        }
+        let activeObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.handleAppForeground() }
+        }
+        let expiryObserver = NotificationCenter.default.addObserver(
+            forName: .streamingBackgroundExpired,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.handleBackgroundExpiry() }
+        }
+        notificationObservers = [resignObserver, activeObserver, expiryObserver]
+    }
+
+    func handleAppBackground() {
+        backgroundedWhileStreaming = isStreaming
+    }
+
+    func handleBackgroundExpiry() {
+        // iOS is about to suspend — cancel stream cleanly, no error shown
+        guard isStreaming else { return }
+        streamingTask?.cancel()
+        streamingTask = nil
+        stepProgressTask?.cancel()
+        cosmicProgressSteps = []
+        isStreaming = false
+        isLoading = false
+        // Don't set errorMessage — user will retry when they return
+        print("[ChatViewModel] Stream cancelled: background time expired")
+    }
+
+    func handleAppForeground() {
+        // Reset stuck isLoading with no active task (overnight idle residue)
+        if isLoading, streamingTask == nil {
+            isLoading = false
+        }
+        // If stream was interrupted by backgrounding, clear broken state without showing error
+        if backgroundedWhileStreaming && !isStreaming {
+            stepProgressTask?.cancel()
+            cosmicProgressSteps = []
+            errorMessage = nil
+        }
+        backgroundedWhileStreaming = false
+
+        // Re-sync quota so canAskQuestion is fresh (stale after overnight idle)
+        let email = userEmail.isEmpty ? (UserDefaults.standard.string(forKey: "userEmail") ?? "") : userEmail
+        guard !email.isEmpty else { return }
+        Task { try? await QuotaManager.shared.syncStatus(email: email, force: true) }
     }
 
     /// Load latest thread for current profile, or start a new chat if none exist.

@@ -62,8 +62,9 @@ final class BackgroundTaskHelper {
     func beginTask() {
         guard taskID == .invalid else { return } // Already running
         taskID = UIApplication.shared.beginBackgroundTask(withName: "app-keep-alive") { [weak self] in
-            // Expiration handler — iOS is about to suspend, clean up
-            print("[Background] ⚠️ Background time expiring")
+            // Expiration handler — iOS is about to suspend, cancel streaming cleanly
+            print("[Background] ⚠️ Background time expiring — cancelling any in-flight stream")
+            NotificationCenter.default.post(name: .streamingBackgroundExpired, object: nil)
             self?.endTask()
         }
         let remaining = UIApplication.shared.backgroundTimeRemaining
@@ -121,6 +122,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
         completionHandler()
     }
+}
+
+extension Notification.Name {
+    static let streamingBackgroundExpired = Notification.Name("streamingBackgroundExpired")
 }
 // Build trigger - 2026-02-07T08:58:23Z
 // Build trigger - 2026-02-07T10:47:14Z
