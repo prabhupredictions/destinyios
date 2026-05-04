@@ -55,7 +55,13 @@ struct ChatView: View {
                 if let error = viewModel.errorMessage {
                     errorBanner(error)
                 }
-                
+
+                // Recovery card — shown when background expiry interrupted a stream
+                if let interrupted = viewModel.interruptedQuestion,
+                   !viewModel.isStreaming, !viewModel.isLoading {
+                    interruptedBanner(interrupted)
+                }
+
                 // Input bar
                 ChatInputBar(
                     text: $viewModel.inputText,
@@ -441,6 +447,48 @@ struct ChatView: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(AppTheme.Colors.error.opacity(0.85))
+        )
+        .padding(.horizontal, 16)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+
+    private func interruptedBanner(_ question: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "pause.circle.fill")
+                .font(.system(size: 16))
+                .foregroundColor(AppTheme.Colors.gold)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Interrupted in background")
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                Text(question)
+                    .font(AppTheme.Fonts.body(size: 13))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+            Spacer()
+            Button {
+                viewModel.retryInterruptedQuestion()
+            } label: {
+                Text("Retry")
+                    .font(AppTheme.Fonts.body(size: 13).bold())
+                    .foregroundColor(AppTheme.Colors.textOnGold)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(AppTheme.Colors.gold)
+                    .clipShape(Capsule())
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppTheme.Colors.gold.opacity(0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                )
         )
         .padding(.horizontal, 16)
         .transition(.move(edge: .bottom).combined(with: .opacity))

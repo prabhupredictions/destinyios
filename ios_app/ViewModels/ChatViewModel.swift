@@ -30,6 +30,10 @@ class ChatViewModel {
     // Tracks whether the app backgrounded mid-stream so we show retry instead of error
     private var backgroundedWhileStreaming = false
     nonisolated(unsafe) private var notificationObservers: [Any] = []
+    // Set when background expiry cancels a stream — shows recovery card in UI
+    private(set) var interruptedQuestion: String?
+    // Last query sent — saved before inputText is cleared so recovery can replay it
+    private var lastSentQuery: String = ""
 
     // Current session/thread
     var currentSessionId: String = ""
@@ -97,15 +101,15 @@ class ChatViewModel {
     }
 
     func handleBackgroundExpiry() {
-        // iOS is about to suspend — cancel stream cleanly, no error shown
+        // iOS is about to suspend — cancel stream cleanly, save question for recovery UI
         guard isStreaming else { return }
+        interruptedQuestion = lastSentQuery.isEmpty ? nil : lastSentQuery
         streamingTask?.cancel()
         streamingTask = nil
         stepProgressTask?.cancel()
         cosmicProgressSteps = []
         isStreaming = false
         isLoading = false
-        // Don't set errorMessage — user will retry when they return
         print("[ChatViewModel] Stream cancelled: background time expired")
     }
 
@@ -194,11 +198,12 @@ class ChatViewModel {
         }
         messages = []
         windowManager.replaceAll([])
-        
+        interruptedQuestion = nil
+
         addWelcomeMessage()
         loadHistory()
     }
-    
+
     func deleteThread(_ thread: LocalChatThread) {
         dataManager.deleteThread(thread)
         loadHistory()
@@ -249,6 +254,8 @@ class ChatViewModel {
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []
+        interruptedQuestion = nil
+        lastSentQuery = query
 
         let currentEmail = userEmail
 
@@ -454,6 +461,13 @@ class ChatViewModel {
         streamingTask = nil
         stepProgressTask?.cancel()
         stepProgressTask = nil
+    }
+
+    func retryInterruptedQuestion() {
+        guard let question = interruptedQuestion else { return }
+        interruptedQuestion = nil
+        inputText = question
+        Task { await sendMessage() }
     }
 
     // Format tool names for display — user-friendly cosmic text
