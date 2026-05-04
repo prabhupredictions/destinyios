@@ -439,15 +439,29 @@ class ChatViewModel {
                         let answer = finalResponse?.answer ?? accumulatedAnswer
                         if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
                             self.messages[idx].content = answer
-                            self.messages[idx].isStreaming = false
                             self.messages[idx].area = finalResponse?.lifeArea
                             self.messages[idx].advice = finalResponse?.advice
-                            if HistorySettingsManager.shared.isHistoryEnabled {
-                                self.dataManager.saveMessage(self.messages[idx])
-                            }
                         }
                         self.suggestedQuestions = finalResponse?.followUpSuggestions ?? []
-                        self.isStreaming = false
+
+                        // Staged reveal: show checkmarks briefly, then fade progress, then reveal content
+                        Task { @MainActor [weak self] in
+                            guard let self else { return }
+                            try? await Task.sleep(nanoseconds: 600_000_000)
+                            withAnimation(.easeOut(duration: 0.4)) {
+                                self.cosmicProgressSteps = []
+                            }
+                            try? await Task.sleep(nanoseconds: 400_000_000)
+                            if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                                withAnimation(.easeIn(duration: 0.5)) {
+                                    self.messages[idx].isStreaming = false
+                                }
+                                if HistorySettingsManager.shared.isHistoryEnabled {
+                                    self.dataManager.saveMessage(self.messages[idx])
+                                }
+                            }
+                            self.isStreaming = false
+                        }
 
                     case .error(let msg):
                         self.stepProgressTask?.cancel()

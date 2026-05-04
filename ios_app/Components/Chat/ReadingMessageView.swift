@@ -44,7 +44,7 @@ struct ReadingMessageView: View {
             CosmicProgressView(steps: cosmicProgressSteps)
 
             // Reading body — rendered markdown, SF Pro Text 16px
-            if !message.content.isEmpty {
+            if !message.content.isEmpty && !isStreaming {
                 MarkdownTextView(
                     content: message.content,
                     textColor: Color.white.opacity(0.92),
@@ -53,6 +53,7 @@ struct ReadingMessageView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityIdentifier("reading_body_text")
                 .padding(.bottom, 2)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
 
             // Depth layers and footer — only once streaming is done
@@ -98,6 +99,7 @@ struct ReadingMessageView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .animation(.easeIn(duration: 0.5), value: isStreaming)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Destiny said: \(message.content)")
         .accessibilityIdentifier("reading_entry")
