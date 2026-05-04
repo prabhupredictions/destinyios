@@ -118,11 +118,18 @@ class ChatViewModel {
         if isLoading, streamingTask == nil {
             isLoading = false
         }
-        // If stream was interrupted by backgrounding, clear broken state without showing error
+        // If stream was interrupted by backgrounding, clean up orphaned state
         if backgroundedWhileStreaming && !isStreaming {
             stepProgressTask?.cancel()
             cosmicProgressSteps = []
             errorMessage = nil
+            // Remove any orphaned streaming messages left behind
+            let orphaned = messages.filter { $0.isStreaming }
+            for msg in orphaned {
+                messages.removeAll { $0.id == msg.id }
+                windowManager.remove(id: msg.id)
+                dataManager.context.delete(msg)
+            }
         }
         backgroundedWhileStreaming = false
 
@@ -250,6 +257,21 @@ class ChatViewModel {
         let displayContent = pendingDisplayLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? query
         pendingDisplayLabel = nil
 
+        // Cancel any in-flight stream and remove orphaned streaming messages
+        if isStreaming || streamingTask != nil {
+            streamingTask?.cancel()
+            streamingTask = nil
+            stepProgressTask?.cancel()
+            cosmicProgressSteps = []
+            let orphaned = messages.filter { $0.isStreaming }
+            for msg in orphaned {
+                messages.removeAll { $0.id == msg.id }
+                windowManager.remove(id: msg.id)
+                dataManager.context.delete(msg)
+            }
+            isStreaming = false
+        }
+
         // Clear input and reset state immediately
         inputText = ""
         errorMessage = nil
@@ -366,6 +388,7 @@ class ChatViewModel {
             guard let self else { return }
             var finalResponse: PredictionResponse? = nil
             var accumulatedAnswer = ""
+            var receivedDone = false
 
             do {
                 try await StreamingPredictionService.shared.predictStream(
@@ -373,7 +396,7 @@ class ChatViewModel {
                 ) { event in
                     switch event {
                     case .action:
-                        break  // No longer used for progress tracking
+                        break
 
                     case .progressStep(_, _, _, let isDone, let displayKey, _):
                         if !isDone {
@@ -406,6 +429,7 @@ class ChatViewModel {
                         finalResponse = response
 
                     case .done:
+                        receivedDone = true
                         self.stepProgressTask?.cancel()
                         for i in self.cosmicProgressSteps.indices {
                             self.cosmicProgressSteps[i].isCompleted = true
@@ -437,6 +461,18 @@ class ChatViewModel {
                     default: break
                     }
                 }
+
+                // Stream ended without .done — connection dropped silently
+                if !receivedDone && self.isStreaming {
+                    self.stepProgressTask?.cancel()
+                    self.cosmicProgressSteps = []
+                    self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
+                    self.messages.removeAll { $0.id == streamingMsg.id }
+                    self.windowManager.remove(id: streamingMsg.id)
+                    self.dataManager.context.delete(streamingMsg)
+                    self.isStreaming = false
+                    print("[ChatViewModel] Stream ended without done event — connection dropped")
+                }
             } catch is CancellationError {
                 self.stepProgressTask?.cancel()
                 self.cosmicProgressSteps = []
@@ -447,7 +483,7 @@ class ChatViewModel {
             } catch {
                 self.stepProgressTask?.cancel()
                 self.cosmicProgressSteps = []
-                self.errorMessage = "Failed to get response. Please try again."
+                self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
                 self.dataManager.context.delete(streamingMsg)
