@@ -11,34 +11,8 @@ struct ReadingMessageView: View {
 
     @State private var showCopied = false
 
-    private var domainLabel: String {
-        message.area?.uppercased() ?? ""
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-
-            // Domain tag — only after streaming completes and no progress steps showing
-            if !domainLabel.isEmpty && !isStreaming && cosmicProgressSteps.isEmpty {
-                HStack(spacing: 5) {
-                    Circle()
-                        .fill(AppTheme.Colors.gold)
-                        .frame(width: 5, height: 5)
-                    Text(domainLabel)
-                        .font(.system(size: 9, weight: .bold))
-                        .tracking(1.2)
-                        .foregroundColor(AppTheme.Colors.gold)
-                }
-                .padding(.horizontal, 9)
-                .padding(.vertical, 3)
-                .background(
-                    Capsule()
-                        .fill(AppTheme.Colors.gold.opacity(0.08))
-                        .overlay(Capsule().stroke(AppTheme.Colors.gold.opacity(0.18), lineWidth: 1))
-                )
-                .padding(.bottom, 12)
-                .accessibilityIdentifier("reading_domain_tag")
-            }
 
             // Cosmic progress (fades in step by step during streaming)
             CosmicProgressView(steps: cosmicProgressSteps)

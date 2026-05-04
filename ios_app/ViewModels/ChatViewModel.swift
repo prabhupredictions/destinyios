@@ -22,8 +22,20 @@ class ChatViewModel {
     var typewriterMessageId: String?  // Message currently being typewritten
     var windowManager = MessageWindowManager()
     var cosmicProgressSteps: [CosmicProgressStep] = []
-    private var pendingProgressSteps: [CosmicProgressStep] = []
-    private var progressPacerTask: Task<Void, Never>? = nil
+    private var progressTimerTask: Task<Void, Never>? = nil
+
+    private static let cosmicMessageKeys: [String] = [
+        "progress_connecting",
+        "progress_mapping_sky",
+        "progress_reading_planets",
+        "progress_planetary_voice",
+        "progress_chart_secrets",
+        "progress_deeper_patterns",
+        "progress_river_of_time",
+        "progress_cosmic_windows",
+        "progress_destiny_shaped",
+        "progress_oracle_weaving",
+    ]
     /// Short label shown in the user bubble when a home card sends a rich contextual query.
     /// The full inputText is still sent to the LLM; this only affects what the user sees.
     var pendingDisplayLabel: String? = nil
@@ -264,9 +276,8 @@ class ChatViewModel {
             streamingTask?.cancel()
             streamingTask = nil
             stepProgressTask?.cancel()
-            progressPacerTask?.cancel()
-            progressPacerTask = nil
-            pendingProgressSteps = []
+            progressTimerTask?.cancel()
+            progressTimerTask = nil
             cosmicProgressSteps = []
             let orphaned = messages.filter { $0.isStreaming }
             for msg in orphaned {
@@ -369,14 +380,8 @@ class ChatViewModel {
         // Streaming API call — replaces fake typewriter
         isLoading = false
         isStreaming = true
-        cosmicProgressSteps = [
-            CosmicProgressStep(
-                text: NSLocalizedString("progress_connecting", comment: ""),
-                displayKey: "progress_connecting",
-                isCompleted: false,
-                isActive: true
-            )
-        ]
+        cosmicProgressSteps = []
+        startCosmicProgressTimer()
 
         let streamingMsg = LocalChatMessage(
             threadId: currentThreadId,
@@ -403,15 +408,8 @@ class ChatViewModel {
                     case .action:
                         break
 
-                    case .progressStep(_, _, _, let isDone, let displayKey, _):
-                        if !isDone {
-                            if let key = displayKey {
-                                let text = NSLocalizedString(key, comment: "")
-                                let step = CosmicProgressStep(text: text, displayKey: key, isCompleted: false, isActive: true)
-                                self.pendingProgressSteps.append(step)
-                                self.startProgressPacerIfNeeded()
-                            }
-                        }
+                    case .progressStep:
+                        break
 
                     case .finalAnswer(let content):
                         accumulatedAnswer = content
@@ -425,9 +423,8 @@ class ChatViewModel {
                     case .done:
                         receivedDone = true
                         self.stepProgressTask?.cancel()
-                        self.progressPacerTask?.cancel()
-                        self.progressPacerTask = nil
-                        self.pendingProgressSteps = []
+                        self.progressTimerTask?.cancel()
+                        self.progressTimerTask = nil
                         for i in self.cosmicProgressSteps.indices {
                             self.cosmicProgressSteps[i].isCompleted = true
                             self.cosmicProgressSteps[i].isActive = false
@@ -462,9 +459,8 @@ class ChatViewModel {
 
                     case .error(let msg):
                         self.stepProgressTask?.cancel()
-                        self.progressPacerTask?.cancel()
-                        self.progressPacerTask = nil
-                        self.pendingProgressSteps = []
+                        self.progressTimerTask?.cancel()
+                        self.progressTimerTask = nil
                         self.errorMessage = msg
                         self.cosmicProgressSteps = []
                         self.messages.removeAll { $0.id == streamingMsg.id }
@@ -479,6 +475,8 @@ class ChatViewModel {
                 // Stream ended without .done — connection dropped silently
                 if !receivedDone && self.isStreaming {
                     self.stepProgressTask?.cancel()
+                    self.progressTimerTask?.cancel()
+                    self.progressTimerTask = nil
                     self.cosmicProgressSteps = []
                     self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
                     self.messages.removeAll { $0.id == streamingMsg.id }
@@ -489,6 +487,8 @@ class ChatViewModel {
                 }
             } catch is CancellationError {
                 self.stepProgressTask?.cancel()
+                self.progressTimerTask?.cancel()
+                self.progressTimerTask = nil
                 self.cosmicProgressSteps = []
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
@@ -496,6 +496,8 @@ class ChatViewModel {
                 self.isStreaming = false
             } catch {
                 self.stepProgressTask?.cancel()
+                self.progressTimerTask?.cancel()
+                self.progressTimerTask = nil
                 self.cosmicProgressSteps = []
                 self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
                 self.messages.removeAll { $0.id == streamingMsg.id }
@@ -545,28 +547,35 @@ class ChatViewModel {
     
     // MARK: - Progress Step Pacer
 
-    private func startProgressPacerIfNeeded() {
-        guard progressPacerTask == nil else { return }
-        progressPacerTask = Task { @MainActor [weak self] in
-            while let self, !self.pendingProgressSteps.isEmpty {
-                let step = self.pendingProgressSteps.removeFirst()
-                // Mark previous step as completed
-                for i in self.cosmicProgressSteps.indices {
-                    if self.cosmicProgressSteps[i].isActive {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            self.cosmicProgressSteps[i].isCompleted = true
-                            self.cosmicProgressSteps[i].isActive = false
-                        }
+    private func startCosmicProgressTimer() {
+        progressTimerTask?.cancel()
+        progressTimerTask = Task { @MainActor [weak self] in
+            var index = 0
+            while !Task.isCancelled {
+                guard let self else { return }
+                if let activeIdx = self.cosmicProgressSteps.lastIndex(where: { $0.isActive }) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        self.cosmicProgressSteps[activeIdx].isCompleted = true
+                        self.cosmicProgressSteps[activeIdx].isActive = false
                     }
                 }
-                // Show new step
+                if index > 0 && index % 10 == 0 {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        self.cosmicProgressSteps = []
+                    }
+                    try? await Task.sleep(nanoseconds: 300_000_000)
+                    if Task.isCancelled { return }
+                }
+                let key = Self.cosmicMessageKeys[index % 10]
+                let msg = NSLocalizedString(key, comment: "")
+                let step = CosmicProgressStep(text: msg, displayKey: key, isCompleted: false, isActive: true)
                 withAnimation(.easeOut(duration: 0.35)) {
                     self.cosmicProgressSteps.append(step)
                 }
-                // Wait minimum interval before showing next step
-                try? await Task.sleep(nanoseconds: 800_000_000)
+                index += 1
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                if Task.isCancelled { return }
             }
-            self?.progressPacerTask = nil
         }
     }
 

@@ -131,3 +131,4 @@ Config.xcconfig
 
 # Claude Code local settings
 .claude/settings.local.json
+e2e/__pycache__/
