@@ -393,6 +393,12 @@ struct ChatView: View {
             .onChange(of: viewModel.suggestedQuestions) { _, q in
                 if !q.isEmpty { requestScrollToBottom() }
             }
+            .onChange(of: viewModel.isStreaming) { _, streaming in
+                if !streaming { requestScrollToBottom(delay: 0.3) }
+            }
+            .onChange(of: viewModel.cosmicProgressSteps.count) { _, _ in
+                requestScrollToBottom()
+            }
             .onChange(of: viewModel.typewriterMessageId) { _, newId in
                 if newId == nil { requestScrollToBottom() }
             }
