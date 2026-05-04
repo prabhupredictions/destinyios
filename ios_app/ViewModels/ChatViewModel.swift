@@ -22,6 +22,8 @@ class ChatViewModel {
     var typewriterMessageId: String?  // Message currently being typewritten
     var windowManager = MessageWindowManager()
     var cosmicProgressSteps: [CosmicProgressStep] = []
+    private var pendingProgressSteps: [CosmicProgressStep] = []
+    private var progressPacerTask: Task<Void, Never>? = nil
     /// Short label shown in the user bubble when a home card sends a rich contextual query.
     /// The full inputText is still sent to the LLM; this only affects what the user sees.
     var pendingDisplayLabel: String? = nil
@@ -262,6 +264,9 @@ class ChatViewModel {
             streamingTask?.cancel()
             streamingTask = nil
             stepProgressTask?.cancel()
+            progressPacerTask?.cancel()
+            progressPacerTask = nil
+            pendingProgressSteps = []
             cosmicProgressSteps = []
             let orphaned = messages.filter { $0.isStreaming }
             for msg in orphaned {
@@ -402,20 +407,9 @@ class ChatViewModel {
                         if !isDone {
                             if let key = displayKey {
                                 let text = NSLocalizedString(key, comment: "")
-                                for i in self.cosmicProgressSteps.indices {
-                                    self.cosmicProgressSteps[i].isActive = false
-                                }
                                 let step = CosmicProgressStep(text: text, displayKey: key, isCompleted: false, isActive: true)
-                                withAnimation(.easeOut(duration: 0.35)) {
-                                    self.cosmicProgressSteps.append(step)
-                                }
-                            }
-                        } else {
-                            if let idx = self.cosmicProgressSteps.indices.last(where: { self.cosmicProgressSteps[$0].isActive }) {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    self.cosmicProgressSteps[idx].isCompleted = true
-                                    self.cosmicProgressSteps[idx].isActive = false
-                                }
+                                self.pendingProgressSteps.append(step)
+                                self.startProgressPacerIfNeeded()
                             }
                         }
 
@@ -431,6 +425,9 @@ class ChatViewModel {
                     case .done:
                         receivedDone = true
                         self.stepProgressTask?.cancel()
+                        self.progressPacerTask?.cancel()
+                        self.progressPacerTask = nil
+                        self.pendingProgressSteps = []
                         for i in self.cosmicProgressSteps.indices {
                             self.cosmicProgressSteps[i].isCompleted = true
                             self.cosmicProgressSteps[i].isActive = false
@@ -465,6 +462,9 @@ class ChatViewModel {
 
                     case .error(let msg):
                         self.stepProgressTask?.cancel()
+                        self.progressPacerTask?.cancel()
+                        self.progressPacerTask = nil
+                        self.pendingProgressSteps = []
                         self.errorMessage = msg
                         self.cosmicProgressSteps = []
                         self.messages.removeAll { $0.id == streamingMsg.id }
@@ -543,6 +543,33 @@ class ChatViewModel {
     }
     
     
+    // MARK: - Progress Step Pacer
+
+    private func startProgressPacerIfNeeded() {
+        guard progressPacerTask == nil else { return }
+        progressPacerTask = Task { @MainActor [weak self] in
+            while let self, !self.pendingProgressSteps.isEmpty {
+                let step = self.pendingProgressSteps.removeFirst()
+                // Mark previous step as completed
+                for i in self.cosmicProgressSteps.indices {
+                    if self.cosmicProgressSteps[i].isActive {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            self.cosmicProgressSteps[i].isCompleted = true
+                            self.cosmicProgressSteps[i].isActive = false
+                        }
+                    }
+                }
+                // Show new step
+                withAnimation(.easeOut(duration: 0.35)) {
+                    self.cosmicProgressSteps.append(step)
+                }
+                // Wait minimum interval before showing next step
+                try? await Task.sleep(nanoseconds: 800_000_000)
+            }
+            self?.progressPacerTask = nil
+        }
+    }
+
     // MARK: - Helpers
     private func loadBirthData() -> BirthData? {
         // Check active profile first (for Switch Profile feature)
