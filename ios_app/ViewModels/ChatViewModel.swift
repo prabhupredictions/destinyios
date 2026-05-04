@@ -425,10 +425,6 @@ class ChatViewModel {
                         self.stepProgressTask?.cancel()
                         self.progressTimerTask?.cancel()
                         self.progressTimerTask = nil
-                        for i in self.cosmicProgressSteps.indices {
-                            self.cosmicProgressSteps[i].isCompleted = true
-                            self.cosmicProgressSteps[i].isActive = false
-                        }
 
                         let answer = finalResponse?.answer ?? accumulatedAnswer
                         if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
@@ -438,14 +434,12 @@ class ChatViewModel {
                         }
                         self.suggestedQuestions = finalResponse?.followUpSuggestions ?? []
 
-                        // Staged reveal: show checkmarks briefly, then fade progress, then reveal content
                         Task { @MainActor [weak self] in
                             guard let self else { return }
-                            try? await Task.sleep(nanoseconds: 600_000_000)
-                            withAnimation(.easeOut(duration: 0.4)) {
+                            withAnimation(.easeOut(duration: 0.3)) {
                                 self.cosmicProgressSteps = []
                             }
-                            try? await Task.sleep(nanoseconds: 400_000_000)
+                            try? await Task.sleep(nanoseconds: 300_000_000)
                             if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
                                 withAnimation(.easeIn(duration: 0.5)) {
                                     self.messages[idx].isStreaming = false
@@ -553,27 +547,14 @@ class ChatViewModel {
             var index = 0
             while !Task.isCancelled {
                 guard let self else { return }
-                if let activeIdx = self.cosmicProgressSteps.lastIndex(where: { $0.isActive }) {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        self.cosmicProgressSteps[activeIdx].isCompleted = true
-                        self.cosmicProgressSteps[activeIdx].isActive = false
-                    }
-                }
-                if index > 0 && index % 10 == 0 {
-                    withAnimation(.easeOut(duration: 0.3)) {
-                        self.cosmicProgressSteps = []
-                    }
-                    try? await Task.sleep(nanoseconds: 300_000_000)
-                    if Task.isCancelled { return }
-                }
                 let key = Self.cosmicMessageKeys[index % 10]
                 let msg = NSLocalizedString(key, comment: "")
                 let step = CosmicProgressStep(text: msg, displayKey: key, isCompleted: false, isActive: true)
-                withAnimation(.easeOut(duration: 0.35)) {
-                    self.cosmicProgressSteps.append(step)
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    self.cosmicProgressSteps = [step]
                 }
                 index += 1
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
                 if Task.isCancelled { return }
             }
         }

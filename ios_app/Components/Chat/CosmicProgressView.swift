@@ -1,124 +1,58 @@
 import SwiftUI
 
-/// Premium agentic pipeline progress — gold left border, fade-in steps, checkmarks.
+/// Gemini-style progress indicator: sparkle icon + single cycling message with crossfade.
 struct CosmicProgressView: View {
     let steps: [CosmicProgressStep]
 
+    private var currentText: String {
+        steps.last(where: { $0.isActive })?.text ?? steps.last?.text ?? ""
+    }
+
     var body: some View {
         if !steps.isEmpty {
-            HStack(alignment: .top, spacing: 12) {
-                Rectangle()
-                    .fill(
-                        LinearGradient(
-                            colors: [AppTheme.Colors.gold.opacity(0.8), AppTheme.Colors.gold.opacity(0.1)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(width: 2)
-                    .cornerRadius(1)
+            HStack(alignment: .center, spacing: 10) {
+                SparkleIcon()
+                    .frame(width: 24, height: 24)
 
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(steps) { step in
-                        CosmicProgressStepRow(step: step)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                Text(currentText)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(Color.white.opacity(0.85))
+                    .lineLimit(1)
+                    .id(currentText)
+                    .transition(.opacity.animation(.easeInOut(duration: 0.4)))
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, 14)
+            .animation(.easeInOut(duration: 0.4), value: currentText)
             .accessibilityIdentifier("cosmic_progress_view")
+            .accessibilityLabel("Loading: \(currentText)")
         }
     }
 }
 
-private struct CosmicProgressStepRow: View {
-    let step: CosmicProgressStep
-
-    @State private var dotsOpacity: Double = 1.0
-    @State private var dotsTimer: Timer?
-    @State private var appeared = false
+private struct SparkleIcon: View {
+    @State private var rotation: Double = 0
+    @State private var scale: CGFloat = 1.0
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "sparkle")
-                .font(.system(size: 9))
-                .foregroundColor(stepColor)
-
-            Text(step.text)
-                .font(AppTheme.Fonts.body(size: 14))
-                .foregroundColor(stepColor)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            Spacer(minLength: 4)
-
-            if step.isCompleted {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
-                    .transition(.scale.combined(with: .opacity))
-                    .accessibilityIdentifier("progress_checkmark")
-            } else if step.isActive {
-                ThreeDotsView(opacity: dotsOpacity)
-                    .accessibilityIdentifier("progress_active_dots")
+        Image(systemName: "sparkle")
+            .font(.system(size: 16, weight: .medium))
+            .foregroundStyle(
+                LinearGradient(
+                    colors: [AppTheme.Colors.gold, AppTheme.Colors.gold.opacity(0.6)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .rotationEffect(.degrees(rotation))
+            .scaleEffect(scale)
+            .onAppear {
+                withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                    rotation = 360
+                }
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    scale = 1.15
+                }
             }
-        }
-        .opacity(step.isCompleted ? 0.55 : 1.0)
-        .accessibilityIdentifier("progress_step_row")
-        .accessibilityLabel(step.isActive ? "active: \(step.text)" : (step.isCompleted ? "completed: \(step.text)" : step.text))
-        .overlay(
-            Color.clear
-                .accessibilityIdentifier(step.isActive ? "progress_step_active" : (step.isCompleted ? "progress_step_completed" : "progress_step_pending"))
-        )
-        .onAppear {
-            guard !appeared else { return }
-            appeared = true
-            if step.isActive {
-                startDotsAnimation()
-            }
-        }
-        .onChange(of: step.isActive) { _, active in
-            if active {
-                startDotsAnimation()
-            } else {
-                stopDotsAnimation()
-            }
-        }
-        .onDisappear {
-            stopDotsAnimation()
-        }
-    }
-
-    private var stepColor: Color {
-        step.isActive ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary
-    }
-
-    private func startDotsAnimation() {
-        stopDotsAnimation()
-        dotsTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: true) { _ in
-            withAnimation(.easeInOut(duration: 0.4)) {
-                dotsOpacity = dotsOpacity < 0.5 ? 1.0 : 0.3
-            }
-        }
-    }
-
-    private func stopDotsAnimation() {
-        dotsTimer?.invalidate()
-        dotsTimer = nil
-    }
-}
-
-private struct ThreeDotsView: View {
-    let opacity: Double
-
-    var body: some View {
-        HStack(spacing: 3) {
-            ForEach(0 ..< 3, id: \.self) { _ in
-                Circle()
-                    .fill(AppTheme.Colors.gold)
-                    .frame(width: 4, height: 4)
-            }
-        }
-        .opacity(opacity)
     }
 }
