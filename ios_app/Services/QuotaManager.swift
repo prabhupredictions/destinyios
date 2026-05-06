@@ -349,17 +349,20 @@ class QuotaManager: ObservableObject {
             URLQueryItem(name: "feature", value: feature.rawValue),
             URLQueryItem(name: "count", value: String(count))
         ]
-        
+
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
         request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
+        // Short timeout: if Cloud Run is cold, fail fast so the catch block in sendQuery
+        // lets the request proceed. The stream itself handles cold-start wait transparently.
+        request.timeoutInterval = 5
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
-        
+
         return try JSONDecoder().decode(FeatureAccessResponse.self, from: data)
     }
     
@@ -525,17 +528,18 @@ class QuotaManager: ObservableObject {
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
         request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
+        request.timeoutInterval = 10  // fail fast on cold Cloud Run; cache stays valid
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
-        
+
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
         updateFromStatus(status)
         lastSyncTime = Date()
-        
+
         // Pre-fetch plans to keep cache fresh (fire-and-forget)
         Task { try? await fetchPlans() }
     }
