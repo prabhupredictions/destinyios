@@ -45,6 +45,10 @@ struct ios_appApp: App {
                 BackgroundTaskHelper.shared.beginTask()
             case .active:
                 BackgroundTaskHelper.shared.endTask()
+                // Warm up Cloud Run — fires only when returning from background/inactive
+                if oldPhase != .active {
+                    BackendWarmUpService.shared.ping()
+                }
             default:
                 break
             }
@@ -126,6 +130,38 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
 extension Notification.Name {
     static let streamingBackgroundExpired = Notification.Name("streamingBackgroundExpired")
+}
+
+// MARK: - Backend Warm-Up Service
+/// Sends a lightweight GET /health ping when the app returns to foreground.
+/// Cloud Run scales to zero after ~15 minutes of inactivity. The ping fires
+/// immediately on foreground so the cold start (20–60s) completes before the
+/// user finishes typing their first query.
+final class BackendWarmUpService {
+    static let shared = BackendWarmUpService()
+    private var lastPingDate: Date = .distantPast
+    private let minInterval: TimeInterval = 60  // don't ping more than once per minute
+
+    func ping() {
+        guard Date().timeIntervalSince(lastPingDate) > minInterval else { return }
+        lastPingDate = Date()
+
+        guard let url = URL(string: "\(APIConfig.baseURL)/health") else { return }
+
+        let config = URLSessionConfiguration.ephemeral
+        config.timeoutIntervalForRequest = 10
+        config.timeoutIntervalForResource = 15
+        let session = URLSession(configuration: config)
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = session.dataTask(with: request) { _, response, _ in
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            print("[WarmUp] /health ping → \(status)")
+        }
+        task.resume()
+    }
 }
 // Build trigger - 2026-02-07T08:58:23Z
 // Build trigger - 2026-02-07T10:47:14Z
