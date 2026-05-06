@@ -73,34 +73,7 @@ struct CompatibilityView: View {
             }
             // Single Partner or Individual Result View
             else if viewModel.showResult, let result = viewModel.result {
-                CompatibilityResultView(
-                    result: result,
-                    boyName: viewModel.boyName,
-                    girlName: viewModel.girlName,
-                    boyDob: viewModel.formattedBoyDob,
-                    girlDob: viewModel.formattedGirlDob,
-                    boyCity: viewModel.boyCity,
-                    girlCity: viewModel.girlCity,
-                    onNewAnalysis: {
-                        viewModel.reset()
-                    },
-                    onBack: {
-                        // If we came from comparison overview, go back there
-                        if viewModel.comparisonResults.count > 1 {
-                            viewModel.showResult = false
-                            viewModel.showComparisonOverview = true
-                        } else {
-                            viewModel.showResult = false
-                        }
-                    },
-                    onHistory: nil,
-                    onCharts: {
-                        showChartsSheet = true
-                    },
-                    onLoadHistory: { item in
-                        viewModel.loadFromHistory(item)
-                    }
-                )
+                resultView(result: result)
             } else {
                 compatibilityForm
             }
@@ -431,6 +404,33 @@ struct CompatibilityView: View {
         print("[CompatibilityView] Navigating to Auth (guest data preserved for carry-forward)")
     }
     
+    // MARK: - Result View (extracted to keep body type-checkable)
+    @ViewBuilder
+    private func resultView(result: CompatibilityResult) -> some View {
+        CompatibilityResultView(
+            result: result,
+            boyName: viewModel.boyName,
+            girlName: viewModel.girlName,
+            boyDob: viewModel.formattedBoyDob,
+            girlDob: viewModel.formattedGirlDob,
+            boyCity: viewModel.boyCity,
+            girlCity: viewModel.girlCity,
+            onNewAnalysis: { viewModel.reset() },
+            onBack: {
+                if viewModel.comparisonResults.count > 1 {
+                    viewModel.showResult = false
+                    viewModel.showComparisonOverview = true
+                } else {
+                    viewModel.showResult = false
+                }
+            },
+            onHistory: nil,
+            onCharts: { showChartsSheet = true },
+            onLoadHistory: { item in viewModel.loadFromHistory(item) },
+            isFromComparison: viewModel.comparisonResults.count > 1
+        )
+    }
+
     // MARK: - Form View (Compact Single-Screen Design)
     private var compatibilityForm: some View {
         VStack(spacing: 0) {

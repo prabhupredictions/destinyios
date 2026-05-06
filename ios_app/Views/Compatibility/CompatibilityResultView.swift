@@ -14,6 +14,30 @@ struct CompatibilityResultView: View {
     let onHistory: (() -> Void)?
     let onCharts: (() -> Void)?
     let onLoadHistory: ((CompatibilityHistoryItem) -> Void)?
+    var isFromComparison: Bool = false  // true when opened from multi-partner comparison overview
+
+    init(result: CompatibilityResult, boyName: String, girlName: String,
+         boyDob: String?, girlDob: String?, boyCity: String?, girlCity: String?,
+         onNewAnalysis: @escaping () -> Void,
+         onBack: (() -> Void)?,
+         onHistory: (() -> Void)?,
+         onCharts: (() -> Void)?,
+         onLoadHistory: ((CompatibilityHistoryItem) -> Void)?,
+         isFromComparison: Bool = false) {
+        self.result = result
+        self.boyName = boyName
+        self.girlName = girlName
+        self.boyDob = boyDob
+        self.girlDob = girlDob
+        self.boyCity = boyCity
+        self.girlCity = girlCity
+        self.onNewAnalysis = onNewAnalysis
+        self.onBack = onBack
+        self.onHistory = onHistory
+        self.onCharts = onCharts
+        self.onLoadHistory = onLoadHistory
+        self.isFromComparison = isFromComparison
+    }
     
     // Sheet States
     @State private var showFullReport = false
@@ -292,7 +316,7 @@ struct CompatibilityResultView: View {
             )
         }
         .sheet(item: $askDestinyItem) { item in
-            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, initialPrompt: item.prompt)
+            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, initialPrompt: item.prompt, showFollowUpSuggestions: !isFromComparison)
         }
          .sheet(isPresented: $showHistorySheet) {
             CompatibilityHistorySheet { selectedItem in
