@@ -431,6 +431,7 @@ class ChatViewModel {
                             self.messages[idx].content = answer
                             self.messages[idx].area = finalResponse?.lifeArea
                             self.messages[idx].advice = finalResponse?.advice
+                            self.messages[idx].executionTimeMs = finalResponse?.executionTimeMs ?? 0
                         }
                         self.suggestedQuestions = finalResponse?.followUpSuggestions ?? []
 

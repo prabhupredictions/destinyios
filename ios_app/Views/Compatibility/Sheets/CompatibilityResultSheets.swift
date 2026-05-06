@@ -932,12 +932,19 @@ struct AskDestinySheet: View {
     @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
     @State private var showStyleSelector = false
     @State private var lengthManager = ResponseLengthManager.shared
-    
+    // Agentic path: cosmic progress while awaiting followup response
+    @State private var cosmicProgressSteps: [CosmicProgressStep] = []
+    @State private var cosmicTimerTask: Task<Void, Never>? = nil
+    // Sub-agent streaming tracking (redirect → individual chart)
+    @State private var redirectStreamingMessageId: UUID? = nil
+    @State private var redirectCosmicProgressSteps: [CosmicProgressStep] = []
+    @State private var redirectProgressTimerTask: Task<Void, Never>? = nil
+
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
     @AppStorage("hasBirthData") private var hasBirthData = false
     @AppStorage("isGuest") private var isGuest = false
-    
+
     // Services
     private let compatibilityService = CompatibilityService()
     private let predictionService = PredictionService()
@@ -968,49 +975,59 @@ struct AskDestinySheet: View {
                     // Messages List
                     ScrollViewReader { proxy in
                         ScrollView {
-                            LazyVStack(spacing: 16) {
-                                // Welcome message — centered with spacers (no GeometryReader)
-                                if messages.isEmpty && !isLoading {
-                                    Spacer(minLength: 80)
-                                    welcomeView
-                                    Spacer(minLength: 80)
-                                }
-                                
-                                ForEach(Array(messages.enumerated()), id: \.element.id) { index, message in
-                                    CompatChatBubble(
-                                        message: message,
-                                        enableTypewriter: message.id == typewriterMessageId,
-                                        onTypewriterFinished: message.id == typewriterMessageId ? {
-                                            typewriterMessageId = nil
-                                            requestCompatScroll()
-                                        } : nil,
-                                        onTypewriterProgress: message.id == typewriterMessageId ? { requestCompatScroll() } : nil
-                                    )
-                                    .id(message.id)
-                                }
-                                
-                                // Loading indicator
-                                if isLoading {
-                                    CompatTypingIndicator()
-                                        .id("loading")
-                                }
-                                
-                                // Inline suggested follow-up questions
-                                if !suggestedQuestions.isEmpty && !isLoading && typewriterMessageId == nil {
-                                    inlineSuggestedQuestionsView
+                            if messages.isEmpty && !isLoading {
+                                welcomeView
+                            } else {
+                                VStack(spacing: 24) {
+                                    ForEach(Array(messages.enumerated()), id: \.element.id) { _, message in
+                                        CompatChatBubble(
+                                            message: message,
+                                            enableTypewriter: message.id == typewriterMessageId,
+                                            cosmicProgressSteps: message.id == redirectStreamingMessageId
+                                                ? redirectCosmicProgressSteps : [],
+                                            onTypewriterFinished: message.id == typewriterMessageId ? {
+                                                typewriterMessageId = nil
+                                                requestCompatScroll()
+                                            } : nil,
+                                            onTypewriterProgress: message.id == typewriterMessageId ? { requestCompatScroll() } : nil
+                                        )
+                                        .id(message.id)
+                                    }
+
+                                    // Agentic path: cosmic progress while awaiting followup
+                                    if isLoading && !cosmicProgressSteps.isEmpty {
+                                        CosmicProgressView(steps: cosmicProgressSteps)
+                                            .id("loading")
+                                            .padding(.horizontal, 4)
+                                    } else if isLoading {
+                                        CompatTypingIndicator()
+                                            .id("loading")
+                                    }
+
+                                    // Follow-up suggestions (vertical rows matching ChatView)
+                                    if !suggestedQuestions.isEmpty && !isLoading && typewriterMessageId == nil {
+                                        FollowUpSuggestionsView(questions: suggestedQuestions) { question in
+                                            HapticManager.shared.play(.light)
+                                            isInputFocused = false
+                                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                            inputText = question
+                                            suggestedQuestions = []
+                                            Task { await sendMessage() }
+                                        }
                                         .id("suggestions")
                                         .transition(.opacity.combined(with: .move(edge: .bottom)))
+                                    }
                                 }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 20)
                             }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 16)
-                            
+
                             Color.clear
                                 .frame(height: 1)
                                 .id("bottomAnchor")
                         }
                         .scrollDismissesKeyboard(.interactively)
-                        // Single consolidated scroll handler
+                        // Single consolidated scroll handler — debounced
                         .onChange(of: compatScrollTrigger) { _, _ in
                             withAnimation(.easeOut(duration: 0.25)) {
                                 proxy.scrollTo("bottomAnchor", anchor: .bottom)
@@ -1025,20 +1042,35 @@ struct AskDestinySheet: View {
                         .onChange(of: suggestedQuestions) { _, q in
                             if !q.isEmpty { requestCompatScroll() }
                         }
+                        .onChange(of: typewriterMessageId) { _, newId in
+                            if newId == nil { requestCompatScroll(delay: 0.3) }
+                        }
+                        .onChange(of: isInputFocused) { _, focused in
+                            if focused { requestCompatScroll(delay: 0.3) }
+                        }
+                        .onChange(of: cosmicProgressSteps.count) { _, _ in
+                            requestCompatScroll()
+                        }
                     }
                     
                     // Error Banner
                     if let error = errorMessage {
-                        Text(error)
-                            .font(AppTheme.Fonts.caption(size: 12))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(AppTheme.Colors.error.opacity(0.9))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 8)
-                            .onTapGesture { errorMessage = nil }
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(AppTheme.Fonts.body(size: 14))
+                            Text(error)
+                                .font(AppTheme.Fonts.body(size: 14))
+                        }
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(AppTheme.Colors.error.opacity(0.85))
+                        )
+                        .padding(.horizontal, 16)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .onTapGesture { errorMessage = nil }
                     }
                     
                     // Input Bar
@@ -1159,25 +1191,27 @@ struct AskDestinySheet: View {
     // MARK: - Welcome View
     private var welcomeView: some View {
         VStack(spacing: 16) {
+            Spacer()
+
             ZStack {
                 Circle()
                     .fill(AppTheme.Colors.gold.opacity(0.1))
-                    .frame(width: 80, height: 80)
+                    .frame(width: 72, height: 72)
                 Image(systemName: "sparkles")
-                    .font(.system(size: 36))
+                    .font(.system(size: 32))
                     .foregroundColor(AppTheme.Colors.gold)
             }
-            
+
             Text(String(format: NSLocalizedString("ask_about_match_title", comment: ""), boyName, girlName))
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.textPrimary)
-            
+
             Text(NSLocalizedString("ask_destiny_welcome", comment: ""))
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
-            
+
             // Quick Questions
             VStack(spacing: 8) {
                 quickQuestionButton("suggested_q_strengths".localized)
@@ -1185,10 +1219,13 @@ struct AskDestinySheet: View {
                 quickQuestionButton("suggested_q_timing".localized)
             }
             .padding(.top, 8)
+
+            Spacer()
         }
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
     }
-    
+
     private func quickQuestionButton(_ text: String) -> some View {
         Button {
             isInputFocused = false
@@ -1212,47 +1249,7 @@ struct AskDestinySheet: View {
         }
     }
     
-    // MARK: - Inline Suggested Questions (horizontal scrollable pills)
-    private var inlineSuggestedQuestionsView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("suggested_questions_title".localized)
-                .font(AppTheme.Fonts.caption())
-                .foregroundColor(AppTheme.Colors.textSecondary)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(suggestedQuestions, id: \.self) { question in
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            isInputFocused = false
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                            inputText = question
-                            suggestedQuestions = []
-                            Task { await sendMessage() }
-                        }) {
-                            Text(question)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(AppTheme.Colors.gold)
-                                .lineLimit(1)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(AppTheme.Colors.gold.opacity(0.1))
-                                        .overlay(
-                                            Capsule()
-                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
-                                        )
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-        .padding(.top, 4)
-    }
-    
+
     // MARK: - Input Bar
     private var inputBar: some View {
         VStack(spacing: 10) {
@@ -1376,7 +1373,11 @@ struct AskDestinySheet: View {
         }
         
         isLoading = true
-        defer { isLoading = false }  // Always reset, even on unexpected throw
+        startCosmicTimer()
+        defer {
+            isLoading = false
+            stopCosmicTimer()
+        }
         
         // Get session ID
         guard let sessionId = result.sessionId else {
@@ -1402,7 +1403,8 @@ struct AskDestinySheet: View {
             // Handle response
             let redirectTarget = response.target  // May be nil if backend returned null
             if response.status == "redirect" || response.status == "redirect_no_data" {
-                // Use backend-provided target, or fall back to boyName if nil
+                // Stop agentic timer — redirect streaming will manage its own cosmic steps
+                stopCosmicTimer()
                 let resolvedTarget = redirectTarget ?? boyName
                 print("[AskDestiny] redirect status=\(response.status ?? "") target=\(resolvedTarget)")
                 await handleRedirect(query: query, target: resolvedTarget, response: response)
@@ -1447,6 +1449,7 @@ struct AskDestinySheet: View {
             answer: nil,
             message: nil,
             birthData: nil,  // Force handleRedirect to use result.analysisData
+            redirectQuery: nil,
             reason: response.reason,
             executionTimeMs: nil,
             followUpSuggestions: nil
@@ -1454,14 +1457,14 @@ struct AskDestinySheet: View {
         await handleRedirect(query: query, target: target, response: localResponse)
     }
 
-    // MARK: - Handle Redirect to Individual Analysis
+    // MARK: - Handle Redirect to Individual Analysis (Streaming)
     private func handleRedirect(query: String, target: String, response: CompatibilityFollowUpResponse) async {
         let targetLower = target.lowercased()
         let boyNameLower = boyName.lowercased()
         let girlNameLower = girlName.lowercased()
         let boyFirst = boyName.components(separatedBy: " ").first ?? boyName
         let girlFirst = girlName.components(separatedBy: " ").first ?? girlName
-        
+
         // Determine actual person — match "boy"/"his"/"him" → boyName, "girl"/"her"/"she" → girlName
         let isBoyTarget = targetLower.contains("boy") || targetLower.contains("him") || targetLower.contains("his") ||
                           targetLower == boyNameLower ||
@@ -1471,7 +1474,7 @@ struct AskDestinySheet: View {
                            targetLower == girlNameLower ||
                            girlNameLower.hasPrefix(targetLower) ||
                            targetLower.hasPrefix(girlNameLower)
-        
+
         // Resolved display name — always a real person's name, never "Boy"/"Girl"
         let resolvedDisplayName: String
         let birthDetails: BirthDetails?
@@ -1482,26 +1485,12 @@ struct AskDestinySheet: View {
             resolvedDisplayName = girlFirst
             birthDetails = result.analysisData?.girl?.details ?? response.birthData
         } else {
-            // Ambiguous — default to boy
             resolvedDisplayName = boyFirst
             birthDetails = result.analysisData?.boy?.details ?? response.birthData
             print("[AskDestiny] Ambiguous target '\(target)' — defaulting to \(boyFirst)'s data")
         }
-        
-        // Show redirect message with actual name (temporary - removed when result arrives)
-        let redirectMsg = CompatChatMessage(
-            content: "🔄 Looking up \(resolvedDisplayName)'s individual chart...",
-            isUser: false,
-            type: .info
-        )
-        messages.append(redirectMsg)
-        let redirectMsgId = redirectMsg.id
-        
+
         guard let details = birthDetails else {
-            // Remove redirect message and show error
-            withAnimation(.easeInOut(duration: 0.2)) {
-                messages.removeAll { $0.id == redirectMsgId }
-            }
             let errorMsg = CompatChatMessage(
                 content: "Could not retrieve \(resolvedDisplayName)'s birth data for individual analysis.",
                 isUser: false,
@@ -1510,104 +1499,139 @@ struct AskDestinySheet: View {
             messages.append(errorMsg)
             return
         }
-        
-        // Call predict API
+
+        // Add placeholder bubble — CompatChatBubble renders CosmicProgressView when redirectStreamingMessageId matches
+        let redirectMsg = CompatChatMessage(content: "", isUser: false, type: .info)
+        messages.append(redirectMsg)
+        let redirectMsgId = redirectMsg.id
+        redirectStreamingMessageId = redirectMsgId
+        startRedirectProgressTimer()
+
+        let birthData = BirthData(
+            dob: details.dob,
+            time: details.time,
+            latitude: details.lat,
+            longitude: details.lon,
+            cityOfBirth: details.place,
+            ayanamsa: "lahiri",
+            houseSystem: "whole_sign"
+        )
+        let email = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let compatThreadId = result.sessionId  // Already "compat_xxx" — use as-is to link predict to compat chat history
+        let redirectLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        let predictRequest = PredictionRequest(
+            query: response.redirectQuery ?? query,
+            birthData: birthData,
+            sessionId: nil,
+            conversationId: nil,  // No compat context — compat history confuses the LLM for the redirect person's chart
+            userEmail: email,
+            language: redirectLang,
+            responseStyle: ContentStyleManager.shared.currentStyle.rawValue,
+            responseLength: ResponseLengthManager.shared.currentLength.rawValue,
+            quotaContext: "compatibility"
+        )
+
         do {
-            let birthData = BirthData(
-                dob: details.dob,
-                time: details.time,
-                latitude: details.lat,
-                longitude: details.lon,
-                cityOfBirth: details.place,
-                ayanamsa: "lahiri",
-                houseSystem: "whole_sign"
-            )
-            
-            let email = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-            // Ensure conversationId matches the compatibility thread ID (compat_sess_...)
-            let compatThreadId = result.sessionId.map { "compat_\($0)" }
-            
-            let redirectLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
-            let predictRequest = PredictionRequest(
-                query: query,
-                birthData: birthData,
-                sessionId: nil,
-                conversationId: compatThreadId,
-                userEmail: email,
-                language: redirectLang,
-                responseStyle: ContentStyleManager.shared.currentStyle.rawValue,
-                responseLength: ResponseLengthManager.shared.currentLength.rawValue,
-                quotaContext: "compatibility"  // Marks this as coming from compatibility
-            )
-            
+            // Sub-agent path: non-streaming individual chart lookup
             let predictResponse = try await predictionService.predict(request: predictRequest)
-            
-            // Remove redirect message and display individual analysis
-            withAnimation(.easeInOut(duration: 0.2)) {
-                messages.removeAll { $0.id == redirectMsgId }
-            }
+            stopRedirectProgressTimer()
+            redirectStreamingMessageId = nil
+            withAnimation(.easeInOut(duration: 0.2)) { messages.removeAll { $0.id == redirectMsgId } }
             let analysisContent = "**Individual Analysis (\(resolvedDisplayName)):**\n\n\(predictResponse.answer)"
             var aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
             aiMessage.executionTimeMs = predictResponse.executionTimeMs
             typewriterMessageId = aiMessage.id
             messages.append(aiMessage)
-            saveMessagesToHistory()  // Persist messages
-            
-            // Set follow-up suggestions from predict API
+            saveMessagesToHistory()
             if !predictResponse.followUpSuggestions.isEmpty {
                 suggestedQuestions = predictResponse.followUpSuggestions
             }
-            
         } catch let error as NetworkError {
-            // Remove redirect message
-            withAnimation(.easeInOut(duration: 0.2)) {
-                messages.removeAll { $0.id == redirectMsgId }
-            }
-            
-            // Check if it's a quota error
+            stopRedirectProgressTimer()
+            redirectStreamingMessageId = nil
+            withAnimation(.easeInOut(duration: 0.2)) { messages.removeAll { $0.id == redirectMsgId } }
             let errorString = String(describing: error)
             if errorString.contains("maximum free questions") || errorString.contains("quota") || errorString.contains("limit") {
-                // Show quota sheet with sign-in/upgrade options
-                let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-                if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "sign_in_to_continue_asking".localized
-                } else {
-                    quotaMessage = "create_account_to_continue".localized
-                }
+                let e = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+                quotaMessage = (e.contains("guest") || e.contains("@gen.com") || isGuest)
+                    ? "sign_in_to_continue_asking".localized
+                    : "create_account_to_continue".localized
                 showQuotaSheet = true
             } else {
-                let errorMsg = CompatChatMessage(
+                messages.append(CompatChatMessage(
                     content: "Failed to get individual analysis: \(error.localizedDescription)",
-                    isUser: false,
-                    type: .error
-                )
-                messages.append(errorMsg)
+                    isUser: false, type: .error
+                ))
             }
         } catch {
-            // Remove redirect message
-            withAnimation(.easeInOut(duration: 0.2)) {
-                messages.removeAll { $0.id == redirectMsgId }
-            }
-            
-            // Check for quota-related errors in the error message
+            stopRedirectProgressTimer()
+            redirectStreamingMessageId = nil
+            withAnimation(.easeInOut(duration: 0.2)) { messages.removeAll { $0.id == redirectMsgId } }
             let errorString = error.localizedDescription.lowercased()
             if errorString.contains("maximum free") || errorString.contains("quota") || errorString.contains("limit") {
-                let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-                if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "sign_in_to_continue_asking".localized
-                } else {
-                    quotaMessage = "create_account_to_continue".localized
-                }
+                let e = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+                quotaMessage = (e.contains("guest") || e.contains("@gen.com") || isGuest)
+                    ? "sign_in_to_continue_asking".localized
+                    : "create_account_to_continue".localized
                 showQuotaSheet = true
             } else {
-                let errorMsg = CompatChatMessage(
+                messages.append(CompatChatMessage(
                     content: "Failed to get individual analysis: \(error.localizedDescription)",
-                    isUser: false,
-                    type: .error
-                )
-                messages.append(errorMsg)
+                    isUser: false, type: .error
+                ))
             }
         }
+    }
+
+    // MARK: - Cosmic Progress Timer Helpers
+
+    private static let cosmicMessageKeys: [String] = [
+        "progress_connecting", "progress_mapping_sky", "progress_reading_planets",
+        "progress_planetary_voice", "progress_chart_secrets", "progress_deeper_patterns",
+        "progress_river_of_time", "progress_cosmic_windows", "progress_destiny_shaped",
+        "progress_oracle_weaving"
+    ]
+
+    private func startCosmicTimer() {
+        cosmicTimerTask?.cancel()
+        cosmicTimerTask = Task { @MainActor in
+            var index = 0
+            while !Task.isCancelled {
+                let key = Self.cosmicMessageKeys[index % 10]
+                let step = CosmicProgressStep(text: NSLocalizedString(key, comment: ""),
+                                              displayKey: key, isCompleted: false, isActive: true)
+                withAnimation(.easeInOut(duration: 0.4)) { cosmicProgressSteps = [step] }
+                index += 1
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+            }
+        }
+    }
+
+    private func stopCosmicTimer() {
+        cosmicTimerTask?.cancel()
+        cosmicTimerTask = nil
+        withAnimation(.easeOut(duration: 0.3)) { cosmicProgressSteps = [] }
+    }
+
+    private func startRedirectProgressTimer() {
+        redirectProgressTimerTask?.cancel()
+        redirectProgressTimerTask = Task { @MainActor in
+            var index = 0
+            while !Task.isCancelled {
+                let key = Self.cosmicMessageKeys[index % 10]
+                let step = CosmicProgressStep(text: NSLocalizedString(key, comment: ""),
+                                              displayKey: key, isCompleted: false, isActive: true)
+                withAnimation(.easeInOut(duration: 0.4)) { redirectCosmicProgressSteps = [step] }
+                index += 1
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+            }
+        }
+    }
+
+    private func stopRedirectProgressTimer() {
+        redirectProgressTimerTask?.cancel()
+        redirectProgressTimerTask = nil
+        withAnimation(.easeOut(duration: 0.3)) { redirectCosmicProgressSteps = [] }
     }
 }
 
@@ -1615,6 +1639,7 @@ struct AskDestinySheet: View {
 private struct CompatChatBubble: View {
     let message: CompatChatMessage
     var enableTypewriter: Bool = false
+    var cosmicProgressSteps: [CosmicProgressStep] = []
     var onTypewriterFinished: (() -> Void)? = nil
     var onTypewriterProgress: (() -> Void)? = nil
     
@@ -1727,17 +1752,22 @@ private struct CompatChatBubble: View {
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.mainBackground)
             } else if message.type == .info {
-                // Info message - styled text
-                HStack(spacing: 8) {
-                    if message.content.contains("Redirecting") {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-                            .scaleEffect(0.8)
+                // Info message — show cosmic progress during redirect streaming, else styled text
+                if !cosmicProgressSteps.isEmpty {
+                    CosmicProgressView(steps: cosmicProgressSteps)
+                        .padding(.horizontal, 4)
+                } else {
+                    HStack(spacing: 8) {
+                        if message.content.contains("Redirecting") {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                                .scaleEffect(0.8)
+                        }
+                        Text(message.content)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .italic()
                     }
-                    Text(message.content)
-                        .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(AppTheme.Colors.gold)
-                        .italic()
                 }
             } else if message.type == .error {
                 // Error message

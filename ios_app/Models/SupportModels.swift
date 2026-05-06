@@ -346,13 +346,15 @@ struct CompatibilityFollowUpResponse: Codable, Sendable {
     let answer: String?       // AI answer for compatibility questions
     let message: String?      // Error or info message
     let birthData: BirthDetails? // For redirect: target's birth details
+    let redirectQuery: String?   // Backend-cleaned query for /predict (boy/girl replaced with real names)
     let reason: String?       // Reason for redirect
     let executionTimeMs: Double?  // Execution time in milliseconds
     let followUpSuggestions: [String]?  // LLM-generated follow-up questions
-    
+
     enum CodingKeys: String, CodingKey {
         case status, target, answer, message, reason
         case birthData = "birth_data"
+        case redirectQuery = "redirect_query"
         case executionTimeMs = "execution_time_ms"
         case followUpSuggestions = "follow_up_suggestions"
     }
