@@ -17,6 +17,15 @@ BIRTH = {
     "longitude": "81.3943",
     "city":      "Bhilai",
 }
+# Compatibility partner (Smita) — used by test_27_compat_ask_destiny.py
+PARTNER = {
+    "name":      "Smita",
+    "dob":       "1980-11-13",
+    "time":      "09:30",
+    "city":      "Belgaum, Karnataka",
+    "latitude":  "15.8497",
+    "longitude": "74.4977",
+}
 
 
 @pytest.fixture(scope="session")
@@ -32,13 +41,19 @@ def driver():
     opts.process_arguments = {
         "args": ["UI_TEST_MODE"],
         "env": {
-            "E2E_USER_EMAIL": E2E_EMAIL,
-            "API_BASE_URL":   BASE_URLS[TEST_ENV],
-            "E2E_DOB":        BIRTH["dob"],
-            "E2E_TIME":       BIRTH["time"],
-            "E2E_LATITUDE":   BIRTH["latitude"],
-            "E2E_LONGITUDE":  BIRTH["longitude"],
-            "E2E_CITY":       BIRTH["city"],
+            "E2E_USER_EMAIL":    E2E_EMAIL,
+            "API_BASE_URL":      BASE_URLS[TEST_ENV],
+            "E2E_DOB":           BIRTH["dob"],
+            "E2E_TIME":          BIRTH["time"],
+            "E2E_LATITUDE":      BIRTH["latitude"],
+            "E2E_LONGITUDE":     BIRTH["longitude"],
+            "E2E_CITY":          BIRTH["city"],
+            "E2E_PARTNER_NAME":  PARTNER["name"],
+            "E2E_PARTNER_DOB":   PARTNER["dob"],
+            "E2E_PARTNER_TIME":  PARTNER["time"],
+            "E2E_PARTNER_CITY":  PARTNER["city"],
+            "E2E_PARTNER_LAT":   PARTNER["latitude"],
+            "E2E_PARTNER_LON":   PARTNER["longitude"],
         },
     }
     drv = webdriver.Remote("http://127.0.0.1:4723", options=opts)
@@ -52,13 +67,14 @@ def screens(driver):
     from helpers.screens import (
         HomeScreen, ChatScreen, CompatibilityScreen, ChartsScreen,
         HistoryScreen, ProfileScreen, PartnersScreen, SubscriptionScreen,
-        NotificationsScreen, OnboardingScreen,
+        NotificationsScreen, OnboardingScreen, AskDestinyScreen,
     )
 
     class _Screens:
         home         = HomeScreen(driver)
         chat         = ChatScreen(driver)
         compat       = CompatibilityScreen(driver)
+        ask_destiny  = AskDestinyScreen(driver)
         charts       = ChartsScreen(driver)
         history      = HistoryScreen(driver)
         profile      = ProfileScreen(driver)

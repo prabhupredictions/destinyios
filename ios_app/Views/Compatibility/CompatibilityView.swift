@@ -312,6 +312,35 @@ struct CompatibilityView: View {
             }
         }
         .onAppear {
+            #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("UI_TEST_MODE"),
+               initialMatchItem == nil, initialMatchGroup == nil {
+                let env = ProcessInfo.processInfo.environment
+                if let name = env["E2E_PARTNER_NAME"],
+                   let lat = Double(env["E2E_PARTNER_LAT"] ?? ""),
+                   let lon = Double(env["E2E_PARTNER_LON"] ?? ""),
+                   !name.isEmpty, lat != 0 {
+                    var partner = PartnerData()
+                    partner.name = name
+                    partner.city = env["E2E_PARTNER_CITY"] ?? ""
+                    partner.latitude = lat
+                    partner.longitude = lon
+                    let fmt = DateFormatter()
+                    fmt.dateFormat = "yyyy-MM-dd"
+                    if let dob = env["E2E_PARTNER_DOB"], let date = fmt.date(from: dob) {
+                        partner.birthDate = date
+                        partner.birthDateSet = true
+                    }
+                    let tfmt = DateFormatter()
+                    tfmt.dateFormat = "HH:mm"
+                    if let t = env["E2E_PARTNER_TIME"], let time = tfmt.date(from: t) {
+                        partner.birthTime = time
+                        partner.birthTimeSet = true
+                    }
+                    viewModel.currentPartner = partner
+                }
+            }
+            #endif
             if let item = initialMatchItem, !hasHandledInitialMatch {
                 hasHandledInitialMatch = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

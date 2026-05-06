@@ -144,3 +144,59 @@ class OnboardingScreen(_Base):
         self.find("birth_dob_field").send_keys(dob)
         self.find("birth_time_field").send_keys(time)
         self.find("birth_city_field").send_keys(city)
+
+
+class AskDestinyScreen(_Base):
+    """Page object for AskDestinySheet (floating chat in compatibility result)."""
+
+    def is_visible(self) -> bool:
+        return self.present("ask_destiny_sheet")
+
+    def send(self, text: str):
+        """Type a message and tap send."""
+        field = self.find("compat_chat_input")
+        field.clear()
+        field.send_keys(text)
+        self.tap("compat_send_button")
+
+    def wait_for_ai_response(self, timeout=120) -> str:
+        """Wait until at least one compat_ai_message is present; return its label."""
+        WebDriverWait(self.d, timeout).until(
+            EC.presence_of_element_located((AppiumBy.ACCESSIBILITY_ID, "compat_ai_message"))
+        )
+        msgs = self.finds("compat_ai_message")
+        return msgs[-1].get_attribute("label") if msgs else ""
+
+    def ai_message_count(self) -> int:
+        return len(self.finds("compat_ai_message"))
+
+    def is_cosmic_progress_visible(self) -> bool:
+        return self.present("cosmic_progress_view")
+
+    def wait_for_cosmic_progress(self, timeout=15) -> bool:
+        """Return True if cosmic progress appears within timeout."""
+        try:
+            WebDriverWait(self.d, timeout).until(
+                EC.presence_of_element_located((AppiumBy.ACCESSIBILITY_ID, "cosmic_progress_view"))
+            )
+            return True
+        except Exception:
+            return False
+
+    def tap_followup(self, index: int = 0):
+        """Tap the Nth follow-up suggestion pill."""
+        self.tap(f"followup_row_{index}")
+
+    def has_followup_suggestions(self) -> bool:
+        return self.present("followup_row_0")
+
+    def dismiss(self):
+        """Tap the Done button to close the sheet."""
+        # Find button labelled "Done" (localized via done_action key)
+        try:
+            btn = self.d.find_element(AppiumBy.ACCESSIBILITY_ID, "done_action")
+            btn.click()
+        except Exception:
+            # Fallback: swipe down
+            self.d.execute_script("mobile: swipe", {"direction": "down"})
+

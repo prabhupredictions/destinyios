@@ -232,6 +232,7 @@ struct CompatibilityResultView: View {
                 icon: "bubble.left.and.bubble.right.fill",
                 action: { askDestinyItem = AskDestinyItem(prompt: nil) }
             )
+            .accessibilityIdentifier("ask_destiny_button")
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             

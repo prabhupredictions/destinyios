@@ -956,7 +956,7 @@ struct AskDestinySheet: View {
                 // Cosmic Background
                 CosmicBackgroundView()
                     .ignoresSafeArea()
-                
+
                 VStack(spacing: 0) {
                     // Custom transparent header
                     HStack {
@@ -1077,6 +1077,7 @@ struct AskDestinySheet: View {
                     inputBar
                 }
             }
+            .accessibilityIdentifier("ask_destiny_sheet")
             .navigationBarHidden(true)  // Use custom header
         }
         .onAppear {
@@ -1272,6 +1273,7 @@ struct AskDestinySheet: View {
                     .onSubmit {
                         Task { await sendMessage() }
                     }
+                    .accessibilityIdentifier("compat_chat_input")
 
                 Button {
                     Task { await sendMessage() }
@@ -1282,6 +1284,7 @@ struct AskDestinySheet: View {
                 }
                 .disabled(!canSend)
                 .accessibilityLabel("a11y_send_question".localized)
+                .accessibilityIdentifier("compat_send_button")
             }
 
             // Style selector row
@@ -1331,7 +1334,6 @@ struct AskDestinySheet: View {
             ResponseLengthSheet()
                 .onDisappear { lengthManager = ResponseLengthManager.shared }
         }
-        .accessibilityHidden(true)
     }
     
     private var canSend: Bool {
@@ -1670,6 +1672,7 @@ private struct CompatChatBubble: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+        .accessibilityIdentifier(isUser ? "compat_user_message" : "compat_ai_message")
         .onAppear {
             if enableTypewriter && !typewriterFinished {
                 startTypewriter()
