@@ -98,7 +98,7 @@ struct FullReportSheet: View {
             }
         }
         .sheet(isPresented: $showAskDestiny) {
-            AskDestinySheet(result: result, boyName: boyName, girlName: girlName)
+            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, showFollowUpSuggestions: false)
         }
     }
     
@@ -915,6 +915,7 @@ struct AskDestinySheet: View {
     let boyName: String
     let girlName: String
     var initialPrompt: String? = nil  // V2.5 — pre-fill from "See classical analysis →"
+    var showFollowUpSuggestions: Bool = true  // false when opened from FullReportSheet
     @Environment(\.dismiss) private var dismiss
     
     // Chat State
@@ -1005,7 +1006,7 @@ struct AskDestinySheet: View {
                                     }
 
                                     // Follow-up suggestions (vertical rows matching ChatView)
-                                    if !suggestedQuestions.isEmpty && !isLoading && typewriterMessageId == nil {
+                                    if showFollowUpSuggestions && !suggestedQuestions.isEmpty && !isLoading && typewriterMessageId == nil {
                                         FollowUpSuggestionsView(questions: suggestedQuestions) { question in
                                             HapticManager.shared.play(.light)
                                             isInputFocused = false
@@ -1407,7 +1408,7 @@ struct AskDestinySheet: View {
                 saveMessagesToHistory()  // Persist messages
                 
                 // Set follow-up suggestions from API
-                if let followUps = response.followUpSuggestions, !followUps.isEmpty {
+                if showFollowUpSuggestions, let followUps = response.followUpSuggestions, !followUps.isEmpty {
                     suggestedQuestions = followUps
                 }
             } else if let message = response.message {
@@ -1533,7 +1534,7 @@ struct AskDestinySheet: View {
             typewriterMessageId = aiMessage.id
             messages.append(aiMessage)
             saveMessagesToHistory()
-            if !predictResponse.followUpSuggestions.isEmpty {
+            if showFollowUpSuggestions && !predictResponse.followUpSuggestions.isEmpty {
                 suggestedQuestions = predictResponse.followUpSuggestions
             }
         } catch let error as NetworkError {
