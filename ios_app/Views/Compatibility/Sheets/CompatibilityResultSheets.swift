@@ -1253,83 +1253,71 @@ struct AskDestinySheet: View {
 
     // MARK: - Input Bar
     private var inputBar: some View {
-        VStack(spacing: 10) {
-            // Text field
-            HStack(spacing: 12) {
-                TextField(NSLocalizedString("ask_question_placeholder", comment: ""), text: $inputText)
-                    .font(AppTheme.Fonts.body(size: 15))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                    .focused($isInputFocused)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 24)
-                            .fill(Color.black.opacity(0.4))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 24)
-                                    .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                            )
-                    )
-                    .onSubmit {
-                        Task { await sendMessage() }
-                    }
-                    .accessibilityIdentifier("compat_chat_input")
-
-                Button {
-                    Task { await sendMessage() }
-                } label: {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 36))
-                        .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
-                }
-                .disabled(!canSend)
-                .accessibilityLabel("a11y_send_question".localized)
-                .accessibilityIdentifier("compat_send_button")
-            }
-
-            // Style selector row
-            HStack {
-                Button {
-                    showStyleSelector = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: lengthManager.currentLength.icon)
-                            .font(.system(size: 12))
-                        Text(lengthManager.currentLength.label)
-                            .font(AppTheme.Fonts.body(size: 13).weight(.medium))
-                        Image(systemName: "chevron.up")
-                            .font(.system(size: 10, weight: .bold))
-                            .padding(.leading, 2)
-                    }
-                    .foregroundColor(AppTheme.Colors.gold)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(
-                        Capsule()
-                            .fill(AppTheme.Colors.gold.opacity(0.1))
-                            .overlay(
-                                Capsule()
-                                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
-                            )
-                    )
+        HStack(alignment: .bottom, spacing: 0) {
+            // Style selector icon (left, inside pill — same as ChatInputBar)
+            if !isLoading {
+                Button { showStyleSelector = true } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 40, height: 36)
                 }
                 .buttonStyle(.plain)
-                Spacer()
+                .accessibilityLabel(lengthManager.currentLength.label)
             }
-            .padding(.horizontal, 4)
+
+            // Text field
+            TextField(NSLocalizedString("ask_question_placeholder", comment: ""), text: $inputText, axis: .vertical)
+                .font(AppTheme.Fonts.body(size: 16))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .lineLimit(1...5)
+                .padding(.vertical, 11)
+                .frame(maxWidth: .infinity)
+                .focused($isInputFocused)
+                .onSubmit {
+                    Task { await sendMessage() }
+                }
+                .accessibilityIdentifier("compat_chat_input")
+
+            // Send button (right, inside pill)
+            Button {
+                Task { await sendMessage() }
+            } label: {
+                ZStack {
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                            .scaleEffect(0.75)
+                            .frame(width: 40, height: 36)
+                    } else {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.4))
+                            .frame(width: 40, height: 36)
+                    }
+                }
+            }
+            .disabled(!canSend)
+            .accessibilityLabel("a11y_send_question".localized)
+            .accessibilityIdentifier("compat_send_button")
+            .animation(.spring(response: 0.3), value: canSend)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.leading, 4)
+        .padding(.trailing, 4)
         .background(
-            Rectangle()
-                .fill(AppTheme.Colors.mainBackground.opacity(0.95))
+            RoundedRectangle(cornerRadius: 24)
+                .fill(AppTheme.Colors.inputBackground)
+                .shadow(color: isInputFocused ? AppTheme.Colors.gold.opacity(0.12) : .clear, radius: 8)
                 .overlay(
-                    Rectangle()
-                        .fill(LinearGradient(colors: [Color.white.opacity(0.05), Color.clear], startPoint: .top, endPoint: .bottom))
-                        .frame(height: 1),
-                    alignment: .top
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(isInputFocused ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.25),
+                                lineWidth: isInputFocused ? 1.5 : 1)
                 )
         )
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .padding(.bottom, 4)
+        .background(AppTheme.Colors.mainBackground)
         .sheet(isPresented: $showStyleSelector) {
             ResponseLengthSheet()
                 .onDisappear { lengthManager = ResponseLengthManager.shared }
