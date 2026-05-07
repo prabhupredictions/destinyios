@@ -916,6 +916,7 @@ struct AskDestinySheet: View {
     let girlName: String
     var initialPrompt: String? = nil  // V2.5 — pre-fill from "See classical analysis →"
     var showFollowUpSuggestions: Bool = true  // false when opened from FullReportSheet
+    var initialQuestions: [String] = []  // AI-generated from /analyze; falls back to hardcoded
     @Environment(\.dismiss) private var dismiss
     
     // Chat State
@@ -1214,11 +1215,14 @@ struct AskDestinySheet: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
 
-            // Quick Questions
+            // Quick Questions — AI-generated from /analyze if available, else hardcoded fallbacks
             VStack(spacing: 8) {
-                quickQuestionButton("suggested_q_strengths".localized)
-                quickQuestionButton("suggested_q_challenges".localized)
-                quickQuestionButton("suggested_q_timing".localized)
+                let questions = initialQuestions.isEmpty
+                    ? ["suggested_q_strengths".localized, "suggested_q_challenges".localized, "suggested_q_timing".localized]
+                    : initialQuestions
+                ForEach(questions, id: \.self) { q in
+                    quickQuestionButton(q)
+                }
             }
             .padding(.top, 8)
 

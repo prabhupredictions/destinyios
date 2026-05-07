@@ -177,7 +177,8 @@ struct CompatibilityResponse: Codable, Sendable {
     let adjustedCategory: String?
     let doshaSummary: DoshaSummary?
     let comparisonIndicators: ComparisonIndicators?
-    
+    let followUpSuggestions: [String]?
+
     enum CodingKeys: String, CodingKey {
         case sessionId = "session_id"
         case predictionId = "prediction_id"
@@ -190,6 +191,7 @@ struct CompatibilityResponse: Codable, Sendable {
         case adjustedCategory = "adjusted_category"
         case doshaSummary = "dosha_summary"
         case comparisonIndicators = "comparison_indicators"
+        case followUpSuggestions = "follow_up_suggestions"
         case status
     }
 }

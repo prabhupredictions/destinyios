@@ -316,7 +316,7 @@ struct CompatibilityResultView: View {
             )
         }
         .sheet(item: $askDestinyItem) { item in
-            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, initialPrompt: item.prompt, showFollowUpSuggestions: !isFromComparison)
+            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, initialPrompt: item.prompt, showFollowUpSuggestions: !isFromComparison, initialQuestions: result.initialFollowUpSuggestions)
         }
          .sheet(isPresented: $showHistorySheet) {
             CompatibilityHistorySheet { selectedItem in
