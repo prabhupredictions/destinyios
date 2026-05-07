@@ -26,29 +26,21 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "我在想什么？";
-"tap_to_explore_day" = "点击探索你的一天";
 
 // MARK: - Filter Labels
 "all" = "全部";
-"good" = "好";
 "steady" = "稳定";
 "caution" = "注意";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "主题";
-"current_dasha" = "当前大运";
 
 // MARK: - Life Area Filters
 "love" = "爱情";
 "wealth" = "财富";
 
 // MARK: - Yoga Card Status
-"yoga_status_active" = "活跃";
-"yoga_status_reduced" = "减弱";
-"yoga_status_cancelled" = "取消";
 "yoga_status_inactive" = "不活跃";
-"planets_label" = "行星";
-"houses_label" = "宫位";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "全部";
@@ -406,15 +398,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "无";
-"severity_mild" = "温和的";
-"severity_moderate" = "缓和";
 "severity_high" = "严重";
-"severity_severe" = "严重";
 
 // MARK: - Status Labels
-"status_active" = "有效";
-"status_reduced" = "减弱";
-"status_cancelled" = "取消";
 "active" = "活跃";
 "reduced" = "减弱";
 "cancelled" = "已消除";
@@ -2164,21 +2150,17 @@
 "view_details" = "查看详情";
 "area_label" = "区域";
 "actual_label" = "实际的";
-"adjusted_label" = "调整后";
 "manglik_label" = "曼利克";
 "none_label" = "没有任何";
 "view_label" = "看法";
-"no_profiles_meet_threshold" = "没有配置文件符合建议的阈值。";
 "review_individual_analyses" = "查看下面的个别分析以获取详细见解。";
 "destiny_ai_astrology_brand" = "命运人工智能占星术";
 "compatibility_comparison" = "兼容性比较";
-"copyright_notice" = "© 2026 命运人工智能占星术。版权所有。";
 "description_not_available" = "描述不可用";
 "this_may_take_moments" = "这可能需要一些时间...";
 "pending_label" = "待办的";
 "overridden_due_to_dosha" = "由于 dosha 不兼容而被覆盖";
 "active_doshas" = "主动能量：";
-"dosha_label" = "多沙";
 "rejection_reason_label" = "担忧";
 "additional_notes" = "附加说明：";
 "not_recommended_because" = "不推荐的原因：";
@@ -2412,7 +2394,6 @@
 
 // Yoga/Dosha Status
 "status_active" = "活跃";
-"status_reduced" = "减弱";
 "status_cancelled" = "取消";
 
 // Yoga/Dosha Types
@@ -2913,123 +2894,165 @@
 "progress_oracle_weaving"   = "神谕正在编织您的解读...";
 "progress_connecting"      = "正在连接宇宙...";
 
-// MARK: - New keys (2026-05)
-"account_delete_warning_1" = "您的账户将被永久停用";
-"account_delete_warning_2" = "您将无法再使用此邮箱登录";
-"account_delete_warning_3" = "您的所有数据（聊天记录、配对、出生档案）将无法访问";
-"ashtakoot_tier_average" = "此配对得分 %@/36，处于平均水平。存在可发展的相容性，但某些方面需要有意识地努力。";
-"ashtakoot_tier_below_average" = "%@/36 的得分显示此配对面临明显挑战。虽然爱情可以弥合许多差距，但了解摩擦领域至关重要。";
-"ashtakoot_tier_excellent" = "%@/36 的得分使此配对跻身卓越级别。这极为罕见——两人之间在最高相容层面上的天然默契。";
-"ashtakoot_tier_good" = "%@/36 的得分反映出良好的配对。在最重要的方面具有相容性，但存在一些需要磨合的差异。";
-"ashtakoot_tier_low" = "%@/36 的得分表明关键领域存在重大不相容性。这并不意味着关系无法维持，但双方都需要付出真诚的努力。";
-"ashtakoot_tier_very_good" = "%@/36 是非常好的配对，远高于平均水平。核心相容性强，摩擦点较少。";
-"astrology_settings_subtitle" = "Ayanamsa 与宫位制";
-"ayanamsa_fagan_bradley" = "Fagan-Bradley";
-"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "出生日期、时间和地点";
+"manage_birth_charts_subtitle" = "为 Destiny Matching™ 添加和编辑出生星盘";
+"astrology_settings_subtitle" = "分至点差与宫位系统";
+"notifications_setting_subtitle" = "开启或关闭通知";
+"personalized_alerts_subtitle" = "根据您的星盘自定义提醒";
+"share_analytics_title" = "分享使用分析";
+"share_analytics_subtitle" = "通过分享使用分析帮助改善应用";
+"contact_us_title" = "联系我们";
+"history_cleared_title" = "历史已清除";
+"personalized_alerts_sign_in_prompt" = "登录以启用基于您出生星盘的个性化提醒。";
+"current_plan_label" = "当前套餐";
+
+// Ayanamsa picker options
 "ayanamsa_lahiri" = "Lahiri（最常用）";
 "ayanamsa_raman" = "Raman";
-"birth_chart_limit_reached_title" = "已达出生星盘上限";
-"birth_details_subtitle" = "出生日期、时间及地点";
-"chat_bg_interrupted" = "在后台被中断";
-"chat_starter_career_direction" = "最佳职业方向？";
-"chat_starter_finance" = "财务前景如何？";
-"chat_starter_health_check" = "健康检查";
-"chat_starter_marriage" = "我何时会结婚？";
-"choose_core_label" = "选择核心版";
-"choose_plus_label" = "选择增强版";
-"contact_us_title" = "联系我们";
-"content_style_complete" = "完整星盘详情";
-"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
-"content_style_complete_tagline" = "回应包含完整行星位置、度数、宫位及古典参考文献。";
-"content_style_essentials" = "核心要点";
-"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
-"content_style_essentials_tagline" = "回应包含关键占星细节，如行星与行运信息。";
-"continue_in_language_format" = "继续使用 %@";
-"current_plan_label" = "当前套餐";
-"delete_birth_chart_confirm_title" = "删除出生星盘？";
-"example_label" = "示例";
-"example_question_career" = "\"现在是换工作的好时机吗？\"";
-"history_cleared_title" = "历史记录已清除";
-"house_system_alcabitus" = "Alcabitus";
-"house_system_campanus" = "Campanus";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
 "house_system_equal" = "等宫制";
-"house_system_koch" = "Koch";
-"house_system_morinus" = "Morinus";
+"house_system_whole_sign" = "整星座宫制";
 "house_system_placidus" = "Placidus";
-"house_system_porphyrius" = "Porphyrius";
+"house_system_koch" = "Koch";
 "house_system_regiomontanus" = "Regiomontanus";
-"house_system_whole_sign" = "整宫制";
-"kala_sarpa_name" = "卡拉萨帕";
-"kuta_theme_attraction" = "吸引力与影响力";
-"kuta_theme_destiny" = "命运与福运";
-"kuta_theme_health_progeny" = "健康与子嗣";
-"kuta_theme_intimacy" = "亲密与肉体";
-"kuta_theme_love" = "爱情与情感";
-"kuta_theme_mental" = "精神与友谊";
-"kuta_theme_temperament" = "气质性情";
-"kuta_theme_work" = "工作相容性";
-"life_area_children" = "子女";
-"life_area_emotions" = "情绪";
-"life_area_home_kalsarpa" = "家庭";
-"life_area_mother" = "母亲";
-"life_area_wealth" = "财富";
-"load_earlier_messages" = "加载更早的消息";
-"manage_birth_charts_subtitle" = "为命运配对™添加和编辑出生星盘";
-"mars_influence_present" = "存在火星影响";
-"multi_match_subtitle_format" = "多人配对 · 已比较 %d 位伴侣";
-"no_mars_affliction" = "无火星affliction";
-"notif_alert_prefs_desc" = "告诉命运您希望接收哪些个性化提醒";
-"notif_alert_prefs_title" = "提醒偏好";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "渠道";
+"notif_channels_desc" = "选择您希望接收提醒的方式";
 "notif_channel_email" = "电子邮件";
 "notif_channel_inbox" = "应用内收件箱";
-"notif_channels_desc" = "选择您希望接收提醒的方式";
-"notif_channels_title" = "渠道";
-"notif_delete_alert_title" = "删除提醒";
+"notif_alert_prefs_title" = "提醒偏好";
+"notif_alert_prefs_desc" = "告诉 Destiny 您希望收到哪些个性化提醒";
 "notif_edit_alert_title" = "编辑提醒";
-"notif_new_alert_title" = "新建提醒";
-"notification_action_compat" = "查看配对";
-"notification_action_default" = "查看";
-"notification_action_life_alert" = "查看提醒";
-"notification_action_transit" = "查看行运提醒";
-"notifications_setting_subtitle" = "开启或关闭通知";
+"notif_new_alert_title" = "新提醒";
+"notif_delete_alert_title" = "删除提醒";
+
+// Partner form
 "partner_form_add_title" = "添加出生星盘";
-"partner_form_date_placeholder" = "选择日期";
 "partner_form_edit_title" = "编辑出生星盘";
 "partner_form_name_label" = "姓名";
 "partner_form_name_placeholder" = "输入姓名";
+"partner_form_date_placeholder" = "选择日期";
+"partner_form_time_placeholder" = "选择时间";
 "partner_form_place_placeholder" = "选择城市";
 "partner_form_save_button" = "保存出生星盘";
-"partner_form_time_placeholder" = "选择时间";
-"personalize_alerts_cta" = "个性化提醒";
-"personalized_alerts_sign_in_prompt" = "登录以根据您的出生星盘启用个性化提醒。";
-"personalized_alerts_subtitle" = "根据您的星盘自定义提醒";
-"planetary_hemming" = "行星包围";
-"planets_are_free" = "行星自由";
-"product_not_available_error" = "产品不可用，请稍后再试。";
+
+// Account deletion warnings
+"account_delete_warning_1" = "您的账户将被永久停用";
+"account_delete_warning_2" = "您将无法再次使用此邮箱登录";
+"account_delete_warning_3" = "您的所有数据（聊天、匹配、出生档案）将无法访问";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "删除出生星盘？";
+"birth_chart_limit_reached_title" = "已达出生星盘上限";
+
+// Profile switcher
+"profile_switch_failed_title" = "切换档案失败";
 "profile_switch_failed_message" = "切换档案失败";
-"profile_switch_failed_title" = "档案切换失败";
-"response_length_concise" = "简洁";
-"response_length_concise_desc" = "简短、聚焦的见解";
-"response_length_expanded" = "详尽";
-"response_length_expanded_desc" = "更多背景与说明";
-"response_style_onboarding_subtitle" = "选择您喜欢的风格，可随时在设置中更改。";
-"response_style_onboarding_title_emphasis" = "回应您？";
-"response_style_onboarding_title_prefix" = "命运应如何";
-"response_style_setting_title" = "回答风格";
-"response_style_settings_subtitle" = "选择您喜欢的风格，可随时更改。";
+
+// Partner picker
 "search_birth_charts_placeholder" = "搜索出生星盘...";
-"search_chats_placeholder" = "搜索聊天...";
-"search_history_placeholder" = "搜索历史记录...";
-"select_a_language" = "选择语言";
-"setup_phase_birth_chart" = "正在计算您的出生星盘...";
-"setup_phase_insights" = "正在生成今日洞察...";
-"setup_phase_planetary" = "正在分析行星位置...";
-"setup_phase_ready" = "您的宇宙档案已就绪！";
-"share_analytics_subtitle" = "通过共享使用分析帮助改善应用";
-"share_analytics_title" = "共享使用分析";
-"sign_up_to_personalize_alerts" = "注册以个性化提醒";
-"sound_off_a11y" = "静音";
-"sound_on_a11y" = "开启声音";
+
+// Chat / History
+"load_earlier_messages" = "加载更早的消息";
+"chat_bg_interrupted" = "在后台中断";
+"multi_match_subtitle_format" = "多重匹配 · 比较了 %d 位伴侣";
+"search_history_placeholder" = "搜索历史...";
+"chat_starter_marriage" = "我什么时候会结婚？";
+"chat_starter_career_direction" = "最佳职业方向？";
+"chat_starter_finance" = "财务前景？";
+"chat_starter_health_check" = "健康检查";
+
+// Dosha status section
+"mars_influence_present" = "存在火星影响";
+"no_mars_affliction" = "无火星affliction";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "行星处于自由状态";
+
+// Subscription CTA labels
 "upgrade_scheduled_label" = "升级已安排 ✓";
-"upgrade_to_plus_label" = "升级至增强版";
+"upgrade_to_plus_label" = "升级到 Plus";
+"choose_plus_label" = "选择 Plus";
+"choose_core_label" = "选择 Core";
+"product_not_available_error" = "产品暂不可用，请稍后再试。";
+
+// Notification inbox actions
+"notification_action_transit" = "查看过境提醒";
+"notification_action_life_alert" = "查看提醒";
+"notification_action_compat" = "查看相合度";
+"notification_action_default" = "查看";
+"sign_up_to_personalize_alerts" = "注册以个性化提醒";
+"personalize_alerts_cta" = "个性化提醒";
+
+// Accessibility labels
+"sound_on_a11y" = "声音开启";
+"sound_off_a11y" = "声音关闭";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "正在计算您的出生星盘...";
+"setup_phase_planetary" = "正在分析行星位置...";
+"setup_phase_insights" = "正在生成今日洞察...";
+"setup_phase_ready" = "您的宇宙档案已就绪！";
+
+// Language selection
+"select_a_language" = "选择语言";
+"continue_in_language_format" = "以 %@ 继续";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "工作相合度";
+"kuta_theme_attraction" = "吸引力与影响力";
+"kuta_theme_destiny" = "命运与财富";
+"kuta_theme_intimacy" = "亲密与身体";
+"kuta_theme_mental" = "心灵与友谊";
+"kuta_theme_temperament" = "性情";
+"kuta_theme_love" = "爱情与情感";
+"kuta_theme_health_progeny" = "健康与后代";
+
+// Kalsarpa life areas
+"life_area_mother" = "母亲";
+"life_area_home_kalsarpa" = "家庭";
+"life_area_emotions" = "情感";
+"life_area_wealth" = "财富";
+"life_area_children" = "子女";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "%@/36分将此匹配置于优秀层级。这是罕见的——两人之间在最高相合度层次上的自然协同。";
+"ashtakoot_tier_very_good" = "%@/36是一个远高于平均水平的非常好的匹配。核心相合度强，摩擦领域较少。";
+"ashtakoot_tier_good" = "%@/36的分数反映出良好的匹配。在最重要的领域相合，有一些差异需要调适。";
+"ashtakoot_tier_average" = "此匹配得分%@/36，处于平均范围。有相合度可以发挥，但某些领域需要有意识的努力。";
+"ashtakoot_tier_below_average" = "%@/36时，此匹配面临明显的挑战。虽然爱可以弥合许多事情，但对摩擦领域的意识将会很重要。";
+"ashtakoot_tier_low" = "%@/36表明关键领域存在重大不相容。这并不意味着关系无法运作，但需要双方伴侣付出真诚的努力。";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "回复风格";
+"response_length_concise" = "简洁";
+"response_length_expanded" = "详细";
+"response_length_concise_desc" = "简短、聚焦的洞察";
+"response_length_expanded_desc" = "更多背景和解释";
+"content_style_essentials" = "精华";
+"content_style_complete" = "完整星盘详情";
+"content_style_essentials_tagline" = "包含行星和过境等关键占星细节的回复。";
+"content_style_complete_tagline" = "包含完整行星位置、度数、宫位及古典参考的回复。";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "Destiny 应该如何";
+"response_style_onboarding_title_emphasis" = "回应您？";
+"response_style_onboarding_subtitle" = "选择感觉合适的。您可以随时在设置中更改。";
+"response_style_settings_subtitle" = "选择感觉合适的。您可以随时更改。";
+"example_label" = "示例";
+"example_question_career" = "\"现在是换工作的好时机吗？\"";
+
+// Additional keys for non-EN files
+"search_chats_placeholder" = "搜索聊天...";
 "view_daily_update" = "查看今日更新";
