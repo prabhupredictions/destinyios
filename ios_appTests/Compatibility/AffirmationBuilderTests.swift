@@ -21,9 +21,9 @@ final class AffirmationBuilderTests: XCTestCase {
         let text = AffirmationBuilder(kutas: kutas, adjustedScore: nil, totalScore: 29).affirmationText()
         XCTAssertTrue(text.contains("Nadi, Bhakoot, and Gana"), "Expected all three names: \(text)")
         XCTAssertTrue(text.contains("all score perfectly"), text)
-        XCTAssertTrue(text.contains("health alignment"), text)
-        XCTAssertTrue(text.contains("emotional bonding"), text)
-        XCTAssertTrue(text.contains("temperament compatibility"), text)
+        XCTAssertTrue(text.contains("Health and progeny"), text)
+        XCTAssertTrue(text.contains("Love and emotional"), text)
+        XCTAssertTrue(text.contains("Temperament"), text)
     }
 
     func test_moreThanThreePerfect_capsAtTopThreeByWeight() {
@@ -58,7 +58,7 @@ final class AffirmationBuilderTests: XCTestCase {
         ]
         let text = AffirmationBuilder(kutas: kutas, adjustedScore: nil, totalScore: 24).affirmationText()
         XCTAssertTrue(text.contains("Nadi scores perfectly"), text)
-        XCTAssertTrue(text.contains("strong health alignment"), text)
+        XCTAssertTrue(text.contains("strong Health and progeny"), text)
         XCTAssertTrue(text.contains("24/36"), text)
     }
 
@@ -88,11 +88,11 @@ final class AffirmationBuilderTests: XCTestCase {
         XCTAssertTrue(text.contains("good match"), text)
     }
 
-    func test_zeroPerfect_minimumTier() {
+    func test_zeroPerfect_averageTier() {
         let kutas = [kuta("Nadi", points: 4, max: 8)]
         let text = AffirmationBuilder(kutas: kutas, adjustedScore: nil, totalScore: 19).affirmationText()
         XCTAssertTrue(text.contains("19/36"), text)
-        XCTAssertTrue(text.contains("minimum threshold"), text)
+        XCTAssertTrue(text.contains("average range"), text)
     }
 
     func test_nilAdjustedScore_fallsBackToTotalScore() {
@@ -132,7 +132,7 @@ final class AffirmationBuilderTests: XCTestCase {
         let text = AffirmationBuilder(kutas: kutas, adjustedScore: nil, totalScore: 26).affirmationText()
         // Should be in 1-perfect path with Graha Maitri as the display name
         XCTAssertTrue(text.contains("Graha Maitri"), "Substring match should produce display name: \(text)")
-        XCTAssertTrue(text.contains("mental friendship"), text)
+        XCTAssertTrue(text.contains("Mental and friendship"), text)
     }
 
     func test_perfectWeightOrdering_bhakootBeforeGana() {

@@ -210,15 +210,17 @@ struct ChatView: View {
     }
     
     // MARK: - Starter Questions ("What's in my mind?" from Home)
-    private static let fallbackQuestions = [
-        "chat_starter_marriage".localized,
-        "chat_starter_career_direction".localized,
-        "chat_starter_finance".localized,
-        "chat_starter_health_check".localized
-    ]
-    
+    private var fallbackQuestions: [String] {
+        [
+            "chat_starter_marriage".localized,
+            "chat_starter_career_direction".localized,
+            "chat_starter_finance".localized,
+            "chat_starter_health_check".localized
+        ]
+    }
+
     private var activeStarterQuestions: [String] {
-        let questions = starterQuestions.isEmpty ? Self.fallbackQuestions : Array(starterQuestions.prefix(4))
+        let questions = starterQuestions.isEmpty ? fallbackQuestions : Array(starterQuestions.prefix(4))
         return questions
     }
     
