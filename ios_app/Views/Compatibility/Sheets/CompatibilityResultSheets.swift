@@ -162,7 +162,7 @@ struct FullReportSheet: View {
                     .font(.system(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
-                Text(NSLocalizedString("save_to_files", comment: ""))
+                Text("save_to_files".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
@@ -197,7 +197,7 @@ struct FullReportSheet: View {
                 .scaledToFit()
                 .frame(height: 44)
             
-            Text(NSLocalizedString("destiny_ai_astrology_brand", comment: ""))
+            Text("destiny_ai_astrology_brand".localized)
                 .font(.system(size: 10, weight: .medium, design: .serif))
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                 .tracking(4)
@@ -442,12 +442,12 @@ struct FullReportSheet: View {
                 Image(systemName: "info.circle.fill")
                     .font(.system(size: 11))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                Text(NSLocalizedString("ai_generated_analysis", comment: ""))
+                Text("ai_generated_analysis".localized)
                     .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             }
             
-            Text(NSLocalizedString("ai_disclaimer_text", comment: ""))
+            Text("ai_disclaimer_text".localized)
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
                 .lineSpacing(3)
@@ -638,7 +638,7 @@ struct FullReportSheet: View {
                 .foregroundColor(gold)
                 .tracking(4)
             
-            Text(NSLocalizedString("compatibility_report_title", comment: ""))
+            Text("compatibility_report_title".localized)
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(gold.opacity(0.6))
                 .tracking(3)
@@ -727,7 +727,7 @@ struct FullReportSheet: View {
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(gold.opacity(0.5))
             
-            Text(NSLocalizedString("ai_disclaimer_text", comment: ""))
+            Text("ai_disclaimer_text".localized)
                 .font(.system(size: 8))
                 .foregroundColor(.white.opacity(0.3))
                 .multilineTextAlignment(.center)
@@ -802,7 +802,7 @@ private struct PremiumReportPDFView: View {
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(4)
                 
-                Text(NSLocalizedString("compatibility_report_title", comment: ""))
+                Text("compatibility_report_title".localized)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.6))
                     .tracking(3)
@@ -888,7 +888,7 @@ private struct PremiumReportPDFView: View {
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.5))
                 
-                Text(NSLocalizedString("ai_disclaimer_text", comment: ""))
+                Text("ai_disclaimer_text".localized)
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.3))
                     .multilineTextAlignment(.center)
@@ -1204,11 +1204,11 @@ struct AskDestinySheet: View {
                     .foregroundColor(AppTheme.Colors.gold)
             }
 
-            Text(String(format: NSLocalizedString("ask_about_match_title", comment: ""), boyName, girlName))
+            Text(String(format: "ask_about_match_title".localized, boyName, girlName))
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.textPrimary)
 
-            Text(NSLocalizedString("ask_destiny_welcome", comment: ""))
+            Text("ask_destiny_welcome".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -1268,7 +1268,7 @@ struct AskDestinySheet: View {
             }
 
             // Text field
-            TextField(NSLocalizedString("ask_question_placeholder", comment: ""), text: $inputText, axis: .vertical)
+            TextField("ask_question_placeholder".localized, text: $inputText, axis: .vertical)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .lineLimit(1...5)
@@ -1589,7 +1589,7 @@ struct AskDestinySheet: View {
             var index = 0
             while !Task.isCancelled {
                 let key = Self.cosmicMessageKeys[index % 10]
-                let step = CosmicProgressStep(text: NSLocalizedString(key, comment: ""),
+                let step = CosmicProgressStep(text: LocalizedString.get(key),
                                               displayKey: key, isCompleted: false, isActive: true)
                 withAnimation(.easeInOut(duration: 0.4)) { cosmicProgressSteps = [step] }
                 index += 1
@@ -1610,7 +1610,7 @@ struct AskDestinySheet: View {
             var index = 0
             while !Task.isCancelled {
                 let key = Self.cosmicMessageKeys[index % 10]
-                let step = CosmicProgressStep(text: NSLocalizedString(key, comment: ""),
+                let step = CosmicProgressStep(text: LocalizedString.get(key),
                                               displayKey: key, isCompleted: false, isActive: true)
                 withAnimation(.easeInOut(duration: 0.4)) { redirectCosmicProgressSteps = [step] }
                 index += 1
@@ -1936,7 +1936,7 @@ private struct CompatTypingIndicator: View {
                         .offset(y: animateThird ? -4 : 0)
                 }
                 
-                Text(NSLocalizedString("ai_thinking", comment: ""))
+                Text("ai_thinking".localized)
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }

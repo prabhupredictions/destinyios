@@ -391,7 +391,7 @@ struct KalsarpaDoshaSheet: View {
                     .foregroundColor(AppTheme.Colors.gold)
             }
             Spacer()
-            statusBadge(text: NSLocalizedString("severity_\((data.severity ?? "unknown").lowercased())", comment: ""), color: severityColor(data.severity ?? ""))
+            statusBadge(text: LocalizedString.get("severity_\((data.severity ?? "unknown").lowercased())"), color: severityColor(data.severity ?? ""))
         }
         .padding()
         .background(AppTheme.Colors.inputBackground)

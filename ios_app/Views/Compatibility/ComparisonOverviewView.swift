@@ -792,7 +792,7 @@ struct ComparisonOverviewView: View {
                 Text(String(format: "generated_date_label".localized, dateFormatter.string(from: Date())))
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.3))
-                Text(NSLocalizedString("copyright_notice", comment: ""))
+                Text("copyright_notice".localized)
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.25))
             }

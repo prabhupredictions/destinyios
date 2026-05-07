@@ -639,7 +639,7 @@ struct ExceptionPersonBlock: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 12))
                         .foregroundColor(.orange.opacity(0.8))
-                    Text(String(format: NSLocalizedString(data.activeIntensityFactors.count == 1 ? "intensifying_factor_singular" : "intensifying_factor_plural", comment: ""), data.activeIntensityFactors.count))
+                    Text(String(format: LocalizedString.get(data.activeIntensityFactors.count == 1 ? "intensifying_factor_singular" : "intensifying_factor_plural"), data.activeIntensityFactors.count))
                         .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(.orange.opacity(0.8))
                 }

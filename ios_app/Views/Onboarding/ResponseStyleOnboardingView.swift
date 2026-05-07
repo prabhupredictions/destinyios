@@ -65,18 +65,18 @@ struct ResponseStyleOnboardingView: View {
 
                     // Header
                     VStack(spacing: 10) {
-                        Text(NSLocalizedString("response_style_onboarding_title_prefix", value: "How should Destiny", comment: ""))
+                        Text("response_style_onboarding_title_prefix".localized)
                             .font(AppTheme.Fonts.title(size: 26))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         + Text(" ")
-                        + Text(NSLocalizedString("response_style_onboarding_title_emphasis", value: "respond to you?", comment: ""))
+                        + Text("response_style_onboarding_title_emphasis".localized)
                             .font(.system(size: 26, weight: .semibold).italic())
                             .foregroundColor(AppTheme.Colors.gold)
 
                         Text(
                             isSettingsMode
-                                ? NSLocalizedString("response_style_settings_subtitle", value: "Pick what feels right. You can change this anytime.", comment: "")
-                                : NSLocalizedString("response_style_onboarding_subtitle", value: "Pick what feels right. You can change this anytime in Settings.", comment: "")
+                                ? "response_style_settings_subtitle".localized
+                                : "response_style_onboarding_subtitle".localized
                         )
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
@@ -107,8 +107,8 @@ struct ResponseStyleOnboardingView: View {
                         }
                     } label: {
                         Text(isSettingsMode
-                             ? NSLocalizedString("save_action", value: "Save", comment: "")
-                             : NSLocalizedString("continue", value: "Continue", comment: ""))
+                             ? "save_action".localized
+                             : "continue".localized)
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(AppTheme.Colors.mainBackground)
                             .frame(maxWidth: .infinity)
@@ -175,12 +175,12 @@ struct ResponseStyleOnboardingView: View {
 
                 // Example box
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(NSLocalizedString("example_label", value: "EXAMPLE", comment: ""))
+                    Text("example_label".localized)
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundColor(AppTheme.Colors.textTertiary)
                         .tracking(1.2)
 
-                    Text(NSLocalizedString("example_question_career", value: "\"Is this a good time to switch jobs?\"", comment: ""))
+                    Text("example_question_career".localized)
                         .font(AppTheme.Fonts.body(size: 11).italic())
                         .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
 
