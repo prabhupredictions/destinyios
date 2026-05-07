@@ -135,7 +135,7 @@ struct HistoryView: View {
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .font(.system(size: 15))
                 
-                TextField("Search history...", text: $viewModel.searchText)
+                TextField("search_history_placeholder".localized, text: $viewModel.searchText)
                     .font(AppTheme.Fonts.body(size: 15))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .autocorrectionDisabled()
@@ -312,7 +312,7 @@ struct HistoryRowView: View {
             
             Button(action: onPin) {
                 Label(
-                    isPinned ? "Unpin" : "Pin",
+                    isPinned ? "unpin".localized : "pin".localized,
                     systemImage: isPinned ? "pin.slash" : "pin"
                 )
             }
@@ -321,7 +321,7 @@ struct HistoryRowView: View {
         .contextMenu {
             Button(action: onPin) {
                 Label(
-                    isPinned ? "Unpin" : "Pin",
+                    isPinned ? "unpin".localized : "pin".localized,
                     systemImage: isPinned ? "pin.slash" : "pin"
                 )
             }
@@ -358,7 +358,7 @@ struct HistoryRowView: View {
         case .chat(let thread): return thread.preview
         case .match(_): return "compatibility_match_subtitle".localized
         case .matchGroup(let group):
-            return "Multi-match · \(group.items.count) partners compared"
+            return String(format: "multi_match_subtitle_format".localized, group.items.count)
         }
     }
     

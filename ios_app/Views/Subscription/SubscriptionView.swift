@@ -277,7 +277,7 @@ struct SubscriptionView: View {
     // MARK: - Purchase Action
     private func purchaseSubscription(planId: String) async {
         guard let product = subscriptionManager.monthlyProduct(for: planId) else {
-            errorMessage = "Product not available. Please try again later."
+            errorMessage = "product_not_available_error".localized
             showError = true
             return
         }
@@ -474,7 +474,7 @@ struct PlanCardWithFeatures: View {
                         Image(systemName: "checkmark")
                             .font(AppTheme.Fonts.title(size: 14))
                     }
-                    Text(isPurchasing ? "Processing..." : buttonText)
+                    Text(isPurchasing ? "processing".localized : buttonText)
                         .font(AppTheme.Fonts.title(size: 16))
                 }
                 .foregroundColor(isCurrentPlan ? AppTheme.Colors.textSecondary : AppTheme.Colors.mainBackground)
@@ -520,17 +520,17 @@ struct PlanCardWithFeatures: View {
     private var buttonText: String {
         // Pending upgrade takes priority
         if isPendingUpgrade {
-            return "Upgrade Scheduled ✓"
+            return "upgrade_scheduled_label".localized
         }
         if isCurrentPlan {
-            return "Current Plan"
+            return "current_plan_label".localized
         }
         if isPlus {
             // Plus card: "Choose Plus" for free users, "Upgrade to Plus" for Core users
-            return userCurrentPlanId == "core" ? "Upgrade to Plus" : "Choose Plus"
+            return userCurrentPlanId == "core" ? "upgrade_to_plus_label".localized : "choose_plus_label".localized
         } else {
             // Core card: "Choose Core" for all users
-            return "Choose Core"
+            return "choose_core_label".localized
         }
     }
 }

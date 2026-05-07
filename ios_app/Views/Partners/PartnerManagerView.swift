@@ -59,7 +59,7 @@ struct PartnerManagerView: View {
             }
         }
         .confirmationDialog(
-            "Delete Birth Chart?",
+            "delete_birth_chart_confirm_title".localized,
             isPresented: $showDeleteConfirmation,
             presenting: partnerToDelete
         ) { partner in
@@ -90,7 +90,7 @@ struct PartnerManagerView: View {
         .sheet(isPresented: $showUpgradePrompt) {
             SubscriptionView()
         }
-        .alert("Birth Chart Limit Reached", isPresented: .constant(limitMessage != nil)) {
+        .alert("birth_chart_limit_reached_title".localized, isPresented: .constant(limitMessage != nil)) {
             Button("upgrade_action".localized) {
                 limitMessage = nil
                 showUpgradePrompt = true

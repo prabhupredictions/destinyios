@@ -227,18 +227,9 @@ struct LanguageSelectionView: View {
     
     // MARK: - Helpers
     private var continueButtonText: String {
-        guard let code = selectedCode else { return "Select a language" }
-        switch code {
-        case "hi": return "जारी रखें"
-        case "es": return "Continuar"
-        case "fr": return "Continuer"
-        case "de": return "Weiter"
-        case "pt": return "Continuar"
-        case "ja": return "続ける"
-        case "ru": return "Продолжить"
-        case "zh-Hans": return "继续"
-        default: return "Continue in \(languages.first(where: { $0.code == code })?.name ?? "English")"
-        }
+        guard let code = selectedCode else { return "select_a_language".localized }
+        let nativeName = languages.first(where: { $0.code == code })?.nativeName ?? "English"
+        return String(format: "continue_in_language_format".localized, nativeName)
     }
     
     private func startAnimations() {

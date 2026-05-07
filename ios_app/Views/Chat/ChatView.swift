@@ -211,10 +211,10 @@ struct ChatView: View {
     
     // MARK: - Starter Questions ("What's in my mind?" from Home)
     private static let fallbackQuestions = [
-        "When will I get married?",
-        "Best career direction?",
-        "Financial outlook?",
-        "Health check"
+        "chat_starter_marriage".localized,
+        "chat_starter_career_direction".localized,
+        "chat_starter_finance".localized,
+        "chat_starter_health_check".localized
     ]
     
     private var activeStarterQuestions: [String] {
@@ -341,7 +341,7 @@ struct ChatView: View {
                 } else {
                     VStack(spacing: 24) {
                         if viewModel.windowManager.hasOlderMessages {
-                            Button("Load earlier messages") {
+                            Button("load_earlier_messages".localized) {
                                 // Pagination: future implementation
                             }
                             .accessibilityIdentifier("load_older_button")
@@ -464,7 +464,7 @@ struct ChatView: View {
                 .font(.system(size: 16))
                 .foregroundColor(AppTheme.Colors.gold)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Interrupted in background")
+                Text("chat_bg_interrupted".localized)
                     .font(AppTheme.Fonts.body(size: 12))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                 Text(question)
@@ -477,7 +477,7 @@ struct ChatView: View {
             Button {
                 viewModel.retryInterruptedQuestion()
             } label: {
-                Text("Retry")
+                Text("retry".localized)
                     .font(AppTheme.Fonts.body(size: 13).bold())
                     .foregroundColor(AppTheme.Colors.textOnGold)
                     .padding(.horizontal, 14)
@@ -828,7 +828,7 @@ struct HistoryRow: View {
             
             Button(action: onPin) {
                 Label(
-                    thread.isPinned ? "Unpin" : "Pin",
+                    thread.isPinned ? "unpin".localized : "pin".localized,
                     systemImage: thread.isPinned ? "pin.slash" : "pin"
                 )
             }
@@ -837,7 +837,7 @@ struct HistoryRow: View {
         .contextMenu {
             Button(action: onPin) {
                 Label(
-                    thread.isPinned ? "Unpin" : "Pin",
+                    thread.isPinned ? "unpin".localized : "pin".localized,
                     systemImage: thread.isPinned ? "pin.slash" : "pin"
                 )
             }

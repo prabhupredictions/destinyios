@@ -7,8 +7,8 @@ enum PartnerFormMode {
     
     var title: String {
         switch self {
-        case .add: return "Add Birth Chart"
-        case .edit: return "Edit Birth Chart"
+        case .add: return "partner_form_add_title".localized
+        case .edit: return "partner_form_edit_title".localized
         }
     }
     
@@ -109,9 +109,9 @@ struct PartnerFormView: View {
                     VStack(spacing: 24) {
                         // Name field uses PremiumInputField
                         PremiumInputField(
-                            label: "Name",
+                            label: "partner_form_name_label".localized,
                             icon: "person.circle",
-                            placeholder: "Enter name",
+                            placeholder: "partner_form_name_placeholder".localized,
                             text: $name,
                             isFocused: $isNameFocused
                         )
@@ -119,8 +119,8 @@ struct PartnerFormView: View {
                         // Gender
                         PremiumSelectionRow(
                             icon: "person",
-                            title: "Gender",
-                            value: gender.isEmpty ? "Select Gender" : gender.capitalized,
+                            title: "gender_identity".localized,
+                            value: gender.isEmpty ? "select_gender".localized : gender.capitalized,
                             isPlaceholder: gender.isEmpty
                         ) {
                             isNameFocused = false
@@ -130,8 +130,8 @@ struct PartnerFormView: View {
                         // Date of Birth
                         PremiumSelectionRow(
                             icon: "calendar",
-                            title: "Date of Birth",
-                            value: isDateSelected ? formattedDate : "Select Date",
+                            title: "date_of_birth".localized,
+                            value: isDateSelected ? formattedDate : "partner_form_date_placeholder".localized,
                             isPlaceholder: !isDateSelected
                         ) {
                             isNameFocused = false
@@ -142,8 +142,8 @@ struct PartnerFormView: View {
                         VStack(spacing: 12) {
                             PremiumSelectionRow(
                                 icon: "clock",
-                                title: "Time of Birth",
-                                value: isTimeSelected ? formattedTime : "Select Time",
+                                title: "time_of_birth".localized,
+                                value: isTimeSelected ? formattedTime : "partner_form_time_placeholder".localized,
                                 isDisabled: birthTimeUnknown,
                                 isPlaceholder: !isTimeSelected && !birthTimeUnknown
                             ) {
@@ -238,8 +238,8 @@ struct PartnerFormView: View {
                         // City of Birth
                         PremiumSelectionRow(
                             icon: "location",
-                            title: "Place of Birth",
-                            value: cityOfBirth.isEmpty ? "Select City" : cityOfBirth,
+                            title: "place_of_birth".localized,
+                            value: cityOfBirth.isEmpty ? "partner_form_place_placeholder".localized : cityOfBirth,
                             isPlaceholder: cityOfBirth.isEmpty
                         ) {
                             isNameFocused = false
@@ -249,7 +249,7 @@ struct PartnerFormView: View {
                         Spacer(minLength: 20)
                         
                         // Save Button
-                        ShimmerButton(title: "Save Birth Chart", icon: "checkmark") {
+                        ShimmerButton(title: "partner_form_save_button".localized, icon: "checkmark") {
                             savePartner()
                         }
                         .disabled(!isValid || isSaving)
@@ -286,7 +286,7 @@ struct PartnerFormView: View {
                 HapticManager.shared.play(.light)
             }) {
                 DatePickerSheet(
-                    title: "Date of Birth",
+                    title: "date_of_birth".localized,
                     selection: $dateOfBirth,
                     components: .date
                 )
@@ -296,20 +296,20 @@ struct PartnerFormView: View {
                 HapticManager.shared.play(.light)
             }) {
                 DatePickerSheet(
-                    title: "Time of Birth",
+                    title: "time_of_birth".localized,
                     selection: $timeOfBirth,
                     components: .hourAndMinute
                 )
             }
             .sheet(isPresented: $showGenderSheet) {
                 PremiumSelectionSheet(
-                    title: "Select Gender",
+                    title: "select_gender".localized,
                     selectedValue: $gender,
                     options: [
-                        ("male", "Male"),
-                        ("female", "Female"),
-                        ("non-binary", "Non-binary"),
-                        ("prefer_not_to_say", "Prefer not to say")
+                        ("male", "male".localized),
+                        ("female", "female".localized),
+                        ("non-binary", "non_binary".localized),
+                        ("prefer_not_to_say", "prefer_not_to_say".localized)
                     ],
                     onDismiss: { showGenderSheet = false }
                 )

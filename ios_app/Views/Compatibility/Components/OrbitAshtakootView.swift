@@ -300,18 +300,24 @@ struct OrbitTooltipView: View {
     // MARK: - Helpers
     private var kutaDisplayName: String {
         let names: [String: String] = [
-            "varna": "Varna", "vashya": "Vashya", "tara": "Tara", "yoni": "Yoni",
-            "maitri": "Graha Maitri", "gana": "Gana", "bhakoot": "Bhakoot", "nadi": "Nadi"
+            "varna": "kuta_varna_label".localized, "vashya": "kuta_vashya_label".localized,
+            "tara": "kuta_tara_label".localized, "yoni": "kuta_yoni_label".localized,
+            "maitri": "kuta_maitri_label".localized, "gana": "kuta_gana_label".localized,
+            "bhakoot": "kuta_bhakoot_label".localized, "nadi": "kuta_nadi_label".localized
         ]
         return names[kuta.key] ?? kuta.key.capitalized
     }
 
     private var kutaThemeLabel: String {
         let themes: [String: String] = [
-            "varna": "Work compatibility", "vashya": "Attraction and influence",
-            "tara": "Destiny and fortune", "yoni": "Intimacy and physical",
-            "maitri": "Mental and friendship", "gana": "Temperament",
-            "bhakoot": "Love and emotional", "nadi": "Health and progeny"
+            "varna": "kuta_theme_work".localized,
+            "vashya": "kuta_theme_attraction".localized,
+            "tara": "kuta_theme_destiny".localized,
+            "yoni": "kuta_theme_intimacy".localized,
+            "maitri": "kuta_theme_mental".localized,
+            "gana": "kuta_theme_temperament".localized,
+            "bhakoot": "kuta_theme_love".localized,
+            "nadi": "kuta_theme_health_progeny".localized
         ]
         return themes[kuta.key] ?? kuta.key.capitalized
     }

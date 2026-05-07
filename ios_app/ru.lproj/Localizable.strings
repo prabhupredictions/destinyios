@@ -2912,3 +2912,166 @@
 "progress_cosmic_windows"   = "Космические окна становятся видимыми...";
 "progress_oracle_weaving"   = "Оракул плетёт вашу карту...";
 "progress_connecting"      = "Подключаемся к космосу...";
+
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "Дата, время и место рождения";
+"manage_birth_charts_subtitle" = "Добавление и редактирование натальных карт для Destiny Matching™";
+"astrology_settings_subtitle" = "Аянамша и система домов";
+"notifications_setting_subtitle" = "Включить или выключить уведомления";
+"personalized_alerts_subtitle" = "Настроить уведомления на основе вашей карты";
+"share_analytics_title" = "Делиться аналитикой использования";
+"share_analytics_subtitle" = "Помогите улучшить приложение, делясь аналитикой использования";
+"contact_us_title" = "Связаться с нами";
+"history_cleared_title" = "История очищена";
+"personalized_alerts_sign_in_prompt" = "Войдите, чтобы получать персонализированные уведомления на основе вашей натальной карты.";
+"current_plan_label" = "Текущий план";
+
+// Ayanamsa picker options
+"ayanamsa_lahiri" = "Lahiri (Наиболее распространённый)";
+"ayanamsa_raman" = "Raman";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
+"house_system_equal" = "Равные дома";
+"house_system_whole_sign" = "Целый знак";
+"house_system_placidus" = "Placidus";
+"house_system_koch" = "Koch";
+"house_system_regiomontanus" = "Regiomontanus";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "Каналы";
+"notif_channels_desc" = "Выберите, как вы хотите получать уведомления";
+"notif_channel_email" = "Электронная почта";
+"notif_channel_inbox" = "Входящие в приложении";
+"notif_alert_prefs_title" = "Настройки уведомлений";
+"notif_alert_prefs_desc" = "Расскажите Destiny, о чём вы хотите получать персонализированные уведомления";
+"notif_edit_alert_title" = "Редактировать уведомление";
+"notif_new_alert_title" = "Новое уведомление";
+"notif_delete_alert_title" = "Удалить уведомление";
+
+// Partner form
+"partner_form_add_title" = "Добавить натальную карту";
+"partner_form_edit_title" = "Редактировать натальную карту";
+"partner_form_name_label" = "Имя";
+"partner_form_name_placeholder" = "Введите имя";
+"partner_form_date_placeholder" = "Выбрать дату";
+"partner_form_time_placeholder" = "Выбрать время";
+"partner_form_place_placeholder" = "Выбрать город";
+"partner_form_save_button" = "Сохранить натальную карту";
+
+// Account deletion warnings
+"account_delete_warning_1" = "Ваш аккаунт будет окончательно деактивирован";
+"account_delete_warning_2" = "Вы НЕ сможете войти с этим адресом электронной почты снова";
+"account_delete_warning_3" = "Все ваши данные (чаты, совпадения, профили рождения) станут недоступны";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "Удалить натальную карту?";
+"birth_chart_limit_reached_title" = "Достигнут лимит натальных карт";
+
+// Profile switcher
+"profile_switch_failed_title" = "Не удалось переключить профиль";
+"profile_switch_failed_message" = "Не удалось переключиться на другой профиль";
+
+// Partner picker
+"search_birth_charts_placeholder" = "Поиск натальных карт...";
+
+// Chat / History
+"load_earlier_messages" = "Загрузить более ранние сообщения";
+"chat_bg_interrupted" = "Прервано в фоновом режиме";
+"multi_match_subtitle_format" = "Мульти-совпадение · Сравнение %d партнёров";
+"search_history_placeholder" = "Поиск в истории...";
+"chat_starter_marriage" = "Когда я выйду замуж/женюсь?";
+"chat_starter_career_direction" = "Лучшее направление карьеры?";
+"chat_starter_finance" = "Финансовые перспективы?";
+"chat_starter_health_check" = "Оценка здоровья";
+
+// Dosha status section
+"mars_influence_present" = "Влияние Марса присутствует";
+"no_mars_affliction" = "Нет поражения Марсом";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "Планеты свободны";
+
+// Subscription CTA labels
+"upgrade_scheduled_label" = "Обновление запланировано ✓";
+"upgrade_to_plus_label" = "Перейти на Plus";
+"choose_plus_label" = "Выбрать Plus";
+"choose_core_label" = "Выбрать Core";
+"product_not_available_error" = "Продукт недоступен. Пожалуйста, попробуйте позже.";
+
+// Notification inbox actions
+"notification_action_transit" = "Просмотреть уведомление о транзите";
+"notification_action_life_alert" = "Просмотреть уведомление";
+"notification_action_compat" = "Просмотреть совместимость";
+"notification_action_default" = "Просмотреть";
+"sign_up_to_personalize_alerts" = "Зарегистрируйтесь, чтобы персонализировать уведомления";
+"personalize_alerts_cta" = "Персонализировать уведомления";
+
+// Accessibility labels
+"sound_on_a11y" = "Звук включён";
+"sound_off_a11y" = "Звук выключен";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "Вычисляем вашу натальную карту...";
+"setup_phase_planetary" = "Анализируем положения планет...";
+"setup_phase_insights" = "Формируем прозрения на сегодня...";
+"setup_phase_ready" = "Ваш космический профиль готов!";
+
+// Language selection
+"select_a_language" = "Выбрать язык";
+"continue_in_language_format" = "Продолжить на %@";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "Рабочая совместимость";
+"kuta_theme_attraction" = "Притяжение и влияние";
+"kuta_theme_destiny" = "Судьба и удача";
+"kuta_theme_intimacy" = "Близость и физическое";
+"kuta_theme_mental" = "Умственное и дружба";
+"kuta_theme_temperament" = "Темперамент";
+"kuta_theme_love" = "Любовь и эмоции";
+"kuta_theme_health_progeny" = "Здоровье и потомство";
+
+// Kalsarpa life areas
+"life_area_mother" = "Мать";
+"life_area_home_kalsarpa" = "Дом";
+"life_area_emotions" = "Эмоции";
+"life_area_wealth" = "Богатство";
+"life_area_children" = "Дети";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "%@/36 баллов помещают это совпадение в превосходный уровень. Это редкость — естественная синергия между двумя людьми на высшем уровне совместимости.";
+"ashtakoot_tier_very_good" = "При %@/36 это очень хорошее совпадение, значительно выше среднего. Сильная базовая совместимость с незначительными зонами трений.";
+"ashtakoot_tier_good" = "Оценка %@/36 отражает хорошее совпадение. Совместимы в наиболее важных областях, с некоторыми различиями для преодоления.";
+"ashtakoot_tier_average" = "Это совпадение набирает %@/36, что находится в среднем диапазоне. Есть совместимость, но некоторые области потребуют осознанных усилий.";
+"ashtakoot_tier_below_average" = "При %@/36 это совпадение сталкивается с заметными трудностями. Хотя любовь может многое преодолеть, осознание зон трений будет важным.";
+"ashtakoot_tier_low" = "%@/36 баллов указывает на значительные несовместимости в ключевых областях. Это не означает, что отношения не могут работать, но потребует искренних усилий от обоих партнёров.";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "Стиль ответа";
+"response_length_concise" = "Кратко";
+"response_length_expanded" = "Подробно";
+"response_length_concise_desc" = "Короткие, сфокусированные выводы";
+"response_length_expanded_desc" = "Больше контекста и пояснений";
+"content_style_essentials" = "Основное";
+"content_style_complete" = "Полные данные натальной карты";
+"content_style_essentials_tagline" = "Ответы с ключевыми астрологическими деталями: планеты и транзиты.";
+"content_style_complete_tagline" = "Ответы с полными позициями планет, градусами, расположением в домах и классическими ссылками.";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "Как Destiny должен";
+"response_style_onboarding_title_emphasis" = "отвечать вам?";
+"response_style_onboarding_subtitle" = "Выберите то, что кажется правильным. Вы можете изменить это в любое время в Настройках.";
+"response_style_settings_subtitle" = "Выберите то, что кажется правильным. Вы можете изменить это в любое время.";
+"example_label" = "ПРИМЕР";
+"example_question_career" = "\"Сейчас хорошее время для смены работы?\"";
+
+// Additional keys for non-EN files
+"search_chats_placeholder" = "Поиск чатов...";
+"view_daily_update" = "Посмотреть обновление на сегодня";

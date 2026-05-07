@@ -2913,3 +2913,166 @@
 "progress_cosmic_windows"   = "പ്രപഞ്ച ജാലകങ്ങൾ ദൃശ്യമാകാൻ തുടങ്ങുന്നു...";
 "progress_oracle_weaving"   = "ജ്യോതിഷൻ നിങ്ങളുടെ വായന നെയ്യുന്നു...";
 "progress_connecting"      = "പ്രപഞ്ചവുമായി ബന്ധപ്പെടുന്നു...";
+
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "ജനന തീയതി, സമയം, സ്ഥലം";
+"manage_birth_charts_subtitle" = "Destiny Matching™-നായി ജനന ജാതകങ്ങൾ ചേർക്കുക, തിരുത്തുക";
+"astrology_settings_subtitle" = "അയനാംശവും ഭാവ സംവിധാനവും";
+"notifications_setting_subtitle" = "അറിയിപ്പുകൾ ഓണോ ഓഫോ ആക്കുക";
+"personalized_alerts_subtitle" = "നിങ്ങളുടെ ജാതകത്തിന്റെ അടിസ്ഥാനത്തിൽ അലർട്ടുകൾ ഇഷ്ടാനുസൃതമാക്കുക";
+"share_analytics_title" = "ഉപയോഗ വിശകലനം പങ്കിടുക";
+"share_analytics_subtitle" = "ഉപയോഗ വിശകലനം പങ്കിടുന്നതിലൂടെ ആപ്പ് മെച്ചപ്പെടുത്താൻ സഹായിക്കുക";
+"contact_us_title" = "ഞങ്ങളെ ബന്ധപ്പെടുക";
+"history_cleared_title" = "ചരിത്രം ഇല്ലാതാക്കി";
+"personalized_alerts_sign_in_prompt" = "നിങ്ങളുടെ ജനന ജാതകത്തിന്റെ അടിസ്ഥാനത്തിൽ വ്യക്തിഗത അലർട്ടുകൾ സക്രിയമാക്കാൻ സൈൻ ഇൻ ചെയ്യുക.";
+"current_plan_label" = "നിലവിലെ പ്ലാൻ";
+
+// Ayanamsa picker options
+"ayanamsa_lahiri" = "Lahiri (ഏറ്റവും സാധാരണ)";
+"ayanamsa_raman" = "Raman";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
+"house_system_equal" = "തുല്യ ഭാവങ്ങൾ";
+"house_system_whole_sign" = "മുഴുവൻ രാശി";
+"house_system_placidus" = "Placidus";
+"house_system_koch" = "Koch";
+"house_system_regiomontanus" = "Regiomontanus";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "ചാനലുകൾ";
+"notif_channels_desc" = "അലർട്ടുകൾ എങ്ങനെ ലഭിക്കണമെന്ന് തിരഞ്ഞെടുക്കുക";
+"notif_channel_email" = "ഇമെയിൽ";
+"notif_channel_inbox" = "ആപ്പ് ഇൻബോക്സ്";
+"notif_alert_prefs_title" = "അലർട്ട് മുൻഗണനകൾ";
+"notif_alert_prefs_desc" = "ഏതെല്ലാം വിഷയങ്ങളിൽ വ്യക്തിഗത അലർട്ടുകൾ വേണമെന്ന് Destinyയോട് പറയുക";
+"notif_edit_alert_title" = "അലർട്ട് തിരുത്തുക";
+"notif_new_alert_title" = "പുതിയ അലർട്ട്";
+"notif_delete_alert_title" = "അലർട്ട് ഇല്ലാതാക്കുക";
+
+// Partner form
+"partner_form_add_title" = "ജനന ജാതകം ചേർക്കുക";
+"partner_form_edit_title" = "ജനന ജാതകം തിരുത്തുക";
+"partner_form_name_label" = "പേര്";
+"partner_form_name_placeholder" = "പേര് നൽകുക";
+"partner_form_date_placeholder" = "തീയതി തിരഞ്ഞെടുക്കുക";
+"partner_form_time_placeholder" = "സമയം തിരഞ്ഞെടുക്കുക";
+"partner_form_place_placeholder" = "നഗരം തിരഞ്ഞെടുക്കുക";
+"partner_form_save_button" = "ജനന ജാതകം സേവ് ചെയ്യുക";
+
+// Account deletion warnings
+"account_delete_warning_1" = "നിങ്ങളുടെ അക്കൗണ്ട് സ്ഥിരമായി നിഷ്ക്രിയമാകും";
+"account_delete_warning_2" = "ഈ ഇമെയിൽ ഉപയോഗിച്ച് വീണ്ടും സൈൻ ഇൻ ചെയ്യാൻ സാധ്യമല്ല";
+"account_delete_warning_3" = "നിങ്ങളുടെ എല്ലാ ഡേറ്റയും (ചാറ്റുകൾ, മ്യാച്ചുകൾ, ജനന പ്രൊഫൈലുകൾ) ആക്സസ് ചെയ്യാൻ കഴിയില്ല";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "ജനന ജാതകം ഇല്ലാതാക്കണോ?";
+"birth_chart_limit_reached_title" = "ജനന ജാതകത്തിന്റെ പരിധി എത്തി";
+
+// Profile switcher
+"profile_switch_failed_title" = "പ്രൊഫൈൽ മാറ്റൽ പരാജയപ്പെട്ടു";
+"profile_switch_failed_message" = "പ്രൊഫൈൽ മാറ്റാൻ സാധ്യമായില്ല";
+
+// Partner picker
+"search_birth_charts_placeholder" = "ജനന ജാതകങ്ങൾ തിരയുക...";
+
+// Chat / History
+"load_earlier_messages" = "മുൻ സന്ദേശങ്ങൾ ലോഡ് ചെയ്യുക";
+"chat_bg_interrupted" = "പശ്ചാത്തലത്തിൽ തടസ്സം";
+"multi_match_subtitle_format" = "മൾട്ടി-മ്യാച്ച് · %d പങ്കാളികൾ താരതമ്യം";
+"search_history_placeholder" = "ചരിത്രം തിരയുക...";
+"chat_starter_marriage" = "എനിക്ക് വിവാഹം എപ്പോൾ?";
+"chat_starter_career_direction" = "ഏറ്റവും നല്ല കരിയർ ദിശ?";
+"chat_starter_finance" = "സാമ്പത്തിക കാഴ്ചപ്പാട്?";
+"chat_starter_health_check" = "ആരോഗ്യ പരിശോധന";
+
+// Dosha status section
+"mars_influence_present" = "ചൊവ്വ ദോഷം ഉണ്ട്";
+"no_mars_affliction" = "ചൊവ്വ ദോഷം ഇല്ല";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "ഗ്രഹങ്ങൾ സ്വതന്ത്രം";
+
+// Subscription CTA labels
+"upgrade_scheduled_label" = "അപ്‌ഗ്രേഡ് നിശ്ചയിച്ചു ✓";
+"upgrade_to_plus_label" = "Plus-ലേക്ക് അപ്‌ഗ്രേഡ് ചെയ്യുക";
+"choose_plus_label" = "Plus തിരഞ്ഞെടുക്കുക";
+"choose_core_label" = "Core തിരഞ്ഞെടുക്കുക";
+"product_not_available_error" = "ഉൽപ്പന്നം ലഭ്യമല്ല. ദയവായി പിന്നീട് ശ്രമിക്കുക.";
+
+// Notification inbox actions
+"notification_action_transit" = "ട്രാൻസിറ്റ് അലർട്ട് കാണുക";
+"notification_action_life_alert" = "അലർട്ട് കാണുക";
+"notification_action_compat" = "അനുയോജ്യത കാണുക";
+"notification_action_default" = "കാണുക";
+"sign_up_to_personalize_alerts" = "അലർട്ടുകൾ വ്യക്തിഗതമാക്കാൻ സൈൻ അപ്പ് ചെയ്യുക";
+"personalize_alerts_cta" = "അലർട്ടുകൾ വ്യക്തിഗതമാക്കുക";
+
+// Accessibility labels
+"sound_on_a11y" = "ശബ്ദം ഓൺ";
+"sound_off_a11y" = "ശബ്ദം ഓഫ്";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "നിങ്ങളുടെ ജനന ജാതകം കണക്കാക്കുന്നു...";
+"setup_phase_planetary" = "ഗ്രഹ സ്ഥാനങ്ങൾ വിശകലനം ചെയ്യുന്നു...";
+"setup_phase_insights" = "ഇന്നത്തെ ഉൾക്കാഴ്ചകൾ തയ്യാറാക്കുന്നു...";
+"setup_phase_ready" = "നിങ്ങളുടെ കോസ്മിക് പ്രൊഫൈൽ തയ്യാർ!";
+
+// Language selection
+"select_a_language" = "ഭാഷ തിരഞ്ഞെടുക്കുക";
+"continue_in_language_format" = "%@-ൽ തുടരുക";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "തൊഴിൽ അനുയോജ്യത";
+"kuta_theme_attraction" = "ആകർഷണവും സ്വാധീനവും";
+"kuta_theme_destiny" = "വിധിയും ഭാഗ്യവും";
+"kuta_theme_intimacy" = "ഇഴയടുപ്പവും ശാരീരികവും";
+"kuta_theme_mental" = "മാനസികവും സൗഹൃദവും";
+"kuta_theme_temperament" = "സ്വഭാവം";
+"kuta_theme_love" = "സ്നേഹവും വൈകാരികവും";
+"kuta_theme_health_progeny" = "ആരോഗ്യവും സന്താനവും";
+
+// Kalsarpa life areas
+"life_area_mother" = "അമ്മ";
+"life_area_home_kalsarpa" = "വീട്";
+"life_area_emotions" = "വികാരങ്ങൾ";
+"life_area_wealth" = "സമ്പത്ത്";
+"life_area_children" = "മക്കൾ";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "%@/36 സ്കോർ ഈ ജോഡിയെ മികച്ച തലത്തിൽ നിർത്തുന്നു. ഇത് അപൂർവ്വമാണ് — ഉയർന്ന അനുയോജ്യതാ നിലയിൽ രണ്ട് പേർക്കിടയിലുള്ള പ്രകൃതിദത്ത ഐക്യം.";
+"ashtakoot_tier_very_good" = "%@/36-ൽ ഇത് ശരാശരിക്ക് മുകളിൽ ഒരു നല്ല ജോഡിയാണ്. ചെറിയ ഘർഷണ മേഖലകളോടൊപ്പം ശക്തമായ അടിസ്ഥാന അനുയോജ്യത.";
+"ashtakoot_tier_good" = "%@/36 സ്കോർ ഒരു നല്ല ജോഡിയെ പ്രതിഫലിപ്പിക്കുന്നു. ഏറ്റവും പ്രധാനപ്പെട്ട മേഖലകളിൽ അനുകൂലം, ചില വ്യത്യാസങ്ങൾ നേരിടേണ്ടതുണ്ട്.";
+"ashtakoot_tier_average" = "ഈ ജോഡി %@/36 സ്കോർ നേടുന്നു, ഇത് ശരാശരി ശ്രേണിയിലാണ്. അനുയോജ്യതയുണ്ട്, എന്നാൽ ചില മേഖലകൾക്ക് ബോധപൂർവമായ ശ്രമം ആവശ്യമാണ്.";
+"ashtakoot_tier_below_average" = "%@/36-ൽ ഈ ജോഡി ശ്രദ്ധേയമായ വെല്ലുവിളികൾ നേരിടുന്നു. സ്നേഹത്തിന് പലതും തരണം ചെയ്യാൻ കഴിഞ്ഞേക്കാം, എന്നാൽ ഘർഷണ മേഖലകളെക്കുറിച്ചുള്ള അവബോധം പ്രധാനമാണ്.";
+"ashtakoot_tier_low" = "%@/36 പ്രധാന മേഖലകളിൽ ഗണ്യമായ അസൗകര്യം സൂചിപ്പിക്കുന്നു. ഇതിന്റെ അർത്ഥം ബന്ധം പ്രവർത്തിക്കില്ല എന്നല്ല, പക്ഷേ ഇതിന് ഇരു പങ്കാളികളുടെയും യഥാർഥ ശ്രമം ആവശ്യമാണ്.";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "പ്രതികരണ ശൈലി";
+"response_length_concise" = "സംക്ഷിപ്തം";
+"response_length_expanded" = "വിശദ";
+"response_length_concise_desc" = "ചെറുതും ശ്രദ്ധകേന്ദ്രീകരിച്ചതുമായ ഉൾക്കാഴ്ചകൾ";
+"response_length_expanded_desc" = "കൂടുതൽ സന്ദർഭവും വിശദീകരണവും";
+"content_style_essentials" = "അടിസ്ഥാനകാര്യങ്ങൾ";
+"content_style_complete" = "സമ്പൂർണ ജാതക വിശദാംശങ്ങൾ";
+"content_style_essentials_tagline" = "ഗ്രഹങ്ങളും ഗോചരങ്ങളും പോലുള്ള പ്രധാന ജ്യോതിഷ വിശദാംശങ്ങളുള്ള ഉത്തരങ്ങൾ.";
+"content_style_complete_tagline" = "പൂർണ ഗ്രഹ സ്ഥാനങ്ങൾ, ഡിഗ്രികൾ, ഭാവ സ്ഥാനങ്ങൾ, ക്ലാസിക്കൽ പരാമർശങ്ങൾ എന്നിവ ഉൾക്കൊള്ളുന്ന ഉത്തരങ്ങൾ.";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "Destiny എങ്ങനെ";
+"response_style_onboarding_title_emphasis" = "നിങ്ങൾക്ക് മറുപടി നൽകണോ?";
+"response_style_onboarding_subtitle" = "ശരിയെന്ന് തോന്നുന്നത് തിരഞ്ഞെടുക്കുക. ഇത് ഏത് സമയത്തും ക്രമീകരണങ്ങളിൽ മാറ്റാം.";
+"response_style_settings_subtitle" = "ശരിയെന്ന് തോന്നുന്നത് തിരഞ്ഞെടുക്കുക. ഇത് ഏത് സമയത്തും മാറ്റാം.";
+"example_label" = "ഉദാഹരണം";
+"example_question_career" = "\"ഇപ്പോൾ ജോലി മാറ്റാൻ നല്ല സമയമാണോ?\"";
+
+// Additional keys for non-EN files
+"search_chats_placeholder" = "ചാറ്റുകൾ തിരയുക...";
+"view_daily_update" = "ഇന്നത്തെ അപ്ഡേറ്റ് കാണുക";

@@ -59,7 +59,7 @@ struct NotificationInboxView: View {
             }
             .sheet(isPresented: $showGuestSignInSheet) {
                 GuestSignInPromptView(
-                    message: "Sign in to enable personalized alerts based on your birth chart.",
+                    message: "personalized_alerts_sign_in_prompt".localized,
                     onBack: { showGuestSignInSheet = false }
                 )
             }
@@ -132,7 +132,7 @@ struct NotificationInboxView: View {
                 Image(systemName: isGuestUser ? "person.badge.plus" : "bell.badge")
                     .font(.system(size: 15, weight: .semibold))
                 
-                Text(isGuestUser ? "Sign up to personalize alerts" : "Personalize alerts")
+                Text(isGuestUser ? "sign_up_to_personalize_alerts".localized : "personalize_alerts_cta".localized)
                     .font(.system(size: 16, weight: .semibold))
                 
                 if !isGuestUser {
@@ -392,11 +392,11 @@ struct NotificationDetailSheet: View {
     private func actionButtonLabel(_ type: String) -> String {
         switch type.uppercased() {
         case "DAILY_PREDICTION_READY", "DAILY_PREDICTION": return "view_daily_update".localized
-        case "TRANSIT_ALERT":            return "View Transit Alert"
-        case "LIFE_ALERT":               return "View Alert"
-        case "COMPATIBILITY_READY":      return "View Compatibility"
-        case "SUBSCRIPTION_EXPIRING":    return "Manage Subscription"
-        default:                         return "View"
+        case "TRANSIT_ALERT":            return "notification_action_transit".localized
+        case "LIFE_ALERT":               return "notification_action_life_alert".localized
+        case "COMPATIBILITY_READY":      return "notification_action_compat".localized
+        case "SUBSCRIPTION_EXPIRING":    return "manage_subscription".localized
+        default:                         return "notification_action_default".localized
         }
     }
 }

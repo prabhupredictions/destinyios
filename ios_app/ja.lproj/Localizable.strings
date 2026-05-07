@@ -2913,3 +2913,166 @@
 "progress_cosmic_windows"   = "宇宙の窓が見えてきています...";
 "progress_oracle_weaving"   = "神託があなたのリーディングを紡いでいます...";
 "progress_connecting"      = "宇宙に接続中...";
+
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "生年月日、時刻、出生地";
+"manage_birth_charts_subtitle" = "Destiny Matching™の出生チャートを追加・編集";
+"astrology_settings_subtitle" = "アヤナムサとハウスシステム";
+"notifications_setting_subtitle" = "通知のオン/オフを切り替える";
+"personalized_alerts_subtitle" = "チャートに基づいてアラートをカスタマイズ";
+"share_analytics_title" = "使用状況の分析を共有";
+"share_analytics_subtitle" = "使用状況の分析を共有してアプリの改善にご協力ください";
+"contact_us_title" = "お問い合わせ";
+"history_cleared_title" = "履歴を消去しました";
+"personalized_alerts_sign_in_prompt" = "出生チャートに基づいたパーソナライズされたアラートを有効にするにはサインインしてください。";
+"current_plan_label" = "現在のプラン";
+
+// Ayanamsa picker options
+"ayanamsa_lahiri" = "Lahiri（最も一般的）";
+"ayanamsa_raman" = "Raman";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
+"house_system_equal" = "等分ハウス";
+"house_system_whole_sign" = "ホールサイン";
+"house_system_placidus" = "Placidus";
+"house_system_koch" = "Koch";
+"house_system_regiomontanus" = "Regiomontanus";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "チャンネル";
+"notif_channels_desc" = "アラートの受け取り方を選択";
+"notif_channel_email" = "メール";
+"notif_channel_inbox" = "アプリ内受信箱";
+"notif_alert_prefs_title" = "アラート設定";
+"notif_alert_prefs_desc" = "パーソナライズされたアラートの対象についてDestinyに伝える";
+"notif_edit_alert_title" = "アラートを編集";
+"notif_new_alert_title" = "新しいアラート";
+"notif_delete_alert_title" = "アラートを削除";
+
+// Partner form
+"partner_form_add_title" = "出生チャートを追加";
+"partner_form_edit_title" = "出生チャートを編集";
+"partner_form_name_label" = "名前";
+"partner_form_name_placeholder" = "名前を入力";
+"partner_form_date_placeholder" = "日付を選択";
+"partner_form_time_placeholder" = "時刻を選択";
+"partner_form_place_placeholder" = "都市を選択";
+"partner_form_save_button" = "出生チャートを保存";
+
+// Account deletion warnings
+"account_delete_warning_1" = "アカウントは完全に無効化されます";
+"account_delete_warning_2" = "このメールアドレスで再度サインインすることはできません";
+"account_delete_warning_3" = "すべてのデータ（チャット、マッチ、出生プロフィール）にアクセスできなくなります";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "出生チャートを削除しますか？";
+"birth_chart_limit_reached_title" = "出生チャートの上限に達しました";
+
+// Profile switcher
+"profile_switch_failed_title" = "プロフィール切り替え失敗";
+"profile_switch_failed_message" = "プロフィールの切り替えに失敗しました";
+
+// Partner picker
+"search_birth_charts_placeholder" = "出生チャートを検索...";
+
+// Chat / History
+"load_earlier_messages" = "以前のメッセージを読み込む";
+"chat_bg_interrupted" = "バックグラウンドで中断";
+"multi_match_subtitle_format" = "マルチマッチ · %d人のパートナーを比較";
+"search_history_placeholder" = "履歴を検索...";
+"chat_starter_marriage" = "いつ結婚できますか？";
+"chat_starter_career_direction" = "最適なキャリアの方向は？";
+"chat_starter_finance" = "財務の見通しは？";
+"chat_starter_health_check" = "健康チェック";
+
+// Dosha status section
+"mars_influence_present" = "火星の影響あり";
+"no_mars_affliction" = "火星の苦afflictionなし";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "惑星は自由です";
+
+// Subscription CTA labels
+"upgrade_scheduled_label" = "アップグレード予定 ✓";
+"upgrade_to_plus_label" = "Plusにアップグレード";
+"choose_plus_label" = "Plusを選択";
+"choose_core_label" = "Coreを選択";
+"product_not_available_error" = "商品をご利用いただけません。後ほど再度お試しください。";
+
+// Notification inbox actions
+"notification_action_transit" = "トランジットアラートを表示";
+"notification_action_life_alert" = "アラートを表示";
+"notification_action_compat" = "相性を表示";
+"notification_action_default" = "表示";
+"sign_up_to_personalize_alerts" = "アラートをパーソナライズするにはサインアップ";
+"personalize_alerts_cta" = "アラートをパーソナライズ";
+
+// Accessibility labels
+"sound_on_a11y" = "サウンドオン";
+"sound_off_a11y" = "サウンドオフ";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "出生チャートを計算中...";
+"setup_phase_planetary" = "惑星の位置を分析中...";
+"setup_phase_insights" = "今日のインサイトを生成中...";
+"setup_phase_ready" = "コズミックプロフィールの準備ができました！";
+
+// Language selection
+"select_a_language" = "言語を選択";
+"continue_in_language_format" = "%@で続ける";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "仕事の相性";
+"kuta_theme_attraction" = "引力と影響";
+"kuta_theme_destiny" = "運命と幸運";
+"kuta_theme_intimacy" = "親密さと身体的";
+"kuta_theme_mental" = "精神と友情";
+"kuta_theme_temperament" = "気質";
+"kuta_theme_love" = "愛情と感情";
+"kuta_theme_health_progeny" = "健康と子孫";
+
+// Kalsarpa life areas
+"life_area_mother" = "母親";
+"life_area_home_kalsarpa" = "家庭";
+"life_area_emotions" = "感情";
+"life_area_wealth" = "富";
+"life_area_children" = "子供";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "%@/36点はこのマッチを優秀な層に位置付けます。これは稀なことです — 最高の相性レベルにある二人の間の自然なシナジー。";
+"ashtakoot_tier_very_good" = "%@/36では、これは平均をはるかに上回る非常に良いマッチです。わずかな摩擦エリアがあるものの、強いコアな相性。";
+"ashtakoot_tier_good" = "%@/36のスコアは良いマッチを反映しています。最も重要なエリアで相性が良く、いくつかの違いがあります。";
+"ashtakoot_tier_average" = "このマッチは%@/36のスコアで、平均的な範囲内です。相性はありますが、いくつかのエリアでは意識的な努力が必要です。";
+"ashtakoot_tier_below_average" = "%@/36では、このマッチは注目すべき課題に直面しています。愛は多くのことを繋げることができますが、摩擦エリアへの認識が重要です。";
+"ashtakoot_tier_low" = "%@/36は主要エリアでの重大な不適合を示しています。これは関係が機能しないということではありませんが、両パートナーからの真の努力が必要です。";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "応答スタイル";
+"response_length_concise" = "簡潔";
+"response_length_expanded" = "詳細";
+"response_length_concise_desc" = "短く、焦点を絞ったインサイト";
+"response_length_expanded_desc" = "より多くのコンテキストと説明";
+"content_style_essentials" = "エッセンシャル";
+"content_style_complete" = "完全なホロスコープの詳細";
+"content_style_essentials_tagline" = "惑星やトランジットなどの重要な占星術の詳細を含む応答。";
+"content_style_complete_tagline" = "完全な惑星位置、度数、ハウス配置、古典的参照を含む応答。";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "Destinyは、どのように";
+"response_style_onboarding_title_emphasis" = "応答しますか？";
+"response_style_onboarding_subtitle" = "合っていると思うものを選んでください。設定でいつでも変更できます。";
+"response_style_settings_subtitle" = "合っていると思うものを選んでください。いつでも変更できます。";
+"example_label" = "例";
+"example_question_career" = "「今は転職に良い時期ですか？」";
+
+// Additional keys for non-EN files
+"search_chats_placeholder" = "チャットを検索...";
+"view_daily_update" = "今日の更新を表示";

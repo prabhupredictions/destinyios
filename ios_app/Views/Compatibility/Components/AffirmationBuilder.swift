@@ -41,17 +41,26 @@ struct AffirmationBuilder {
     /// Ordered weight list (descending). Varna (max=1) is intentionally absent.
     private static let weightOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "tara", "vashya"]
 
-    private static let displayNames: [String: String] = [
-        "nadi": "Nadi", "bhakoot": "Bhakoot", "gana": "Gana",
-        "maitri": "Graha Maitri", "yoni": "Yoni", "tara": "Tara", "vashya": "Vashya"
-    ]
+    private var displayNames: [String: String] {
+        [
+            "nadi": "kuta_nadi_label".localized, "bhakoot": "kuta_bhakoot_label".localized,
+            "gana": "kuta_gana_label".localized, "maitri": "kuta_maitri_label".localized,
+            "yoni": "kuta_yoni_label".localized, "tara": "kuta_tara_label".localized,
+            "vashya": "kuta_vashya_label".localized
+        ]
+    }
 
-    private static let themes: [String: String] = [
-        "nadi": "health alignment", "bhakoot": "emotional bonding",
-        "gana": "temperament compatibility", "maitri": "mental friendship",
-        "yoni": "physical compatibility", "tara": "shared fortune",
-        "vashya": "natural attraction"
-    ]
+    private var themes: [String: String] {
+        [
+            "nadi": "kuta_theme_health_progeny".localized,
+            "bhakoot": "kuta_theme_love".localized,
+            "gana": "kuta_theme_temperament".localized,
+            "maitri": "kuta_theme_mental".localized,
+            "yoni": "kuta_theme_intimacy".localized,
+            "tara": "kuta_theme_destiny".localized,
+            "vashya": "kuta_theme_attraction".localized
+        ]
+    }
 
     private struct PerfectKoota {
         let displayName: String
@@ -67,21 +76,28 @@ struct AffirmationBuilder {
             guard let kuta = kutas.first(where: { $0.name.lowercased().contains(key) }),
                   kuta.maxPoints >= 3,
                   kuta.points == kuta.maxPoints else { continue }
-            let displayName = Self.displayNames[key] ?? key.capitalized
-            let theme = Self.themes[key] ?? key
+            let displayName = displayNames[key] ?? key.capitalized
+            let theme = themes[key] ?? key
             result.append(PerfectKoota(displayName: displayName, theme: theme))
         }
         return result
     }
 
     private func scoreTierSentence(score: Int) -> String {
+        let scoreStr = "\(score)"
         switch score {
-        case 26...:
-            return "Scoring \(score)/36 puts this match in the excellent tier — above the 26-point threshold for a strong Vedic match."
-        case 22...25:
-            return "Scoring \(score)/36 is a good match. No critical doshas are active — a solid foundation."
+        case 28...:
+            return String(format: "ashtakoot_tier_excellent".localized, scoreStr)
+        case 24...27:
+            return String(format: "ashtakoot_tier_very_good".localized, scoreStr)
+        case 20...23:
+            return String(format: "ashtakoot_tier_good".localized, scoreStr)
+        case 16...19:
+            return String(format: "ashtakoot_tier_average".localized, scoreStr)
+        case 12...15:
+            return String(format: "ashtakoot_tier_below_average".localized, scoreStr)
         default:
-            return "Scoring \(score)/36 meets the minimum threshold. No critical doshas are blocking this match."
+            return String(format: "ashtakoot_tier_low".localized, scoreStr)
         }
     }
 }

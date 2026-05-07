@@ -374,7 +374,7 @@ struct KalsarpaDoshaSheet: View {
                 // Shared Remedies
                 let allRemedies = Array(Set((bData.remedies ?? []) + (gData.remedies ?? []))).prefix(3).map { String($0) }
                 if !allRemedies.isEmpty {
-                    remediesCard(allRemedies, forName: "Both")
+                    remediesCard(allRemedies, forName: "Both") // TODO: i18n — needs "both_partners" key
                 }
             }
         }

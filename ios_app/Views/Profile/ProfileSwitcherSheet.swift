@@ -105,7 +105,7 @@ struct ProfileSwitcherSheet: View {
                                             if success {
                                                 dismiss()
                                             } else {
-                                                errorMessage = profileContext.switchError ?? "Failed to switch profile"
+                                                errorMessage = profileContext.switchError ?? "profile_switch_failed_message".localized
                                                 if errorMessage?.contains("Upgrade") == true {
                                                     showUpgradePrompt = true
                                                 } else {
@@ -124,7 +124,7 @@ struct ProfileSwitcherSheet: View {
                                             if success {
                                                 dismiss()
                                             } else {
-                                                errorMessage = profileContext.switchError ?? "Failed to switch profile"
+                                                errorMessage = profileContext.switchError ?? "profile_switch_failed_message".localized
                                                 if errorMessage?.contains("Upgrade") == true {
                                                     showUpgradePrompt = true
                                                 } else {
@@ -198,7 +198,7 @@ struct ProfileSwitcherSheet: View {
                 }
             }
         }
-        .alert("Profile Switch Failed", isPresented: $showError) {
+        .alert("profile_switch_failed_title".localized, isPresented: $showError) {
             Button("ok_action".localized, role: .cancel) { }
         } message: {
             Text(errorMessage ?? "Unknown error")

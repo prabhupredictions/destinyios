@@ -51,16 +51,16 @@ struct ChartComparisonSheet: View {
                     Menu {
                         Button(action: { chartStyle = "south" }) {
                             if chartStyle == "south" {
-                                Label("South Indian", systemImage: "checkmark")
+                                Label("south_indian".localized, systemImage: "checkmark")
                             } else {
-                                Text("South Indian")
+                                Text("south_indian".localized)
                             }
                         }
                         Button(action: { chartStyle = "north" }) {
                             if chartStyle == "north" {
-                                Label("North Indian", systemImage: "checkmark")
+                                Label("north_indian".localized, systemImage: "checkmark")
                             } else {
-                                Text("North Indian")
+                                Text("north_indian".localized)
                             }
                         }
                     } label: {

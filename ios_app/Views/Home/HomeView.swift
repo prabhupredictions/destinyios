@@ -500,7 +500,7 @@ struct HomeView: View {
                                         .contentTransition(.symbolEffect(.replace))
                                 }
                             }
-                            .accessibilityLabel(soundManager.isSoundEnabled ? "Sound on" : "Sound off")
+                            .accessibilityLabel(soundManager.isSoundEnabled ? "sound_on_a11y".localized : "sound_off_a11y".localized)
                             .accessibilityHint("Double tap to toggle sound")
                         }
                         
@@ -820,7 +820,7 @@ struct HomeView: View {
         case "pisces": localizedSign = "sign_pi".localized
         default: localizedSign = viewModel.ascendantSign
         }
-        return localizedSign + " " + "Ascendant".localized
+        return localizedSign + " " + "ascendant".localized
     }
     
     // F. What's in my mind? (2×2 Golden Gradient Grid)

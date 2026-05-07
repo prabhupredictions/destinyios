@@ -137,7 +137,7 @@ struct PartnerPickerSheet: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(AppTheme.Colors.gold)
             
-            TextField("Search birth charts...", text: $searchText)
+            TextField("search_birth_charts_placeholder".localized, text: $searchText)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .autocorrectionDisabled()

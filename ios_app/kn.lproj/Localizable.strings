@@ -2912,3 +2912,166 @@
 "progress_cosmic_windows"   = "ಬ್ರಹ್ಮಾಂಡದ ಕಿಟಕಿಗಳು ಗೋಚರಿಸಲು ಆರಂಭವಾಗುತ್ತಿವೆ...";
 "progress_oracle_weaving"   = "ಜ್ಯೋತಿಷಿ ನಿಮ್ಮ ಜ್ಯೋತಿಷ್ಯವನ್ನು ನೇಯ್ಯುತ್ತಿದ್ದಾರೆ...";
 "progress_connecting"      = "ಬ್ರಹ್ಮಾಂಡಕ್ಕೆ ಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ...";
+
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "ಜನ್ಮ ದಿನಾಂಕ, ಸಮಯ ಮತ್ತು ಸ್ಥಳ";
+"manage_birth_charts_subtitle" = "Destiny Matching™ಗಾಗಿ ಜನ್ಮ ಕುಂಡಲಿಗಳನ್ನು ಸೇರಿಸಿ ಮತ್ತು ಸಂಪಾದಿಸಿ";
+"astrology_settings_subtitle" = "ಅಯನಾಂಶ ಮತ್ತು ಭಾವ ವ್ಯವಸ್ಥೆ";
+"notifications_setting_subtitle" = "ಅಧಿಸೂಚನೆಗಳನ್ನು ಆನ್ ಅಥವಾ ಆಫ್ ಮಾಡಿ";
+"personalized_alerts_subtitle" = "ನಿಮ್ಮ ಕುಂಡಲಿ ಆಧಾರದ ಮೇಲೆ ಎಚ್ಚರಿಕೆಗಳನ್ನು ಕಸ್ಟಮೈಸ್ ಮಾಡಿ";
+"share_analytics_title" = "ಬಳಕೆ ವಿಶ್ಲೇಷಣೆ ಹಂಚಿಕೊಳ್ಳಿ";
+"share_analytics_subtitle" = "ಬಳಕೆ ವಿಶ್ಲೇಷಣೆ ಹಂಚಿಕೊಳ್ಳುವ ಮೂಲಕ ಆಪ್ ಸುಧಾರಿಸಲು ಸಹಾಯ ಮಾಡಿ";
+"contact_us_title" = "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ";
+"history_cleared_title" = "ಇತಿಹಾಸ ಅಳಿಸಲಾಗಿದೆ";
+"personalized_alerts_sign_in_prompt" = "ನಿಮ್ಮ ಜನ್ಮ ಕುಂಡಲಿ ಆಧಾರದ ಮೇಲೆ ವೈಯಕ್ತಿಕ ಎಚ್ಚರಿಕೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.";
+"current_plan_label" = "ಪ್ರಸ್ತುತ ಯೋಜನೆ";
+
+// Ayanamsa picker options
+"ayanamsa_lahiri" = "Lahiri (ಅತ್ಯಂತ ಸಾಮಾನ್ಯ)";
+"ayanamsa_raman" = "Raman";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
+"house_system_equal" = "ಸಮಾನ ಭಾವಗಳು";
+"house_system_whole_sign" = "ಸಂಪೂರ್ಣ ರಾಶಿ";
+"house_system_placidus" = "Placidus";
+"house_system_koch" = "Koch";
+"house_system_regiomontanus" = "Regiomontanus";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "ಚಾನೆಲ್‌ಗಳು";
+"notif_channels_desc" = "ನೀವು ಎಚ್ಚರಿಕೆಗಳನ್ನು ಹೇಗೆ ಸ್ವೀಕರಿಸಲು ಬಯಸುತ್ತೀರಿ ಎಂದು ಆಯ್ಕೆ ಮಾಡಿ";
+"notif_channel_email" = "ಇಮೇಲ್";
+"notif_channel_inbox" = "ಇನ್-ಆಪ್ ಇನ್‌ಬಾಕ್ಸ್";
+"notif_alert_prefs_title" = "ಎಚ್ಚರಿಕೆ ಆದ್ಯತೆಗಳು";
+"notif_alert_prefs_desc" = "ನೀವು ಯಾವ ವಿಷಯಗಳ ಬಗ್ಗೆ ವೈಯಕ್ತಿಕ ಎಚ್ಚರಿಕೆಗಳನ್ನು ಬಯಸುತ್ತೀರಿ ಎಂದು Destinyಗೆ ಹೇಳಿ";
+"notif_edit_alert_title" = "ಎಚ್ಚರಿಕೆ ಸಂಪಾದಿಸಿ";
+"notif_new_alert_title" = "ಹೊಸ ಎಚ್ಚರಿಕೆ";
+"notif_delete_alert_title" = "ಎಚ್ಚರಿಕೆ ಅಳಿಸಿ";
+
+// Partner form
+"partner_form_add_title" = "ಜನ್ಮ ಕುಂಡಲಿ ಸೇರಿಸಿ";
+"partner_form_edit_title" = "ಜನ್ಮ ಕುಂಡಲಿ ಸಂಪಾದಿಸಿ";
+"partner_form_name_label" = "ಹೆಸರು";
+"partner_form_name_placeholder" = "ಹೆಸರು ನಮೂದಿಸಿ";
+"partner_form_date_placeholder" = "ದಿನಾಂಕ ಆಯ್ಕೆ ಮಾಡಿ";
+"partner_form_time_placeholder" = "ಸಮಯ ಆಯ್ಕೆ ಮಾಡಿ";
+"partner_form_place_placeholder" = "ನಗರ ಆಯ್ಕೆ ಮಾಡಿ";
+"partner_form_save_button" = "ಜನ್ಮ ಕುಂಡಲಿ ಉಳಿಸಿ";
+
+// Account deletion warnings
+"account_delete_warning_1" = "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಶಾಶ್ವತವಾಗಿ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗುತ್ತದೆ";
+"account_delete_warning_2" = "ನೀವು ಈ ಇಮೇಲ್‌ನೊಂದಿಗೆ ಮತ್ತೆ ಸೈನ್ ಇನ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುವುದಿಲ್ಲ";
+"account_delete_warning_3" = "ನಿಮ್ಮ ಎಲ್ಲಾ ಡೇಟಾ (ಚಾಟ್‌ಗಳು, ಮ್ಯಾಚ್‌ಗಳು, ಜನ್ಮ ಪ್ರೊಫೈಲ್‌ಗಳು) ಪ್ರವೇಶಿಸಲಾಗದಂತಾಗುತ್ತದೆ";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "ಜನ್ಮ ಕುಂಡಲಿ ಅಳಿಸಲೇ?";
+"birth_chart_limit_reached_title" = "ಜನ್ಮ ಕುಂಡಲಿ ಮಿತಿ ತಲುಪಿದೆ";
+
+// Profile switcher
+"profile_switch_failed_title" = "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆ ವಿಫಲವಾಗಿದೆ";
+"profile_switch_failed_message" = "ಪ್ರೊಫೈಲ್ ಬದಲಾಯಿಸಲು ವಿಫಲವಾಗಿದೆ";
+
+// Partner picker
+"search_birth_charts_placeholder" = "ಜನ್ಮ ಕುಂಡಲಿಗಳನ್ನು ಹುಡುಕಿ...";
+
+// Chat / History
+"load_earlier_messages" = "ಹಿಂದಿನ ಸಂದೇಶಗಳನ್ನು ಲೋಡ್ ಮಾಡಿ";
+"chat_bg_interrupted" = "ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಅಡಚಣೆಯಾಗಿದೆ";
+"multi_match_subtitle_format" = "ಮಲ್ಟಿ-ಮ್ಯಾಚ್ · %d ಪಾಲುದಾರರ ಹೋಲಿಕೆ";
+"search_history_placeholder" = "ಇತಿಹಾಸ ಹುಡುಕಿ...";
+"chat_starter_marriage" = "ನನ್ನ ಮದುವೆ ಯಾವಾಗ ಆಗುತ್ತದೆ?";
+"chat_starter_career_direction" = "ಅತ್ಯುತ್ತಮ ವೃತ್ತಿ ನಿರ್ದೇಶನ?";
+"chat_starter_finance" = "ಆರ್ಥಿಕ ದೃಷ್ಟಿಕೋನ?";
+"chat_starter_health_check" = "ಆರೋಗ್ಯ ತಪಾಸಣೆ";
+
+// Dosha status section
+"mars_influence_present" = "ಕುಜ ದೋಷ ಇದೆ";
+"no_mars_affliction" = "ಕುಜ ದೋಷ ಇಲ್ಲ";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "ಗ್ರಹಗಳು ಮುಕ್ತವಾಗಿವೆ";
+
+// Subscription CTA labels
+"upgrade_scheduled_label" = "ಅಪ್‌ಗ್ರೇಡ್ ನಿಗದಿಪಡಿಸಲಾಗಿದೆ ✓";
+"upgrade_to_plus_label" = "Plusಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ";
+"choose_plus_label" = "Plus ಆಯ್ಕೆ ಮಾಡಿ";
+"choose_core_label" = "Core ಆಯ್ಕೆ ಮಾಡಿ";
+"product_not_available_error" = "ಉತ್ಪನ್ನ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+
+// Notification inbox actions
+"notification_action_transit" = "ಟ್ರಾನ್ಸಿಟ್ ಎಚ್ಚರಿಕೆ ನೋಡಿ";
+"notification_action_life_alert" = "ಎಚ್ಚರಿಕೆ ನೋಡಿ";
+"notification_action_compat" = "ಹೊಂದಾಣಿಕೆ ನೋಡಿ";
+"notification_action_default" = "ನೋಡಿ";
+"sign_up_to_personalize_alerts" = "ಎಚ್ಚರಿಕೆಗಳನ್ನು ವೈಯಕ್ತಿಕಗೊಳಿಸಲು ಸೈನ್ ಅಪ್ ಮಾಡಿ";
+"personalize_alerts_cta" = "ಎಚ್ಚರಿಕೆಗಳನ್ನು ವೈಯಕ್ತಿಕಗೊಳಿಸಿ";
+
+// Accessibility labels
+"sound_on_a11y" = "ಧ್ವನಿ ಆನ್";
+"sound_off_a11y" = "ಧ್ವನಿ ಆಫ್";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "ನಿಮ್ಮ ಜನ್ಮ ಕುಂಡಲಿ ಲೆಕ್ಕಾಚಾರ ಮಾಡಲಾಗುತ್ತಿದೆ...";
+"setup_phase_planetary" = "ಗ್ರಹ ಸ್ಥಾನಗಳನ್ನು ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...";
+"setup_phase_insights" = "ಇಂದಿನ ಒಳನೋಟಗಳನ್ನು ರಚಿಸಲಾಗುತ್ತಿದೆ...";
+"setup_phase_ready" = "ನಿಮ್ಮ ಕಾಸ್ಮಿಕ್ ಪ್ರೊಫೈಲ್ ಸಿದ್ಧವಾಗಿದೆ!";
+
+// Language selection
+"select_a_language" = "ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ";
+"continue_in_language_format" = "%@ನಲ್ಲಿ ಮುಂದುವರಿಯಿರಿ";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "ಕಾರ್ಯ ಹೊಂದಾಣಿಕೆ";
+"kuta_theme_attraction" = "ಆಕರ್ಷಣೆ ಮತ್ತು ಪ್ರಭಾವ";
+"kuta_theme_destiny" = "ಭಾಗ್ಯ ಮತ್ತು ಸೌಭಾಗ್ಯ";
+"kuta_theme_intimacy" = "ಆತ್ಮೀಯತೆ ಮತ್ತು ದೈಹಿಕ";
+"kuta_theme_mental" = "ಮಾನಸಿಕ ಮತ್ತು ಸ್ನೇಹ";
+"kuta_theme_temperament" = "ಸ್ವಭಾವ";
+"kuta_theme_love" = "ಪ್ರೇಮ ಮತ್ತು ಭಾವನಾತ್ಮಕ";
+"kuta_theme_health_progeny" = "ಆರೋಗ್ಯ ಮತ್ತು ಸಂತಾನ";
+
+// Kalsarpa life areas
+"life_area_mother" = "ತಾಯಿ";
+"life_area_home_kalsarpa" = "ಮನೆ";
+"life_area_emotions" = "ಭಾವನೆಗಳು";
+"life_area_wealth" = "ಸಂಪತ್ತು";
+"life_area_children" = "ಮಕ್ಕಳು";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "%@/36 ಅಂಕಗಳು ಈ ಜೋಡಿಯನ್ನು ಶ್ರೇಷ್ಠ ಶ್ರೇಣಿಯಲ್ಲಿ ಇರಿಸುತ್ತವೆ. ಇದು ಅಪರೂಪ — ಅತ್ಯುನ್ನತ ಹೊಂದಾಣಿಕೆ ಮಟ್ಟದಲ್ಲಿ ಇಬ್ಬರ ನಡುವಿನ ನೈಸರ್ಗಿಕ ಸಹಕಾರ.";
+"ashtakoot_tier_very_good" = "%@/36ರಲ್ಲಿ ಇದು ಸರಾಸರಿಗಿಂತ ಹೆಚ್ಚಿನ ಬಹಳ ಉತ್ತಮ ಜೋಡಿ. ಅಲ್ಪ ಘರ್ಷಣೆ ಕ್ಷೇತ್ರಗಳೊಂದಿಗೆ ಬಲವಾದ ಮೂಲ ಹೊಂದಾಣಿಕೆ.";
+"ashtakoot_tier_good" = "%@/36 ಅಂಕ ಉತ್ತಮ ಜೋಡಿಯನ್ನು ಪ್ರತಿಬಿಂಬಿಸುತ್ತದೆ. ಅತಿ ಮುಖ್ಯ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಹೊಂದಾಣಿಕೆ, ನ್ಯಾವಿಗೇಟ್ ಮಾಡಲು ಕೆಲವು ವ್ಯತ್ಯಾಸಗಳಿವೆ.";
+"ashtakoot_tier_average" = "ಈ ಜೋಡಿ %@/36 ಅಂಕ ಗಳಿಸುತ್ತದೆ, ಇದು ಸರಾಸರಿ ಶ್ರೇಣಿಯಲ್ಲಿದೆ. ಹೊಂದಾಣಿಕೆ ಇದೆ, ಆದರೆ ಕೆಲವು ಕ್ಷೇತ್ರಗಳಿಗೆ ಪ್ರಜ್ಞಾಪೂರ್ವಕ ಪ್ರಯತ್ನ ಬೇಕಾಗುತ್ತದೆ.";
+"ashtakoot_tier_below_average" = "%@/36ರಲ್ಲಿ ಈ ಜೋಡಿ ಗಮನಾರ್ಹ ಸವಾಲುಗಳನ್ನು ಎದುರಿಸುತ್ತದೆ. ಪ್ರೇಮ ಅನೇಕ ವಿಷಯಗಳನ್ನು ಸೇತುವೆ ಮಾಡಬಹುದಾದರೂ, ಘರ್ಷಣೆ ಕ್ಷೇತ್ರಗಳ ಅರಿವು ಮುಖ್ಯ.";
+"ashtakoot_tier_low" = "%@/36 ಪ್ರಮುಖ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಮಹತ್ವದ ಅಸಾಮರಸ್ಯಗಳನ್ನು ಸೂಚಿಸುತ್ತದೆ. ಇದರ ಅರ್ಥ ಸಂಬಂಧ ಕಾರ್ಯಕಾರಿಯಾಗುವುದಿಲ್ಲ ಎಂದಲ್ಲ, ಆದರೆ ಇದಕ್ಕೆ ಇಬ್ಬರು ಸಂಗಾತಿಗಳಿಂದ ನಿಜವಾದ ಪ್ರಯತ್ನ ಅಗತ್ಯ.";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "ಪ್ರತಿಕ್ರಿಯೆ ಶೈಲಿ";
+"response_length_concise" = "ಸಂಕ್ಷಿಪ್ತ";
+"response_length_expanded" = "ವಿಸ್ತೃತ";
+"response_length_concise_desc" = "ಚಿಕ್ಕ, ಕೇಂದ್ರೀಕೃತ ಒಳನೋಟಗಳು";
+"response_length_expanded_desc" = "ಹೆಚ್ಚು ಸಂದರ್ಭ ಮತ್ತು ವಿವರಣೆ";
+"content_style_essentials" = "ಅಗತ್ಯಾಂಶಗಳು";
+"content_style_complete" = "ಸಂಪೂರ್ಣ ಕುಂಡಲಿ ವಿವರಗಳು";
+"content_style_essentials_tagline" = "ಗ್ರಹಗಳು ಮತ್ತು ಗೋಚರಗಳಂತಹ ಪ್ರಮುಖ ಜ್ಯೋತಿಷ್ಯ ವಿವರಗಳೊಂದಿಗೆ ಉತ್ತರಗಳು.";
+"content_style_complete_tagline" = "ಸಂಪೂರ್ಣ ಗ್ರಹ ಸ್ಥಾನಗಳು, ಡಿಗ್ರಿಗಳು, ಭಾವ ಸ್ಥಾನಗಳು ಮತ್ತು ಶಾಸ್ತ್ರೀಯ ಉಲ್ಲೇಖಗಳೊಂದಿಗೆ ಉತ್ತರಗಳು.";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "Destiny ಹೇಗೆ";
+"response_style_onboarding_title_emphasis" = "ನಿಮಗೆ ಪ್ರತಿಕ್ರಿಯಿಸಬೇಕು?";
+"response_style_onboarding_subtitle" = "ಸರಿ ಅನ್ನಿಸುವುದನ್ನು ಆಯ್ಕೆ ಮಾಡಿ. ಇದನ್ನು ಯಾವಾಗಲಾದರೂ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು.";
+"response_style_settings_subtitle" = "ಸರಿ ಅನ್ನಿಸುವುದನ್ನು ಆಯ್ಕೆ ಮಾಡಿ. ಇದನ್ನು ಯಾವಾಗಲಾದರೂ ಬದಲಾಯಿಸಬಹುದು.";
+"example_label" = "ಉದಾಹರಣೆ";
+"example_question_career" = "\"ಈಗ ಉದ್ಯೋಗ ಬದಲಾಯಿಸಲು ಇದು ಸರಿಯಾದ ಸಮಯವೇ?\"";
+
+// Additional keys for non-EN files
+"search_chats_placeholder" = "ಚಾಟ್‌ಗಳನ್ನು ಹುಡುಕಿ...";
+"view_daily_update" = "ಇಂದಿನ ಅಪ್ಡೇಟ್ ತೋರಿಸಿ";

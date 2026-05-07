@@ -45,15 +45,15 @@ struct DeleteAccountSheet: View {
                     VStack(alignment: .leading, spacing: 14) {
                         warningBullet(
                             icon: "xmark.circle.fill",
-                            text: "Your account will be permanently deactivated"
+                            text: "account_delete_warning_1".localized
                         )
                         warningBullet(
                             icon: "envelope.badge.fill",
-                            text: "You will NOT be able to sign in with this email again"
+                            text: "account_delete_warning_2".localized
                         )
                         warningBullet(
                             icon: "trash.fill",
-                            text: "All your data (chats, matches, birth profiles) will be inaccessible"
+                            text: "account_delete_warning_3".localized
                         )
                     }
                     .padding(.horizontal, 8)

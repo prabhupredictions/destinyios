@@ -163,7 +163,7 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $showGuestSignInForAlerts) {
                 GuestSignInPromptView(
-                    message: "Sign in to enable personalized alerts based on your birth chart.",
+                    message: "personalized_alerts_sign_in_prompt".localized,
                     onBack: { showGuestSignInForAlerts = false }
                 )
                 .environment(authViewModel)
@@ -223,7 +223,7 @@ struct ProfileView: View {
                 Text("clear_history_warning".localized)
                     .font(AppTheme.Fonts.body(size: 15))
             }
-            .alert("History Cleared", isPresented: $showClearSuccessAlert) {
+            .alert("history_cleared_title".localized, isPresented: $showClearSuccessAlert) {
                 Button("ok_action".localized, role: .cancel) {}
             } message: {
                 Text(String(format: clearedThreadCount == 1 ? "deleted_conversation_singular".localized : "deleted_conversation_plural".localized, clearedThreadCount))
@@ -248,7 +248,7 @@ struct ProfileView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(userName.isEmpty ? "Guest User" : userName)
+                    Text(userName.isEmpty ? "guest_user".localized : userName)
                         .font(AppTheme.Fonts.title(size: 20))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
@@ -304,8 +304,8 @@ struct ProfileView: View {
             
             VStack(spacing: 12) {
                 PremiumListItem(
-                    title: "Birth Details",
-                    subtitle: "Date, time, and place of birth",
+                    title: "birth_details".localized,
+                    subtitle: "birth_details_subtitle".localized,
                     icon: "calendar.circle.fill",
                     action: { showBirthDetails = true }
                 )
@@ -314,11 +314,11 @@ struct ProfileView: View {
                 // Manage Birth Charts (Core+)
                 // GUEST RULE: Guests must sign in first to manage birth charts
                 PremiumListItem(
-                    title: "Manage Birth Charts",
-                    subtitle: "Add and edit birth charts for Destiny Matching\u{2122}",
+                    title: "manage_birth_charts".localized,
+                    subtitle: "manage_birth_charts_subtitle".localized,
                     icon: "person.2.fill",
                     isPremiumFeature: true,
-                    premiumBadgeText: isGuestUser ? "Sign Up" : "Core",
+                    premiumBadgeText: isGuestUser ? "sign_up".localized : "Core",
                     premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
@@ -339,7 +339,7 @@ struct ProfileView: View {
                     subtitle: "Viewing as \(ProfileContextManager.shared.activeProfileName)",
                     icon: "arrow.triangle.2.circlepath",
                     isPremiumFeature: true,
-                    premiumBadgeText: isGuestUser ? "Sign Up" : "Plus",
+                    premiumBadgeText: isGuestUser ? "sign_up".localized : "Plus",
                     premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
@@ -365,7 +365,7 @@ struct ProfileView: View {
             
             VStack(spacing: 12) {
                 PremiumListItem(
-                    title: "Language",
+                    title: "language".localized,
                     subtitle: currentLanguageDisplay,
                     icon: "globe",
                     action: { showLanguageSettings = true }
@@ -382,8 +382,8 @@ struct ProfileView: View {
                 
                 if AppTheme.Features.showAstrologySettings {
                     PremiumListItem(
-                        title: "Astrology Settings",
-                        subtitle: "Ayanamsa & House System",
+                        title: "astrology_settings_title".localized,
+                        subtitle: "astrology_settings_subtitle".localized,
                         icon: "star.circle.fill",
                         action: { showAstrologySettings = true }
                     )
@@ -391,8 +391,8 @@ struct ProfileView: View {
                 }
                 
                 PremiumListItem(
-                    title: "Chart Style",
-                    subtitle: chartStyle == "north" ? "North Indian" : "South Indian",
+                    title: "chart_style".localized,
+                    subtitle: chartStyle == "north" ? "north_indian".localized : "south_indian".localized,
                     icon: "square.grid.3x3.fill",
                     action: { showChartStylePicker = true }
                 )
@@ -400,8 +400,8 @@ struct ProfileView: View {
                 
                 // Notifications toggle (available to everyone)
                 PremiumListItem(
-                    title: "Notifications",
-                    subtitle: "Turn notifications on or off",
+                    title: "notifications_title".localized,
+                    subtitle: "notifications_setting_subtitle".localized,
                     icon: "bell.fill",
                     showChevron: false
                 ) {
@@ -422,11 +422,11 @@ struct ProfileView: View {
                 // GUEST RULE: Guests must sign in first to access personalized alerts
                 // Personalized Alerts (Plus-only)
                 PremiumListItem(
-                    title: "Personalized Alerts",
-                    subtitle: "Customize alerts based on your chart",
+                    title: "personalized_alerts_title".localized,
+                    subtitle: "personalized_alerts_subtitle".localized,
                     icon: "bell.badge.fill",
                     isPremiumFeature: true,
-                    premiumBadgeText: isGuestUser ? "Sign Up" : "Plus",
+                    premiumBadgeText: isGuestUser ? "sign_up".localized : "Plus",
                     premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
@@ -442,8 +442,8 @@ struct ProfileView: View {
                 
                 // Analytics Consent Toggle
                 PremiumListItem(
-                    title: "Share Usage Analytics",
-                    subtitle: "Help improve the app by sharing usage analytics",
+                    title: "share_analytics_title".localized,
+                    subtitle: "share_analytics_subtitle".localized,
                     icon: "chart.bar.fill",
                     showChevron: false
                 ) {
@@ -489,7 +489,7 @@ struct ProfileView: View {
                             .font(AppTheme.Fonts.body(size: 16))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         
-                        Text(historySettings.isHistoryEnabled ? "Chats and matches are saved" : "History is turned off")
+                        Text(historySettings.isHistoryEnabled ? "history_chats_saved".localized : "history_turned_off".localized)
                             .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
@@ -598,11 +598,11 @@ struct ProfileView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(isGuestUser ? "Sign Up" : "Upgrade to Premium")
+                        Text(isGuestUser ? "sign_up".localized : "upgrade_to_premium".localized)
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(.white)
 
-                        Text(isGuestUser ? "Save your birth chart & unlock insights" : "Unlock unlimited insights")
+                        Text(isGuestUser ? "save_birth_chart_unlock_insights".localized : "unlock_unlimited_insights".localized)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
@@ -715,7 +715,7 @@ struct ProfileView: View {
                     FAQHelpView()
                 } label: {
                     PremiumListItem<EmptyView>(
-                        title: "FAQ & Help",
+                        title: "faq_and_help".localized,
                         icon: "questionmark.circle.fill",
                         showChevron: true // NavigationLink handles click, but visual needs chevron
                     )
@@ -723,7 +723,7 @@ struct ProfileView: View {
                 .buttonStyle(PlainButtonStyle()) // Important for NavLink wrap
                 
                 PremiumListItem<EmptyView>(
-                    title: "Contact Us",
+                    title: "contact_us_title".localized,
                     icon: "envelope.fill",
                     action: {
                         if let url = URL(string: "https://www.destinyaiastrology.com/#contact") {
@@ -731,9 +731,9 @@ struct ProfileView: View {
                         }
                     }
                 )
-                
+
                 PremiumListItem<EmptyView>(
-                    title: "Privacy Policy",
+                    title: "privacy_policy".localized,
                     icon: "hand.raised.fill",
                     action: {
                         if let url = URL(string: "https://www.destinyaiastrology.com/privacy-policy/") {
@@ -741,9 +741,9 @@ struct ProfileView: View {
                         }
                     }
                 )
-                
+
                 PremiumListItem<EmptyView>(
-                    title: "Terms of Service",
+                    title: "terms_of_service".localized,
                     icon: "doc.text.fill",
                     action: {
                         if let url = URL(string: "https://www.destinyaiastrology.com/terms-of-service/") {

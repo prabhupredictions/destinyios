@@ -25,29 +25,31 @@ struct KutaTextBuilder {
 
     private var kutaName: String {
         let names: [String: String] = [
-            "varna": "Varna", "vashya": "Vashya", "tara": "Tara",
-            "yoni": "Yoni", "maitri": "Graha Maitri", "gana": "Gana",
-            "bhakoot": "Bhakoot", "nadi": "Nadi"
+            "varna": "kuta_varna_label".localized, "vashya": "kuta_vashya_label".localized,
+            "tara": "kuta_tara_label".localized, "yoni": "kuta_yoni_label".localized,
+            "maitri": "kuta_maitri_label".localized, "gana": "kuta_gana_label".localized,
+            "bhakoot": "kuta_bhakoot_label".localized, "nadi": "kuta_nadi_label".localized
         ]
         return names[kuta.key] ?? kuta.key.capitalized
     }
 
     private var score: Int { Int(kuta.score) }
     private var maxScore: Int { Int(kuta.maxScore) }
-    private var displayScore: String { "\(score) out of \(maxScore)" }
+    private var displayScore: String { "\(score) out of \(maxScore)" } // TODO: i18n
 
     // MARK: - Sign name expansion
 
     private func expand(_ value: String) -> String {
+        // Abbreviation → localization key map (note: Cancer abbr is "Cn", key is "sign_ca")
         let map: [String: String] = [
-            "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini", "Cn": "Cancer",
-            "Le": "Leo", "Vi": "Virgo", "Li": "Libra", "Sc": "Scorpio",
-            "Sg": "Sagittarius", "Cp": "Capricorn", "Aq": "Aquarius", "Pi": "Pisces"
+            "Ar": "sign_ar", "Ta": "sign_ta", "Ge": "sign_ge", "Cn": "sign_ca",
+            "Le": "sign_le", "Vi": "sign_vi", "Li": "sign_li", "Sc": "sign_sc",
+            "Sg": "sign_sg", "Cp": "sign_cp", "Aq": "sign_aq", "Pi": "sign_pi"
         ]
         var result = value
-        for (abbr, full) in map {
+        for (abbr, key) in map {
             result = result.replacingOccurrences(
-                of: "\\b\(abbr)\\b", with: full, options: .regularExpression
+                of: "\\b\(abbr)\\b", with: key.localized, options: .regularExpression
             )
         }
         return result
@@ -65,11 +67,13 @@ struct KutaTextBuilder {
     /// Empty string when not cancelled.
     private var adjustedScoreNote: String {
         guard kuta.doshaCancelled else { return "" }
+        // TODO: i18n — needs localized format key
         return "Score restored to \(maxScore)/\(maxScore) — this dosha does not count against your match."
     }
 
     // MARK: - Description paragraph
 
+    // TODO: i18n — long classical description strings below need translation in all 13 languages
     private func buildDescription() -> String {
         var parts: [String] = []
 
@@ -192,6 +196,7 @@ struct KutaTextBuilder {
 
     // MARK: - Classical analysis prompt
 
+    // TODO: i18n — long classical prompt strings below need translation in all 13 languages
     private func buildPrompt() -> String {
         let scoreStr = "\(score)/\(maxScore)"
         let valuesLine = hasValues ? "\(boyName) is \(bv) and \(girlName) is \(gv). " : ""

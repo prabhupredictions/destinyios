@@ -2908,3 +2908,166 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "progress_cosmic_windows"   = "Die kosmischen Fenster werden sichtbar...";
 "progress_oracle_weaving"   = "Das Orakel webt deine Lesung...";
 "progress_connecting"      = "Verbindung zum Kosmos wird hergestellt...";
+
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "Datum, Uhrzeit und Geburtsort";
+"manage_birth_charts_subtitle" = "Geburtshoroskope für Destiny Matching™ hinzufügen und bearbeiten";
+"astrology_settings_subtitle" = "Ayanamsa & Häusersystem";
+"notifications_setting_subtitle" = "Benachrichtigungen ein- oder ausschalten";
+"personalized_alerts_subtitle" = "Benachrichtigungen basierend auf deinem Horoskop anpassen";
+"share_analytics_title" = "Nutzungsanalysen teilen";
+"share_analytics_subtitle" = "Hilf dabei, die App durch das Teilen von Nutzungsanalysen zu verbessern";
+"contact_us_title" = "Kontakt";
+"history_cleared_title" = "Verlauf gelöscht";
+"personalized_alerts_sign_in_prompt" = "Melde dich an, um personalisierte Benachrichtigungen basierend auf deinem Geburtshoroskop zu erhalten.";
+"current_plan_label" = "Aktueller Plan";
+
+// Ayanamsa picker options
+"ayanamsa_lahiri" = "Lahiri (Am häufigsten)";
+"ayanamsa_raman" = "Raman";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
+"house_system_equal" = "Gleiches Häusersystem";
+"house_system_whole_sign" = "Ganzes Zeichen";
+"house_system_placidus" = "Placidus";
+"house_system_koch" = "Koch";
+"house_system_regiomontanus" = "Regiomontanus";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "Kanäle";
+"notif_channels_desc" = "Wähle, wie du Benachrichtigungen erhalten möchtest";
+"notif_channel_email" = "E-Mail";
+"notif_channel_inbox" = "In-App-Posteingang";
+"notif_alert_prefs_title" = "Benachrichtigungseinstellungen";
+"notif_alert_prefs_desc" = "Teile Destiny mit, worüber du personalisierte Benachrichtigungen erhalten möchtest";
+"notif_edit_alert_title" = "Benachrichtigung bearbeiten";
+"notif_new_alert_title" = "Neue Benachrichtigung";
+"notif_delete_alert_title" = "Benachrichtigung löschen";
+
+// Partner form
+"partner_form_add_title" = "Geburtshoroskop hinzufügen";
+"partner_form_edit_title" = "Geburtshoroskop bearbeiten";
+"partner_form_name_label" = "Name";
+"partner_form_name_placeholder" = "Namen eingeben";
+"partner_form_date_placeholder" = "Datum auswählen";
+"partner_form_time_placeholder" = "Uhrzeit auswählen";
+"partner_form_place_placeholder" = "Stadt auswählen";
+"partner_form_save_button" = "Geburtshoroskop speichern";
+
+// Account deletion warnings
+"account_delete_warning_1" = "Dein Konto wird dauerhaft deaktiviert";
+"account_delete_warning_2" = "Du kannst dich NICHT mehr mit dieser E-Mail-Adresse anmelden";
+"account_delete_warning_3" = "Alle deine Daten (Chats, Matches, Geburtsprofile) sind nicht mehr zugänglich";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "Geburtshoroskop löschen?";
+"birth_chart_limit_reached_title" = "Limit für Geburtshoroskope erreicht";
+
+// Profile switcher
+"profile_switch_failed_title" = "Profilwechsel fehlgeschlagen";
+"profile_switch_failed_message" = "Profilwechsel fehlgeschlagen";
+
+// Partner picker
+"search_birth_charts_placeholder" = "Geburtshoroskope suchen...";
+
+// Chat / History
+"load_earlier_messages" = "Frühere Nachrichten laden";
+"chat_bg_interrupted" = "Im Hintergrund unterbrochen";
+"multi_match_subtitle_format" = "Multi-Match · %d Partner verglichen";
+"search_history_placeholder" = "Verlauf durchsuchen...";
+"chat_starter_marriage" = "Wann werde ich heiraten?";
+"chat_starter_career_direction" = "Beste Karriererichtung?";
+"chat_starter_finance" = "Finanzielle Aussichten?";
+"chat_starter_health_check" = "Gesundheitscheck";
+
+// Dosha status section
+"mars_influence_present" = "Mars-Einfluss vorhanden";
+"no_mars_affliction" = "Keine Mars-Beeinträchtigung";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "Planeten sind frei";
+
+// Subscription CTA labels
+"upgrade_scheduled_label" = "Upgrade geplant ✓";
+"upgrade_to_plus_label" = "Auf Plus upgraden";
+"choose_plus_label" = "Plus wählen";
+"choose_core_label" = "Core wählen";
+"product_not_available_error" = "Produkt nicht verfügbar. Bitte versuche es später erneut.";
+
+// Notification inbox actions
+"notification_action_transit" = "Transit-Benachrichtigung anzeigen";
+"notification_action_life_alert" = "Benachrichtigung anzeigen";
+"notification_action_compat" = "Kompatibilität anzeigen";
+"notification_action_default" = "Anzeigen";
+"sign_up_to_personalize_alerts" = "Registriere dich, um Benachrichtigungen zu personalisieren";
+"personalize_alerts_cta" = "Benachrichtigungen personalisieren";
+
+// Accessibility labels
+"sound_on_a11y" = "Ton an";
+"sound_off_a11y" = "Ton aus";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "Dein Geburtshoroskop wird berechnet...";
+"setup_phase_planetary" = "Planetenpositionen werden analysiert...";
+"setup_phase_insights" = "Die heutigen Einblicke werden generiert...";
+"setup_phase_ready" = "Dein kosmisches Profil ist fertig!";
+
+// Language selection
+"select_a_language" = "Sprache auswählen";
+"continue_in_language_format" = "Weiter auf %@";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "Arbeitskompatibilität";
+"kuta_theme_attraction" = "Anziehung und Einfluss";
+"kuta_theme_destiny" = "Schicksal und Glück";
+"kuta_theme_intimacy" = "Intimität und Körperliches";
+"kuta_theme_mental" = "Geist und Freundschaft";
+"kuta_theme_temperament" = "Temperament";
+"kuta_theme_love" = "Liebe und Emotionen";
+"kuta_theme_health_progeny" = "Gesundheit und Nachkommen";
+
+// Kalsarpa life areas
+"life_area_mother" = "Mutter";
+"life_area_home_kalsarpa" = "Zuhause";
+"life_area_emotions" = "Emotionen";
+"life_area_wealth" = "Reichtum";
+"life_area_children" = "Kinder";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "%@/36 Punkte bedeuten, dass diese Verbindung in die hervorragende Kategorie fällt. Das ist selten — eine natürliche Synergie zwischen zwei Menschen auf höchstem Kompatibilitätsniveau.";
+"ashtakoot_tier_very_good" = "Mit %@/36 ist dies eine sehr gute Verbindung, weit überdurchschnittlich. Starke Kernkompatibilität mit geringen Reibungspunkten.";
+"ashtakoot_tier_good" = "Ein Wert von %@/36 zeigt eine gute Verbindung. In den wichtigsten Bereichen kompatibel, mit einigen Unterschieden zu überbrücken.";
+"ashtakoot_tier_average" = "Diese Verbindung erzielt %@/36, was im Durchschnittsbereich liegt. Es gibt Kompatibilität, aber einige Bereiche erfordern bewusste Anstrengung.";
+"ashtakoot_tier_below_average" = "Mit %@/36 steht diese Verbindung vor erheblichen Herausforderungen. Auch wenn Liebe vieles überbrücken kann, ist das Bewusstsein für Reibungspunkte wichtig.";
+"ashtakoot_tier_low" = "%@/36 Punkte weisen auf erhebliche Unverträglichkeiten in wichtigen Bereichen hin. Das bedeutet nicht, dass die Beziehung nicht funktionieren kann, aber sie erfordert echte Anstrengung von beiden Partnern.";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "Antwortstil";
+"response_length_concise" = "Präzise";
+"response_length_expanded" = "Ausführlich";
+"response_length_concise_desc" = "Kurze, fokussierte Einblicke";
+"response_length_expanded_desc" = "Mehr Kontext und Erklärungen";
+"content_style_essentials" = "Das Wesentliche";
+"content_style_complete" = "Vollständige Chartdetails";
+"content_style_essentials_tagline" = "Antworten mit wichtigen astrologischen Details wie Planeten und Transite.";
+"content_style_complete_tagline" = "Antworten mit vollständigen Planetenpositionen, Graden, Hausstellungen und klassischen Referenzen.";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "Wie soll Destiny";
+"response_style_onboarding_title_emphasis" = "antworten?";
+"response_style_onboarding_subtitle" = "Wähle, was sich richtig anfühlt. Du kannst das jederzeit in den Einstellungen ändern.";
+"response_style_settings_subtitle" = "Wähle, was sich richtig anfühlt. Du kannst das jederzeit ändern.";
+"example_label" = "BEISPIEL";
+"example_question_career" = "\"Ist jetzt ein guter Zeitpunkt für einen Jobwechsel?\"";
+
+// Additional keys for non-EN files
+"search_chats_placeholder" = "Chats durchsuchen...";
+"view_daily_update" = "Heutiges Update anzeigen";

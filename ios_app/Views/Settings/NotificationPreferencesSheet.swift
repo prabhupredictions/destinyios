@@ -48,12 +48,12 @@ struct NotificationPreferencesSheet: View {
                         // MARK: - Channels
                         Section {
                             pushNotificationsRow
-                            channelToggle("Email", icon: "envelope.fill", isOn: $viewModel.emailEnabled)
-                            channelToggle("In-App inbox", icon: "tray.fill", isOn: $viewModel.inAppEnabled)
+                            channelToggle("notif_channel_email".localized, icon: "envelope.fill", isOn: $viewModel.emailEnabled)
+                            channelToggle("notif_channel_inbox".localized, icon: "tray.fill", isOn: $viewModel.inAppEnabled)
                         } header: {
                             sectionHeader(
-                                title: "Channels",
-                                description: "Choose how you want to receive alerts"
+                                title: "notif_channels_title".localized,
+                                description: "notif_channels_desc".localized
                             )
                         }
                         
@@ -114,8 +114,8 @@ struct NotificationPreferencesSheet: View {
                             }
                         } header: {
                             sectionHeader(
-                                title: "Alert preferences",
-                                description: "Tell Destiny what you want personalized alerts about"
+                                title: "notif_alert_prefs_title".localized,
+                                description: "notif_alert_prefs_desc".localized
                             )
                         }
                         
@@ -214,7 +214,7 @@ struct NotificationPreferencesSheet: View {
             }
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
-            .alert("Error", isPresented: Binding(
+            .alert("error".localized, isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
                 set: { if !$0 { viewModel.errorMessage = nil } }
             )) {
@@ -222,7 +222,7 @@ struct NotificationPreferencesSheet: View {
             } message: {
                 Text(viewModel.errorMessage ?? "")
             }
-            .alert("Delete Alert", isPresented: $showDeleteConfirmation) {
+            .alert("notif_delete_alert_title".localized, isPresented: $showDeleteConfirmation) {
                 Button("cancel_action".localized, role: .cancel) { alertToDelete = nil }
                 Button("delete_action".localized, role: .destructive) {
                     if let item = alertToDelete {
@@ -633,7 +633,7 @@ struct AddEditAlertSheet: View {
                     .padding(.bottom, 40)
                 }
             }
-            .navigationTitle(isEditing ? "Edit alert" : "New alert")
+            .navigationTitle(isEditing ? "notif_edit_alert_title".localized : "notif_new_alert_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -653,7 +653,7 @@ struct AddEditAlertSheet: View {
                         onSave(item)
                         dismiss()
                     } label: {
-                        Text(isEditing ? "Save" : "Add")
+                        Text(isEditing ? "save_action".localized : "add_action".localized)
                             .fontWeight(.semibold)
                             .foregroundColor(canSave ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                     }

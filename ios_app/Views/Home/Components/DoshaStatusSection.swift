@@ -16,22 +16,22 @@ struct DoshaStatusSection: View {
                     HStack(spacing: 12) {
                         // Mangal Dosha Card
                         PremiumDoshaCard(
-                            title: "Mangal Dosha",
+                            title: "mangal_dosha".localized,
                             status: mangal.hasDosha ? "Active" : "None",
                             severity: mangal.severity,
                             isPositive: !mangal.hasDosha,
                             icon: "flame.fill",
-                            description: mangal.hasDosha ? "Mars influence present" : "No Mars affliction"
+                            description: mangal.hasDosha ? "mars_influence_present".localized : "no_mars_affliction".localized
                         )
-                        
+
                         // Kala Sarpa Card
                         PremiumDoshaCard(
-                            title: "Kala Sarpa",
+                            title: "kala_sarpa_name".localized,
                             status: kala.yogaPresent ? "Active" : "None",
                             severity: kala.severity.capitalized,
                             isPositive: !kala.yogaPresent,
                             icon: "alternatives",
-                            description: kala.yogaPresent ? (kala.yogaType ?? "Planetary Hemming") : "Planets are free"
+                            description: kala.yogaPresent ? (kala.yogaType ?? "planetary_hemming".localized) : "planets_are_free".localized
                         )
                     }
                     .padding(.horizontal, 12)

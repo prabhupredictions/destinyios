@@ -2779,3 +2779,166 @@
 "progress_cosmic_windows"   = "ब्रह्मांडीय द्वार दृश्यमान हो रहे हैं...";
 "progress_oracle_weaving"   = "ज्योतिषी आपकी कुंडली बुन रहे हैं...";
 "progress_connecting"      = "ब्रह्मांड से जुड़ रहे हैं...";
+
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "जन्म की तारीख, समय और स्थान";
+"manage_birth_charts_subtitle" = "Destiny Matching™ के लिए जन्म कुंडली जोड़ें और संपादित करें";
+"astrology_settings_subtitle" = "अयनांश और भाव प्रणाली";
+"notifications_setting_subtitle" = "सूचनाएं चालू या बंद करें";
+"personalized_alerts_subtitle" = "अपनी कुंडली के आधार पर अलर्ट अनुकूलित करें";
+"share_analytics_title" = "उपयोग विश्लेषण साझा करें";
+"share_analytics_subtitle" = "उपयोग विश्लेषण साझा करके ऐप को बेहतर बनाने में मदद करें";
+"contact_us_title" = "हमसे संपर्क करें";
+"history_cleared_title" = "इतिहास साफ किया";
+"personalized_alerts_sign_in_prompt" = "अपनी जन्म कुंडली के आधार पर व्यक्तिगत अलर्ट सक्षम करने के लिए साइन इन करें।";
+"current_plan_label" = "वर्तमान प्लान";
+
+// Ayanamsa picker options
+"ayanamsa_lahiri" = "Lahiri (सबसे सामान्य)";
+"ayanamsa_raman" = "Raman";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
+"house_system_equal" = "समान भाव";
+"house_system_whole_sign" = "पूर्ण राशि";
+"house_system_placidus" = "Placidus";
+"house_system_koch" = "Koch";
+"house_system_regiomontanus" = "Regiomontanus";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "चैनल";
+"notif_channels_desc" = "चुनें कि आप अलर्ट कैसे प्राप्त करना चाहते हैं";
+"notif_channel_email" = "ईमेल";
+"notif_channel_inbox" = "इन-ऐप इनबॉक्स";
+"notif_alert_prefs_title" = "अलर्ट प्राथमिकताएं";
+"notif_alert_prefs_desc" = "Destiny को बताएं कि आप किन विषयों पर व्यक्तिगत अलर्ट चाहते हैं";
+"notif_edit_alert_title" = "अलर्ट संपादित करें";
+"notif_new_alert_title" = "नया अलर्ट";
+"notif_delete_alert_title" = "अलर्ट हटाएं";
+
+// Partner form
+"partner_form_add_title" = "जन्म कुंडली जोड़ें";
+"partner_form_edit_title" = "जन्म कुंडली संपादित करें";
+"partner_form_name_label" = "नाम";
+"partner_form_name_placeholder" = "नाम दर्ज करें";
+"partner_form_date_placeholder" = "तारीख चुनें";
+"partner_form_time_placeholder" = "समय चुनें";
+"partner_form_place_placeholder" = "शहर चुनें";
+"partner_form_save_button" = "जन्म कुंडली सहेजें";
+
+// Account deletion warnings
+"account_delete_warning_1" = "आपका खाता स्थायी रूप से निष्क्रिय हो जाएगा";
+"account_delete_warning_2" = "आप इस ईमेल से दोबारा साइन इन नहीं कर पाएंगे";
+"account_delete_warning_3" = "आपके सभी डेटा (चैट, मैच, जन्म प्रोफाइल) अनुपलब्ध हो जाएंगे";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "जन्म कुंडली हटाएं?";
+"birth_chart_limit_reached_title" = "जन्म कुंडली की सीमा पहुंच गई";
+
+// Profile switcher
+"profile_switch_failed_title" = "प्रोफाइल स्विच विफल";
+"profile_switch_failed_message" = "प्रोफाइल स्विच करने में विफल";
+
+// Partner picker
+"search_birth_charts_placeholder" = "जन्म कुंडली खोजें...";
+
+// Chat / History
+"load_earlier_messages" = "पुराने संदेश लोड करें";
+"chat_bg_interrupted" = "पृष्ठभूमि में बाधित";
+"multi_match_subtitle_format" = "मल्टी-मैच · %d साझेदारों की तुलना";
+"search_history_placeholder" = "इतिहास खोजें...";
+"chat_starter_marriage" = "मेरी शादी कब होगी?";
+"chat_starter_career_direction" = "सबसे अच्छी करियर दिशा?";
+"chat_starter_finance" = "वित्तीय संभावनाएं?";
+"chat_starter_health_check" = "स्वास्थ्य जांच";
+
+// Dosha status section
+"mars_influence_present" = "मंगल का प्रभाव है";
+"no_mars_affliction" = "मंगल दोष नहीं";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "ग्रह मुक्त हैं";
+
+// Subscription CTA labels
+"upgrade_scheduled_label" = "अपग्रेड निर्धारित ✓";
+"upgrade_to_plus_label" = "Plus में अपग्रेड करें";
+"choose_plus_label" = "Plus चुनें";
+"choose_core_label" = "Core चुनें";
+"product_not_available_error" = "उत्पाद उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।";
+
+// Notification inbox actions
+"notification_action_transit" = "ट्रांजिट अलर्ट देखें";
+"notification_action_life_alert" = "अलर्ट देखें";
+"notification_action_compat" = "अनुकूलता देखें";
+"notification_action_default" = "देखें";
+"sign_up_to_personalize_alerts" = "अलर्ट वैयक्तिकृत करने के लिए साइन अप करें";
+"personalize_alerts_cta" = "अलर्ट वैयक्तिकृत करें";
+
+// Accessibility labels
+"sound_on_a11y" = "ध्वनि चालू";
+"sound_off_a11y" = "ध्वनि बंद";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "आपकी जन्म कुंडली की गणना हो रही है...";
+"setup_phase_planetary" = "ग्रहों की स्थिति का विश्लेषण हो रहा है...";
+"setup_phase_insights" = "आज की अंतर्दृष्टि तैयार हो रही है...";
+"setup_phase_ready" = "आपकी कॉस्मिक प्रोफाइल तैयार है!";
+
+// Language selection
+"select_a_language" = "भाषा चुनें";
+"continue_in_language_format" = "%@ में जारी रखें";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "कार्य अनुकूलता";
+"kuta_theme_attraction" = "आकर्षण और प्रभाव";
+"kuta_theme_destiny" = "भाग्य और समृद्धि";
+"kuta_theme_intimacy" = "अंतरंगता और शारीरिक";
+"kuta_theme_mental" = "मानसिक और मित्रता";
+"kuta_theme_temperament" = "स्वभाव";
+"kuta_theme_love" = "प्रेम और भावनात्मक";
+"kuta_theme_health_progeny" = "स्वास्थ्य और संतान";
+
+// Kalsarpa life areas
+"life_area_mother" = "माता";
+"life_area_home_kalsarpa" = "घर";
+"life_area_emotions" = "भावनाएं";
+"life_area_wealth" = "धन";
+"life_area_children" = "संतान";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "%@/36 अंक इस मिलान को उत्कृष्ट श्रेणी में रखते हैं। यह दुर्लभ है — दो लोगों के बीच सर्वोच्च अनुकूलता स्तर पर एक प्राकृतिक सहयोग।";
+"ashtakoot_tier_very_good" = "%@/36 पर यह एक बहुत अच्छा मिलान है, औसत से काफी ऊपर। मजबूत मूल अनुकूलता और मामूली घर्षण क्षेत्र।";
+"ashtakoot_tier_good" = "%@/36 का स्कोर एक अच्छे मिलान को दर्शाता है। सबसे महत्वपूर्ण क्षेत्रों में अनुकूल, कुछ मतभेदों के साथ।";
+"ashtakoot_tier_average" = "यह मिलान %@/36 अंक प्राप्त करता है, जो औसत श्रेणी में है। अनुकूलता है, लेकिन कुछ क्षेत्रों में सचेत प्रयास की आवश्यकता होगी।";
+"ashtakoot_tier_below_average" = "%@/36 पर, यह मिलान उल्लेखनीय चुनौतियों का सामना करता है। प्रेम कई चीजें जोड़ सकता है, लेकिन घर्षण क्षेत्रों की जागरूकता मायने रखेगी।";
+"ashtakoot_tier_low" = "%@/36 अंक प्रमुख क्षेत्रों में महत्वपूर्ण असंगतताओं का संकेत देते हैं। इसका मतलब यह नहीं है कि रिश्ता काम नहीं कर सकता, लेकिन इसके लिए दोनों साझेदारों की ओर से वास्तविक प्रयास की आवश्यकता होगी।";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "उत्तर शैली";
+"response_length_concise" = "संक्षिप्त";
+"response_length_expanded" = "विस्तृत";
+"response_length_concise_desc" = "छोटी, केंद्रित अंतर्दृष्टि";
+"response_length_expanded_desc" = "अधिक संदर्भ और स्पष्टीकरण";
+"content_style_essentials" = "मूल बातें";
+"content_style_complete" = "पूरी कुंडली विवरण";
+"content_style_essentials_tagline" = "ग्रहों और गोचरों जैसे प्रमुख ज्योतिषीय विवरणों के साथ उत्तर।";
+"content_style_complete_tagline" = "पूर्ण ग्रह स्थितियों, अंशों, भाव स्थानों और शास्त्रीय संदर्भों के साथ उत्तर।";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "Destiny कैसे";
+"response_style_onboarding_title_emphasis" = "आपको जवाब दे?";
+"response_style_onboarding_subtitle" = "जो सही लगे वह चुनें। आप इसे कभी भी सेटिंग में बदल सकते हैं।";
+"response_style_settings_subtitle" = "जो सही लगे वह चुनें। आप इसे कभी भी बदल सकते हैं।";
+"example_label" = "उदाहरण";
+"example_question_career" = "\"क्या अभी नौकरी बदलने का सही समय है?\"";
+
+// Additional keys for non-EN files
+"search_chats_placeholder" = "चैट खोजें...";
+"view_daily_update" = "आज का अपडेट देखें";

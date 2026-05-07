@@ -2879,3 +2879,162 @@
 "progress_cosmic_windows"   = "The cosmic windows are becoming visible...";
 "progress_oracle_weaving"   = "The oracle is weaving your reading...";
 "progress_connecting"      = "Connecting to the cosmos...";
+
+// MARK: - Localization additions (2026-05)
+
+// Profile settings section subtitles
+"birth_details_subtitle" = "Date, time, and place of birth";
+"manage_birth_charts_subtitle" = "Add and edit birth charts for Destiny Matching™";
+"astrology_settings_subtitle" = "Ayanamsa & House System";
+"notifications_setting_subtitle" = "Turn notifications on or off";
+"personalized_alerts_subtitle" = "Customize alerts based on your chart";
+"share_analytics_title" = "Share Usage Analytics";
+"share_analytics_subtitle" = "Help improve the app by sharing usage analytics";
+"contact_us_title" = "Contact Us";
+"history_cleared_title" = "History Cleared";
+"personalized_alerts_sign_in_prompt" = "Sign in to enable personalized alerts based on your birth chart.";
+"current_plan_label" = "Current Plan";
+
+// Ayanamsa picker options
+"ayanamsa_lahiri" = "Lahiri (Most common)";
+"ayanamsa_raman" = "Raman";
+"ayanamsa_krishnamurti" = "Krishnamurti (KP)";
+"ayanamsa_fagan_bradley" = "Fagan-Bradley";
+
+// House system picker options
+"house_system_equal" = "Equal Houses";
+"house_system_whole_sign" = "Whole Sign";
+"house_system_placidus" = "Placidus";
+"house_system_koch" = "Koch";
+"house_system_regiomontanus" = "Regiomontanus";
+"house_system_campanus" = "Campanus";
+"house_system_morinus" = "Morinus";
+"house_system_alcabitus" = "Alcabitus";
+"house_system_porphyrius" = "Porphyrius";
+
+// Notification preferences sheet
+"notif_channels_title" = "Channels";
+"notif_channels_desc" = "Choose how you want to receive alerts";
+"notif_channel_email" = "Email";
+"notif_channel_inbox" = "In-App inbox";
+"notif_alert_prefs_title" = "Alert preferences";
+"notif_alert_prefs_desc" = "Tell Destiny what you want personalized alerts about";
+"notif_edit_alert_title" = "Edit alert";
+"notif_new_alert_title" = "New alert";
+"notif_delete_alert_title" = "Delete Alert";
+
+// Partner form
+"partner_form_add_title" = "Add Birth Chart";
+"partner_form_edit_title" = "Edit Birth Chart";
+"partner_form_name_label" = "Name";
+"partner_form_name_placeholder" = "Enter name";
+"partner_form_date_placeholder" = "Select Date";
+"partner_form_time_placeholder" = "Select Time";
+"partner_form_place_placeholder" = "Select City";
+"partner_form_save_button" = "Save Birth Chart";
+
+// Account deletion warnings
+"account_delete_warning_1" = "Your account will be permanently deactivated";
+"account_delete_warning_2" = "You will NOT be able to sign in with this email again";
+"account_delete_warning_3" = "All your data (chats, matches, birth profiles) will be inaccessible";
+
+// Partner management alerts
+"delete_birth_chart_confirm_title" = "Delete Birth Chart?";
+"birth_chart_limit_reached_title" = "Birth Chart Limit Reached";
+
+// Profile switcher
+"profile_switch_failed_title" = "Profile Switch Failed";
+"profile_switch_failed_message" = "Failed to switch profile";
+
+// Partner picker
+"search_birth_charts_placeholder" = "Search birth charts...";
+
+// Chat / History
+"load_earlier_messages" = "Load earlier messages";
+"chat_bg_interrupted" = "Interrupted in background";
+"multi_match_subtitle_format" = "Multi-match · %d partners compared";
+"search_history_placeholder" = "Search history...";
+"chat_starter_marriage" = "When will I get married?";
+"chat_starter_career_direction" = "Best career direction?";
+"chat_starter_finance" = "Financial outlook?";
+"chat_starter_health_check" = "Health check";
+
+// Dosha status section
+"mars_influence_present" = "Mars influence present";
+"no_mars_affliction" = "No Mars affliction";
+"kala_sarpa_name" = "Kala Sarpa";
+"planetary_hemming" = "Planetary Hemming";
+"planets_are_free" = "Planets are free";
+
+// Subscription CTA labels
+"upgrade_scheduled_label" = "Upgrade Scheduled ✓";
+"upgrade_to_plus_label" = "Upgrade to Plus";
+"choose_plus_label" = "Choose Plus";
+"choose_core_label" = "Choose Core";
+"product_not_available_error" = "Product not available. Please try again later.";
+
+// Notification inbox actions
+"notification_action_transit" = "View Transit Alert";
+"notification_action_life_alert" = "View Alert";
+"notification_action_compat" = "View Compatibility";
+"notification_action_default" = "View";
+"sign_up_to_personalize_alerts" = "Sign up to personalize alerts";
+"personalize_alerts_cta" = "Personalize alerts";
+
+// Accessibility labels
+"sound_on_a11y" = "Sound on";
+"sound_off_a11y" = "Sound off";
+
+// Profile setup loading phases
+"setup_phase_birth_chart" = "Calculating your birth chart...";
+"setup_phase_planetary" = "Analyzing planetary positions...";
+"setup_phase_insights" = "Generating today's insights...";
+"setup_phase_ready" = "Your cosmic profile is ready!";
+
+// Language selection
+"select_a_language" = "Select a language";
+"continue_in_language_format" = "Continue in %@";
+
+// Orbit Ashtakoot view theme labels
+"kuta_theme_work" = "Work compatibility";
+"kuta_theme_attraction" = "Attraction and influence";
+"kuta_theme_destiny" = "Destiny and fortune";
+"kuta_theme_intimacy" = "Intimacy and physical";
+"kuta_theme_mental" = "Mental and friendship";
+"kuta_theme_temperament" = "Temperament";
+"kuta_theme_love" = "Love and emotional";
+"kuta_theme_health_progeny" = "Health and progeny";
+
+// Kalsarpa life areas
+"life_area_mother" = "Mother";
+"life_area_home_kalsarpa" = "Home";
+"life_area_emotions" = "Emotions";
+"life_area_wealth" = "Wealth";
+"life_area_children" = "Children";
+
+// Ashtakoot score affirmation tiers
+"ashtakoot_tier_excellent" = "Scoring %@/36 puts this match in the excellent tier. This is rare — a natural synergy between two people at the highest level of compatibility.";
+"ashtakoot_tier_very_good" = "At %@/36 this is a very good match, well above average. Strong core compatibility with minor friction areas.";
+"ashtakoot_tier_good" = "A score of %@/36 reflects a good match. Compatible in the most important areas, with some differences to navigate.";
+"ashtakoot_tier_average" = "This match scores %@/36, which is in the average range. There is compatibility to work with, but some areas will need conscious effort.";
+"ashtakoot_tier_below_average" = "At %@/36, this match faces notable challenges. While love can bridge many things, awareness of the friction areas will matter.";
+"ashtakoot_tier_low" = "Scoring %@/36 indicates significant incompatibilities in key areas. This does not mean the relationship cannot work, but it will require genuine effort from both partners.";
+
+// Response style (missing from all languages)
+"response_style_setting_title" = "Response Style";
+"response_length_concise" = "Concise";
+"response_length_expanded" = "Expanded";
+"response_length_concise_desc" = "Short, focused insights";
+"response_length_expanded_desc" = "More context and explanation";
+"content_style_essentials" = "Essentials";
+"content_style_complete" = "Complete Chart Details";
+"content_style_essentials_tagline" = "Responses with key astrological details such as planets and transits.";
+"content_style_complete_tagline" = "Responses with full planetary positions, degrees, house placements, and classical references.";
+"content_style_essentials_example" = "This is not the best time to switch. Saturn is putting pressure on your career house right now, making transitions harder than usual.\n\nBetter window: April to June 2027, when Jupiter supports your career house.\n\nUntil then: Build skills, grow your network.";
+"content_style_complete_example" = "This is not the best time to switch. Saturn (retrograde, 8° Pisces) is transiting your 10th house. Your 10th-lord Mars (14° Gemini) is in the 3rd house.\n\nBetter window: Jupiter transits your 10th house from April 2027, conjunct natal Midheaven at 12° Aries.\n\nUntil then: Use this period for strategic positioning.";
+"response_style_onboarding_title_prefix" = "How should Destiny";
+"response_style_onboarding_title_emphasis" = "respond to you?";
+"response_style_onboarding_subtitle" = "Pick what feels right. You can change this anytime in Settings.";
+"response_style_settings_subtitle" = "Pick what feels right. You can change this anytime.";
+"example_label" = "EXAMPLE";
+"example_question_career" = "\"Is this a good time to switch jobs?\"";
