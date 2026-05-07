@@ -2562,21 +2562,21 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "அஷ்டகூட பகுப்பாய்வு";
-"kuta_varna_label" = "Varna";
+"kuta_varna_label" = "தொழில்";
 "kuta_varna_theme" = "வேலை";
-"kuta_vashya_label" = "Vashya";
+"kuta_vashya_label" = "கவர்ச்சி";
 "kuta_vashya_theme" = "ஈர்ப்பு";
-"kuta_tara_label" = "Tara";
+"kuta_tara_label" = "விதி";
 "kuta_tara_theme" = "விதி";
-"kuta_yoni_label" = "Yoni";
+"kuta_yoni_label" = "நெருக்கம்";
 "kuta_yoni_theme" = "நெருக்கம்";
-"kuta_maitri_label" = "Graha Maitri";
+"kuta_maitri_label" = "நட்பு";
 "kuta_maitri_theme" = "நட்பு";
-"kuta_gana_label" = "Gana";
+"kuta_gana_label" = "குணம்";
 "kuta_gana_theme" = "குணம்";
-"kuta_bhakoot_label" = "Bhakoot";
+"kuta_bhakoot_label" = "அன்பு";
 "kuta_bhakoot_theme" = "அன்பு";
-"kuta_nadi_label" = "Nadi";
+"kuta_nadi_label" = "ஆரோக்கியம்";
 "kuta_nadi_theme" = "ஆரோக்கியம்";
 "analysis_step_mapping_charts" = "பிறப்பு வரைபடங்களை வரிசைப்படுத்துதல்";
 "analysis_step_ashtakoot" = "ஜோதிட பொருத்தத்தை கணக்கிடுதல்";

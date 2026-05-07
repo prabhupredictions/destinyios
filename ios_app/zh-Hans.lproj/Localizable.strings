@@ -2573,21 +2573,21 @@
 
 /* Compatibility Components */
 "ashtakoot_analysis_title" = "Ashtakoot 分析";
-"kuta_varna_label" = "Varna";
+"kuta_varna_label" = "事业";
 "kuta_varna_theme" = "工作";
-"kuta_vashya_label" = "Vashya";
+"kuta_vashya_label" = "吸引力";
 "kuta_vashya_theme" = "吸引力";
-"kuta_tara_label" = "Tara";
+"kuta_tara_label" = "命运";
 "kuta_tara_theme" = "命运";
-"kuta_yoni_label" = "Yoni";
+"kuta_yoni_label" = "亲密";
 "kuta_yoni_theme" = "亲密感";
-"kuta_maitri_label" = "Graha Maitri";
+"kuta_maitri_label" = "友谊";
 "kuta_maitri_theme" = "友谊";
-"kuta_gana_label" = "Gana";
+"kuta_gana_label" = "性格";
 "kuta_gana_theme" = "气质";
-"kuta_bhakoot_label" = "Bhakoot";
+"kuta_bhakoot_label" = "爱情";
 "kuta_bhakoot_theme" = "爱";
-"kuta_nadi_label" = "Nadi";
+"kuta_nadi_label" = "健康";
 "kuta_nadi_theme" = "健康";
 "analysis_step_mapping_charts" = "绘制出生图";
 "analysis_step_ashtakoot" = "计算占星兼容性";

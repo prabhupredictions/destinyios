@@ -41,12 +41,12 @@ struct AffirmationBuilder {
     /// Ordered weight list (descending). Varna (max=1) is intentionally absent.
     private static let weightOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "tara", "vashya"]
 
+    // Sanskrit proper names — same in all languages, not localized
     private var displayNames: [String: String] {
         [
-            "nadi": "kuta_nadi_label".localized, "bhakoot": "kuta_bhakoot_label".localized,
-            "gana": "kuta_gana_label".localized, "maitri": "kuta_maitri_label".localized,
-            "yoni": "kuta_yoni_label".localized, "tara": "kuta_tara_label".localized,
-            "vashya": "kuta_vashya_label".localized
+            "nadi": "Nadi", "bhakoot": "Bhakoot", "gana": "Gana",
+            "maitri": "Graha Maitri", "yoni": "Yoni", "tara": "Tara",
+            "vashya": "Vashya"
         ]
     }
 
