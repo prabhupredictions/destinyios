@@ -930,7 +930,7 @@ struct AskDestinySheet: View {
     @State private var showSubscription: Bool = false
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
-    @State private var typewriterMessageId: UUID? = nil  // ID of message currently animating; nil = done
+    @State private var newMessageIds: Set<UUID> = []  // IDs of newly arrived messages (fade-in targets)
     @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
     @State private var showStyleSelector = false
     @State private var lengthManager = ResponseLengthManager.shared
@@ -984,14 +984,14 @@ struct AskDestinySheet: View {
                                     ForEach(Array(messages.enumerated()), id: \.element.id) { _, message in
                                         CompatChatBubble(
                                             message: message,
-                                            enableTypewriter: message.id == typewriterMessageId,
+                                            enableTypewriter: newMessageIds.contains(message.id),
                                             cosmicProgressSteps: message.id == redirectStreamingMessageId
                                                 ? redirectCosmicProgressSteps : [],
-                                            onTypewriterFinished: message.id == typewriterMessageId ? {
-                                                typewriterMessageId = nil
+                                            onTypewriterFinished: newMessageIds.contains(message.id) ? {
+                                                newMessageIds.remove(message.id)
                                                 requestCompatScroll()
                                             } : nil,
-                                            onTypewriterProgress: message.id == typewriterMessageId ? { requestCompatScroll() } : nil
+                                            onTypewriterProgress: nil
                                         )
                                         .id(message.id)
                                     }
@@ -1007,7 +1007,7 @@ struct AskDestinySheet: View {
                                     }
 
                                     // Follow-up suggestions (vertical rows matching ChatView)
-                                    if showFollowUpSuggestions && !suggestedQuestions.isEmpty && !isLoading && typewriterMessageId == nil {
+                                    if showFollowUpSuggestions && !suggestedQuestions.isEmpty && !isLoading && newMessageIds.isEmpty {
                                         FollowUpSuggestionsView(questions: suggestedQuestions) { question in
                                             HapticManager.shared.play(.light)
                                             isInputFocused = false
@@ -1044,8 +1044,8 @@ struct AskDestinySheet: View {
                         .onChange(of: suggestedQuestions) { _, q in
                             if !q.isEmpty { requestCompatScroll() }
                         }
-                        .onChange(of: typewriterMessageId) { _, newId in
-                            if newId == nil { requestCompatScroll(delay: 0.3) }
+                        .onChange(of: newMessageIds) { _, ids in
+                            if ids.isEmpty { requestCompatScroll(delay: 0.3) }
                         }
                         .onChange(of: isInputFocused) { _, focused in
                             if focused { requestCompatScroll(delay: 0.3) }
@@ -1407,13 +1407,14 @@ struct AskDestinySheet: View {
                 // Normal compatibility answer
                 var aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
                 aiMessage.executionTimeMs = response.executionTimeMs ?? 0
-                typewriterMessageId = aiMessage.id
+                newMessageIds.insert(aiMessage.id)
                 messages.append(aiMessage)
                 saveMessagesToHistory()  // Persist messages
-                
-                // Set follow-up suggestions from API
-                if showFollowUpSuggestions, let followUps = response.followUpSuggestions, !followUps.isEmpty {
-                    suggestedQuestions = followUps
+
+                // Set follow-up suggestions — prefer JSON field, fall back to embedded block
+                if showFollowUpSuggestions {
+                    let followUps = response.followUpSuggestions ?? []
+                    suggestedQuestions = followUps.isEmpty ? extractFollowUpQuestions(from: answer) : followUps
                 }
             } else if let message = response.message {
                 // Info/error message — detect redirect patterns (including "None's chart" from backend bug)
@@ -1535,11 +1536,12 @@ struct AskDestinySheet: View {
             let analysisContent = "**Individual Analysis (\(resolvedDisplayName)):**\n\n\(predictResponse.answer)"
             var aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
             aiMessage.executionTimeMs = predictResponse.executionTimeMs
-            typewriterMessageId = aiMessage.id
+            newMessageIds.insert(aiMessage.id)
             messages.append(aiMessage)
             saveMessagesToHistory()
-            if showFollowUpSuggestions && !predictResponse.followUpSuggestions.isEmpty {
-                suggestedQuestions = predictResponse.followUpSuggestions
+            if showFollowUpSuggestions {
+                let followUps = predictResponse.followUpSuggestions
+                suggestedQuestions = followUps.isEmpty ? extractFollowUpQuestions(from: analysisContent) : followUps
             }
         } catch let error as NetworkError {
             stopRedirectProgressTimer()
@@ -1575,6 +1577,23 @@ struct AskDestinySheet: View {
                     isUser: false, type: .error
                 ))
             }
+        }
+    }
+
+    // MARK: - Follow-up Question Extraction
+
+    /// Parse embedded FOLLOW_UP_QUESTIONS block from content when the JSON field is absent.
+    private func extractFollowUpQuestions(from content: String) -> [String] {
+        guard let markerRange = content.range(of: "\nFOLLOW_UP_QUESTIONS:") else { return [] }
+        let block = String(content[markerRange.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        return block.components(separatedBy: "\n").compactMap { line -> String? in
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return nil }
+            let cleaned = trimmed
+                .replacingOccurrences(of: "^[-•*]\\s*", with: "", options: .regularExpression)
+                .replacingOccurrences(of: "^\\d+\\.\\s*", with: "", options: .regularExpression)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            return cleaned.isEmpty ? nil : cleaned
         }
     }
 
@@ -1630,18 +1649,15 @@ struct AskDestinySheet: View {
     }
 }
 
-// MARK: - Chat Bubble View (Follows ChatView Pattern with Typewriter)
+// MARK: - Chat Bubble View (Matches ReadingMessageView fade-in pattern)
 private struct CompatChatBubble: View {
     let message: CompatChatMessage
-    var enableTypewriter: Bool = false
+    var enableTypewriter: Bool = false  // true = new message, triggers fade-in
     var cosmicProgressSteps: [CosmicProgressStep] = []
     var onTypewriterFinished: (() -> Void)? = nil
     var onTypewriterProgress: (() -> Void)? = nil
 
-    // Local typewriter state (only this bubble re-renders, no parent jitter)
-    @State private var revealedContent: String = ""
-    @State private var typewriterFinished = false
-    @State private var typewriterTimer: Timer?
+    @State private var appeared = false
     @State private var showCopiedConfirmation = false
 
     // Cached formatter — DateFormatter is expensive to create
@@ -1663,7 +1679,7 @@ private struct CompatChatBubble: View {
                 messageContent
 
                 // Metadata row — only for completed AI messages (matches ChatView)
-                if !isUser && message.type == .ai && (!enableTypewriter || typewriterFinished) {
+                if !isUser && message.type == .ai && (!enableTypewriter || appeared) {
                     metadataRow
                 }
             }
@@ -1675,73 +1691,15 @@ private struct CompatChatBubble: View {
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
         .accessibilityIdentifier(isUser ? "compat_user_message" : "compat_ai_message")
         .onAppear {
-            if enableTypewriter && !typewriterFinished {
-                startTypewriter()
+            guard enableTypewriter && !appeared else { return }
+            withAnimation(.easeIn(duration: 0.5)) {
+                appeared = true
             }
-        }
-        .onDisappear {
-            typewriterTimer?.invalidate()
-            typewriterTimer = nil
-        }
-    }
-
-    // MARK: - Typewriter Effect
-    private func startTypewriter() {
-        typewriterTimer?.invalidate()
-        typewriterTimer = nil
-
-        // Strip the FOLLOW_UP_QUESTIONS block before animating
-        let rawText = message.content
-        let displayText: String
-        if let markerRange = rawText.range(of: "\nFOLLOW_UP_QUESTIONS:") {
-            displayText = String(rawText[rawText.startIndex..<markerRange.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
-        } else {
-            displayText = rawText
-        }
-
-        let words = displayText.components(separatedBy: " ")
-        guard !words.isEmpty else {
-            typewriterFinished = true
             onTypewriterFinished?()
-            return
-        }
-
-        var wordIndex = 0
-        revealedContent = ""
-
-        // 1 word every 50ms — same as ChatView (MessageBubble)
-        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-            let batchEnd = min(wordIndex + 1, words.count)
-            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
-
-            if revealedContent.isEmpty {
-                revealedContent = batch
-            } else {
-                revealedContent += " " + batch
-            }
-
-            wordIndex = batchEnd
-
-            if wordIndex % 10 == 0 {
-                onTypewriterProgress?()
-            }
-
-            if wordIndex >= words.count {
-                timer.invalidate()
-                typewriterTimer = nil
-                withAnimation(.easeIn(duration: 0.25)) {
-                    typewriterFinished = true
-                }
-                onTypewriterFinished?()
-            }
         }
     }
 
     private var displayContent: String {
-        if enableTypewriter && !typewriterFinished {
-            return revealedContent
-        }
-        // Strip FOLLOW_UP_QUESTIONS block from final static display too
         let raw = message.content
         if let markerRange = raw.range(of: "\nFOLLOW_UP_QUESTIONS:") {
             return String(raw[raw.startIndex..<markerRange.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1779,22 +1737,14 @@ private struct CompatChatBubble: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.error)
             } else {
-                // Plain text during typewriter — avoids 600+ MarkdownTextView re-parse cycles
-                // that cause watchdog kills on long responses. Switch to full markdown after.
-                if enableTypewriter && !typewriterFinished {
-                    Text(revealedContent)
-                        .font(AppTheme.Fonts.body(size: 17))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .lineSpacing(6)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } else {
-                    MarkdownTextView(
-                        content: displayContent,
-                        textColor: AppTheme.Colors.textPrimary,
-                        fontSize: 17
-                    )
-                    .transition(.opacity)
-                }
+                MarkdownTextView(
+                    content: displayContent,
+                    textColor: AppTheme.Colors.textPrimary,
+                    fontSize: 17
+                )
+                .opacity(enableTypewriter && !appeared ? 0 : 1)
+                .animation(.easeIn(duration: 0.5), value: appeared)
+                .transition(.opacity)
             }
         }
         .padding(.horizontal, isUser ? 14 : 4)

@@ -58,6 +58,15 @@ struct ReadingMessageView: View {
 
                     Spacer()
 
+                    if message.executionTimeMs > 0 {
+                        Text("•")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color.white.opacity(0.2))
+                        Text(formatExecTime(message.executionTimeMs))
+                            .font(.system(size: 11))
+                            .foregroundColor(Color.white.opacity(0.2))
+                    }
+
                     Text(message.createdAt, style: .time)
                         .font(.system(size: 11))
                         .foregroundColor(Color.white.opacity(0.2))
@@ -77,5 +86,16 @@ struct ReadingMessageView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Destiny said: \(message.content)")
         .accessibilityIdentifier("reading_entry")
+    }
+
+    private func formatExecTime(_ ms: Double) -> String {
+        let seconds = ms / 1000
+        if seconds < 1 { return String(format: "%.0fms", ms) }
+        else if seconds < 60 { return String(format: "%.1fs", seconds) }
+        else {
+            let mins = Int(seconds) / 60
+            let secs = Int(seconds) % 60
+            return "\(mins)m \(secs)s"
+        }
     }
 }

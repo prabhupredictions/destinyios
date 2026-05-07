@@ -179,29 +179,45 @@ struct CompatChatMessageData: Codable, Identifiable {
     let isUser: Bool
     let timestamp: Date
     let type: String  // "user", "ai", "info", "error"
-    
+    var executionTimeMs: Double
+
     // Memberwise initializer for direct instantiation
-    init(id: String, content: String, isUser: Bool, timestamp: Date, type: String = "ai") {
+    init(id: String, content: String, isUser: Bool, timestamp: Date, type: String = "ai", executionTimeMs: Double = 0) {
         self.id = id
         self.content = content
         self.isUser = isUser
         self.timestamp = timestamp
         self.type = type
+        self.executionTimeMs = executionTimeMs
     }
-    
+
+    // Backward-compatible decoder: existing items lack executionTimeMs
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        content = try container.decode(String.self, forKey: .content)
+        isUser = try container.decode(Bool.self, forKey: .isUser)
+        timestamp = try container.decode(Date.self, forKey: .timestamp)
+        type = try container.decode(String.self, forKey: .type)
+        executionTimeMs = try container.decodeIfPresent(Double.self, forKey: .executionTimeMs) ?? 0
+    }
+
     init(from message: CompatChatMessage) {
         self.id = message.id.uuidString
         self.content = message.content
         self.isUser = message.isUser
         self.timestamp = message.timestamp
         self.type = message.type.rawValue
+        self.executionTimeMs = message.executionTimeMs
     }
-    
+
     func toMessage() -> CompatChatMessage {
-        CompatChatMessage(
+        var msg = CompatChatMessage(
             content: content,
             isUser: isUser,
             type: CompatChatMessage.MessageType(rawValue: type) ?? .ai
         )
+        msg.executionTimeMs = executionTimeMs
+        return msg
     }
 }
