@@ -12,11 +12,15 @@ struct NotificationItem: Codable, Identifiable, Equatable {
     let read: Bool
     let createdAt: String?
     let readAt: String?
-    
+    let actionUrl: String?
+    let imageUrl: String?
+
     enum CodingKeys: String, CodingKey {
         case id, type, channel, subject, preview, status, read
         case createdAt = "created_at"
         case readAt = "read_at"
+        case actionUrl = "action_url"
+        case imageUrl = "image_url"
     }
     
     // MARK: - Computed Properties
@@ -46,9 +50,11 @@ struct NotificationItem: Codable, Identifiable, Equatable {
         case "SUBSCRIPTION_EXPIRING":
             return "creditcard.fill"
         case "WELCOME":
-            return "hand.wave.fill"
+            return "star.fill"
         case "LIFE_ALERT":
             return "exclamationmark.triangle.fill"
+        case "COMPATIBILITY_READY":
+            return "heart.fill"
         default:
             return "bell.fill"
         }

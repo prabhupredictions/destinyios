@@ -119,10 +119,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         print("🔔 Notification tapped: \(userInfo)")
-        
-        // Post notification for navigation (deep linking)
+
         if let eventType = userInfo["type"] as? String {
-             print("➡️ Navigating to event: \(eventType)")
+            NotificationRouter.shared.route(type: eventType)
         }
         completionHandler()
     }

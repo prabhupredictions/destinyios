@@ -297,10 +297,7 @@ struct NotificationDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     var onNavigateToHome: (() -> Void)? = nil
 
-    private var isDailyPrediction: Bool {
-        let t = notification.type.uppercased()
-        return t == "DAILY_PREDICTION" || t == "DAILY_PREDICTION_READY"
-    }
+    private var hasAction: Bool { notification.actionUrl != nil }
 
     var body: some View {
         ZStack {
@@ -312,6 +309,7 @@ struct NotificationDetailSheet: View {
                     .fill(AppTheme.Colors.separator)
                     .frame(width: 40, height: 5)
                     .padding(.top, 12)
+                    .accessibilityIdentifier("sheet_close_button")
 
                 // Icon
                 ZStack {
@@ -348,14 +346,16 @@ struct NotificationDetailSheet: View {
 
                 // Action buttons
                 VStack(spacing: 12) {
-                    if isDailyPrediction {
+                    if hasAction {
                         Button(action: {
+                            NotificationRouter.shared.route(type: notification.type)
+                            dismiss()
                             onNavigateToHome?()
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 15, weight: .semibold))
-                                Text("view_daily_update".localized)
+                                Text(actionButtonLabel(notification.type))
                                     .font(AppTheme.Fonts.caption(size: 16))
                             }
                             .foregroundColor(AppTheme.Colors.mainBackground)
@@ -364,18 +364,19 @@ struct NotificationDetailSheet: View {
                             .background(AppTheme.Colors.gold)
                             .cornerRadius(14)
                         }
+                        .accessibilityIdentifier("notification_action_button")
                     }
 
                     Button(action: { dismiss() }) {
                         Text("done".localized)
                             .font(AppTheme.Fonts.caption(size: 16))
-                            .foregroundColor(isDailyPrediction ? AppTheme.Colors.gold : AppTheme.Colors.mainBackground)
+                            .foregroundColor(hasAction ? AppTheme.Colors.gold : AppTheme.Colors.mainBackground)
                             .frame(maxWidth: .infinity)
                             .frame(height: 52)
-                            .background(isDailyPrediction ? Color.clear : AppTheme.Colors.gold)
+                            .background(hasAction ? Color.clear : AppTheme.Colors.gold)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .stroke(isDailyPrediction ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
+                                    .stroke(hasAction ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
                             )
                             .cornerRadius(14)
                     }
@@ -386,6 +387,17 @@ struct NotificationDetailSheet: View {
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.hidden)
+    }
+
+    private func actionButtonLabel(_ type: String) -> String {
+        switch type.uppercased() {
+        case "DAILY_PREDICTION_READY", "DAILY_PREDICTION": return "view_daily_update".localized
+        case "TRANSIT_ALERT":            return "View Transit Alert"
+        case "LIFE_ALERT":               return "View Alert"
+        case "COMPATIBILITY_READY":      return "View Compatibility"
+        case "SUBSCRIPTION_EXPIRING":    return "Manage Subscription"
+        default:                         return "View"
+        }
     }
 }
 

@@ -155,7 +155,9 @@ final class NotificationInboxService: ObservableObject {
                             status: "READ",
                             read: true,
                             createdAt: updated.createdAt,
-                            readAt: ISO8601DateFormatter().string(from: Date())
+                            readAt: ISO8601DateFormatter().string(from: Date()),
+                            actionUrl: updated.actionUrl,
+                            imageUrl: updated.imageUrl
                         )
                         self.notifications[index] = readItem
                     }
@@ -198,7 +200,9 @@ final class NotificationInboxService: ObservableObject {
                         status: "READ",
                         read: true,
                         createdAt: item.createdAt,
-                        readAt: ISO8601DateFormatter().string(from: Date())
+                        readAt: ISO8601DateFormatter().string(from: Date()),
+                        actionUrl: item.actionUrl,
+                        imageUrl: item.imageUrl
                     )
                 }
                 self.unreadCount = 0

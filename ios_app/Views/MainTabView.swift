@@ -15,13 +15,15 @@ struct MainTabView: View {
     @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
     @State private var isKeyboardVisible = false  // Track keyboard for tab bar hiding
-    
+
     @State private var hasVisitedChat = false
     @State private var hasVisitedMatch = false
-    
+
     /// Reactive guest user check - uses @AppStorage for automatic UI updates
     @AppStorage("isGuest") private var isGuestUser = false
-    
+
+    private var notificationRouter = NotificationRouter.shared
+
     var body: some View {
         ZStack(alignment: .bottom) {
             // Tab Content
@@ -147,6 +149,16 @@ struct MainTabView: View {
             pendingMatchItem = nil
             pendingMatchGroup = nil
             showMatchResult = false
+        }
+        .onChange(of: notificationRouter.pendingDeepLink) { _, deepLink in
+            guard let deepLink else { return }
+            switch deepLink {
+            case .home:    selectedTab = 0
+            case .chat:    selectedTab = 1
+            case .match:   selectedTab = 2
+            case .settings: selectedTab = 0
+            }
+            notificationRouter.pendingDeepLink = nil
         }
         .sheet(isPresented: $showAskSheet) {
             AskDestinyQuestionsSheet(

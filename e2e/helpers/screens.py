@@ -133,6 +133,16 @@ class SubscriptionScreen(_Base):
 class NotificationsScreen(_Base):
     def is_visible(self):               return self.present("notifications_screen")
     def notification_count(self):       return len(self.finds("notification_row"))
+    def tap_row(self, index=0):
+        rows = self.finds("notification_row")
+        if rows:
+            rows[index].click()
+    def has_unread_badge(self):         return self.present("notification_unread_count")
+    def unread_count_text(self):        return self.find("notification_unread_count").get_attribute("label")
+    def tap_mark_all_read(self):        self.tap("notification_mark_all_read")
+    def has_action_button(self):        return self.present("notification_action_button")
+    def tap_action_button(self):        self.tap("notification_action_button")
+    def dismiss_detail(self):           self.tap("sheet_close_button")
 
 
 class OnboardingScreen(_Base):
