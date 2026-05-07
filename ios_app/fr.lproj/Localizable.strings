@@ -3075,3 +3075,13 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Rechercher des chats...";
 "view_daily_update" = "Voir la mise à jour d'aujourd'hui";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "Inactif";
+"history_chats_saved" = "Les chats et correspondances sont enregistrés";
+"analyzing" = "Analyse en cours…";
+"upgrade_to_premium" = "Passer à Premium";
+"save_birth_chart_unlock_insights" = "Enregistrez votre thème natal et débloquez des insights";
+"unlock_unlimited_insights" = "Débloquer des insights illimités";
+"switch_profile_birth_chart" = "Changer de profil / Thème natal";
+"dosha_active_badge" = "Dosha actif";

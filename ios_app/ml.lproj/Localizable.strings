@@ -3076,3 +3076,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "ചാറ്റുകൾ തിരയുക...";
 "view_daily_update" = "ഇന്നത്തെ അപ്ഡേറ്റ് കാണുക";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "നിഷ്ക്രിയം";
+"history_chats_saved" = "ചാറ്റുകളും മാച്ചുകളും സേവ് ചെയ്യുന്നു";
+"analyzing" = "വിശകലനം ചെയ്യുന്നു…";
+"upgrade_to_premium" = "Premium-ലേക്ക് അപ്ഗ്രേഡ് ചെയ്യുക";
+"save_birth_chart_unlock_insights" = "ജനന ചാര്ട് സേവ് ചെയ്ത് ഉള്ക്കാഴ്ച അന്ലോക്ക് ചെയ്യുക";
+"unlock_unlimited_insights" = "അപരിമിത ഉള്ക്കാഴ്ച അന്ലോക്ക് ചെയ്യുക";
+"switch_profile_birth_chart" = "പ്രൊഫൈല് / ജനന ചാര്ട് മാറ്റുക";
+"dosha_active_badge" = "ദോഷം സക്രിയം";

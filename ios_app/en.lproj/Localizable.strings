@@ -3038,3 +3038,13 @@
 "response_style_settings_subtitle" = "Pick what feels right. You can change this anytime.";
 "example_label" = "EXAMPLE";
 "example_question_career" = "\"Is this a good time to switch jobs?\"";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "Inactive";
+"history_chats_saved" = "Chats and matches are being saved";
+"analyzing" = "Analyzing…";
+"upgrade_to_premium" = "Upgrade to Premium";
+"save_birth_chart_unlock_insights" = "Save your birth chart and unlock insights";
+"unlock_unlimited_insights" = "Unlock unlimited insights";
+"switch_profile_birth_chart" = "Switch Profile / Birth Chart";
+"dosha_active_badge" = "Dosha Active";

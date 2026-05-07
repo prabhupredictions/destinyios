@@ -236,14 +236,14 @@ struct OrbitTooltipView: View {
     @ViewBuilder
     private var scoreBadge: some View {
         if kuta.doshaPresent && !kuta.doshaCancelled {
-            Text("⚠ Dosha Active")
+            Text("⚠ \("dosha_active_badge".localized)")
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(AppTheme.Colors.error)
                 .padding(.horizontal, 7).padding(.vertical, 3)
                 .background(Capsule().fill(AppTheme.Colors.error.opacity(0.15)))
         } else if kuta.doshaPresent && kuta.doshaCancelled {
             let adj = kuta.adjustedScore ?? kuta.maxScore
-            Text("✓ Cancelled · \(format(adj))/\(format(kuta.maxScore))")
+            Text("✓ \("cancelled".localized) · \(format(adj))/\(format(kuta.maxScore))")
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(AppTheme.Colors.success)
                 .padding(.horizontal, 7).padding(.vertical, 3)

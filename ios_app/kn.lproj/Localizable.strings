@@ -3075,3 +3075,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "ಚಾಟ್‌ಗಳನ್ನು ಹುಡುಕಿ...";
 "view_daily_update" = "ಇಂದಿನ ಅಪ್ಡೇಟ್ ತೋರಿಸಿ";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "ನಿಷ್ಕ್ರಿಯ";
+"history_chats_saved" = "ಚಾಟ್‌ಗಳು ಮತ್ತು ಮ್ಯಾಚ್‌ಗಳು ಮೆಮೋರಿ ಮಾಡಲಾಬುತ್ತಿವೆ";
+"analyzing" = "ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ…";
+"upgrade_to_premium" = "Premiumಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ";
+"save_birth_chart_unlock_insights" = "ನಿಮ್ಮ ಜನ್ಮ ಚಾರ್ಟ್ ಉಳಿಸಿ ಒಳನೋಟಗಳನ್ನು ಅನ್ಲಾಕ್ ಮಾಡಿ";
+"unlock_unlimited_insights" = "ಅಪರಿಮಿತ ಒಳನೋಟಗಳನ್ನು ಅನ್ಲಾಕ್ ಮಾಡಿ";
+"switch_profile_birth_chart" = "ಪ್ರೊಫೈಲ್ / ಜನ್ಮ ಚಾರ್ಟ್ ಬದಲಾಯಿಸಿ";
+"dosha_active_badge" = "ದೋಷ ಸಕ್ರಿಯ";

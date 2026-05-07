@@ -2942,3 +2942,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "चैट खोजें...";
 "view_daily_update" = "आज का अपडेट देखें";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "निष्क्रिय";
+"history_chats_saved" = "चैट और मैच सेव हो रहे हैं";
+"analyzing" = "विश्लेषण हो रहा है…";
+"upgrade_to_premium" = "Premium पर अपग्रेड करें";
+"save_birth_chart_unlock_insights" = "अपनी जन्म कुंडली सेव करें और अंतर्दृष्टि अनलॉक करें";
+"unlock_unlimited_insights" = "असीमित अंतर्दृष्टि अनलॉक करें";
+"switch_profile_birth_chart" = "प्रोफ़ाइल / जन्म कुंडली बदलें";
+"dosha_active_badge" = "दोष सक्रिय";

@@ -335,8 +335,8 @@ struct ProfileView: View {
                 // Switch Profile/Birth Chart (Plus-only)
                 // GUEST RULE: Guests must sign in first to switch profiles
                 PremiumListItem(
-                    title: "Switch Profile/Birth Chart",
-                    subtitle: "Viewing as \(ProfileContextManager.shared.activeProfileName)",
+                    title: "switch_profile_birth_chart".localized,
+                    subtitle: String(format: "viewing_as_label".localized, ProfileContextManager.shared.activeProfileName),
                     icon: "arrow.triangle.2.circlepath",
                     isPremiumFeature: true,
                     premiumBadgeText: isGuestUser ? "sign_up".localized : "Plus",
@@ -373,7 +373,7 @@ struct ProfileView: View {
                 .accessibilityIdentifier("profile_language_settings")
 
                 PremiumListItem(
-                    title: NSLocalizedString("response_style_setting_title", value: "Response Style", comment: ""),
+                    title: "response_style_setting_title".localized,
                     subtitle: ContentStyleManager.shared.currentStyle.label,
                     icon: "sparkles",
                     action: { showResponseStyleSettings = true }

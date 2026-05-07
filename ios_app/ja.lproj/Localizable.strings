@@ -3076,3 +3076,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "チャットを検索...";
 "view_daily_update" = "今日の更新を表示";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "非アクティブ";
+"history_chats_saved" = "チャットとマッチが保存されています";
+"analyzing" = "分析中…";
+"upgrade_to_premium" = "Premiumにアップグレード";
+"save_birth_chart_unlock_insights" = "出生チャートを保存してインサイトを解锁";
+"unlock_unlimited_insights" = "無限のインサイトを解锁";
+"switch_profile_birth_chart" = "プロフィール / 出生チャートを切り替え";
+"dosha_active_badge" = "ドーシャ アクティブ";

@@ -3075,3 +3075,13 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Buscar chats...";
 "view_daily_update" = "Ver actualización de hoy";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "Inactivo";
+"history_chats_saved" = "Los chats y coincidencias se están guardando";
+"analyzing" = "Analizando…";
+"upgrade_to_premium" = "Actualizar a Premium";
+"save_birth_chart_unlock_insights" = "Guarda tu carta natal y desbloquea perspectivas";
+"unlock_unlimited_insights" = "Desbloquear perspectivas ilimitadas";
+"switch_profile_birth_chart" = "Cambiar perfil / Carta natal";
+"dosha_active_badge" = "Dosha activo";

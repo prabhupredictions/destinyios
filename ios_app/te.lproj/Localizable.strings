@@ -3052,3 +3052,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "చాట్‌లను శోధించండి...";
 "view_daily_update" = "ఈరోజు అప్‌డేట్ చూడండి";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "నిష్క్రియం";
+"history_chats_saved" = "చాట్‌లు మరియు మాచ్‌లు సేవ్ అవుతున్నాయి";
+"analyzing" = "విశ్లేషిస్తున్నాం…";
+"upgrade_to_premium" = "Premiumకి అప్‌గ్రేడ్ చేయండి";
+"save_birth_chart_unlock_insights" = "మీ జన్మ చార్ట్‌ను సేవ్ చేసి విశేషాలు అన్‌లాక్ చేయండి";
+"unlock_unlimited_insights" = "అనంత విశేషాలు అన్‌లాక్ చేయండి";
+"switch_profile_birth_chart" = "ప్రొఫైల్ / జన్మ చార్ట్ మార్చండి";
+"dosha_active_badge" = "దోష సక్రియంగా ఉంది";

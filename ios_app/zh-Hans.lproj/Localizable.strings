@@ -3056,3 +3056,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "搜索聊天...";
 "view_daily_update" = "查看今日更新";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "不活跃";
+"history_chats_saved" = "聊天和匹配正在保存";
+"analyzing" = "分析中…";
+"upgrade_to_premium" = "升级至 Premium";
+"save_birth_chart_unlock_insights" = "保存您的星盘并解锁洞察";
+"unlock_unlimited_insights" = "解锁无限洞察";
+"switch_profile_birth_chart" = "切换档案 / 星盘";
+"dosha_active_badge" = "沙 活跃";

@@ -3075,3 +3075,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Поиск чатов...";
 "view_daily_update" = "Посмотреть обновление на сегодня";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "Неактивный";
+"history_chats_saved" = "Чаты и совпадения сохраняются";
+"analyzing" = "Анализируется…";
+"upgrade_to_premium" = "Перейти на Premium";
+"save_birth_chart_unlock_insights" = "Сохраните натальную карту и откройте инсайты";
+"unlock_unlimited_insights" = "Открыть неограниченные инсайты";
+"switch_profile_birth_chart" = "Сменить профиль / натальную карту";
+"dosha_active_badge" = "Доша активна";

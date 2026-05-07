@@ -3075,3 +3075,13 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Pesquisar chats...";
 "view_daily_update" = "Ver atualização de hoje";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "Inativo";
+"history_chats_saved" = "Chats e correspondências estão sendo salvos";
+"analyzing" = "Analisando…";
+"upgrade_to_premium" = "Atualizar para Premium";
+"save_birth_chart_unlock_insights" = "Salve seu mapa natal e desbloqueie insights";
+"unlock_unlimited_insights" = "Desbloquear insights ilimitados";
+"switch_profile_birth_chart" = "Trocar Perfil / Mapa Natal";
+"dosha_active_badge" = "Dosha Ativo";

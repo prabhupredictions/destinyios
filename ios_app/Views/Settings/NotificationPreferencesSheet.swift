@@ -150,8 +150,8 @@ struct NotificationPreferencesSheet: View {
                                 }
                             } header: {
                                 sectionHeader(
-                                    title: "Suggestions",
-                                    description: "Tap to add"
+                                    title: "suggestions_label".localized,
+                                    description: "tap_to_add".localized
                                 )
                             }
                         }

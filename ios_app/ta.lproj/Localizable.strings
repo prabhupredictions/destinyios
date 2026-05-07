@@ -3054,3 +3054,13 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "அரட்டைகளை தேடுக...";
 "view_daily_update" = "இன்றைய புதுப்பிப்பைப் பார்க்கவும்";
+
+// MARK: - Round 2 new keys (2026-05)
+"status_inactive" = "இயங்காதது";
+"history_chats_saved" = "அரட்டைகளும் பார்வைகளும் சேமிக்கப்படுகின்றன";
+"analyzing" = "ஆய்வு செய்யப்படுகிறது…";
+"upgrade_to_premium" = "Premium-க்கு மேம்படுத்துக";
+"save_birth_chart_unlock_insights" = "உங்கள் ஜனன சார்ட்டை சேமித்து உள்நோக்குகளை திறந்துகொள்ளுங்கள்";
+"unlock_unlimited_insights" = "காலையற்ற உள்நோக்குகளை திறந்துகொள்ளுங்கள்";
+"switch_profile_birth_chart" = "சுயரு / ஜனன சார்ட்டை மாற்றுக";
+"dosha_active_badge" = "தோஞ்சம் சுற்சீல்";
