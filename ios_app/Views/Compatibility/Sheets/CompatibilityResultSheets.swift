@@ -1000,7 +1000,7 @@ struct AskDestinySheet: View {
                                         CosmicProgressView(steps: cosmicProgressSteps)
                                             .id("loading")
                                             .padding(.horizontal, 4)
-                                    } else if isLoading {
+                                    } else if isLoading && redirectCosmicProgressSteps.isEmpty {
                                         CompatTypingIndicator()
                                             .id("loading")
                                     }
