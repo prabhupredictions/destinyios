@@ -70,7 +70,7 @@ class ChatViewModel {
         observeAppLifecycle()
     }
 
-    deinit {
+    nonisolated deinit {
         notificationObservers.forEach { NotificationCenter.default.removeObserver($0) }
     }
     

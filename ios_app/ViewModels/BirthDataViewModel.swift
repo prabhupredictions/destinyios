@@ -5,6 +5,8 @@ import SwiftUI
 @MainActor
 @Observable
 class BirthDataViewModel {
+    nonisolated deinit {}
+
     // MARK: - Form State
     var userName = ""  // User's display name
     var dateOfBirth = Calendar.current.date(byAdding: .year, value: -25, to: Date()) ?? Date()

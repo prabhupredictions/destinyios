@@ -1637,14 +1637,22 @@ private struct CompatChatBubble: View {
     var cosmicProgressSteps: [CosmicProgressStep] = []
     var onTypewriterFinished: (() -> Void)? = nil
     var onTypewriterProgress: (() -> Void)? = nil
-    
+
     // Local typewriter state (only this bubble re-renders, no parent jitter)
     @State private var revealedContent: String = ""
     @State private var typewriterFinished = false
     @State private var typewriterTimer: Timer?
-    
+    @State private var showCopiedConfirmation = false
+
+    // Cached formatter — DateFormatter is expensive to create
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
+
     private var isUser: Bool { message.isUser }
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             if isUser {
@@ -1661,7 +1669,7 @@ private struct CompatChatBubble: View {
             }
 
             if !isUser {
-                Spacer(minLength: 16)  // Modern full-width AI messages
+                Spacer(minLength: 16)
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
@@ -1676,10 +1684,11 @@ private struct CompatChatBubble: View {
             typewriterTimer = nil
         }
     }
-    
-    // MARK: - Typewriter Effect (Task-based, auto-cancels on view teardown)
+
+    // MARK: - Typewriter Effect
     private func startTypewriter() {
         typewriterTimer?.invalidate()
+        typewriterTimer = nil
 
         // Strip the FOLLOW_UP_QUESTIONS block before animating
         let rawText = message.content
@@ -1702,31 +1711,32 @@ private struct CompatChatBubble: View {
 
         // 1 word every 50ms — same as ChatView (MessageBubble)
         typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-            DispatchQueue.main.async {
-                let batchEnd = min(wordIndex + 1, words.count)
-                let batch = words[wordIndex..<batchEnd].joined(separator: " ")
+            let batchEnd = min(wordIndex + 1, words.count)
+            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
 
-                if revealedContent.isEmpty {
-                    revealedContent = batch
-                } else {
-                    revealedContent += " " + batch
-                }
+            if revealedContent.isEmpty {
+                revealedContent = batch
+            } else {
+                revealedContent += " " + batch
+            }
 
-                wordIndex = batchEnd
+            wordIndex = batchEnd
 
-                if wordIndex % 10 == 0 {
-                    onTypewriterProgress?()
-                }
+            if wordIndex % 10 == 0 {
+                onTypewriterProgress?()
+            }
 
-                if wordIndex >= words.count {
-                    timer.invalidate()
+            if wordIndex >= words.count {
+                timer.invalidate()
+                typewriterTimer = nil
+                withAnimation(.easeIn(duration: 0.25)) {
                     typewriterFinished = true
-                    onTypewriterFinished?()
                 }
+                onTypewriterFinished?()
             }
         }
     }
-    
+
     private var displayContent: String {
         if enableTypewriter && !typewriterFinished {
             return revealedContent
@@ -1738,14 +1748,13 @@ private struct CompatChatBubble: View {
         }
         return raw
     }
-    
+
     @ViewBuilder
     private var messageContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             if isUser {
-                // User message - plain text in bubble
                 Text(message.content)
-                    .font(AppTheme.Fonts.body(size: 16))
+                    .font(AppTheme.Fonts.body(size: 17))
                     .foregroundColor(AppTheme.Colors.mainBackground)
             } else if message.type == .info {
                 // Info message — show cosmic progress during redirect streaming, else styled text
@@ -1766,24 +1775,33 @@ private struct CompatChatBubble: View {
                     }
                 }
             } else if message.type == .error {
-                // Error message
                 Text(message.content)
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.error)
             } else {
-                // AI message - always use MarkdownTextView (formatted from start during typewriter)
-                MarkdownTextView(
-                    content: displayContent,
-                    textColor: AppTheme.Colors.textPrimary,
-                    fontSize: 16
-                )
+                // Plain text during typewriter — avoids 600+ MarkdownTextView re-parse cycles
+                // that cause watchdog kills on long responses. Switch to full markdown after.
+                if enableTypewriter && !typewriterFinished {
+                    Text(revealedContent)
+                        .font(AppTheme.Fonts.body(size: 17))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .lineSpacing(6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    MarkdownTextView(
+                        content: displayContent,
+                        textColor: AppTheme.Colors.textPrimary,
+                        fontSize: 17
+                    )
+                    .transition(.opacity)
+                }
             }
         }
-        .padding(.horizontal, isUser ? 14 : 4)  // Less padding for AI (no bubble)
+        .padding(.horizontal, isUser ? 14 : 4)
         .padding(.vertical, isUser ? 10 : 4)
         .background(userBubbleBackground)
     }
-    
+
     @ViewBuilder
     private var userBubbleBackground: some View {
         if isUser {
@@ -1791,7 +1809,7 @@ private struct CompatChatBubble: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18))
                 .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 5, y: 2)
         } else {
-            Color.clear  // Modern: no bubble for AI messages
+            Color.clear
         }
     }
 
@@ -1799,14 +1817,12 @@ private struct CompatChatBubble: View {
     @ViewBuilder
     private var metadataRow: some View {
         HStack(spacing: 6) {
-            // Timestamp
             Text(formatTime(message.timestamp))
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textTertiary)
 
-            // Execution time
             if message.executionTimeMs > 0 {
-                Text("·")
+                Text("•")
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.6))
                 Text(formatExecTime(message.executionTimeMs))
@@ -1816,20 +1832,25 @@ private struct CompatChatBubble: View {
 
             Spacer()
 
-            // Copy button
             if message.content.count > 50 {
                 Button(action: {
                     UIPasteboard.general.string = displayContent
+                    showCopiedConfirmation = true
                     HapticManager.shared.play(.light)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        showCopiedConfirmation = false
+                    }
                 }) {
-                    Image(systemName: "doc.on.doc")
+                    Image(systemName: showCopiedConfirmation ? "checkmark" : "doc.on.doc")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
+                        .foregroundColor(showCopiedConfirmation ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                 }
                 .buttonStyle(.plain)
+                .animation(.easeInOut(duration: 0.2), value: showCopiedConfirmation)
+                .accessibilityLabel("a11y_copy_response".localized)
+                .accessibilityIdentifier("copy_button")
             }
 
-            // Inline star rating
             if message.content.count > 50 {
                 CompatInlineRating(messageContent: displayContent)
             }
@@ -1838,14 +1859,20 @@ private struct CompatChatBubble: View {
     }
 
     private func formatTime(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.timeStyle = .short
-        return f.string(from: date)
+        Self.timeFormatter.string(from: date)
     }
 
     private func formatExecTime(_ ms: Double) -> String {
-        let s = ms / 1000
-        return s < 1 ? String(format: "%.0fms", ms) : String(format: "%.1fs", s)
+        let seconds = ms / 1000
+        if seconds < 1 {
+            return String(format: "%.0fms", ms)
+        } else if seconds < 60 {
+            return String(format: "%.1fs", seconds)
+        } else {
+            let mins = Int(seconds) / 60
+            let secs = Int(seconds) % 60
+            return "\(mins)m \(secs)s"
+        }
     }
 }
 

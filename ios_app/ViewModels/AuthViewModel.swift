@@ -5,6 +5,8 @@ import SwiftUI
 @MainActor
 @Observable
 class AuthViewModel {
+    nonisolated deinit {}
+
     // MARK: - Published State
     var isLoading = false
     var errorMessage: String?

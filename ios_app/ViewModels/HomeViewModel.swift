@@ -4,6 +4,8 @@ import SwiftUI
 /// ViewModel for the Home screen
 @MainActor @Observable
 class HomeViewModel {
+    nonisolated deinit {}
+
     // MARK: - State
     var userName: String = ""
     var quotaRemaining: Int = 3
