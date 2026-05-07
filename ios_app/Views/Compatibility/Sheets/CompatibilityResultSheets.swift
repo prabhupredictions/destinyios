@@ -1001,9 +1001,6 @@ struct AskDestinySheet: View {
                                         CosmicProgressView(steps: cosmicProgressSteps)
                                             .id("loading")
                                             .padding(.horizontal, 4)
-                                    } else if isLoading && redirectCosmicProgressSteps.isEmpty {
-                                        CompatTypingIndicator()
-                                            .id("loading")
                                     }
 
                                     // Follow-up suggestions (vertical rows matching ChatView)
@@ -1888,66 +1885,6 @@ private struct CompatInlineRating: View {
                 isSubmitting = false
                 hasSubmitted = true
             }
-        }
-    }
-}
-
-// MARK: - Typing Indicator (Matches ChatView Style)
-private struct CompatTypingIndicator: View {
-    @State private var animateFirst = false
-    @State private var animateSecond = false
-    @State private var animateThird = false
-    
-    var body: some View {
-        HStack(alignment: .center, spacing: 0) {
-            HStack(spacing: 10) {
-                // Animated dots
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(AppTheme.Colors.gold)
-                        .frame(width: 6, height: 6)
-                        .offset(y: animateFirst ? -4 : 0)
-                    Circle()
-                        .fill(AppTheme.Colors.gold)
-                        .frame(width: 6, height: 6)
-                        .offset(y: animateSecond ? -4 : 0)
-                    Circle()
-                        .fill(AppTheme.Colors.gold)
-                        .frame(width: 6, height: 6)
-                        .offset(y: animateThird ? -4 : 0)
-                }
-                
-                Text("ai_thinking".localized)
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(AppTheme.Colors.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
-            )
-            
-            Spacer()
-        }
-        .onAppear {
-            startAnimation()
-        }
-    }
-    
-    private func startAnimation() {
-        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) {
-            animateFirst = true
-        }
-        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.15)) {
-            animateSecond = true
-        }
-        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.3)) {
-            animateThird = true
         }
     }
 }
