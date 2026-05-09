@@ -3075,6 +3075,7 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Поиск чатов...";
 "view_daily_update" = "Посмотреть обновление на сегодня";
+"ask_more" = "Узнать больше";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "Неактивный";

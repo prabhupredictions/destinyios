@@ -3075,6 +3075,7 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Rechercher des chats...";
 "view_daily_update" = "Voir la mise à jour d'aujourd'hui";
+"ask_more" = "En savoir plus";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "Inactif";

@@ -3075,6 +3075,7 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Buscar chats...";
 "view_daily_update" = "Ver actualización de hoy";
+"ask_more" = "Preguntar más";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "Inactivo";

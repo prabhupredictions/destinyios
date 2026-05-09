@@ -3071,6 +3071,7 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Chats durchsuchen...";
 "view_daily_update" = "Heutiges Update anzeigen";
+"ask_more" = "Mehr erfahren";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "Inaktiv";

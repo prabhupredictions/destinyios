@@ -2942,6 +2942,7 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "चैट खोजें...";
 "view_daily_update" = "आज का अपडेट देखें";
+"ask_more" = "और जानें";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "निष्क्रिय";

@@ -3076,6 +3076,7 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "チャットを検索...";
 "view_daily_update" = "今日の更新を表示";
+"ask_more" = "もっと聞く";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "非アクティブ";

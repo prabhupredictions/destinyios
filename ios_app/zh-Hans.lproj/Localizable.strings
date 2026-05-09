@@ -3056,6 +3056,7 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "搜索聊天...";
 "view_daily_update" = "查看今日更新";
+"ask_more" = "了解更多";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "不活跃";

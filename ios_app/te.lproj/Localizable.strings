@@ -3052,6 +3052,7 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "చాట్‌లను శోధించండి...";
 "view_daily_update" = "ఈరోజు అప్‌డేట్ చూడండి";
+"ask_more" = "మరింత అడగండి";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "నిష్క్రియం";

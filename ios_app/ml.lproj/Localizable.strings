@@ -3076,6 +3076,7 @@
 // Additional keys for non-EN files
 "search_chats_placeholder" = "ചാറ്റുകൾ തിരയുക...";
 "view_daily_update" = "ഇന്നത്തെ അപ്ഡേറ്റ് കാണുക";
+"ask_more" = "കൂടുതൽ ചോദിക്കൂ";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "നിഷ്ക്രിയം";

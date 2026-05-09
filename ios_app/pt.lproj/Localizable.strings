@@ -3075,6 +3075,7 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 // Additional keys for non-EN files
 "search_chats_placeholder" = "Pesquisar chats...";
 "view_daily_update" = "Ver atualização de hoje";
+"ask_more" = "Saiba mais";
 
 // MARK: - Round 2 new keys (2026-05)
 "status_inactive" = "Inativo";
