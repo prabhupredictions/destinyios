@@ -118,11 +118,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        print("🔔 Notification tapped: \(userInfo)")
-
-        if let eventType = userInfo["type"] as? String {
-            NotificationRouter.shared.route(type: eventType)
-        }
+        let eventType  = userInfo["type"]        as? String ?? ""
+        let chatPrompt = userInfo["chat_prompt"] as? String ?? ""
+        NotificationRouter.shared.route(type: eventType, prefill: chatPrompt)
         completionHandler()
     }
 }
