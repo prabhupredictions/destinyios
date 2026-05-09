@@ -157,7 +157,8 @@ final class NotificationInboxService: ObservableObject {
                             createdAt: updated.createdAt,
                             readAt: ISO8601DateFormatter().string(from: Date()),
                             actionUrl: updated.actionUrl,
-                            imageUrl: updated.imageUrl
+                            imageUrl: updated.imageUrl,
+                            chatPrompt: updated.chatPrompt
                         )
                         self.notifications[index] = readItem
                     }
@@ -202,7 +203,8 @@ final class NotificationInboxService: ObservableObject {
                         createdAt: item.createdAt,
                         readAt: ISO8601DateFormatter().string(from: Date()),
                         actionUrl: item.actionUrl,
-                        imageUrl: item.imageUrl
+                        imageUrl: item.imageUrl,
+                        chatPrompt: item.chatPrompt
                     )
                 }
                 self.unreadCount = 0

@@ -285,6 +285,7 @@ struct NotificationRow: View {
                         .stroke(notification.read ? Color.clear : AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                 )
         )
+        .opacity(notification.isToday ? 1.0 : 0.6)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: "a11y_notification_detail_format".localized, notification.displayTitle, notification.displayBody, notification.timeAgo, notification.read ? "" : "a11y_unread_suffix".localized))
         .accessibilityIdentifier("notification_row")
@@ -348,7 +349,10 @@ struct NotificationDetailSheet: View {
                 VStack(spacing: 12) {
                     if hasAction {
                         Button(action: {
-                            NotificationRouter.shared.route(type: notification.type)
+                            NotificationRouter.shared.route(
+                                type: notification.type,
+                                prefill: notification.chatPrompt ?? ""
+                            )
                             dismiss()
                             onNavigateToHome?()
                         }) {
@@ -368,7 +372,7 @@ struct NotificationDetailSheet: View {
                     }
 
                     Button(action: { dismiss() }) {
-                        Text("done".localized)
+                        Text("close".localized)
                             .font(AppTheme.Fonts.caption(size: 16))
                             .foregroundColor(hasAction ? AppTheme.Colors.gold : AppTheme.Colors.mainBackground)
                             .frame(maxWidth: .infinity)
@@ -391,12 +395,11 @@ struct NotificationDetailSheet: View {
 
     private func actionButtonLabel(_ type: String) -> String {
         switch type.uppercased() {
-        case "DAILY_PREDICTION_READY", "DAILY_PREDICTION": return "view_daily_update".localized
-        case "TRANSIT_ALERT":            return "notification_action_transit".localized
-        case "LIFE_ALERT":               return "notification_action_life_alert".localized
+        case "DAILY_PREDICTION_READY", "DAILY_PREDICTION",
+             "TRANSIT_ALERT", "LIFE_ALERT", "CUSTOM_ALERT": return "ask_more".localized
         case "COMPATIBILITY_READY":      return "notification_action_compat".localized
         case "SUBSCRIPTION_EXPIRING":    return "manage_subscription".localized
-        default:                         return "notification_action_default".localized
+        default:                         return "ask_more".localized
         }
     }
 }
