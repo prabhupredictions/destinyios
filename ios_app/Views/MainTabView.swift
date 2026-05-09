@@ -153,10 +153,18 @@ struct MainTabView: View {
         .onChange(of: notificationRouter.pendingDeepLink) { _, deepLink in
             guard let deepLink else { return }
             switch deepLink {
-            case .home:    selectedTab = 0
-            case .chat:    selectedTab = 1
-            case .match:   selectedTab = 2
-            case .settings: selectedTab = 0
+            case .home:
+                selectedTab = 0
+            case .chat(let prefill):
+                selectedTab = 1
+                if !prefill.isEmpty {
+                    pendingQuestion = prefill
+                    pendingQuestionLabel = nil
+                }
+            case .match:
+                selectedTab = 2
+            case .settings:
+                selectedTab = 0
             }
             notificationRouter.pendingDeepLink = nil
         }
