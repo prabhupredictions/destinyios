@@ -42,29 +42,42 @@ struct ComparisonOverviewView: View {
         let bestActual = best.overallScore
         let hasCancellation = bestAdj > bestActual
 
-        // Find the runner-up (highest adjusted score among the rest)
-        let runnerUp = others.max(by: { $0.adjustedScore < $1.adjustedScore })
+        let recommendedOthers = others.filter { $0.isRecommended }
+        let rejectedOthers = others.filter { !$0.isRecommended }
 
-        if let second = runnerUp {
+        // Primary: compare against best viable (recommended) alternative
+        var primary: String? = nil
+        if let second = recommendedOthers.max(by: { $0.adjustedScore < $1.adjustedScore }) {
             let delta = bestAdj - second.adjustedScore
             let secondName = second.partner.name.components(separatedBy: " ").first ?? second.partner.name
-
             if delta > 0 {
-                if hasCancellation {
-                    return "Leads \(secondName) by \(delta) pts after dosha cancellation (\(bestAdj) vs \(second.adjustedScore))"
-                } else {
-                    return "Scores \(delta) points higher than \(secondName) (\(bestAdj) vs \(second.adjustedScore))"
-                }
+                primary = hasCancellation
+                    ? "Leads \(secondName) by \(delta) pts after dosha cancellation (\(bestAdj) vs \(second.adjustedScore))"
+                    : "Scores \(delta) points higher than \(secondName) (\(bestAdj) vs \(second.adjustedScore))"
             } else {
-                // Tied on score — best won on another criterion
-                if hasCancellation {
-                    return "Equal score, but dosha cancellation strengthens the match (+\(bestAdj - bestActual) pts applied)"
-                } else {
-                    return "Tied on score — fewer doshas and better individual compatibility"
-                }
+                primary = hasCancellation
+                    ? "Tied with \(secondName) — dosha cancellation tips the balance (+\(bestAdj - bestActual) pts applied)"
+                    : "Tied with \(secondName) at \(bestAdj)"
             }
         }
-        return nil
+
+        // Secondary: note if a rejected partner outscored the winner
+        var rejectionNote: String? = nil
+        if let topRej = rejectedOthers.max(by: { $0.adjustedScore < $1.adjustedScore }),
+           topRej.adjustedScore > bestAdj {
+            let rejName = topRej.partner.name.components(separatedBy: " ").first ?? topRej.partner.name
+            rejectionNote = "\(rejName) scored \(topRej.adjustedScore) but disqualified by active dosha"
+        }
+
+        // Combine
+        switch (primary, rejectionNote) {
+        case let (p?, r?): return "\(p) · \(r)"
+        case let (p?, nil): return p
+        case let (nil, r?): return r
+        default:
+            // All others are rejected with scores ≤ best — no additional explanation needed
+            return rejectedOthers.isEmpty ? nil : "Only viable match — others disqualified by active doshas"
+        }
     }
     
     var body: some View {
