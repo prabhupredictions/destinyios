@@ -970,11 +970,12 @@ struct CompatibilityView: View {
 
     // MARK: - Analyze Button
     private var analyzeButton: some View {
+        let completedCount = viewModel.partners.filter { $0.isComplete }.count
         let buttonTitle: String = {
             if viewModel.isAnalyzing {
                 return "analyzing".localized
-            } else if viewModel.partners.count > 1 {
-                return "compare_all".localized + " (\(viewModel.partners.count))"
+            } else if completedCount > 1 {
+                return "compare_all".localized + " (\(completedCount))"
             } else {
                 return "analyze_match".localized
             }
@@ -1006,7 +1007,9 @@ struct CompatibilityView: View {
     private func analyzeAction() {
         Task {
             let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-            let partnerCount = viewModel.partners.count
+            // Only analyze partners with complete birth data — ignore empty tabs the user added by mistake
+            let completedPartners = viewModel.partners.filter { $0.isComplete }
+            let partnerCount = completedPartners.count
             
             // Check quota upfront for ALL partners (count-based check)
             // Single partner = count=1, multi-partner = count=N
