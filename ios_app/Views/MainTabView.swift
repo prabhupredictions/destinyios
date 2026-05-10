@@ -155,7 +155,13 @@ struct MainTabView: View {
             switch deepLink {
             case .home:
                 selectedTab = 0
-            case .chat(let prefill):
+            case .chat(let prefill, _, let newThread):
+                if newThread {
+                    // New thread: clear existing conversation state before switching
+                    pendingQuestion = nil
+                    pendingQuestionLabel = nil
+                    pendingThreadId = nil
+                }
                 selectedTab = 1
                 if !prefill.isEmpty {
                     pendingQuestion = prefill

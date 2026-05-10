@@ -2,7 +2,7 @@ import Foundation
 
 enum NotificationDeepLink: Equatable {
     case home
-    case chat(prefill: String)
+    case chat(prefill: String, autoSubmit: Bool, newThread: Bool)
     case match
     case settings
 }
@@ -15,13 +15,12 @@ final class NotificationRouter {
     var pendingDeepLink: NotificationDeepLink?
 
     /// Routes by notification type, optionally prefilling the chat input.
-    func route(type: String, prefill: String = "") {
+    func route(type: String, prefill: String = "", autoSubmit: Bool = false, newThread: Bool = false) {
         switch type.uppercased() {
         case "DAILY_PREDICTION_READY", "DAILY_PREDICTION",
              "TRANSIT_ALERT", "LIFE_ALERT", "CUSTOM_ALERT",
              "WELCOME":
-            pendingDeepLink = .chat(prefill: prefill)
-        case "COMPATIBILITY_READY":
+            pendingDeepLink = .chat(prefill: prefill, autoSubmit: autoSubmit, newThread: newThread)        case "COMPATIBILITY_READY":
             pendingDeepLink = .match
         case "SUBSCRIPTION_EXPIRING":
             pendingDeepLink = .settings

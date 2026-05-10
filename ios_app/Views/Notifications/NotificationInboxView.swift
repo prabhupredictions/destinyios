@@ -298,60 +298,67 @@ struct NotificationDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     var onNavigateToHome: (() -> Void)? = nil
 
-    private var hasAction: Bool { notification.actionUrl != nil }
-
     var body: some View {
         ZStack {
             AppTheme.Colors.mainBackground.ignoresSafeArea()
 
-            VStack(spacing: 24) {
+            VStack(spacing: 0) {
                 // Pull indicator
                 RoundedRectangle(cornerRadius: 3)
                     .fill(AppTheme.Colors.separator)
-                    .frame(width: 40, height: 5)
-                    .padding(.top, 12)
-                    .accessibilityIdentifier("sheet_close_button")
+                    .frame(width: 36, height: 4)
+                    .padding(.top, 10)
+                    .padding(.bottom, 16)
 
-                // Icon
-                ZStack {
-                    Circle()
-                        .fill(AppTheme.Colors.gold.opacity(0.15))
-                        .frame(width: 80, height: 80)
-
-                    Image(systemName: notification.iconName)
-                        .font(.system(size: 36, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.gold)
+                // Header: icon + title + timestamp
+                HStack(alignment: .top, spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(AppTheme.Colors.gold.opacity(0.15))
+                            .frame(width: 44, height: 44)
+                        Image(systemName: notification.iconName)
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(AppTheme.Colors.gold)
+                    }
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(notification.displayTitle)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                        Text(notification.timeAgo)
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                    }
+                    Spacer()
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
 
-                // Content
-                VStack(spacing: 12) {
-                    Text(notification.displayTitle)
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .multilineTextAlignment(.center)
+                Divider()
 
+                // Scrollable full body text
+                ScrollView(showsIndicators: false) {
                     Text(notification.displayBody)
-                        .font(.system(size: 16))
+                        .font(.system(size: 15))
                         .foregroundColor(AppTheme.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
+                        .lineSpacing(5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 20)
-
-                    // Timestamp
-                    Label(notification.timeAgo, systemImage: "clock")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.goldDim)
-                        .padding(.top, 8)
+                        .padding(.vertical, 16)
                 }
 
-                Spacer()
+                Divider()
 
-                // Action buttons
-                VStack(spacing: 12) {
-                    if hasAction {
+                // Buttons
+                VStack(spacing: 10) {
+                    if canAskMore {
                         Button(action: {
+                            let prompt = notification.chatPrompt
+                                ?? "Tell me more about \(notification.displayTitle)"
                             NotificationRouter.shared.route(
                                 type: notification.type,
-                                prefill: notification.chatPrompt ?? ""
+                                prefill: prompt,
+                                autoSubmit: true,
+                                newThread: true
                             )
                             dismiss()
                             onNavigateToHome?()
@@ -359,48 +366,72 @@ struct NotificationDetailSheet: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 15, weight: .semibold))
-                                Text(actionButtonLabel(notification.type))
+                                Text("ask_more".localized)
                                     .font(AppTheme.Fonts.caption(size: 16))
                             }
                             .foregroundColor(AppTheme.Colors.mainBackground)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 52)
+                            .frame(height: 50)
                             .background(AppTheme.Colors.gold)
-                            .cornerRadius(14)
+                            .cornerRadius(12)
                         }
                         .accessibilityIdentifier("notification_action_button")
+                    } else if notification.type.uppercased() == "COMPATIBILITY_READY" {
+                        Button(action: {
+                            NotificationRouter.shared.route(type: notification.type)
+                            dismiss()
+                            onNavigateToHome?()
+                        }) {
+                            Text("notification_action_compat".localized)
+                                .font(AppTheme.Fonts.caption(size: 16))
+                                .foregroundColor(AppTheme.Colors.mainBackground)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(AppTheme.Colors.gold)
+                                .cornerRadius(12)
+                        }
+                    } else if notification.type.uppercased() == "SUBSCRIPTION_EXPIRING" {
+                        Button(action: {
+                            NotificationRouter.shared.route(type: notification.type)
+                            dismiss()
+                            onNavigateToHome?()
+                        }) {
+                            Text("manage_subscription".localized)
+                                .font(AppTheme.Fonts.caption(size: 16))
+                                .foregroundColor(AppTheme.Colors.mainBackground)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(AppTheme.Colors.gold)
+                                .cornerRadius(12)
+                        }
                     }
 
                     Button(action: { dismiss() }) {
-                        Text("close".localized)
+                        Text("done".localized)
                             .font(AppTheme.Fonts.caption(size: 16))
-                            .foregroundColor(hasAction ? AppTheme.Colors.gold : AppTheme.Colors.mainBackground)
+                            .foregroundColor(AppTheme.Colors.gold)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 52)
-                            .background(hasAction ? Color.clear : AppTheme.Colors.gold)
+                            .frame(height: 50)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 14)
-                                    .stroke(hasAction ? AppTheme.Colors.gold.opacity(0.5) : Color.clear, lineWidth: 1)
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
                             )
-                            .cornerRadius(14)
+                            .cornerRadius(12)
                     }
                 }
                 .padding(.horizontal, 20)
+                .padding(.top, 14)
                 .padding(.bottom, 32)
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
         .presentationDragIndicator(.hidden)
     }
 
-    private func actionButtonLabel(_ type: String) -> String {
-        switch type.uppercased() {
-        case "DAILY_PREDICTION_READY", "DAILY_PREDICTION",
-             "TRANSIT_ALERT", "LIFE_ALERT", "CUSTOM_ALERT": return "ask_more".localized
-        case "COMPATIBILITY_READY":      return "notification_action_compat".localized
-        case "SUBSCRIPTION_EXPIRING":    return "manage_subscription".localized
-        default:                         return "ask_more".localized
-        }
+    private var canAskMore: Bool {
+        let t = notification.type.uppercased()
+        return ["DAILY_PREDICTION_READY", "DAILY_PREDICTION", "TRANSIT_ALERT",
+                "LIFE_ALERT", "CUSTOM_ALERT", "WELCOME"].contains(t)
     }
 }
 

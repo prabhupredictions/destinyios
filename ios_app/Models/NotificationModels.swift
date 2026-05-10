@@ -15,9 +15,10 @@ struct NotificationItem: Codable, Identifiable, Equatable {
     let actionUrl: String?
     let imageUrl: String?
     let chatPrompt: String?
+    let topic: String?
 
     enum CodingKeys: String, CodingKey {
-        case id, type, channel, subject, preview, status, read
+        case id, type, channel, subject, preview, status, read, topic
         case createdAt  = "created_at"
         case readAt     = "read_at"
         case actionUrl  = "action_url"
