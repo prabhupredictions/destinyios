@@ -194,6 +194,12 @@ struct PlanetaryPositionsSheet: View {
                     .font(AppTheme.Fonts.body(size: 12))
                     .foregroundColor(.white.opacity(0.6))
             }
+            HStack(spacing: 6) {
+                Badge(text: "V", color: .purple)
+                Text("Vargottama")
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
             Spacer()
         }
         .padding(.top, 4)

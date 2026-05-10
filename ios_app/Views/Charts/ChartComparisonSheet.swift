@@ -131,7 +131,7 @@ struct ChartComparisonSheet: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .font(.caption)
             }
-            
+
             // Girl D1
             if let girlData = girlChartData {
                 chartView(
@@ -145,6 +145,9 @@ struct ChartComparisonSheet: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .font(.caption)
             }
+
+            // Legend
+            badgeLegend
         }
     }
     
@@ -229,6 +232,32 @@ struct ChartComparisonSheet: View {
                 }
                 .padding(.horizontal, 8)
             }
+        }
+    }
+    private var badgeLegend: some View {
+        HStack(spacing: 16) {
+            legendItem(text: "R", color: .red, label: "Retrograde")
+            legendItem(text: "C", color: .orange, label: "Combust")
+            legendItem(text: "V", color: .purple, label: "Vargottama")
+            Spacer()
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func legendItem(text: String, color: Color, label: String) -> some View {
+        HStack(spacing: 6) {
+            Text(text)
+                .font(AppTheme.Fonts.title(size: 8))
+                .foregroundColor(color.opacity(0.9))
+                .frame(width: 14, height: 14)
+                .background(
+                    Circle()
+                        .fill(color.opacity(0.2))
+                        .strokeBorder(color.opacity(0.5), lineWidth: 0.5)
+                )
+            Text(label)
+                .font(AppTheme.Fonts.body(size: 12))
+                .foregroundColor(.white.opacity(0.6))
         }
     }
 }
