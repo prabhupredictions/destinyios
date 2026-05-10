@@ -455,8 +455,10 @@ class CompatibilityViewModel {
         if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
             boyDob: dobFmt.string(from: boyBirthDate),
             boyTime: timeFmt.string(from: boyBirthTime),
+            boyCity: boyCity,
             girlDob: dobFmt.string(from: girlBirthDate),
-            girlTime: timeFmt.string(from: girlBirthTime)
+            girlTime: timeFmt.string(from: girlBirthTime),
+            girlCity: girlCity
         ) {
             print("[CompatibilityViewModel] Found existing match in local history — loading FREE (no API call)")
             await MainActor.run {
@@ -669,8 +671,10 @@ class CompatibilityViewModel {
             if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
                 boyDob: partnerDobFmt.string(from: boyBirthDate),
                 boyTime: partnerTimeFmt.string(from: boyBirthTime),
+                boyCity: boyCity,
                 girlDob: partnerDobFmt.string(from: partner.birthDate),
-                girlTime: partnerTimeFmt.string(from: partner.birthTime)
+                girlTime: partnerTimeFmt.string(from: partner.birthTime),
+                girlCity: partner.city
             ),
             let cachedCompatibilityResult = existingMatch.result {
                 print("[Multi-Partner] Found existing match for \(partner.name) in cache - loading FREE")

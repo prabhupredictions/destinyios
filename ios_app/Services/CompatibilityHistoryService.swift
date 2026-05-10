@@ -134,7 +134,7 @@ final class CompatibilityHistoryService {
         // 2. For UNGROUPED items only: upsert by person pair (prevents duplicate rows for same couple)
         //    Group items skip this — each group member is a distinct entry
         else if item.comparisonGroupId == nil,
-                let existingIndex = findUngroupedMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime, girlDob: item.girlDob, girlTime: item.girlTime) {
+                let existingIndex = findUngroupedMatchIndex(in: items, boyDob: item.boyDob, boyTime: item.boyTime, boyCity: item.boyCity, girlDob: item.girlDob, girlTime: item.girlTime, girlCity: item.girlCity) {
             // Update existing entry: refresh timestamp, score, result; merge chat messages
             var existing = items[existingIndex]
             existing.timestamp = item.timestamp
@@ -166,37 +166,45 @@ final class CompatibilityHistoryService {
     // MARK: - Find Existing Match (pair-symmetric)
     /// Checks if a match with the same person pair exists in ANY item (grouped or ungrouped),
     /// checking BOTH orderings (A,B) and (B,A). Returns the most recent matching item.
-    func findExistingMatch(boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> CompatibilityHistoryItem? {
+    func findExistingMatch(boyDob: String, boyTime: String, boyCity: String, girlDob: String, girlTime: String, girlCity: String) -> CompatibilityHistoryItem? {
         let items = loadAll()
-        guard let index = findMatchIndex(in: items, boyDob: boyDob, boyTime: boyTime, girlDob: girlDob, girlTime: girlTime) else {
+        guard let index = findMatchIndex(in: items, boyDob: boyDob, boyTime: boyTime, boyCity: boyCity, girlDob: girlDob, girlTime: girlTime, girlCity: girlCity) else {
             return nil
         }
         return items[index]
     }
-    
-    /// Finds the index of ANY matching item by person pair (symmetric check).
-    /// Searches ALL items — grouped and ungrouped — for cache purposes.
-    private func findMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
+
+    /// Finds the index of ANY matching item by person pair (symmetric check), including city.
+    /// City is included so a re-run with a different birth location bypasses the cache.
+    private func findMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, boyCity: String, girlDob: String, girlTime: String, girlCity: String) -> Int? {
         return items.firstIndex { existing in
             // Forward: same order
             let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
-                           existing.girlDob == girlDob && existing.girlTime == girlTime
+                           existing.boyCity == boyCity &&
+                           existing.girlDob == girlDob && existing.girlTime == girlTime &&
+                           existing.girlCity == girlCity
             // Reverse: swapped roles
             let reverse = existing.boyDob == girlDob && existing.boyTime == girlTime &&
-                           existing.girlDob == boyDob && existing.girlTime == boyTime
+                           existing.boyCity == girlCity &&
+                           existing.girlDob == boyDob && existing.girlTime == boyTime &&
+                           existing.girlCity == boyCity
             return forward || reverse
         }
     }
     
     /// Finds index of an UNGROUPED match only — used by save() to upsert standalone items
     /// without corrupting group entries.
-    private func findUngroupedMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, girlDob: String, girlTime: String) -> Int? {
+    private func findUngroupedMatchIndex(in items: [CompatibilityHistoryItem], boyDob: String, boyTime: String, boyCity: String, girlDob: String, girlTime: String, girlCity: String) -> Int? {
         return items.firstIndex { existing in
             guard existing.comparisonGroupId == nil else { return false }
             let forward = existing.boyDob == boyDob && existing.boyTime == boyTime &&
-                           existing.girlDob == girlDob && existing.girlTime == girlTime
+                           existing.boyCity == boyCity &&
+                           existing.girlDob == girlDob && existing.girlTime == girlTime &&
+                           existing.girlCity == girlCity
             let reverse = existing.boyDob == girlDob && existing.boyTime == girlTime &&
-                           existing.girlDob == boyDob && existing.girlTime == boyTime
+                           existing.boyCity == girlCity &&
+                           existing.girlDob == boyDob && existing.girlTime == boyTime &&
+                           existing.girlCity == boyCity
             return forward || reverse
         }
     }
