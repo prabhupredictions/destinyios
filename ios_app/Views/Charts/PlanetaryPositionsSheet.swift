@@ -63,6 +63,9 @@ struct PlanetaryPositionsSheet: View {
                             
                             // Premium Planetary Grid
                             planetaryGrid(chart: chart)
+
+                            // Legend
+                            badgeLegend
                         }
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
@@ -177,6 +180,25 @@ struct PlanetaryPositionsSheet: View {
     }
 
     // MARK: - Minimal Birth Info (Clean, no box)
+    private var badgeLegend: some View {
+        HStack(spacing: 16) {
+            HStack(spacing: 6) {
+                Badge(text: "R", color: AppTheme.Colors.error)
+                Text("Retrograde")
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            HStack(spacing: 6) {
+                Badge(text: "C", color: .orange)
+                Text("Combust")
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            Spacer()
+        }
+        .padding(.top, 4)
+    }
+
     private func minimalBirthInfo(_ details: AstroBirthDetails, city: String, ascendant: String) -> some View {
         return HStack(spacing: 8) {
             // Date

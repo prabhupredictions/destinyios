@@ -726,7 +726,7 @@ struct ProfileView: View {
                     title: "contact_us_title".localized,
                     icon: "envelope.fill",
                     action: {
-                        if let url = URL(string: "https://www.destinyaiastrology.com/#contact") {
+                        if let url = URL(string: "mailto:support@destinyaiastrology.com") {
                             openURL(url)
                         }
                     }
