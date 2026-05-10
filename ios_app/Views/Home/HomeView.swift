@@ -851,6 +851,7 @@ struct HomeView: View {
                             }) {
                                 QuickQuestionCard(question: question)
                             }
+                            .frame(maxHeight: .infinity)
                             .buttonStyle(ScaleButtonStyle())
                             .accessibilityIdentifier("mind_question_\(qIndex)")
                         }
@@ -1109,7 +1110,7 @@ struct QuickQuestionCard: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 70, maxHeight: .infinity, alignment: .topLeading)
         .background(
             RoundedRectangle(cornerRadius: 14)
                 .fill(AppTheme.Colors.cardBackground)

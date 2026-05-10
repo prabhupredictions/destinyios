@@ -30,6 +30,42 @@ struct ComparisonOverviewView: View {
     private var allRejected: Bool {
         results.allSatisfy { !$0.isRecommended }
     }
+
+    // One-line comparative reason shown in the recommendation footer.
+    // Answers: "why this one?" not just "this one is good."
+    private var comparisonReasonText: String? {
+        guard let best = bestMatch else { return nil }
+        let others = sortedResults.filter { $0.id != best.id }
+        guard !others.isEmpty else { return nil }
+
+        let bestAdj = best.adjustedScore
+        let bestActual = best.overallScore
+        let hasCancellation = bestAdj > bestActual
+
+        // Find the runner-up (highest adjusted score among the rest)
+        let runnerUp = others.max(by: { $0.adjustedScore < $1.adjustedScore })
+
+        if let second = runnerUp {
+            let delta = bestAdj - second.adjustedScore
+            let secondName = second.partner.name.components(separatedBy: " ").first ?? second.partner.name
+
+            if delta > 0 {
+                if hasCancellation {
+                    return "Leads \(secondName) by \(delta) pts after dosha cancellation (\(bestAdj) vs \(second.adjustedScore))"
+                } else {
+                    return "Scores \(delta) points higher than \(secondName) (\(bestAdj) vs \(second.adjustedScore))"
+                }
+            } else {
+                // Tied on score — best won on another criterion
+                if hasCancellation {
+                    return "Equal score, but dosha cancellation strengthens the match (+\(bestAdj - bestActual) pts applied)"
+                } else {
+                    return "Tied on score — fewer doshas and better individual compatibility"
+                }
+            }
+        }
+        return nil
+    }
     
     var body: some View {
         ZStack {
@@ -626,6 +662,12 @@ struct ComparisonOverviewView: View {
                             Text(String(format: "final_recommendation_label".localized, best.partner.name, "\(best.adjustedScore)"))
                                 .font(AppTheme.Fonts.title(size: 15))
                                 .foregroundColor(AppTheme.Colors.gold)
+                            if let reason = comparisonReasonText {
+                                Text(reason)
+                                    .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
+                                    .foregroundColor(AppTheme.Colors.textPrimary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
                             Text(best.oneLiner ?? "all_doshas_safe_fallback".localized)
                                 .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
