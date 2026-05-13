@@ -32,6 +32,8 @@ struct AuthView: View {
     
     // Sound Manager
     @ObservedObject private var soundManager = SoundManager.shared
+
+    @State private var appStartup = AppStartupService.shared
     
     var body: some View {
         ZStack {
@@ -68,8 +70,10 @@ struct AuthView: View {
                     .offset(y: contentOffset)
                 
                 // Guest option
-                guestSection
-                    .opacity(contentOpacity)
+                if appStartup.allowGuest {
+                    guestSection
+                        .opacity(contentOpacity)
+                }
                 
                 Spacer()
                 

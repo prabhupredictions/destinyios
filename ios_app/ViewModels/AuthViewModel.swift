@@ -241,7 +241,19 @@ class AuthViewModel {
                 
                 print("📥 [AuthViewModel] registerUser response:")
                 print("   - userEmail: \(registerResponse?.userEmail ?? "nil")")
-                
+
+                // Waitlist gate: early exit if user is not yet approved
+                if registerResponse?.accessState == "waitlist_pending" {
+                    await MainActor.run {
+                        UserDefaults.standard.set(email, forKey: "userEmail")
+                        UserDefaults.standard.set("waitlist_pending", forKey: "lastAccessState")
+                        UserDefaults.standard.set(true, forKey: "isAuthenticated")
+                        self.isAuthenticated = true
+                    }
+                    await MainActor.run { isLoading = false }
+                    return
+                }
+
                 // Use the server-returned email (critical for apple_id/google_id recovery)
                 let actualEmail = registerResponse?.userEmail ?? email
                 print("📧 [AuthViewModel] Using actualEmail for profile fetch: \(actualEmail)")
@@ -500,12 +512,13 @@ class AuthViewModel {
         self.isGuest = isGuest
         self.userEmail = user.email
         self.userName = user.name
-        
+
         // Securely store user ID
         try? keychain.saveString(user.id, forKey: KeychainService.Keys.userId)
-        
+
         // Store non-sensitive state
         UserDefaults.standard.set(true, forKey: "isAuthenticated")
+        UserDefaults.standard.set("granted", forKey: "lastAccessState")
         UserDefaults.standard.set(isGuest, forKey: "isGuest")
         
         if let email = user.email {
