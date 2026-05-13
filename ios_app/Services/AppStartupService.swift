@@ -39,10 +39,8 @@ final class AppStartupService {
                 self.lastFetchedAt = Date()
             }
         } catch {
-            await MainActor.run {
-                self.gateMode = "off"
-                self.allowGuest = false
-            }
+            // Leave prior cached values intact on transient network failure.
+            // On first launch with no cache, defaults ("off", false) remain — safe.
         }
     }
 }
