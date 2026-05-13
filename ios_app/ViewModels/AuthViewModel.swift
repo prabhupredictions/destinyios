@@ -375,7 +375,20 @@ class AuthViewModel {
                 
                 print("📥 [AuthViewModel] registerUser (ID lookup) response:")
                 print("   - userEmail: \(registerResponse?.userEmail ?? "nil")")
-                
+
+                // Waitlist gate: early exit if user is not yet approved (nil-email path)
+                if registerResponse?.accessState == "waitlist_pending" {
+                    let lookupEmail = registerResponse?.userEmail ?? "lookup-by-id@placeholder.local"
+                    await MainActor.run {
+                        UserDefaults.standard.set(lookupEmail, forKey: "userEmail")
+                        UserDefaults.standard.set("waitlist_pending", forKey: "lastAccessState")
+                        UserDefaults.standard.set(true, forKey: "isAuthenticated")
+                        self.isAuthenticated = true
+                    }
+                    await MainActor.run { isLoading = false }
+                    return
+                }
+
                 if let storedEmail = registerResponse?.userEmail, storedEmail != "lookup-by-id@placeholder.local" {
                     // Found existing user! Fetch their profile
                     print("✅ [AuthViewModel] Found existing user by ID! Email: \(storedEmail)")
