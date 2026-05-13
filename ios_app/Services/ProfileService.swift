@@ -77,7 +77,8 @@ class ProfileService {
         let featureUsage: [String: FeatureUsageInfo]?
         let subscriptionStatus: String?
         let analyticsConsent: Bool?  // Analytics consent status
-        
+        let accessState: String
+
         enum CodingKeys: String, CodingKey {
             case userEmail = "user_email"
             case planId = "plan_id"
@@ -86,6 +87,7 @@ class ProfileService {
             case featureUsage = "feature_usage"
             case subscriptionStatus = "subscription_status"
             case analyticsConsent = "analytics_consent"
+            case accessState = "access_state"
         }
     }
     
