@@ -4,6 +4,8 @@ import SwiftUI
 struct WaitlistPendingView: View {
     let userEmail: String
 
+    @AppStorage("isAuthenticated") private var isAuthenticated = false
+    @AppStorage("lastAccessState") private var lastAccessState = "unknown"
     @State private var showTally = false
 
     private var tallyURL: URL {
@@ -64,6 +66,18 @@ struct WaitlistPendingView: View {
                     .foregroundStyle(AppTheme.Colors.gold)
 
                 Spacer()
+
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        lastAccessState = "unknown"
+                        isAuthenticated = false
+                    }
+                } label: {
+                    Text(NSLocalizedString("waitlist_back_to_login", value: "Back to Login", comment: "Waitlist screen back to login button"))
+                        .font(AppTheme.Fonts.body(size: 15))
+                        .foregroundStyle(AppTheme.Colors.textSecondary)
+                }
+                .padding(.bottom, 32)
             }
         }
         .sheet(isPresented: $showTally) {
