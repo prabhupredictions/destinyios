@@ -264,8 +264,11 @@ struct ProfileView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "person.text.rectangle")
                             .font(AppTheme.Fonts.caption(size: 11))
-                        Text(String(format: "viewing_birth_chart_format".localized, profileContext.activeProfileName))
+                        let fullName = profileContext.activeProfileName
+                        let displayName = fullName.split(separator: " ").first.map(String.init) ?? fullName
+                        Text(String(format: "viewing_birth_chart_format".localized, displayName))
                             .font(AppTheme.Fonts.caption(size: 11))
+                            .lineLimit(1)
                     }
                     .foregroundColor(AppTheme.Colors.gold)
                     .padding(.top, 4)
