@@ -20,8 +20,14 @@ class HomeViewModel {
     var planDisplayName: String = UserDefaults.standard.string(forKey: "currentPlanDisplayName") ?? "Free"
 
     private var hasSeenFirstPrediction: Bool {
-        get { UserDefaults.standard.bool(forKey: "hasSeenFirstPrediction") }
-        set { UserDefaults.standard.set(newValue, forKey: "hasSeenFirstPrediction") }
+        get {
+            let key = "hasSeenFirstPrediction_\(UserDefaults.standard.string(forKey: "userEmail") ?? "guest")"
+            return UserDefaults.standard.bool(forKey: key)
+        }
+        set {
+            let key = "hasSeenFirstPrediction_\(UserDefaults.standard.string(forKey: "userEmail") ?? "guest")"
+            UserDefaults.standard.set(newValue, forKey: key)
+        }
     }
     
     // MARK: - New Premium State
