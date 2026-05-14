@@ -6,12 +6,13 @@ struct UserAstroDataRequest: Codable {
     let birthData: UserBirthData
     let userEmail: String?
     let language: String?  // Language code for LLM response (e.g., "en", "hi", "es")
-    
-    init(birthData: UserBirthData, userEmail: String? = nil, language: String? = nil) {
+    let isFirstLogin: Bool?
+
+    init(birthData: UserBirthData, userEmail: String? = nil, language: String? = nil, isFirstLogin: Bool? = nil) {
         // Round coordinates to 6 decimal places to satisfy backend validation
         let roundedLat = (birthData.latitude * 1_000_000).rounded() / 1_000_000
         let roundedLong = (birthData.longitude * 1_000_000).rounded() / 1_000_000
-        
+
         self.birthData = UserBirthData(
             dob: birthData.dob,
             time: birthData.time,
@@ -25,12 +26,14 @@ struct UserAstroDataRequest: Codable {
         )
         self.userEmail = userEmail
         self.language = language
+        self.isFirstLogin = isFirstLogin
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case birthData = "birth_data"
         case userEmail = "user_email"
         case language
+        case isFirstLogin = "is_first_login"
     }
 }
 

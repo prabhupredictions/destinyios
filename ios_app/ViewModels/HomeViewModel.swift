@@ -18,6 +18,11 @@ class HomeViewModel {
     var isGuest = false
     var isPremium = false
     var planDisplayName: String = UserDefaults.standard.string(forKey: "currentPlanDisplayName") ?? "Free"
+
+    private var hasSeenFirstPrediction: Bool {
+        get { UserDefaults.standard.bool(forKey: "hasSeenFirstPrediction") }
+        set { UserDefaults.standard.set(newValue, forKey: "hasSeenFirstPrediction") }
+    }
     
     // MARK: - New Premium State
     var currentDasha: String = "Loading..."
@@ -296,13 +301,15 @@ class HomeViewModel {
             let userEmail = UserDefaults.standard.string(forKey: "userEmail")
             // Get current app language from user selection (not system locale)
             let language = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
-            var request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail, language: language)
-            
+            let isFirstLogin = !hasSeenFirstPrediction
+            var request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail, language: language, isFirstLogin: isFirstLogin)
+
             let response = try await predictionService.getTodaysPrediction(request: request)
-            
+
             print("[HomeViewModel] API response received for profile: \(profileId)")
             TodaysPredictionCache.shared.set(response)
-            
+            if isFirstLogin { hasSeenFirstPrediction = true }
+
             await MainActor.run {
                 self.applyPredictionResponse(response)
                 self.errorMessage = nil // Clear any previous error
