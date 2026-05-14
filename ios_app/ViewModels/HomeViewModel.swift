@@ -286,8 +286,8 @@ class HomeViewModel {
         print("[HomeViewModel] fetchTodaysPrediction for profile: \(profileName) (id: \(profileId))")
         print("[HomeViewModel] Birth data DOB: \(birthData.dob)")
         
-        // Check local cache first (profile-scoped via TodaysPredictionCache)
-        if !force, let cached = TodaysPredictionCache.shared.get() {
+        // Check local cache first — but bypass if this is first login so fixed question is guaranteed
+        if !force, hasSeenFirstPrediction, let cached = TodaysPredictionCache.shared.get() {
             print("[HomeViewModel] Cache HIT for profile: \(profileId)")
             await MainActor.run {
                 self.applyPredictionResponse(cached)
