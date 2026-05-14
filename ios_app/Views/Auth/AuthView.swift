@@ -61,9 +61,10 @@ struct AuthView: View {
                     .opacity(contentOpacity)
                     .offset(y: contentOffset)
                     .padding(.top, 28)
-                
-                Spacer()
-                
+
+                Spacer(minLength: 0)
+                    .frame(maxHeight: 48)
+
                 // Auth buttons
                 authButtonsSection
                     .opacity(contentOpacity)
