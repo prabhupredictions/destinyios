@@ -122,6 +122,7 @@ struct AppRootView: View {
         }
         .task {
             await appStartup.fetchConfig()
+            await recheckWaitlistStatus()
         }
         .onReceive(NotificationCenter.default.publisher(for: .appLanguageChanged)) { _ in
             // Force UI refresh when language changes
@@ -135,7 +136,7 @@ struct AppRootView: View {
     // MARK: - Waitlist Recheck
 
     private func recheckWaitlistStatus() async {
-        guard isAuthenticated && lastAccessState == "waitlist_pending" else { return }
+        guard isAuthenticated else { return }
         let storedEmail = UserDefaults.standard.string(forKey: "userEmail") ?? ""
         let appleId = UserDefaults.standard.string(forKey: "appleUserID")
         let googleId = UserDefaults.standard.string(forKey: "googleUserID")
@@ -148,15 +149,15 @@ struct AppRootView: View {
                 appleId: appleId,
                 googleId: googleId
             )
-            if let state = response?.accessState, state == "granted" {
+            if let state = response?.accessState {
                 await MainActor.run {
                     withAnimation(.easeInOut(duration: 0.4)) {
-                        lastAccessState = "granted"
+                        lastAccessState = state
                     }
                 }
             }
         } catch {
-            // silently ignore — user stays on WaitlistPendingView
+            // silently ignore — keep existing access state on network failure
         }
     }
 
