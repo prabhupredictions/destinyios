@@ -48,7 +48,7 @@ struct ProfileView: View {
     @State private var notificationsEnabled = false
     
     // Analytics consent toggle
-    @State private var analyticsConsent = true
+    @State private var analyticsConsent = false
     @State private var isUpdatingAnalyticsConsent = false
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
@@ -925,11 +925,11 @@ struct ProfileView: View {
             do {
                 let status = try await ProfileService.shared.getUserStatus(email: userEmail)
                 await MainActor.run {
-                    analyticsConsent = status.analyticsConsent ?? true
+                    analyticsConsent = status.analyticsConsent ?? (Locale.current.region?.identifier == "US")
                 }
             } catch {
                 print("[ProfileView] Failed to load analytics consent: \(error.localizedDescription)")
-                // Keep default value (true) on error
+                // Default: US = on (opt-out), non-US = off (opt-in)
             }
         }
     }
