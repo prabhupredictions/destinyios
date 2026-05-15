@@ -24,8 +24,13 @@ struct BirthDataView: View {
     // Response style picker — shown after birth data is saved, before profile setup loading
     @State private var showResponseStylePicker = false
 
+    // Analytics consent — unchecked by default for non-US users
+    @State private var analyticsConsent = false
+
     // Sound Manager
     @ObservedObject private var soundManager = SoundManager.shared
+
+    private var isUSLocale: Bool { Locale.current.region?.identifier == "US" }
     
     var body: some View {
         NavigationStack {
@@ -406,9 +411,9 @@ struct BirthDataView: View {
                 title: "gender_identity".localized,
                 value: viewModel.gender.isEmpty ? "select_gender".localized : (
                     // Map value to localized label
-                    ["male": "male".localized, 
-                     "female": "female".localized, 
-                     "non-binary": "non_binary".localized, 
+                    ["male": "male".localized,
+                     "female": "female".localized,
+                     "non-binary": "non_binary".localized,
                      "prefer_not_to_say": "prefer_not_to_say".localized][viewModel.gender] ?? viewModel.gender
                 ),
                 isPlaceholder: viewModel.gender.isEmpty
@@ -416,9 +421,30 @@ struct BirthDataView: View {
                isNameFocused = false
                showGenderSheet = true
             }
+
+            // Analytics consent — shown only for non-US users, unchecked by default
+            if !isUSLocale {
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        analyticsConsent.toggle()
+                    }
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: analyticsConsent ? "checkmark.square.fill" : "square")
+                            .font(AppTheme.Fonts.title(size: 18))
+                            .foregroundColor(analyticsConsent ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                        Text("analytics_consent_label".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
-    
+
     // MARK: - Submit Button (ShimmerButton - consistent with Onboarding)
     private var submitButton: some View {
         ShimmerButton(title: "continue".localized, icon: "arrow.right") {
@@ -541,7 +567,14 @@ struct BirthDataView: View {
             print("❌ Failed to sync profile: \(error)")
             // Continue anyway - local data is saved
         }
-        
+
+        // For non-US users, send their analytics consent choice (backend defaults to true)
+        if !isUSLocale {
+            let email = userEmail
+            let consent = analyticsConsent
+            Task { try? await ProfileService.shared.updateAnalyticsConsent(email: email, consent: consent) }
+        }
+
         return true // Success - proceed to next screen
     }
     
