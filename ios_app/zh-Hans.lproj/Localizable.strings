@@ -221,6 +221,7 @@
 "continue_with_google" = "通过 Google 继续";
 "continue_with_email" = "通过邮箱继续";
 "i_dont_know_birth_time" = "我不知道出生时间";
+"analytics_consent_label" = "通过分享使用分析帮助改进应用";
 "profile_data_refreshed" = "您的个人资料已在服务器上刷新。请重新输入您的出生详情。";
 "sign_up" = "注册";
 "account_deleted_error" = "此帳户已永久删除，无法再使用。相关的電子邮件地址不可重複使用。如果您认为这是错誤，请联系客服。";

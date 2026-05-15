@@ -229,6 +229,7 @@
 "continue_with_google" = "Continuar com Google";
 "continue_with_email" = "Continuar com e-mail";
 "i_dont_know_birth_time" = "Não sei minha hora de nascimento";
+"analytics_consent_label" = "Ajude a melhorar o app compartilhando análises de uso";
 "profile_data_refreshed" = "Seus dados de perfil foram atualizados no servidor. Por favor, reinsira os detalhes do seu nascimento.";
 "sign_up" = "Cadastre-se";
 "account_deleted_error" = "Esta conta foi excluída permanentemente e não pode mais ser usada. O e-mail associado não pode ser reutilizado. Se você acredita que isso é um erro, entre em contato com o suporte.";

@@ -229,6 +229,7 @@
 "continue_with_google" = "Mit Google fortfahren";
 "continue_with_email" = "Mit E-Mail fortfahren";
 "i_dont_know_birth_time" = "Ich kenne meine Geburtszeit nicht";
+"analytics_consent_label" = "Helfen Sie, die App zu verbessern, indem Sie Nutzungsanalysen teilen";
 "profile_data_refreshed" = "Ihre Profildaten wurden auf dem Server aktualisiert. Bitte geben Sie Ihre Geburtsdaten erneut ein.";
 "sign_up" = "Registrieren";
 "account_deleted_error" = "Dieses Konto wurde dauerhaft gelöscht und kann nicht mehr verwendet werden. Die verknüpfte E-Mail kann nicht wiederverwendet werden. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich an den Support.";

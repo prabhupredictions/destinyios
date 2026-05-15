@@ -229,6 +229,7 @@
 "continue_with_google" = "Googleで続ける";
 "continue_with_email" = "メールで続ける";
 "i_dont_know_birth_time" = "生まれた時間がわからない";
+"analytics_consent_label" = "使用状況の分析を共有してアプリの改善にご協力ください";
 "profile_data_refreshed" = "プロフィールデータがサーバー上で更新されました。出生データを再入力してください。";
 "sign_up" = "サインアップ";
 "account_deleted_error" = "このアカウントは永久に削除されており、使用できません。関連付けられたメールアドレスは再利用できません。エラーと思われる場合は、サポートにお問い合わせください。";
