@@ -26,29 +26,21 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "എന്റെ മനസ്സിൽ എന്താണ്?";
-"tap_to_explore_day" = "നിങ്ങളുടെ ദിനം പര്യവേക്ഷണം ചെയ്യാൻ ടാപ്പ് ചെയ്യുക";
 
 // MARK: - Filter Labels
 "all" = "എല്ലാം";
-"good" = "നല്ലത്";
 "steady" = "സ്ഥിരം";
 "caution" = "ശ്രദ്ധിക്കുക";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "തീം";
-"current_dasha" = "നിലവിലെ ദശ";
 
 // MARK: - Life Area Filters
 "love" = "സ്നേഹം";
 "wealth" = "സമ്പത്ത്";
 
 // MARK: - Yoga Card Status
-"yoga_status_active" = "സജീവം";
-"yoga_status_reduced" = "കുറഞ്ഞു";
-"yoga_status_cancelled" = "റദ്ദാക്കി";
 "yoga_status_inactive" = "നിഷ്ക്രിയം";
-"planets_label" = "ഗ്രഹങ്ങൾ";
-"houses_label" = "ഭാവങ്ങൾ";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "എല്ലാം";
@@ -407,15 +399,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "ഇല്ല";
-"severity_mild" = "സൗമ്യമായ";
-"severity_moderate" = "മിതത്വം";
 "severity_high" = "ഉയർന്ന";
-"severity_severe" = "കഠിനമായ";
 
 // MARK: - Status Labels
-"status_active" = "സജീവം";
-"status_reduced" = "കുറഞ്ഞു";
-"status_cancelled" = "റദ്ദാക്കി";
 "active" = "സജീവം";
 "reduced" = "കുറഞ്ഞു";
 "cancelled" = "റദ്ദായി";
@@ -2165,21 +2151,17 @@
 "view_details" = "വിശദാംശങ്ങൾ കാണുക";
 "area_label" = "ഏരിയ";
 "actual_label" = "യഥാർത്ഥം";
-"adjusted_label" = "ക്രമീകരിച്ചു";
 "manglik_label" = "മംഗ്ലിക്";
 "none_label" = "ഒന്നുമില്ല";
 "view_label" = "കാണുക";
-"no_profiles_meet_threshold" = "പ്രൊഫൈലുകളൊന്നും ശുപാർശ ചെയ്യുന്ന പരിധി പാലിക്കുന്നില്ല.";
 "review_individual_analyses" = "വിശദമായ സ്ഥിതിവിവരക്കണക്കുകൾക്കായി ചുവടെയുള്ള വ്യക്തിഗത വിശകലനങ്ങൾ അവലോകനം ചെയ്യുക.";
 "destiny_ai_astrology_brand" = "ഡെസ്റ്റിനി AI ജ്യോതിഷം";
 "compatibility_comparison" = "അനുയോജ്യത താരതമ്യം";
-"copyright_notice" = "© 2026 ഡെസ്റ്റിനി AI ജ്യോതിഷം. എല്ലാ അവകാശങ്ങളും നിക്ഷിപ്തം.";
 "description_not_available" = "വിവരണം ലഭ്യമല്ല";
 "this_may_take_moments" = "ഇതിന് കുറച്ച് നിമിഷങ്ങൾ എടുത്തേക്കാം...";
 "pending_label" = "തീർപ്പാക്കാത്തത്";
 "overridden_due_to_dosha" = "ദോഷ പൊരുത്തക്കേട് കാരണം അസാധുവാക്കപ്പെട്ടു";
 "active_doshas" = "സജീവ ദോഷങ്ങൾ:";
-"dosha_label" = "ദോശ";
 "rejection_reason_label" = "കൺസൺ";
 "additional_notes" = "അധിക കുറിപ്പുകൾ:";
 "not_recommended_because" = "ശുപാർശ ചെയ്യാത്തതിന്റെ കാരണം:";
@@ -2413,7 +2395,6 @@
 
 // Yoga/Dosha Status
 "status_active" = "സജീവം";
-"status_reduced" = "കുറഞ്ഞു";
 "status_cancelled" = "റദ്ദാക്കി";
 
 // Yoga/Dosha Types

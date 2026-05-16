@@ -19,17 +19,17 @@ struct FullReportSheet: View {
     
     private var ratingText: String {
         if !result.isRecommended { return "not_recommended".localized }
-        let pct = result.percentage * 100
+        let pct = result.adjustedPercentage * 100
         if pct >= 90 { return "excellent".localized }
         else if pct >= 75 { return "very_good".localized }
         else if pct >= 60 { return "good".localized }
         else if pct >= 50 { return "average".localized }
         else { return "not_recommended".localized }
     }
-    
+
     private var starCount: Int {
         if !result.isRecommended { return 1 }
-        let pct = result.percentage * 100
+        let pct = result.adjustedPercentage * 100
         if pct >= 90 { return 5 }
         else if pct >= 75 { return 4 }
         else if pct >= 60 { return 3 }

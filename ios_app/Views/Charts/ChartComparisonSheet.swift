@@ -194,7 +194,7 @@ struct ChartComparisonSheet: View {
                     .foregroundColor(AppTheme.Colors.gold)
                 
                 if let asc = ascendant {
-                    Text("• " + String(format: "asc_label".localized, ChartConstants.signFullNames[asc] ?? asc))
+                    Text("• Asc: \(ChartConstants.signFullNames[asc] ?? asc)")
                         .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(.white.opacity(0.7))
                 }

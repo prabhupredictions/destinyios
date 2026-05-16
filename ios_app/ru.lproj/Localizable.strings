@@ -26,29 +26,21 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "Что у меня на уме?";
-"tap_to_explore_day" = "Нажмите, чтобы исследовать день";
 
 // MARK: - Filter Labels
 "all" = "Все";
-"good" = "Хорошо";
 "steady" = "Стабильно";
 "caution" = "Осторожно";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "Тема";
-"current_dasha" = "Текущая Даша";
 
 // MARK: - Life Area Filters
 "love" = "Любовь";
 "wealth" = "Богатство";
 
 // MARK: - Yoga Card Status
-"yoga_status_active" = "Активно";
-"yoga_status_reduced" = "Снижено";
-"yoga_status_cancelled" = "Отменено";
 "yoga_status_inactive" = "Неактивно";
-"planets_label" = "Планеты";
-"houses_label" = "Дома";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "Все";
@@ -407,15 +399,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "Нет";
-"severity_mild" = "Мягкий";
-"severity_moderate" = "Умеренный";
 "severity_high" = "Высокая";
-"severity_severe" = "Серьезный";
 
 // MARK: - Status Labels
-"status_active" = "Активна";
-"status_reduced" = "Ослаблена";
-"status_cancelled" = "Отменена";
 "active" = "Активно";
 "reduced" = "Ослаблена";
 "cancelled" = "Отменено";
@@ -2165,21 +2151,17 @@
 "view_details" = "Посмотреть детали";
 "area_label" = "Область";
 "actual_label" = "Действительный";
-"adjusted_label" = "Скорректировано";
 "manglik_label" = "Манглик";
 "none_label" = "Никто";
 "view_label" = "Вид";
-"no_profiles_meet_threshold" = "Ни один профиль не соответствует рекомендуемому порогу.";
 "review_individual_analyses" = "Просмотрите отдельные анализы ниже для получения подробной информации.";
 "destiny_ai_astrology_brand" = "СУДЬБА ИИ АСТРОЛОГИЯ";
 "compatibility_comparison" = "СРАВНЕНИЕ СОВМЕСТИМОСТИ";
-"copyright_notice" = "© 2026 Destiny AI Астрология. Все права защищены.";
 "description_not_available" = "Описание недоступно";
 "this_may_take_moments" = "Это может занять несколько минут...";
 "pending_label" = "В ожидании";
 "overridden_due_to_dosha" = "Отменено из-за несовместимости дош.";
 "active_doshas" = "Активные Доши:";
-"dosha_label" = "Доша";
 "rejection_reason_label" = "Беспокойство";
 "additional_notes" = "Дополнительные заметки:";
 "not_recommended_because" = "Не рекомендуется, причина:";
@@ -2413,7 +2395,6 @@
 
 // Yoga/Dosha Status
 "status_active" = "Активный";
-"status_reduced" = "Ослаблен";
 "status_cancelled" = "Отменён";
 
 // Yoga/Dosha Types

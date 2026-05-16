@@ -28,29 +28,21 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "What's in my mind?";
-"tap_to_explore_day" = "Tap to explore your day";
 
 // MARK: - Filter Labels
 "all" = "All";
-"good" = "Good";
 "steady" = "Steady";
 "caution" = "Caution";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "Theme";
-"current_dasha" = "Current Dasha";
 
 // MARK: - Life Area Filters
 "love" = "Love";
 "wealth" = "Wealth";
 
 // MARK: - Yoga Card Status
-"yoga_status_active" = "Active";
-"yoga_status_reduced" = "Reduced";
-"yoga_status_cancelled" = "Cancelled";
 "yoga_status_inactive" = "Inactive";
-"planets_label" = "Planets";
-"houses_label" = "Houses";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "All";
@@ -260,7 +252,6 @@
 "worlds_advanced_ai" = "WORLD'S MOST ADVANCED AI ASTROLOGER";
 
 // MARK: - Onboarding
-"questions_asked" = "questions asked";
 
 // MARK: - Birth Details View
 "your_birth_info" = "Your Birth Information";
@@ -409,15 +400,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "None";
-"severity_mild" = "Mild";
-"severity_moderate" = "Moderate";
 "severity_high" = "High";
-"severity_severe" = "Severe";
 
 // MARK: - Status Labels
-"status_active" = "Active";
-"status_reduced" = "Reduced";
-"status_cancelled" = "Cancelled";
 "active" = "Active";
 "reduced" = "Reduced";
 "cancelled" = "Cancelled";
@@ -2128,21 +2113,17 @@
 "view_details" = "View Details";
 "area_label" = "Area";
 "actual_label" = "Actual";
-"adjusted_label" = "Adjusted";
 "manglik_label" = "Manglik";
 "none_label" = "None";
 "view_label" = "View";
-"no_profiles_meet_threshold" = "None of the profiles meet the recommended compatibility threshold.";
 "review_individual_analyses" = "Review individual analyses below for detailed insights.";
 "destiny_ai_astrology_brand" = "DESTINY AI ASTROLOGY";
 "compatibility_comparison" = "COMPATIBILITY COMPARISON";
-"copyright_notice" = "© 2026 Destiny AI Astrology · destinyaiastrology.com";
 "description_not_available" = "Description not available";
 "this_may_take_moments" = "This may take a few moments...";
 "pending_label" = "Pending";
 "overridden_due_to_dosha" = "Overridden due to dosha incompatibility";
 "active_doshas" = "Active Doshas:";
-"dosha_label" = "Dosha";
 "rejection_reason_label" = "Concern";
 "additional_notes" = "Additional Notes:";
 "not_recommended_because" = "Not recommended because:";
@@ -2266,7 +2247,6 @@
 
 "select_year_transits" = "Select a year to view transits";
 "select_year_dasha" = "Select a year to view dasha periods";
-"calculating_chart" = "Calculating Chart...";
 "failed_to_load_chart" = "Failed to load chart";
 "planet_details" = "Planet Details";
 "planet_cards" = "Planet Cards";
@@ -2381,7 +2361,6 @@
 
 // Yoga/Dosha Status
 "status_active" = "Active";
-"status_reduced" = "Reduced";
 "status_cancelled" = "Cancelled";
 
 // Yoga detail grid labels
@@ -2567,7 +2546,6 @@
 "south_indian" = "South Indian";
 "d1_rashi" = "D1 (Rashi)";
 "d9_navamsa" = "D9 (Navamsa)";
-"asc_label" = "Asc: %@";
 "house_num_label" = "House %@";
 "pada_num_label" = "Pada %@";
 "vimshottari_dasha_year" = "Vimshottari Dasha (%@)";

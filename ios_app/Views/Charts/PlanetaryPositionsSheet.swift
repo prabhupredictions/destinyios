@@ -235,7 +235,7 @@ struct PlanetaryPositionsSheet: View {
             Text("•")
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             
-            Text(String(format: "asc_label".localized, ascendant))
+            Text("Asc: \(ascendant)")
                 .font(AppTheme.Fonts.title(size: 14)) // Slightly bolder
                 .foregroundColor(AppTheme.Colors.gold) // Gold color to stand out
         }

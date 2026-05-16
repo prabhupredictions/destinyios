@@ -26,29 +26,21 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "O que está na minha mente?";
-"tap_to_explore_day" = "Toque para explorar seu dia";
 
 // MARK: - Filter Labels
 "all" = "Todos";
-"good" = "Bom";
 "steady" = "Estável";
 "caution" = "Cuidado";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "Tema";
-"current_dasha" = "Dasha Atual";
 
 // MARK: - Life Area Filters
 "love" = "Amor";
 "wealth" = "Riqueza";
 
 // MARK: - Yoga Card Status
-"yoga_status_active" = "Ativo";
-"yoga_status_reduced" = "Reduzido";
-"yoga_status_cancelled" = "Cancelado";
 "yoga_status_inactive" = "Inativo";
-"planets_label" = "Planetas";
-"houses_label" = "Casas";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "Todos";
@@ -407,15 +399,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "Nenhum";
-"severity_mild" = "Leve";
-"severity_moderate" = "Moderado";
 "severity_high" = "Alto";
-"severity_severe" = "Forte";
 
 // MARK: - Status Labels
-"status_active" = "Ativo";
-"status_reduced" = "Reduzido";
-"status_cancelled" = "Cancelado";
 "active" = "Ativo";
 "reduced" = "Reduzido";
 "cancelled" = "Cancelado";
@@ -2165,21 +2151,17 @@
 "view_details" = "Ver detalhes";
 "area_label" = "Área";
 "actual_label" = "Real";
-"adjusted_label" = "Ajustado";
 "manglik_label" = "Manglik";
 "none_label" = "Nenhum";
 "view_label" = "Visualizar";
-"no_profiles_meet_threshold" = "Nenhum perfil atende ao limite recomendado.";
 "review_individual_analyses" = "Revise as análises individuais abaixo para obter insights detalhados.";
 "destiny_ai_astrology_brand" = "ASTROLOGIA DO DESTINO AI";
 "compatibility_comparison" = "COMPARAÇÃO DE COMPATIBILIDADE";
-"copyright_notice" = "© 2026 Destiny AI Astrologia. Todos os direitos reservados.";
 "description_not_available" = "Descrição não disponível";
 "this_may_take_moments" = "Isso pode levar alguns instantes...";
 "pending_label" = "Pendente";
 "overridden_due_to_dosha" = "Substituído devido à incompatibilidade do dosha";
 "active_doshas" = "Doshas ativos:";
-"dosha_label" = "Dosha";
 "rejection_reason_label" = "Preocupação";
 "additional_notes" = "Notas adicionais:";
 "not_recommended_because" = "Não recomendado porque:";
@@ -2413,7 +2395,6 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 
 // Yoga/Dosha Status
 "status_active" = "Ativo";
-"status_reduced" = "Reduzido";
 "status_cancelled" = "Cancelado";
 
 // Yoga/Dosha Types

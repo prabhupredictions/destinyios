@@ -26,17 +26,14 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "मेरे मन में क्या है?";
-"tap_to_explore_day" = "अपने दिन को जानने के लिए टैप करें";
 
 // MARK: - Filter Labels
 "all" = "सभी";
-"good" = "अच्छा";
 "steady" = "स्थिर";
 "caution" = "सावधानी";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "थीम";
-"current_dasha" = "वर्तमान दशा";
 
 // MARK: - Life Area Filters
 "love" = "प्रेम";
@@ -174,12 +171,7 @@
 
 // MARK: - Splash
 "aligning_stars" = "तारों को मिला रहे हैं...";
-"yoga_status_active" = "सक्रिय";
-"yoga_status_reduced" = "कम हुआ";
-"yoga_status_cancelled" = "निरस्त";
 "yoga_status_inactive" = "निष्क्रिय";
-"planets_label" = "ग्रह";
-"houses_label" = "भाव";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "सभी";
@@ -259,7 +251,6 @@
 "worlds_advanced_ai" = "दुनिया का सबसे एडवांस AI ज्योतिषी";
 
 // MARK: - Onboarding
-"questions_asked" = "सवाल पूछे गए";
 
 // MARK: - Birth Details View
 "your_birth_info" = "आपकी जन्म जानकारी";
@@ -408,15 +399,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "कोई नहीं";
-"severity_mild" = "हल्का";
-"severity_moderate" = "मध्यम";
 "severity_high" = "तीव्र";
-"severity_severe" = "गंभीर";
 
 // MARK: - Status Labels
-"status_active" = "सक्रिय";
-"status_reduced" = "कम हुआ";
-"status_cancelled" = "निरस्त";
 "active" = "सक्रिय";
 "reduced" = "कम हुआ";
 "cancelled" = "निरस्त";
@@ -531,7 +516,6 @@
 "Education" = "शिक्षा";
 "Investment" = "निवेश";
 "Sudden Events" = "आकस्मिक घटनाएं";
-"Ascendant" = "लग्न";
 "career" = "आजीविका";
 "education" = "शिक्षा";
 "finance" = "वित्त";
@@ -2066,21 +2050,17 @@
 "view_details" = "विवरण देखें";
 "area_label" = "क्षेत्र";
 "actual_label" = "वास्तविक";
-"adjusted_label" = "समायोजित";
 "manglik_label" = "मांगलिक";
 "none_label" = "कोई नहीं";
 "view_label" = "देखें";
-"no_profiles_meet_threshold" = "कोई भी प्रोफ़ाइल अनुशंसित अनुकूलता सीमा को पूरा नहीं करती।";
 "review_individual_analyses" = "विस्तृत जानकारी के लिए नीचे दिए गए व्यक्तिगत विश्लेषण देखें।";
 "destiny_ai_astrology_brand" = "डेस्टिनी AI ज्योतिष";
 "compatibility_comparison" = "अनुकूलता तुलना";
-"copyright_notice" = "©2026 डेस्टिनी AI ज्योतिष · Destinyaiastrology.com";
 "description_not_available" = "विवरण उपलब्ध नहीं";
 "this_may_take_moments" = "इसमें कुछ पल लग सकते हैं...";
 "pending_label" = "प्रतीक्षित";
 "overridden_due_to_dosha" = "दोष असंगति के कारण बदला गया";
 "active_doshas" = "सक्रिय दोष:";
-"dosha_label" = "दोष";
 "rejection_reason_label" = "चिंता";
 "additional_notes" = "अतिरिक्त नोट्स:";
 "not_recommended_because" = "अनुशंसित नहीं, कारण:";
@@ -2182,7 +2162,6 @@
 // MARK: - Charts Planetary Positions, Transits & Dasha
 "select_year_transits" = "गोचर देखने के लिए वर्ष चुनें";
 "select_year_dasha" = "दशा अवधि देखने के लिए वर्ष चुनें";
-"calculating_chart" = "कुंडली की गणना हो रही है...";
 "failed_to_load_chart" = "कुंडली लोड नहीं हो सकी";
 "planet_details" = "ग्रह विवरण";
 "planet_cards" = "ग्रह कार्ड";
@@ -2274,7 +2253,6 @@
 
 // Yoga/Dosha Status
 "status_active" = "सक्रिय";
-"status_reduced" = "घटा हुआ";
 "status_cancelled" = "रद्द";
 
 // Yoga/Dosha Types
@@ -2444,7 +2422,6 @@
 "south_indian" = "दक्षिण भारतीय";
 "d1_rashi" = "D1 (राशि)";
 "d9_navamsa" = "D9 (नवांश)";
-"asc_label" = "लग्न: %@";
 "house_num_label" = "भाव %@";
 "pada_num_label" = "पद %@";
 "vimshottari_dasha_year" = "विंशोत्तरी दशा (%@)";

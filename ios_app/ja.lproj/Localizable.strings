@@ -26,29 +26,21 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "気になることは？";
-"tap_to_explore_day" = "タップして今日を探索";
 
 // MARK: - Filter Labels
 "all" = "すべて";
-"good" = "良い";
 "steady" = "安定";
 "caution" = "注意";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "テーマ";
-"current_dasha" = "現在のダシャ";
 
 // MARK: - Life Area Filters
 "love" = "愛";
 "wealth" = "富";
 
 // MARK: - Yoga Card Status
-"yoga_status_active" = "アクティブ";
-"yoga_status_reduced" = "軽減";
-"yoga_status_cancelled" = "キャンセル";
 "yoga_status_inactive" = "非アクティブ";
-"planets_label" = "惑星";
-"houses_label" = "ハウス";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "すべて";
@@ -407,15 +399,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "なし";
-"severity_mild" = "軽度";
-"severity_moderate" = "適度";
 "severity_high" = "高度";
-"severity_severe" = "厳しい";
 
 // MARK: - Status Labels
-"status_active" = "有効";
-"status_reduced" = "軽減";
-"status_cancelled" = "解除";
 "active" = "活性";
 "reduced" = "軽減";
 "cancelled" = "解消済み";
@@ -512,7 +498,6 @@
 "tail_of_serpent" = "蛇の尾";
 "analysis_notes" = "分析メモ";
 "no_kalsarpa_data" = "利用可能なカルサルパ データはありません";
-"tara_effect_label" = "タラ・クータはナクシャトラ位置に基づく健康と運命の相性を表します";
 
 /* Streaming Progress */
 "processing" = "処理...";
@@ -2166,21 +2151,17 @@
 "view_details" = "詳細を見る";
 "area_label" = "エリア";
 "actual_label" = "実際の";
-"adjusted_label" = "調整済み";
 "manglik_label" = "マングリク";
 "none_label" = "なし";
 "view_label" = "ビュー";
-"no_profiles_meet_threshold" = "推奨されるしきい値を満たすプロファイルはありません。";
 "review_individual_analyses" = "詳細な洞察については、以下の個々の分析を確認してください。";
 "destiny_ai_astrology_brand" = "DESTINY AI占星術";
 "compatibility_comparison" = "互換性の比較";
-"copyright_notice" = "© 2026 Destiny AI 占星術。無断転載を禁じます。";
 "description_not_available" = "説明がありません";
 "this_may_take_moments" = "これには少し時間がかかる場合があります...";
 "pending_label" = "保留中";
 "overridden_due_to_dosha" = "Dosha の非互換性のためオーバーライドされました";
 "active_doshas" = "活動的なドーシャ:";
-"dosha_label" = "ドーシャ";
 "rejection_reason_label" = "懸念事項";
 "additional_notes" = "追加メモ:";
 "not_recommended_because" = "おすすめしない理由：";
@@ -2414,7 +2395,6 @@
 
 // Yoga/Dosha Status
 "status_active" = "活性";
-"status_reduced" = "弱化";
 "status_cancelled" = "無効";
 
 // Yoga/Dosha Types

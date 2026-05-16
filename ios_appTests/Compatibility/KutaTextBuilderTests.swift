@@ -138,14 +138,14 @@ final class KutaTextBuilderTests: XCTestCase {
         let result = builder(key: "gana", score: 1, maxScore: 6,
                              boyValue: "Manushya", girlValue: "Rakshasa",
                              doshaPresent: true, doshaCancelled: false).descriptionParagraph()
-        XCTAssertTrue(result.contains("⚠ Active Gana Dosha"), "got: \(result)")
+        XCTAssertTrue(result.contains("Active Gana Dosha"), "got: \(result)")
         XCTAssertTrue(result.contains("No cancellation was found"), "got: \(result)")
     }
 
     func test_description_nadiActiveDoshaAppendsWarning() {
         let result = builder(key: "nadi", score: 0, maxScore: 8,
                              doshaPresent: true, doshaCancelled: false).descriptionParagraph()
-        XCTAssertTrue(result.contains("⚠ Active Nadi Dosha"), "got: \(result)")
+        XCTAssertTrue(result.contains("Active Nadi Dosha"), "got: \(result)")
     }
 
     // MARK: - Description: cancelled dosha mentions cancellation reason

@@ -23,12 +23,13 @@ struct KutaTextBuilder {
 
     // MARK: - Sanskrit Koota names
 
+    // Sanskrit names are proper nouns used universally in Vedic astrology — not localized.
     private var kutaName: String {
         let names: [String: String] = [
-            "varna": "kuta_varna_label".localized, "vashya": "kuta_vashya_label".localized,
-            "tara": "kuta_tara_label".localized, "yoni": "kuta_yoni_label".localized,
-            "maitri": "kuta_maitri_label".localized, "gana": "kuta_gana_label".localized,
-            "bhakoot": "kuta_bhakoot_label".localized, "nadi": "kuta_nadi_label".localized
+            "varna": "Varna", "vashya": "Vashya",
+            "tara": "Tara", "yoni": "Yoni",
+            "maitri": "Maitri", "gana": "Gana",
+            "bhakoot": "Bhakoot", "nadi": "Nadi"
         ]
         return names[kuta.key] ?? kuta.key.capitalized
     }
@@ -36,6 +37,18 @@ struct KutaTextBuilder {
     private var score: Int { Int(kuta.score) }
     private var maxScore: Int { Int(kuta.maxScore) }
     private var displayScore: String { "\(score) out of \(maxScore)" } // TODO: i18n
+
+    /// Effective score after cancellation restoration
+    private var effectiveScore: Int {
+        guard kuta.doshaCancelled, let adj = kuta.adjustedScore else { return score }
+        return Int(adj)
+    }
+
+    /// Display string using the effective (post-cancellation) score
+    private var effectiveDisplayScore: String {
+        guard kuta.doshaCancelled, let adj = kuta.adjustedScore else { return displayScore }
+        return "\(Int(adj)) out of \(maxScore)"
+    }
 
     // MARK: - Sign name expansion
 
@@ -63,12 +76,12 @@ struct KutaTextBuilder {
         expand(kuta.cancellationReason ?? "exemption conditions in your charts")
     }
 
-    /// "Score restored to X/X — this dosha does not count against your match."
+    /// "Your score is restored to X/X. This dosha does not count against your match."
     /// Empty string when not cancelled.
     private var adjustedScoreNote: String {
         guard kuta.doshaCancelled else { return "" }
         // TODO: i18n — needs localized format key
-        return "Score restored to \(maxScore)/\(maxScore) — this dosha does not count against your match."
+        return "Your score is restored to \(maxScore)/\(maxScore). This does not count against your match."
     }
 
     // MARK: - Description paragraph
@@ -115,11 +128,16 @@ struct KutaTextBuilder {
             parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which assigns each Nakshatra a symbolic animal. Matching or friendly animals score highly; hostile pairs score low — reflecting depth of physical chemistry and intimate compatibility.")
             if hasValues { parts.append("\(boyName) is \(bv) and \(girlName) is \(gv).") }
             let body: String
-            if let s = kuta.plainEnglishSummary, !s.isEmpty { body = s }
-            else if score == 4 { body = "An ideal Yoni match — deep physical chemistry and strong intimate compatibility between these two natures." }
-            else if score >= 2 { body = "These two natures are partially compatible — decent physical chemistry that can deepen with time and mutual effort." }
-            else { body = "A hostile Yoni pairing — physical incompatibility is likely to be a recurring source of friction in this relationship." }
-            parts.append("Their score is \(displayScore). \(body)")
+            if let s = kuta.plainEnglishSummary, !s.isEmpty, !kuta.doshaCancelled { body = s }
+            else if effectiveScore == 4 { body = "An ideal Yoni match — deep physical chemistry and strong intimate compatibility between these two natures." }
+            else if effectiveScore >= 2 { body = "These two natures are partially compatible — decent physical chemistry that can deepen with time and mutual effort." }
+            else { body = "A hostile Yoni pairing. Physical incompatibility is likely to be a recurring source of friction in this relationship." }
+            parts.append("Their score is \(effectiveDisplayScore). \(body)")
+            if kuta.doshaPresent && !kuta.doshaCancelled {
+                parts.append("Active Yoni Dosha. The animal pairing here is considered hostile in classical texts. No cancellation was found in your charts.")
+            } else if kuta.doshaPresent && kuta.doshaCancelled {
+                parts.append("The Yoni Dosha is cancelled. \(cancellationReason) qualifies for an exemption, which fully neutralizes the physical compatibility concern. \(adjustedScoreNote)")
+            }
 
         case "maitri":
             parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which compares the ruling planets of each partner's moon sign. Friendly lords score 5; neutral 3; enemies 0 — governing intellectual rapport, mutual respect, and the friendship beneath the romance.")
@@ -143,9 +161,9 @@ struct KutaTextBuilder {
             if kuta.doshaPresent && !kuta.doshaCancelled {
                 let bvLabel = bv.isEmpty ? boyName : bv
                 let gvLabel = gv.isEmpty ? girlName : gv
-                parts.append("⚠ Active Gana Dosha. When \(bvLabel) and \(gvLabel) natures pair up, the dominant nature tends to overpower the gentler one, creating friction in how you communicate, handle conflict, and show up for each other under stress. No cancellation was found in your charts.")
+                parts.append("Active Gana Dosha. When \(bvLabel) and \(gvLabel) natures pair up, the dominant nature tends to overpower the gentler one, creating friction in how you communicate, handle conflict, and show up for each other under stress. No cancellation was found in your charts.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
-                parts.append("The Gana Dosha is cancelled — \(cancellationReason). \(adjustedScoreNote) This softens the temperament clash significantly.")
+                parts.append("The Gana Dosha is cancelled. \(cancellationReason) qualifies for an exemption. \(adjustedScoreNote) This softens the temperament clash significantly.")
             }
 
         case "bhakoot":
@@ -159,24 +177,24 @@ struct KutaTextBuilder {
             parts.append(body.isEmpty ? "Their raw score is \(displayScore)." : "Their score is \(displayScore). \(body)")
             if kuta.doshaPresent && !kuta.doshaCancelled {
                 let typeNote = kuta.doshaType.map { " (\($0))" } ?? ""
-                parts.append("⚠ Active Bhakoot Dosha\(typeNote). Classical texts link this moon-sign pairing with emotional distance and financial hardship. No cancellation was found — this is a significant flag in your match.")
+                parts.append("Active Bhakoot Dosha\(typeNote). Classical texts link this moon-sign pairing with emotional distance and financial hardship. No cancellation was found. This is a significant flag in your match.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
-                parts.append("The Bhakoot Dosha is cancelled — \(cancellationReason). Score restored to \(maxScore)/\(maxScore). The underlying dosha does not count against your compatibility.")
+                parts.append("The Bhakoot Dosha is cancelled. \(cancellationReason) qualifies for an exemption. Score restored to \(maxScore)/\(maxScore). The underlying dosha does not count against your compatibility.")
             }
 
         case "nadi":
             parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota — the most heavily weighted Koota at 8 points, and classically considered the most critical for long-term compatibility. It looks at the Ayurvedic body-type (Nadi) of each partner: Aadi (Vata), Madhya (Pitta), or Antya (Kapha).")
             if hasValues { parts.append("\(boyName) is \(bv) Nadi and \(girlName) is \(gv) Nadi.") }
             let body: String
-            if let s = kuta.plainEnglishSummary, !s.isEmpty { body = s }
+            if let s = kuta.plainEnglishSummary, !s.isEmpty, !kuta.doshaCancelled { body = s }
             else if score == 8 { body = "Different Nadis — ideal for genetic harmony, health compatibility, and prospects for children." }
             else if !kuta.doshaPresent { body = "Partial Nadi compatibility — mostly harmonious constitutional energies." }
             else { body = "" }
-            parts.append(body.isEmpty ? "Their score is \(displayScore)." : "Their score is \(displayScore). \(body)")
+            parts.append(body.isEmpty ? "Their score is \(effectiveDisplayScore)." : "Their score is \(effectiveDisplayScore). \(body)")
             if kuta.doshaPresent && !kuta.doshaCancelled {
-                parts.append("⚠ Active Nadi Dosha. Identical Nadis form the most serious dosha in Ashtakoot matching. Classical texts associate same-Nadi couples with health challenges, genetic incompatibility, and difficulties conceiving. No cancellation found — classical remedies are strongly recommended.")
+                parts.append("Active Nadi Dosha. Identical Nadis form the most serious dosha in Ashtakoot matching. Classical texts associate same-Nadi couples with health challenges, genetic incompatibility, and difficulties conceiving. No cancellation found. Classical remedies are strongly recommended.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
-                parts.append("The Nadi Dosha is cancelled — \(cancellationReason). \(adjustedScoreNote) The genetic and health concerns are considered neutralised.")
+                parts.append("The Nadi Dosha is cancelled. \(cancellationReason) qualifies for an exemption, which fully neutralizes the health and progeny concern. \(adjustedScoreNote) The genetic and health concerns are considered neutralised.")
             }
 
         default:
@@ -185,9 +203,9 @@ struct KutaTextBuilder {
             if let s = kuta.plainEnglishSummary, !s.isEmpty { parts.append(s) }
             parts.append("Their score is \(displayScore).")
             if kuta.doshaPresent && !kuta.doshaCancelled {
-                parts.append("⚠ Active \(kutaName) Dosha. No cancellation was found in your charts.")
+                parts.append("Active \(kutaName) Dosha. No cancellation was found in your charts.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
-                parts.append("The dosha is cancelled — \(cancellationReason). \(adjustedScoreNote)")
+                parts.append("The dosha is cancelled. \(cancellationReason) qualifies for an exemption. \(adjustedScoreNote)")
             }
         }
 

@@ -26,29 +26,21 @@
 
 // MARK: - Home Screen Section Headers
 "what_in_my_mind" = "ನನ್ನ ಮನಸ್ಸಿನಲ್ಲಿ ಏನಿದೆ?";
-"tap_to_explore_day" = "ನಿಮ್ಮ ದಿನವನ್ನು ಅನ್ವೇಷಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ";
 
 // MARK: - Filter Labels
 "all" = "ಎಲ್ಲಾ";
-"good" = "ಒಳ್ಳೆಯದು";
 "steady" = "ಸ್ಥಿರ";
 "caution" = "ಎಚ್ಚರಿಕೆ";
 
 // MARK: - Dasha Card Labels
 "theme_label" = "ಥೀಮ್";
-"current_dasha" = "ಪ್ರಸ್ತುತ ದಶಾ";
 
 // MARK: - Life Area Filters
 "love" = "ಪ್ರೀತಿ";
 "wealth" = "ಐಶ್ವರ್ಯ";
 
 // MARK: - Yoga Card Status
-"yoga_status_active" = "ಸಕ್ರಿಯ";
-"yoga_status_reduced" = "ಕಡಿತ";
-"yoga_status_cancelled" = "ರದ್ದು";
 "yoga_status_inactive" = "ನಿಷ್ಕ್ರಿಯ";
-"planets_label" = "ಗ್ರಹಗಳು";
-"houses_label" = "ಮನೆಗಳು";
 
 // MARK: - Yoga Category Filters
 "filter_all" = "ಎಲ್ಲಾ";
@@ -407,15 +399,9 @@
 
 // MARK: - Severity Levels
 "severity_none" = "ಇಲ್ಲ";
-"severity_mild" = "ಸೌಮ್ಯ";
-"severity_moderate" = "ಮಧ್ಯಮ";
 "severity_high" = "ಹೆಚ್ಚು";
-"severity_severe" = "ತೀವ್ರ";
 
 // MARK: - Status Labels
-"status_active" = "ಸಕ್ರಿಯ";
-"status_reduced" = "ಕಡಿಮೆಯಾಗಿದೆ";
-"status_cancelled" = "ರದ್ದು";
 "active" = "ಸಕ್ರಿಯ";
 "reduced" = "ಕಡಿಮೆ";
 "cancelled" = "ರದ್ದು";
@@ -2165,21 +2151,17 @@
 "view_details" = "ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ";
 "area_label" = "ಪ್ರದೇಶ";
 "actual_label" = "ವಾಸ್ತವಿಕ";
-"adjusted_label" = "ಸರಿಹೊಂದಿಸಲಾಗಿದೆ";
 "manglik_label" = "ಮಾಂಗ್ಲಿಕ್";
 "none_label" = "ಯಾವುದೂ ಇಲ್ಲ";
 "view_label" = "ವೀಕ್ಷಿಸಿ";
-"no_profiles_meet_threshold" = "ಯಾವುದೇ ಪ್ರೊಫೈಲ್‌ಗಳು ಶಿಫಾರಸು ಮಾಡಲಾದ ಮಿತಿಯನ್ನು ಪೂರೈಸುವುದಿಲ್ಲ.";
 "review_individual_analyses" = "ವಿವರವಾದ ಒಳನೋಟಗಳಿಗಾಗಿ ಕೆಳಗಿನ ವೈಯಕ್ತಿಕ ವಿಶ್ಲೇಷಣೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.";
 "destiny_ai_astrology_brand" = "ಡೆಸ್ಟಿನಿ AI ಜ್ಯೋತಿಷ್ಯ";
 "compatibility_comparison" = "ಹೊಂದಾಣಿಕೆಯ ಹೋಲಿಕೆ";
-"copyright_notice" = "© 2026 ಡೆಸ್ಟಿನಿ AI ಜ್ಯೋತಿಷ್ಯ. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.";
 "description_not_available" = "ವಿವರಣೆ ಲಭ್ಯವಿಲ್ಲ";
 "this_may_take_moments" = "ಇದು ಕೆಲವು ಕ್ಷಣಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಬಹುದು...";
 "pending_label" = "ಬಾಕಿಯಿದೆ";
 "overridden_due_to_dosha" = "ದೋಷದ ಅಸಾಮರಸ್ಯದಿಂದಾಗಿ ಅತಿಕ್ರಮಿಸಲಾಗಿದೆ";
 "active_doshas" = "ಸಕ್ರಿಯ ದೋಷಗಳು:";
-"dosha_label" = "ದೋಷ";
 "rejection_reason_label" = "ಕಾಳಜಿ";
 "additional_notes" = "ಹೆಚ್ಚಿನ ಟಿಪ್ಪಣಿಗಳು:";
 "not_recommended_because" = "ಶಿಫಾರಸು ಮಾಡಲಾಗಿಲ್ಲ, ಕಾರಣ:";
@@ -2413,7 +2395,6 @@
 
 // Yoga/Dosha Status
 "status_active" = "ಸಕ್ರಿಯ";
-"status_reduced" = "ಕಡಿಮೆಯಾಗಿದೆ";
 "status_cancelled" = "ರದ್ದು";
 
 // Yoga/Dosha Types

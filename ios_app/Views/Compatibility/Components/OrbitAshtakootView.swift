@@ -298,12 +298,13 @@ struct OrbitTooltipView: View {
     }
 
     // MARK: - Helpers
+    // Sanskrit names are proper nouns used universally in Vedic astrology — not localized.
     private var kutaDisplayName: String {
         let names: [String: String] = [
-            "varna": "kuta_varna_label".localized, "vashya": "kuta_vashya_label".localized,
-            "tara": "kuta_tara_label".localized, "yoni": "kuta_yoni_label".localized,
-            "maitri": "kuta_maitri_label".localized, "gana": "kuta_gana_label".localized,
-            "bhakoot": "kuta_bhakoot_label".localized, "nadi": "kuta_nadi_label".localized
+            "varna": "Varna", "vashya": "Vashya",
+            "tara": "Tara", "yoni": "Yoni",
+            "maitri": "Maitri", "gana": "Gana",
+            "bhakoot": "Bhakoot", "nadi": "Nadi"
         ]
         return names[kuta.key] ?? kuta.key.capitalized
     }
