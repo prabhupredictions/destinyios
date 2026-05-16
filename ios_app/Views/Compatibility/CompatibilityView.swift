@@ -644,9 +644,9 @@ struct CompatibilityView: View {
                 HStack(spacing: 8) {
                     // Partner pills
                     ForEach(Array(viewModel.partners.enumerated()), id: \.offset) { index, partner in
-                        Button(action: { 
+                        Button(action: {
                             withAnimation(.easeInOut(duration: 0.2)) {
-                                viewModel.activePartnerIndex = index 
+                                viewModel.selectPartner(at: index)
                             }
                         }) {
                             HStack(spacing: 4) {
@@ -676,9 +676,12 @@ struct CompatibilityView: View {
                     // Add button (Plus-only, max 3 partners)
                     let maxPartners = 3
                     let isPlus = quotaManager.isPlus
-                    let canAddMore = isPlus && viewModel.partners.count < maxPartners
-                    
-                    Button(action: { 
+                    let activeIsComplete = viewModel.partners.indices.contains(viewModel.activePartnerIndex)
+                        ? viewModel.partners[viewModel.activePartnerIndex].isComplete
+                        : false
+                    let canAddMore = isPlus && viewModel.partners.count < maxPartners && activeIsComplete
+
+                    Button(action: {
                         if !isPlus {
                             // Non-Plus: show subscription paywall
                             showSubscription = true
@@ -686,7 +689,7 @@ struct CompatibilityView: View {
                         }
                         guard canAddMore else { return }
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            viewModel.addPartner() 
+                            viewModel.addPartner()
                         }
                     }) {
                         ZStack(alignment: .topTrailing) {
@@ -709,7 +712,7 @@ struct CompatibilityView: View {
                             }
                         }
                     }
-                    .disabled(isPlus && !canAddMore)  // Only disable at max for Plus users; non-Plus always tappable (opens paywall)
+                    .disabled(isPlus && !canAddMore)  // Disabled when at max OR active partner incomplete
                     .accessibilityLabel("accessibility_add_partner".localized)
                     
                     Spacer()

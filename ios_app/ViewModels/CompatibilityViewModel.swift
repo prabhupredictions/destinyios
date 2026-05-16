@@ -340,7 +340,7 @@ class CompatibilityViewModel {
     func selectPartner(at index: Int) {
         guard partners.indices.contains(index) else { return }
         activePartnerIndex = index
-        // Computed properties auto-sync; no manual sync needed
+        errorMessage = nil
     }
     
     /// Load a saved partner into the current slot
