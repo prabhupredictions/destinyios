@@ -329,10 +329,10 @@ class CompatibilityViewModel {
         guard partners.count > 1 else { return }  // Keep at least one
         guard partners.indices.contains(index) else { return }
         partners.remove(at: index)
-        // Adjust active index if needed
         if activePartnerIndex >= partners.count {
             activePartnerIndex = partners.count - 1
         }
+        errorMessage = nil
         HapticManager.shared.play(.medium)
     }
     
