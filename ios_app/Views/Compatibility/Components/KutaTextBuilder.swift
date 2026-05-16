@@ -93,44 +93,49 @@ struct KutaTextBuilder {
         switch kuta.key {
 
         case "varna":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which looks at each partner's spiritual and social orientation — Brahmin (wisdom), Kshatriya (leadership), Vaishya (commerce), or Shudra (service/craft).")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which looks at each partner's spiritual and social orientation: Brahmin (wisdom), Kshatriya (leadership), Vaishya (commerce), or Shudra (service/craft).")
             if hasValues {
                 parts.append("\(boyName) belongs to the \(bv) Varna and \(girlName) to the \(gv) Varna.")
             }
-            let body = kuta.plainEnglishSummary ?? (score == maxScore
+            let body = kuta.plainEnglishSummary ?? (effectiveScore == maxScore
                 ? "Compatible Varnas indicate natural alignment in how you approach your duties, ambitions, and life purpose."
                 : "A mismatch here suggests your fundamental life orientations pull in different directions, which can create friction in shared decisions and long-term goals.")
-            parts.append("Their score is \(displayScore). \(body)")
+            parts.append("Their score is \(effectiveDisplayScore). \(body)")
+            if kuta.doshaPresent && !kuta.doshaCancelled {
+                parts.append("Active Varna Dosha. No cancellation was found in your charts.")
+            } else if kuta.doshaPresent && kuta.doshaCancelled {
+                parts.append("The Varna Dosha is cancelled. \(cancellationReason) qualifies for an exemption. \(adjustedScoreNote)")
+            }
 
         case "vashya":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which looks at the natural power dynamic and magnetism between partners — based on each moon sign's symbolic animal group (human, four-legged, aquatic, forest, or insect).")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which looks at the natural power dynamic and magnetism between partners, based on each moon sign's symbolic animal group (human, four-legged, aquatic, forest, or insect).")
             if hasValues { parts.append("\(boyName) is \(bv) and \(girlName) is \(gv).") }
             let body: String
             if let s = kuta.plainEnglishSummary, !s.isEmpty { body = s }
-            else if score == 2 { body = "Mutual Vashya indicates strong natural attraction and a balanced sense of influence between you." }
-            else if score == 1 { body = "Partial Vashya — there is a draw between you, but it may feel one-sided at times. Conscious balance prevents resentment." }
-            else { body = "No Vashya match — little natural pull between these signs. The relationship requires conscious effort to maintain attraction." }
-            parts.append("Their score is \(displayScore). \(body)")
+            else if effectiveScore == 2 { body = "Mutual Vashya indicates strong natural attraction and a balanced sense of influence between you." }
+            else if effectiveScore == 1 { body = "Partial Vashya: there is a draw between you, but it may feel one-sided at times. Conscious balance prevents resentment." }
+            else { body = "No Vashya match. Little natural pull between these signs. The relationship requires conscious effort to maintain attraction." }
+            parts.append("Their score is \(effectiveDisplayScore). \(body)")
 
         case "tara":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which counts the distance between each partner's birth Nakshatra (lunar mansion). Even-numbered counts are auspicious; odd are inauspicious — a full score means both directions align well.")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which counts the distance between each partner's birth Nakshatra (lunar mansion). Even-numbered counts are auspicious; odd are inauspicious. A full score means both directions align well.")
             if let btg = kuta.taraBoyToGirl, let gtb = kuta.taraGirlToBoy {
                 parts.append("\(boyName)'s birth star counts \(btg) positions to \(girlName)'s, and the reverse counts \(gtb).")
             }
             let body: String
             if let s = kuta.plainEnglishSummary, !s.isEmpty { body = s }
-            else if score == 3 { body = "Your life paths are in harmony and you are likely to bring good fortune to each other rather than draining vitality." }
-            else if score >= 1 { body = "Mostly harmonious destinies with some areas of misalignment in how your individual life paths interact." }
+            else if effectiveScore == 3 { body = "Your life paths are in harmony and you are likely to bring good fortune to each other rather than draining vitality." }
+            else if effectiveScore >= 1 { body = "Mostly harmonious destinies with some areas of misalignment in how your individual life paths interact." }
             else { body = "Your birth stars indicate life paths that may work against each other's vitality and long-term fortune." }
-            parts.append("Their score is \(displayScore). \(body)")
+            parts.append("Their score is \(effectiveDisplayScore). \(body)")
 
         case "yoni":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which assigns each Nakshatra a symbolic animal. Matching or friendly animals score highly; hostile pairs score low — reflecting depth of physical chemistry and intimate compatibility.")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which assigns each Nakshatra a symbolic animal. Matching or friendly animals score highly; hostile pairs score low, reflecting depth of physical chemistry and intimate compatibility.")
             if hasValues { parts.append("\(boyName) is \(bv) and \(girlName) is \(gv).") }
             let body: String
             if let s = kuta.plainEnglishSummary, !s.isEmpty, !kuta.doshaCancelled { body = s }
-            else if effectiveScore == 4 { body = "An ideal Yoni match — deep physical chemistry and strong intimate compatibility between these two natures." }
-            else if effectiveScore >= 2 { body = "These two natures are partially compatible — decent physical chemistry that can deepen with time and mutual effort." }
+            else if effectiveScore == 4 { body = "An ideal Yoni match with deep physical chemistry and strong intimate compatibility between these two natures." }
+            else if effectiveScore >= 2 { body = "These two natures are partially compatible with decent physical chemistry that can deepen with time and mutual effort." }
             else { body = "A hostile Yoni pairing. Physical incompatibility is likely to be a recurring source of friction in this relationship." }
             parts.append("Their score is \(effectiveDisplayScore). \(body)")
             if kuta.doshaPresent && !kuta.doshaCancelled {
@@ -140,24 +145,24 @@ struct KutaTextBuilder {
             }
 
         case "maitri":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which compares the ruling planets of each partner's moon sign. Friendly lords score 5; neutral 3; enemies 0 — governing intellectual rapport, mutual respect, and the friendship beneath the romance.")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which compares the ruling planets of each partner's moon sign. Friendly lords score 5; neutral 3; enemies 0, governing intellectual rapport, mutual respect, and the friendship beneath the romance.")
             if hasValues { parts.append("\(boyName)'s moon sign lord is \(bv) and \(girlName)'s is \(gv).") }
             let body: String
             if let s = kuta.plainEnglishSummary, !s.isEmpty { body = s }
-            else if score >= 4 { body = "These planetary lords are friendly — natural intellectual rapport and genuine friendship form the core of this relationship." }
-            else if score >= 2 { body = "Neutral lords — the friendship is functional and stable but may lack a deep natural intellectual affinity." }
-            else { body = "Enemy lords — intellectual friction and a lack of mutual understanding are likely without deliberate and sustained effort." }
-            parts.append("Their score is \(displayScore). \(body)")
+            else if effectiveScore >= 4 { body = "These planetary lords are friendly. Natural intellectual rapport and genuine friendship form the core of this relationship." }
+            else if effectiveScore >= 2 { body = "Neutral lords. The friendship is functional and stable but may lack a deep natural intellectual affinity." }
+            else { body = "Enemy lords. Intellectual friction and a lack of mutual understanding are likely without deliberate and sustained effort." }
+            parts.append("Their score is \(effectiveDisplayScore). \(body)")
 
         case "gana":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which classifies each partner's fundamental nature as divine (Deva — gentle, idealistic), human (Manushya — balanced, practical), or intense (Rakshasa — ambitious, dominant).")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, which classifies each partner's fundamental nature as divine (Deva: gentle, idealistic), human (Manushya: balanced, practical), or intense (Rakshasa: ambitious, dominant).")
             if hasValues { parts.append("\(boyName) is \(bv) and \(girlName) is \(gv).") }
             let body: String
             if let s = kuta.plainEnglishSummary, !s.isEmpty { body = s }
-            else if score == 6 { body = "Matching Ganas — your temperaments are in natural harmony and you handle conflict and stress in compatible ways." }
-            else if score == 5 { body = "Very close Ganas — minor differences in approach but fundamentally compatible temperaments." }
-            else { body = "Mixed Ganas — real differences in how you each handle conflict, pressure, and emotional expression." }
-            parts.append("Their score is \(displayScore). \(body)")
+            else if effectiveScore == 6 { body = "Matching Ganas. Your temperaments are in natural harmony and you handle conflict and stress in compatible ways." }
+            else if effectiveScore == 5 { body = "Very close Ganas. Minor differences in approach but fundamentally compatible temperaments." }
+            else { body = "Mixed Ganas. Real differences in how you each handle conflict, pressure, and emotional expression." }
+            parts.append("Their score is \(effectiveDisplayScore). \(body)")
             if kuta.doshaPresent && !kuta.doshaCancelled {
                 let bvLabel = bv.isEmpty ? boyName : bv
                 let gvLabel = gv.isEmpty ? girlName : gv
@@ -167,14 +172,14 @@ struct KutaTextBuilder {
             }
 
         case "bhakoot":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota — the most emotionally significant of all 8 Kootas at 7 points. It looks at the angular distance between moon signs, governing romantic love, emotional bonding, financial prosperity, and prospects for children.")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, the most emotionally significant of all 8 Kootas at 7 points. It looks at the angular distance between moon signs, governing romantic love, emotional bonding, financial prosperity, and prospects for children.")
             if hasValues { parts.append("\(boyName)'s moon is in \(bv) and \(girlName)'s in \(gv).") }
             let body: String
             if let s = kuta.plainEnglishSummary, !s.isEmpty { body = s }
-            else if score == 7 { body = "Excellent Bhakoot — a strong emotional bond, aligned financial energies, and favourable prospects for family life." }
-            else if !kuta.doshaPresent { body = "This moon-sign pairing scores \(score) but does not form a classical Bhakoot Dosha — the score reflects partial alignment in emotional and financial energies." }
+            else if effectiveScore == 7 { body = "Excellent Bhakoot. A strong emotional bond, aligned financial energies, and favourable prospects for family life." }
+            else if !kuta.doshaPresent { body = "This moon-sign pairing scores \(effectiveScore) but does not form a classical Bhakoot Dosha. The score reflects partial alignment in emotional and financial energies." }
             else { body = "" }
-            parts.append(body.isEmpty ? "Their raw score is \(displayScore)." : "Their score is \(displayScore). \(body)")
+            parts.append(body.isEmpty ? "Their raw score is \(effectiveDisplayScore)." : "Their score is \(effectiveDisplayScore). \(body)")
             if kuta.doshaPresent && !kuta.doshaCancelled {
                 let typeNote = kuta.doshaType.map { " (\($0))" } ?? ""
                 parts.append("Active Bhakoot Dosha\(typeNote). Classical texts link this moon-sign pairing with emotional distance and financial hardship. No cancellation was found. This is a significant flag in your match.")
@@ -183,12 +188,12 @@ struct KutaTextBuilder {
             }
 
         case "nadi":
-            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota — the most heavily weighted Koota at 8 points, and classically considered the most critical for long-term compatibility. It looks at the Ayurvedic body-type (Nadi) of each partner: Aadi (Vata), Madhya (Pitta), or Antya (Kapha).")
+            parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota, the most heavily weighted Koota at 8 points, and classically considered the most critical for long-term compatibility. It looks at the Ayurvedic body-type (Nadi) of each partner: Aadi (Vata), Madhya (Pitta), or Antya (Kapha).")
             if hasValues { parts.append("\(boyName) is \(bv) Nadi and \(girlName) is \(gv) Nadi.") }
             let body: String
             if let s = kuta.plainEnglishSummary, !s.isEmpty, !kuta.doshaCancelled { body = s }
-            else if score == 8 { body = "Different Nadis — ideal for genetic harmony, health compatibility, and prospects for children." }
-            else if !kuta.doshaPresent { body = "Partial Nadi compatibility — mostly harmonious constitutional energies." }
+            else if effectiveScore == 8 { body = "Different Nadis. Ideal for genetic harmony, health compatibility, and prospects for children." }
+            else if !kuta.doshaPresent { body = "Partial Nadi compatibility. Mostly harmonious constitutional energies." }
             else { body = "" }
             parts.append(body.isEmpty ? "Their score is \(effectiveDisplayScore)." : "Their score is \(effectiveDisplayScore). \(body)")
             if kuta.doshaPresent && !kuta.doshaCancelled {
@@ -201,7 +206,7 @@ struct KutaTextBuilder {
             parts.append("\(kuta.label) compatibility is measured by \(kutaName) Koota.")
             if hasValues { parts.append("\(boyName) is \(bv) and \(girlName) is \(gv).") }
             if let s = kuta.plainEnglishSummary, !s.isEmpty { parts.append(s) }
-            parts.append("Their score is \(displayScore).")
+            parts.append("Their score is \(effectiveDisplayScore).")
             if kuta.doshaPresent && !kuta.doshaCancelled {
                 parts.append("Active \(kutaName) Dosha. No cancellation was found in your charts.")
             } else if kuta.doshaPresent && kuta.doshaCancelled {
