@@ -45,9 +45,10 @@ struct ios_appApp: App {
                 BackgroundTaskHelper.shared.beginTask()
             case .active:
                 BackgroundTaskHelper.shared.endTask()
-                // Warm up Cloud Run — fires only when returning from background/inactive
+                // Warm up Cloud Run and refresh subscription state when returning from background
                 if oldPhase != .active {
                     BackendWarmUpService.shared.ping()
+                    Task { await SubscriptionManager.shared.updatePurchasedProducts() }
                 }
             default:
                 break
