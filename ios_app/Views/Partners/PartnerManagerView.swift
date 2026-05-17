@@ -35,6 +35,7 @@ struct PartnerManagerView: View {
             }
         }
         .navigationBarHidden(true)
+        .accessibilityIdentifier("partners_screen")
         .sheet(isPresented: $showAddForm) {
             PartnerFormView(mode: .add) { newPartner in
                 Task {
@@ -58,11 +59,11 @@ struct PartnerManagerView: View {
             }
         }
         .confirmationDialog(
-            "Delete Profile?",
+            "delete_birth_chart_confirm_title".localized,
             isPresented: $showDeleteConfirmation,
             presenting: partnerToDelete
         ) { partner in
-            Button("Delete \(partner.name)", role: .destructive) {
+            Button(String(format: "delete_partner_action_format".localized, partner.name), role: .destructive) {
                 Task {
                     let success = await viewModel.deletePartner(partner)
                     if success {
@@ -70,12 +71,12 @@ struct PartnerManagerView: View {
                     }
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            Button("cancel_action".localized, role: .cancel) {}
         } message: { partner in
-            Text("This will permanently remove \(partner.name) from your saved profiles.")
+            Text(String(format: "delete_partner_confirm_format".localized, partner.name))
         }
         .alert("Error", isPresented: $viewModel.showError) {
-            Button("OK", role: .cancel) {}
+            Button("ok_action".localized, role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage ?? "An error occurred")
         }
@@ -89,12 +90,12 @@ struct PartnerManagerView: View {
         .sheet(isPresented: $showUpgradePrompt) {
             SubscriptionView()
         }
-        .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
-            Button("Upgrade") {
+        .alert("birth_chart_limit_reached_title".localized, isPresented: .constant(limitMessage != nil)) {
+            Button("upgrade_action".localized) {
                 limitMessage = nil
                 showUpgradePrompt = true
             }
-            Button("OK", role: .cancel) {
+            Button("ok_action".localized, role: .cancel) {
                 limitMessage = nil
             }
         } message: {
@@ -117,7 +118,7 @@ struct PartnerManagerView: View {
                     showUpgradePrompt = true
                 } else {
                     // Core user at limit
-                    limitMessage = "You can save up to \(result.limit) profiles. Upgrade to Plus for unlimited profiles."
+                    limitMessage = "You can save up to \(result.limit) birth charts. Upgrade to Plus for unlimited."
                 }
             }
         }
@@ -138,7 +139,7 @@ struct PartnerManagerView: View {
             
             Spacer()
             
-            Text("Saved Birth Charts")
+            Text("saved_birth_charts_title".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
@@ -150,7 +151,7 @@ struct PartnerManagerView: View {
             }) {
                 HStack(spacing: 4) {
                     Image(systemName: "plus")
-                    Text("Add")
+                    Text("add_action".localized)
                 }
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.mainBackground)
@@ -159,6 +160,7 @@ struct PartnerManagerView: View {
                 .background(AppTheme.Colors.premiumGradient)
                 .cornerRadius(8)
             }
+            .accessibilityIdentifier("partner_add_button")
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
@@ -172,7 +174,7 @@ struct PartnerManagerView: View {
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
                 .scaleEffect(1.5)
             
-            Text("Loading profiles...")
+            Text("loading_birth_charts".localized)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -193,11 +195,11 @@ struct PartnerManagerView: View {
                 .foregroundStyle(AppTheme.Colors.premiumGradient)
                 .modifier(Tilt3DModifier())
             
-            Text("No Saved Birth Charts")
+            Text("no_saved_birth_charts".localized)
                 .font(AppTheme.Fonts.title(size: 24))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Save profiles for quick matching")
+            Text("save_birth_charts_desc".localized)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -206,7 +208,7 @@ struct PartnerManagerView: View {
                 HapticManager.shared.play(.medium)
                 checkAndShowAddForm()
             }) {
-                Text("Add Profile")
+                Text("add_birth_chart_action".localized)
                     .font(AppTheme.Fonts.title(size: 16))
                     .foregroundColor(AppTheme.Colors.mainBackground)
                     .padding(.horizontal, 32)
@@ -238,6 +240,7 @@ struct PartnerManagerView: View {
                             showDeleteConfirmation = true
                         }
                     )
+                    .accessibilityIdentifier("partner_row")
                     .transition(.asymmetric(
                         insertion: .scale.combined(with: .opacity),
                         removal: .opacity

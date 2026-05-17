@@ -28,6 +28,8 @@ enum UnifiedHistoryItem: Identifiable {
 @Observable
 @MainActor
 class HistoryViewModel {
+    nonisolated deinit {}
+
     // MARK: - State
     var items: [UnifiedHistoryItem] = []
     var isLoading = false

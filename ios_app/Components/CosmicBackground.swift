@@ -100,11 +100,10 @@ struct OrbitalBackground: View {
 // MARK: - Central Sun
 struct CentralSun: View {
     let center: CGPoint
-    @State private var pulse: CGFloat = 1.0
     
     var body: some View {
         ZStack {
-            // Outer glow
+            // Outer glow (static)
             Circle()
                 .fill(
                     RadialGradient(
@@ -118,7 +117,7 @@ struct CentralSun: View {
                         endRadius: 60
                     )
                 )
-                .frame(width: 120 * pulse, height: 120 * pulse)
+                .frame(width: 132, height: 132) // Fixed at ~1.1x scale
                 .position(center)
             
             // Inner core
@@ -137,14 +136,6 @@ struct CentralSun: View {
                 .frame(width: 30, height: 30)
                 .position(center)
                 .shadow(color: Color("GoldAccent").opacity(0.5), radius: 10)
-        }
-        .onAppear {
-            withAnimation(
-                Animation.easeInOut(duration: 3)
-                    .repeatForever(autoreverses: true)
-            ) {
-                pulse = 1.15
-            }
         }
     }
 }
@@ -177,10 +168,8 @@ struct OrbitingPlanet: View {
     var hasRing: Bool = false
     var glowColor: Color? = nil
     
-    @State private var angle: Double = 0
-    
     private var planetPosition: CGPoint {
-        let radians = (angle + startAngle) * .pi / 180
+        let radians = startAngle * .pi / 180
         return CGPoint(
             x: center.x + radius * cos(radians),
             y: center.y + radius * sin(radians) * 0.4 // Elliptical orbit (perspective)
@@ -235,14 +224,6 @@ struct OrbitingPlanet: View {
                     .position(planetPosition)
             }
         }
-        .onAppear {
-            withAnimation(
-                Animation.linear(duration: orbitDuration)
-                    .repeatForever(autoreverses: false)
-            ) {
-                angle = 360
-            }
-        }
     }
 }
 
@@ -295,11 +276,10 @@ struct SubtleOrbit: View {
     let duration: Double
     let startAngle: Double
     
-    @State private var angle: Double = 0
-    @State private var opacity: Double = 0.4
+    private let opacity: Double = 0.6
     
     private var position: CGPoint {
-        let radians = (angle + startAngle) * .pi / 180
+        let radians = startAngle * .pi / 180
         return CGPoint(
             x: center.x + radius * cos(radians),
             y: center.y + radius * sin(radians) * 0.35
@@ -327,21 +307,6 @@ struct SubtleOrbit: View {
             }
             .position(position)
             .opacity(opacity)
-        }
-        .onAppear {
-            withAnimation(
-                Animation.linear(duration: duration)
-                    .repeatForever(autoreverses: false)
-            ) {
-                angle = 360
-            }
-            
-            withAnimation(
-                Animation.easeInOut(duration: 2)
-                    .repeatForever(autoreverses: true)
-            ) {
-                opacity = 0.8
-            }
         }
     }
 }

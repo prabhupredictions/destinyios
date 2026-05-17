@@ -70,8 +70,14 @@ class PartnerProfileViewModel {
         errorMessage = nil
         
         do {
+            // Check for task cancellation before making the network call
+            try Task.checkCancellation()
+            
             // Fetch from server
             let serverPartners = try await service.fetchPartners(email: email)
+            
+            // Check again after await — the task may have been cancelled while waiting
+            try Task.checkCancellation()
             
             // Save locally
             if let context = modelContext {
@@ -81,12 +87,23 @@ class PartnerProfileViewModel {
             partners = serverPartners
             print("[PartnerProfileVM] Loaded \(partners.count) partners")
             
+        } catch is CancellationError {
+            // SwiftUI .refreshable cancels the task when user lifts their finger —
+            // silently ignore and keep existing data intact
+            print("[PartnerProfileVM] Task cancelled (pull-to-refresh released early) — keeping existing data")
+        } catch let urlError as URLError where urlError.code == .cancelled {
+            // URLSession also throws URLError(.cancelled) on task cancellation
+            print("[PartnerProfileVM] URLSession cancelled — keeping existing data")
         } catch {
             print("[PartnerProfileVM] Failed to load from server: \(error)")
             
-            // Fallback to local storage
+            // Fallback to local storage only for real errors
             if let context = modelContext {
-                partners = service.fetchPartnersLocally(context: context)
+                let localPartners = service.fetchPartnersLocally(context: context)
+                // Only replace if we actually got data from local storage
+                if !localPartners.isEmpty || partners.isEmpty {
+                    partners = localPartners
+                }
                 print("[PartnerProfileVM] Loaded \(partners.count) partners from local storage")
             }
             
@@ -153,6 +170,11 @@ class PartnerProfileViewModel {
             // Update in list
             if let index = partners.firstIndex(where: { $0.id == profile.id }) {
                 partners[index] = updatedPartner
+            }
+            
+            // Update local SwiftData store
+            if let context = modelContext {
+                service.updatePartnerLocally(updatedPartner, context: context)
             }
             
             print("[PartnerProfileVM] Updated partner: \(updatedPartner.name)")
@@ -238,7 +260,7 @@ class PartnerProfileViewModel {
             case .mainUser:
                 return "profile_delete_blocked_main_user".localized
             case .activeChart:
-                return "profile_delete_blocked_active".localized
+                return "profile_edit_blocked_active".localized
             case .usedProfile:
                 return "profile_delete_blocked_used".localized
             }
@@ -273,7 +295,7 @@ class PartnerProfileViewModel {
         case "PROTECTED_ACTIVE_CHART":
             return action == "edit"
                 ? "profile_edit_blocked_active".localized
-                : "profile_delete_blocked_active".localized
+                : "profile_edit_blocked_active".localized
         case "PROTECTED_USED_PROFILE":
             return action == "edit"
                 ? "profile_edit_blocked_used".localized

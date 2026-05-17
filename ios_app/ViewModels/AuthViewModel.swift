@@ -5,6 +5,8 @@ import SwiftUI
 @MainActor
 @Observable
 class AuthViewModel {
+    nonisolated deinit {}
+
     // MARK: - Published State
     var isLoading = false
     var errorMessage: String?
@@ -34,6 +36,15 @@ class AuthViewModel {
             self.isGuest = UserDefaults.standard.bool(forKey: "isGuest")
             self.userEmail = UserDefaults.standard.string(forKey: "userEmail")
             self.userName = UserDefaults.standard.string(forKey: "userName")
+            
+            // Register for push notifications on launch if already logged in
+            // This ensures device token is always fresh and registered
+            if let email = self.userEmail {
+                print("🔔 [AuthViewModel] Existing session found for \(email), registering for push notifications")
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
         }
     }
     
@@ -63,6 +74,9 @@ class AuthViewModel {
     /// Async version for testing
     func continueAsGuestAsync() async {
         self.isLoading = true
+        
+        // Clear any stale server-related flags from prior sessions
+        UserDefaults.standard.removeObject(forKey: "birthDataRefreshedOnServer")
         
         let guestUser = await authService.signInAsGuest()
         
@@ -111,6 +125,10 @@ class AuthViewModel {
         UserDefaults.standard.set(false, forKey: "hasBirthData")
         UserDefaults.standard.removeObject(forKey: "quotaUsed")
         UserDefaults.standard.removeObject(forKey: "isPremium")
+        UserDefaults.standard.removeObject(forKey: "birthDataRefreshedOnServer")
+        UserDefaults.standard.removeObject(forKey: "appleUserID")
+        UserDefaults.standard.removeObject(forKey: "googleUserID")
+        UserDefaults.standard.removeObject(forKey: "userGender")
         
         print("[DEBUG] SignOut - hasBirthData set to false, isAuthenticated: \(UserDefaults.standard.bool(forKey: "isAuthenticated"))")
         
@@ -129,6 +147,9 @@ class AuthViewModel {
         // Clear compatibility history for ALL users (profile-scoped data can cause contamination)
         // This data is local-only and preventing cross-profile issues is more important than caching
         CompatibilityHistoryService.shared.clearAll(forUser: previousEmail)
+        
+        // Deactivate SwiftData session to prevent stale active sessions on re-login
+        DataManager.shared.deactivateSessions(for: previousEmail)
         
         // Also reset ProfileContextManager active profile to prevent stale state
         ProfileContextManager.shared.resetActiveProfile()
@@ -220,7 +241,19 @@ class AuthViewModel {
                 
                 print("📥 [AuthViewModel] registerUser response:")
                 print("   - userEmail: \(registerResponse?.userEmail ?? "nil")")
-                
+
+                // Waitlist gate: early exit if user is not yet approved
+                if registerResponse?.accessState == "waitlist_pending" {
+                    await MainActor.run {
+                        UserDefaults.standard.set(email, forKey: "userEmail")
+                        UserDefaults.standard.set("waitlist_pending", forKey: "lastAccessState")
+                        UserDefaults.standard.set(true, forKey: "isAuthenticated")
+                        self.isAuthenticated = true
+                    }
+                    await MainActor.run { isLoading = false }
+                    return
+                }
+
                 // Use the server-returned email (critical for apple_id/google_id recovery)
                 let actualEmail = registerResponse?.userEmail ?? email
                 print("📧 [AuthViewModel] Using actualEmail for profile fetch: \(actualEmail)")
@@ -235,6 +268,18 @@ class AuthViewModel {
                 // If registered user has no birth data BUT guest had birth data, save it now
                 if !profileHasBirthData, let guestData = guestBirthData {
                     print("🔄 [AuthViewModel] Carrying forward guest birth data to registered user...")
+                    
+                    // Migrate guest chat threads to registered email on backend
+                    if !guestEmail.isEmpty {
+                        do {
+                            try await ProfileService.shared.upgradeGuestToRegistered(
+                                oldEmail: guestEmail,
+                                newEmail: actualEmail
+                            )
+                        } catch {
+                            print("⚠️ [AuthViewModel] Guest thread migration failed (non-fatal): \(error)")
+                        }
+                    }
                     
                     let userName = user.name ?? guestUserName ?? "User"
                     
@@ -279,10 +324,13 @@ class AuthViewModel {
                         UserDefaults.standard.set(true, forKey: "hasBirthData")
                         print("✅ [AuthViewModel] hasBirthData set to TRUE on MainActor")
                     } else {
-                        print("⚠️ [AuthViewModel] profileHasBirthData is FALSE - NOT setting hasBirthData")
+                        // Server confirmed no birth data — clear stale local cache
+                        UserDefaults.standard.set(false, forKey: "hasBirthData")
+                        UserDefaults.standard.removeObject(forKey: "userBirthData")
+                        print("⚠️ [AuthViewModel] Server has no birth data — cleared local cache, will show birth data form")
                     }
                     print("🚀 [AuthViewModel] Calling handleAuthSuccess...")
-                    handleAuthSuccess(user: user, isGuest: false)
+                    handleAuthSuccess(user: user, isGuest: false, skipHydration: !profileHasBirthData)
                     
                     // Force immediate UserDefaults persistence
                     // This fixes race condition where ProfileSwitcherSheet may open before
@@ -327,7 +375,20 @@ class AuthViewModel {
                 
                 print("📥 [AuthViewModel] registerUser (ID lookup) response:")
                 print("   - userEmail: \(registerResponse?.userEmail ?? "nil")")
-                
+
+                // Waitlist gate: early exit if user is not yet approved (nil-email path)
+                if registerResponse?.accessState == "waitlist_pending" {
+                    let lookupEmail = registerResponse?.userEmail ?? "lookup-by-id@placeholder.local"
+                    await MainActor.run {
+                        UserDefaults.standard.set(lookupEmail, forKey: "userEmail")
+                        UserDefaults.standard.set("waitlist_pending", forKey: "lastAccessState")
+                        UserDefaults.standard.set(true, forKey: "isAuthenticated")
+                        self.isAuthenticated = true
+                    }
+                    await MainActor.run { isLoading = false }
+                    return
+                }
+
                 if let storedEmail = registerResponse?.userEmail, storedEmail != "lookup-by-id@placeholder.local" {
                     // Found existing user! Fetch their profile
                     print("✅ [AuthViewModel] Found existing user by ID! Email: \(storedEmail)")
@@ -340,12 +401,15 @@ class AuthViewModel {
                             UserDefaults.standard.set(true, forKey: "hasBirthData")
                             print("✅ [AuthViewModel] hasBirthData set to TRUE on MainActor")
                         } else {
-                            print("⚠️ [AuthViewModel] profileHasBirthData is FALSE - NOT setting hasBirthData")
+                            // Server confirmed no birth data — clear stale local cache
+                            UserDefaults.standard.set(false, forKey: "hasBirthData")
+                            UserDefaults.standard.removeObject(forKey: "userBirthData")
+                            print("⚠️ [AuthViewModel] Server has no birth data — cleared local cache, will show birth data form")
                         }
                         // Store the recovered email
                         UserDefaults.standard.set(storedEmail, forKey: "userEmail")
                         print("🚀 [AuthViewModel] Calling handleAuthSuccess with recovered email...")
-                        handleAuthSuccess(user: user, isGuest: false)
+                        handleAuthSuccess(user: user, isGuest: false, skipHydration: !profileHasBirthData)
                         UserDefaults.standard.synchronize()  // Force immediate persistence
                         print("✅ [AuthViewModel] handleAuthSuccess completed. isAuthenticated=\(isAuthenticated)")
                     }
@@ -368,6 +432,18 @@ class AuthViewModel {
                     if !profileHasBirthData, let guestData = guestBirthData {
                         print("🔄 [AuthViewModel] Carrying forward guest birth data to Apple Hide My Email user...")
                         
+                        // Migrate guest chat threads to registered email on backend
+                        if !guestEmail.isEmpty {
+                            do {
+                                try await ProfileService.shared.upgradeGuestToRegistered(
+                                    oldEmail: guestEmail,
+                                    newEmail: effectiveEmail
+                                )
+                            } catch {
+                                print("⚠️ [AuthViewModel] Guest thread migration failed (non-fatal): \(error)")
+                            }
+                        }
+                        
                         let userName = user.name ?? guestUserName ?? "User"
                         
                         do {
@@ -386,9 +462,15 @@ class AuthViewModel {
                             await LoginSyncCoordinator.shared.syncAll(userEmail: effectiveEmail, dataManager: DataManager.shared)
                             print("✅ [AuthViewModel] Post-migration history sync complete")
                             
+                        } catch let error as ProfileError {
+                            if case .birthDataTaken(let existingEmail, let provider) = error {
+                                print("🚫 [AuthViewModel] Guest birth data conflict (Hide My Email): \(existingEmail ?? "unknown")")
+                                throw BirthDataTakenError(existingEmail: existingEmail, provider: provider)
+                            } else {
+                                print("⚠️ [AuthViewModel] Profile error: \(error). User will need to re-enter birth data.")
+                            }
                         } catch {
                             print("❌ [AuthViewModel] Failed to save guest birth data: \(error)")
-                            // Continue anyway - user will see birth data form
                         }
                     }
                     
@@ -419,12 +501,17 @@ class AuthViewModel {
         } catch let error as ProfileError where error.isAccountDeleted {
             print("🚫 [AuthViewModel] Account deleted — blocking sign-in: \(error)")
             await MainActor.run {
-                errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support."
+                errorMessage = "account_deleted_error".localized
+            }
+        } catch let error as BirthDataTakenError {
+            print("🚫 [AuthViewModel] Birth data conflict: \(error)")
+            await MainActor.run {
+                errorMessage = error.localizedDescription
             }
         } catch {
             print("❌ [AuthViewModel] Sign in error: \(error)")
             await MainActor.run {
-                errorMessage = "Sign in failed. Please try again. (\(error.localizedDescription))"
+                errorMessage = "sign_in_failed".localized + " (\(error.localizedDescription))"
             }
         }
         
@@ -438,12 +525,13 @@ class AuthViewModel {
         self.isGuest = isGuest
         self.userEmail = user.email
         self.userName = user.name
-        
+
         // Securely store user ID
         try? keychain.saveString(user.id, forKey: KeychainService.Keys.userId)
-        
+
         // Store non-sensitive state
         UserDefaults.standard.set(true, forKey: "isAuthenticated")
+        UserDefaults.standard.set("granted", forKey: "lastAccessState")
         UserDefaults.standard.set(isGuest, forKey: "isGuest")
         
         if let email = user.email {
@@ -500,6 +588,16 @@ class AuthViewModel {
             UserDefaults.standard.removeObject(forKey: "googleUserID")
         }
         
+        // BEST PRACTICE: Register for remote notifications immediately on login
+        // Token will be sent to backend when APNs returns it (regardless of permission status)
+        // This ensures device token is always available when needed
+        if let email = user.email {
+            print("🔔 [AuthViewModel] Requesting remote notification registration for: \(email)")
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
+        
         // Note: Profile fetch is now done in performSignIn BEFORE calling this method
         // This ensures hasBirthData is set correctly before UI transition
     }
@@ -529,6 +627,19 @@ class AuthViewModel {
                     print("✅ [AuthViewModel] Profile has birth data - will skip birth chart screen")
                 } else {
                     print("⚠️ [AuthViewModel] Profile exists but NO birth data")
+                    // Only show "data refreshed" banner for RETURNING registered users
+                    // who previously had birth data (user-scoped cache exists) but server lost it.
+                    // Do NOT show for: new users, guests, or first-time registrations.
+                    if !profile.isGeneratedEmail {
+                        let userScopedHasDataKey = StorageKeys.userKey(for: StorageKeys.hasBirthData, email: email)
+                        let previouslyHadBirthData = UserDefaults.standard.bool(forKey: userScopedHasDataKey)
+                        if previouslyHadBirthData {
+                            UserDefaults.standard.set(true, forKey: "birthDataRefreshedOnServer")
+                            print("🔔 [AuthViewModel] Returning user had local birth data but server lost it — set refresh flag")
+                        } else {
+                            print("ℹ️ [AuthViewModel] New registered user without birth data — no refresh banner")
+                        }
+                    }
                 }
                 
                 // Sync history in background (don't block UI)
@@ -593,6 +704,31 @@ class AuthViewModel {
                 print("✅ [AuthViewModel] Gender '\(gender)' saved for \(email)")
             }
             
+            // Save UserBirthProfile to SwiftData for registered user
+            let userProfile = UserBirthProfile(
+                email: email,
+                isGuestEmail: false,
+                dateOfBirth: birthData.dob,
+                timeOfBirth: birthData.time,
+                cityOfBirth: birthData.cityOfBirth ?? "",
+                latitude: birthData.latitude,
+                longitude: birthData.longitude,
+                placeId: nil,
+                gender: gender.isEmpty ? nil : gender,
+                timeUnknown: false
+            )
+            DataManager.shared.saveBirthProfile(userProfile)
+            print("✅ [AuthViewModel] SwiftData UserBirthProfile saved for \(email)")
+            
+            // Clean up orphaned guest SwiftData profile
+            let guestEmail = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+            if !guestEmail.isEmpty && guestEmail != email {
+                if let guestProfile = DataManager.shared.getBirthProfile(for: guestEmail) {
+                    DataManager.shared.deleteBirthProfile(guestProfile)
+                    print("🗑️ [AuthViewModel] Cleaned up guest SwiftData profile for \(guestEmail)")
+                }
+            }
+            
             // Create self partner profile for Switch Profile feature
             // This makes the upgraded user work exactly like a normal registered user
             print("👤 [AuthViewModel] Creating self partner profile...")
@@ -611,7 +747,7 @@ class AuthViewModel {
             )
             print("✅ [AuthViewModel] Self partner profile created")
         } else {
-            throw NSError(domain: "AuthViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to save profile"])
+            throw NSError(domain: "AuthViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "failed_save_profile".localized])
         }
     }
 }

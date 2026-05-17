@@ -8,11 +8,22 @@ struct MessageBubble: View {
     var thinkingSteps: [ThinkingStep] = []  // For streaming progress
     var enableTypewriter: Bool = false
     var onTypewriterFinished: (() -> Void)? = nil
+    var onTypewriterProgress: (() -> Void)? = nil
+    // Pipeline step state for reading layout
+    var cosmicProgressSteps: [CosmicProgressStep] = []
     
     // Local typewriter state (only this bubble re-renders, no parent jitter)
     @State private var revealedContent: String = ""
     @State private var typewriterFinished = false
     @State private var typewriterTimer: Timer?
+    @State private var showCopiedConfirmation = false
+    
+    // Cached formatter (DateFormatter is expensive to create)
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
     
     private var isUser: Bool {
         message.messageRole == .user
@@ -26,7 +37,7 @@ struct MessageBubble: View {
     }
     
     private var isWelcomeMessage: Bool {
-        message.content.contains("I'm Destiny, your personal astrology guide")
+        message.role == "assistant" && message.id == "welcome"
     }
     
     // Check if we're in loading/streaming state
@@ -35,67 +46,84 @@ struct MessageBubble: View {
     }
     
     var body: some View {
-        HStack(alignment: .top, spacing: 0) {
-            if isUser {
+        if isUser {
+            // User bubble (unchanged)
+            HStack(alignment: .top, spacing: 0) {
                 Spacer(minLength: 60)
+                VStack(alignment: .trailing, spacing: 6) {
+                    messageContent
+                }
             }
-            
-            VStack(alignment: isUser ? .trailing : .leading, spacing: 6) {
-                // Message content
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("You said: \(message.content)")
+            .accessibilityIdentifier("user_message")
+        } else if isWelcomeMessage {
+            // Welcome message — simple layout
+            VStack(alignment: .leading, spacing: 6) {
                 messageContent
-                
-                // Metadata row with inline rating — hidden during typewriter
-                if !isUser && !message.isStreaming && (!enableTypewriter || typewriterFinished) {
+                if !message.isStreaming {
                     metadataRowWithRating
                 }
             }
-            
-            if !isUser {
-                Spacer(minLength: 16) // Modern full-width AI messages
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Destiny said: \(message.content)")
+            .accessibilityIdentifier("ai_message")
+        } else {
+            // Premium reading layout for all real AI predictions
+            ReadingMessageView(
+                message: message,
+                userQuery: userQuery,
+                cosmicProgressSteps: cosmicProgressSteps,
+                isStreaming: message.isStreaming
+            )
+            .onDisappear {
+                typewriterTimer?.invalidate()
+                typewriterTimer = nil
             }
-        }
-        .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(isUser ? "You said: \(message.content)" : "Destiny said: \(displayContent)")
-        .onAppear {
-            if enableTypewriter {
-                startTypewriter()
-            }
-        }
-        .onDisappear {
-            typewriterTimer?.invalidate()
-            typewriterTimer = nil
         }
     }
     
     // MARK: - Typewriter Effect (local @State, no parent re-renders)
     private func startTypewriter() {
+        // Guard against double-start when LazyVStack re-appears
+        typewriterTimer?.invalidate()
+        typewriterTimer = nil
+
         let fullText = message.content
         let words = fullText.components(separatedBy: " ")
         guard !words.isEmpty else {
             typewriterFinished = true
             return
         }
-        
+
         var wordIndex = 0
         revealedContent = ""
         
-        // Reveal 3 words every 60ms (~50 words/sec for smooth fast reveal)
-        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.06, repeats: true) { timer in
-            let batchEnd = min(wordIndex + 3, words.count)
+        // Reveal 1 word every 50ms (~20 words/sec for faster smooth reading pace)
+        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
+            let batchEnd = min(wordIndex + 1, words.count)
             let batch = words[wordIndex..<batchEnd].joined(separator: " ")
-            
+
             if revealedContent.isEmpty {
                 revealedContent = batch
             } else {
                 revealedContent += " " + batch
             }
-            
+
             wordIndex = batchEnd
-            
+
+            if wordIndex % 10 == 0 {
+                onTypewriterProgress?()
+            }
+
             if wordIndex >= words.count {
                 timer.invalidate()
-                typewriterFinished = true
+                typewriterTimer = nil
+                withAnimation(.easeIn(duration: 0.25)) {
+                    typewriterFinished = true
+                }
                 onTypewriterFinished?()
             }
         }
@@ -104,22 +132,32 @@ struct MessageBubble: View {
     // MARK: - Message Content
     @ViewBuilder
     private var messageContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             if isUser {
                 // User message - plain text
                 Text(message.content)
-                    .font(AppTheme.Fonts.body(size: 16)) // HIG standard body text
+                    .font(AppTheme.Fonts.body(size: 17)) // HIG standard body text
                     .foregroundColor(AppTheme.Colors.mainBackground) // Dark text on gold gradient
             } else if isLoadingState {
                 // AI loading state - show progress inside bubble
                 streamingProgressView
             } else if !displayContent.isEmpty {
-                // AI message with content
-                MarkdownTextView(
-                    content: displayContent,
-                    textColor: AppTheme.Colors.textPrimary,
-                    fontSize: 16 // HIG standard body text
-                )
+                // Plain text during typewriter — avoids 600+ MarkdownTextView re-parse cycles
+                // that cause watchdog kills on long responses. Switch to full markdown after.
+                if enableTypewriter && !typewriterFinished {
+                    Text(revealedContent)
+                        .font(AppTheme.Fonts.body(size: 17))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .lineSpacing(6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    MarkdownTextView(
+                        content: streamingContent ?? message.content,
+                        textColor: AppTheme.Colors.textPrimary,
+                        fontSize: 17
+                    )
+                    .transition(.opacity)
+                }
             }
             
             // Tool calls chips (if any)
@@ -152,8 +190,8 @@ struct MessageBubble: View {
     private var streamingProgressView: some View {
         HStack(spacing: 10) {
             AnimatedDots()
-            
-            Text("Thinking...")
+
+            Text("thinking".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -167,6 +205,7 @@ struct MessageBubble: View {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
         )
+        .accessibilityIdentifier("streaming_indicator")
     }
     
     // Fallback parser for **bold** syntax
@@ -251,6 +290,26 @@ struct MessageBubble: View {
             
             Spacer()
             
+            // Copy button (for substantial AI messages)
+            if !isWelcomeMessage && message.content.count > 50 {
+                Button(action: {
+                    UIPasteboard.general.string = message.content
+                    showCopiedConfirmation = true
+                    HapticManager.shared.play(.light)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        showCopiedConfirmation = false
+                    }
+                }) {
+                    Image(systemName: showCopiedConfirmation ? "checkmark" : "doc.on.doc")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(showCopiedConfirmation ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                }
+                .buttonStyle(.plain)
+                .animation(.easeInOut(duration: 0.2), value: showCopiedConfirmation)
+                .accessibilityLabel("a11y_copy_response".localized)
+                .accessibilityIdentifier("copy_button")
+            }
+            
             // Inline rating (only for substantial AI messages)
             if !isWelcomeMessage && message.content.count > 50 {
                 InlineMessageRating(
@@ -265,9 +324,7 @@ struct MessageBubble: View {
     
     // MARK: - Helpers
     private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+        Self.timeFormatter.string(from: date)
     }
     
     private func formatExecutionTime(_ ms: Double) -> String {
@@ -385,7 +442,7 @@ struct CollapsibleProgressView: View {
                     AnimatedDots()
                     
                     // Status text
-                    Text("Analyzing your chart")
+                    Text("analyzing_chart".localized)
                         .font(AppTheme.Fonts.body(size: 14).weight(.medium))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
@@ -436,6 +493,7 @@ struct CollapsibleProgressView: View {
     }
     
     private func startTimer() {
+        timer?.invalidate()  // guard against double-start on LazyVStack re-appear
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             elapsedSeconds += 1
         }

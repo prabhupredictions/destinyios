@@ -109,10 +109,11 @@ class AstroDataCache {
         }
     }
     
-    // MARK: - Transits Cache (Per Year, per profile)
-    
+    // MARK: - Transits Cache (Per Month, per profile)
+
     func getTransits(birthHash: String, year: Int) -> TransitResponse? {
-        let key = profileContext.profileScopedKey("\(transitsPrefix)_\(birthHash)_\(year)")
+        let month = Calendar.current.component(.month, from: Date())
+        let key = profileContext.profileScopedKey("\(transitsPrefix)_\(birthHash)_\(year)_\(month)")
         
         guard let data = UserDefaults.standard.data(forKey: key) else {
             return nil
@@ -129,7 +130,8 @@ class AstroDataCache {
     }
     
     func setTransits(_ response: TransitResponse, birthHash: String, year: Int) {
-        let key = profileContext.profileScopedKey("\(transitsPrefix)_\(birthHash)_\(year)")
+        let month = Calendar.current.component(.month, from: Date())
+        let key = profileContext.profileScopedKey("\(transitsPrefix)_\(birthHash)_\(year)_\(month)")
         
         do {
             let data = try JSONEncoder().encode(response)

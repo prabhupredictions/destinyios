@@ -10,7 +10,7 @@ struct TransitsView: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(Color("GoldAccent"))
                 
-                Text("Transits (\(transitResponse?.year ?? 2024))")
+                Text(String(format: "transits_year".localized, transitResponse?.year ?? 2024))
                     .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(AppTheme.Colors.textPrimary)
             }
@@ -24,8 +24,8 @@ struct TransitsView: View {
                     }
                 }
             } else {
-                Text("Select a year to view transits")
-                    .font(.caption)
+                Text("select_year_transits".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(.secondary)
             }
         }
@@ -35,6 +35,7 @@ struct TransitsView: View {
                 .fill(Color.white)
                 .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
         )
+        .accessibilityIdentifier("chart_tab_transits")
     }
 }
 
@@ -44,7 +45,7 @@ struct TransitPlanetSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(planet)
+            Text("planet_\(planet.lowercased())".localized)
                 .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(Color("NavyPrimary"))
             
@@ -58,7 +59,7 @@ struct TransitPlanetSection: View {
                         .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(.gray)
                     
-                    Text("\(event.sign) (H\(event.houseFromLagna))")
+                    Text("\("sign_\(event.sign.lowercased())".localized) (" + String(format: "house_short".localized, "\(event.houseFromLagna)") + ")")
                         .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(Color("NavyPrimary"))
                 }

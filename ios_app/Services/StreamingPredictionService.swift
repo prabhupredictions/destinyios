@@ -13,6 +13,7 @@ class StreamingPredictionService {
         case thought(step: Int, content: String, display: String)
         case action(step: Int, tool: String, display: String)
         case observation(step: Int, display: String)
+        case progressStep(phase: String, group: Int, groupCount: Int, isDone: Bool, displayKey: String?, elapsedMs: Int)
         case finalAnswer(content: String)
         case answer(response: PredictionResponse)
         case done(totalSteps: Int)
@@ -34,7 +35,7 @@ class StreamingPredictionService {
         urlRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-        urlRequest.timeoutInterval = 60  // 60 second timeout for long predictions
+        urlRequest.timeoutInterval = 300  // 5 min — Opus first-token can be slow
         
         // Build request body using correct BirthData properties
         let body: [String: Any] = [
@@ -51,6 +52,9 @@ class StreamingPredictionService {
             "session_id": request.sessionId ?? UUID().uuidString,
             "conversation_id": request.conversationId ?? UUID().uuidString,
             "user_email": request.userEmail ?? "",
+            "language": request.language,
+            "response_style": request.responseStyle ?? "",
+            "response_length": request.responseLength ?? "",
             "profile_id": ProfileContextManager.shared.activeProfileId  // Profile-scoped threads
         ]
         
@@ -58,8 +62,8 @@ class StreamingPredictionService {
         
         // Use dedicated URLSession configuration for SSE
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 60
-        config.timeoutIntervalForResource = 120
+        config.timeoutIntervalForRequest = 300   // 5 min — Opus first-token latency
+        config.timeoutIntervalForResource = 600  // 10 min — full Opus stream
         config.waitsForConnectivity = true
         let session = URLSession(configuration: config)
         
@@ -135,6 +139,16 @@ class StreamingPredictionService {
                 display: json["display"] as? String ?? "📊 Analyzing..."
             )
             
+        case "progress_step":
+            return .progressStep(
+                phase:      json["phase"]       as? String ?? "",
+                group:      json["group"]       as? Int    ?? 0,
+                groupCount: json["group_count"] as? Int    ?? 1,
+                isDone:     json["is_done"]     as? Bool   ?? false,
+                displayKey: json["display_key"] as? String,
+                elapsedMs:  json["elapsed_ms"]  as? Int    ?? 0
+            )
+
         case "final_answer":
             return .finalAnswer(
                 content: json["content"] as? String ?? ""
@@ -185,7 +199,7 @@ class StreamingPredictionService {
                 case "daily_limit_reached":
                     return .error(message: "Daily limit reached. Try again tomorrow.")
                 case "overall_limit_reached":
-                    return .error(message: "free_limit_reached".localized)
+                    return .error(message: "create_account_to_continue".localized)
                 default:
                     return .error(message: errorMsg)
                 }

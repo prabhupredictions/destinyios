@@ -37,13 +37,11 @@ struct FloatingIcon<Content: View>: View {
 }
 
 // MARK: - Shimmer Button
-/// Premium button with animated shimmer effect
+/// Premium button with gold gradient background - simple and clickable
 struct ShimmerButton: View {
     let title: String
     let icon: String?
     let action: () -> Void
-    
-    @State private var shimmerPhase: CGFloat = 0
     
     init(title: String, icon: String? = "arrow.right", action: @escaping () -> Void) {
         self.title = title
@@ -52,7 +50,10 @@ struct ShimmerButton: View {
     }
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            HapticManager.shared.play(.medium)
+            action()
+        }) {
             HStack(spacing: 10) {
                 Text(title)
                     .font(AppTheme.Fonts.title(size: 17))
@@ -66,24 +67,25 @@ struct ShimmerButton: View {
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(
-                ZStack {
-                    // Base gradient
-                    AppTheme.Colors.premiumCardGradient
-                    
-                    // Top highlight
-                    VStack {
-                        Rectangle()
-                            .fill(Color.white.opacity(0.3))
-                            .frame(height: 1)
-                        Spacer()
-                    }
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: AppTheme.Colors.gold.opacity(0.4), radius: 15, y: 6)
+                AppTheme.Colors.premiumCardGradient
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
             )
         }
-        .contentShape(Rectangle())
-        .buttonStyle(ScaleButtonStyle())
+        .buttonStyle(PressedButtonStyle())
+    }
+}
+
+// MARK: - Pressed Button Style
+/// Simple button style with immediate visual feedback on press
+struct PressedButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 
@@ -127,6 +129,7 @@ struct TypewriterText: View {
     @State private var displayedText = ""
     @State private var showCursor = true
     @State private var isComplete = false
+    @State private var cursorTimer: Timer?
     
     init(_ text: String, font: Font = AppTheme.Fonts.display(size: 30), color: Color = .white) {
         self.fullText = text
@@ -152,6 +155,10 @@ struct TypewriterText: View {
             startTyping()
             startCursorBlink()
         }
+        .onDisappear {
+            cursorTimer?.invalidate()
+            cursorTimer = nil
+        }
     }
     
     private func startTyping() {
@@ -172,7 +179,7 @@ struct TypewriterText: View {
     }
     
     private func startCursorBlink() {
-        Timer.scheduledTimer(withTimeInterval: AppTheme.Visionary.Typewriter.cursorBlinkDuration, repeats: true) { _ in
+        cursorTimer = Timer.scheduledTimer(withTimeInterval: AppTheme.Visionary.Typewriter.cursorBlinkDuration, repeats: true) { _ in
             showCursor.toggle()
         }
     }
@@ -293,8 +300,8 @@ struct BentoGridFeaturesView: View {
 
 // MARK: - 3D Tilt Modifier (Device Motion)
 /// Applies 3D rotation effect based on device tilt using MotionManager
+/// BATTERY OPTIMIZATION: No-op while motion is disabled in MotionManager.start().
 struct Tilt3DModifier: ViewModifier {
-    @StateObject private var motionManager = MotionManager()
     let intensity: CGFloat
     let perspective: CGFloat
     
@@ -304,26 +311,14 @@ struct Tilt3DModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content
-            .rotation3DEffect(
-                .degrees(Double(motionManager.yOffset * intensity / 25)),
-                axis: (x: 1, y: 0, z: 0),
-                perspective: perspective
-            )
-            .rotation3DEffect(
-                .degrees(Double(motionManager.xOffset * intensity / 25)),
-                axis: (x: 0, y: 1, z: 0),
-                perspective: perspective
-            )
-            .onAppear { motionManager.start() }
-            .onDisappear { motionManager.stop() }
+        content // No-op: motion disabled
     }
 }
 
 // MARK: - Inertia Motion Modifier (Proprioception/Weight)
 /// Simulates mass by making content "lag" behind device movement
+/// BATTERY OPTIMIZATION: No-op while motion is disabled in MotionManager.start().
 struct InertiaModifier: ViewModifier {
-    @StateObject private var motionManager = MotionManager()
     let intensity: CGFloat
     
     init(intensity: CGFloat = 10) {
@@ -331,14 +326,7 @@ struct InertiaModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content
-            .offset(
-                x: motionManager.xOffset * intensity,
-                y: motionManager.yOffset * intensity
-            )
-            .animation(.interpolatingSpring(stiffness: 100, damping: 10), value: motionManager.xOffset)
-            .onAppear { motionManager.start() }
-            .onDisappear { motionManager.stop() }
+        content // No-op: motion disabled
     }
 }
 

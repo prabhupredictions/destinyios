@@ -22,29 +22,29 @@ struct DashaProgressWidget: View {
                         .rotationEffect(.degrees(-90))
                         .frame(width: 60, height: 60)
                     
-                    Text("\(Int(progress * 100))%")
+                    Text(String(format: "percentage_format".localized, Int(progress * 100)))
                         .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 
                 // Text Info
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Current Phase")
-                        .font(AppTheme.Fonts.caption(size: 11))
+                    Text("current_phase".localized)
+                        .font(.system(size: 11))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                     
                     HStack(alignment: .bottom, spacing: 4) {
-                        Text(period.mahadasha)
+                        Text(localizedPlanetName(period.mahadasha))
                             .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(AppTheme.Colors.textPrimary)
-                        Text("- \(period.antardasha)")
+                        Text(String(format: "hyphen_format".localized, localizedPlanetName(period.antardasha)))
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .padding(.bottom, 2)
                     }
                     
                     if let end = formatDate(period.end) {
-                        Text("Until \(end)")
+                        Text(String(format: "until_date_format".localized, end))
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
@@ -55,10 +55,10 @@ struct DashaProgressWidget: View {
                 // Next Up (Mini)
                 if let next = upcomingPeriod {
                     VStack(alignment: .trailing, spacing: 2) {
-                        Text("Next")
+                        Text("next_label".localized)
                             .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
-                        Text(next.antardasha)
+                        Text(localizedPlanetName(next.antardasha))
                             .font(AppTheme.Fonts.body(size: 12))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
@@ -67,12 +67,16 @@ struct DashaProgressWidget: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.clear) // Transparent
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(AppTheme.Colors.gold.opacity(0.1), lineWidth: 1)
+                    .fill(AppTheme.Colors.cardBackground)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        AppTheme.Colors.gold.opacity(0.5),
+                        lineWidth: 2
                     )
             )
+            .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
             .padding(.horizontal, 12)
         }
     }
@@ -99,5 +103,21 @@ struct DashaProgressWidget: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, yyyy"
         return formatter.string(from: date)
+    }
+    
+    private func localizedPlanetName(_ planet: String) -> String {
+        let key = planet.lowercased()
+        switch key {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return planet
+        }
     }
 }

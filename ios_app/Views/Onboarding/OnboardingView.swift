@@ -13,18 +13,19 @@ struct OnboardingView: View {
         ZStack {
             // Cosmic background with tilt parallax
             CosmicBackgroundView()
-            
+
             VStack(spacing: 0) {
                 // Top bar with Skip
                 topBar
-                
+
                 // Paging ScrollView with parallax transitions
                 slideContent
-                
+
                 // Bottom section
                 bottomSection
             }
         }
+        .accessibilityIdentifier("onboarding_screen")
         .onAppear {
             // Initialize with first slide
             scrolledSlideID = slides.first?.id
@@ -107,6 +108,7 @@ struct OnboardingView: View {
                     SoundManager.shared.playButtonTap()
                     goToNextSlide()
                 }
+                .accessibilityIdentifier("onboarding_continue")
                 .padding(.horizontal, 24)
             } else {
                 // Get Started button on last slide
@@ -115,6 +117,7 @@ struct OnboardingView: View {
                     SoundManager.shared.playSuccess()
                     onComplete()
                 }
+                .accessibilityIdentifier("onboarding_continue")
                 .padding(.horizontal, 24)
             }
         }

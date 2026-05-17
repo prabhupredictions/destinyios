@@ -51,7 +51,7 @@ struct PartnerData: Identifiable, Codable, Hashable {
     // MARK: - Formatted Display
     var formattedDob: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: birthDate)
     }
     

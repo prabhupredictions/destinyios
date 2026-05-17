@@ -31,6 +31,7 @@ struct ios_appApp: App {
     var body: some Scene {
         WindowGroup {
             AppRootView()
+                .preferredColorScheme(.dark)
                 .onOpenURL { url in
                     // Handle Google Sign-In callback
                     #if canImport(GoogleSignIn)
@@ -44,6 +45,10 @@ struct ios_appApp: App {
                 BackgroundTaskHelper.shared.beginTask()
             case .active:
                 BackgroundTaskHelper.shared.endTask()
+                // Warm up Cloud Run — fires only when returning from background/inactive
+                if oldPhase != .active {
+                    BackendWarmUpService.shared.ping()
+                }
             default:
                 break
             }
@@ -61,8 +66,9 @@ final class BackgroundTaskHelper {
     func beginTask() {
         guard taskID == .invalid else { return } // Already running
         taskID = UIApplication.shared.beginBackgroundTask(withName: "app-keep-alive") { [weak self] in
-            // Expiration handler — iOS is about to suspend, clean up
-            print("[Background] ⚠️ Background time expiring")
+            // Expiration handler — iOS is about to suspend, cancel streaming cleanly
+            print("[Background] ⚠️ Background time expiring — cancelling any in-flight stream")
+            NotificationCenter.default.post(name: .streamingBackgroundExpired, object: nil)
             self?.endTask()
         }
         let remaining = UIApplication.shared.backgroundTimeRemaining
@@ -112,13 +118,46 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        print("🔔 Notification tapped: \(userInfo)")
-        
-        // Post notification for navigation (deep linking)
-        if let eventType = userInfo["type"] as? String {
-             print("➡️ Navigating to event: \(eventType)")
-        }
+        let eventType  = userInfo["type"]        as? String ?? ""
+        let chatPrompt = userInfo["chat_prompt"] as? String ?? ""
+        NotificationRouter.shared.route(type: eventType, prefill: chatPrompt)
         completionHandler()
+    }
+}
+
+extension Notification.Name {
+    static let streamingBackgroundExpired = Notification.Name("streamingBackgroundExpired")
+}
+
+// MARK: - Backend Warm-Up Service
+/// Sends a lightweight GET /health ping when the app returns to foreground.
+/// Cloud Run scales to zero after ~15 minutes of inactivity. The ping fires
+/// immediately on foreground so the cold start (20–60s) completes before the
+/// user finishes typing their first query.
+final class BackendWarmUpService {
+    static let shared = BackendWarmUpService()
+    private var lastPingDate: Date = .distantPast
+    private let minInterval: TimeInterval = 60  // don't ping more than once per minute
+
+    func ping() {
+        guard Date().timeIntervalSince(lastPingDate) > minInterval else { return }
+        lastPingDate = Date()
+
+        guard let url = URL(string: "\(APIConfig.baseURL)/health") else { return }
+
+        let config = URLSessionConfiguration.ephemeral
+        config.timeoutIntervalForRequest = 10
+        config.timeoutIntervalForResource = 15
+        let session = URLSession(configuration: config)
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+
+        let task = session.dataTask(with: request) { _, response, _ in
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            print("[WarmUp] /health ping → \(status)")
+        }
+        task.resume()
     }
 }
 // Build trigger - 2026-02-07T08:58:23Z

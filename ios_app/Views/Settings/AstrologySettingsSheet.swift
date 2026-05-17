@@ -11,29 +11,29 @@ struct AstrologySettingsSheet: View {
     
     // Ayanamsa options matching API
     private let ayanamsaOptions: [(key: String, label: String)] = [
-        ("lahiri", "Lahiri (Most common)"),
-        ("raman", "Raman"),
-        ("krishnamurti", "Krishnamurti (KP)"),
-        ("fagan_bradley", "Fagan-Bradley")
+        ("lahiri", "ayanamsa_lahiri"),
+        ("raman", "ayanamsa_raman"),
+        ("krishnamurti", "ayanamsa_krishnamurti"),
+        ("fagan_bradley", "ayanamsa_fagan_bradley")
     ]
-    
+
     // House system options matching API
     private let houseSystemOptions: [(key: String, label: String)] = [
-        ("equal", "Equal Houses"),
-        ("whole_sign", "Whole Sign"),
-        ("placidus", "Placidus"),
-        ("koch", "Koch"),
-        ("regiomontanus", "Regiomontanus"),
-        ("campanus", "Campanus"),
-        ("morinus", "Morinus"),
-        ("alcabitus", "Alcabitus"),
-        ("porphyrius", "Porphyrius")
+        ("equal", "house_system_equal"),
+        ("whole_sign", "house_system_whole_sign"),
+        ("placidus", "house_system_placidus"),
+        ("koch", "house_system_koch"),
+        ("regiomontanus", "house_system_regiomontanus"),
+        ("campanus", "house_system_campanus"),
+        ("morinus", "house_system_morinus"),
+        ("alcabitus", "house_system_alcabitus"),
+        ("porphyrius", "house_system_porphyrius")
     ]
-    
+
     // Chart style options
     private let chartStyleOptions: [(key: String, label: String)] = [
-        ("north", "North Indian Style"),
-        ("south", "South Indian Style")
+        ("north", "north_indian_style"),
+        ("south", "south_indian_style")
     ]
     
     var body: some View {
@@ -50,7 +50,7 @@ struct AstrologySettingsSheet: View {
                                 HapticManager.shared.play(.light)
                             } label: {
                                 HStack {
-                                    Text(option.label)
+                                    Text(option.label.localized)
                                         .font(AppTheme.Fonts.body(size: 16))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
                                     
@@ -84,7 +84,7 @@ struct AstrologySettingsSheet: View {
                                 HapticManager.shared.play(.light)
                             } label: {
                                 HStack {
-                                    Text(option.label)
+                                    Text(option.label.localized)
                                         .font(AppTheme.Fonts.body(size: 16))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
                                     
@@ -118,7 +118,7 @@ struct AstrologySettingsSheet: View {
                                 HapticManager.shared.play(.light)
                             } label: {
                                 HStack {
-                                    Text(option.label)
+                                    Text(option.label.localized)
                                         .font(AppTheme.Fonts.body(size: 16))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
                                     
@@ -135,11 +135,11 @@ struct AstrologySettingsSheet: View {
                         }
                     } header: {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Chart Style")
-                                .font(AppTheme.Fonts.title(size: 14))
+                            Text("chart_style".localized)
+                                .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                                 .foregroundColor(AppTheme.Colors.gold)
-                            Text("Choose how birth charts are displayed")
-                                .font(AppTheme.Fonts.caption(size: 12))
+                            Text("choose_chart_display".localized)
+                                .font(AppTheme.Fonts.caption(size: 13))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                     }
@@ -147,11 +147,11 @@ struct AstrologySettingsSheet: View {
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Astrology Settings")
+            .navigationTitle("astrology_settings_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }

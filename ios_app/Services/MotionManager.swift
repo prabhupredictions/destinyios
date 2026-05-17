@@ -58,18 +58,13 @@ final class MotionManager: ObservableObject {
 }
 
 /// View modifier that applies motion-based parallax offset
+/// BATTERY OPTIMIZATION: No-op while motion is disabled in MotionManager.start().
+/// This avoids allocating CMMotionManager + OperationQueue at 17+ call sites.
 struct MotionParallaxModifier: ViewModifier {
-    @StateObject private var motionManager = MotionManager()
     let intensity: CGFloat
     
     func body(content: Content) -> some View {
-        content
-            .offset(
-                x: motionManager.xOffset * intensity,
-                y: motionManager.yOffset * intensity
-            )
-            .onAppear { motionManager.start() }
-            .onDisappear { motionManager.stop() }
+        content // No-op: motion disabled
     }
 }
 

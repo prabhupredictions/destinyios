@@ -7,6 +7,7 @@ struct MainTabView: View {
     @State private var showHistory = false
     @State private var showAskSheet = false  // New: Show Ask Destiny Sheet
     @State private var pendingQuestion: String? = nil
+    @State private var pendingQuestionLabel: String? = nil
     @State private var pendingThreadId: String? = nil
     @State private var pendingMatchItem: CompatibilityHistoryItem? = nil
     @State private var pendingMatchGroup: ComparisonGroup? = nil
@@ -14,82 +15,98 @@ struct MainTabView: View {
     @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
     @State private var isKeyboardVisible = false  // Track keyboard for tab bar hiding
-    
+
+    @State private var hasVisitedChat = false
+    @State private var hasVisitedMatch = false
+
     /// Reactive guest user check - uses @AppStorage for automatic UI updates
     @AppStorage("isGuest") private var isGuestUser = false
 
-    
+    private var notificationRouter = NotificationRouter.shared
+
     var body: some View {
         ZStack(alignment: .bottom) {
             // Tab Content
-            Group {
-                switch selectedTab {
-                case 0:
-                    HomeView(
-                        onQuestionSelected: { question in
-                            pendingQuestion = question
-                            selectedTab = 1  // Navigate to chat
-                        },
-                        onChatHistorySelected: { threadId in
-                            pendingThreadId = threadId
-                            selectedTab = 1 // Navigate to chat
-                        },
-                        onMatchHistorySelected: { matchItem in
-                            // Guest cannot view match history - show sign in
-                            if isGuestUser {
-                                showGuestSignInSheet = true
-                            } else {
-                                pendingMatchItem = matchItem
-                                pendingMatchGroup = nil  // Clear any pending group
-                                selectedTab = 2 // Navigate to match
-                            }
-                        },
-                        onMatchGroupHistorySelected: { group in
-                            if isGuestUser {
-                                showGuestSignInSheet = true
-                            } else {
-                                pendingMatchGroup = group
-                                pendingMatchItem = nil  // Clear any pending single item
-                                selectedTab = 2 // Navigate to match
-                            }
+            ZStack {
+                // HOME TAB - Always loaded, kept alive
+                HomeView(
+                    viewModel: homeViewModel,
+                    onQuestionSelected: { question, label in
+                        pendingQuestion = question
+                        pendingQuestionLabel = label
+                        selectedTab = 1  // Navigate to chat
+                    },
+                    onChatHistorySelected: { threadId in
+                        pendingThreadId = threadId
+                        selectedTab = 1 // Navigate to chat
+                    },
+                    onMatchHistorySelected: { matchItem in
+                        // Guest cannot view match history - show sign in
+                        if isGuestUser {
+                            showGuestSignInSheet = true
+                        } else {
+                            pendingMatchItem = matchItem
+                            pendingMatchGroup = nil  // Clear any pending group
+                            selectedTab = 2 // Navigate to match
                         }
-                    )
-                    .ignoresSafeArea(.keyboard)
-                case 1:
+                    },
+                    onMatchGroupHistorySelected: { group in
+                        if isGuestUser {
+                            showGuestSignInSheet = true
+                        } else {
+                            pendingMatchGroup = group
+                            pendingMatchItem = nil  // Clear any pending single item
+                            selectedTab = 2 // Navigate to match
+                        }
+                    }
+                )
+                .ignoresSafeArea(.keyboard)
+                .opacity(selectedTab == 0 ? 1 : 0)
+                .allowsHitTesting(selectedTab == 0)
+                
+                // CHAT TAB - Lazily loaded on first visit
+                if hasVisitedChat || selectedTab == 1 {
                     ChatView(
-                        onBack: { 
-                            selectedTab = 0 
+                        onBack: {
+                            selectedTab = 0
                             pendingQuestion = nil  // Clear pending question
+                            pendingQuestionLabel = nil
                             pendingThreadId = nil
                         },
                         initialQuestion: pendingQuestion,
+                        initialDisplayLabel: pendingQuestionLabel,
                         initialThreadId: pendingThreadId,
                         starterQuestions: homeViewModel.suggestedQuestions
                     )
-                case 2:
-                    // Guest users cannot access Match tab - show sign-in prompt
-                    if isGuestUser {
-                        GuestSignInPromptView(
-                            message: "sign_in_to_check_compatibility".localized,
-                            onBack: { selectedTab = 0 }
-                        )
-                        .ignoresSafeArea(.keyboard)
-                    } else {
-                        CompatibilityView(
-                            initialMatchItem: pendingMatchItem,
-                            initialMatchGroup: pendingMatchGroup,
-                            onShowResultChange: { isShowing in
-                                withAnimation(.easeInOut(duration: 0.25)) {
-                                    showMatchResult = isShowing
+                    .opacity(selectedTab == 1 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 1)
+                }
+                
+                // MATCH TAB - Lazily loaded on first visit
+                if hasVisitedMatch || selectedTab == 2 {
+                    Group {
+                        if isGuestUser {
+                            GuestSignInPromptView(
+                                message: "sign_in_to_check_compatibility".localized,
+                                onBack: { selectedTab = 0 }
+                            )
+                            .ignoresSafeArea(.keyboard)
+                        } else {
+                            CompatibilityView(
+                                initialMatchItem: pendingMatchItem,
+                                initialMatchGroup: pendingMatchGroup,
+                                onShowResultChange: { isShowing in
+                                    withAnimation(.easeInOut(duration: 0.25)) {
+                                        showMatchResult = isShowing
+                                    }
                                 }
-                            }
-                        )
-                        .id(ProfileContextManager.shared.activeProfileId) // Force recreation on profile switch
-                        .ignoresSafeArea(.keyboard)
+                            )
+                            .id(ProfileContextManager.shared.activeProfileId) // Force recreation on profile switch
+                            .ignoresSafeArea(.keyboard)
+                        }
                     }
-                default:
-                    HomeView(onQuestionSelected: { _ in })
-                        .ignoresSafeArea(.keyboard)
+                    .opacity(selectedTab == 2 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 2)
                 }
             }
             
@@ -114,6 +131,13 @@ struct MainTabView: View {
         }
         // Clear pending match state when navigating away from Match tab
         .onChange(of: selectedTab) { oldTab, newTab in
+            // Dismiss keyboard explicitly when leaving any tab
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            
+            // Mark tabs as visited for lazy internal loading
+            if newTab == 1 { hasVisitedChat = true }
+            if newTab == 2 { hasVisitedMatch = true }
+            
             if oldTab == 2 && newTab != 2 {
                 pendingMatchItem = nil
                 pendingMatchGroup = nil
@@ -126,20 +150,48 @@ struct MainTabView: View {
             pendingMatchGroup = nil
             showMatchResult = false
         }
+        .onChange(of: notificationRouter.pendingDeepLink) { _, deepLink in
+            guard let deepLink else { return }
+            switch deepLink {
+            case .home:
+                selectedTab = 0
+            case .chat(let prefill, _, let newThread):
+                if newThread {
+                    // New thread: clear existing conversation state before switching
+                    pendingQuestion = nil
+                    pendingQuestionLabel = nil
+                    pendingThreadId = nil
+                }
+                selectedTab = 1
+                if !prefill.isEmpty {
+                    pendingQuestion = prefill
+                    pendingQuestionLabel = nil
+                }
+            case .match:
+                selectedTab = 2
+            case .settings:
+                selectedTab = 0
+            }
+            notificationRouter.pendingDeepLink = nil
+        }
         .sheet(isPresented: $showAskSheet) {
             AskDestinyQuestionsSheet(
                 suggestedQuestions: homeViewModel.suggestedQuestions,
                 onQuestionSelected: { question in
                     pendingQuestion = question
+                    pendingQuestionLabel = nil
                     selectedTab = 1  // Navigate to chat with question
                 }
             )
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
-        .task {
-            // Load home data to have life areas available for Ask sheet
-            await homeViewModel.loadHomeData()
+        .onAppear {
+            // Load home data for Ask sheet instead of .task
+            // This prevents duplicate .task loads since HomeView also calls this
+            Task {
+                await homeViewModel.loadHomeData()
+            }
         }
     }
 }
@@ -162,6 +214,7 @@ struct CustomTabBar: View {
                 }
             }
             .frame(width: 60) // Fixed width touch target
+            .accessibilityIdentifier("tab_home")
             
             Spacer()
             
@@ -173,6 +226,7 @@ struct CustomTabBar: View {
                 }
             }
             .frame(width: 80) // Fixed width for center
+            .accessibilityIdentifier("tab_chat")
             
             Spacer()
             
@@ -187,6 +241,7 @@ struct CustomTabBar: View {
                 }
             }
             .frame(width: 60) // Fixed width touch target
+            .accessibilityIdentifier("tab_match")
         }
         .padding(.horizontal, 30) // HIG: ~30pt minimum from edges
         .padding(.top, 4)        // Minimal top padding

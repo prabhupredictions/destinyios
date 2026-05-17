@@ -1,0 +1,214 @@
+<style>
+  body { font-family: -apple-system, sans-serif; }
+  .grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 16px; }
+  .case { width: 260px; }
+  .case-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 6px; }
+  .case-sublabel { font-size: 10px; color: #555; margin-bottom: 8px; font-style: italic; }
+
+  /* Card */
+  .card { border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,100,100,0.2); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 13px;
+    background: rgba(255, 59, 48, 0.1);
+  }
+  .card-header-left { display: flex; align-items: center; gap: 7px; }
+  .card-title { font-size: 14px; font-weight: 700; color: #ff3b30; }
+  .card-score { font-size: 12px; color: #aaa; }
+  .card-score strong { color: #fff; font-size: 17px; }
+  .card-body { padding: 11px 13px; background: rgba(15,15,24,0.95); }
+
+  .reason-label {
+    font-size: 11px; font-weight: 700; color: #ff3b30;
+    margin-bottom: 7px;
+  }
+  .reason-item {
+    display: flex; align-items: flex-start; gap: 7px; margin-bottom: 7px;
+  }
+  .reason-icon { font-size: 10px; color: #ff3b30; margin-top: 2px; flex-shrink: 0; }
+  .reason-text { font-size: 12px; color: #ccc; line-height: 1.45; }
+  .reason-text strong { color: #fff; }
+
+  .divider { border: none; border-top: 1px solid rgba(52,199,89,0.15); margin: 9px 0; }
+  .cancelled-row { display: flex; align-items: flex-start; gap: 6px; }
+  .cancelled-icon { font-size: 10px; color: #34c759; margin-top: 2px; flex-shrink: 0; }
+  .cancelled-text { font-size: 11px; color: rgba(52,199,89,0.8); line-height: 1.4; }
+
+  .score-reason { font-size: 12px; color: #ccc; line-height: 1.45; }
+  .score-reason .num { color: #ff9f0a; font-weight: 700; }
+
+  .source-note {
+    font-size: 10px; color: #555; margin-top: 6px; padding: 5px 7px;
+    background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 2px solid #333;
+  }
+  .source-note span { color: #34c759; }
+</style>
+
+<h2>Not Recommended — All Hard No Conditions</h2>
+<p class="subtitle">6 distinct states. Source of truth: <code>hard_no_flags.rejection_reasons</code> (never re-derived on client)</p>
+
+<div class="grid">
+
+  <!-- Case 1 -->
+  <div class="case">
+    <div class="case-label">Case 1 — Nadi Dosha only</div>
+    <div class="case-sublabel">Most serious. Same Nadi, no cancellation found.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span>⛔</span>
+          <span class="card-title">Not Recommended</span>
+        </div>
+        <div class="card-score"><strong>26</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="reason-item">
+          <span class="reason-icon">▲</span>
+          <span class="reason-text"><strong>Nadi Dosha:</strong> You share the same biological constitution. Classical texts flag same-Nadi as a long-term health and vitality concern.</span>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">rejection_reasons[0] only. No cancelled doshas.</div>
+  </div>
+
+  <!-- Case 2 -->
+  <div class="case">
+    <div class="case-label">Case 2 — Bhakoot Dosha only</div>
+    <div class="case-sublabel">Emotional/financial tension. No Nadi concern.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span>⛔</span>
+          <span class="card-title">Not Recommended</span>
+        </div>
+        <div class="card-score"><strong>28</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="reason-item">
+          <span class="reason-icon">▲</span>
+          <span class="reason-text"><strong>Bhakoot Dosha:</strong> Moon positions create a 6-8 axis — classical texts link this to recurring emotional distance and financial hardship.</span>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">rejection_reasons[0] only. Bhakoot 0/7.</div>
+  </div>
+
+  <!-- Case 3 -->
+  <div class="case">
+    <div class="case-label">Case 3 — Nadi + Bhakoot (worst case)</div>
+    <div class="case-sublabel">Both critical doshas active.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span>⛔</span>
+          <span class="card-title">Not Recommended</span>
+        </div>
+        <div class="card-score"><strong>19</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="reason-item">
+          <span class="reason-icon">▲</span>
+          <span class="reason-text"><strong>Nadi Dosha:</strong> Same biological constitution — long-term health and vitality concern.</span>
+        </div>
+        <div class="reason-item">
+          <span class="reason-icon">▲</span>
+          <span class="reason-text"><strong>Bhakoot Dosha (6-8 axis):</strong> Recurring emotional distance and financial hardship.</span>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">rejection_reasons has 2 items.</div>
+  </div>
+
+  <!-- Case 4 -->
+  <div class="case">
+    <div class="case-label">Case 4 — Low Score only (< 18)</div>
+    <div class="case-sublabel">No Nadi/Bhakoot dosha, just low Ashtakoot total.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span>⛔</span>
+          <span class="card-title">Not Recommended</span>
+        </div>
+        <div class="card-score"><strong>15</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="reason-item">
+          <span class="reason-icon">▲</span>
+          <span class="reason-text">Adjusted Ashtakoot score <span class="num" style="color:#ff9f0a;font-weight:700">15/36</span> — below the 18-point minimum threshold for a compatible match.</span>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">No dosha detail needed — reason comes from rejection_reasons directly.</div>
+  </div>
+
+  <!-- Case 5 -->
+  <div class="case">
+    <div class="case-label">Case 5 — Hard Dosha + Cancelled Doshas</div>
+    <div class="case-sublabel">Nadi active, but Gana and Maitri were cancelled.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span>⛔</span>
+          <span class="card-title">Not Recommended</span>
+        </div>
+        <div class="card-score"><strong>26</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="reason-item">
+          <span class="reason-icon">▲</span>
+          <span class="reason-text"><strong>Nadi Dosha:</strong> Same biological constitution — long-term health and vitality concern.</span>
+        </div>
+        <hr class="divider">
+        <div class="cancelled-row">
+          <span class="cancelled-icon">✓</span>
+          <span class="cancelled-text">Two other doshas (Gana and Maitri) were found but cancelled based on exemption conditions in your charts.</span>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">rejection_reasons for the "why". cancelled_doshas_summary for the ✓ section. <span>No double-counting.</span></div>
+  </div>
+
+  <!-- Case 6 -->
+  <div class="case">
+    <div class="case-label">Case 6 — Low Score + Cancelled Doshas</div>
+    <div class="case-sublabel">Score < 18 even after cancellations helped.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span>⛔</span>
+          <span class="card-title">Not Recommended</span>
+        </div>
+        <div class="card-score"><strong>16</strong> /36</div>
+      </div>
+      <div class="card-body">
+        <div class="reason-label">Not recommended because:</div>
+        <div class="reason-item">
+          <span class="reason-icon">▲</span>
+          <span class="reason-text">Adjusted Ashtakoot score <span style="color:#ff9f0a;font-weight:700">16/36</span> — below the 18-point minimum threshold.</span>
+        </div>
+        <hr class="divider">
+        <div class="cancelled-row">
+          <span class="cancelled-icon">✓</span>
+          <span class="cancelled-text">One other dosha (Bhakoot) was found but cancelled based on exemption conditions — this helped the score but could not fully recover it.</span>
+        </div>
+      </div>
+    </div>
+    <div class="source-note">Score reason from rejection_reasons. Cancelled section clarifies the cancellations still happened.</div>
+  </div>
+
+</div>
+
+<div style="margin-top:28px; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid #333; max-width: 700px; margin-left: auto; margin-right: auto;">
+  <p style="font-size:12px;color:#aaa;margin:0 0 6px 0;font-weight:600;color:#fff">Consistency fix — source of truth mapping:</p>
+  <table style="width:100%;font-size:11px;color:#999;border-collapse:collapse">
+    <tr><td style="padding:3px 8px;color:#ff3b30">⛔ "Not recommended because:" bullets</td><td style="padding:3px 8px">← <code>hard_no_flags.rejection_reasons[]</code> (never doshaSummary scan)</td></tr>
+    <tr><td style="padding:3px 8px;color:#34c759">✓ "X doshas cancelled" row</td><td style="padding:3px 8px">← <code>hard_no_flags.cancelled_doshas_summary</code></td></tr>
+    <tr><td style="padding:3px 8px;color:#888">Orbit tooltip details</td><td style="padding:3px 8px">← <code>doshaSummary.details[key]</code> (unchanged)</td></tr>
+    <tr><td style="padding:3px 8px;color:#888">Verdict (recommended / not)</td><td style="padding:3px 8px">← <code>hard_no_flags.is_recommended</code> only</td></tr>
+  </table>
+</div>

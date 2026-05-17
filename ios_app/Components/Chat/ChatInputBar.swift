@@ -6,74 +6,84 @@ struct ChatInputBar: View {
     @FocusState.Binding var isFocused: Bool
     let isLoading: Bool
     let isStreaming: Bool
+    let isTyping: Bool  // disable during typewriter effect
     let onSend: () -> Void
-    
+
+    @State private var showStyleSelector = false
+    @State private var lengthManager = ResponseLengthManager.shared
+
     private var canSend: Bool {
-        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming
+        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming && !isTyping
     }
-    
+
     var body: some View {
-        HStack(spacing: 12) {
-            // Text field
+        // Single full-width pill — + and ↑ live inside
+        HStack(alignment: .bottom, spacing: 0) {
+
+            // + button (left, inside pill)
+            if !isLoading {
+                Button { showStyleSelector = true } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 40, height: 36)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("style_selector_button")
+                .accessibilityLabel(lengthManager.currentLength.label)
+            }
+
+            // Text field — grows between the two buttons
             TextField("Ask anything...", text: $text, axis: .vertical)
-                .font(AppTheme.Fonts.body(size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .lineLimit(1...5)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
-                .background(
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(AppTheme.Colors.inputBackground)
-                        .shadow(color: isFocused ? AppTheme.Colors.gold.opacity(0.15) : .clear, radius: 10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(isFocused ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.3), lineWidth: isFocused ? 1.5 : 1)
-                        )
-                )
+                .padding(.vertical, 11)
+                .frame(maxWidth: .infinity)
                 .focused($isFocused)
-                .onSubmit {
-                    if canSend {
-                        onSend()
-                    }
-                }
-            
-            // Send button
+                .onSubmit { if canSend { onSend() } }
+                .accessibilityIdentifier("chat_input")
+
+            // Send / loading indicator (right, inside pill)
             Button(action: onSend) {
                 ZStack {
-                    Group {
-                        if canSend {
-                            Circle()
-                                .fill(AppTheme.Colors.premiumGradient)
-                        } else {
-                            Circle()
-                                .fill(AppTheme.Colors.surfaceBackground)
-                        }
-                    }
-                        .frame(width: 48, height: 48)
-                        .shadow(
-                            color: canSend ? AppTheme.Colors.gold.opacity(0.3) : Color.clear,
-                            radius: 8,
-                            y: 4
-                        )
-                    
                     if isLoading || isStreaming {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-                            .scaleEffect(0.9)
+                            .scaleEffect(0.75)
+                            .frame(width: 40, height: 36)
                     } else {
                         Image(systemName: "arrow.up")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(canSend ? AppTheme.Colors.mainBackground : AppTheme.Colors.textSecondary)
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.4))
+                            .frame(width: 40, height: 36)
                     }
                 }
             }
             .disabled(!canSend)
-            .accessibilityLabel("Send message")
+            .accessibilityLabel("a11y_send_message".localized)
+            .accessibilityIdentifier("send_button")
             .animation(.spring(response: 0.3), value: canSend)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.leading, 4)
+        .padding(.trailing, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(AppTheme.Colors.inputBackground)
+                .shadow(color: isFocused ? AppTheme.Colors.gold.opacity(0.12) : .clear, radius: 8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(isFocused ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.25),
+                                lineWidth: isFocused ? 1.5 : 1)
+                )
+        )
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .padding(.bottom, 4)
         .background(AppTheme.Colors.mainBackground)
+        .sheet(isPresented: $showStyleSelector) {
+            ResponseLengthSheet()
+        }
     }
 }
 
@@ -82,7 +92,7 @@ struct ChatInputBar: View {
     struct PreviewWrapper: View {
         @State private var text = ""
         @FocusState private var isFocused: Bool
-        
+
         var body: some View {
             VStack {
                 Spacer()
@@ -90,7 +100,8 @@ struct ChatInputBar: View {
                     text: $text,
                     isFocused: $isFocused,
                     isLoading: false,
-                    isStreaming: false
+                    isStreaming: false,
+                    isTyping: false
                 ) {
                     print("Send: \(text)")
                     text = ""
@@ -99,6 +110,6 @@ struct ChatInputBar: View {
             .background(AppTheme.Colors.mainBackground)
         }
     }
-    
+
     return PreviewWrapper()
 }

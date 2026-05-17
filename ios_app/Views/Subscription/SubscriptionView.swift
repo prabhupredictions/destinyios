@@ -28,13 +28,13 @@ struct SubscriptionView: View {
                         ProgressView("Loading plans...")
                             .padding(.vertical, 40)
                     } else if plans.isEmpty {
-                        Text("No plans available")
+                        Text("no_plans_available".localized)
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .padding(.vertical, 40)
                     } else {
                         // Subheader
-                        Text("Upgrade to keep going and unlock unlimited access")
-                            .font(AppTheme.Fonts.body(size: 15))
+                        Text("upgrade_to_keep_going".localized)
+                            .font(AppTheme.Fonts.body(size: 16))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 16)
@@ -61,7 +61,7 @@ struct SubscriptionView: View {
                 .padding(.bottom, 40)
             }
             .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
-            .navigationTitle("Choose a plan")
+            .navigationTitle("choose_plan_title".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -82,29 +82,30 @@ struct SubscriptionView: View {
                         }
                     }
                     .disabled(isRefreshing)
-                    .accessibilityLabel("Refresh subscription status")
+                    .accessibilityLabel("a11y_refresh_subscription".localized)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #endif
             }
             .alert("Error", isPresented: $showError) {
-                Button("OK", role: .cancel) {}
+                Button("ok_action".localized, role: .cancel) {}
             } message: {
                 Text(errorMessage)
             }
             .alert("Welcome to \(successPlanName)! 🎉", isPresented: $showSuccess) {
-                Button("Let's Go!") {
+                Button("lets_go_action".localized) {
                     dismiss()
                 }
             } message: {
-                Text("Your subscription is now active. Enjoy your premium features!")
+                Text("subscription_active_message".localized)
             }
             .task {
                 await loadPlans()
             }
+            .accessibilityIdentifier("subscription_screen")
         }
     }
     
@@ -179,6 +180,7 @@ struct SubscriptionView: View {
                         await purchaseSubscription(planId: plan.planId)
                     }
                 }
+                .accessibilityIdentifier("subscription_plan_card")
             }
         }
     }
@@ -194,8 +196,8 @@ struct SubscriptionView: View {
                 HStack {
                     Image(systemName: showDestinyMatchingInfo ? "chevron.up" : "chevron.down")
                         .font(AppTheme.Fonts.title(size: 14))
-                    Text("What is Destiny Matching™?")
-                        .font(AppTheme.Fonts.body(size: 15))
+                    Text("what_is_destiny_matching".localized)
+                        .font(AppTheme.Fonts.title(size: 18))
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(AppTheme.Fonts.body(size: 14))
@@ -205,15 +207,15 @@ struct SubscriptionView: View {
             
             if showDestinyMatchingInfo {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Destiny Matching™ looks beyond surface-level compatibility.")
+                    Text("destiny_matching_desc_1".localized)
+                        .font(AppTheme.Fonts.body(size: 15).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                    
+                    Text("destiny_matching_desc_2".localized)
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                     
-                    Text("While many astrology apps focus on pointing out mismatches, Destiny examines how two charts interact, where differences show up, and how alignment can be found even when things feel misaligned.")
-                        .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                    
-                    Text("It uses astrology to help you understand and navigate relationships in context, not simply label them as good or bad.")
+                    Text("destiny_matching_desc_3".localized)
                         .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -245,12 +247,12 @@ struct SubscriptionView: View {
     // MARK: - Footer Disclaimers
     private var footerDisclaimers: some View {
         VStack(spacing: 8) {
-            Text("Subscription automatically renews unless canceled at least 24 hours before the end of the current period.")
-                .font(AppTheme.Fonts.caption(size: 11))
+            Text("subscription_auto_renew".localized)
+                .font(AppTheme.Fonts.caption(size: 12))
                 .foregroundColor(AppTheme.Colors.textTertiary)
                 .multilineTextAlignment(.center)
             
-            Text("Unlimited access is subject to fair use.")
+            Text("fair_use_notice".localized)
                 .font(AppTheme.Fonts.caption(size: 11))
                 .italic()
                 .foregroundColor(AppTheme.Colors.textTertiary)
@@ -264,7 +266,7 @@ struct SubscriptionView: View {
         HStack(spacing: 6) {
             Image(systemName: "apple.logo")
                 .font(.system(size: 12))
-            Text("Purchases are billed through your Apple ID. Manage in Settings → Apple ID → Subscriptions.")
+            Text("apple_subscription_notice".localized)
                 .font(AppTheme.Fonts.caption(size: 11))
         }
         .foregroundColor(AppTheme.Colors.textTertiary)
@@ -275,7 +277,7 @@ struct SubscriptionView: View {
     // MARK: - Purchase Action
     private func purchaseSubscription(planId: String) async {
         guard let product = subscriptionManager.monthlyProduct(for: planId) else {
-            errorMessage = "Product not available. Please try again later."
+            errorMessage = "product_not_available_error".localized
             showError = true
             return
         }
@@ -389,8 +391,8 @@ struct PlanCardWithFeatures: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text("Current")
-                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("current_plan".localized)
+                                    .font(AppTheme.Fonts.caption(size: 10).weight(.heavy))
                             }
                             .foregroundColor(AppTheme.Colors.mainBackground)
                             .padding(.horizontal, 8)
@@ -406,8 +408,8 @@ struct PlanCardWithFeatures: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "clock.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text("Scheduled")
-                                    .font(AppTheme.Fonts.caption(size: 10))
+                                Text("scheduled_plan".localized)
+                                    .font(AppTheme.Fonts.caption(size: 10).weight(.heavy))
                             }
                             .foregroundColor(AppTheme.Colors.mainBackground)
                             .padding(.horizontal, 8)
@@ -435,20 +437,20 @@ struct PlanCardWithFeatures: View {
                             .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     } else {
-                        Text("$\(String(format: "%.2f", plan.priceMonthly ?? 0))")
+                        Text(String(format: "price_monthly_format".localized, String(format: "%.2f", plan.priceMonthly ?? 0)))
                             .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     }
-                    Text("/ month")
-                        .font(AppTheme.Fonts.caption(size: 12))
+                    Text("per_month".localized)
+                        .font(AppTheme.Fonts.body(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
             }
             
             // For Plus: "Everything in Core, plus:" header
             if isPlus {
-                Text("Everything in Core, plus:")
-                    .font(AppTheme.Fonts.title(size: 15))
+                Text("everything_in_core_plus".localized)
+                    .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
                     .foregroundColor(AppTheme.Colors.gold)
                     .padding(.top, 4)
             }
@@ -472,7 +474,7 @@ struct PlanCardWithFeatures: View {
                         Image(systemName: "checkmark")
                             .font(AppTheme.Fonts.title(size: 14))
                     }
-                    Text(isPurchasing ? "Processing..." : buttonText)
+                    Text(isPurchasing ? "processing".localized : buttonText)
                         .font(AppTheme.Fonts.title(size: 16))
                 }
                 .foregroundColor(isCurrentPlan ? AppTheme.Colors.textSecondary : AppTheme.Colors.mainBackground)
@@ -490,7 +492,7 @@ struct PlanCardWithFeatures: View {
             
             // Show pending upgrade effective date below button
             if isPendingUpgrade, let dateText = pendingUpgradeDateText {
-                Text("Starts \(dateText)")
+                Text(String(format: "subscription_starts_format".localized, dateText))
                     .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(Color.orange)
                     .frame(maxWidth: .infinity)
@@ -518,17 +520,17 @@ struct PlanCardWithFeatures: View {
     private var buttonText: String {
         // Pending upgrade takes priority
         if isPendingUpgrade {
-            return "Upgrade Scheduled ✓"
+            return "upgrade_scheduled_label".localized
         }
         if isCurrentPlan {
-            return "Current Plan"
+            return "current_plan_label".localized
         }
         if isPlus {
             // Plus card: "Choose Plus" for free users, "Upgrade to Plus" for Core users
-            return userCurrentPlanId == "core" ? "Upgrade to Plus" : "Choose Plus"
+            return userCurrentPlanId == "core" ? "upgrade_to_plus_label".localized : "choose_plus_label".localized
         } else {
             // Core card: "Choose Core" for all users
-            return "Choose Core"
+            return "choose_core_label".localized
         }
     }
 }
@@ -559,8 +561,8 @@ struct FeatureItemRow: View {
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     if isComingSoon {
-                        Text("(coming soon)")
-                            .font(AppTheme.Fonts.caption(size: 12))
+                        Text("coming_soon".localized)
+                            .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }
                 }

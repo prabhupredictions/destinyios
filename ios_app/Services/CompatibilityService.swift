@@ -28,8 +28,8 @@ final class CompatibilityService: CompatibilityServiceProtocol {
         
         // Configure session for streaming with no caching
         let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 120
-        config.timeoutIntervalForResource = 300
+        config.timeoutIntervalForRequest = 300   // 5 min — Opus first-token latency
+        config.timeoutIntervalForResource = 600  // 10 min — full Opus stream
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.waitsForConnectivity = true
         self.streamSession = URLSession(configuration: config)

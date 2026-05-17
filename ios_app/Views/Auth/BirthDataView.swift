@@ -14,14 +14,23 @@ struct BirthDataView: View {
     @State private var showLocationSearch = false
     @State private var showGenderSheet = false
     @State private var showSignInPrompt = false  // For birthDataTaken case
+    @State private var showDataRefreshedBanner = false  // Backend wiped birth data
     
     @FocusState private var isNameFocused: Bool
-    
+
     // Profile setup loading - setting this triggers fullScreenCover via item binding
     @State private var savedBirthData: BirthData?
-    
+
+    // Response style picker — shown after birth data is saved, before profile setup loading
+    @State private var showResponseStylePicker = false
+
+    // Analytics consent — unchecked by default for non-US users
+    @State private var analyticsConsent = false
+
     // Sound Manager
     @ObservedObject private var soundManager = SoundManager.shared
+
+    private var isUSLocale: Bool { Locale.current.region?.identifier == "US" }
     
     var body: some View {
         NavigationStack {
@@ -38,6 +47,21 @@ struct BirthDataView: View {
                             // Compact Header
                             headerSection
                                 .padding(.top, AppTheme.BirthData.sectionTopPadding)
+                            
+                            // Backend data refresh banner
+                            if showDataRefreshedBanner {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundColor(AppTheme.Colors.warning)
+                                    Text("profile_data_refreshed".localized)
+                                        .font(AppTheme.Fonts.caption())
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                }
+                                .padding(12)
+                                .background(AppTheme.Colors.warning.opacity(0.15))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .transition(.opacity)
+                            }
                             
                             // Form fields (Glass Slabs)
                             formSection
@@ -72,7 +96,7 @@ struct BirthDataView: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "chevron.left")
                                         .font(.system(size: 14, weight: .medium))
-                                    Text("Sign up")
+                                    Text("sign_up".localized)
                                         .font(AppTheme.Fonts.body(size: 14))
                                 }
                                 .foregroundColor(AppTheme.Colors.gold)
@@ -112,6 +136,11 @@ struct BirthDataView: View {
         }
         .onAppear {
             viewModel.loadSaved()
+            // Check if backend data was refreshed/wiped for returning user
+            if UserDefaults.standard.bool(forKey: "birthDataRefreshedOnServer") {
+                showDataRefreshedBanner = true
+                UserDefaults.standard.removeObject(forKey: "birthDataRefreshedOnServer")
+            }
             withAnimation(.easeOut(duration: 0.4)) {
                 contentOpacity = 1.0
             }
@@ -159,13 +188,29 @@ struct BirthDataView: View {
                 onDismiss: { showGenderSheet = false }
             )
         }
+        .fullScreenCover(isPresented: $showResponseStylePicker) {
+            ResponseStyleOnboardingView(isSettingsMode: false) {
+                // Dismiss style picker first, then trigger ProfileSetupLoadingView after animation
+                showResponseStylePicker = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    // savedBirthData was set before showResponseStylePicker became true;
+                    // re-trigger the item cover by toggling through nil if needed.
+                    // savedBirthData is still set — setting hasBirthData drives the next cover.
+                    let bd = savedBirthData
+                    savedBirthData = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        savedBirthData = bd
+                    }
+                }
+            }
+        }
         .fullScreenCover(item: $savedBirthData) { birthData in
             ProfileSetupLoadingView(
                 onComplete: {
                     // Set hasBirthData FIRST so AppRootView transitions to MainTabView
                     // BEFORE the cover dismisses (avoids flash of BirthDataView)
                     hasBirthData = true
-                    
+
                     // Small delay to allow transition to start, then dismiss cover
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         savedBirthData = nil
@@ -277,6 +322,7 @@ struct BirthDataView: View {
                             .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                     )
                 }
+                .accessibilityIdentifier("birth_dob_field")
                 
                 // Time Button
                 Button(action: {
@@ -306,6 +352,7 @@ struct BirthDataView: View {
                     )
                 }
                 .disabled(viewModel.timeUnknown)
+                .accessibilityIdentifier("birth_time_field")
             }
             
             // Age validation message
@@ -356,6 +403,7 @@ struct BirthDataView: View {
                 isNameFocused = false
                 showLocationSearch = true
             }
+            .accessibilityIdentifier("birth_city_field")
             
             // Gender Identity (Mandatory)
             PremiumSelectionRow(
@@ -363,9 +411,9 @@ struct BirthDataView: View {
                 title: "gender_identity".localized,
                 value: viewModel.gender.isEmpty ? "select_gender".localized : (
                     // Map value to localized label
-                    ["male": "male".localized, 
-                     "female": "female".localized, 
-                     "non-binary": "non_binary".localized, 
+                    ["male": "male".localized,
+                     "female": "female".localized,
+                     "non-binary": "non_binary".localized,
                      "prefer_not_to_say": "prefer_not_to_say".localized][viewModel.gender] ?? viewModel.gender
                 ),
                 isPlaceholder: viewModel.gender.isEmpty
@@ -373,9 +421,30 @@ struct BirthDataView: View {
                isNameFocused = false
                showGenderSheet = true
             }
+
+            // Analytics consent — shown only for non-US users, unchecked by default
+            if !isUSLocale {
+                Button(action: {
+                    HapticManager.shared.play(.light)
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        analyticsConsent.toggle()
+                    }
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: analyticsConsent ? "checkmark.square.fill" : "square")
+                            .font(AppTheme.Fonts.title(size: 18))
+                            .foregroundColor(analyticsConsent ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                        Text("analytics_consent_label".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
-    
+
     // MARK: - Submit Button (ShimmerButton - consistent with Onboarding)
     private var submitButton: some View {
         ShimmerButton(title: "continue".localized, icon: "arrow.right") {
@@ -383,17 +452,17 @@ struct BirthDataView: View {
             // Play premium haptic and sound
             HapticManager.shared.premiumContinue()
             SoundManager.shared.playButtonTap()
-            
+
             if viewModel.save() {
                 // Register with backend subscription service FIRST
                 // Wait for result before proceeding to avoid race condition
                 Task {
                     let shouldProceed = await registerWithBackend()
-                    
+
                     if shouldProceed {
                         // Only proceed if registration succeeded (no conflict)
                         await MainActor.run {
-                            // Create birth data for prefetch
+                            // Store birth data, then show response style picker before profile setup
                             savedBirthData = BirthData(
                                 dob: viewModel.formattedDOB,
                                 time: viewModel.formattedTOB,
@@ -401,12 +470,15 @@ struct BirthDataView: View {
                                 longitude: viewModel.longitude,
                                 cityOfBirth: viewModel.cityOfBirth
                             )
-                            print("[DEBUG] BirthData saved, triggering ProfileSetupLoadingView via item binding")
+                            // Show response style picker; it will trigger ProfileSetupLoadingView on Continue
+                            showResponseStylePicker = true
+                            print("[DEBUG] BirthData saved, showing ResponseStylePicker before ProfileSetupLoadingView")
                         }
                     }
                 }
             }
         }
+        .accessibilityIdentifier("birth_submit_button")
         .disabled(!viewModel.isValid)
         .opacity(viewModel.isValid ? 1 : 0.5)
     }
@@ -454,7 +526,7 @@ struct BirthDataView: View {
             // Account was soft-deleted — block all access
             print("🚫 Account deleted: \(error.message)")
             await MainActor.run {
-                viewModel.errorMessage = "This account has been permanently deleted and can no longer be used. The email associated with this account cannot be reused. If you believe this is an error, please contact support."
+                viewModel.errorMessage = "account_deleted_error".localized
             }
             return false // Don't proceed - account deleted
         } catch {
@@ -477,15 +549,15 @@ struct BirthDataView: View {
                     // Show friendly message based on provider
                     switch provider {
                     case "apple":
-                        viewModel.errorMessage = "Your birth data is already linked to your Apple account. Please sign in with Apple."
+                        viewModel.errorMessage = "birth_data_linked_apple".localized
                     case "google":
                         if let email = maskedEmail {
-                            viewModel.errorMessage = "Your birth data is already linked to \(email). Please sign in with Google."
+                            viewModel.errorMessage = String(format: "birth_data_linked_google_email".localized, email)
                         } else {
-                            viewModel.errorMessage = "Your birth data is already linked to your Google account. Please sign in with Google."
+                            viewModel.errorMessage = "birth_data_linked_google".localized
                         }
                     default:
-                        viewModel.errorMessage = "Your birth data is already linked to \(maskedEmail ?? "a registered account"). Please sign in with that account."
+                        viewModel.errorMessage = String(format: "birth_data_linked_email".localized, maskedEmail ?? "a_registered_account".localized)
                     }
                     showSignInPrompt = true
                 }
@@ -495,7 +567,14 @@ struct BirthDataView: View {
             print("❌ Failed to sync profile: \(error)")
             // Continue anyway - local data is saved
         }
-        
+
+        // For non-US users, send their analytics consent choice (backend defaults to true)
+        if !isUSLocale {
+            let email = userEmail
+            let consent = analyticsConsent
+            Task { try? await ProfileService.shared.updateAnalyticsConsent(email: email, consent: consent) }
+        }
+
         return true // Success - proceed to next screen
     }
     

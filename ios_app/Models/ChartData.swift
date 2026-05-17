@@ -88,12 +88,14 @@ enum ChartConstants {
         "Rahu": "Ra", "Ketu": "Ke", "Ascendant": "As"
     ]
     
-    // Sign short codes to full names
-    static let signFullNames: [String: String] = [
-        "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini", "Ca": "Cancer",
-        "Le": "Leo", "Vi": "Virgo", "Li": "Libra", "Sc": "Scorpio",
-        "Sg": "Sagittarius", "Cp": "Capricorn", "Aq": "Aquarius", "Pi": "Pisces"
-    ]
+    // Sign short codes to full names (Localized)
+    static var signFullNames: [String: String] {
+        [
+            "Ar": "sign_ar".localized, "Ta": "sign_ta".localized, "Ge": "sign_ge".localized, "Ca": "sign_ca".localized,
+            "Le": "sign_le".localized, "Vi": "sign_vi".localized, "Li": "sign_li".localized, "Sc": "sign_sc".localized,
+            "Sg": "sign_sg".localized, "Cp": "sign_cp".localized, "Aq": "sign_aq".localized, "Pi": "sign_pi".localized
+        ]
+    }
     
     // Sign symbols
     static let signSymbols: [String: String] = [

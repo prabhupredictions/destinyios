@@ -3,14 +3,16 @@ import Combine
 
 /// Premium "Sensory Home" Screen (Divine Luxury Edition)
 struct HomeView: View {
+    // MARK: - State & Dependencies
+    var viewModel: HomeViewModel
+    
     // MARK: - Callbacks
-    var onQuestionSelected: ((String) -> Void)? = nil
+    var onQuestionSelected: ((String, String?) -> Void)? = nil
     var onChatHistorySelected: ((String) -> Void)? = nil
     var onMatchHistorySelected: ((CompatibilityHistoryItem) -> Void)? = nil
     var onMatchGroupHistorySelected: ((ComparisonGroup) -> Void)? = nil
     
-    // MARK: - State
-    @State private var viewModel = HomeViewModel()
+    // Local UI State
     @State private var showProfile = false
     @State private var contentOpacity: Double = 0
     @State private var headerOffset: CGFloat = -20
@@ -64,6 +66,7 @@ struct HomeView: View {
     @State private var showNotificationInbox = false
     @ObservedObject private var notificationService = NotificationInboxService.shared
     
+    
     // Environment for detecting app foreground/background
     @Environment(\.scenePhase) private var scenePhase
     
@@ -88,10 +91,61 @@ struct HomeView: View {
                 
                 // 2. Scrollable Content
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 24) { // iOS HIG: 24pt between major sections
+                    VStack(spacing: 20) { // Compact premium spacing between major sections
                         
                         // Offline indicator
                         OfflineBanner()
+                        
+                        // Error banner with retry option
+                        if let errorMessage = viewModel.errorMessage {
+                            VStack(spacing: 12) {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(AppTheme.Colors.gold)
+                                    
+                                    Text(errorMessage)
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                        .foregroundColor(AppTheme.Colors.textPrimary)
+                                        .multilineTextAlignment(.center)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                
+                                Button(action: {
+                                    HapticManager.shared.play(.light)
+                                    Task {
+                                        await viewModel.loadHomeData(force: true)
+                                    }
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "arrow.clockwise")
+                                            .font(.system(size: 12, weight: .semibold))
+                                        Text("retry_action".localized)
+                                            .font(AppTheme.Fonts.caption(size: 13))
+                                    }
+                                    .foregroundColor(AppTheme.Colors.textOnGold)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        AppTheme.Colors.premiumCardGradient
+                                            .clipShape(Capsule())
+                                    )
+                                }
+                                .buttonStyle(ScaleButtonStyle())
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .padding(.horizontal, 20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(AppTheme.Colors.error.opacity(0.15))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(AppTheme.Colors.error.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                            .padding(.horizontal, 4)
+                        }
                         
                         if viewModel.isLoading {
                             VStack(spacing: 20) {
@@ -105,6 +159,9 @@ struct HomeView: View {
                                     Text("syncing_cosmic_data".localized)
                                         .font(AppTheme.Fonts.title(size: 18))
                                         .foregroundColor(AppTheme.Colors.textPrimary)
+                                    Text("almost_there".localized)
+                                        .font(AppTheme.Fonts.caption(size: 14))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
                                 }
                                 
                                 ProgressView()
@@ -114,35 +171,53 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity, minHeight: 300)
                             .padding(.top, 60)
                         } else {
-                            // 1. Hero: Cosmic Vibe
-                            insightHeroSection
+                            // 1. Life Area Story Orbs (Instagram-style, top of feed)
+                            storyOrbsSection
                             
-                            // 2. How is my day today? (Life Areas with filters)
-                            lifeAreasGridSection
-                            
-                            // 3. What's in my mind? (Quick Questions)
+                            // 2. What's in my mind? (Quick Questions)
                             whatsInMyMindSection
                             
-                            // 4. Current Dasha
+                            // 3. Current Dasha (Tappable → sends to chat)
                             if let dasha = viewModel.dashaInsight {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text("Current Dasha")
+                                    Text("current_dasha".localized)
                                         .font(AppTheme.Fonts.premiumDisplay(size: 18))
                                         .goldGradient()
                                     
-                                    DashaInsightCard(dasha: dasha)
+                                    Button(action: {
+                                        HapticManager.shared.play(.light)
+                                        let localizedQuality = localizedDashaQuality(dasha.quality)
+                                        let meaningPart = dasha.meaning != nil ? String(format: "context_dasha_phase_suggests".localized, dasha.meaning!) : ""
+                                        let q = String(format: "context_dasha_question".localized, dasha.period, dasha.theme, localizedQuality, meaningPart)
+                                        let label = "context_dasha_card_label".localized
+                                        onQuestionSelected?(q, label)
+                                    }) {
+                                        DashaInsightCard(dasha: dasha)
+                                    }
+                                    .buttonStyle(ScaleButtonStyle())
+                                    .accessibilityIdentifier("dasha_insight_card")
                                 }
                             }
                             
-                            // 5. Current Transit Influences (Horizontal Scroll)
+                            // 4. Current Transit Influences (Tappable → sends to chat)
                             if !viewModel.transitInfluences.isEmpty {
-                                TransitInfluencesSection(transits: viewModel.transitInfluences)
+                                TransitInfluencesSection(
+                                    transits: viewModel.transitInfluences,
+                                    onTransitTapped: { transit in
+                                        HapticManager.shared.play(.light)
+                                        let signName = localizedZodiacName(for: transit.sign)
+                                        let localizedPlanet = localizedPlanetName(transit.planet)
+                                        let q = String(format: "context_transit_question".localized, localizedPlanet, signName, transit.house, transit.description)
+                                        let label = String(format: "context_transit_card_label".localized, localizedPlanet)
+                                        onQuestionSelected?(q, label)
+                                    }
+                                )
                             }
                             
-                            // 6. Dosha Status
+                            // 5. Dosha Status
                             // doshaStatusSection // Removed per user request
                             
-                            // 7. Yoga Cards
+                            // 6. Yoga Cards
                             yogaHighlightsSection
                             
                             Spacer(minLength: 20)
@@ -154,7 +229,7 @@ struct HomeView: View {
                 }
                 .padding(.bottom, 90) // Reserve space for Transparent Tab Bar (Content won't scroll behind it)
                 .refreshable {
-                    await viewModel.loadHomeData()
+                    await viewModel.loadHomeData(force: true)
                 }
             }
             .opacity(contentOpacity)
@@ -166,9 +241,10 @@ struct HomeView: View {
                     brief: selected.status.brief,
                     iconName: iconName(for: selected.area),
                     onAskMore: {
-                        let contextualQuestion = "Today's forecast mentions: '\(selected.status.brief)' for my \(selected.area). Can you elaborate on what this means for me?"
+                        let contextualQuestion = String(format: "context_life_area_question".localized, selected.status.brief, selected.area.localized)
+                        let label = String(format: "context_life_area_card_label".localized, selected.area.localized)
                         selectedLifeArea = nil
-                        onQuestionSelected?(contextualQuestion)
+                        onQuestionSelected?(contextualQuestion, label)
                     },
                     onDismiss: {
                         selectedLifeArea = nil
@@ -183,55 +259,56 @@ struct HomeView: View {
                     yoga: yoga,
                     onAskMore: {
                         // Build rich LLM context
-                        let statusText = yoga.status == "A" ? "Active" : (yoga.status == "R" ? "Reduced" : "Cancelled")
-                        let typeText = yoga.isDosha ? "dosha (negative combination)" : "yoga (positive combination)"
+                        let statusText = yoga.status == "A" ? "status_active".localized : (yoga.status == "R" ? "status_reduced".localized : "status_cancelled".localized)
+                        let typeText = yoga.isDosha ? "type_dosha".localized : "type_yoga".localized
                         
                         var contextParts: [String] = [
-                            "I have \(yoga.localizedName) in my birth chart.",
+                            String(format: "yoga_context_header".localized, yoga.localizedName),
                             "",
-                            "Details:",
-                            "- Type: \(typeText)",
-                            "- Category: \(yoga.category ?? "Unknown")",
-                            "- Status: \(statusText)",
-                            "- Strength: \(Int(yoga.strength * 100))%",
-                            "- Planets Involved: \(yoga.planets)",
-                            "- Houses Involved: \(yoga.houses)"
+                            "yoga_context_details".localized,
+                            String(format: "yoga_context_type".localized, typeText),
+                            String(format: "yoga_context_category".localized, localizedYogaCategory(yoga.category)),
+                            String(format: "yoga_context_status".localized, statusText),
+                            String(format: "yoga_context_strength".localized, Int(yoga.strength * 100)),
+                            String(format: "yoga_context_planets".localized, localizedPlanets(yoga.planets)),
+                            String(format: "yoga_context_houses".localized, yoga.houses)
                         ]
                         
                         if let formation = yoga.formation, !formation.isEmpty {
-                            contextParts.append("- Formation: \(formation)")
+                            contextParts.append(String(format: "yoga_context_formation".localized, formation))
                         }
                         
                         // Add outcome (What it means) if available
                         if let outcome = yoga.localizedOutcome, !outcome.isEmpty {
-                            contextParts.append("- What it means: \(outcome)")
+                            contextParts.append(String(format: "yoga_context_outcome".localized, outcome))
                         }
                         
                         if let reason = yoga.reason, !reason.isEmpty, yoga.status != "A" {
                             // Transform exception keys to human-readable text
                             let localizedReason = DoshaDescriptions.localizeExceptionKeys(in: reason)
-                            contextParts.append("- \(yoga.status == "R" ? "Reduction" : "Cancellation") Reason: \(localizedReason)")
+                            let reasonKey = yoga.status == "R" ? "yoga_context_reduction_reason" : "yoga_context_cancellation_reason"
+                            contextParts.append(String(format: reasonKey.localized, localizedReason))
                         }
                         
                         contextParts.append("")
-                        contextParts.append("Please explain in more detail:")
-                        contextParts.append("1. What this \(yoga.isDosha ? "dosha" : "yoga") means for my life")
+                        contextParts.append("yoga_context_explain_header".localized)
+                        contextParts.append(String(format: "yoga_context_question_1".localized, yoga.isDosha ? "dosha".localized : "yoga".localized))
                         
                         if yoga.status == "A" {
                             if yoga.isDosha {
-                                contextParts.append("2. What challenges it may bring and any remedies")
+                                contextParts.append("yoga_context_dosha_question_2".localized)
                             } else {
-                                contextParts.append("2. How to maximize its benefits")
+                                contextParts.append("yoga_context_yoga_question_2".localized)
                             }
                         } else {
-                            contextParts.append("2. Why it is \(statusText.lowercased()) and what this means")
-                            contextParts.append("3. Any remedies or actions I can take")
+                            contextParts.append(String(format: "yoga_context_inactive_question_2".localized, statusText.lowercased()))
+                            contextParts.append("yoga_context_question_3".localized)
                         }
                         
                         let contextualQuestion = contextParts.joined(separator: "\n")
-                        
+                        let label = String(format: "context_yoga_card_label".localized, yoga.localizedName)
                         selectedYogaForPopup = nil
-                        onQuestionSelected?(contextualQuestion)
+                        onQuestionSelected?(contextualQuestion, label)
                     },
                     onDismiss: {
                         withAnimation(.spring(response: 0.3)) {
@@ -242,6 +319,7 @@ struct HomeView: View {
                 .transition(.opacity)
             }
         }
+        .accessibilityIdentifier("home_screen")
         .navigationBarHidden(true)
         .task {
             // Single entry point for initial data load (runs once when view appears)
@@ -253,25 +331,48 @@ struct HomeView: View {
             
             // Request push notification permission
             PushNotificationService.shared.requestPermission()
+            
         }
         .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
-            // Reload home data when profile switches
-            // Uses profile-scoped cache, so API only called once/day per profile
+            // Reset stale data + 24h cache guard so fresh data is fetched for new profile
+            viewModel.resetForProfileSwitch()
             Task {
                 await viewModel.loadHomeData()
                 await notificationService.fetchUnreadCount()
             }
         }
-        .onChange(of: scenePhase) { oldPhase, newPhase in
-            // Refresh notification badge when app returns to foreground
-            if newPhase == .active && oldPhase == .background {
+        .onChange(of: scenePhase) {
+            if scenePhase == .active {
                 Task {
                     await notificationService.fetchUnreadCount()
+
+                    if let cached = TodaysPredictionCache.shared.get() {
+                        let fmt = DateFormatter()
+                        fmt.dateFormat = "yyyy-MM-dd"
+                        if let cachedDate = fmt.date(from: String(cached.targetDate.prefix(10))),
+                           !Calendar.current.isDateInToday(cachedDate) {
+                            await viewModel.loadHomeData(force: true)
+                        }
+                    } else {
+                        await viewModel.loadHomeData(force: true)
+                    }
+                }
+            }
+        }
+        .onChange(of: quotaManager.isPremium) { newStatus in
+            // Listen for subscription purchases: instantly unlock UI
+            if newStatus {
+                print("[HomeView] User upgraded to premium! Refreshing limits.")
+                Task {
+                    await viewModel.loadHomeData(force: true)
                 }
             }
         }
         .sheet(isPresented: $showNotificationInbox) {
-            NotificationInboxView()
+            NotificationInboxView(onNavigateToHome: {
+                showNotificationInbox = false
+                Task { await viewModel.loadHomeData(force: true) }
+            })
         }
         .sheet(isPresented: $showProfile) {
             ProfileView()
@@ -339,7 +440,8 @@ struct HomeView: View {
                                 .foregroundColor(AppTheme.Colors.gold)
                         }
                     }
-                    .accessibilityLabel("History")
+                    .accessibilityLabel("history_title".localized)
+                    .accessibilityIdentifier("home_history_button")
                     
                     Spacer()
                     
@@ -378,6 +480,7 @@ struct HomeView: View {
                             )
                         }
                         .accessibilityLabel(notificationService.unreadCount > 0 ? "Notifications, \(notificationService.unreadCount) unread" : "Notifications")
+                        .accessibilityIdentifier("home_notifications_button")
                         
                         // Sound Toggle
                         if AppTheme.Features.showSoundToggle {
@@ -397,7 +500,7 @@ struct HomeView: View {
                                         .contentTransition(.symbolEffect(.replace))
                                 }
                             }
-                            .accessibilityLabel(soundManager.isSoundEnabled ? "Sound on" : "Sound off")
+                            .accessibilityLabel(soundManager.isSoundEnabled ? "sound_on_a11y".localized : "sound_off_a11y".localized)
                             .accessibilityHint("Double tap to toggle sound")
                         }
                         
@@ -416,7 +519,8 @@ struct HomeView: View {
                                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.2))
                             }
                         }
-                        .accessibilityLabel("Profile, \(profileContext.activeProfileName)")
+                        .accessibilityLabel(String(format: "a11y_profile_name_format".localized, profileContext.activeProfileName))
+                        .accessibilityIdentifier("home_profile_button")
                     }
                 }
             }
@@ -430,7 +534,7 @@ struct HomeView: View {
             // Card Content
             VStack(alignment: .leading, spacing: 8) {
                 // Title - needs extra padding to clear orb
-                Text("Today's Cosmic Vibe")
+                Text("todays_cosmic_vibe".localized)
                     .font(.system(size: 20, weight: .semibold, design: .serif))
                     .foregroundStyle(
                         LinearGradient(
@@ -476,7 +580,7 @@ struct HomeView: View {
                         .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
                         .padding(.top, 4)
                     
-                    Text("ASC")
+                    Text("asc_label".localized)
                         .font(.system(size: 8, weight: .black))
                         .foregroundStyle(Color(red: 0.2, green: 0.15, blue: 0.05))
                     
@@ -581,6 +685,47 @@ struct HomeView: View {
         return fullMap[sign] ?? sign
     }
     
+    /// Returns localized zodiac sign name using sign_* keys
+    private func localizedZodiacName(for sign: String) -> String {
+        let keyMap: [String: String] = [
+            "Ar": "sign_ar", "Aries": "sign_ar",
+            "Ta": "sign_ta", "Taurus": "sign_ta",
+            "Ge": "sign_ge", "Gemini": "sign_ge",
+            "Cn": "sign_ca", "Ca": "sign_ca", "Cancer": "sign_ca",
+            "Le": "sign_le", "Leo": "sign_le",
+            "Vi": "sign_vi", "Virgo": "sign_vi",
+            "Li": "sign_li", "Libra": "sign_li",
+            "Sc": "sign_sc", "Scorpio": "sign_sc",
+            "Sg": "sign_sg", "Sagittarius": "sign_sg", "Sag": "sign_sg",
+            "Cp": "sign_cp", "Capricorn": "sign_cp", "Cap": "sign_cp",
+            "Aq": "sign_aq", "Aquarius": "sign_aq",
+            "Pi": "sign_pi", "Pisces": "sign_pi"
+        ]
+        if let key = keyMap[sign] {
+            return key.localized
+        }
+        return sign
+    }
+    
+    /// Returns localized dasha quality string
+    private func localizedDashaQuality(_ quality: String) -> String {
+        switch quality.lowercased() {
+        case "good": return "dasha_quality_good".localized
+        case "steady": return "dasha_quality_steady".localized
+        case "caution": return "dasha_quality_caution".localized
+        default: return quality
+        }
+    }
+    
+    /// Returns localized yoga category name
+    private func localizedYogaCategory(_ category: String?) -> String {
+        guard let cat = category, !cat.isEmpty else { return "yoga_context_unknown".localized }
+        let key = "yoga_cat_" + cat.lowercased().replacingOccurrences(of: " ", with: "_")
+        let localized = key.localized
+        // If key not found (returns same string), fall back to original
+        return localized == key ? cat : localized
+    }
+    
     // C. Cosmic Status Strip
     private var cosmicStatusStrip: some View {
         let transits = viewModel.currentTransits.map { transit in
@@ -595,128 +740,122 @@ struct HomeView: View {
         .premiumInertia(intensity: 0.5)
     }
     
-    // E. How is my day today? (formerly Life Areas)
-    // selectedFilter and filterOptions already declared at top of struct
-    
-    private var lifeAreasGridSection: some View {
-        VStack(spacing: 8) { // iOS HIG: 8pt internal spacing
-            // Header (no extra padding - parent handles it)
-            Text("How is my day today?")
-                .font(AppTheme.Fonts.premiumDisplay(size: 18))
-                .goldGradient()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityAddTraits(.isHeader)
-            
-            // Filter Tabs (Compact)
-            HStack(spacing: 8) {
-                ForEach(filterOptions, id: \.self) { filter in
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedFilter = filter
-                        }
-                        HapticManager.shared.play(.light)
-                    }) {
-                        Text(filter)
-                            .font(AppTheme.Fonts.caption(size: 11))
-                            .fontWeight(selectedFilter == filter ? .semibold : .regular)
-                            .foregroundColor(selectedFilter == filter ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(selectedFilter == filter ?
-                                          AppTheme.Colors.gold.opacity(0.1) : Color.clear)
-                                    .overlay(
-                                        Capsule()
-                                            .strokeBorder(
-                                                selectedFilter == filter ?
-                                                AppTheme.Colors.gold.opacity(0.5) :
-                                                AppTheme.Colors.textSecondary.opacity(0.2),
-                                                lineWidth: 1
-                                            )
-                                    )
-                            )
-                    }
-                    .buttonStyle(.plain)
+    // E. Instagram-style Story Orbs (Life Areas)
+    private var storyOrbsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Greeting + subtitle
+            VStack(alignment: .leading, spacing: 6) {
+                Text(timeBasedGreeting + ", " + profileContext.activeProfileName)
+                    .font(AppTheme.Fonts.premiumDisplay(size: 22))
+                    .goldGradient()
+                
+                HStack(spacing: 6) {
+                    Text(localizedAscendant)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
                 }
-                Spacer()
             }
+            .padding(.top, 16)
             
-            // Horizontal Scrolling Celestial Orbs (filtered)
+            // Horizontal story orbs — Instagram-style: last orb cropped as scroll hint
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 0) { // Edge-to-edge orbs
-                    // Calculate dynamic size for 3.5 items visible
-                    let screenWidth = UIScreen.main.bounds.width
-                    // Total width available minus padding (if any significant padding exists, but here we want edge-to-edge calculation)
-                    // We target 3.5 items visible. Item width = orbSize * 1.4
-                    // So visibleWidth = 3.5 * (orbSize * 1.4)
-                    // orbSize = visibleWidth / (3.5 * 1.4)
-                    let dynamicSize = screenWidth / (3.5 * 1.4)
-                    
-                    ForEach(filteredAreas, id: \.area) { item in
-                        CelestialOrbView(
+                HStack(spacing: 18) {
+                    ForEach(allAreas, id: \.area) { item in
+                        StoryOrbView(
                             icon: iconName(for: item.area),
                             title: item.area,
-                            status: item.status.status,
-                            size: dynamicSize
+                            status: item.status.status
                         ) {
                             HapticManager.shared.play(.light)
                             withAnimation(.spring(response: 0.4)) {
                                 selectedLifeArea = item
                             }
                         }
+                        .accessibilityIdentifier("life_area_\(item.area.lowercased().replacingOccurrences(of: " ", with: "_"))")
                     }
                 }
-                .padding(.horizontal, 12) // Match parent edge
-                .padding(.vertical, 2)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 8)
             }
-            .padding(.horizontal, -12) // Negative margin to extend to edges
+            .padding(.horizontal, -12)
+            
+            // Guide text (centered, like Match screen)
+            HStack(spacing: 5) {
+                Image(systemName: "hand.tap.fill")
+                    .font(.system(size: 11))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+                Text("tap_to_explore_day".localized)
+                    .font(AppTheme.Fonts.caption(size: 11))
+                    .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.8))
+                    .italic()
+            }
+            .frame(maxWidth: .infinity)
         }
     }
     
-    // F. What's in my mind? (Quick Questions - taps go to Chat)
-    // F. What's in my mind? (Compact List View)
+    private var timeBasedGreeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 0..<12: return "good_morning".localized      // Until noon (12:00)
+        case 12..<18: return "good_afternoon".localized    // Noon to 6pm
+        default: return "good_evening".localized          // 6pm onward through the night
+        }
+    }
+    
+    private var localizedAscendant: String {
+        let signKey = viewModel.ascendantSign.lowercased()
+        let localizedSign: String
+        switch signKey {
+        case "aries": localizedSign = "sign_ar".localized
+        case "taurus": localizedSign = "sign_ta".localized
+        case "gemini": localizedSign = "sign_ge".localized
+        case "cancer": localizedSign = "sign_ca".localized
+        case "leo": localizedSign = "sign_le".localized
+        case "virgo": localizedSign = "sign_vi".localized
+        case "libra": localizedSign = "sign_li".localized
+        case "scorpio": localizedSign = "sign_sc".localized
+        case "sagittarius": localizedSign = "sign_sg".localized
+        case "capricorn": localizedSign = "sign_cp".localized
+        case "aquarius": localizedSign = "sign_aq".localized
+        case "pisces": localizedSign = "sign_pi".localized
+        default: localizedSign = viewModel.ascendantSign
+        }
+        return localizedSign + " " + "ascendant".localized
+    }
+    
+    // F. What's in my mind? (2×2 Golden Gradient Grid)
     private var whatsInMyMindSection: some View {
-        VStack(alignment: .leading, spacing: 8) { // iOS HIG: 8pt internal spacing
-            // Header (no extra padding - parent handles it)
-            Text("What's in my mind?")
+        VStack(alignment: .leading, spacing: 6) {
+            Text("what_in_my_mind".localized)
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
                 .accessibilityAddTraits(.isHeader)
             
-            // Quick Questions (Compact List)
             let questions = viewModel.suggestedQuestions.isEmpty ?
                 ["When will I get married?", "Best career direction?", "Financial outlook?", "Health check"] :
                 Array(viewModel.suggestedQuestions.prefix(4))
             
-            VStack(spacing: 8) { // iOS HIG: 8pt grid
-                ForEach(questions, id: \.self) { question in
-                    Button(action: {
-                        HapticManager.shared.play(.light)
-                        onQuestionSelected?(question)
-                    }) {
-                        HStack {
-                            Text(question)
-                                .font(AppTheme.Fonts.caption(size: 13))
-                                .foregroundColor(AppTheme.Colors.textPrimary)
-                                .lineLimit(1)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+            // 2×2 Grid
+            let rows = stride(from: 0, to: questions.count, by: 2).map { i in
+                Array(questions[i..<min(i + 2, questions.count)])
+            }
+            
+            VStack(spacing: 10) {
+                ForEach(Array(rows.enumerated()), id: \.offset) { rowIdx, row in
+                    HStack(spacing: 10) {
+                        ForEach(Array(row.enumerated()), id: \.element) { colIdx, question in
+                            let qIndex = rowIdx * 2 + colIdx
+                            Button(action: {
+                                HapticManager.shared.play(.light)
+                                onQuestionSelected?(question, nil)
+                            }) {
+                                QuickQuestionCard(question: question)
+                            }
+                            .frame(maxHeight: .infinity)
+                            .buttonStyle(ScaleButtonStyle())
+                            .accessibilityIdentifier("mind_question_\(qIndex)")
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.black.opacity(0.1))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .strokeBorder(AppTheme.Colors.gold.opacity(0.2), lineWidth: 1)
-                                )
-                        )
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
@@ -726,6 +865,7 @@ struct HomeView: View {
     private var transitAlertsSection: some View {
         TransitAlertCard(transits: viewModel.currentTransits)
             .padding(.horizontal, 12)
+            .accessibilityIdentifier("transit_alert_card")
     }
     
     // H. Dosha Status
@@ -740,24 +880,16 @@ struct HomeView: View {
     private var yogaHighlightsSection: some View {
         YogaHighlightCard(
             yogas: viewModel.yogaCombinations,
-            onQuestionSelected: onQuestionSelected,
+            onQuestionSelected: { q, label in onQuestionSelected?(q, label) },
             onYogaTapped: { yoga in
                 withAnimation(.spring(response: 0.35)) {
                     selectedYogaForPopup = yoga
                 }
             }
         )
+        .accessibilityIdentifier("yoga_highlight_card")
     }
     
-    // J. Dasha Widget
-    private var dashaWidgetSection: some View {
-        DashaProgressWidget(
-            currentPeriod: viewModel.currentDashaPeriod,
-            upcomingPeriod: viewModel.upcomingDashaPeriod
-        )
-    }
-    
-    // Icon helper for orbs
     private func iconName(for area: String) -> String {
         switch area.lowercased() {
         case "career": return "briefcase.fill"
@@ -810,6 +942,46 @@ struct HomeView: View {
             return false
         }
     }
+    
+    // MARK: - Helper Functions for Localization
+    
+    /// Localizes a single planet name
+    private func localizedPlanetName(_ planet: String) -> String {
+        let key = planet.lowercased()
+        switch key {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return planet
+        }
+    }
+    
+    /// Localizes a comma-separated list of planet names
+    private func localizedPlanets(_ planets: String) -> String {
+        let planetNames = planets.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        let localized = planetNames.map { planet -> String in
+            let key = planet.lowercased()
+            switch key {
+            case "sun": return "planet_sun".localized
+            case "moon": return "planet_moon".localized
+            case "mars": return "planet_mars".localized
+            case "mercury": return "planet_mercury".localized
+            case "jupiter": return "planet_jupiter".localized
+            case "venus": return "planet_venus".localized
+            case "saturn": return "planet_saturn".localized
+            case "rahu": return "planet_rahu".localized
+            case "ketu": return "planet_ketu".localized
+            default: return planet
+            }
+        }
+        return localized.joined(separator: ", ")
+    }
 }
 
 // MARK: - Subviews
@@ -822,7 +994,7 @@ struct LifeAreaLuxuryTile: View {
     
     var body: some View {
         Button(action: {
-            action("Tell me about \(area)")
+            action("Tell me about my \(area) outlook")
         }) {
             // WRAPPER: The Deep 3D Crystal
             DivineGlassCard(cornerRadius: 16) {
@@ -904,5 +1076,52 @@ struct LifeAreaLuxuryTile: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(viewModel: HomeViewModel())
+}
+
+/// Standalone Quick Question Card — battery-optimized (static border, no pulse)
+struct QuickQuestionCard: View {
+    let question: String
+    
+    var body: some View {
+        HStack(spacing: 10) {
+            // Question text
+            Text(question)
+                .font(AppTheme.Fonts.caption(size: 13))
+                .fontWeight(.medium)
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .lineLimit(3)
+                .minimumScaleFactor(0.9)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Spacer(minLength: 0)
+            
+            // Arrow CTA (static — pulse removed for battery optimization)
+            Image(systemName: "arrow.forward.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, minHeight: 70, maxHeight: .infinity, alignment: .topLeading)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(AppTheme.Colors.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(
+                    AppTheme.Colors.gold.opacity(0.5),
+                    lineWidth: 2
+                )
+        )
+        .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
+    }
 }

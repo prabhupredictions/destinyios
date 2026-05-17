@@ -2,8 +2,10 @@ import Foundation
 import SwiftUI
 
 /// ViewModel for the Home screen
-@Observable
+@MainActor @Observable
 class HomeViewModel {
+    nonisolated deinit {}
+
     // MARK: - State
     var userName: String = ""
     var quotaRemaining: Int = 3
@@ -15,7 +17,18 @@ class HomeViewModel {
     var errorMessage: String?
     var isGuest = false
     var isPremium = false
-    var planDisplayName: String = "Free"
+    var planDisplayName: String = UserDefaults.standard.string(forKey: "currentPlanDisplayName") ?? "Free"
+
+    private var hasSeenFirstPrediction: Bool {
+        get {
+            let key = "hasSeenFirstPrediction_\(UserDefaults.standard.string(forKey: "userEmail") ?? "guest")"
+            return UserDefaults.standard.bool(forKey: key)
+        }
+        set {
+            let key = "hasSeenFirstPrediction_\(UserDefaults.standard.string(forKey: "userEmail") ?? "guest")"
+            UserDefaults.standard.set(newValue, forKey: key)
+        }
+    }
     
     // MARK: - New Premium State
     var currentDasha: String = "Loading..."
@@ -35,8 +48,41 @@ class HomeViewModel {
     var dashaInsight: DashaInsight?
     var transitInfluences: [TransitInfluence] = []
     
+    /// Profile-scoped key for the 24h chart data cache guard
+    private var lastFullLoadDateKey: String {
+        "lastFullLoadDate_\(ProfileContextManager.shared.activeProfileId)"
+    }
+    
     /// Timestamp of last successful full data load (for 24-hour cache guard)
-    private var lastFullLoadDate: Date?
+    private var lastFullLoadDate: Date? {
+        get { UserDefaults.standard.object(forKey: lastFullLoadDateKey) as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: lastFullLoadDateKey) }
+    }
+    
+    /// Reset cached state when switching profiles so fresh data is fetched
+    @MainActor
+    func resetForProfileSwitch() {
+        // Clear 24h cache guard so full chart/dasha always re-fetches
+        lastFullLoadDate = nil
+        // Clear stale chart/dasha/yoga data from previous profile
+        fullAstroData = nil
+        dashaResponse = nil
+        dashaInsight = nil
+        transitInfluences = []
+        yogaCombinations = []
+        doshaStatus = (nil, nil)
+        currentDashaPeriod = nil
+        upcomingDashaPeriod = nil
+        // Clear displayed prediction data from previous profile
+        dailyInsight = ""
+        suggestedQuestions = []
+        lifeAreas = [:]
+        currentTransits = []
+        moonSign = ""
+        // Reset loading flag to prevent race with any in-flight load
+        isLoading = false
+        loadUserInfo()
+    }
 
     
     struct TransitDisplayData: Identifiable {
@@ -103,16 +149,83 @@ class HomeViewModel {
     }
     
     // MARK: - Load Home Data
-    func loadHomeData() async {
+    func loadHomeData(force: Bool = false) async {
         // Prevent concurrent calls (e.g., .task + profile switch firing close together)
         guard !isLoading else {
             print("[HomeViewModel] loadHomeData already in progress — skipping")
             return
         }
         
+        let currentConfigLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        let lastLoadedLang = UserDefaults.standard.string(forKey: "lastLoadedLanguage")
+        let languageChanged = currentConfigLang != lastLoadedLang
+        
+        let shouldBypassCache = force || languageChanged
+        
+        if !shouldBypassCache {
+            // Fast path for returning to HomeView in same session
+            let hasCachedPrediction = TodaysPredictionCache.shared.get() != nil
+            let hasChartData = fullAstroData != nil
+            if hasCachedPrediction && hasChartData && !dailyInsight.isEmpty {
+                print("[HomeViewModel] Same session cache hit — skipping network calls")
+                errorMessage = nil // Clear any stale error from a previous failed attempt
+                return
+            }
+        }
+        
+        if languageChanged {
+            UserDefaults.standard.set(currentConfigLang, forKey: "lastLoadedLanguage")
+        }
+        
+        // On cold start, apply cached prediction immediately so user sees data
+        // instead of a loading spinner. Chart/dasha will fetch silently below.
+        if !shouldBypassCache, dailyInsight.isEmpty,
+           let cached = TodaysPredictionCache.shared.get() {
+            await MainActor.run {
+                self.applyPredictionResponse(cached)
+                print("[HomeViewModel] Applied cached prediction on cold start — no spinner needed")
+            }
+        }
+
+        // Pre-populate chart data (yogas, ascendant, doshas) from disk cache
+        // so the user sees them immediately instead of blank sections
+        if fullAstroData == nil, let birthData = loadBirthData() {
+            let cache = AstroDataCache.shared
+            let hash = cache.birthHash(birthData)
+            if let cached = cache.getFullChart(birthHash: hash) {
+                await MainActor.run {
+                    self.fullAstroData = cached
+                    var allCombinations: [YogaDetail] = []
+                    if let yogas = cached.analysis.yogas?.yogas {
+                        allCombinations.append(contentsOf: yogas)
+                    }
+                    if let doshas = cached.analysis.yogas?.doshas {
+                        allCombinations.append(contentsOf: doshas)
+                    }
+                    self.yogaCombinations = allCombinations.sorted {
+                        if $0.status == "A" && $1.status != "A" { return true }
+                        if $0.status != "A" && $1.status == "A" { return false }
+                        return $0.strength > $1.strength
+                    }
+                    self.doshaStatus = (cached.analysis.mangalDosha, cached.analysis.kalaSarpa)
+                    print("[HomeViewModel] Pre-populated chart/yogas from disk cache")
+                }
+            }
+        }
+        
+        // Only show loading spinner if we have NO prediction data to display yet
+        let showSpinner = dailyInsight.isEmpty
+        
         await MainActor.run {
-            isLoading = true
+            isLoading = showSpinner
             errorMessage = nil
+            
+            // Clear in-memory state briefly if language changed to force redraw
+            if languageChanged {
+                dailyInsight = ""
+                fullAstroData = nil
+                isLoading = true // Force spinner for language change
+            }
         }
         
         // Sync quota
@@ -131,7 +244,10 @@ class HomeViewModel {
         // Create a task group to fetch all data concurrently
         // Check if full chart/dasha data needs refreshing (24-hour guard)
         let needsFullRefresh: Bool
-        if let lastLoad = lastFullLoadDate,
+        if shouldBypassCache {
+            needsFullRefresh = true
+            print("[HomeViewModel] Full data refresh forced (Bypass: \\(shouldBypassCache))")
+        } else if let lastLoad = lastFullLoadDate,
            Date().timeIntervalSince(lastLoad) < 86400, // 24 hours
            fullAstroData != nil,
            dashaResponse != nil {
@@ -144,7 +260,7 @@ class HomeViewModel {
         await withTaskGroup(of: Void.self) { group in
             // 1. Fetch Todays Prediction (uses TodaysPredictionCache internally)
             group.addTask {
-                await self.fetchTodaysPrediction(birthData: birthData)
+                await self.fetchTodaysPrediction(birthData: birthData, force: shouldBypassCache)
             }
             
             if needsFullRefresh {
@@ -169,15 +285,15 @@ class HomeViewModel {
         }
     }
     
-    private func fetchTodaysPrediction(birthData: UserBirthData) async {
+    private func fetchTodaysPrediction(birthData: UserBirthData, force: Bool = false) async {
         let profileId = ProfileContextManager.shared.activeProfileId
         let profileName = ProfileContextManager.shared.activeProfileName
         
         print("[HomeViewModel] fetchTodaysPrediction for profile: \(profileName) (id: \(profileId))")
         print("[HomeViewModel] Birth data DOB: \(birthData.dob)")
         
-        // Check local cache first (profile-scoped via TodaysPredictionCache)
-        if let cached = TodaysPredictionCache.shared.get() {
+        // Check local cache first — but bypass if this is first login so fixed question is guaranteed
+        if !force, hasSeenFirstPrediction, let cached = TodaysPredictionCache.shared.get() {
             print("[HomeViewModel] Cache HIT for profile: \(profileId)")
             await MainActor.run {
                 self.applyPredictionResponse(cached)
@@ -189,21 +305,31 @@ class HomeViewModel {
         
         do {
             let userEmail = UserDefaults.standard.string(forKey: "userEmail")
-            var request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail)
-            
+            // Get current app language from user selection (not system locale)
+            let language = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+            let isFirstLogin = !hasSeenFirstPrediction
+            var request = UserAstroDataRequest(birthData: birthData, userEmail: userEmail, language: language, isFirstLogin: isFirstLogin)
+
             let response = try await predictionService.getTodaysPrediction(request: request)
-            
+
             print("[HomeViewModel] API response received for profile: \(profileId)")
             TodaysPredictionCache.shared.set(response)
-            
+            if isFirstLogin { hasSeenFirstPrediction = true }
+
             await MainActor.run {
                 self.applyPredictionResponse(response)
+                self.errorMessage = nil // Clear any previous error
             }
         } catch {
             print("[HomeViewModel] Prediction error for \(profileId): \(error)")
             await MainActor.run {
-                // Don't override general error if other calls succeed, just log it
-                // self.errorMessage = "Failed to load prediction" 
+                // Only show error banner if there's no cached data displayed
+                // If user already sees valid predictions, a silent refresh failure is fine
+                if self.dailyInsight.isEmpty {
+                    self.errorMessage = Self.friendlyError(from: error)
+                } else {
+                    print("[HomeViewModel] Refresh failed but cached data is displayed — suppressing error banner")
+                }
             }
         }
     }
@@ -277,6 +403,14 @@ class HomeViewModel {
         self.currentDasha = response.currentDasha
         self.suggestedQuestions = response.mindQuestions
         self.lifeAreas = response.lifeAreas
+
+        // Green circle guarantee: ensure at least 1 "Good" area
+        if !self.lifeAreas.values.contains(where: { $0.status.lowercased() == "good" }) {
+            if let firstKey = self.lifeAreas.keys.sorted().first,
+               let existing = self.lifeAreas[firstKey] {
+                self.lifeAreas[firstKey] = LifeAreaStatus(status: "Good", brief: existing.brief)
+            }
+        }
         
         // NEW: Apply Dasha Insight
         self.dashaInsight = response.dashaInsight
@@ -401,10 +535,15 @@ class HomeViewModel {
         return Double(quotaTotal - quotaRemaining) / Double(quotaTotal)
     }
     
+    private static let renewalFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f
+    }()
+
     var renewalDateString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: renewalDate)
+        Self.renewalFormatter.string(from: renewalDate)
     }
     
     var greetingMessage: String {
@@ -430,5 +569,36 @@ class HomeViewModel {
         
         let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 0
         return insights[dayOfYear % insights.count]
+    }
+    
+    // MARK: - User-Friendly Error Mapping
+    
+    static func friendlyError(from error: Error) -> String {
+        let raw: String
+        if let networkError = error as? NetworkError {
+            raw = networkError.errorDescription ?? ""
+        } else {
+            raw = error.localizedDescription
+        }
+        let lower = raw.lowercased()
+        
+        // Map known backend messages to user-friendly text
+        if lower.contains("email") && (lower.contains("valid") || lower.contains("invalid")) {
+            return "We couldn't verify your account. Please re-enter your birth details and try again."
+        }
+        if lower.contains("validation failed") {
+            return "Something went wrong with your data. Please update your birth details and try again."
+        }
+        if lower.contains("timeout") || lower.contains("timed out") {
+            return "The server is taking too long to respond. Please try again in a moment."
+        }
+        if lower.contains("no data") || lower.contains("empty") {
+            return "No data received from the server. Please check your connection and retry."
+        }
+        if lower.contains("unauthorized") || lower.contains("session expired") {
+            return "Your session has expired. Please sign in again."
+        }
+        // Fallback — never show raw JSON or technical details
+        return "Unable to load your prediction right now. Please try again."
     }
 }

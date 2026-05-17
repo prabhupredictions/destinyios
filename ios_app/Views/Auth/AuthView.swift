@@ -32,6 +32,8 @@ struct AuthView: View {
     
     // Sound Manager
     @ObservedObject private var soundManager = SoundManager.shared
+
+    @State private var appStartup = AppStartupService.shared
     
     var body: some View {
         ZStack {
@@ -59,17 +61,20 @@ struct AuthView: View {
                     .opacity(contentOpacity)
                     .offset(y: contentOffset)
                     .padding(.top, 28)
-                
-                Spacer()
-                
+
+                Spacer(minLength: 0)
+                    .frame(maxHeight: 48)
+
                 // Auth buttons
                 authButtonsSection
                     .opacity(contentOpacity)
                     .offset(y: contentOffset)
                 
                 // Guest option
-                guestSection
-                    .opacity(contentOpacity)
+                if appStartup.allowGuest {
+                    guestSection
+                        .opacity(contentOpacity)
+                }
                 
                 Spacer()
                 
@@ -183,7 +188,7 @@ struct AuthView: View {
             AuthButton(
                 icon: "apple.logo",
                 iconImage: nil,
-                title: "Continue with Apple",
+                title: "continue_with_apple".localized,
                 style: .goldSlab,
                 iconScale: 1.15  // Apple logo has more whitespace
             ) {
@@ -194,7 +199,7 @@ struct AuthView: View {
             AuthButton(
                 icon: nil,
                 iconImage: "google_logo",
-                title: "Continue with Google",
+                title: "continue_with_google".localized,
                 style: .glassSlab,
                 iconScale: 1.0   // Image asset - no scaling needed
             ) {

@@ -14,24 +14,52 @@ struct CompatibilityResultView: View {
     let onHistory: (() -> Void)?
     let onCharts: (() -> Void)?
     let onLoadHistory: ((CompatibilityHistoryItem) -> Void)?
+    var isFromComparison: Bool = false  // true when opened from multi-partner comparison overview
+
+    init(result: CompatibilityResult, boyName: String, girlName: String,
+         boyDob: String?, girlDob: String?, boyCity: String?, girlCity: String?,
+         onNewAnalysis: @escaping () -> Void,
+         onBack: (() -> Void)?,
+         onHistory: (() -> Void)?,
+         onCharts: (() -> Void)?,
+         onLoadHistory: ((CompatibilityHistoryItem) -> Void)?,
+         isFromComparison: Bool = false) {
+        self.result = result
+        self.boyName = boyName
+        self.girlName = girlName
+        self.boyDob = boyDob
+        self.girlDob = girlDob
+        self.boyCity = boyCity
+        self.girlCity = girlCity
+        self.onNewAnalysis = onNewAnalysis
+        self.onBack = onBack
+        self.onHistory = onHistory
+        self.onCharts = onCharts
+        self.onLoadHistory = onLoadHistory
+        self.isFromComparison = isFromComparison
+    }
     
     // Sheet States
     @State private var showFullReport = false
-    @State private var showAskDestiny = false
     @State private var showHistorySheet = false
     @State private var showProfile = false
+    // V2.5: item-based sheet so initialPrompt is always captured correctly
+    private struct AskDestinyItem: Identifiable {
+        let id = UUID()
+        let prompt: String?
+    }
+    @State private var askDestinyItem: AskDestinyItem? = nil
+    // Lifted from OrbitAshtakootView so tooltip renders above ScrollView content
+    @State private var selectedKuta: AshtakootData? = nil
     
     // Animation State
     @State private var contentOpacity: Double = 0
     
-    // Status Logic Helpers
-    private var isMangalEffective: Bool {
-        // Simple logic: if present in result data as "Present" or "Effective"
-        // For MVP, we'll check the summary text or assume based on score if data missing
-        // Better: check result.analysisData?.joint?.mangalCompatibility
-        return false // Default safe, effectively handled by sheet logic usually
-    }
-    
+    // Cached Mangal Dosha data (avoid re-decoding on every render)
+    @State private var cachedBoyMangalDosha: MangalDoshaData?
+    @State private var cachedGirlMangalDosha: MangalDoshaData?
+    @State private var mangalDoshaCached = false
+
     // Computed Data for Grid
     private var ashtakootPoints: [String: Double] {
         Dictionary<String, Double>(uniqueKeysWithValues: result.kutas.map { ($0.name.lowercased(), Double($0.points)) })
@@ -43,11 +71,11 @@ struct CompatibilityResultView: View {
         let girlPresent = result.analysisData?.girl?.raw?.kalaSarpa?.present ?? false
         
         if !boyPresent && !girlPresent {
-            return "Clear"
+            return "kalsarpa_clear".localized
         } else if boyPresent && girlPresent {
-            return "Both Present"
+            return "kalsarpa_both_present".localized
         } else {
-            return "Moderate"
+            return "kalsarpa_moderate".localized
         }
     }
     
@@ -111,6 +139,8 @@ struct CompatibilityResultView: View {
                     onNewMatchTap: onNewAnalysis,
                     transparent: true
                 )
+                .accessibilityLabel("accessibility_birth_chart".localized)
+                .accessibilityLabel("accessibility_new_analysis".localized)
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 8) { // Reduced spacing to compact layout
@@ -133,12 +163,13 @@ struct CompatibilityResultView: View {
                             },
                             boyName: boyName,
                             girlName: girlName,
-                            doshaSummary: result.doshaSummary
+                            doshaSummary: result.doshaSummary,
+                            selectedKuta: $selectedKuta
                         )
                         .padding(.bottom, 0) // Removed extra padding to close gap
                         
                         // 1.5. Recommendation + Dosha Summary Banner
-                        recommendationBanner
+                        RecommendationBannerView(result: result)
                         
                         // 2. Partners (Removed - Embedded in Orbit)
                         
@@ -152,13 +183,14 @@ struct CompatibilityResultView: View {
                                     mangalDoshaDestination
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Mangal Dosha (Manglik/Kuja)",
+                                        title: "mangal_dosha_full".localized,
                                         icon: "flame.fill",
-                                        statusText: result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String ?? "View",
+                                        statusText: result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String ?? "view_action".localized,
                                         statusColor: (result.analysisData?.joint?.mangalCompatibility?["compatibility_category"]?.value as? String)?.lowercased() == "excellent" ? AppTheme.Colors.success : .orange
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
+                                .accessibilityIdentifier("mangal_dosha_row")
                                 
                                 // Kalsarpa Dosha - NavigationLink
                                 NavigationLink {
@@ -170,13 +202,14 @@ struct CompatibilityResultView: View {
                                     )
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Kaal Sarp Dosha (Kalasarpa)",
+                                        title: "kaal_sarp_dosha_full".localized,
                                         icon: "tornado",
                                         statusText: kalsarpaStatusText,
                                         statusColor: kalsarpaStatusColor
                                     )
                                 }
                                 .buttonStyle(PlainButtonStyle())
+                                .accessibilityIdentifier("kalsarpa_dosha_row")
                                 
                                 // Additional Yogas - NavigationLink
                                 NavigationLink {
@@ -188,9 +221,9 @@ struct CompatibilityResultView: View {
                                     )
                                 } label: {
                                     DoshaStatusRowLabel(
-                                        title: "Additional Yogas",
+                                        title: "additional_yogas_title".localized,
                                         icon: "sparkles",
-                                        statusText: "View All",
+                                        statusText: "view_all_action".localized,
                                         statusColor: AppTheme.Colors.textSecondary
                                     )
                                 }
@@ -201,7 +234,7 @@ struct CompatibilityResultView: View {
                         .padding(.top, 20)
                         
                         ShimmerButton(
-                            title: "View Full Report",
+                            title: "view_full_report_action".localized,
                             icon: nil
                         ) {
                             HapticManager.shared.play(.medium)
@@ -221,17 +254,55 @@ struct CompatibilityResultView: View {
             // 3. Floating Context Action (Ask)
             FloatingContextButton(
                 icon: "bubble.left.and.bubble.right.fill",
-                action: { showAskDestiny = true }
+                action: { askDestinyItem = AskDestinyItem(prompt: nil) }
             )
+            .accessibilityIdentifier("ask_destiny_button")
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             
+            // Kuta tooltip overlay — rendered here so it floats above the ScrollView and
+            // recommendation banner without being clipped by scroll content layout.
+            if let kuta = selectedKuta {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { withAnimation { selectedKuta = nil } }
+                    .ignoresSafeArea()
+
+                OrbitTooltipView(
+                    kuta: kuta,
+                    boyName: boyName,
+                    girlName: girlName,
+                    onDismiss: { withAnimation { selectedKuta = nil } },
+                    onClassicalAnalysis: { prompt in
+                        withAnimation(.easeOut(duration: 0.2)) { selectedKuta = nil }
+                        askDestinyItem = AskDestinyItem(prompt: prompt)
+                    }
+                )
+                .transition(.scale(scale: 0.95).combined(with: .opacity))
+                .zIndex(200)
+            }
+
             } // End ZStack
             .navigationBarHidden(true)
         } // End NavigationStack
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) {
                 contentOpacity = 1.0
+            }
+            // Decode Mangal Dosha off the main thread — JSONSerialization + JSONDecoder
+            // block for ~1-3s on complex Opus results, which compounds the markdown
+            // parsing cost and pushes the total past the watchdog threshold.
+            if !mangalDoshaCached {
+                let mangalCompat = result.analysisData?.joint?.mangalCompatibility
+                Task.detached(priority: .userInitiated) {
+                    let boy = Self.extractMangalDoshaData(from: mangalCompat?["boy_dosha"])
+                    let girl = Self.extractMangalDoshaData(from: mangalCompat?["girl_dosha"])
+                    await MainActor.run {
+                        cachedBoyMangalDosha = boy
+                        cachedGirlMangalDosha = girl
+                        mangalDoshaCached = true
+                    }
+                }
             }
         }
         // Sheets
@@ -244,14 +315,15 @@ struct CompatibilityResultView: View {
                 girlDob: girlDob
             )
         }
-        .sheet(isPresented: $showAskDestiny) {
-            AskDestinySheet(result: result, boyName: boyName, girlName: girlName)
+        .sheet(item: $askDestinyItem) { item in
+            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, initialPrompt: item.prompt, showFollowUpSuggestions: !isFromComparison, initialQuestions: result.initialFollowUpSuggestions)
         }
          .sheet(isPresented: $showHistorySheet) {
             CompatibilityHistorySheet { selectedItem in
                 showHistorySheet = false
                 onLoadHistory?(selectedItem)
             }
+            .accessibilityLabel("accessibility_history_match".localized)
         }
         .sheet(isPresented: $showProfile) {
             ProfileView()
@@ -261,207 +333,236 @@ struct CompatibilityResultView: View {
         }
     }
     
-    // MARK: - Recommendation + Dosha Summary Banner
-    @ViewBuilder
-    private var recommendationBanner: some View {
-        let hasDosha = (result.doshaSummary?.totalDoshas ?? 0) > 0
-        let cancelledCount = result.doshaSummary?.cancelledCount ?? 0
-        let activeCount = result.doshaSummary?.activeCount ?? 0
-        
-        if hasDosha || !result.isRecommended || !result.rejectionReasons.isEmpty {
-            VStack(spacing: 8) {
-                // Recommendation status
-                HStack(spacing: 8) {
-                    Image(systemName: result.isRecommended ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
-                    
-                    Text(result.isRecommended ? "marriage_recommended".localized : "not_recommended".localized)
-                        .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
-                        .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
-                    
-                    Spacer()
-                }
-                
-                // Dosha summary counts
-                if hasDosha {
-                    HStack(spacing: 12) {
-                        doshaPill(count: result.doshaSummary?.totalDoshas ?? 0, label: "doshas".localized, color: AppTheme.Colors.warning)
-                        if cancelledCount > 0 {
-                            doshaPill(count: cancelledCount, label: "cancelled".localized, color: AppTheme.Colors.success)
-                        }
-                        if activeCount > 0 {
-                            doshaPill(count: activeCount, label: "active".localized, color: AppTheme.Colors.error)
-                        }
-                        Spacer()
-                    }
-                }
-                
-                // Rejection reasons (if not recommended)
-                if !result.rejectionReasons.isEmpty {
-                    ForEach(result.rejectionReasons, id: \.self) { reason in
-                        let displayReason = reason
-                            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
-                            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
-                            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
-                            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
-                        HStack(alignment: .top, spacing: 6) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 11))
-                                .foregroundColor(AppTheme.Colors.error.opacity(0.8))
-                                .padding(.top, 2)
-                            Text(displayReason)
-                                .font(AppTheme.Fonts.caption(size: 12))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(.bottom, 4)
-                    }
-                }
-                
-                // Active dosha details (from doshaSummary — shows ALL active issues)
-                if let details = result.doshaSummary?.details {
-                    let doshaOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "vashya", "tara", "varna"]
-                    let doshaNames = [
-                        "nadi": "Nadi Dosha",
-                        "bhakoot": "Bhakoot Dosha",
-                        "gana": "Gana Dosha",
-                        "maitri": "Maitri Dosha",
-                        "yoni": "Yoni Dosha",
-                        "vashya": "Vashya Dosha",
-                        "tara": "Tara Dosha",
-                        "varna": "Varna Dosha"
-                    ]
-                    
-                    let activeDoshas = doshaOrder.compactMap { key -> (name: String, detail: DoshaDetail)? in
-                        guard let detail = details[key],
-                              detail.present == true,
-                              detail.cancelled != true else { return nil }
-                        return (name: doshaNames[key] ?? key.capitalized, detail: detail)
-                    }
-                    // Only show if there are active doshas not already covered by rejection reasons
-                    let uncoveredDoshas = activeDoshas.filter { dosha in
-                        !result.rejectionReasons.contains(where: { $0.localizedCaseInsensitiveContains(dosha.name.replacingOccurrences(of: " Dosha", with: "")) })
-                    }
-                    
-                    if !uncoveredDoshas.isEmpty {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Active Doshas:")
-                                .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
-                                .foregroundColor(AppTheme.Colors.warning)
-                            
-                            ForEach(uncoveredDoshas, id: \.name) { dosha in
-                                HStack(alignment: .top, spacing: 6) {
-                                    Image(systemName: "exclamationmark.triangle.fill")
-                                        .font(.system(size: 10))
-                                        .foregroundColor(AppTheme.Colors.warning.opacity(0.7))
-                                        .padding(.top, 2)
-                                    Text(dosha.name)
-                                        .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
-                                        .foregroundColor(AppTheme.Colors.textSecondary)
-                                }
-                            }
-                        }
-                        .padding(.top, 2)
-                    }
-                }
-            }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(AppTheme.Colors.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        result.isRecommended
-                            ? AppTheme.Colors.success.opacity(0.2)
-                            : AppTheme.Colors.error.opacity(0.3),
-                        lineWidth: 1
-                    )
-            )
-            .padding(.horizontal, 0)
-            .padding(.top, 8)
-        }
-    }
-    
-    private func doshaPill(count: Int, label: String, color: Color) -> some View {
-        HStack(spacing: 4) {
-            Text("\(count)")
-                .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
-                .foregroundColor(color)
-            Text(label)
-                .font(AppTheme.Fonts.caption(size: 11))
-                .foregroundColor(AppTheme.Colors.textTertiary)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(
-            Capsule()
-                .fill(color.opacity(0.1))
-        )
-        .overlay(
-            Capsule()
-                .stroke(color.opacity(0.25), lineWidth: 0.5)
-        )
-    }
-    
     // Helper needed for Sheet Data Extraction
     static func extractMangalDoshaData(from anyCodable: AnyCodable?) -> MangalDoshaData? {
         guard let dict = anyCodable?.value as? [String: Any] else {
-            print("[MangalDosha] ❌ anyCodable?.value is not [String: Any], type=\(type(of: anyCodable?.value)) value=\(String(describing: anyCodable?.value))")
             return nil
-        }
-        
-        // Debug: Print all keys and their types
-        print("[MangalDosha] 📋 Dictionary keys: \(Array(dict.keys).sorted())")
-        if let doshaFromVal = dict["dosha_from"] {
-            print("[MangalDosha] 📋 dosha_from value: \(String(describing: doshaFromVal)), type: \(type(of: doshaFromVal))")
-        } else {
-            print("[MangalDosha] ❌ dosha_from key NOT FOUND in dict")
         }
         
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
-            
-            // Debug: Print the JSON that was serialized
-            if let jsonStr = String(data: jsonData, encoding: .utf8) {
-                // Find dosha_from in the JSON string
-                if let range = jsonStr.range(of: "dosha_from") {
-                    let start = jsonStr.index(range.upperBound, offsetBy: 0)
-                    let end = jsonStr.index(start, offsetBy: min(200, jsonStr.distance(from: start, to: jsonStr.endIndex)))
-                    print("[MangalDosha] 📋 JSON dosha_from snippet: \(jsonStr[start..<end])")
-                } else {
-                    print("[MangalDosha] ❌ dosha_from not found in serialized JSON")
-                }
-            }
-            
             let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let result = try decoder.decode(MangalDoshaData.self, from: jsonData)
-            print("[MangalDosha] ✅ Decoded successfully - doshaFrom has \(result.doshaFrom?.count ?? 0) keys")
-            return result
+            // NOTE: Do NOT use .convertFromSnakeCase here — MangalDoshaData
+            // already has custom CodingKeys that map snake_case to camelCase.
+            // Using both causes double-conversion and key lookup failures.
+            return try decoder.decode(MangalDoshaData.self, from: jsonData)
         } catch {
             print("[MangalDosha] ❌ Failed to decode: \(error)")
-            if let jsonStr = String(data: (try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)) ?? Data(), encoding: .utf8) {
-                print("[MangalDosha] 📋 Full JSON: \(jsonStr)")
-            }
             return nil
         }
     }
     
-    // Computed property for Mangal Dosha NavigationLink destination
+    // Computed property for Mangal Dosha NavigationLink destination (uses cached data)
     private var mangalDoshaDestination: some View {
         let mangalCompat = result.analysisData?.joint?.mangalCompatibility
-        let boyDosha = Self.extractMangalDoshaData(from: mangalCompat?["boy_dosha"])
-        let girlDosha = Self.extractMangalDoshaData(from: mangalCompat?["girl_dosha"])
-        
+
         return MangalDoshaSheet(
-            boyData: boyDosha ?? result.analysisData?.boy?.raw?.mangalDosha,
-            girlData: girlDosha ?? result.analysisData?.girl?.raw?.mangalDosha,
+            boyData: cachedBoyMangalDosha ?? result.analysisData?.boy?.raw?.mangalDosha,
+            girlData: cachedGirlMangalDosha ?? result.analysisData?.girl?.raw?.mangalDosha,
             boyName: boyName,
             girlName: girlName,
             mangalCompatibility: mangalCompat
         )
+    }
+}
+
+// MARK: - Recommendation Banner View
+
+private struct RecommendationBannerView: View {
+    let result: CompatibilityResult
+
+    var body: some View {
+        let score = result.adjustedScore ?? result.totalScore
+        let borderColor = result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error
+
+        VStack(spacing: 0) {
+            // ── Header ──
+            HStack(spacing: 10) {
+                Image(systemName: result.isRecommended ? "checkmark.seal.fill" : "exclamationmark.octagon.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
+
+                Text(result.isRecommended ? "recommended".localized : "not_recommended".localized)
+                    .font(AppTheme.Fonts.title(size: 16).weight(.bold))
+                    .foregroundColor(result.isRecommended ? AppTheme.Colors.success : AppTheme.Colors.error)
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Text("\(score)")
+                        .font(AppTheme.Fonts.title(size: 20).weight(.bold))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    Text("/\(result.maxScore)")
+                        .font(AppTheme.Fonts.title(size: 16))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+                .accessibilityIdentifier("compat_result_score")
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(result.isRecommended
+                          ? AppTheme.Colors.success.opacity(0.1)
+                          : AppTheme.Colors.error.opacity(0.1))
+            )
+
+            // ── Body ──
+            VStack(alignment: .leading, spacing: 12) {
+                if result.isRecommended {
+                    // Affirmation text (device-computed)
+                    let affirmation = AffirmationBuilder(
+                        kutas: result.kutas,
+                        adjustedScore: result.adjustedScore,
+                        totalScore: result.totalScore
+                    ).affirmationText()
+
+                    Text(affirmation)
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    // "Not recommended because:" bullets
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("not_recommended_because".localized)
+                            .font(AppTheme.Fonts.caption(size: 12).weight(.bold))
+                            .foregroundColor(AppTheme.Colors.error)
+
+                        ForEach(Array(result.rejectionReasons.enumerated()), id: \.offset) { _, reason in
+                            reasonBullet(reason)
+                        }
+                    }
+                }
+
+                // ── Cancelled doshas row ──
+                cancelledDoshasRow
+            }
+            .padding(14)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(borderColor.opacity(0.3), lineWidth: 1)
+        )
+        .shadow(color: borderColor.opacity(0.15), radius: 8, x: 0, y: 4)
+        .padding(.top, 8)
+    }
+
+    // MARK: - Reason bullet
+
+    @ViewBuilder
+    private func reasonBullet(_ reason: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 11))
+                .foregroundColor(reasonIconColor(for: reason))
+                .padding(.top, 2)
+
+            reasonText(reason)
+                .font(AppTheme.Fonts.caption(size: 13))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func reasonIconColor(for reason: String) -> Color {
+        if reason.hasPrefix("Adjusted Ashtakoot score") { return .orange }
+        return AppTheme.Colors.error
+    }
+
+    @ViewBuilder
+    private func reasonText(_ reason: String) -> some View {
+        // Backend format: "Nadi Dosha is active — same biological constitution. ..." (agent.py gate 1)
+        if reason.hasPrefix("Nadi Dosha") {
+            let suffix = reason.dropFirst("Nadi Dosha is active".count)
+                .trimmingCharacters(in: .init(charactersIn: " —"))
+            (Text("Nadi Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
+             + Text(" — \(suffix)"))
+        // Backend format: "Bhakoot Dosha is active — Moon positions create..." (agent.py gate 2)
+        } else if reason.hasPrefix("Bhakoot Dosha") {
+            let suffix = reason.dropFirst("Bhakoot Dosha is active".count)
+                .trimmingCharacters(in: .init(charactersIn: " —"))
+            (Text("Bhakoot Dosha is active").bold().foregroundColor(AppTheme.Colors.textPrimary)
+             + Text(" — \(suffix)"))
+        // Backend format: "Mangal Dosha incompatibility — {boy}: {sev} (Mars in {house}), ..." (agent.py:155-161)
+        } else if reason.hasPrefix("Mangal Dosha") {
+            let suffix = reason.dropFirst("Mangal Dosha incompatibility — ".count)
+                .trimmingCharacters(in: .whitespaces)
+            (Text("Mangal Dosha incompatibility").bold().foregroundColor(AppTheme.Colors.textPrimary)
+             + Text(" — \(suffix)"))
+        // Backend format: "Adjusted Ashtakoot score {N}/36 — below the 18-point minimum threshold." (agent.py gate 3)
+        } else if reason.hasPrefix("Adjusted Ashtakoot score") {
+            scoreReasonText(reason)
+        } else {
+            Text(reason)
+        }
+    }
+
+    /// Renders "Adjusted Ashtakoot score N/36 — …" with N/36 in orange bold.
+    @ViewBuilder
+    private func scoreReasonText(_ reason: String) -> some View {
+        if let range = reason.range(of: #"\d+\.?\d*/36"#, options: .regularExpression) {
+            let score = String(reason[range])
+            let after = String(reason[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+            let before = String(reason[..<range.lowerBound])
+            (Text(before)
+             + Text(score).bold().foregroundColor(.orange)
+             + Text(" \(after)"))
+        } else {
+            Text(reason)
+        }
+    }
+
+    // MARK: - Cancelled doshas row
+
+    @ViewBuilder
+    private var cancelledDoshasRow: some View {
+        let cancelledCount = result.doshaSummary?.cancelledCount ?? 0
+        if cancelledCount > 0 {
+            let summaryText = result.cancelledDoshasSummary ?? fallbackCancelledText(count: cancelledCount)
+            VStack(alignment: .leading, spacing: 0) {
+                Divider()
+                    .background(AppTheme.Colors.success.opacity(0.2))
+                    .padding(.bottom, 10)
+
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.success)
+                        .padding(.top, 1)
+
+                    Text(summaryText)
+                        .font(AppTheme.Fonts.caption(size: 12))
+                        .foregroundColor(AppTheme.Colors.success.opacity(0.85))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private func fallbackCancelledText(count: Int) -> String {
+        // Build a name-aware fallback from doshaSummary.details when cancelledDoshasSummary is nil
+        let keyOrder = ["nadi", "bhakoot", "gana", "maitri", "yoni", "tara", "vashya", "varna"]
+        let displayNames = ["nadi": "Nadi", "bhakoot": "Bhakoot", "gana": "Gana",
+                            "maitri": "Maitri", "yoni": "Yoni", "tara": "Tara",
+                            "vashya": "Vashya", "varna": "Varna"]
+        let details = result.doshaSummary?.details ?? [:]
+        let cancelledNames = keyOrder.compactMap { key -> String? in
+            guard details[key]?.cancelled == true else { return nil }
+            return displayNames[key]
+        }
+        let names = cancelledNames.isEmpty ? nil : cancelledNames
+
+        if let names, !names.isEmpty {
+            if names.count == 1 {
+                return "\(names[0]) Dosha found and cancelled — it doesn't count against this match."
+            } else {
+                let joined = names.dropLast().joined(separator: ", ") + " and \(names.last!)"
+                return "\(joined) Doshas found and cancelled — they don't count against this match."
+            }
+        }
+        // Last resort: count-only
+        let subject = count == 1 ? "it doesn't" : "they don't"
+        return "\(count) \(count == 1 ? "dosha".localized : "doshas".localized) found and cancelled — \(subject) affect this match."
     }
 }

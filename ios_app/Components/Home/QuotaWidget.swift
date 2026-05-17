@@ -50,7 +50,7 @@ struct QuotaWidget: View {
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(Color("GoldAccent"))
                 
-                Text("\(remaining)/\(total) questions left")
+                Text(String(format: "questions_left_format".localized, remaining, total))
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color("NavyPrimary"))
                 
@@ -97,8 +97,8 @@ struct QuotaWidget: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "person.fill")
                                     .font(.system(size: 12))
-                                Text("Sign In")
-                                    .font(.system(size: 13, weight: .semibold))
+                                Text("sign_in_button".localized)
+                                    .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                             }
                             .foregroundColor(Color("NavyPrimary"))
                             .padding(.horizontal, 16)
@@ -115,8 +115,8 @@ struct QuotaWidget: View {
                         HStack(spacing: 6) {
                             Image(systemName: "crown.fill")
                                 .font(.system(size: 12))
-                            Text("Go Premium")
-                                .font(.system(size: 13, weight: .semibold))
+                            Text("go_premium".localized)
+                                .font(AppTheme.Fonts.caption(size: 11).weight(.bold))
                         }
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)
@@ -134,7 +134,7 @@ struct QuotaWidget: View {
                 .padding(.top, 4)
             } else {
                 // Renewal text when not showing upgrade
-                Text("Renews \(renewalDate)")
+                Text(String(format: "renews_date_format".localized, renewalDate))
                     .font(.system(size: 12))
                     .foregroundColor(Color("TextDark").opacity(0.5))
             }

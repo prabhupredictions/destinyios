@@ -12,53 +12,64 @@ struct NotificationItem: Codable, Identifiable, Equatable {
     let read: Bool
     let createdAt: String?
     let readAt: String?
-    
+    let actionUrl: String?
+    let imageUrl: String?
+    let chatPrompt: String?
+    let topic: String?
+
     enum CodingKeys: String, CodingKey {
-        case id, type, channel, subject, preview, status, read
-        case createdAt = "created_at"
-        case readAt = "read_at"
+        case id, type, channel, subject, preview, status, read, topic
+        case createdAt  = "created_at"
+        case readAt     = "read_at"
+        case actionUrl  = "action_url"
+        case imageUrl   = "image_url"
+        case chatPrompt = "chat_prompt"
     }
-    
+
     // MARK: - Computed Properties
-    
+
     /// Parsed creation date
     var createdDate: Date? {
-        guard let createdAt = createdAt else { return nil }
+        guard let createdAt else { return nil }
         return ISO8601DateFormatter().date(from: createdAt) ??
                DateFormatter.backendFormatter.date(from: createdAt)
     }
-    
-    /// Friendly time ago string
+
+    /// Calendar-style timestamp: "Today", "Yesterday", or "Mar 27"
     var timeAgo: String {
         guard let date = createdDate else { return "" }
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: date, relativeTo: Date())
+        let cal = Calendar.current
+        if cal.isDateInToday(date)     { return "Today" }
+        if cal.isDateInYesterday(date) { return "Yesterday" }
+        let fmt = DateFormatter()
+        fmt.dateFormat = "MMM d"
+        return fmt.string(from: date)
     }
-    
+
+    /// True if the notification was created today
+    var isToday: Bool {
+        guard let date = createdDate else { return false }
+        return Calendar.current.isDateInToday(date)
+    }
+
     /// Icon name based on notification type
     var iconName: String {
         switch type.uppercased() {
-        case "DAILY_PREDICTION", "DAILY_PREDICTION_READY":
-            return "sun.max.fill"
-        case "TRANSIT_ALERT":
-            return "sparkles"
-        case "SUBSCRIPTION_EXPIRING":
-            return "creditcard.fill"
-        case "WELCOME":
-            return "hand.wave.fill"
-        case "LIFE_ALERT":
-            return "exclamationmark.triangle.fill"
-        default:
-            return "bell.fill"
+        case "DAILY_PREDICTION", "DAILY_PREDICTION_READY": return "sun.max.fill"
+        case "TRANSIT_ALERT":          return "sparkles"
+        case "SUBSCRIPTION_EXPIRING":  return "creditcard.fill"
+        case "WELCOME":                return "star.fill"
+        case "LIFE_ALERT":             return "exclamationmark.triangle.fill"
+        case "COMPATIBILITY_READY":    return "heart.fill"
+        default:                       return "bell.fill"
         }
     }
-    
+
     /// Title with fallback
     var displayTitle: String {
         subject ?? type.replacingOccurrences(of: "_", with: " ").capitalized
     }
-    
+
     /// Body preview with fallback
     var displayBody: String {
         preview ?? "Tap to view details"

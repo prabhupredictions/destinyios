@@ -5,6 +5,8 @@ import SwiftUI
 @MainActor
 @Observable
 class BirthDataViewModel {
+    nonisolated deinit {}
+
     // MARK: - Form State
     var userName = ""  // User's display name
     var dateOfBirth = Calendar.current.date(byAdding: .year, value: -25, to: Date()) ?? Date()
@@ -60,7 +62,7 @@ class BirthDataViewModel {
     var formattedDate: String {
         guard isDateSelected else { return "select_date".localized }
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: dateOfBirth)
     }
     
@@ -126,12 +128,10 @@ class BirthDataViewModel {
     func loadSaved() {
         let email = userEmail ?? "guest"
         
-        // Try to load from SwiftData first
-        if !isGuest {
-            if let profile = dataManager.getBirthProfile(for: email) {
-                loadFromProfile(profile)
-                return
-            }
+        // Try to load from SwiftData first (works for both registered and guest users)
+        if let profile = dataManager.getBirthProfile(for: email) {
+            loadFromProfile(profile)
+            return
         }
         
         // Fallback to UserDefaults (User-Scoped)

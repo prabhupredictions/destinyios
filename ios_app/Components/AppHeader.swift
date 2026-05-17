@@ -29,7 +29,7 @@ struct AppHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 44, height: 44)
                 }
-                .accessibilityLabel("Menu")
+                .accessibilityLabel("accessibility_menu".localized)
             } else {
                 Spacer()
                     .frame(width: 44)
@@ -75,7 +75,7 @@ struct AppHeader: View {
                             .frame(width: 44, height: 44)
                     }
                 }
-                .accessibilityLabel("Profile")
+                .accessibilityLabel("accessibility_profile".localized)
             } else {
                 Spacer()
                     .frame(width: 44)
@@ -124,7 +124,7 @@ struct ChatHeader: View {
                     Image(systemName: "person.crop.circle.badge.checkmark")
                         .font(.caption)
                     
-                    Text("Viewing as \(profileContext.activeProfileName)")
+                    Text(String(format: "viewing_as_label".localized, profileContext.activeProfileName))
                         .font(AppTheme.Fonts.caption())
                 }
                 .foregroundColor(AppTheme.Colors.gold)
@@ -146,8 +146,9 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 44, height: 44)
                 }
-                .accessibilityLabel("Back")
-                
+                .accessibilityLabel("accessibility_back".localized)
+                .accessibilityIdentifier("chat_back_button")
+
                 // History button
                 Button(action: { onHistoryTap?() }) {
                     Image(systemName: "clock.arrow.circlepath")
@@ -155,7 +156,8 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
-                .accessibilityLabel("Chat history")
+                .accessibilityLabel("accessibility_history_chat".localized)
+                .accessibilityIdentifier("chat_history_button")
                 
                 Spacer()
                 
@@ -171,8 +173,9 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
-                .accessibilityLabel("Birth chart")
-                
+                .accessibilityLabel("accessibility_birth_chart".localized)
+                .accessibilityIdentifier("chat_chart_button")
+
                 // New chat button
                 Button(action: { onNewChatTap?() }) {
                     Image(systemName: "square.and.pencil")
@@ -180,7 +183,8 @@ struct ChatHeader: View {
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(width: 40, height: 40)
                 }
-                .accessibilityLabel("New conversation")
+                .accessibilityLabel("accessibility_new_conversation".localized)
+                .accessibilityIdentifier("new_chat_button")
             }
         }
         .padding(.horizontal, 12)
@@ -206,7 +210,7 @@ struct MatchInputHeader: View {
                     Image(systemName: "person.crop.circle.badge.checkmark")
                         .font(.caption)
                     
-                    Text("Viewing as \(profileContext.activeProfileName)")
+                    Text(String(format: "viewing_as_profile_format".localized, profileContext.activeProfileName))
                         .font(AppTheme.Fonts.caption())
                 }
                 .foregroundColor(AppTheme.Colors.gold)
@@ -234,15 +238,16 @@ struct MatchInputHeader: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
-                .accessibilityLabel("Match history")
-                
+                .accessibilityLabel("accessibility_history_match".localized)
+                .accessibilityIdentifier("compat_history_button")
+
                 Spacer()
-                
+
                 // Logo
                 LogoView()
-                
+
                 Spacer()
-                
+
                 // New match button (clears form)
                 Button(action: { onNewMatchTap?() }) {
                     ZStack {
@@ -256,7 +261,7 @@ struct MatchInputHeader: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
-                .accessibilityLabel("Reset form")
+                .accessibilityLabel("accessibility_reset_form".localized)
             }
         }
         .padding(.horizontal, 12)
@@ -289,7 +294,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("Back")
+            .accessibilityLabel("accessibility_back".localized)
             
             // History button
             Button(action: { onHistoryTap?() }) {
@@ -298,7 +303,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityLabel("Match history")
+            .accessibilityLabel("accessibility_history_match".localized)
             
             Spacer()
             
@@ -331,7 +336,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityLabel("Birth charts")
+            .accessibilityLabel("accessibility_birth_charts".localized)
             
             // New match button
             Button(action: { onNewMatchTap?() }) {
@@ -340,7 +345,7 @@ struct MatchResultHeader: View {
                     .foregroundColor(AppTheme.Colors.gold)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityLabel("New analysis")
+            .accessibilityLabel("accessibility_new_analysis".localized)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)

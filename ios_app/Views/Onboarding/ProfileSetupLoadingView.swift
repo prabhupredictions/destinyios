@@ -28,6 +28,15 @@ struct ProfileSetupLoadingView: View {
             case .complete: return "checkmark.circle.fill"
             }
         }
+
+        var displayText: String {
+            switch self {
+            case .calculatingChart: return "setup_phase_birth_chart".localized
+            case .analyzingPlanets: return "setup_phase_planetary".localized
+            case .generatingInsights: return "setup_phase_insights".localized
+            case .complete: return "setup_phase_ready".localized
+            }
+        }
     }
     
     var body: some View {
@@ -67,7 +76,7 @@ struct ProfileSetupLoadingView: View {
                         .font(AppTheme.Fonts.display(size: 28)) // Soul Typography
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
-                    Text(currentPhase.rawValue)
+                    Text(currentPhase.displayText)
                         .font(AppTheme.Fonts.body(size: 16)) // Brain Typography
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .animation(.easeInOut, value: currentPhase)
@@ -133,7 +142,8 @@ struct ProfileSetupLoadingView: View {
         withAnimation(.linear(duration: 1.5)) { progress = 0.9 }
         
         do {
-            let request = UserAstroDataRequest(birthData: userBirthData, userEmail: userEmail)
+            let language = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+            let request = UserAstroDataRequest(birthData: userBirthData, userEmail: userEmail, language: language)
             _ = try await PredictionService().getTodaysPrediction(request: request)
         } catch {
             print("[ProfileSetup] Prediction fetch failed: \(error)")

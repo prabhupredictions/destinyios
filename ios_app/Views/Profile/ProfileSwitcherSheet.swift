@@ -50,15 +50,15 @@ struct ProfileSwitcherSheet: View {
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(AppTheme.Colors.gold)
-                        Text("Loading profiles...")
-                            .font(AppTheme.Fonts.caption(size: 14))
+                        Text("loading_profiles".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
                 } else {
                     VStack(spacing: 20) {
                         // Header
                         HStack {
-                            Text("Switch Birth Chart")
+                            Text("switch_birth_chart".localized)
                                 .font(AppTheme.Fonts.title(size: 20))
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             
@@ -78,7 +78,7 @@ struct ProfileSwitcherSheet: View {
                                         .background(Color.white.opacity(0.1))
                                         .clipShape(Circle())
                                 }
-                                .accessibilityLabel("Close")
+                                .accessibilityLabel("a11y_close".localized)
                             }
                         }
                         .padding(.horizontal)
@@ -105,7 +105,7 @@ struct ProfileSwitcherSheet: View {
                                             if success {
                                                 dismiss()
                                             } else {
-                                                errorMessage = profileContext.switchError ?? "Failed to switch profile"
+                                                errorMessage = profileContext.switchError ?? "profile_switch_failed_message".localized
                                                 if errorMessage?.contains("Upgrade") == true {
                                                     showUpgradePrompt = true
                                                 } else {
@@ -124,7 +124,7 @@ struct ProfileSwitcherSheet: View {
                                             if success {
                                                 dismiss()
                                             } else {
-                                                errorMessage = profileContext.switchError ?? "Failed to switch profile"
+                                                errorMessage = profileContext.switchError ?? "profile_switch_failed_message".localized
                                                 if errorMessage?.contains("Upgrade") == true {
                                                     showUpgradePrompt = true
                                                 } else {
@@ -141,11 +141,11 @@ struct ProfileSwitcherSheet: View {
                                         Image(systemName: "person.2.slash")
                                             .font(.system(size: 40))
                                             .foregroundColor(AppTheme.Colors.textSecondary)
-                                        Text("No profiles found")
+                                        Text("no_profiles_found".localized)
                                             .font(AppTheme.Fonts.body(size: 16))
                                             .foregroundColor(AppTheme.Colors.textSecondary)
-                                        Text("Add a partner profile to get started")
-                                            .font(AppTheme.Fonts.caption(size: 14))
+                                        Text("add_partner_to_start".localized)
+                                            .font(AppTheme.Fonts.body(size: 14))
                                             .foregroundColor(AppTheme.Colors.textTertiary)
                                     }
                                     .padding(.top, 40)
@@ -163,8 +163,8 @@ struct ProfileSwitcherSheet: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.system(size: 18))
-                                Text("Manage Birth Charts")
-                                    .font(AppTheme.Fonts.body(size: 15))
+                                Text("manage_birth_charts".localized)
+                                    .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .semibold))
@@ -198,8 +198,8 @@ struct ProfileSwitcherSheet: View {
                 }
             }
         }
-        .alert("Profile Switch Failed", isPresented: $showError) {
-            Button("OK", role: .cancel) { }
+        .alert("profile_switch_failed_title".localized, isPresented: $showError) {
+            Button("ok_action".localized, role: .cancel) { }
         } message: {
             Text(errorMessage ?? "Unknown error")
         }
@@ -229,11 +229,11 @@ struct ProfileSwitcherSheet: View {
             }
         }
         .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
-            Button("Upgrade") {
+            Button("upgrade_action".localized) {
                 limitMessage = nil
                 showUpgradePrompt = true
             }
-            Button("OK", role: .cancel) {
+            Button("ok_action".localized, role: .cancel) {
                 limitMessage = nil
             }
         } message: {
@@ -327,8 +327,8 @@ private struct ActiveProfileCard: View {
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
                 if profile.isSelf {
-                    Text("YOU")
-                        .font(AppTheme.Fonts.caption(size: 10))
+                    Text("you_label".localized)
+                        .font(AppTheme.Fonts.caption(size: 9).weight(.bold))
                         .foregroundColor(AppTheme.Colors.gold)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -337,8 +337,8 @@ private struct ActiveProfileCard: View {
                 }
             }
             
-            Text("Active Profile")
-                .font(AppTheme.Fonts.caption(size: 12))
+            Text("active_profile".localized)
+                .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
@@ -355,7 +355,7 @@ private struct ActiveProfileCard: View {
         .cornerRadius(16)
         .padding(.horizontal)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Active profile: \(profile.name)\(profile.isSelf ? ", you" : "")")
+        .accessibilityLabel(String(format: "a11y_active_profile_format".localized, profile.name, profile.isSelf ? "a11y_you_suffix".localized : ""))
     }
 }
 
@@ -386,8 +386,8 @@ struct ProfileRow: View {
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         
                         if profile.isSelf {
-                            Text("YOU")
-                                .font(AppTheme.Fonts.caption(size: 10))
+                            Text("you_label".localized)
+                                .font(AppTheme.Fonts.caption(size: 9).weight(.bold))
                                 .foregroundColor(AppTheme.Colors.gold)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -396,7 +396,7 @@ struct ProfileRow: View {
                         }
                     }
                     
-                    Text(profile.dateOfBirth)
+                    Text(profile.formattedDateOfBirth)
                         .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -417,7 +417,7 @@ struct ProfileRow: View {
             )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Switch to \(profile.name)\(profile.isSelf ? ", your profile" : "")")
+        .accessibilityLabel(String(format: "a11y_switch_profile_format".localized, profile.name, profile.isSelf ? "a11y_your_profile_suffix".localized : ""))
         .accessibilityHint("Double tap to switch")
     }
 }

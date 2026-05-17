@@ -10,6 +10,7 @@ struct PartnerPickerSheet: View {
     @Binding var isPresented: Bool
     let gender: String? // nil = all, "male", "female"
     let excludeIds: Set<String> // IDs to exclude (already selected partners + active profile)
+    let forCompatibilityOnly: Bool // If true, only show charts marked for compatibility
     let onSelect: (PartnerProfile) -> Void
     
     @State private var viewModel = PartnerProfileViewModel()
@@ -51,6 +52,11 @@ struct PartnerPickerSheet: View {
             }
         }
         
+        // Filter by compatibility flag
+        if forCompatibilityOnly {
+            result = result.filter { $0.forCompatibility }
+        }
+        
         return result
     }
     
@@ -77,13 +83,13 @@ struct PartnerPickerSheet: View {
                     addNewButton
                 }
             }
-            .navigationTitle("Select Birth Chart")
+            .navigationTitle("select_birth_chart_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .preferredColorScheme(.dark)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("cancel_action".localized) {
                         HapticManager.shared.play(.light)
                         isPresented = false
                     }
@@ -111,11 +117,11 @@ struct PartnerPickerSheet: View {
                 SubscriptionView()
             }
             .alert("Profile Limit Reached", isPresented: .constant(limitMessage != nil)) {
-                Button("Upgrade") {
+                Button("upgrade_action".localized) {
                     limitMessage = nil
                     showUpgradePrompt = true
                 }
-                Button("OK", role: .cancel) {
+                Button("ok_action".localized, role: .cancel) {
                     limitMessage = nil
                 }
             } message: {
@@ -131,7 +137,7 @@ struct PartnerPickerSheet: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(AppTheme.Colors.gold)
             
-            TextField("Search birth charts...", text: $searchText)
+            TextField("search_birth_charts_placeholder".localized, text: $searchText)
                 .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .autocorrectionDisabled()
@@ -155,7 +161,7 @@ struct PartnerPickerSheet: View {
             Spacer()
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-            Text("Loading profiles...")
+            Text("loading_birth_charts".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             Spacer()
@@ -173,11 +179,11 @@ struct PartnerPickerSheet: View {
                 .opacity(0.8)
             
             if viewModel.partners.isEmpty {
-                Text("No saved profiles yet")
+                Text("no_saved_birth_charts_yet".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             } else {
-                Text("No matches found")
+                Text("no_matches_found".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
@@ -271,7 +277,7 @@ struct PartnerPickerSheet: View {
             HStack(spacing: 8) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 20))
-                Text("Add New Birth Chart")
+                Text("add_new_birth_chart_action".localized)
                     .font(AppTheme.Fonts.body(size: 16))
             }
             .foregroundStyle(AppTheme.Colors.premiumGradient)
@@ -301,7 +307,7 @@ struct PartnerPickerSheet: View {
                 } else if result.limit == 0 {
                     showUpgradePrompt = true
                 } else {
-                    limitMessage = "You can save up to \(result.limit) profiles. Upgrade to Plus for unlimited profiles."
+                    limitMessage = "You can save up to \(result.limit) birth charts. Upgrade to Plus for unlimited."
                 }
             }
         }
@@ -314,7 +320,8 @@ struct PartnerPickerSheet: View {
     PartnerPickerSheet(
         isPresented: .constant(true),
         gender: nil,
-        excludeIds: []
+        excludeIds: [],
+        forCompatibilityOnly: false
     ) { partner in
         print("Selected: \(partner.name)")
     }

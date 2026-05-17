@@ -36,8 +36,8 @@ struct DeleteAccountSheet: View {
                     .padding(.top, 20)
                     
                     // Title
-                    Text("Delete Your Account?")
-                        .font(AppTheme.Fonts.display(size: 24))
+                    Text("delete_your_account".localized)
+                        .font(AppTheme.Fonts.title(size: 24))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                     
@@ -45,15 +45,15 @@ struct DeleteAccountSheet: View {
                     VStack(alignment: .leading, spacing: 14) {
                         warningBullet(
                             icon: "xmark.circle.fill",
-                            text: "Your account will be permanently deactivated"
+                            text: "account_delete_warning_1".localized
                         )
                         warningBullet(
                             icon: "envelope.badge.fill",
-                            text: "You will NOT be able to sign in with this email again"
+                            text: "account_delete_warning_2".localized
                         )
                         warningBullet(
                             icon: "trash.fill",
-                            text: "All your data (chats, matches, birth profiles) will be inaccessible"
+                            text: "account_delete_warning_3".localized
                         )
                     }
                     .padding(.horizontal, 8)
@@ -65,8 +65,8 @@ struct DeleteAccountSheet: View {
                                 .font(.system(size: 16))
                                 .foregroundColor(.orange)
                             
-                            Text("Please cancel your subscription in the App Store before deleting your account.")
-                                .font(AppTheme.Fonts.body(size: 14))
+                            Text("cancel_subscription_first".localized)
+                                .font(AppTheme.Fonts.caption(size: 13))
                                 .foregroundColor(.orange)
                         }
                         .padding(14)
@@ -82,8 +82,8 @@ struct DeleteAccountSheet: View {
                     
                     // Confirmation input
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Type DELETE to confirm")
-                            .font(AppTheme.Fonts.title(size: 14))
+                        Text("type_delete_to_confirm".localized)
+                            .font(AppTheme.Fonts.caption(size: 13))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                         
                         TextField("", text: $confirmationText)
@@ -132,8 +132,8 @@ struct DeleteAccountSheet: View {
                                     Image(systemName: "trash.fill")
                                         .font(.system(size: 14))
                                 }
-                                Text("Delete Account")
-                                    .font(AppTheme.Fonts.title(size: 16))
+                                Text("delete_account".localized)
+                                    .font(AppTheme.Fonts.body(size: 16).weight(.bold))
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -147,8 +147,8 @@ struct DeleteAccountSheet: View {
                         
                         // Cancel button
                         Button(action: { dismiss() }) {
-                            Text("Cancel")
-                                .font(AppTheme.Fonts.title(size: 16))
+                            Text("cancel_action".localized)
+                                .font(AppTheme.Fonts.body(size: 16).weight(.medium))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)

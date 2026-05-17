@@ -1,89 +1,163 @@
 import SwiftUI
 
-/// Premium Transit Influence Card matching reference mockup
-/// Shows planet icon, badge, description with cosmic background
+/// Premium Transit Influence Card matching Current Dasha style
+/// Professional layout: Badge top right, Arrow bottom right, animated golden border
 struct TransitInfluenceCard: View {
     let transit: TransitInfluence
     
     var body: some View {
-        HStack(spacing: 16) {
-            // Planet Icon (3D style)
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [planetGlowColor.opacity(0.6), planetGlowColor.opacity(0.1)],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 30
-                        )
-                    )
-                    .frame(width: 56, height: 56)
-                
-                Image(systemName: planetSymbol)
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color.white, planetGlowColor],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .shadow(color: planetGlowColor.opacity(0.8), radius: 8)
-            }
-            
-            // Content
-            VStack(alignment: .leading, spacing: 4) {
-                // Planet Name + Badge
-                HStack(spacing: 8) {
-                    Text("\(transit.planet) Transit")
-                        .font(AppTheme.Fonts.premiumDisplay(size: 16))
+        ZStack {
+            // Main content
+            VStack(alignment: .leading, spacing: 12) {
+                // Header Row: Icon + Planet Name (Badge is in overlay at top right)
+                HStack(spacing: 12) {
+                    // Planet Icon
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [planetGlowColor.opacity(0.4), planetGlowColor.opacity(0.1)],
+                                    center: .center,
+                                    startRadius: 0,
+                                    endRadius: 25
+                                )
+                            )
+                            .frame(width: 44, height: 44)
+                        
+                        Image(systemName: planetSymbol)
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color.white, planetGlowColor],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                    }
+                    
+                    // Planet Transit Name
+                    Text("\(localizedPlanet) Transit".localized)
+                        .font(AppTheme.Fonts.premiumDisplay(size: 17))
                         .foregroundColor(.white)
                     
-                    // Badge Pill
-                    Text(transit.badge)
-                        .font(AppTheme.Fonts.caption(size: 10))
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(badgeColor)
-                        )
+                    Spacer()
+                }
+                
+                // Sign & House info
+                HStack(spacing: 8) {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.Colors.gold.opacity(0.8))
+                    
+                    Text("\(localizedSignName(for: transit.sign)) · \("house_label".localized) \(transit.house)")
+                        .font(AppTheme.Fonts.body(size: 14))
+                        .fontWeight(.medium)
+                        .foregroundColor(AppTheme.Colors.goldLight)
                 }
                 
                 // Description
                 Text(transit.description)
                     .font(AppTheme.Fonts.body(size: 13))
-                    .foregroundColor(Color.white.opacity(0.8))
-                    .lineLimit(2)
+                    .foregroundColor(Color.white.opacity(0.7))
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                // Spacer to push arrow to bottom
+                Spacer(minLength: 0)
             }
+            .padding(16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             
-            Spacer()
+            // Top Right: Badge Pill (overlay)
+            VStack {
+                HStack {
+                    Spacer()
+                    Text(transit.badge)
+                        .font(AppTheme.Fonts.caption(size: 11))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(badgeColor)
+                        )
+                }
+                Spacer()
+            }
+            .padding(.top, 16)
+            .padding(.trailing, 16)
+            
+            // Bottom Right: Animated Arrow click indicator
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.forward.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .scaleEffect(1.0)
+                }
+            }
+            .padding(.bottom, 12)
+            .padding(.trailing, 12)
         }
-        .padding(16)
+        .frame(minHeight: 120)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.4),
-                            Color(red: 0.1, green: 0.1, blue: 0.15).opacity(0.6)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(badgeColor.opacity(0.3), lineWidth: 1)
+                .fill(AppTheme.Colors.cardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    AppTheme.Colors.gold.opacity(0.5),
+                    lineWidth: 2
                 )
         )
-        .shadow(color: badgeColor.opacity(0.2), radius: 10, x: 0, y: 5)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.08), radius: 8, x: 0, y: 4)
     }
     
     // MARK: - Computed Properties
+    
+    /// Localized planet name
+    var localizedPlanet: String {
+        switch transit.planet.lowercased() {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return transit.planet
+        }
+    }
+    
+    /// Localized sign name from abbreviation
+    func localizedSignName(for sign: String) -> String {
+        switch sign {
+        case "Ar": return "sign_ar".localized
+        case "Ta": return "sign_ta".localized
+        case "Ge": return "sign_ge".localized
+        case "Ca": return "sign_ca".localized
+        case "Le": return "sign_le".localized
+        case "Vi": return "sign_vi".localized
+        case "Li": return "sign_li".localized
+        case "Sc": return "sign_sc".localized
+        case "Sg": return "sign_sg".localized
+        case "Cp": return "sign_cp".localized
+        case "Aq": return "sign_aq".localized
+        case "Pi": return "sign_pi".localized
+        default: return sign
+        }
+    }
     
     var planetSymbol: String {
         switch transit.planet.lowercased() {
@@ -124,6 +198,16 @@ struct TransitInfluenceCard: View {
         default: return AppTheme.Colors.gold
         }
     }
+    
+    func fullSignName(for sign: String) -> String {
+        let signMap: [String: String] = [
+            "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini",
+            "Ca": "Cancer", "Le": "Leo", "Vi": "Virgo",
+            "Li": "Libra", "Sc": "Scorpio", "Sg": "Sagittarius",
+            "Cp": "Capricorn", "Aq": "Aquarius", "Pi": "Pisces"
+        ]
+        return signMap[sign] ?? sign
+    }
 }
 
 /// Compact Transit Orb (Divine Gold Edition)
@@ -131,62 +215,64 @@ struct TransitOrbView: View {
     let transit: TransitInfluence
     
     var body: some View {
-        VStack(spacing: 8) { // iOS HIG: 8pt grid
-            // Planet Orb
+        VStack(spacing: 4) { // Reduced spacing for tighter layout
+            // Planet Orb with centered name badge (floating together)
             ZStack {
                 // Planet Image Asset (Premium AI Generated)
                 Image(planetImageName)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 60, height: 60)
-                    // Dynamic premium shadow that pulses with the float
-                    .shadow(
-                        color: AppTheme.Colors.gold.opacity(isHovering ? 0.4 : 0.2),
-                        radius: isHovering ? 8 : 4,
-                        x: 0,
-                        y: isHovering ? 5 : 2
+                
+                // Planet Name Badge (centered, floating with planet)
+                Text(localizedPlanet)
+                    .font(AppTheme.Fonts.caption(size: 9))
+                    .fontWeight(.semibold)
+                    .foregroundColor(AppTheme.Colors.gold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(
+                        Capsule()
+                            .fill(Color(red: 0.08, green: 0.08, blue: 0.12).opacity(0.85))
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(AppTheme.Colors.gold.opacity(0.4), lineWidth: 0.5)
+                            )
                     )
-                    // Gentle floating movement
-                    .offset(y: isHovering ? -3 : 3)
-            }
-            .overlay(alignment: .bottomTrailing) {
-                // Status Dot (Keeping this functional element)
+                    .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+                
+                // Status-colored border circle (68x68 centered around 60x60 planet)
                 Circle()
-                    .fill(badgeColor)
-                    .frame(width: 12, height: 12)
-                    .overlay(
-                        Circle()
-                            .strokeBorder(Color(red: 0.1, green: 0.1, blue: 0.15), lineWidth: 2)
-                    )
-                    .offset(x: 2, y: 2)
+                    .stroke(borderColor.opacity(0.5), lineWidth: 2)
+                    .frame(width: 68, height: 68)
             }
+            .frame(width: 68, height: 68) // Container fits border without clipping
+            // Static premium shadow
+            .shadow(
+                color: borderColor.opacity(0.25),
+                radius: 5,
+                x: 0,
+                y: 3
+            )
             
-            // Planet Name
-            Text(transit.planet)
-                .font(AppTheme.Fonts.caption(size: 11))
-                .fontWeight(.semibold)
-                .foregroundColor(AppTheme.Colors.gold)
-            
-            // Sign (Full Name)
-            Text(fullSignName)
+            // Sign (Full Name - Localized)
+            Text(localizedSignName)
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary)
+            
+            // Arrow Click Indicator (static — pulse removed for battery optimization)
+            Image(systemName: "arrow.forward.circle.fill")
+                .font(.system(size: 14))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         }
         .frame(width: 80) // Slightly wider for elegance
-        .onAppear {
-            // Random delay for organic feel
-            let randomDelay = Double.random(in: 0...2.0)
-            withAnimation(
-                .easeInOut(duration: 2.5)
-                .repeatForever(autoreverses: true)
-                .delay(randomDelay)
-            ) {
-                isHovering = true
-            }
-        }
     }
-    
-    @State private var isHovering = false
     
     // MARK: - Computed Properties
     
@@ -195,21 +281,53 @@ struct TransitOrbView: View {
         return "planet_\(name)"
     }
     
-    // Note: planetSymbol and planetGlowColor removed as we actully use assets now
-    
-    // Note: planetGlowColor removed as we are unifying to Gold theme
-    
-    var badgeColor: Color {
+    // Border color based on transit status (green=positive, red=caution, yellow=neutral)
+    var borderColor: Color {
         switch transit.badgeType.lowercased() {
-        case "positive": return AppTheme.Colors.success
-        case "caution": return AppTheme.Colors.error
-        case "warning": return AppTheme.Colors.error
-        case "neutral": return AppTheme.Colors.textSecondary
+        case "positive": return AppTheme.Colors.success // Green
+        case "caution": return AppTheme.Colors.error    // Red
+        case "warning": return AppTheme.Colors.error    // Red
+        case "neutral": return AppTheme.Colors.warning   // Yellow/Orange
         default: return AppTheme.Colors.gold
         }
     }
     
-    /// Convert abbreviated sign to full name
+    /// Localized sign name from abbreviation
+    var localizedSignName: String {
+        switch transit.sign {
+        case "Ar": return "sign_ar".localized
+        case "Ta": return "sign_ta".localized
+        case "Ge": return "sign_ge".localized
+        case "Ca": return "sign_ca".localized
+        case "Le": return "sign_le".localized
+        case "Vi": return "sign_vi".localized
+        case "Li": return "sign_li".localized
+        case "Sc": return "sign_sc".localized
+        case "Sg": return "sign_sg".localized
+        case "Cp": return "sign_cp".localized
+        case "Aq": return "sign_aq".localized
+        case "Pi": return "sign_pi".localized
+        default: return transit.sign
+        }
+    }
+    
+    /// Localized planet name
+    var localizedPlanet: String {
+        switch transit.planet.lowercased() {
+        case "sun": return "planet_sun".localized
+        case "moon": return "planet_moon".localized
+        case "mars": return "planet_mars".localized
+        case "mercury": return "planet_mercury".localized
+        case "jupiter": return "planet_jupiter".localized
+        case "venus": return "planet_venus".localized
+        case "saturn": return "planet_saturn".localized
+        case "rahu": return "planet_rahu".localized
+        case "ketu": return "planet_ketu".localized
+        default: return transit.planet
+        }
+    }
+    
+    /// Convert abbreviated sign to full name (English - kept for backwards compatibility)
     var fullSignName: String {
         let signMap: [String: String] = [
             "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini",
@@ -224,11 +342,12 @@ struct TransitOrbView: View {
 /// Section displaying transit influences as horizontal scroll
 struct TransitInfluencesSection: View {
     let transits: [TransitInfluence]
+    var onTransitTapped: ((TransitInfluence) -> Void)? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Header (no extra padding - parent handles it)
-            Text("Current Transits")
+            Text("current_transits".localized)
                 .font(AppTheme.Fonts.premiumDisplay(size: 18))
                 .goldGradient()
             
@@ -236,7 +355,13 @@ struct TransitInfluencesSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 4) {
                     ForEach(transits) { transit in
-                        TransitOrbView(transit: transit)
+                        Button(action: {
+                            onTransitTapped?(transit)
+                        }) {
+                            TransitOrbView(transit: transit)
+                        }
+                        .buttonStyle(ScaleButtonStyle())
+                        .accessibilityIdentifier("transit_card_\(transit.planet.lowercased())")
                     }
                 }
                 .padding(.horizontal, 12) // Match parent edge

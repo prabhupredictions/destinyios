@@ -632,8 +632,8 @@ final class ComparisonPDFRenderer {
             currentY += 4
         }
         
-        // LLM summary — rendered with markdown parser for proper tables
-        let summary = result.result.summary
+        // LLM summary — rendered with markdown parser for proper tables (strip follow-up section)
+        let summary = ComparisonOverviewView.stripFollowUpSection(result.result.summary)
         if !summary.isEmpty {
             drawMarkdownContent(summary)
         }

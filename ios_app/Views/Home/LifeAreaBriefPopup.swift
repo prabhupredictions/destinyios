@@ -73,12 +73,13 @@ struct LifeAreaBriefPopup: View {
                     HStack(spacing: 6) {
                         Image(systemName: "sparkles")
                             .font(.system(size: 12))
-                        Text("Ask More...")
+                        Text("ask_more_ellipsis".localized)
                             .font(AppTheme.Fonts.body(size: 13))
                     }
                     .foregroundColor(AppTheme.Colors.gold)
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
+                .accessibilityIdentifier("life_area_ask_more_button")
             }
             .padding(16)
             .frame(width: 280)

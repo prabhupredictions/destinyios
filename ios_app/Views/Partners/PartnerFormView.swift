@@ -7,8 +7,8 @@ enum PartnerFormMode {
     
     var title: String {
         switch self {
-        case .add: return "Add Profile"
-        case .edit: return "Edit Profile"
+        case .add: return "partner_form_add_title".localized
+        case .edit: return "partner_form_edit_title".localized
         }
     }
     
@@ -50,7 +50,7 @@ struct PartnerFormView: View {
     @State private var isDateSelected = false
     @State private var isTimeSelected = false
     
-    // Age check
+    // Age checks
     private var isUnder13: Bool {
         guard isDateSelected else { return false }
         let calendar = Calendar.current
@@ -58,8 +58,18 @@ struct PartnerFormView: View {
         return (ageComponents.year ?? 0) < 13
     }
     
+    private var isUnder18: Bool {
+        guard isDateSelected else { return false }
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: dateOfBirth, to: Date())
+        return (ageComponents.year ?? 0) <= 18
+    }
+    
     // Guardian consent state
     @State private var guardianConsentGiven = false
+    
+    // Compatibility matching flag (default ON for all new birth charts)
+    @State private var forCompatibility = true
     
     // Validation
     private var isValid: Bool {
@@ -78,7 +88,7 @@ struct PartnerFormView: View {
     // Formatted helpers
     private var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: dateOfBirth)
     }
     
@@ -99,9 +109,9 @@ struct PartnerFormView: View {
                     VStack(spacing: 24) {
                         // Name field uses PremiumInputField
                         PremiumInputField(
-                            label: "Name",
+                            label: "partner_form_name_label".localized,
                             icon: "person.circle",
-                            placeholder: "Enter profile name",
+                            placeholder: "partner_form_name_placeholder".localized,
                             text: $name,
                             isFocused: $isNameFocused
                         )
@@ -109,8 +119,8 @@ struct PartnerFormView: View {
                         // Gender
                         PremiumSelectionRow(
                             icon: "person",
-                            title: "Gender",
-                            value: gender.isEmpty ? "Select Gender" : gender.capitalized,
+                            title: "gender_identity".localized,
+                            value: gender.isEmpty ? "select_gender".localized : gender.capitalized,
                             isPlaceholder: gender.isEmpty
                         ) {
                             isNameFocused = false
@@ -120,8 +130,8 @@ struct PartnerFormView: View {
                         // Date of Birth
                         PremiumSelectionRow(
                             icon: "calendar",
-                            title: "Date of Birth",
-                            value: isDateSelected ? formattedDate : "Select Date",
+                            title: "date_of_birth".localized,
+                            value: isDateSelected ? formattedDate : "partner_form_date_placeholder".localized,
                             isPlaceholder: !isDateSelected
                         ) {
                             isNameFocused = false
@@ -132,8 +142,8 @@ struct PartnerFormView: View {
                         VStack(spacing: 12) {
                             PremiumSelectionRow(
                                 icon: "clock",
-                                title: "Time of Birth",
-                                value: isTimeSelected ? formattedTime : "Select Time",
+                                title: "time_of_birth".localized,
+                                value: isTimeSelected ? formattedTime : "partner_form_time_placeholder".localized,
                                 isDisabled: birthTimeUnknown,
                                 isPlaceholder: !isTimeSelected && !birthTimeUnknown
                             ) {
@@ -184,7 +194,7 @@ struct PartnerFormView: View {
                                             .foregroundColor(guardianConsentGiven ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                             .padding(.top, 2)
                                         
-                                        Text("By adding this birth chart, you confirm that you are the parent or legal guardian and have the authority to provide this information")
+                                        Text("partner_consent_text".localized)
                                             .font(AppTheme.Fonts.caption(size: 13))
                                             .foregroundColor(AppTheme.Colors.textSecondary)
                                             .multilineTextAlignment(.leading)
@@ -195,11 +205,41 @@ struct PartnerFormView: View {
                             .padding(.vertical, 4)
                         }
                         
+                        // For compatibility matching toggle
+                        VStack(alignment: .leading, spacing: 6) {
+                            Button(action: {
+                                guard !isUnder18 else { return }
+                                HapticManager.shared.play(.light)
+                                withAnimation { forCompatibility.toggle() }
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: (forCompatibility && !isUnder18) ? "checkmark.square.fill" : "square")
+                                        .font(.system(size: 18))
+                                        .foregroundColor((forCompatibility && !isUnder18) ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                                    
+                                    Text("for_compatibility_matching".localized)
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                        .foregroundColor(isUnder18 ? AppTheme.Colors.textTertiary : AppTheme.Colors.textSecondary)
+                                    
+                                    Spacer()
+                                }
+                                .padding(.leading, 4)
+                            }
+                            .disabled(isUnder18)
+                            
+                            if isUnder18 {
+                                Text("compatibility_age_restriction".localized)
+                                    .font(AppTheme.Fonts.caption(size: 11))
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
+                                    .padding(.leading, 4)
+                            }
+                        }
+                        
                         // City of Birth
                         PremiumSelectionRow(
                             icon: "location",
-                            title: "Place of Birth",
-                            value: cityOfBirth.isEmpty ? "Select City" : cityOfBirth,
+                            title: "place_of_birth".localized,
+                            value: cityOfBirth.isEmpty ? "partner_form_place_placeholder".localized : cityOfBirth,
                             isPlaceholder: cityOfBirth.isEmpty
                         ) {
                             isNameFocused = false
@@ -209,7 +249,7 @@ struct PartnerFormView: View {
                         Spacer(minLength: 20)
                         
                         // Save Button
-                        ShimmerButton(title: "Save Profile", icon: "checkmark") {
+                        ShimmerButton(title: "partner_form_save_button".localized, icon: "checkmark") {
                             savePartner()
                         }
                         .disabled(!isValid || isSaving)
@@ -226,7 +266,7 @@ struct PartnerFormView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("cancel_action".localized) {
                         HapticManager.shared.play(.light)
                         dismiss()
                     }
@@ -246,7 +286,7 @@ struct PartnerFormView: View {
                 HapticManager.shared.play(.light)
             }) {
                 DatePickerSheet(
-                    title: "Date of Birth",
+                    title: "date_of_birth".localized,
                     selection: $dateOfBirth,
                     components: .date
                 )
@@ -256,20 +296,20 @@ struct PartnerFormView: View {
                 HapticManager.shared.play(.light)
             }) {
                 DatePickerSheet(
-                    title: "Time of Birth",
+                    title: "time_of_birth".localized,
                     selection: $timeOfBirth,
                     components: .hourAndMinute
                 )
             }
             .sheet(isPresented: $showGenderSheet) {
                 PremiumSelectionSheet(
-                    title: "Select Gender",
+                    title: "select_gender".localized,
                     selectedValue: $gender,
                     options: [
-                        ("male", "Male"),
-                        ("female", "Female"),
-                        ("non-binary", "Non-binary"),
-                        ("prefer_not_to_say", "Prefer not to say")
+                        ("male", "male".localized),
+                        ("female", "female".localized),
+                        ("non-binary", "non_binary".localized),
+                        ("prefer_not_to_say", "prefer_not_to_say".localized)
                     ],
                     onDismiss: { showGenderSheet = false }
                 )
@@ -291,6 +331,8 @@ struct PartnerFormView: View {
         cityOfBirth = partner.cityOfBirth ?? ""
         latitude = partner.latitude ?? 0
         longitude = partner.longitude ?? 0
+        guardianConsentGiven = partner.guardianConsentGiven
+        forCompatibility = partner.forCompatibility
         
         // Parse date of birth
         let formatter = DateFormatter()
@@ -319,6 +361,9 @@ struct PartnerFormView: View {
         HapticManager.shared.play(.medium)
         isSaving = true
         
+        // Force forCompatibility to false for under-18 (cannot be used for matching)
+        let finalForCompatibility = isUnder18 ? false : forCompatibility
+        
         // Format date
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -342,7 +387,9 @@ struct PartnerFormView: View {
             longitude: longitude == 0 ? nil : longitude,
             timezone: nil,
             birthTimeUnknown: birthTimeUnknown,
-            consentGiven: true
+            consentGiven: true,
+            guardianConsentGiven: guardianConsentGiven,
+            forCompatibility: finalForCompatibility
         )
         
         onSave(partner)
@@ -353,5 +400,5 @@ struct PartnerFormView: View {
 // MARK: - Preview
 
 #Preview {
-    PartnerFormView(mode: .add) { _ in }
+    PartnerFormView(mode: .add) { newPartner in }
 }

@@ -11,6 +11,8 @@ struct CompatibilityView: View {
     @State private var showChartsSheet = false
     @State private var showPartnerPicker = false
     @State private var savePartnerForFuture = false
+    @State private var partnerFromSavedChart = false
+    @State private var isLoadingFromSaved = false  // guards onChange from firing during programmatic field population
     
     // Focus State for Name Field
     @FocusState private var isNameFocused: Bool
@@ -44,12 +46,13 @@ struct CompatibilityView: View {
         ZStack {
             // Cosmic Background (Soul of the App)
             CosmicBackgroundView()
+
             
             // Multi-Partner: Comparison Overview
             if viewModel.showComparisonOverview && !viewModel.comparisonResults.isEmpty {
                 ComparisonOverviewView(
                     results: viewModel.comparisonResults,
-                    userName: viewModel.boyName.isEmpty ? "You" : viewModel.boyName,
+                    userName: viewModel.boyName.isEmpty ? "you_label".localized : viewModel.boyName,
                     onSelectPartner: { index in
                         // Navigate to individual result
                         if viewModel.comparisonResults.indices.contains(index) {
@@ -70,34 +73,7 @@ struct CompatibilityView: View {
             }
             // Single Partner or Individual Result View
             else if viewModel.showResult, let result = viewModel.result {
-                CompatibilityResultView(
-                    result: result,
-                    boyName: viewModel.boyName,
-                    girlName: viewModel.girlName,
-                    boyDob: viewModel.formattedBoyDob,
-                    girlDob: viewModel.formattedGirlDob,
-                    boyCity: viewModel.boyCity,
-                    girlCity: viewModel.girlCity,
-                    onNewAnalysis: {
-                        viewModel.reset()
-                    },
-                    onBack: {
-                        // If we came from comparison overview, go back there
-                        if viewModel.comparisonResults.count > 1 {
-                            viewModel.showResult = false
-                            viewModel.showComparisonOverview = true
-                        } else {
-                            viewModel.showResult = false
-                        }
-                    },
-                    onHistory: nil,
-                    onCharts: {
-                        showChartsSheet = true
-                    },
-                    onLoadHistory: { item in
-                        viewModel.loadFromHistory(item)
-                    }
-                )
+                resultView(result: result)
             } else {
                 compatibilityForm
             }
@@ -124,6 +100,7 @@ struct CompatibilityView: View {
                 }
             }
         }
+        .accessibilityIdentifier("compat_screen")
         .sheet(isPresented: $showBoyLocationSearch) {
             LocationSearchView(
                 selectedCity: $viewModel.boyCity,
@@ -173,8 +150,8 @@ struct CompatibilityView: View {
                 let boyAsc = result.analysisData?.boy?.chartData?.d1["Ascendant"]?.sign
                 let girlAsc = result.analysisData?.girl?.chartData?.d1["Ascendant"]?.sign
                 ChartComparisonSheet(
-                    boyName: viewModel.boyName.isEmpty ? "You" : viewModel.boyName,
-                    girlName: viewModel.girlName.isEmpty ? "Partner" : viewModel.girlName,
+                    boyName: viewModel.boyName.isEmpty ? "you_label".localized : viewModel.boyName,
+                    girlName: viewModel.girlName.isEmpty ? "partner_label".localized : viewModel.girlName,
                     boyChartData: result.analysisData?.boy?.chartData,
                     girlChartData: result.analysisData?.girl?.chartData,
                     boyAscendant: boyAsc,
@@ -201,29 +178,14 @@ struct CompatibilityView: View {
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
         }
-        // "Loaded from history" toast when cached match is used
-        .overlay(alignment: .top) {
-            if viewModel.historyLoadedToast {
-                HStack(spacing: 8) {
-                    Image(systemName: "clock.arrow.circlepath")
-                    Text("Loaded from history")
-                }
-                .font(AppTheme.Fonts.body(size: 14))
-                .foregroundColor(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .fill(Color.purple.opacity(0.85))
-                )
-                .padding(.top, 60)
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        withAnimation { viewModel.historyLoadedToast = false }
-                    }
-                }
-            }
+        // Duplicate birth chart alert (suppress when partner came from saved charts)
+        .alert("duplicate_birth_chart_title".localized, isPresented: .init(
+            get: { viewModel.duplicateMessage != nil && !partnerFromSavedChart },
+            set: { if !$0 { viewModel.duplicateMessage = nil } }
+        )) {
+            Button("ok_action".localized, role: .cancel) { viewModel.duplicateMessage = nil }
+        } message: {
+            Text(viewModel.duplicateMessage ?? "")
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.historyLoadedToast)
         .sheet(isPresented: $showHistorySheet) {
@@ -260,8 +222,12 @@ struct CompatibilityView: View {
             PartnerPickerSheet(
                 isPresented: $showPartnerPicker,
                 gender: nil,  // Show all partners, let user pick
-                excludeIds: excludeIds
+                excludeIds: excludeIds,
+                forCompatibilityOnly: true
             ) { partner in
+                // Suppress onChange handlers during programmatic field population
+                isLoadingFromSaved = true
+
                 // Fill form with selected partner data
                 viewModel.girlName = partner.name
                 viewModel.partnerGender = partner.gender
@@ -269,10 +235,10 @@ struct CompatibilityView: View {
                 viewModel.girlLatitude = partner.latitude ?? 0
                 viewModel.girlLongitude = partner.longitude ?? 0
                 viewModel.partnerTimeUnknown = partner.birthTimeUnknown
-                
+
                 // Store the saved profile ID for filtering
                 viewModel.currentPartner.savedProfileId = partner.id
-                
+
                 // Parse and set date
                 let dateFormatter = DateFormatter()
                 dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -280,7 +246,7 @@ struct CompatibilityView: View {
                 if let date = dateFormatter.date(from: partner.dateOfBirth) {
                     viewModel.girlBirthDate = date
                 }
-                
+
                 // Parse and set time if available
                 if let timeString = partner.timeOfBirth {
                     let timeFormatter = DateFormatter()
@@ -290,7 +256,16 @@ struct CompatibilityView: View {
                         viewModel.girlBirthTime = time
                     }
                 }
-                
+
+                // Chart is already saved — disable save checkbox
+                savePartnerForFuture = false
+                partnerFromSavedChart = true
+
+                // Reset loading guard after onChange handlers have processed
+                Task { @MainActor in
+                    isLoadingFromSaved = false
+                }
+
                 HapticManager.shared.playSuccess()
             }
         }
@@ -300,13 +275,50 @@ struct CompatibilityView: View {
         // Handle initial match loading
         .onChange(of: initialMatchItem) { oldValue, newValue in
             if let item = newValue {
+                isLoadingFromSaved = true
+                savePartnerForFuture = false
+                partnerFromSavedChart = true
                 viewModel.loadFromHistory(item)
+                Task { @MainActor in
+                    isLoadingFromSaved = false
+                }
             }
         }
         .onAppear {
+            #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("UI_TEST_MODE"),
+               initialMatchItem == nil, initialMatchGroup == nil {
+                let env = ProcessInfo.processInfo.environment
+                if let name = env["E2E_PARTNER_NAME"],
+                   let lat = Double(env["E2E_PARTNER_LAT"] ?? ""),
+                   let lon = Double(env["E2E_PARTNER_LON"] ?? ""),
+                   !name.isEmpty, lat != 0 {
+                    var partner = PartnerData()
+                    partner.name = name
+                    partner.city = env["E2E_PARTNER_CITY"] ?? ""
+                    partner.latitude = lat
+                    partner.longitude = lon
+                    let fmt = DateFormatter()
+                    fmt.dateFormat = "yyyy-MM-dd"
+                    if let dob = env["E2E_PARTNER_DOB"], let date = fmt.date(from: dob) {
+                        partner.birthDate = date
+                        partner.birthDateSet = true
+                    }
+                    let tfmt = DateFormatter()
+                    tfmt.dateFormat = "HH:mm"
+                    if let t = env["E2E_PARTNER_TIME"], let time = tfmt.date(from: t) {
+                        partner.birthTime = time
+                        partner.birthTimeSet = true
+                    }
+                    viewModel.currentPartner = partner
+                }
+            }
+            #endif
             if let item = initialMatchItem, !hasHandledInitialMatch {
                 hasHandledInitialMatch = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    savePartnerForFuture = false
+                    partnerFromSavedChart = true
                     viewModel.loadFromHistory(item)
                 }
             }
@@ -318,8 +330,11 @@ struct CompatibilityView: View {
             }
             
             // Pre-check "Save birth chart" for paid users (hide + unchecked for free users)
-            if !quotaManager.isFreePlan {
-                savePartnerForFuture = true
+            // Only if not loading from history/picker (already saved)
+            if initialMatchItem == nil && initialMatchGroup == nil {
+                // Default to unchecked - user must explicitly choose to save
+                savePartnerForFuture = false
+                partnerFromSavedChart = false
             }
         }
         .onChange(of: initialMatchGroup) { oldValue, newValue in
@@ -329,10 +344,52 @@ struct CompatibilityView: View {
         }
         .onChange(of: ProfileContextManager.shared.activeProfileId) { oldProfileId, newProfileId in
             // When profile switches, clear old match result and reload user data
+            // Note: reset() already calls loadUserDataFromProfile() internally
             if oldProfileId != newProfileId {
                 viewModel.reset()
-                // Reload user birth data for the new profile
-                viewModel.reloadUserData()
+            }
+        }
+        // Detect any partner detail modification and re-enable save checkbox
+        .onChange(of: viewModel.girlName) { _, _ in
+            guard !isLoadingFromSaved else { return }
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.girlCity) { _, _ in
+            guard !isLoadingFromSaved else { return }
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.girlBirthDate) { _, _ in
+            guard !isLoadingFromSaved else { return }
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.girlBirthTime) { _, _ in
+            guard !isLoadingFromSaved else { return }
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.partnerGender) { _, _ in
+            guard !isLoadingFromSaved else { return }
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
+            }
+        }
+        .onChange(of: viewModel.partnerTimeUnknown) { _, _ in
+            guard !isLoadingFromSaved else { return }
+            if partnerFromSavedChart {
+                partnerFromSavedChart = false
+                savePartnerForFuture = true
             }
         }
     }
@@ -347,6 +404,33 @@ struct CompatibilityView: View {
         print("[CompatibilityView] Navigating to Auth (guest data preserved for carry-forward)")
     }
     
+    // MARK: - Result View (extracted to keep body type-checkable)
+    @ViewBuilder
+    private func resultView(result: CompatibilityResult) -> some View {
+        CompatibilityResultView(
+            result: result,
+            boyName: viewModel.boyName,
+            girlName: viewModel.girlName,
+            boyDob: viewModel.formattedBoyDob,
+            girlDob: viewModel.formattedGirlDob,
+            boyCity: viewModel.boyCity,
+            girlCity: viewModel.girlCity,
+            onNewAnalysis: { viewModel.reset() },
+            onBack: {
+                if viewModel.comparisonResults.count > 1 {
+                    viewModel.showResult = false
+                    viewModel.showComparisonOverview = true
+                } else {
+                    viewModel.showResult = false
+                }
+            },
+            onHistory: nil,
+            onCharts: { showChartsSheet = true },
+            onLoadHistory: { item in viewModel.loadFromHistory(item) },
+            isFromComparison: viewModel.comparisonResults.count > 1
+        )
+    }
+
     // MARK: - Form View (Compact Single-Screen Design)
     private var compatibilityForm: some View {
         VStack(spacing: 0) {
@@ -520,16 +604,32 @@ struct CompatibilityView: View {
                         .padding(.horizontal, 8)
                     }
                     
-                    // Bottom padding for scrolling
-                    Spacer(minLength: 100) 
+                    // Bottom padding for scrolling - increased to prevent checkbox being hidden by button
+                    Spacer(minLength: 140) 
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
             }
             
             // Analyze Button (Fixed at bottom, above tab bar)
-            VStack {
+            VStack(spacing: 8) {
+                // Age restriction warning
+                if let ageMsg = viewModel.ageBlockMessage {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 13))
+                            .foregroundColor(AppTheme.Colors.gold)
+                        Text(ageMsg)
+                            .font(AppTheme.Fonts.caption(size: 12))
+                            .foregroundColor(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 4)
+                }
                 analyzeButton
+                    .disabled(viewModel.ageBlockMessage != nil)
+                    .opacity(viewModel.ageBlockMessage != nil ? 0.5 : 1)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 90) // Clear tab bar completely (tab bar + safe area + margin)
@@ -544,13 +644,13 @@ struct CompatibilityView: View {
                 HStack(spacing: 8) {
                     // Partner pills
                     ForEach(Array(viewModel.partners.enumerated()), id: \.offset) { index, partner in
-                        Button(action: { 
+                        Button(action: {
                             withAnimation(.easeInOut(duration: 0.2)) {
-                                viewModel.activePartnerIndex = index 
+                                viewModel.selectPartner(at: index)
                             }
                         }) {
                             HStack(spacing: 4) {
-                                Text("Partner \(index + 1)")
+                                Text(String(format: "partner_index_label".localized, index + 1))
                                     .font(AppTheme.Fonts.caption(size: 11))
                                 if partner.isComplete {
                                     Image(systemName: "checkmark")
@@ -576,9 +676,12 @@ struct CompatibilityView: View {
                     // Add button (Plus-only, max 3 partners)
                     let maxPartners = 3
                     let isPlus = quotaManager.isPlus
-                    let canAddMore = isPlus && viewModel.partners.count < maxPartners
-                    
-                    Button(action: { 
+                    let activeIsComplete = viewModel.partners.indices.contains(viewModel.activePartnerIndex)
+                        ? viewModel.partners[viewModel.activePartnerIndex].isComplete
+                        : false
+                    let canAddMore = isPlus && viewModel.partners.count < maxPartners && activeIsComplete
+
+                    Button(action: {
                         if !isPlus {
                             // Non-Plus: show subscription paywall
                             showSubscription = true
@@ -586,7 +689,7 @@ struct CompatibilityView: View {
                         }
                         guard canAddMore else { return }
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            viewModel.addPartner() 
+                            viewModel.addPartner()
                         }
                     }) {
                         ZStack(alignment: .topTrailing) {
@@ -609,8 +712,8 @@ struct CompatibilityView: View {
                             }
                         }
                     }
-                    .disabled(isPlus && !canAddMore)  // Only disable at max for Plus users; non-Plus always tappable (opens paywall)
-                    .accessibilityLabel(isPlus ? "Add partner" : "Upgrade to Plus to add multiple partners")
+                    .disabled(isPlus && !canAddMore)  // Disabled when at max OR active partner incomplete
+                    .accessibilityLabel("accessibility_add_partner".localized)
                     
                     Spacer()
                     
@@ -626,7 +729,7 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                                 .padding(6)
                         }
-                        .accessibilityLabel("Remove partner")
+                        .accessibilityLabel("a11y_remove_partner".localized)
                     }
                 }
                 .padding(.bottom, 4)
@@ -641,8 +744,8 @@ struct CompatibilityView: View {
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
                     ZStack(alignment: .leading) {
                         if viewModel.girlName.isEmpty {
-                            Text("Partner Name")
-                                .font(AppTheme.Fonts.body(size: 13))
+                            Text("partner_name_placeholder".localized)
+                                .font(AppTheme.Fonts.body(size: 16))
                                 .foregroundColor(AppTheme.Colors.textTertiary)
                         }
                         TextField("", text: $viewModel.girlName)
@@ -659,8 +762,8 @@ struct CompatibilityView: View {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 14))
                             .foregroundColor(AppTheme.Colors.gold)
+                            .accessibilityLabel("a11y_search_saved_partners".localized)
                     }
-                    .accessibilityLabel("Search saved partners")
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 11)
@@ -681,7 +784,7 @@ struct CompatibilityView: View {
                         Image(systemName: "person")
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
-                        Text(viewModel.partnerGender.isEmpty ? "Gender" : viewModel.partnerGender.localized)
+                        Text(viewModel.partnerGender.isEmpty ? "gender_label".localized : viewModel.partnerGender.localized)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(viewModel.partnerGender.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                             .lineLimit(1)
@@ -700,7 +803,7 @@ struct CompatibilityView: View {
                     )
                 }
                 .frame(width: 140)
-                .accessibilityLabel(viewModel.partnerGender.isEmpty ? "Select gender" : "Gender: \(viewModel.partnerGender)")
+                .accessibilityLabel(viewModel.partnerGender.isEmpty ? "select_gender_a11y".localized : String(format: "gender_value_a11y".localized, viewModel.partnerGender))
             }
             
             // Date & Time Row
@@ -714,7 +817,7 @@ struct CompatibilityView: View {
                         Image(systemName: "calendar")
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.Colors.gold.opacity(0.7))
-                        Text(viewModel.currentPartner.birthDateSet ? viewModel.formattedGirlDob : "Select Date")
+                        Text(viewModel.currentPartner.birthDateSet ? viewModel.formattedGirlDob : "select_date_action".localized)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(viewModel.currentPartner.birthDateSet ? AppTheme.Colors.textPrimary : AppTheme.Colors.textTertiary)
                             .lineLimit(1)
@@ -729,7 +832,8 @@ struct CompatibilityView: View {
                             .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                     )
                 }
-                .accessibilityLabel(viewModel.currentPartner.birthDateSet ? "Date of birth: \(viewModel.formattedGirlDob)" : "Select date of birth")
+                .accessibilityLabel(viewModel.currentPartner.birthDateSet ? String(format: "dob_value_a11y".localized, viewModel.formattedGirlDob) : "select_dob_a11y".localized)
+                .accessibilityIdentifier("compat_person2_dob")
                 
                 // Time Button
                 Button(action: { 
@@ -742,7 +846,7 @@ struct CompatibilityView: View {
                         Image(systemName: "clock")
                             .font(.system(size: 12))
                             .foregroundColor(viewModel.partnerTimeUnknown ? AppTheme.Colors.textTertiary : AppTheme.Colors.gold.opacity(0.7))
-                        Text(viewModel.partnerTimeUnknown ? "Unknown" : (viewModel.currentPartner.birthTimeSet ? viewModel.formattedGirlTime : "Select Time"))
+                        Text(viewModel.partnerTimeUnknown ? "unknown_label".localized : (viewModel.currentPartner.birthTimeSet ? viewModel.formattedGirlTime : "select_time_action".localized))
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor((viewModel.partnerTimeUnknown || !viewModel.currentPartner.birthTimeSet) ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
                             .lineLimit(1)
@@ -759,7 +863,7 @@ struct CompatibilityView: View {
                 }
                 .frame(width: 140)
                 .disabled(viewModel.partnerTimeUnknown)
-                .accessibilityLabel(viewModel.partnerTimeUnknown ? "Time of birth: unknown" : (viewModel.currentPartner.birthTimeSet ? "Time of birth: \(viewModel.formattedGirlTime)" : "Select time of birth"))
+                .accessibilityLabel(viewModel.partnerTimeUnknown ? "tob_unknown_a11y".localized : (viewModel.currentPartner.birthTimeSet ? String(format: "tob_value_a11y".localized, viewModel.formattedGirlTime) : "select_tob_a11y".localized))
             }
             
             // Place Button (full width) - Moved UP for better vertical flow
@@ -789,7 +893,7 @@ struct CompatibilityView: View {
                         .stroke(AppTheme.Colors.goldDim.opacity(0.5), lineWidth: 1)
                 )
             }
-            .accessibilityLabel(viewModel.girlCity.isEmpty ? "Select birth city" : "Birth city: \(viewModel.girlCity)")
+            .accessibilityLabel(viewModel.girlCity.isEmpty ? "select_birth_city_a11y".localized : String(format: "birth_city_value_a11y".localized, viewModel.girlCity))
             
             // Time Unknown & Save Row (Moved to Bottom)
             VStack(alignment: .leading, spacing: 4) {
@@ -809,12 +913,13 @@ struct CompatibilityView: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
-                    .accessibilityLabel("Birth time unknown")
+                    .accessibilityLabel("a11y_birth_time_unknown".localized)
                     .accessibilityAddTraits(viewModel.partnerTimeUnknown ? .isSelected : [])
                     
-                    // Save Partner Toggle (hidden for free plan users)
+                    // Save Partner Toggle (hidden for free plan users, disabled when picked from saved charts)
                     if !quotaManager.isFreePlan {
                         Button(action: {
+                            guard !partnerFromSavedChart else { return }
                             HapticManager.shared.play(.light)
                             withAnimation { savePartnerForFuture.toggle() }
                         }) {
@@ -824,10 +929,11 @@ struct CompatibilityView: View {
                                     .foregroundColor(savePartnerForFuture ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
                                 Text("save_birth_chart".localized)
                                     .font(AppTheme.Fonts.caption(size: 11))
-                                    .foregroundColor(AppTheme.Colors.textSecondary)
+                                    .foregroundColor(partnerFromSavedChart ? AppTheme.Colors.textSecondary.opacity(0.5) : AppTheme.Colors.textSecondary)
                             }
                         }
-                        .accessibilityLabel("Save partner for future")
+                        .disabled(partnerFromSavedChart)
+                        .accessibilityLabel("a11y_save_partner".localized)
                         .accessibilityAddTraits(savePartnerForFuture ? .isSelected : [])
                     }
                     
@@ -867,11 +973,12 @@ struct CompatibilityView: View {
 
     // MARK: - Analyze Button
     private var analyzeButton: some View {
+        let completedCount = viewModel.partners.filter { $0.isComplete }.count
         let buttonTitle: String = {
             if viewModel.isAnalyzing {
                 return "analyzing".localized
-            } else if viewModel.partners.count > 1 {
-                return "compare_all".localized + " (\(viewModel.partners.count))"
+            } else if completedCount > 1 {
+                return "compare_all".localized + " (\(completedCount))"
             } else {
                 return "analyze_match".localized
             }
@@ -897,12 +1004,15 @@ struct CompatibilityView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
+        .accessibilityIdentifier("compat_analyze_button")
     }
     
     private func analyzeAction() {
         Task {
             let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-            let partnerCount = viewModel.partners.count
+            // Only analyze partners with complete birth data — ignore empty tabs the user added by mistake
+            let completedPartners = viewModel.partners.filter { $0.isComplete }
+            let partnerCount = completedPartners.count
             
             // Check quota upfront for ALL partners (count-based check)
             // Single partner = count=1, multi-partner = count=N
@@ -937,9 +1047,9 @@ struct CompatibilityView: View {
                                 let timeFormatter = DateFormatter()
                                 timeFormatter.timeStyle = .short
                                 let timeStr = timeFormatter.string(from: date)
-                                viewModel.errorMessage = "Daily limit reached. Resets at \(timeStr)."
+                                viewModel.errorMessage = String(format: "daily_limit_reset_time".localized, timeStr)
                             } else {
-                                viewModel.errorMessage = "Daily limit reached. Resets tomorrow."
+                                viewModel.errorMessage = "daily_limit_reached_tomorrow".localized
                             }
                             // No sheet for daily limit
                         } else if accessResponse.reason == "overall_limit_reached" {
@@ -948,12 +1058,12 @@ struct CompatibilityView: View {
                                 // Guest users should only see Sign In option (no subscribe)
                                 quotaErrorMessage = "sign_in_to_continue_matching".localized
                             } else {
-                                quotaErrorMessage = "free_limit_reached".localized
+                                quotaErrorMessage = "create_account_to_continue".localized
                             }
                             showQuotaExhausted = true
                         } else {
                             // FEATURE NOT AVAILABLE: Show sheet only
-                            quotaErrorMessage = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
+                            quotaErrorMessage = accessResponse.upgradeCta?.message ?? "upgrade_to_unlock".localized
                             showQuotaExhausted = true
                         }
                     }
@@ -961,7 +1071,7 @@ struct CompatibilityView: View {
             } catch {
                 print("❌ Quota check failed: \(error)")
                 await MainActor.run {
-                    quotaErrorMessage = "Unable to check compatibility access."
+                    quotaErrorMessage = "quota_check_failed".localized
                     showQuotaExhausted = true
                 }
             }
@@ -980,7 +1090,8 @@ struct CompatibilityView: View {
     
     private var formattedBoyDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
         return formatter.string(from: viewModel.boyBirthDate)
     }
     

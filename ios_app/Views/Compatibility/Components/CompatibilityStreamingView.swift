@@ -84,12 +84,12 @@ enum AnalysisStep: Int, CaseIterable {
     
     var title: String {
         switch self {
-        case .calculatingCharts: return "Mapping birth charts"
-        case .ashtakootMatching: return "Calculating astrological compatibility"
-        case .mangalDosha: return "Checking Manglik compatibility"
-        case .collectingYogas: return "Evaluating yogas and doshas"
-        case .generatingAnalysis: return "Preparing your compatibility insights"
-        case .complete: return "Your compatibility insights are ready ✨"
+        case .calculatingCharts: return "analysis_step_mapping_charts".localized
+        case .ashtakootMatching: return "analysis_step_ashtakoot".localized
+        case .mangalDosha: return "analysis_step_mangal".localized
+        case .collectingYogas: return "analysis_step_yogas".localized
+        case .generatingAnalysis: return "analysis_step_generating".localized
+        case .complete: return "analysis_step_ready".localized
         }
     }
     
@@ -196,7 +196,7 @@ struct StreamingTextView: View {
                     .font(AppTheme.Fonts.caption(size: 12))
                     .foregroundColor(AppTheme.Colors.gold)
                 
-                Text("AI Analysis")
+                Text("ai_analysis_label".localized)
                     .font(AppTheme.Fonts.title(size: 11))
                     .foregroundColor(AppTheme.Colors.gold)
             }

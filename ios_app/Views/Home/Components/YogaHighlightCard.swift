@@ -2,30 +2,26 @@ import SwiftUI
 
 struct YogaHighlightCard: View {
     let yogas: [YogaDetail]
-    var onQuestionSelected: ((String) -> Void)?
+    var onQuestionSelected: ((String, String?) -> Void)?
     var onYogaTapped: ((YogaDetail) -> Void)?  // Callback to show popup at parent level
     
     @State private var selectedFilter: FilterType = .all
     
     enum FilterType: String, CaseIterable {
-        case all = "All"
-        case wealth = "Wealth"
-        case career = "Career"
-        case love = "Relationship"
-        case health = "Health"
-        case family = "Family"
-        case education = "Education"
-        case spiritual = "Spiritual"
-        case foundation = "Basic Foundation"
-        case personality = "Personality"
-        case special = "Special"
+        case all = "filter_all"
+        case wealth = "filter_wealth"
+        case career = "filter_career"
+        case love = "filter_relationship"
+        case health = "filter_health"
+        case family = "filter_family"
+        case education = "filter_education"
+        case spiritual = "filter_spiritual"
+        case foundation = "filter_foundation"
+        case personality = "filter_personality"
+        case special = "filter_special"
         
         var displayName: String {
-            switch self {
-            case .love: return "Love"
-            case .foundation: return "Foundation"
-            default: return self.rawValue
-            }
+            return self.rawValue.localized
         }
         
         // All possible backend values that match this filter
@@ -96,7 +92,7 @@ struct YogaHighlightCard: View {
                 
                 // Header & Filter
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Positive & Negative Combinations")
+                    Text("yoga_positive_negative".localized)
                         .font(AppTheme.Fonts.premiumDisplay(size: 18))
                         .goldGradient()
                     
@@ -133,7 +129,7 @@ struct YogaHighlightCard: View {
                 
                 // Content
                 if filteredYogas.isEmpty {
-                    Text("No combinations found for this category.")
+                    Text("no_combinations_found".localized)
                         .font(AppTheme.Fonts.caption(size: 14))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -141,8 +137,9 @@ struct YogaHighlightCard: View {
                 } else {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(filteredYogas, id: \.name) { yoga in
+                            ForEach(Array(filteredYogas.enumerated()), id: \.offset) { index, yoga in
                                 PremiumYogaCard(yoga: yoga)
+                                    .accessibilityIdentifier("yoga_card_\(index)")
                                     .onTapGesture {
                                         HapticManager.shared.play(.light)
                                         onYogaTapped?(yoga)
@@ -163,10 +160,10 @@ struct PremiumYogaCard: View {
     // Status Logic
     var statusText: String {
         switch yoga.status {
-        case "A": return "Active"
-        case "C": return "Cancelled"
-        case "R": return "Reduced"
-        default: return "Inactive"
+        case "A": return "yoga_status_active".localized
+        case "C": return "yoga_status_cancelled".localized
+        case "R": return "yoga_status_reduced".localized
+        default: return "yoga_status_inactive".localized
         }
     }
     
@@ -194,114 +191,149 @@ struct PremiumYogaCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Header: Icon + Status Badge
-            HStack(alignment: .center) {
-                ZStack {
-                    Circle()
-                        .fill(baseColor.opacity(0.1))
-                        .frame(width: 32, height: 32)
+        ZStack {
+            VStack(alignment: .leading, spacing: 8) {
+                // Header: Icon + Status Badge
+                HStack(alignment: .center) {
+                    ZStack {
+                        Circle()
+                            .fill(baseColor.opacity(0.1))
+                            .frame(width: 32, height: 32)
+                        
+                        Image(systemName: iconName)
+                            .font(.system(size: 14))
+                            .foregroundColor(baseColor)
+                    }
                     
-                    Image(systemName: iconName)
-                        .font(.system(size: 14))
-                        .foregroundColor(baseColor)
+                    Spacer()
+                    
+                    // Status Badge
+                    Text(statusText)
+                        .font(AppTheme.Fonts.caption(size: 10))
+                        .fontWeight(.bold)
+                        .foregroundColor(badgeColor)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .strokeBorder(badgeColor.opacity(0.4), lineWidth: 1)
+                                .background(Capsule().fill(badgeColor.opacity(0.1)))
+                        )
                 }
                 
-                Spacer()
+                // Yoga Name (Limit 2 lines)
+                Text(yoga.localizedName)
+                    .font(AppTheme.Fonts.title(size: 14))
+                    .foregroundColor(Color.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(height: 36, alignment: .topLeading) // Fixed height for alignment
                 
-                // Status Badge
-                Text(statusText)
-                    .font(AppTheme.Fonts.caption(size: 10))
-                    .fontWeight(.bold)
-                    .foregroundColor(badgeColor)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .strokeBorder(badgeColor.opacity(0.4), lineWidth: 1)
-                            .background(Capsule().fill(badgeColor.opacity(0.1)))
-                    )
-            }
-            
-            // Yoga Name (Limit 2 lines)
-            Text(yoga.localizedName)
-                .font(AppTheme.Fonts.title(size: 14))
-                .foregroundColor(Color.white)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(height: 36, alignment: .topLeading) // Fixed height for alignment
-            
-            // Divider
-            Rectangle()
-                .fill(LinearGradient(
-                    colors: [baseColor.opacity(0.5), .clear],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ))
-                .frame(height: 1)
-            
-            // Details: Planets & Houses
-            HStack(alignment: .top) {
-                // Left: Planets
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("PLANETS")
-                        .font(AppTheme.Fonts.caption(size: 9))
-                        .foregroundColor(AppTheme.Colors.textTertiary)
-                        .tracking(1)
-                    
-                    Text(yoga.planets.isEmpty ? "Unknown" : yoga.planets)
-                        .font(AppTheme.Fonts.caption(size: 11))
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .lineLimit(1)
-                }
+                // Divider
+                Rectangle()
+                    .fill(LinearGradient(
+                        colors: [baseColor.opacity(0.5), .clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ))
+                    .frame(height: 1)
                 
-                Spacer()
-                
-                // Right: Houses
-                if !yoga.houses.isEmpty {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("HOUSES")
+                // Details: Planets & Houses
+                HStack(alignment: .top) {
+                    // Left: Planets
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("planets_label".localized)
                             .font(AppTheme.Fonts.caption(size: 9))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                             .tracking(1)
                         
-                        Text(formatHouses(yoga.houses))
+                        Text(yoga.planets.isEmpty ? "yoga_label_unknown".localized : localizedPlanets(yoga.planets))
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .lineLimit(1)
                     }
+                    
+                    Spacer()
+                    
+                    // Right: Houses
+                    if !yoga.houses.isEmpty {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("houses_label".localized)
+                                .font(AppTheme.Fonts.caption(size: 9))
+                                .foregroundColor(AppTheme.Colors.textTertiary)
+                                .tracking(1)
+                            
+                            Text(formatHouses(yoga.houses))
+                                .font(AppTheme.Fonts.caption(size: 11))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+                
+                // Spacer to push content up if needed
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            
+            // Bottom Right: Animated Arrow click indicator
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Image(systemName: "arrow.forward.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppTheme.Colors.goldLight, AppTheme.Colors.gold],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .scaleEffect(1.0)
                 }
             }
-            
-            // Spacer to push content up if needed
-            Spacer(minLength: 0)
+            .padding(.bottom, 12)
+            .padding(.trailing, 12)
         }
-        .padding(14)
-        .frame(width: 170, height: 160) // Increased height to fit Houses
+        .frame(width: 170, height: 170)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(AppTheme.Colors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(
-                    LinearGradient(
-                        colors: [
-                            baseColor.opacity(0.3),
-                            Color.white.opacity(0.05)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 1
+                .stroke(
+                    // Static border matching comparison result card style
+                    yoga.isDosha ? AppTheme.Colors.error.opacity(0.4) : AppTheme.Colors.gold.opacity(0.5),
+                    lineWidth: yoga.isDosha ? 1.5 : 2
                 )
         )
-        // Tinted shadow
-        .shadow(color: baseColor.opacity(0.08), radius: 10)
+        .shadow(color: baseColor.opacity(0.08), radius: 8, x: 0, y: 4)
     }
     
     private func formatHouses(_ houses: String) -> String {
         let items = houses.split(separator: ",")
         return items.map { "H\($0.trimmingCharacters(in: .whitespaces))" }.joined(separator: ", ")
+    }
+    
+    private func localizedPlanets(_ planets: String) -> String {
+        let planetNames = planets.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        let localized = planetNames.map { planet -> String in
+            let key = planet.lowercased()
+            switch key {
+            case "sun": return "planet_sun".localized
+            case "moon": return "planet_moon".localized
+            case "mars": return "planet_mars".localized
+            case "mercury": return "planet_mercury".localized
+            case "jupiter": return "planet_jupiter".localized
+            case "venus": return "planet_venus".localized
+            case "saturn": return "planet_saturn".localized
+            case "rahu": return "planet_rahu".localized
+            case "ketu": return "planet_ketu".localized
+            default: return planet
+            }
+        }
+        return localized.joined(separator: ", ")
     }
 }

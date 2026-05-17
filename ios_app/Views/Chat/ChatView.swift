@@ -7,6 +7,9 @@ struct ChatView: View {
     
     // Initial question passed from HomeView
     var initialQuestion: String? = nil
+
+    // Short label to show in the user bubble instead of the raw contextual query
+    var initialDisplayLabel: String? = nil
     
     // Initial thread ID passed from History
     var initialThreadId: String? = nil
@@ -52,16 +55,25 @@ struct ChatView: View {
                 if let error = viewModel.errorMessage {
                     errorBanner(error)
                 }
-                
+
+                // Recovery card — shown when background expiry interrupted a stream
+                if let interrupted = viewModel.interruptedQuestion,
+                   !viewModel.isStreaming, !viewModel.isLoading {
+                    interruptedBanner(interrupted)
+                }
+
                 // Input bar
                 ChatInputBar(
                     text: $viewModel.inputText,
                     isFocused: $isInputFocused,
                     isLoading: viewModel.isLoading,
-                    isStreaming: viewModel.isStreaming
+                    isStreaming: viewModel.isStreaming,
+                    isTyping: viewModel.typewriterMessageId != nil
                 ) {
                     // Check quota before sending
                     if viewModel.canAskQuestion {
+                        isInputFocused = false  // Dismiss keyboard on send
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                         Task { await viewModel.sendMessage() }
                     } else {
                         showQuotaExhausted = true
@@ -103,6 +115,7 @@ struct ChatView: View {
             if let question = newValue, !question.isEmpty, question != oldValue {
                 hasHandledInitialQuestion = true
                 viewModel.startNewChat()
+                viewModel.pendingDisplayLabel = initialDisplayLabel
                 viewModel.inputText = question
                 Task {
                     await viewModel.sendMessage()
@@ -124,21 +137,23 @@ struct ChatView: View {
             }
         }
         .onAppear {
-            // Handle initial question on first appear — always in a NEW chat
+            // onChange(of:) with the iOS 17 API does NOT fire on initial creation —
+            // only when the value changes while the view is already in the hierarchy.
+            // Handle the initial question here so a home-screen card tap always opens a fresh chat.
             if let question = initialQuestion, !question.isEmpty, !hasHandledInitialQuestion {
                 hasHandledInitialQuestion = true
                 viewModel.startNewChat()
+                viewModel.pendingDisplayLabel = initialDisplayLabel
                 viewModel.inputText = question
-                Task {
-                    await viewModel.sendMessage()
-                }
-            }
-            
-            if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {
+                Task { await viewModel.sendMessage() }
+            } else if let threadId = initialThreadId, !threadId.isEmpty, !hasHandledInitialThread {
                 hasHandledInitialThread = true
                 if let thread = viewModel.dataManager.fetchThread(id: threadId) {
                     viewModel.loadThread(thread)
                 }
+            } else {
+                // Normal open — load latest thread or start new
+                viewModel.loadDefaultState()
             }
         }
         // Sync ViewModel quota state to View
@@ -149,6 +164,15 @@ struct ChatView: View {
              if !newValue {
                  viewModel.showQuotaSheet = false
              }
+        }
+        // Switch Profile: reset chat to new profile's latest thread or new chat
+        .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in
+            viewModel.handleProfileSwitch()
+        }
+        // Dismiss keyboard when leaving the view (fixes keyboard persistence bug)
+        .onDisappear {
+            isInputFocused = false
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
     
@@ -186,15 +210,17 @@ struct ChatView: View {
     }
     
     // MARK: - Starter Questions ("What's in my mind?" from Home)
-    private static let fallbackQuestions = [
-        "When will I get married?",
-        "Best career direction?",
-        "Financial outlook?",
-        "Health check"
-    ]
-    
+    private var fallbackQuestions: [String] {
+        [
+            "chat_starter_marriage".localized,
+            "chat_starter_career_direction".localized,
+            "chat_starter_finance".localized,
+            "chat_starter_health_check".localized
+        ]
+    }
+
     private var activeStarterQuestions: [String] {
-        let questions = starterQuestions.isEmpty ? Self.fallbackQuestions : Array(starterQuestions.prefix(4))
+        let questions = starterQuestions.isEmpty ? fallbackQuestions : Array(starterQuestions.prefix(4))
         return questions
     }
     
@@ -218,12 +244,12 @@ struct ChatView: View {
             }
             
             // Title
-            Text("Ask Destiny")
+            Text("ask_destiny".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
             // Subtitle
-            Text("Your personal astrology guide. Ask about your day, relationships, career, or path ahead.")
+            Text("chat_welcome_subtitle".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -234,6 +260,8 @@ struct ChatView: View {
                 ForEach(activeStarterQuestions, id: \.self) { question in
                     Button(action: {
                         HapticManager.shared.play(.light)
+                        isInputFocused = false  // Dismiss keyboard
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                         viewModel.inputText = question
                         if viewModel.canAskQuestion {
                             Task { await viewModel.sendMessage() }
@@ -266,48 +294,45 @@ struct ChatView: View {
         .padding(24)
     }
     
-    // MARK: - Inline Suggested Questions (horizontal scrollable pills)
+    // MARK: - Inline Suggested Questions (vertical full-width rows)
     private var inlineSuggestedQuestionsView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("suggested_questions".localized)
-                .font(AppTheme.Fonts.caption())
-                .foregroundColor(AppTheme.Colors.textSecondary)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(viewModel.suggestedQuestions, id: \.self) { question in
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            viewModel.inputText = question
-                            viewModel.suggestedQuestions = []
-                            if viewModel.canAskQuestion {
-                                Task { await viewModel.sendMessage() }
-                            } else {
-                                showQuotaExhausted = true
-                            }
-                        }) {
-                            Text(question)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(AppTheme.Colors.gold)
-                                .lineLimit(1)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(AppTheme.Colors.gold.opacity(0.1))
-                                        .overlay(
-                                            Capsule()
-                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
-                                        )
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+        FollowUpSuggestionsView(
+            questions: viewModel.suggestedQuestions
+        ) { question in
+            HapticManager.shared.play(.light)
+            isInputFocused = false
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            viewModel.inputText = question
+            viewModel.suggestedQuestions = []
+            if viewModel.canAskQuestion {
+                Task { await viewModel.sendMessage() }
+            } else {
+                showQuotaExhausted = true
             }
         }
-        .padding(.top, 4)
     }
+    
+    // MARK: - Visible Messages (from window manager, filtered for non-empty)
+    private var visibleMessages: [LocalChatMessage] {
+        viewModel.windowManager.visibleMessages.filter { !$0.content.isEmpty || $0.isStreaming }
+    }
+    
+    // MARK: - User Query Lookup (pre-computed, avoids O(n²) per-message scan)
+    private var userQueryLookup: [String: String] {
+        var lookup: [String: String] = [:]
+        var lastUserQuery = "General question"
+        for msg in viewModel.windowManager.visibleMessages {
+            if msg.messageRole == .user {
+                lastUserQuery = msg.content
+            } else {
+                lookup[msg.id] = lastUserQuery
+            }
+        }
+        return lookup
+    }
+    
+    // MARK: - Scroll State (single debounced trigger replaces 5 competing handlers)
+    @State private var scrollTrigger = UUID()
     
     // MARK: - Messages View (matches compat chat scroll pattern exactly)
     private var messagesView: some View {
@@ -316,90 +341,79 @@ struct ChatView: View {
                 if isNewChat && !viewModel.isLoading {
                     starterQuestionsView
                 } else {
-                    LazyVStack(spacing: 16) {
-                        ForEach(viewModel.messages.filter { !$0.content.isEmpty }) { message in
+                    VStack(spacing: 24) {
+                        if viewModel.windowManager.hasOlderMessages {
+                            Button("load_earlier_messages".localized) {
+                                // Pagination: future implementation
+                            }
+                            .accessibilityIdentifier("load_older_button")
+                            .font(.system(size: 13))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .padding(.bottom, 8)
+                        }
+                        ForEach(visibleMessages) { message in
                             MessageBubble(
                                 message: message,
-                                userQuery: getUserQuery(for: message),
+                                userQuery: userQueryLookup[message.id] ?? "",
                                 streamingContent: nil,
                                 thinkingSteps: [],
-                                enableTypewriter: message.id == viewModel.typewriterMessageId,
-                                onTypewriterFinished: {
-                                    viewModel.typewriterMessageId = nil
-                                }
+                                enableTypewriter: false,
+                                cosmicProgressSteps: message.isStreaming ? viewModel.cosmicProgressSteps : []
                             )
                             .id(message.id)
                         }
                         
-                        // Loading indicator (matches compat chat's CompatTypingIndicator)
-                        if viewModel.isLoading {
-                            thinkingIndicator
-                                .id("loading")
-                        }
-                        
-                        // Inline suggested questions — only after typewriter finishes
-                        if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && viewModel.typewriterMessageId == nil {
+                        // Inline suggested questions — only after streaming finishes
+                        if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && !viewModel.isStreaming {
                             inlineSuggestedQuestionsView
                                 .id("suggestions")
                                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                         }
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 16)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 20)
                 }
                 
                 Color.clear
                     .frame(height: 1)
                     .id("bottomAnchor")
             }
-            .defaultScrollAnchor(.bottom)
             .scrollDismissesKeyboard(.interactively)
-            // Scroll when a new message is added (user msg or AI response)
+            // Single consolidated scroll handler — debounced to prevent racing animations
+            .onChange(of: scrollTrigger) { _, _ in
+                withAnimation(.easeOut(duration: 0.25)) {
+                    proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                }
+            }
+            // Coalesce all state changes into one scroll trigger
             .onChange(of: viewModel.messages.count) { _, _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        proxy.scrollTo("bottomAnchor", anchor: .bottom)
-                    }
-                }
+                requestScrollToBottom()
             }
-            // Scroll when loading starts (show thinking indicator)
-            .onChange(of: viewModel.isLoading) { _, isLoading in
-                withAnimation {
-                    if isLoading {
-                        proxy.scrollTo("loading", anchor: .bottom)
-                    }
-                }
+            .onChange(of: viewModel.isLoading) { _, loading in
+                if loading { requestScrollToBottom() }
             }
-            // Scroll smoothly when suggested questions appear
-            .onChange(of: viewModel.suggestedQuestions) { _, newQuestions in
-                if !newQuestions.isEmpty && viewModel.typewriterMessageId == nil {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            proxy.scrollTo("suggestions", anchor: .bottom)
-                        }
-                    }
-                }
+            .onChange(of: viewModel.suggestedQuestions) { _, q in
+                if !q.isEmpty { requestScrollToBottom() }
             }
-            // Scroll when typewriter finishes (suggestions may already be loaded)
+            .onChange(of: viewModel.isStreaming) { _, streaming in
+                if !streaming { requestScrollToBottom(delay: 0.3) }
+            }
+            .onChange(of: viewModel.cosmicProgressSteps.count) { _, _ in
+                requestScrollToBottom()
+            }
             .onChange(of: viewModel.typewriterMessageId) { _, newId in
-                if newId == nil && !viewModel.suggestedQuestions.isEmpty {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            proxy.scrollTo("suggestions", anchor: .bottom)
-                        }
-                    }
-                }
+                if newId == nil { requestScrollToBottom() }
             }
-            // Scroll when keyboard appears
             .onChange(of: isInputFocused) { _, focused in
-                if focused {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        withAnimation {
-                            proxy.scrollTo("bottomAnchor", anchor: .bottom)
-                        }
-                    }
-                }
+                if focused { requestScrollToBottom(delay: 0.3) }
             }
+        }
+    }
+    
+    /// Debounced scroll request — coalesces rapid state changes into a single scroll
+    private func requestScrollToBottom(delay: Double = 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            scrollTrigger = UUID()
         }
     }
     
@@ -408,7 +422,7 @@ struct ChatView: View {
         HStack(spacing: 10) {
             AnimatedDots()
             
-            Text("Thinking...")
+            Text("thinking".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
         }
@@ -425,27 +439,7 @@ struct ChatView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
-    // Pre-compute user query outside of ForEach body
-    private func getUserQuery(for message: LocalChatMessage) -> String {
-        guard message.messageRole != .user else { return "" }
-        
-        // Find the previous user message
-        guard let index = viewModel.messages.firstIndex(where: { $0.id == message.id }) else {
-            return ""
-        }
-        return findPreviousUserQuery(before: index)
-    }
-    
-    
-    /// Find the user's question that precedes an AI message (for feedback)
-    private func findPreviousUserQuery(before index: Int) -> String {
-        for i in stride(from: index - 1, through: 0, by: -1) {
-            if viewModel.messages[i].messageRole == .user {
-                return viewModel.messages[i].content
-            }
-        }
-        return "General question"
-    }
+    // getUserQuery replaced by pre-computed userQueryLookup dictionary above
     
     // MARK: - Error Banner
     private func errorBanner(_ message: String) -> some View {
@@ -461,6 +455,48 @@ struct ChatView: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(AppTheme.Colors.error.opacity(0.85))
+        )
+        .padding(.horizontal, 16)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+
+    private func interruptedBanner(_ question: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "pause.circle.fill")
+                .font(.system(size: 16))
+                .foregroundColor(AppTheme.Colors.gold)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("chat_bg_interrupted".localized)
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                Text(question)
+                    .font(AppTheme.Fonts.body(size: 13))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+            Spacer()
+            Button {
+                viewModel.retryInterruptedQuestion()
+            } label: {
+                Text("retry".localized)
+                    .font(AppTheme.Fonts.body(size: 13).bold())
+                    .foregroundColor(AppTheme.Colors.textOnGold)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(AppTheme.Colors.gold)
+                    .clipShape(Capsule())
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppTheme.Colors.gold.opacity(0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                )
         )
         .padding(.horizontal, 16)
         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -498,7 +534,7 @@ struct ChatHistorySidebar: View {
                     historyList
                 }
             }
-            .navigationTitle("Chat History")
+            .navigationTitle("chat_history_title".localized)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -513,7 +549,7 @@ struct ChatHistorySidebar: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { onDismiss() }
+                    Button("done_action".localized) { onDismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #else
@@ -525,7 +561,7 @@ struct ChatHistorySidebar: View {
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { onDismiss() }
+                    Button("done_action".localized) { onDismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
                 #endif
@@ -534,8 +570,8 @@ struct ChatHistorySidebar: View {
                 loadFirstPage()
             }
             .alert("Delete", isPresented: $showDeleteConfirmation) {
-                Button("Cancel", role: .cancel) { threadToDelete = nil }
-                Button("Delete", role: .destructive) {
+                Button("cancel_action".localized, role: .cancel) { threadToDelete = nil }
+                Button("delete_action".localized, role: .destructive) {
                     if let thread = threadToDelete {
                         viewModel.deleteThread(thread)
                         loadedThreads.removeAll { $0.id == thread.id }
@@ -543,7 +579,7 @@ struct ChatHistorySidebar: View {
                     }
                 }
             } message: {
-                Text("Are you sure you want to delete \"\(threadToDelete?.title ?? "")\"?")
+                Text(String(format: "chat_delete_thread_confirm".localized, threadToDelete?.title ?? ""))
             }
         }
     }
@@ -555,11 +591,11 @@ struct ChatHistorySidebar: View {
                 .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
             
-            Text("History is turned off")
+            Text("history_turned_off".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Your conversations aren't being saved.")
+            Text("conversations_not_saved".localized)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -573,7 +609,7 @@ struct ChatHistorySidebar: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "gearshape")
-                    Text("Open Settings")
+                    Text("open_settings".localized)
                 }
                 .font(AppTheme.Fonts.title(size: 15))
                 .foregroundColor(AppTheme.Colors.mainBackground)
@@ -654,7 +690,7 @@ struct ChatHistorySidebar: View {
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .font(.system(size: 15))
                 
-                TextField("Search chats...", text: $searchText)
+                TextField("search_chats_placeholder".localized, text: $searchText)
                     .font(AppTheme.Fonts.body(size: 15))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .autocorrectionDisabled()
@@ -680,7 +716,7 @@ struct ChatHistorySidebar: View {
                         .font(AppTheme.Fonts.display(size: 48))
                         .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
                     
-                    Text(searchText.isEmpty ? "no_chat_history".localized : "No results found")
+                    Text(searchText.isEmpty ? "no_chat_history".localized : "no_results_found".localized)
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -788,13 +824,13 @@ struct HistoryRow: View {
         .buttonStyle(.plain)
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label("delete_action".localized, systemImage: "trash")
             }
             .tint(AppTheme.Colors.error)
             
             Button(action: onPin) {
                 Label(
-                    thread.isPinned ? "Unpin" : "Pin",
+                    thread.isPinned ? "unpin".localized : "pin".localized,
                     systemImage: thread.isPinned ? "pin.slash" : "pin"
                 )
             }
@@ -803,13 +839,13 @@ struct HistoryRow: View {
         .contextMenu {
             Button(action: onPin) {
                 Label(
-                    thread.isPinned ? "Unpin" : "Pin",
+                    thread.isPinned ? "unpin".localized : "pin".localized,
                     systemImage: thread.isPinned ? "pin.slash" : "pin"
                 )
             }
             
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label("delete_action".localized, systemImage: "trash")
             }
         }
     }

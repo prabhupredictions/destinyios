@@ -22,7 +22,7 @@ struct MessageRating: View {
                 thankYouView
             } else {
                 // Rating prompt
-                Text("Rate this response")
+                Text("rate_this_response".localized)
                     .font(.system(size: 11))
                     .foregroundColor(Color("NavyPrimary").opacity(0.5))
                 
@@ -40,7 +40,7 @@ struct MessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
-                        .accessibilityLabel("\(star) of 5 stars")
+                        .accessibilityLabel(String(format: "a11y_star_rating".localized, star))
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -69,7 +69,7 @@ struct MessageRating: View {
                 .font(.system(size: 12))
                 .foregroundColor(.green)
             
-            Text("Thanks for your feedback!")
+            Text("thanks_for_feedback".localized)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundColor(Color("NavyPrimary").opacity(0.6))
             
@@ -134,10 +134,20 @@ struct InlineMessageRating: View {
     let query: String
     let responseText: String
     let predictionId: String?
-    
-    @State private var selectedRating: Int = 0
+
+    @State private var selectedRating: Int
     @State private var isSubmitting = false
-    @State private var hasSubmitted = false
+    @State private var hasSubmitted: Bool
+
+    init(message: LocalChatMessage, query: String, responseText: String, predictionId: String?) {
+        self.message = message
+        self.query = query
+        self.responseText = responseText
+        self.predictionId = predictionId
+        let saved = message.rating ?? 0
+        _selectedRating = State(initialValue: saved)
+        _hasSubmitted = State(initialValue: saved > 0)
+    }
     
     var body: some View {
         HStack(spacing: 4) {
@@ -157,14 +167,14 @@ struct InlineMessageRating: View {
                         }
                     }
                 } else {
-                    Text("Rated")
+                    Text("rated_status".localized)
                         .font(.system(size: 10))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .fixedSize()
                 }
             } else {
                 // Rate label
-                Text("Rate")
+                Text("rate_action".localized)
                     .font(.system(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .fixedSize()
@@ -181,7 +191,7 @@ struct InlineMessageRating: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(isSubmitting)
-                        .accessibilityLabel("\(star) of 5 stars")
+                        .accessibilityLabel(String(format: "a11y_star_rating".localized, star))
                     }
                 }
                 .opacity(isSubmitting ? 0.5 : 1)
@@ -258,7 +268,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .up ? .green : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Rate helpful")
+            .accessibilityLabel("a11y_rate_helpful".localized)
             
             Button {
                 selected = .down
@@ -269,7 +279,7 @@ struct CompactRating: View {
                     .foregroundColor(selected == .down ? .orange : Color("NavyPrimary").opacity(0.4))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Rate unhelpful")
+            .accessibilityLabel("a11y_rate_unhelpful".localized)
         }
     }
 }
@@ -289,7 +299,7 @@ struct CompactRating: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 12))
                 .foregroundColor(.green)
-            Text("Thanks for your feedback!")
+            Text("thanks_for_feedback".localized)
                 .font(.system(size: 11))
                 .foregroundColor(Color("NavyPrimary").opacity(0.6))
             Spacer()

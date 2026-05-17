@@ -42,7 +42,7 @@ struct ChartComparisonSheet: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle("Birth Charts")
+            .navigationTitle("birth_charts".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -50,10 +50,18 @@ struct ChartComparisonSheet: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
                         Button(action: { chartStyle = "south" }) {
-                            Label("South Indian", systemImage: chartStyle == "south" ? "checkmark" : "")
+                            if chartStyle == "south" {
+                                Label("south_indian".localized, systemImage: "checkmark")
+                            } else {
+                                Text("south_indian".localized)
+                            }
                         }
                         Button(action: { chartStyle = "north" }) {
-                            Label("North Indian", systemImage: chartStyle == "north" ? "checkmark" : "")
+                            if chartStyle == "north" {
+                                Label("north_indian".localized, systemImage: "checkmark")
+                            } else {
+                                Text("north_indian".localized)
+                            }
                         }
                     } label: {
                         Image(systemName: "slider.horizontal.3")
@@ -61,7 +69,7 @@ struct ChartComparisonSheet: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                     Button("Done") { dismiss() }
+                        Button("done".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -74,8 +82,8 @@ struct ChartComparisonSheet: View {
     
     private var tabSelector: some View {
         HStack(spacing: 0) {
-            tabButton(title: "D1 (Rashi)", index: 0)
-            tabButton(title: "D9 (Navamsa)", index: 1)
+            tabButton(title: "d1_rashi".localized, index: 0)
+            tabButton(title: "d9_navamsa".localized, index: 1)
         }
         .background(Color.black.opacity(0.3)) // Dark Glass
         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -119,11 +127,11 @@ struct ChartComparisonSheet: View {
                     ascendant: boyAscendant
                 )
             } else {
-                Text("Boy chart data not available")
-                    .foregroundColor(.gray)
+                Text("boy_chart_not_available".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .font(.caption)
             }
-            
+
             // Girl D1
             if let girlData = girlChartData {
                 chartView(
@@ -133,10 +141,13 @@ struct ChartComparisonSheet: View {
                     ascendant: girlAscendant
                 )
             } else {
-                Text("Girl chart data not available")
-                    .foregroundColor(.gray)
+                Text("girl_chart_not_available".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .font(.caption)
             }
+
+            // Legend
+            badgeLegend
         }
     }
     
@@ -212,8 +223,8 @@ struct ChartComparisonSheet: View {
             // Planet Detail Cards (3x3 grid) - only for D1
             if chartType == .d1 {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Planet Details")
-                        .font(AppTheme.Fonts.title(size: 12))
+                    Text("planet_details".localized)
+                        .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
                         .foregroundColor(AppTheme.Colors.gold.opacity(0.9))
                         .padding(.horizontal, 4)
                     
@@ -221,6 +232,32 @@ struct ChartComparisonSheet: View {
                 }
                 .padding(.horizontal, 8)
             }
+        }
+    }
+    private var badgeLegend: some View {
+        HStack(spacing: 16) {
+            legendItem(text: "R", color: .red, label: "Retrograde")
+            legendItem(text: "C", color: .orange, label: "Combust")
+            legendItem(text: "V", color: .purple, label: "Vargottama")
+            Spacer()
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func legendItem(text: String, color: Color, label: String) -> some View {
+        HStack(spacing: 6) {
+            Text(text)
+                .font(AppTheme.Fonts.title(size: 8))
+                .foregroundColor(color.opacity(0.9))
+                .frame(width: 14, height: 14)
+                .background(
+                    Circle()
+                        .fill(color.opacity(0.2))
+                        .strokeBorder(color.opacity(0.5), lineWidth: 0.5)
+                )
+            Text(label)
+                .font(AppTheme.Fonts.body(size: 12))
+                .foregroundColor(.white.opacity(0.6))
         }
     }
 }

@@ -125,7 +125,7 @@ struct CelestialOrbView: View {
             }
         }
         .buttonStyle(ScaleButtonStyle())
-        .accessibilityLabel("\(title): \(status)")
+        .accessibilityLabel(String(format: "a11y_orb_status_format".localized, title, status))
         .accessibilityHint("Double tap for details")
     }
     

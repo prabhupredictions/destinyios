@@ -6,41 +6,43 @@ struct OrbitAshtakootView: View {
     var boyName: String = "Boy"
     var girlName: String = "Girl"
     var doshaSummary: DoshaSummary? = nil  // V2.1: Cancellation data
-    
-    @State private var selectedKuta: AshtakootData?
+    @Binding var selectedKuta: AshtakootData?
+
     @State private var hintVisible: Bool = true
-    
+
     // Semantic Map (v5)
     private let semantics: [String: (label: String, icon: String)] = [
-        "varna": ("Work", "briefcase.fill"),
-        "vashya": ("Dominance", "bolt.heart.fill"),
-        "tara": ("Destiny", "star.fill"),
-        "yoni": ("Intimacy", "flame.fill"),
-        "maitri": ("Friendship", "person.2.fill"),
-        "gana": ("Temperament", "theatermasks.fill"),
-        "bhakoot": ("Love", "heart.circle.fill"),
-        "nadi": ("Health", "waveform.path.ecg")
+        "varna": ("kuta_varna_label".localized, "briefcase.fill"),
+        "vashya": ("kuta_vashya_label".localized, "bolt.heart.fill"),
+        "tara": ("kuta_tara_label".localized, "star.fill"),
+        "yoni": ("kuta_yoni_label".localized, "flame.fill"),
+        "maitri": ("kuta_maitri_label".localized, "person.2.fill"),
+        "gana": ("kuta_gana_label".localized, "theatermasks.fill"),
+        "bhakoot": ("kuta_bhakoot_label".localized, "heart.circle.fill"),
+        "nadi": ("kuta_nadi_label".localized, "waveform.path.ecg")
     ]
-    
+
     // Convert dictionary to ordered array, enriched with cancellation data
     private var orbitItems: [AshtakootData] {
         let order = ["varna", "vashya", "tara", "yoni", "maitri", "gana", "bhakoot", "nadi"]
-        
+
         return order.compactMap { key in
             guard let kuta = kutas.first(where: { $0.name.lowercased().prefix(key.count) == key }) else { return nil }
             let meta = semantics[key] ?? (kuta.name, "circle.fill")
-            
+
             // Enrich with cancellation data from DoshaSummary
             let detail = doshaSummary?.details?[key]
             let doshaPresent = detail?.present ?? false
             let doshaCancelled = detail?.cancelled ?? false
             let reason = detail?.reasonShort
-            
+            let reasonsAll = detail?.reasonsAll
+
+
             // Adjusted score: if cancelled → max points restored, if active dosha → stays 0
             let adjustedScore: Double? = doshaPresent
                 ? (doshaCancelled ? Double(kuta.maxPoints) : 0)
                 : nil
-            
+
             return AshtakootData(
                 key: key,
                 label: meta.label,
@@ -51,20 +53,42 @@ struct OrbitAshtakootView: View {
                 doshaPresent: doshaPresent,
                 doshaCancelled: doshaCancelled,
                 cancellationReason: reason,
-                adjustedScore: adjustedScore
+                cancellationReasons: reasonsAll,
+                adjustedScore: adjustedScore,
+                doshaType: detail?.doshaType,
+                classicalEffect: detail?.classicalEffect,
+                boyConstitution: detail?.boyConstitution,
+                girlConstitution: detail?.girlConstitution,
+                severity: detail?.severity,
+                housePositions: detail?.housePositions,
+                sadbhakootWarning: detail?.sadbhakootWarning,
+                taraBoyToGirl: detail?.taraBoyToGirl,
+                taraGirlToBoy: detail?.taraGirlToBoy,
+                boyVashya: detail?.boyVashya,
+                girlVashya: detail?.girlVashya,
+                boyToGirlScore: detail?.boyToGirlScore,
+                girlToBoyScore: detail?.girlToBoyScore,
+                boyVarna: detail?.boyVarna,
+                girlVarna: detail?.girlVarna,
+                complementarityNote: detail?.complementarityNote,
+                boyValue: detail?.boyValue,
+                girlValue: detail?.girlValue,
+                plainEnglishSummary: detail?.plainEnglishSummary,
+                boyValueDescription: detail?.boyValueDescription,
+                girlValueDescription: detail?.girlValueDescription
             )
         }
     }
-    
+
     /// Whether any dosha data exists to show indicators
     private var hasDoshaData: Bool {
         orbitItems.contains { $0.doshaPresent }
     }
-    
+
     // Geometry
     private let orbitRadius: CGFloat = 155
     private let bubbleSize: CGFloat = 64
-    
+
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
@@ -72,22 +96,22 @@ struct OrbitAshtakootView: View {
                 Circle()
                     .stroke(AppTheme.Colors.gold.opacity(0.15), lineWidth: 1)
                     .frame(width: orbitRadius * 2, height: orbitRadius * 2)
-                
+
                 Circle()
                     .stroke(AppTheme.Colors.gold.opacity(0.05), lineWidth: 40)
                     .frame(width: orbitRadius * 2, height: orbitRadius * 2)
-                
+
                 // 2. Center Sun (The Gauge)
                 centerView()
                     .frame(width: 180, height: 180)
                     .opacity(selectedKuta == nil ? 1 : 0.3) // Dim when tooltip active
                     .animation(.easeInOut, value: selectedKuta != nil)
-                
+
                 // 3. Planet Bubbles
                 ForEach(Array(orbitItems.enumerated()), id: \.element.key) { index, item in
                     let angleDeg = Double(index) * (360.0 / 8.0) - 90.0 // Start from Top (-90)
                     let angleRad = CGFloat(angleDeg) * .pi / 180.0
-                    
+
                     PlanetBubble(item: item, isSelected: selectedKuta?.key == item.key) {
                         // Tap handler
                         HapticManager.shared.play(.light)
@@ -105,13 +129,7 @@ struct OrbitAshtakootView: View {
                         y: orbitRadius * sin(angleRad)
                     )
                 }
-                
-                // 4. Premium Tooltip Overlay (Center)
-                if let kuta = selectedKuta {
-                    kutaTooltipView(kuta: kuta)
-                        .transition(.scale.combined(with: .opacity))
-                        .zIndex(100)
-                }
+
             }
             .frame(height: (orbitRadius * 2) + bubbleSize + 20)
             .contentShape(Rectangle())
@@ -121,259 +139,192 @@ struct OrbitAshtakootView: View {
                     withAnimation { selectedKuta = nil }
                 }
             }
-            
+
         }
     }
-    
-    // MARK: - Tooltip View
-    @ViewBuilder
-    private func kutaTooltipView(kuta: AshtakootData) -> some View {
-        VStack(spacing: 12) {
-            // Header
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: kuta.icon)
-                    .font(.system(size: 24))
-                    .foregroundColor(kuta.statusColor)
-                    .shadow(color: kuta.statusColor.opacity(0.6), radius: 8)
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(kuta.label)
-                        .font(AppTheme.Fonts.title(size: 18))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                    
-                    // Score line — show original + adjusted if different
-                    if kuta.doshaPresent, let adj = kuta.adjustedScore, Int(adj) != Int(kuta.score) {
-                        HStack(spacing: 6) {
-                            Text("\(format(kuta.score))")
-                                .strikethrough(true, color: AppTheme.Colors.textTertiary)
-                                .foregroundColor(AppTheme.Colors.textTertiary)
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 10))
-                                .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                            Text("\(format(adj)) / \(format(kuta.maxScore))")
-                                .foregroundColor(kuta.statusColor)
-                                .bold()
-                        }
-                        .font(AppTheme.Fonts.body(size: 14))
-                    } else {
-                        Text("\(format(kuta.score)) / \(format(kuta.maxScore))")
-                            .font(AppTheme.Fonts.body(size: 14).bold())
-                            .foregroundColor(kuta.statusColor)
-                    }
-                }
-                
-                Spacer()
-                
-                // Close Button
-                Button(action: {
-                    withAnimation { selectedKuta = nil }
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                        .font(.system(size: 22))
-                }
-            }
-            
-            // Cancellation Badge (if dosha present)
-            if kuta.doshaPresent {
-                HStack(spacing: 8) {
-                    Image(systemName: kuta.doshaCancelled ? "checkmark.shield.fill" : "exclamationmark.triangle.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(kuta.doshaCancelled ? AppTheme.Colors.success : AppTheme.Colors.error)
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(kuta.doshaCancelled ? "Dosha Cancelled" : "Active Dosha")
-                            .font(AppTheme.Fonts.caption(size: 12).weight(.semibold))
-                            .foregroundColor(kuta.doshaCancelled ? AppTheme.Colors.success : AppTheme.Colors.error)
-                        
-                        if let reason = kuta.cancellationReason, !reason.isEmpty {
-                            Text(replaceNames(in: reason))
-                                .font(AppTheme.Fonts.caption(size: 11))
-                                .foregroundColor(AppTheme.Colors.textSecondary)
-                        }
-                    }
-                    
-                    Spacer()
-                }
-                .padding(10)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(
-                            kuta.doshaCancelled
-                                ? AppTheme.Colors.success.opacity(0.1)
-                                : AppTheme.Colors.error.opacity(0.1)
-                        )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(
-                            kuta.doshaCancelled
-                                ? AppTheme.Colors.success.opacity(0.3)
-                                : AppTheme.Colors.error.opacity(0.3),
-                            lineWidth: 1
-                        )
-                )
-            }
-            
-            Divider().background(AppTheme.Colors.gold.opacity(0.3))
-            
-            // Description
-            if !kuta.description.isEmpty {
-                Text(replaceNames(in: enhanceDescription(kuta.description, for: kuta.key)))
-                    .font(AppTheme.Fonts.body(size: 14))
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                Text("Description not available")
-                    .font(AppTheme.Fonts.caption(size: 12))
-                    .italic()
-                    .foregroundColor(AppTheme.Colors.textTertiary)
-            }
+
+    // MARK: - Helpers
+
+    private func format(_ value: Double) -> String {
+        value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
+    }
+}
+
+// MARK: - OrbitTooltipView
+
+/// Standalone tooltip card rendered at the screen level (above ScrollView) to avoid z-order clipping.
+struct OrbitTooltipView: View {
+    let kuta: AshtakootData
+    let boyName: String
+    let girlName: String
+    let onDismiss: () -> Void
+    let onClassicalAnalysis: (String) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            tooltipHeader
+            Divider().background(AppTheme.Colors.gold.opacity(0.2))
+            tooltipDescription
+            Divider().background(AppTheme.Colors.gold.opacity(0.2))
+            classicalAnalysisCTA
         }
-        .padding(16)
-        .frame(width: 270)
+        .padding(14)
+        .frame(width: 300, alignment: .topLeading)
+        .fixedSize(horizontal: false, vertical: true)
         .background(
             ZStack {
                 AppTheme.Colors.mainBackground
-                
-                // Subtle cosmic glow
                 RadialGradient(
-                    colors: [
-                        AppTheme.Colors.gold.opacity(0.1),
-                        Color.clear
-                    ],
-                    center: .topLeading,
-                    startRadius: 0,
-                    endRadius: 150
+                    colors: [AppTheme.Colors.gold.opacity(0.08), Color.clear],
+                    center: .topLeading, startRadius: 0, endRadius: 150
                 )
             }
-            .clipShape(RoundedRectangle(cornerRadius: 16))
         )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
                     LinearGradient(
-                        colors: [
-                            AppTheme.Colors.gold.opacity(0.6),
-                            AppTheme.Colors.gold.opacity(0.2)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                        colors: [AppTheme.Colors.gold.opacity(0.6), AppTheme.Colors.gold.opacity(0.2)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
                     ),
                     lineWidth: 1
                 )
         )
-        .shadow(color: AppTheme.Colors.gold.opacity(0.25), radius: 15, x: 0, y: 8)
+        .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 20, x: 0, y: 10)
     }
-    
-    private func format(_ value: Double) -> String {
-        return value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
-    }
-    
-    /// Enhance description with astrological context and score-based interpretation
-    private func enhanceDescription(_ desc: String, for key: String) -> String {
-        // Find the matching kuta to get score information
-        guard let kuta = orbitItems.first(where: { $0.key == key }) else {
-            return desc
+
+    // MARK: Header — icon + theme label + Sanskrit subtitle + score badge + close
+    private var tooltipHeader: some View {
+        HStack(alignment: .top, spacing: 10) {
+            // Icon
+            Image(systemName: kuta.icon)
+                .font(.system(size: 20))
+                .foregroundColor(kuta.statusColor)
+                .shadow(color: kuta.statusColor.opacity(0.6), radius: 6)
+                .frame(width: 24, alignment: .center)
+                .padding(.top, 2)
+
+            // Theme label + Sanskrit subtitle — fills available width
+            VStack(alignment: .leading, spacing: 2) {
+                Text(kutaThemeLabel)
+                    .font(AppTheme.Fonts.title(size: 15))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("\(kutaDisplayName) Koota · \(kutaScoreSubtitle)")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            // Badge + close grouped so they don't squeeze the title
+            HStack(spacing: 6) {
+                scoreBadge
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .font(.system(size: 18))
+                }
+                .buttonStyle(.plain)
+            }
+            .fixedSize()
         }
-        
-        let statusColor = kuta.statusColor
-        
-        // Determine compatibility level based on score
-        let compatibilityLevel: String
-        if kuta.doshaPresent && kuta.doshaCancelled {
-            compatibilityLevel = "dosha was found but has been cancelled by astrological exceptions"
-        } else if kuta.doshaPresent && !kuta.doshaCancelled {
-            compatibilityLevel = "active dosha that requires attention and remedial measures"
-        } else if statusColor == .green {
-            compatibilityLevel = "excellent compatibility"
-        } else if statusColor == .yellow {
-            compatibilityLevel = "moderate compatibility"
+    }
+
+    @ViewBuilder
+    private var scoreBadge: some View {
+        if kuta.doshaPresent && !kuta.doshaCancelled {
+            Text("⚠ \("dosha_active_badge".localized)")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(AppTheme.Colors.error)
+                .padding(.horizontal, 7).padding(.vertical, 3)
+                .background(Capsule().fill(AppTheme.Colors.error.opacity(0.15)))
+        } else if kuta.doshaPresent && kuta.doshaCancelled {
+            let adj = kuta.adjustedScore ?? kuta.maxScore
+            Text("✓ \("cancelled".localized) · \(format(adj))/\(format(kuta.maxScore))")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(AppTheme.Colors.success)
+                .padding(.horizontal, 7).padding(.vertical, 3)
+                .background(Capsule().fill(AppTheme.Colors.success.opacity(0.15)))
         } else {
-            compatibilityLevel = "challenging area that requires understanding and effort"
+            // Green = perfect, gold = partial, no special colour for zero (handled by dosha branch)
+            let isPerfect = kuta.score >= kuta.maxScore
+            let color: Color = isPerfect ? AppTheme.Colors.success : AppTheme.Colors.gold
+            Text("\(isPerfect ? "✓" : "◑") \(format(kuta.score))/\(format(kuta.maxScore))")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(color)
+                .padding(.horizontal, 7).padding(.vertical, 3)
+                .background(Capsule().fill(color.opacity(0.15)))
         }
-        
-        // Clean up API description if present
-        let cleanedDesc = desc
-            .replacingOccurrences(
-                of: "(\\w+) lord: (\\w+)",
-                with: "$1's ruling planet $2",
-                options: .regularExpression
-            )
-            .trimmingCharacters(in: .punctuationCharacters.union(.whitespaces))
-        
-        // Build comprehensive description based on kuta type
-        var result = ""
-        
-        switch key {
-        case "varna":
-            result = "Work compatibility is determined using Varna Ashtakoot property which focuses on the Varna categories of both partners (Brahmin, Kshatriya, Vaishya, Shudra);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "vashya":
-            result = "Dominance compatibility is determined using Vashya Ashtakoot property which focuses on the Vashya groups of both partners (Manava, Vanachara, Keeta...);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "tara":
-            result = "Destiny alignment is determined using Tara Ashtakoot property which focuses on the birth stars (Nakshatras) and Tara groups of both partners (Janma, Sampat, Vipat...);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "yoni":
-            result = "Physical and intimate compatibility is determined using Yoni Ashtakoot property which focuses on the animal symbols (Yoni types) of both partners (Aswa, Vanara, Sarpa...);"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "maitri":
-            result = "Friendship and mental compatibility is determined using Maitri Ashtakoot property which focuses on the ruling sign lords (Moon sign lords) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "gana":
-            result = "Temperament compatibility is determined using Gana Ashtakoot property which focuses on the temperament categories (Deva, Manushya, Rakshasa) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "bhakoot":
-            result = "Emotional bonding and love compatibility is determined using Bhakoot Ashtakoot property which focuses on the Moon sign positions (Rashis) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        case "nadi":
-            result = "Health and genetic compatibility is determined using Nadi Ashtakoot property which focuses on the Nadi types (Aadi, Madhya, Antya) of both partners;"
-            if !cleanedDesc.isEmpty {
-                result += " \(cleanedDesc)"
-            }
-        default:
-            result = desc
-        }
-        
-        // Add score-based interpretation
+    }
+
+    /// Subtitle score string: "0/8 → 8/8" when cancelled, raw score otherwise.
+    private var kutaScoreSubtitle: String {
         if kuta.doshaPresent && kuta.doshaCancelled, let adj = kuta.adjustedScore {
-            let reasonText = kuta.cancellationReason ?? "astrological exceptions"
-            result += " — Since the dosha was cancelled due to \(reasonText), the score has been adjusted from \(Int(kuta.score))/\(Int(kuta.maxScore)) to \(Int(adj))/\(Int(kuta.maxScore))."
-        } else if kuta.doshaPresent && !kuta.doshaCancelled {
-            result += " — Score: \(Int(kuta.score))/\(Int(kuta.maxScore)) — This is an active dosha that requires attention and remedial measures."
-        } else {
-            result += " — Score: \(Int(kuta.score))/\(Int(kuta.maxScore)) — This indicates \(compatibilityLevel)."
+            return "\(format(kuta.score))/\(format(kuta.maxScore)) → \(format(adj))/\(format(kuta.maxScore))"
         }
-        
-        return result
+        return "\(format(kuta.score))/\(format(kuta.maxScore))"
     }
-    
-    /// Replace generic "Boy"/"Girl" with actual partner names
-    private func replaceNames(in text: String) -> String {
-        text
-            .replacingOccurrences(of: "Boy:", with: "\(boyName):")
-            .replacingOccurrences(of: "Girl:", with: "\(girlName):")
-            .replacingOccurrences(of: "Boy's", with: "\(boyName)'s")
-            .replacingOccurrences(of: "Girl's", with: "\(girlName)'s")
-            .replacingOccurrences(of: "Boy ", with: "\(boyName) ")
-            .replacingOccurrences(of: "Girl ", with: "\(girlName) ")
+
+    private var tooltipDescription: some View {
+        Text(KutaTextBuilder(kuta: kuta, boyName: boyName, girlName: girlName).descriptionParagraph())
+            .font(AppTheme.Fonts.body(size: 13))
+            .foregroundColor(AppTheme.Colors.textSecondary)
+            .lineSpacing(4)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var classicalAnalysisCTA: some View {
+        Button {
+            onClassicalAnalysis(
+                KutaTextBuilder(kuta: kuta, boyName: boyName, girlName: girlName).classicalPrompt()
+            )
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "scroll.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.gold)
+                Text("see_classical_analysis".localized)
+                    .font(AppTheme.Fonts.caption(size: 12).weight(.medium))
+                    .foregroundColor(AppTheme.Colors.gold)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9))
+                    .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
+            }
+        }
+    }
+
+    // MARK: - Helpers
+    // Sanskrit names are proper nouns used universally in Vedic astrology — not localized.
+    private var kutaDisplayName: String {
+        let names: [String: String] = [
+            "varna": "Varna", "vashya": "Vashya",
+            "tara": "Tara", "yoni": "Yoni",
+            "maitri": "Maitri", "gana": "Gana",
+            "bhakoot": "Bhakoot", "nadi": "Nadi"
+        ]
+        return names[kuta.key] ?? kuta.key.capitalized
+    }
+
+    private var kutaThemeLabel: String {
+        let themes: [String: String] = [
+            "varna": "kuta_theme_work".localized,
+            "vashya": "kuta_theme_attraction".localized,
+            "tara": "kuta_theme_destiny".localized,
+            "yoni": "kuta_theme_intimacy".localized,
+            "maitri": "kuta_theme_mental".localized,
+            "gana": "kuta_theme_temperament".localized,
+            "bhakoot": "kuta_theme_love".localized,
+            "nadi": "kuta_theme_health_progeny".localized
+        ]
+        return themes[kuta.key] ?? kuta.key.capitalized
+    }
+
+    private func format(_ value: Double) -> String {
+        value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
     }
 }
 
@@ -381,31 +332,25 @@ struct PlanetBubble: View {
     let item: AshtakootData
     let isSelected: Bool
     let action: () -> Void
-    
-    @State private var pulsePhase: Bool = false
-    
+
     var body: some View {
         let orbSize: CGFloat = 64
-        
+
         Button(action: action) {
             ZStack {
-                // 0. Outer ring (double circle effect for all orbs)
+                // 0. Outer ring (static — pulse animation removed for battery optimization)
                 Circle()
                     .stroke(
                         item.doshaPresent
                             ? (item.doshaCancelled
-                                ? AppTheme.Colors.success.opacity(pulsePhase ? 0.5 : 0.15)
-                                : AppTheme.Colors.error.opacity(pulsePhase ? 0.6 : 0.15))
-                            : item.statusColor.opacity(pulsePhase ? 0.5 : 0.15),
+                                ? AppTheme.Colors.success.opacity(0.35)
+                                : AppTheme.Colors.error.opacity(0.4))
+                            : item.statusColor.opacity(0.35),
                         lineWidth: 2
                     )
                     .frame(width: orbSize + 8, height: orbSize + 8)
-                    .scaleEffect(pulsePhase ? 1.15 : 1.0)
-                    .animation(
-                        .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
-                        value: pulsePhase
-                    )
-                
+                    .scaleEffect(1.08)
+
                 // 1. Status Glow Aura
                 Circle()
                     .fill(
@@ -422,7 +367,7 @@ struct PlanetBubble: View {
                     )
                     .frame(width: orbSize * 1.5, height: orbSize * 1.5)
                     .blur(radius: 12)
-                
+
                 // 2. Glass Sphere Base
                 Circle()
                     .fill(
@@ -439,7 +384,7 @@ struct PlanetBubble: View {
                         )
                     )
                     .frame(width: orbSize, height: orbSize)
-                
+
                 // 3. Inner Glass Bubble
                 Circle()
                     .fill(
@@ -455,7 +400,7 @@ struct PlanetBubble: View {
                         )
                     )
                     .frame(width: orbSize * 0.85, height: orbSize * 0.85)
-                
+
                 // 4. Highlight
                 Circle()
                     .fill(
@@ -471,7 +416,7 @@ struct PlanetBubble: View {
                         )
                     )
                     .frame(width: orbSize, height: orbSize)
-                
+
                 // 5. Gold Ring (Brighter if selected)
                 Circle()
                     .strokeBorder(
@@ -487,7 +432,7 @@ struct PlanetBubble: View {
                         lineWidth: isSelected ? 2 : 1.5
                     )
                     .frame(width: orbSize, height: orbSize)
-                
+
                 // 6. Content
                 VStack(spacing: 0) {
                     Image(systemName: item.icon)
@@ -495,12 +440,12 @@ struct PlanetBubble: View {
                         .foregroundColor(item.statusColor)
                         .padding(.bottom, 2)
                         .shadow(color: item.statusColor.opacity(0.5), radius: 4)
-                    
+
                     let displayScore = (item.doshaPresent && item.doshaCancelled && item.adjustedScore != nil) ? item.adjustedScore! : item.score
                     Text("\(format(displayScore))/\(format(item.maxScore))")
                         .font(.system(size: 10, weight: .bold, design: .rounded))
                         .foregroundColor(item.doshaCancelled ? AppTheme.Colors.success : AppTheme.Colors.goldLight)
-                    
+
                     Text(item.label)
                         .font(AppTheme.Fonts.caption(size: 8))
                         .foregroundColor(.white.opacity(0.9))
@@ -509,7 +454,7 @@ struct PlanetBubble: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                
+
                 // 7. Dosha indicator badge (top-right corner)
                 if item.doshaPresent {
                     VStack {
@@ -533,11 +478,8 @@ struct PlanetBubble: View {
             .frame(width: 64, height: 64)
             .scaleEffect(isSelected ? 1.1 : 1.0) // Pop effect
         }
-        .onAppear {
-            pulsePhase = true
-        }
     }
-    
+
     private func format(_ value: Double) -> String {
         return value.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", value) : String(value)
     }

@@ -61,7 +61,18 @@ struct MockDataFactory {
             ],
             lifeArea: "general",
             executionTimeMs: 8991,
-            createdAt: "2025-12-23T08:34:54.327489"
+            createdAt: "2025-12-23T08:34:54.327489",
+            reasoningTrace: nil,
+            reasoningSummary: nil,
+            advice: nil,
+            sources: nil,
+            query: nil,
+            subArea: nil,
+            ascendant: nil,
+            plannerUsed: nil,
+            llmCalls: nil,
+            trainingSampleId: nil,
+            completedAt: nil
         )
     }
     

@@ -5,12 +5,14 @@ import Foundation
 struct UserAstroDataRequest: Codable {
     let birthData: UserBirthData
     let userEmail: String?
-    
-    init(birthData: UserBirthData, userEmail: String? = nil) {
+    let language: String?  // Language code for LLM response (e.g., "en", "hi", "es")
+    let isFirstLogin: Bool?
+
+    init(birthData: UserBirthData, userEmail: String? = nil, language: String? = nil, isFirstLogin: Bool? = nil) {
         // Round coordinates to 6 decimal places to satisfy backend validation
         let roundedLat = (birthData.latitude * 1_000_000).rounded() / 1_000_000
         let roundedLong = (birthData.longitude * 1_000_000).rounded() / 1_000_000
-        
+
         self.birthData = UserBirthData(
             dob: birthData.dob,
             time: birthData.time,
@@ -23,11 +25,15 @@ struct UserAstroDataRequest: Codable {
             birthTimeUnknown: birthData.birthTimeUnknown
         )
         self.userEmail = userEmail
+        self.language = language
+        self.isFirstLogin = isFirstLogin
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case birthData = "birth_data"
         case userEmail = "user_email"
+        case language
+        case isFirstLogin = "is_first_login"
     }
 }
 
@@ -369,7 +375,7 @@ struct OtherData: Codable {
     let upgrahas: [String: UpgrahaData]?
     let d60Amsa: [String: D60Data]?
     let ashtakavarga: AshtakavargaData?
-    let aspects: [String: String]?  // Empty dict from API - placeholder
+    let aspects: [String: AnyCodable]?
     let bhavatBhavam: [String: BhavatBhavamData]?
     
     enum CodingKeys: String, CodingKey {

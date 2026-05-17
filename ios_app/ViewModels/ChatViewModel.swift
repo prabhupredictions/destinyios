@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import SwiftUI
 
 /// ViewModel for Chat screen with streaming and history support
@@ -19,16 +20,44 @@ class ChatViewModel {
     var showQuotaSheet = false
     var quotaDetails: String?
     var typewriterMessageId: String?  // Message currently being typewritten
-    
+    var windowManager = MessageWindowManager()
+    var cosmicProgressSteps: [CosmicProgressStep] = []
+    private var progressTimerTask: Task<Void, Never>? = nil
+
+    private static let cosmicMessageKeys: [String] = [
+        "progress_connecting",
+        "progress_mapping_sky",
+        "progress_reading_planets",
+        "progress_planetary_voice",
+        "progress_chart_secrets",
+        "progress_deeper_patterns",
+        "progress_river_of_time",
+        "progress_cosmic_windows",
+        "progress_destiny_shaped",
+        "progress_oracle_weaving",
+    ]
+    /// Short label shown in the user bubble when a home card sends a rich contextual query.
+    /// The full inputText is still sent to the LLM; this only affects what the user sees.
+    var pendingDisplayLabel: String? = nil
+    private var streamingTask: Task<Void, Never>? = nil
+    private var stepProgressTask: Task<Void, Never>? = nil
+    // Tracks whether the app backgrounded mid-stream so we show retry instead of error
+    private var backgroundedWhileStreaming = false
+    nonisolated(unsafe) private var notificationObservers: [Any] = []
+    // Set when background expiry cancels a stream — shows recovery card in UI
+    private(set) var interruptedQuestion: String?
+    // Last query sent — saved before inputText is cleared so recovery can replay it
+    private var lastSentQuery: String = ""
+
     // Current session/thread
     var currentSessionId: String = ""
     var currentThreadId: String = ""
     var userEmail: String = ""
-    
+
     // MARK: - Dependencies
     private let predictionService: PredictionServiceProtocol
     let dataManager: DataManager
-    
+
     // MARK: - Init
     init(
         predictionService: PredictionServiceProtocol? = nil,
@@ -36,23 +65,97 @@ class ChatViewModel {
     ) {
         self.predictionService = predictionService ?? PredictionService()
         self.dataManager = dataManager ?? DataManager.shared
-        
+
         loadUserSession()
+        observeAppLifecycle()
+    }
+
+    nonisolated deinit {
+        notificationObservers.forEach { NotificationCenter.default.removeObserver($0) }
     }
     
     // MARK: - Session Management
     private func loadUserSession() {
         userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        
+
         // Get or create session
         let session = dataManager.getOrCreateSession(for: userEmail)
         currentSessionId = session.sessionId
-        
-        // Load history
+
+        // Load sidebar history only — thread loading is deferred to ChatView.onAppear
+        // so the view can decide: load latest thread OR start new (if a question is pending)
         loadHistory()
-        
-        // Start new thread or load latest for CURRENT PROFILE
-        // Must filter by profile ID to show correct thread when profile is switched
+    }
+
+    // MARK: - App Lifecycle
+    private func observeAppLifecycle() {
+        let resignObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.willResignActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.handleAppBackground() }
+        }
+        let activeObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.handleAppForeground() }
+        }
+        let expiryObserver = NotificationCenter.default.addObserver(
+            forName: .streamingBackgroundExpired,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.handleBackgroundExpiry() }
+        }
+        notificationObservers = [resignObserver, activeObserver, expiryObserver]
+    }
+
+    func handleAppBackground() {
+        backgroundedWhileStreaming = isStreaming
+    }
+
+    func handleBackgroundExpiry() {
+        // iOS is about to suspend — cancel stream cleanly, save question for recovery UI
+        guard isStreaming else { return }
+        interruptedQuestion = lastSentQuery.isEmpty ? nil : lastSentQuery
+        streamingTask?.cancel()
+        streamingTask = nil
+        stepProgressTask?.cancel()
+        cosmicProgressSteps = []
+        isStreaming = false
+        isLoading = false
+        print("[ChatViewModel] Stream cancelled: background time expired")
+    }
+
+    func handleAppForeground() {
+        // Reset stuck isLoading with no active task (overnight idle residue)
+        if isLoading, streamingTask == nil {
+            isLoading = false
+        }
+        // If stream was interrupted by backgrounding, clean up orphaned state
+        if backgroundedWhileStreaming && !isStreaming {
+            stepProgressTask?.cancel()
+            cosmicProgressSteps = []
+            errorMessage = nil
+            // Remove any orphaned streaming messages left behind
+            let orphaned = messages.filter { $0.isStreaming }
+            for msg in orphaned {
+                messages.removeAll { $0.id == msg.id }
+                windowManager.remove(id: msg.id)
+                dataManager.context.delete(msg)
+            }
+        }
+        backgroundedWhileStreaming = false
+
+        // Re-sync quota so canAskQuestion is fresh (stale after overnight idle)
+        let email = userEmail.isEmpty ? (UserDefaults.standard.string(forKey: "userEmail") ?? "") : userEmail
+        guard !email.isEmpty else { return }
+        Task { try? await QuotaManager.shared.syncStatus(email: email, force: true) }
+    }
+
+    /// Load latest thread for current profile, or start a new chat if none exist.
+    /// Called from ChatView.onAppear when no initial question or thread ID is pending.
+    func loadDefaultState() {
         let threads = dataManager.fetchThreads(
             for: currentSessionId,
             profileId: ProfileContextManager.shared.activeProfileId
@@ -63,7 +166,24 @@ class ChatViewModel {
             startNewChat()
         }
     }
-    
+
+    // MARK: - Profile Switch
+    /// Called when active profile changes — isolates chat per profile
+    func handleProfileSwitch() {
+        // Clear current conversation state
+        messages = []
+        windowManager.replaceAll([])
+        suggestedQuestions = []
+        errorMessage = nil
+        streamingContent = ""
+        typewriterMessageId = nil
+        stopStreaming()
+
+        // Reload history filtered for the new profile and load its latest thread
+        loadHistory()
+        loadDefaultState()
+    }
+
     // MARK: - History Management
     func loadHistory() {
         // Filter by active profile for Switch Profile feature
@@ -76,6 +196,7 @@ class ChatViewModel {
     func loadThread(_ thread: LocalChatThread) {
         currentThreadId = thread.id
         messages = dataManager.fetchMessages(for: thread.id)
+        windowManager.replaceAll(messages)
         
         // Add welcome if empty
         if messages.isEmpty {
@@ -97,11 +218,13 @@ class ChatViewModel {
             currentThreadId = UUID().uuidString
         }
         messages = []
-        
+        windowManager.replaceAll([])
+        interruptedQuestion = nil
+
         addWelcomeMessage()
         loadHistory()
     }
-    
+
     func deleteThread(_ thread: LocalChatThread) {
         dataManager.deleteThread(thread)
         loadHistory()
@@ -122,14 +245,18 @@ class ChatViewModel {
         // Use active profile name for Switch Profile feature
         // If viewing as another profile, greet them by that name
         let profileName = ProfileContextManager.shared.activeProfileName
-        let greeting = "Hello \(profileName)! I'm Destiny, your personal astrology guide. What would you like to know about your day, relationships, or path ahead?"
-        
+        let greeting = String(format: "chat_welcome_greeting".localized, profileName)
+
         let welcome = LocalChatMessage(
+            id: "welcome_\(currentThreadId)",
             threadId: currentThreadId,
             role: .assistant,
             content: greeting
         )
+        // Always insert into context so SwiftData backing data is valid for SwiftUI rendering
+        dataManager.context.insert(welcome)
         messages.append(welcome)
+        windowManager.append(welcome)
         if HistorySettingsManager.shared.isHistoryEnabled {
             dataManager.saveMessage(welcome)
         }
@@ -139,21 +266,47 @@ class ChatViewModel {
     func sendMessage() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
-        
+
+        // Short label for the user bubble; full query still goes to LLM
+        let displayContent = pendingDisplayLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? query
+        pendingDisplayLabel = nil
+
+        // Cancel any in-flight stream and remove orphaned streaming messages
+        if isStreaming || streamingTask != nil {
+            streamingTask?.cancel()
+            streamingTask = nil
+            stepProgressTask?.cancel()
+            progressTimerTask?.cancel()
+            progressTimerTask = nil
+            cosmicProgressSteps = []
+            let orphaned = messages.filter { $0.isStreaming }
+            for msg in orphaned {
+                messages.removeAll { $0.id == msg.id }
+                windowManager.remove(id: msg.id)
+                dataManager.context.delete(msg)
+            }
+            isStreaming = false
+        }
+
         // Clear input and reset state immediately
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []
-        
+        interruptedQuestion = nil
+        lastSentQuery = query
+
         let currentEmail = userEmail
-        
+
         // Add user message immediately for responsiveness
         let userMessage = LocalChatMessage(
             threadId: currentThreadId,
             role: .user,
-            content: query
+            content: displayContent
         )
+        // Always insert into context so SwiftData backing data is valid for SwiftUI rendering
+        dataManager.context.insert(userMessage)
         messages.append(userMessage)
+        windowManager.append(userMessage)
         if HistorySettingsManager.shared.isHistoryEnabled {
             dataManager.saveMessage(userMessage)
         }
@@ -169,6 +322,7 @@ class ChatViewModel {
                 // Remove message
                 if let idx = messages.lastIndex(where: { $0.id == userMessage.id }) {
                     messages.remove(at: idx)
+                    windowManager.remove(id: userMessage.id)
                     dataManager.deleteMessage(userMessage)
                 }
                 
@@ -186,7 +340,7 @@ class ChatViewModel {
                     if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
                         quotaDetails = "sign_in_to_continue_asking".localized
                     } else {
-                        quotaDetails = "free_limit_reached".localized
+                        quotaDetails = "create_account_to_continue".localized
                     }
                     showQuotaSheet = true
                 } else {
@@ -206,44 +360,163 @@ class ChatViewModel {
             return
         }
         
+        let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        
+        // Read response length and content style directly from UserDefaults to avoid stale cache
+        let responseLength = UserDefaults.standard.string(forKey: "userResponseLength") ?? "detailed"
+        let responseStyle = UserDefaults.standard.string(forKey: "userContentStyle") ?? "guidance"
+
         let request = PredictionRequest(
             query: query,
             birthData: birthData,
             sessionId: currentSessionId,
             conversationId: currentThreadId,
-            userEmail: userEmail
+            userEmail: userEmail,
+            language: appLanguage,
+            responseStyle: responseStyle,
+            responseLength: responseLength
         )
         
-        // Non-streaming API call (server records quota + chat history)
-        do {
-            let resp = try await predictionService.predict(request: request)
-            
-            // Add AI message with full content
-            let aiMessage = LocalChatMessage(
-                threadId: currentThreadId,
-                role: .assistant,
-                content: resp.answer,
-                area: resp.lifeArea,
-                confidence: resp.confidenceLabel,
-                traceId: resp.predictionId,
-                executionTimeMs: resp.executionTimeMs
-            )
-            typewriterMessageId = aiMessage.id  // Trigger typewriter in MessageBubble
-            messages.append(aiMessage)
-            if HistorySettingsManager.shared.isHistoryEnabled {
-                dataManager.saveMessage(aiMessage)
-            }
-            
-            suggestedQuestions = resp.followUpSuggestions
-            
-        } catch {
-            print("[Predict] Error: \(error)")
-            errorMessage = "Failed to get response. Please try again."
-        }
-        
+        // Streaming API call — replaces fake typewriter
         isLoading = false
+        isStreaming = true
+        cosmicProgressSteps = []
+        startCosmicProgressTimer()
+
+        let streamingMsg = LocalChatMessage(
+            threadId: currentThreadId,
+            role: .assistant,
+            content: "",
+            isStreaming: true
+        )
+        // Insert into context so SwiftData backing data is valid for SwiftUI rendering
+        dataManager.context.insert(streamingMsg)
+        messages.append(streamingMsg)
+        windowManager.append(streamingMsg)
+
+        streamingTask = Task { [weak self] in
+            guard let self else { return }
+            var finalResponse: PredictionResponse? = nil
+            var accumulatedAnswer = ""
+            var receivedDone = false
+
+            do {
+                try await StreamingPredictionService.shared.predictStream(
+                    request: request
+                ) { event in
+                    switch event {
+                    case .action:
+                        break
+
+                    case .progressStep:
+                        break
+
+                    case .finalAnswer(let content):
+                        accumulatedAnswer = content
+                        if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                            self.messages[idx].content = accumulatedAnswer
+                        }
+
+                    case .answer(let response):
+                        finalResponse = response
+
+                    case .done:
+                        receivedDone = true
+                        self.stepProgressTask?.cancel()
+                        self.progressTimerTask?.cancel()
+                        self.progressTimerTask = nil
+
+                        let answer = finalResponse?.answer ?? accumulatedAnswer
+                        if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                            self.messages[idx].content = answer
+                            self.messages[idx].area = finalResponse?.lifeArea
+                            self.messages[idx].advice = finalResponse?.advice
+                            self.messages[idx].executionTimeMs = finalResponse?.executionTimeMs ?? 0
+                        }
+                        self.suggestedQuestions = finalResponse?.followUpSuggestions ?? []
+
+                        Task { @MainActor [weak self] in
+                            guard let self else { return }
+                            withAnimation(.easeOut(duration: 0.3)) {
+                                self.cosmicProgressSteps = []
+                            }
+                            try? await Task.sleep(nanoseconds: 300_000_000)
+                            if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                                withAnimation(.easeIn(duration: 0.5)) {
+                                    self.messages[idx].isStreaming = false
+                                }
+                                if HistorySettingsManager.shared.isHistoryEnabled {
+                                    self.dataManager.saveMessage(self.messages[idx])
+                                }
+                            }
+                            self.isStreaming = false
+                        }
+
+                    case .error(let msg):
+                        self.stepProgressTask?.cancel()
+                        self.progressTimerTask?.cancel()
+                        self.progressTimerTask = nil
+                        self.errorMessage = msg
+                        self.cosmicProgressSteps = []
+                        self.messages.removeAll { $0.id == streamingMsg.id }
+                        self.windowManager.remove(id: streamingMsg.id)
+                        self.dataManager.context.delete(streamingMsg)
+                        self.isStreaming = false
+
+                    default: break
+                    }
+                }
+
+                // Stream ended without .done — connection dropped silently
+                if !receivedDone && self.isStreaming {
+                    self.stepProgressTask?.cancel()
+                    self.progressTimerTask?.cancel()
+                    self.progressTimerTask = nil
+                    self.cosmicProgressSteps = []
+                    self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
+                    self.messages.removeAll { $0.id == streamingMsg.id }
+                    self.windowManager.remove(id: streamingMsg.id)
+                    self.dataManager.context.delete(streamingMsg)
+                    self.isStreaming = false
+                    print("[ChatViewModel] Stream ended without done event — connection dropped")
+                }
+            } catch is CancellationError {
+                self.stepProgressTask?.cancel()
+                self.progressTimerTask?.cancel()
+                self.progressTimerTask = nil
+                self.cosmicProgressSteps = []
+                self.messages.removeAll { $0.id == streamingMsg.id }
+                self.windowManager.remove(id: streamingMsg.id)
+                self.dataManager.context.delete(streamingMsg)
+                self.isStreaming = false
+            } catch {
+                self.stepProgressTask?.cancel()
+                self.progressTimerTask?.cancel()
+                self.progressTimerTask = nil
+                self.cosmicProgressSteps = []
+                self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
+                self.messages.removeAll { $0.id == streamingMsg.id }
+                self.windowManager.remove(id: streamingMsg.id)
+                self.dataManager.context.delete(streamingMsg)
+                self.isStreaming = false
+            }
+        }
     }
-    
+
+    func stopStreaming() {
+        streamingTask?.cancel()
+        streamingTask = nil
+        stepProgressTask?.cancel()
+        stepProgressTask = nil
+    }
+
+    func retryInterruptedQuestion() {
+        guard let question = interruptedQuestion else { return }
+        interruptedQuestion = nil
+        inputText = question
+        Task { await sendMessage() }
+    }
+
     // Format tool names for display — user-friendly cosmic text
     private func friendlyToolName(_ tool: String) -> String {
         let toolNames: [String: String] = [
@@ -266,29 +539,28 @@ class ChatViewModel {
         return toolNames[tool] ?? "🔮 Analyzing your chart..."
     }
     
-    // MARK: - Word-by-Word Streaming
-    private func streamWords(_ text: String, messageId: String) async {
-        let words = text.components(separatedBy: " ")
-        streamingContent = ""  // Reset
-        
-        for (index, word) in words.enumerated() {
-            // Small delay between words (30-50ms)
-            try? await Task.sleep(nanoseconds: UInt64.random(in: 25_000_000...45_000_000))
-            
-            // Update streaming content - this triggers @Observable UI update
-            if index < words.count - 1 {
-                streamingContent += word + " "
-            } else {
-                streamingContent += word
+    
+    // MARK: - Progress Step Pacer
+
+    private func startCosmicProgressTimer() {
+        progressTimerTask?.cancel()
+        progressTimerTask = Task { @MainActor [weak self] in
+            var index = 0
+            while !Task.isCancelled {
+                guard let self else { return }
+                let key = Self.cosmicMessageKeys[index % 10]
+                let msg = NSLocalizedString(key, comment: "")
+                let step = CosmicProgressStep(text: msg, displayKey: key, isCompleted: false, isActive: true)
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    self.cosmicProgressSteps = [step]
+                }
+                index += 1
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                if Task.isCancelled { return }
             }
         }
-        
-        // After streaming, update the actual message
-        if let msgIndex = messages.firstIndex(where: { $0.id == messageId }) {
-            messages[msgIndex].content = streamingContent
-        }
     }
-    
+
     // MARK: - Helpers
     private func loadBirthData() -> BirthData? {
         // Check active profile first (for Switch Profile feature)
@@ -371,8 +643,9 @@ class ChatViewModel {
         for message in messages {
             dataManager.deleteMessage(message)
         }
-        
+
         messages = []
+        windowManager.replaceAll([])
         addWelcomeMessage()
     }
     

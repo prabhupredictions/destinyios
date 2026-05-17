@@ -21,13 +21,15 @@ struct ProfileView: View {
     // Navigation states for settings sheets
     @State private var showBirthDetails = false
     @State private var showLanguageSettings = false
+    @State private var showResponseStyleSettings = false
     @State private var showAstrologySettings = false
     @State private var showChartStylePicker = false
     @State private var showSubscription = false
     @State private var showSignOutAlert = false
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for subscription
     @State private var showProfileSwitcher = false  // Switch Birth Chart sheet
-    @State private var showUpgradePrompt = false  // Upgrade prompt for Switch Profile feature
+    @State private var showUpgradePrompt = false  // Upgrade prompt for premium features
+    @State private var showGuestSignInForAlerts = false  // Guest sign-in prompt for Personalized Alerts
     @State private var showGuestSignInForSwitch = false  // Guest sign-in prompt for Switch Profile
     @State private var showNotificationPreferences = false  // Notification preferences sheet
     @State private var showPartnerManager = false  // Partner manager sheet (Plus-only)
@@ -44,6 +46,10 @@ struct ProfileView: View {
     
     // Notification toggle
     @State private var notificationsEnabled = false
+    
+    // Analytics consent toggle
+    @State private var analyticsConsent = false
+    @State private var isUpdatingAnalyticsConsent = false
     
     /// Check if current user is a guest (generated email with @daa.com or legacy @gen.com)
     private var isGuestUser: Bool {
@@ -75,28 +81,28 @@ struct ProfileView: View {
                     VStack(spacing: 24) {
                         // MARK: - Account Section
                         accountSection
-                        
+
                         // MARK: - Subscription Banner
                         subscriptionSection
-                        
+
                         // MARK: - Profile Settings
                         profileSection
-                        
+
                         // MARK: - History Settings
                         historySection
-                        
+
                         // MARK: - Astrology Settings
                         astrologySection
-                        
+
                         // MARK: - Support
                         supportSection
-                        
+
                         // MARK: - App Info
                         appInfoSection
-                        
+
                         // MARK: - Sign Out
                         signOutSection
-                        
+
                         // MARK: - Delete Account (registered users only)
                         if !isGuestUser {
                             deleteAccountSection
@@ -105,14 +111,15 @@ struct ProfileView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
                 }
+                .accessibilityIdentifier("profile_screen")
             }
-            .navigationTitle("Profile")
+            .navigationTitle("profile_title".localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                     Button("Done") { dismiss() }
+                     Button("done_action".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -121,6 +128,9 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $showLanguageSettings) {
                 LanguageSettingsSheet()
+            }
+            .sheet(isPresented: $showResponseStyleSettings) {
+                ResponseStyleOnboardingView(isSettingsMode: true)
             }
             .sheet(isPresented: $showAstrologySettings) {
                 AstrologySettingsSheet()
@@ -151,6 +161,13 @@ struct ProfileView: View {
                 )
                 .environment(authViewModel)
             }
+            .sheet(isPresented: $showGuestSignInForAlerts) {
+                GuestSignInPromptView(
+                    message: "personalized_alerts_sign_in_prompt".localized,
+                    onBack: { showGuestSignInForAlerts = false }
+                )
+                .environment(authViewModel)
+            }
             .sheet(isPresented: $showNotificationPreferences) {
                 NotificationPreferencesSheet(userEmail: userEmail)
             }
@@ -170,25 +187,29 @@ struct ProfileView: View {
                 )
             }
             .preferredColorScheme(.dark)
-            .onAppear { checkNotificationStatus() }
+            .onAppear { 
+                checkNotificationStatus()
+                loadAnalyticsConsent()
+            }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                 checkNotificationStatus()
             }
             .alert("Turn off history?", isPresented: $showTurnOffHistoryAlert) {
-                Button("Cancel", role: .cancel) {
+                Button("cancel_action".localized, role: .cancel) {
                     // Revert toggle back to ON
                     historySettings.isHistoryEnabled = true
                 }
-                Button("Turn Off", role: .destructive) {
+                Button("turn_off_action".localized, role: .destructive) {
                     historySettings.isHistoryEnabled = false
                     HapticManager.shared.play(.heavy)
                 }
             } message: {
-                Text("New chats and matches won't be saved. You can turn this back on anytime.")
+                Text("history_off_warning".localized)
+                    .font(AppTheme.Fonts.body(size: 15))
             }
             .alert("Clear history?", isPresented: $showClearHistoryAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Clear", role: .destructive) {
+                Button("cancel_action".localized, role: .cancel) {}
+                Button("clear_action".localized, role: .destructive) {
                     Task {
                         let count = await historySettings.clearAllHistory(dataManager: DataManager.shared)
                         await MainActor.run {
@@ -199,12 +220,13 @@ struct ProfileView: View {
                     }
                 }
             } message: {
-                Text("This will remove saved chats and match history. This can't be undone.")
+                Text("clear_history_warning".localized)
+                    .font(AppTheme.Fonts.body(size: 15))
             }
-            .alert("History Cleared", isPresented: $showClearSuccessAlert) {
-                Button("OK", role: .cancel) {}
+            .alert("history_cleared_title".localized, isPresented: $showClearSuccessAlert) {
+                Button("ok_action".localized, role: .cancel) {}
             } message: {
-                Text("Successfully deleted \(clearedThreadCount) conversation\(clearedThreadCount == 1 ? "" : "s").")
+                Text(String(format: clearedThreadCount == 1 ? "deleted_conversation_singular".localized : "deleted_conversation_plural".localized, clearedThreadCount))
             }
         }
     }
@@ -226,12 +248,12 @@ struct ProfileView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(userName.isEmpty ? "Guest User" : userName)
+                    Text(userName.isEmpty ? "guest_user".localized : userName)
                         .font(AppTheme.Fonts.title(size: 20))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
                     if !userEmail.isEmpty {
-                        Text(userEmail)
+                        Text(isGuestUser ? "Guest user" : userEmail)
                             .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                             .lineLimit(1)
@@ -242,8 +264,11 @@ struct ProfileView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "person.text.rectangle")
                             .font(AppTheme.Fonts.caption(size: 11))
-                        Text("Viewing Birth Chart : \(profileContext.activeProfileName)")
+                        let fullName = profileContext.activeProfileName
+                        let displayName = fullName.split(separator: " ").first.map(String.init) ?? fullName
+                        Text(String(format: "viewing_birth_chart_format".localized, displayName))
                             .font(AppTheme.Fonts.caption(size: 11))
+                            .lineLimit(1)
                     }
                     .foregroundColor(AppTheme.Colors.gold)
                     .padding(.top, 4)
@@ -275,27 +300,29 @@ struct ProfileView: View {
     // MARK: - Profile Settings
     private var profileSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Profile")
+            Text("profile_title".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
             
             VStack(spacing: 12) {
                 PremiumListItem(
-                    title: "Birth Details",
-                    subtitle: "Date, time, and place of birth",
+                    title: "birth_details".localized,
+                    subtitle: "birth_details_subtitle".localized,
                     icon: "calendar.circle.fill",
                     action: { showBirthDetails = true }
                 )
+                .accessibilityIdentifier("profile_birth_details")
                 
                 // Manage Birth Charts (Core+)
+                // GUEST RULE: Guests must sign in first to manage birth charts
                 PremiumListItem(
-                    title: "Manage Birth Charts",
-                    subtitle: "Add and edit birth charts for Destiny Matching\u{2122}",
+                    title: "manage_birth_charts".localized,
+                    subtitle: "manage_birth_charts_subtitle".localized,
                     icon: "person.2.fill",
                     isPremiumFeature: true,
-                    premiumBadgeText: "Core",
-                    premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : AppTheme.Colors.gold,
+                    premiumBadgeText: isGuestUser ? "sign_up".localized : "Core",
+                    premiumBadgeColor: quotaManager.hasFeature(.maintainProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
                         if isGuestUser {
                             showGuestSignInForSwitch = true
@@ -306,16 +333,18 @@ struct ProfileView: View {
                         }
                     }
                 )
+                .accessibilityIdentifier("profile_partner_manager")
                 
                 // Switch Profile/Birth Chart (Plus-only)
+                // GUEST RULE: Guests must sign in first to switch profiles
                 PremiumListItem(
-                    title: "Switch Profile/Birth Chart",
-                    subtitle: "Viewing as \(ProfileContextManager.shared.activeProfileName)",
+                    title: "switch_profile_birth_chart".localized,
+                    subtitle: String(format: "viewing_as_label".localized, ProfileContextManager.shared.activeProfileName),
                     icon: "arrow.triangle.2.circlepath",
                     isPremiumFeature: true,
-                    premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : AppTheme.Colors.gold,
+                    premiumBadgeText: isGuestUser ? "sign_up".localized : "Plus",
+                    premiumBadgeColor: quotaManager.hasFeature(.switchProfile) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
-                        // GUEST RULE: Guests must sign in first
                         if isGuestUser {
                             showGuestSignInForSwitch = true
                         } else if quotaManager.hasFeature(.switchProfile) {
@@ -332,39 +361,50 @@ struct ProfileView: View {
     // MARK: - Astrology Settings
     private var astrologySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Preferences")
+            Text("preferences_menu".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
             
             VStack(spacing: 12) {
                 PremiumListItem(
-                    title: "Language",
+                    title: "language".localized,
                     subtitle: currentLanguageDisplay,
                     icon: "globe",
                     action: { showLanguageSettings = true }
                 )
+                .accessibilityIdentifier("profile_language_settings")
+
+                PremiumListItem(
+                    title: "response_style_setting_title".localized,
+                    subtitle: ContentStyleManager.shared.currentStyle.label,
+                    icon: "sparkles",
+                    action: { showResponseStyleSettings = true }
+                )
+                .accessibilityIdentifier("profile_response_style")
                 
                 if AppTheme.Features.showAstrologySettings {
                     PremiumListItem(
-                        title: "Astrology Settings",
-                        subtitle: "Ayanamsa & House System",
+                        title: "astrology_settings_title".localized,
+                        subtitle: "astrology_settings_subtitle".localized,
                         icon: "star.circle.fill",
                         action: { showAstrologySettings = true }
                     )
+                    .accessibilityIdentifier("profile_astrology_settings")
                 }
                 
                 PremiumListItem(
-                    title: "Chart Style",
-                    subtitle: chartStyle == "north" ? "North Indian" : "South Indian",
+                    title: "chart_style".localized,
+                    subtitle: chartStyle == "north" ? "north_indian".localized : "south_indian".localized,
                     icon: "square.grid.3x3.fill",
                     action: { showChartStylePicker = true }
                 )
+                .accessibilityIdentifier("profile_chart_style")
                 
                 // Notifications toggle (available to everyone)
                 PremiumListItem(
-                    title: "Notifications",
-                    subtitle: "Turn notifications on or off",
+                    title: "notifications_title".localized,
+                    subtitle: "notifications_setting_subtitle".localized,
                     icon: "bell.fill",
                     showChevron: false
                 ) {
@@ -382,21 +422,46 @@ struct ProfileView: View {
                     .tint(AppTheme.Colors.gold)
                 }
                 
+                // GUEST RULE: Guests must sign in first to access personalized alerts
                 // Personalized Alerts (Plus-only)
                 PremiumListItem(
-                    title: "Personalized Alerts",
-                    subtitle: "Customize alerts based on your chart",
+                    title: "personalized_alerts_title".localized,
+                    subtitle: "personalized_alerts_subtitle".localized,
                     icon: "bell.badge.fill",
                     isPremiumFeature: true,
-                    premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : AppTheme.Colors.gold,
+                    premiumBadgeText: isGuestUser ? "sign_up".localized : "Plus",
+                    premiumBadgeColor: quotaManager.hasFeature(.alerts) ? .green : (isGuestUser ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold),
                     action: {
-                        if quotaManager.hasFeature(.alerts) {
+                        if isGuestUser {
+                            showGuestSignInForAlerts = true
+                        } else if quotaManager.hasFeature(.alerts) {
                             showNotificationPreferences = true
                         } else {
                             showUpgradePrompt = true
                         }
                     }
                 )
+                .accessibilityIdentifier("profile_notification_prefs")
+                
+                // Analytics Consent Toggle
+                PremiumListItem(
+                    title: "share_analytics_title".localized,
+                    subtitle: "share_analytics_subtitle".localized,
+                    icon: "chart.bar.fill",
+                    showChevron: false
+                ) {
+                    Toggle("", isOn: Binding(
+                        get: { analyticsConsent },
+                        set: { newValue in
+                            Task {
+                                await updateAnalyticsConsent(newValue)
+                            }
+                        }
+                    ))
+                    .labelsHidden()
+                    .tint(AppTheme.Colors.gold)
+                    .disabled(isUpdatingAnalyticsConsent)
+                }
             }
         }
     }
@@ -404,7 +469,7 @@ struct ProfileView: View {
     // MARK: - History Settings
     private var historySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("History")
+            Text("history_section".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
@@ -423,11 +488,11 @@ struct ProfileView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Save conversation history")
+                        Text("save_conversation_history".localized)
                             .font(AppTheme.Fonts.body(size: 16))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         
-                        Text(historySettings.isHistoryEnabled ? "Chats and matches are saved" : "History is turned off")
+                        Text(historySettings.isHistoryEnabled ? "history_chats_saved".localized : "history_turned_off".localized)
                             .font(AppTheme.Fonts.caption(size: 12))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }
@@ -471,11 +536,11 @@ struct ProfileView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Clear history")
+                            Text("clear_history".localized)
                                 .font(AppTheme.Fonts.body(size: 16))
                                 .foregroundColor(AppTheme.Colors.error)
                             
-                            Text("Remove all saved chats and matches")
+                            Text("remove_all_saved".localized)
                                 .font(AppTheme.Fonts.caption(size: 12))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
@@ -514,7 +579,7 @@ struct ProfileView: View {
     
     /// Card for free users showing upgrade CTA
     private var freeUpgradeCard: some View {
-        Button(action: { 
+        Button(action: {
             // Guest users must sign in first to view plans
             if isGuestUser {
                 showGuestSignInSheet = true
@@ -529,24 +594,24 @@ struct ProfileView: View {
                         Circle()
                             .fill(Color.white.opacity(0.2))
                             .frame(width: 40, height: 40)
-                        
+
                         Image(systemName: "crown.fill")
                             .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(.white)
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Upgrade to Premium")
+                        Text(isGuestUser ? "sign_up".localized : "upgrade_to_premium".localized)
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(.white)
-                        
-                        Text("Unlock unlimited insights")
+
+                        Text(isGuestUser ? "save_birth_chart_unlock_insights".localized : "unlock_unlimited_insights".localized)
                             .font(AppTheme.Fonts.body(size: 13))
                             .foregroundColor(.white.opacity(0.8))
                     }
-                    
+
                     Spacer()
-                    
+
                     Image(systemName: "chevron.right")
                         .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(.white.opacity(0.6))
@@ -554,6 +619,7 @@ struct ProfileView: View {
             }
         }
         .buttonStyle(ScaleButtonStyle())
+        .accessibilityIdentifier("profile_subscription")
     }
     
     /// Card for paid users showing current plan and manage option
@@ -623,7 +689,7 @@ struct ProfileView: View {
                 HStack {
                     Image(systemName: "gear")
                         .font(AppTheme.Fonts.body(size: 14))
-                    Text("Manage Subscription")
+                    Text("manage_subscription".localized)
                         .font(AppTheme.Fonts.body(size: 15))
                 }
                 .foregroundColor(AppTheme.Colors.gold)
@@ -631,17 +697,18 @@ struct ProfileView: View {
             
             // View plans button
             Button(action: { showSubscription = true }) {
-                Text("View All Plans")
+                Text("view_all_plans".localized)
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
+            .accessibilityIdentifier("profile_subscription")
         }
     }
     
     // MARK: - Support Section
     private var supportSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Support")
+            Text("support_menu".localized)
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.leading, 4)
@@ -651,7 +718,7 @@ struct ProfileView: View {
                     FAQHelpView()
                 } label: {
                     PremiumListItem<EmptyView>(
-                        title: "FAQ & Help",
+                        title: "faq_and_help".localized,
                         icon: "questionmark.circle.fill",
                         showChevron: true // NavigationLink handles click, but visual needs chevron
                     )
@@ -659,17 +726,17 @@ struct ProfileView: View {
                 .buttonStyle(PlainButtonStyle()) // Important for NavLink wrap
                 
                 PremiumListItem<EmptyView>(
-                    title: "Contact Us",
+                    title: "contact_us_title".localized,
                     icon: "envelope.fill",
                     action: {
-                        if let url = URL(string: "https://www.destinyaiastrology.com/#contact") {
+                        if let url = URL(string: "mailto:support@destinyaiastrology.com") {
                             openURL(url)
                         }
                     }
                 )
-                
+
                 PremiumListItem<EmptyView>(
-                    title: "Privacy Policy",
+                    title: "privacy_policy".localized,
                     icon: "hand.raised.fill",
                     action: {
                         if let url = URL(string: "https://www.destinyaiastrology.com/privacy-policy/") {
@@ -677,9 +744,9 @@ struct ProfileView: View {
                         }
                     }
                 )
-                
+
                 PremiumListItem<EmptyView>(
-                    title: "Terms of Service",
+                    title: "terms_of_service".localized,
                     icon: "doc.text.fill",
                     action: {
                         if let url = URL(string: "https://www.destinyaiastrology.com/terms-of-service/") {
@@ -694,15 +761,15 @@ struct ProfileView: View {
     // MARK: - App Info Section
     private var appInfoSection: some View {
         VStack(spacing: 8) {
-            Text("Destiny AI Astrology")
+            Text("destiny_ai_brand_name".localized)
                 .font(AppTheme.Fonts.title(size: 14))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Version \(appVersion)")
+            Text(String(format: "app_version_format".localized, appVersion))
                 .font(AppTheme.Fonts.body(size: 12))
                 .foregroundColor(AppTheme.Colors.textSecondary)
             
-            Text("© 2026 Destiny AI. All rights reserved.")
+            Text("copyright_full".localized)
                 .font(AppTheme.Fonts.body(size: 11))
                 .foregroundColor(AppTheme.Colors.textTertiary)
         }
@@ -744,7 +811,7 @@ struct ProfileView: View {
             deleteErrorMessage = nil
             showDeleteAccountSheet = true
         }) {
-            Text("Delete Account")
+            Text("delete_account".localized)
                 .font(AppTheme.Fonts.title(size: 16))
                 .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                 .frame(maxWidth: .infinity)
@@ -850,6 +917,54 @@ struct ProfileView: View {
         }
     }
     
+    // MARK: - Analytics Consent Helpers
+    
+    /// Load current analytics consent status from user profile
+    private func loadAnalyticsConsent() {
+        Task {
+            do {
+                let status = try await ProfileService.shared.getUserStatus(email: userEmail)
+                await MainActor.run {
+                    analyticsConsent = status.analyticsConsent ?? (Locale.current.region?.identifier == "US")
+                }
+            } catch {
+                print("[ProfileView] Failed to load analytics consent: \(error.localizedDescription)")
+                // Default: US = on (opt-out), non-US = off (opt-in)
+            }
+        }
+    }
+    
+    /// Update analytics consent preference via API
+    private func updateAnalyticsConsent(_ newValue: Bool) async {
+        guard !userEmail.isEmpty else { return }
+        
+        await MainActor.run {
+            isUpdatingAnalyticsConsent = true
+        }
+        
+        do {
+            let response = try await ProfileService.shared.updateAnalyticsConsent(
+                email: userEmail,
+                consent: newValue
+            )
+            
+            await MainActor.run {
+                analyticsConsent = response.analyticsConsent
+                isUpdatingAnalyticsConsent = false
+                HapticManager.shared.play(.light)
+            }
+            
+            print("[ProfileView] Analytics consent updated: \(newValue)")
+        } catch {
+            await MainActor.run {
+                isUpdatingAnalyticsConsent = false
+                // Revert to previous value on error
+                analyticsConsent = !newValue
+            }
+            print("[ProfileView] Failed to update analytics consent: \(error.localizedDescription)")
+        }
+    }
+    
     // MARK: - Computed Properties
     private var avatarInitials: String {
         if userName.isEmpty { return "G" }
@@ -892,7 +1007,7 @@ struct FAQHelpView: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-                    Text("Common Questions")
+                    Text("common_questions".localized)
                         .font(AppTheme.Fonts.title(size: 18))
                         .foregroundColor(AppTheme.Colors.gold)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -908,7 +1023,7 @@ struct FAQHelpView: View {
                 .padding(.vertical)
             }
         }
-        .navigationTitle("FAQ & Help")
+        .navigationTitle("faq_and_help".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
     

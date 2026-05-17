@@ -157,7 +157,7 @@ struct GuestSignInPromptView: View {
                 AuthButton(
                     icon: "apple.logo",
                     iconImage: nil,
-                    title: "Continue with Apple",
+                    title: "continue_with_apple".localized,
                     style: provider == "apple" ? .goldSlab : (provider == nil ? .goldSlab : .glassSlab),
                     iconScale: 1.15
                 ) {
@@ -170,7 +170,7 @@ struct GuestSignInPromptView: View {
                 AuthButton(
                     icon: nil,
                     iconImage: "google_logo",
-                    title: "Continue with Google",
+                    title: "continue_with_google".localized,
                     style: provider == "google" ? .goldSlab : .glassSlab,
                     iconScale: 1.0
                 ) {

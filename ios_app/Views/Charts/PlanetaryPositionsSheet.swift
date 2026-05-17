@@ -20,13 +20,13 @@ struct PlanetaryPositionsSheet: View {
                 // Premium Cosmic Background
                 CosmicBackgroundView()
                     .ignoresSafeArea()
-                
+
                 if isLoading {
                     VStack(spacing: 16) {
                         ProgressView()
                             .tint(Color("GoldAccent"))
                             .scaleEffect(1.5)
-                        Text("Calculating Chart...")
+                        Text("calculating_chart".localized)
                             .foregroundColor(.white.opacity(0.8))
                     }
                 } else if let error = errorMessage {
@@ -34,14 +34,14 @@ struct PlanetaryPositionsSheet: View {
                         Image(systemName: "exclamationmark.triangle")
                             .font(AppTheme.Fonts.display(size: 40))
                             .foregroundColor(.red.opacity(0.8))
-                        Text("Failed to load chart")
-                            .font(.headline)
+                        Text("failed_to_load_chart".localized)
+                            .font(AppTheme.Fonts.body(size: 14))
                             .foregroundColor(.white)
                         Text(error)
                             .font(.caption)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.white.opacity(0.7))
-                        Button("Retry") { loadData() }
+                        Button("retry".localized) { loadData() }
                             .buttonStyle(.borderedProminent)
                             .tint(Color("GoldAccent"))
                     }
@@ -63,6 +63,9 @@ struct PlanetaryPositionsSheet: View {
                             
                             // Premium Planetary Grid
                             planetaryGrid(chart: chart)
+
+                            // Legend
+                            badgeLegend
                         }
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
@@ -70,7 +73,7 @@ struct PlanetaryPositionsSheet: View {
                     }
                 }
             }
-            .navigationTitle("Birth Chart")
+            .navigationTitle("birth_chart".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -80,10 +83,18 @@ struct PlanetaryPositionsSheet: View {
                     // Chart Style Toggles
                     Menu {
                         Button(action: { chartStyle = "north" }) {
-                            Label("North Indian", systemImage: chartStyle == "north" ? "checkmark" : "")
+                            if chartStyle == "north" {
+                                Label("north_indian".localized, systemImage: "checkmark")
+                            } else {
+                                Text("north_indian".localized)
+                            }
                         }
                         Button(action: { chartStyle = "south" }) {
-                            Label("South Indian", systemImage: chartStyle == "south" ? "checkmark" : "")
+                            if chartStyle == "south" {
+                                Label("south_indian".localized, systemImage: "checkmark")
+                            } else {
+                                Text("south_indian".localized)
+                            }
                         }
                     } label: {
                         Image(systemName: "slider.horizontal.3")
@@ -92,7 +103,7 @@ struct PlanetaryPositionsSheet: View {
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("done".localized) { dismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
                 }
             }
@@ -100,6 +111,7 @@ struct PlanetaryPositionsSheet: View {
                 loadData()
             }
         }
+        .accessibilityIdentifier("chart_screen")
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
@@ -121,8 +133,8 @@ struct PlanetaryPositionsSheet: View {
                     NorthIndianChartView(
                         chartData: mappedData,
                         chartType: .d1,
-                        personName: "", // Hidden in view
-                        ascendantSign: nil // Hidden in view
+                        personName: "",
+                        ascendantSign: ascendantSign
                     )
                 } else {
                     SouthIndianChartView(
@@ -145,11 +157,12 @@ struct PlanetaryPositionsSheet: View {
         
         return VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Planetary Positions")
+                Text("planetary_positions".localized)
                     .font(AppTheme.Fonts.title(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 Spacer()
             }
+            .accessibilityIdentifier("chart_tab_planets")
             
             VStack(spacing: 12) {
                 ForEach(planetOrder, id: \.self) { planetName in
@@ -159,6 +172,7 @@ struct PlanetaryPositionsSheet: View {
                             data: pData,
                             nakshatra: chart.nakshatra[planetName]
                         )
+                        .accessibilityIdentifier("planet_position_row")
                     }
                 }
             }
@@ -166,6 +180,31 @@ struct PlanetaryPositionsSheet: View {
     }
 
     // MARK: - Minimal Birth Info (Clean, no box)
+    private var badgeLegend: some View {
+        HStack(spacing: 16) {
+            HStack(spacing: 6) {
+                Badge(text: "R", color: AppTheme.Colors.error)
+                Text("Retrograde")
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            HStack(spacing: 6) {
+                Badge(text: "C", color: .orange)
+                Text("Combust")
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            HStack(spacing: 6) {
+                Badge(text: "V", color: .purple)
+                Text("Vargottama")
+                    .font(AppTheme.Fonts.body(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            Spacer()
+        }
+        .padding(.top, 4)
+    }
+
     private func minimalBirthInfo(_ details: AstroBirthDetails, city: String, ascendant: String) -> some View {
         return HStack(spacing: 8) {
             // Date
@@ -204,13 +243,14 @@ struct PlanetaryPositionsSheet: View {
     }
     
     private func formatBirthDate(_ dob: String) -> String {
-        // Convert 2013-04-22 to Apr 22, 2013
+        // Convert yyyy-MM-dd to long format (e.g. April 22, 2013) — avoids DD/MM vs MM/DD ambiguity
         let inputFormatter = DateFormatter()
         inputFormatter.dateFormat = "yyyy-MM-dd"
-        
+
         let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "MMM dd, yyyy"
-        
+        outputFormatter.dateStyle = .long
+        outputFormatter.timeStyle = .none
+
         if let date = inputFormatter.date(from: dob) {
             return outputFormatter.string(from: date)
         }
@@ -406,7 +446,7 @@ struct PremiumPlanetRow: View {
                 // Main Info Column
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
-                    Text(name.localized)
+                    Text("planet_\(name.lowercased())".localized)
                         .font(AppTheme.Fonts.title(size: 16))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                     
@@ -423,7 +463,7 @@ struct PremiumPlanetRow: View {
                 }
                 
                 HStack(spacing: 6) {
-                    Text(data.sign)
+                    Text(ChartConstants.signFullNames[data.sign] ?? data.sign)
                         .font(AppTheme.Fonts.title(size: 14))
                         .foregroundColor(AppTheme.Colors.gold)
                     
@@ -441,7 +481,7 @@ struct PremiumPlanetRow: View {
             
             // Detailed Right Column (House & Nakshatra)
             VStack(alignment: .trailing, spacing: 4) {
-                Text("House \(data.house)")
+                Text(String(format: "house_num_label".localized, "\(data.house)"))
                     .font(AppTheme.Fonts.title(size: 12))
                     .foregroundColor(AppTheme.Colors.gold)
                     .padding(.horizontal, 8)
@@ -457,7 +497,7 @@ struct PremiumPlanetRow: View {
                         Text(nak.nakshatra)
                             .font(AppTheme.Fonts.caption(size: 11))
                             .foregroundColor(AppTheme.Colors.textSecondary)
-                        Text("Pada \(nak.pada)")
+                        Text(String(format: "pada_num_label".localized, "\(nak.pada)"))
                             .font(AppTheme.Fonts.caption(size: 10))
                             .foregroundColor(AppTheme.Colors.textTertiary)
                     }

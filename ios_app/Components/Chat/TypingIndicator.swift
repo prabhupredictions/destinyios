@@ -29,7 +29,7 @@ struct TypingIndicator: View {
             Spacer()
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Destiny is thinking")
+        .accessibilityLabel("a11y_destiny_thinking".localized)
         .onAppear {
             startAnimation()
         }

@@ -12,7 +12,43 @@ struct AshtakootData {
     var doshaPresent: Bool = false
     var doshaCancelled: Bool = false
     var cancellationReason: String? = nil
+    var cancellationReasons: [String]? = nil
     var adjustedScore: Double? = nil
+    
+    // V2.2 — Nadi transparency fields
+    var doshaType: String? = nil
+    var classicalEffect: String? = nil
+    var boyConstitution: NadiConstitution? = nil
+    var girlConstitution: NadiConstitution? = nil
+    
+    // V2.2 — Bhakoot transparency fields
+    var severity: String? = nil
+    var housePositions: String? = nil
+    var sadbhakootWarning: String? = nil
+    
+    // V2.2 — Tara transparency fields
+    var taraBoyToGirl: Int? = nil
+    var taraGirlToBoy: Int? = nil
+    
+    // V2.2 — Vashya transparency fields
+    var boyVashya: String? = nil
+    var girlVashya: String? = nil
+    var boyToGirlScore: Double? = nil
+    var girlToBoyScore: Double? = nil
+    
+    // V2.3 — Varna transparency fields
+    var boyVarna: String? = nil
+    var girlVarna: String? = nil
+    var complementarityNote: String? = nil
+    
+    // V2.4 — Universal partner values
+    var boyValue: String? = nil
+    var girlValue: String? = nil
+
+    // V2.5 — Sprint 3 enrichment fields
+    var plainEnglishSummary: String? = nil
+    var boyValueDescription: String? = nil
+    var girlValueDescription: String? = nil
     
     /// Effective score after cancellation (adjusted if available, else raw)
     var effectiveScore: Double {
@@ -52,16 +88,16 @@ struct AshtakootData {
 struct AshtakootGlassGrid: View {
     let kutas: [KutaDetail] // Full detail object
     
-    // Semantic Map (v3)
+    // Semantic Map (v4)
     private let semantics: [String: (label: String, icon: String)] = [
-        "varna": ("Work & Ego", "briefcase.fill"),
-        "vashya": ("Dominance", "bolt.heart.fill"),
-        "tara": ("Destiny", "star.fill"),
-        "yoni": ("Intimacy", "flame.fill"),
-        "maitri": ("Friendship", "person.2.fill"),
-        "gana": ("Temperament", "theatermasks.fill"),
-        "bhakoot": ("Love", "heart.circle.fill"),
-        "nadi": ("Health", "waveform.path.ecg")
+        "varna": ("kuta_varna_label".localized, "briefcase.fill"),
+        "vashya": ("kuta_vashya_label".localized, "bolt.heart.fill"),
+        "tara": ("kuta_tara_label".localized, "star.fill"),
+        "yoni": ("kuta_yoni_label".localized, "flame.fill"),
+        "maitri": ("kuta_maitri_label".localized, "person.2.fill"),
+        "gana": ("kuta_gana_label".localized, "theatermasks.fill"),
+        "bhakoot": ("kuta_bhakoot_label".localized, "heart.circle.fill"),
+        "nadi": ("kuta_nadi_label".localized, "waveform.path.ecg")
     ]
     
     // Convert dictionary to ordered array
@@ -89,7 +125,7 @@ struct AshtakootGlassGrid: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Ashtakoot Analysis")
+            Text("ashtakoot_analysis_title".localized)
                 .font(AppTheme.Fonts.title(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .padding(.horizontal, 4)
@@ -163,10 +199,10 @@ struct GlassPill: View {
                  Text(item.label)
                      .font(AppTheme.Fonts.display(size: 24))
                  
-                 Text("Score: \(item.score.formatted()) / \(item.maxScore.formatted())")
+                 Text("\("score".localized): \(item.score.formatted()) / \(item.maxScore.formatted())")
                      .font(AppTheme.Fonts.title(size: 16))
                  
-                 Text("Detailed explanation for \(item.label) will appear here.")
+                 Text(String(format: "kuta_detail_placeholder_format".localized, item.label))
                      .font(AppTheme.Fonts.body(size: 14))
                      .multilineTextAlignment(.center)
                      .foregroundColor(AppTheme.Colors.textSecondary)

@@ -42,7 +42,7 @@ struct CompatibilityHistorySheet: View {
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .font(.system(size: 15))
                             
-                            TextField("Search matches...", text: $searchText)
+                            TextField("search_matches_placeholder".localized, text: $searchText)
                                 .font(AppTheme.Fonts.body(size: 15))
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .autocorrectionDisabled()
@@ -63,8 +63,7 @@ struct CompatibilityHistorySheet: View {
                         .padding(.bottom, 4)
                         
                         if filteredGroups.isEmpty {
-                            Spacer()
-                            Text("No results found")
+                            Text(searchText.isEmpty ? "no_history_yet".localized : "no_results_found".localized)
                                 .font(AppTheme.Fonts.body(size: 16))
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                             Spacer()
@@ -74,16 +73,13 @@ struct CompatibilityHistorySheet: View {
                     }
                 }
             }
-            .navigationTitle("Match History")
+            .navigationTitle("match_history_title".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .foregroundColor(AppTheme.Colors.gold)
-                }
+                    Button("done_action".localized) { dismiss() }
             }
-            .alert("delete_match".localized, isPresented: $showDeleteConfirmation) {
+            .alert("delete".localized, isPresented: $showDeleteConfirmation) {
                 Button("cancel".localized, role: .cancel) {}
                 Button("delete".localized, role: .destructive) {
                     if let group = groupToDelete {
@@ -92,7 +88,7 @@ struct CompatibilityHistorySheet: View {
                 }
             } message: {
                 if let group = groupToDelete {
-                    Text("delete_match_confirmation".localized + " \(group.displayTitle)?")
+                    Text(String(format: "delete_item_confirm_format".localized, group.displayTitle))
                 }
             }
         }
@@ -109,11 +105,11 @@ struct CompatibilityHistorySheet: View {
                 .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
             
-            Text("History is turned off")
+            Text("history_turned_off".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
             
-            Text("Your match results aren't being saved.")
+            Text("match_results_not_saved".localized)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -127,7 +123,7 @@ struct CompatibilityHistorySheet: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "gearshape")
-                    Text("Open Settings")
+                    Text("open_settings".localized)
                 }
                 .font(AppTheme.Fonts.title(size: 15))
                 .foregroundColor(AppTheme.Colors.mainBackground)
@@ -195,7 +191,7 @@ struct CompatibilityHistorySheet: View {
                             togglePinGroup(group)
                         } label: {
                             Label(
-                                group.items.first?.isPinned == true ? "Unpin" : "Pin",
+                                (group.items.first?.isPinned == true ? "unpin" : "pin").localized,
                                 systemImage: group.items.first?.isPinned == true ? "pin.slash" : "pin"
                             )
                         }
@@ -240,7 +236,7 @@ struct CompatibilityHistorySheet: View {
                             togglePinItem(item)
                         } label: {
                             Label(
-                                item.isPinned ? "Unpin" : "Pin",
+                                (item.isPinned ? "unpin" : "pin").localized,
                                 systemImage: item.isPinned ? "pin.slash" : "pin"
                             )
                         }
@@ -348,7 +344,7 @@ struct GroupHistoryRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     // Title: "UserName + Partner1, Partner2"
                     let partnerNames = group.items.map { $0.girlName }
-                    Text("\(group.userName) + \(partnerNames.joined(separator: ", "))")
+                    Text(String(format: "group_match_title".localized, group.userName, partnerNames.joined(separator: ", ")))
                         .font(AppTheme.Fonts.title(size: 15))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .lineLimit(1)
@@ -363,7 +359,7 @@ struct GroupHistoryRow: View {
                             HStack(spacing: 3) {
                                 Image(systemName: "star.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text("Best: \(best.totalScore)/\(best.maxScore)")
+                                Text(String(format: "best_match_score".localized, best.totalScore, best.maxScore))
                                     .font(AppTheme.Fonts.caption(size: 11))
                             }
                             .foregroundColor(accentPurple)

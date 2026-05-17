@@ -1,10 +1,11 @@
 import SwiftUI
-import Combine
 
+/// BATTERY OPTIMIZATION: Replaced 60fps Timer.publish with SwiftUI-native animation.
 struct TransitsCarousel: View {
     // Dark Navy Background Colors
     private let darkNavyStart = Color(red: 10/255, green: 14/255, blue: 26/255) // #0a0e1a
     private let darkNavyEnd = Color(red: 21/255, green: 25/255, blue: 34/255)   // #151922
+    @Environment(\.scenePhase) private var scenePhase
     
     // Sample Data based on Spec
     private let transits: [(planet: String, sign: String)] = [
@@ -15,11 +16,11 @@ struct TransitsCarousel: View {
         ("♃", "♓")  // Jupiter in Pisces
     ]
     
-    // Infinite Auto-Scroll State
+    // Infinite Auto-Scroll State (GPU-driven animation, no timer)
     @State private var offsetX: CGFloat = 0
     @State private var contentWidth: CGFloat = 0
+    @State private var isAnimating = false
     private let speed: CGFloat = 0.5 // Pixels per tick
-    private let timer = Timer.publish(every: 0.016, on: .main, in: .common).autoconnect() // ~60fps
     
     var body: some View {
         ZStack {
@@ -42,20 +43,15 @@ struct TransitsCarousel: View {
                     GeometryReader { contentGeo in
                         Color.clear
                             .onAppear {
-                                contentWidth = contentGeo.size.width / 3 // Width of one set
+                                let measured = contentGeo.size.width / 3
+                                if measured > 0 && !isAnimating {
+                                    contentWidth = measured
+                                    startScrollAnimation()
+                                }
                             }
                     }
                 )
                 .offset(x: offsetX)
-                .onReceive(timer) { _ in
-                    // Move left continuously
-                    offsetX -= speed
-                    
-                    // Reset when first set finishes
-                    if abs(offsetX) >= contentWidth {
-                        offsetX += contentWidth
-                    }
-                }
             }
             .mask(RoundedRectangle(cornerRadius: 12))
             
@@ -73,6 +69,22 @@ struct TransitsCarousel: View {
             .allowsHitTesting(false)
         }
         .frame(height: 110) // Reduced height for compact fit
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active && contentWidth > 0 {
+                startScrollAnimation()
+            }
+        }
+    }
+    
+    // MARK: - Scroll Animation (replaces 60fps timer)
+    private func startScrollAnimation() {
+        guard contentWidth > 0 else { return }
+        isAnimating = true
+        let duration = Double(contentWidth) / (Double(speed) / 0.016)
+        offsetX = 0
+        withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+            offsetX = -contentWidth
+        }
     }
     
     // Extracted Transit Group View (Triplicated)

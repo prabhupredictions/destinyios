@@ -10,6 +10,7 @@ struct FullReportSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isGeneratingPDF = false
     @State private var showShareOptions = false
+    @State private var showAskDestiny = false
     
     // Parse summary into sections by ### headers
     private var sections: [(emoji: String, title: String, content: String)] {
@@ -18,17 +19,17 @@ struct FullReportSheet: View {
     
     private var ratingText: String {
         if !result.isRecommended { return "not_recommended".localized }
-        let pct = result.percentage * 100
+        let pct = result.adjustedPercentage * 100
         if pct >= 90 { return "excellent".localized }
         else if pct >= 75 { return "very_good".localized }
         else if pct >= 60 { return "good".localized }
         else if pct >= 50 { return "average".localized }
         else { return "not_recommended".localized }
     }
-    
+
     private var starCount: Int {
         if !result.isRecommended { return 1 }
-        let pct = result.percentage * 100
+        let pct = result.adjustedPercentage * 100
         if pct >= 90 { return 5 }
         else if pct >= 75 { return 4 }
         else if pct >= 60 { return 3 }
@@ -51,8 +52,8 @@ struct FullReportSheet: View {
                         
                         // 3. Section Cards (parsed from LLM output)
                         if sections.isEmpty {
-                            // Fallback: render full summary as markdown
-                            sectionCard(emoji: "📋", title: "Analysis", content: result.summary)
+                            // Fallback: render full summary as markdown (strip follow-up section)
+                            sectionCard(emoji: "📋", title: "Analysis", content: ComparisonOverviewView.stripFollowUpSection(result.summary))
                         } else {
                             ForEach(Array(sections.enumerated()), id: \.offset) { _, section in
                                 sectionCard(emoji: section.emoji, title: section.title, content: section.content)
@@ -65,6 +66,14 @@ struct FullReportSheet: View {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 32)
                 }
+                
+                // Floating AMA Chat Button
+                FloatingContextButton(
+                    icon: "bubble.left.and.bubble.right.fill",
+                    action: { showAskDestiny = true }
+                )
+                .padding(20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -87,6 +96,9 @@ struct FullReportSheet: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showAskDestiny) {
+            AskDestinySheet(result: result, boyName: boyName, girlName: girlName, showFollowUpSuggestions: false)
         }
     }
     
@@ -150,7 +162,7 @@ struct FullReportSheet: View {
                     .font(.system(size: 18))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
-                Text("Save to Files")
+                Text("save_to_files".localized)
                     .font(AppTheme.Fonts.body(size: 16))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
@@ -185,7 +197,7 @@ struct FullReportSheet: View {
                 .scaledToFit()
                 .frame(height: 44)
             
-            Text("DESTINY AI ASTROLOGY")
+            Text("destiny_ai_astrology_brand".localized)
                 .font(.system(size: 10, weight: .medium, design: .serif))
                 .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
                 .tracking(4)
@@ -213,7 +225,7 @@ struct FullReportSheet: View {
             
             // Date info
             if let bDob = boyDob, let gDob = girlDob {
-                Text("Born: \(bDob) · \(gDob)")
+            Text(String(format: "born_date_format".localized, bDob, gDob))
                     .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
@@ -271,12 +283,12 @@ struct FullReportSheet: View {
             
             // Transparency: show original vs adjusted score for all cases
             if let adjScore = result.adjustedScore, adjScore != result.totalScore {
-                Text("Ashtakoot: \(result.totalScore)/\(result.maxScore) · Adjusted: \(adjScore)/\(result.maxScore)")
+                Text(String(format: "ashtakoot_adjusted_score_format".localized, result.totalScore, result.maxScore, adjScore, result.maxScore))
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
                     .padding(.top, 2)
             } else {
-                Text("Ashtakoot Score: \(result.totalScore)/\(result.maxScore)")
+                Text(String(format: "ashtakoot_score_format".localized, result.totalScore, result.maxScore))
                     .font(AppTheme.Fonts.caption(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.7))
                     .padding(.top, 2)
@@ -285,7 +297,7 @@ struct FullReportSheet: View {
             // Rejection reasons for Not Recommended
             if !result.isRecommended {
                 VStack(spacing: 6) {
-                    Text("Overridden due to compatibility issues:")
+                    Text("overridden_due_to_issues".localized)
                         .font(AppTheme.Fonts.caption(size: 10))
                         .foregroundColor(AppTheme.Colors.error.opacity(0.7))
                         .multilineTextAlignment(.center)
@@ -314,7 +326,7 @@ struct FullReportSheet: View {
             }
             
             // Report date
-            Text("Report generated: \(formattedDate)")
+            Text(String(format: "report_generated_format".localized, formattedDate))
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
                 .padding(.top, 4)
@@ -430,12 +442,12 @@ struct FullReportSheet: View {
                 Image(systemName: "info.circle.fill")
                     .font(.system(size: 11))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
-                Text("AI-Generated Analysis")
+                Text("ai_generated_analysis".localized)
                     .font(AppTheme.Fonts.caption(size: 11).weight(.semibold))
                     .foregroundColor(AppTheme.Colors.gold.opacity(0.6))
             }
             
-            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
+            Text("ai_disclaimer_text".localized)
                 .font(AppTheme.Fonts.caption(size: 10))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
                 .lineSpacing(3)
@@ -500,7 +512,10 @@ struct FullReportSheet: View {
             }
         }
         
-        return result
+        // Strip follow-up questions section — only relevant in Ask Destiny chat, not in reports or share
+        return result.filter { section in
+            !section.title.localizedCaseInsensitiveContains("SUGGESTED FOLLOW-UP")
+        }
     }
     
     /// Extract emoji and title from header like "🎯 COMPATIBILITY VERDICT"
@@ -618,12 +633,12 @@ struct FullReportSheet: View {
         
         // 1. Header
         let header = VStack(spacing: 12) {
-            Text("DESTINY AI ASTROLOGY")
+            Text("destiny_ai_astrology_title".localized)
                 .font(.system(size: 14, weight: .medium, design: .serif))
                 .foregroundColor(gold)
                 .tracking(4)
             
-            Text("COMPATIBILITY REPORT")
+            Text("compatibility_report_title".localized)
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(gold.opacity(0.6))
                 .tracking(3)
@@ -633,7 +648,7 @@ struct FullReportSheet: View {
                 .foregroundColor(.white)
             
             if let bDob = boyDob, let gDob = girlDob {
-                Text("Born: \(bDob) · \(gDob)")
+                Text(String(format: "born_date_format".localized, bDob, gDob))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.5))
             }
@@ -708,11 +723,11 @@ struct FullReportSheet: View {
                 .frame(height: 1)
                 .padding(.horizontal, 40)
             
-            Text("ⓘ AI-Generated Analysis")
+            Text("ai_generated_analysis_info".localized)
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(gold.opacity(0.5))
             
-            Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only.")
+            Text("ai_disclaimer_text".localized)
                 .font(.system(size: 8))
                 .foregroundColor(.white.opacity(0.3))
                 .multilineTextAlignment(.center)
@@ -721,13 +736,13 @@ struct FullReportSheet: View {
                 .font(.system(size: 8))
                 .foregroundColor(.white.opacity(0.25))
             
-            Text("Generated: \(formattedDate)")
+            Text(String(format: "report_generated_label_format".localized, formattedDate))
                 .font(.system(size: 7))
                 .foregroundColor(.white.opacity(0.2))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
-        
+
         pdfSections.append(AnyView(disclaimer))
         
         return pdfSections
@@ -782,12 +797,12 @@ private struct PremiumReportPDFView: View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
             VStack(spacing: 12) {
-                Text("DESTINY AI ASTROLOGY")
+                Text("destiny_ai_astrology_title".localized)
                     .font(.system(size: 14, weight: .medium, design: .serif))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22))
                     .tracking(4)
                 
-                Text("COMPATIBILITY REPORT")
+                Text("compatibility_report_title".localized)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.6))
                     .tracking(3)
@@ -797,7 +812,7 @@ private struct PremiumReportPDFView: View {
                     .foregroundColor(.white)
                 
                 if let bDob = boyDob, let gDob = girlDob {
-                    Text("Born: \(bDob) · \(gDob)")
+                    Text(String(format: "born_date_format".localized, bDob, gDob))
                         .font(.system(size: 11))
                         .foregroundColor(.white.opacity(0.5))
                 }
@@ -869,11 +884,11 @@ private struct PremiumReportPDFView: View {
                     .frame(height: 1)
                     .padding(.horizontal, 40)
                 
-                Text("ⓘ AI-Generated Analysis")
+                Text("ai_generated_analysis_info".localized)
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(Color(red: 0.83, green: 0.69, blue: 0.22).opacity(0.5))
                 
-                Text("This report is generated using AI based on vedic astrology principles. Results are for informational and entertainment purposes only. Consider multiple factors when making important relationship or marriage decisions.")
+                Text("ai_disclaimer_text".localized)
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.3))
                     .multilineTextAlignment(.center)
@@ -882,7 +897,7 @@ private struct PremiumReportPDFView: View {
                     .font(.system(size: 8))
                     .foregroundColor(.white.opacity(0.25))
                 
-                Text("Generated: \(formattedDate)")
+                Text(String(format: "report_generated_label_format".localized, formattedDate))
                     .font(.system(size: 7))
                     .foregroundColor(.white.opacity(0.2))
             }
@@ -899,23 +914,39 @@ struct AskDestinySheet: View {
     let result: CompatibilityResult
     let boyName: String
     let girlName: String
+    var initialPrompt: String? = nil  // V2.5 — pre-fill from "See classical analysis →"
+    var showFollowUpSuggestions: Bool = true  // false when opened from FullReportSheet
+    var initialQuestions: [String] = []  // AI-generated from /analyze; falls back to hardcoded
     @Environment(\.dismiss) private var dismiss
     
     // Chat State
     @State private var messages: [CompatChatMessage] = []
     @State private var inputText: String = ""
+    @FocusState private var isInputFocused: Bool
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     @State private var showQuotaSheet: Bool = false
     @State private var quotaMessage: String = ""
     @State private var showSubscription: Bool = false
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
-    
+    @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
+    @State private var newMessageIds: Set<UUID> = []  // IDs of newly arrived messages (fade-in targets)
+    @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
+    @State private var showStyleSelector = false
+    @State private var lengthManager = ResponseLengthManager.shared
+    // Agentic path: cosmic progress while awaiting followup response
+    @State private var cosmicProgressSteps: [CosmicProgressStep] = []
+    @State private var cosmicTimerTask: Task<Void, Never>? = nil
+    // Sub-agent streaming tracking (redirect → individual chart)
+    @State private var redirectStreamingMessageId: UUID? = nil
+    @State private var redirectCosmicProgressSteps: [CosmicProgressStep] = []
+    @State private var redirectProgressTimerTask: Task<Void, Never>? = nil
+
     // Auth State (for sign-out flow)
     @AppStorage("isAuthenticated") private var isAuthenticated = false
     @AppStorage("hasBirthData") private var hasBirthData = false
     @AppStorage("isGuest") private var isGuest = false
-    
+
     // Services
     private let compatibilityService = CompatibilityService()
     private let predictionService = PredictionService()
@@ -927,16 +958,16 @@ struct AskDestinySheet: View {
                 // Cosmic Background
                 CosmicBackgroundView()
                     .ignoresSafeArea()
-                
+
                 VStack(spacing: 0) {
                     // Custom transparent header
                     HStack {
                         Spacer()
-                        Text("Ask Destiny")
+                        Text("ask_destiny_title".localized)
                             .font(AppTheme.Fonts.title(size: 17))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                         Spacer()
-                        Button("Done") { dismiss() }
+                        Button("done_action".localized) { dismiss() }
                             .font(AppTheme.Fonts.title(size: 17))
                             .foregroundColor(AppTheme.Colors.gold)
                     }
@@ -944,90 +975,117 @@ struct AskDestinySheet: View {
                     .padding(.vertical, 12)
                     
                     // Messages List
-                    GeometryReader { scrollGeo in
                     ScrollViewReader { proxy in
                         ScrollView {
-                            LazyVStack(spacing: 16) {
-                                // Welcome message — vertically centered
-                                if messages.isEmpty && !isLoading {
-                                    welcomeView
-                                        .frame(minHeight: scrollGeo.size.height - 32)
-                                }
-                                
-                                ForEach(messages) { message in
-                                    CompatChatBubble(message: message)
+                            if messages.isEmpty && !isLoading {
+                                welcomeView
+                            } else {
+                                VStack(spacing: 24) {
+                                    ForEach(Array(messages.enumerated()), id: \.element.id) { _, message in
+                                        CompatChatBubble(
+                                            message: message,
+                                            enableTypewriter: newMessageIds.contains(message.id),
+                                            cosmicProgressSteps: message.id == redirectStreamingMessageId
+                                                ? redirectCosmicProgressSteps : [],
+                                            onTypewriterFinished: newMessageIds.contains(message.id) ? {
+                                                newMessageIds.remove(message.id)
+                                                requestCompatScroll()
+                                            } : nil,
+                                            onTypewriterProgress: nil
+                                        )
                                         .id(message.id)
-                                }
-                                
-                                // Loading indicator
-                                if isLoading {
-                                    CompatTypingIndicator()
-                                        .id("loading")
-                                }
-                                
-                                // Inline suggested follow-up questions
-                                if !suggestedQuestions.isEmpty && !isLoading {
-                                    inlineSuggestedQuestionsView
+                                    }
+
+                                    // Agentic path: cosmic progress while awaiting followup
+                                    if isLoading && !cosmicProgressSteps.isEmpty {
+                                        CosmicProgressView(steps: cosmicProgressSteps)
+                                            .id("loading")
+                                            .padding(.horizontal, 4)
+                                    }
+
+                                    // Follow-up suggestions (vertical rows matching ChatView)
+                                    if showFollowUpSuggestions && !suggestedQuestions.isEmpty && !isLoading && newMessageIds.isEmpty {
+                                        FollowUpSuggestionsView(questions: suggestedQuestions) { question in
+                                            HapticManager.shared.play(.light)
+                                            isInputFocused = false
+                                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                            inputText = question
+                                            suggestedQuestions = []
+                                            Task { await sendMessage() }
+                                        }
                                         .id("suggestions")
                                         .transition(.opacity.combined(with: .move(edge: .bottom)))
+                                    }
                                 }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 20)
                             }
-                            .padding(.horizontal, 12)  // Match ChatView padding
-                            .padding(.vertical, 16)
+
+                            Color.clear
+                                .frame(height: 1)
+                                .id("bottomAnchor")
                         }
-                        .defaultScrollAnchor(.bottom)
                         .scrollDismissesKeyboard(.interactively)
+                        // Single consolidated scroll handler — debounced
+                        .onChange(of: compatScrollTrigger) { _, _ in
+                            withAnimation(.easeOut(duration: 0.25)) {
+                                proxy.scrollTo("bottomAnchor", anchor: .bottom)
+                            }
+                        }
                         .onChange(of: messages.count) { _, _ in
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                withAnimation(.easeOut(duration: 0.25)) {
-                                    if let lastId = messages.last?.id {
-                                        proxy.scrollTo(lastId, anchor: .bottom)
-                                    }
-                                }
-                            }
+                            requestCompatScroll()
                         }
-                        .onChange(of: isLoading) { _, _ in
-                            withAnimation {
-                                if isLoading {
-                                    proxy.scrollTo("loading", anchor: .bottom)
-                                }
-                            }
+                        .onChange(of: isLoading) { _, loading in
+                            if loading { requestCompatScroll() }
                         }
-                        // Scroll smoothly when suggested questions appear
-                        .onChange(of: suggestedQuestions) { _, newQuestions in
-                            if !newQuestions.isEmpty {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        proxy.scrollTo("suggestions", anchor: .bottom)
-                                    }
-                                }
-                            }
+                        .onChange(of: suggestedQuestions) { _, q in
+                            if !q.isEmpty { requestCompatScroll() }
+                        }
+                        .onChange(of: newMessageIds) { _, ids in
+                            if ids.isEmpty { requestCompatScroll(delay: 0.3) }
+                        }
+                        .onChange(of: isInputFocused) { _, focused in
+                            if focused { requestCompatScroll(delay: 0.3) }
+                        }
+                        .onChange(of: cosmicProgressSteps.count) { _, _ in
+                            requestCompatScroll()
                         }
                     }
-                    } // GeometryReader
                     
                     // Error Banner
                     if let error = errorMessage {
-                        Text(error)
-                            .font(AppTheme.Fonts.caption(size: 12))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(AppTheme.Colors.error.opacity(0.9))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 8)
-                            .onTapGesture { errorMessage = nil }
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(AppTheme.Fonts.body(size: 14))
+                            Text(error)
+                                .font(AppTheme.Fonts.body(size: 14))
+                        }
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(AppTheme.Colors.error.opacity(0.85))
+                        )
+                        .padding(.horizontal, 16)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .onTapGesture { errorMessage = nil }
                     }
                     
                     // Input Bar
                     inputBar
                 }
             }
+            .accessibilityIdentifier("ask_destiny_sheet")
             .navigationBarHidden(true)  // Use custom header
         }
         .onAppear {
             loadStoredMessages()
+            // V2.5 — auto-send classical analysis prompt regardless of existing chat history
+            if let prompt = initialPrompt, !prompt.isEmpty {
+                inputText = prompt
+                Task { await sendMessage() }
+            }
         }
         .sheet(isPresented: $showQuotaSheet) {
             QuotaExhaustedView(
@@ -1082,17 +1140,12 @@ struct AskDestinySheet: View {
         print("[AskDestinySheet] Found history item with \(item.chatMessages.count) messages")
         
         // Convert stored messages to CompatChatMessage
-        // Filter out the initial compatibility report (contains markdown tables, very long)
+        // Filter out only the initial compatibility report (identified by table markers or header keywords)
         if !item.chatMessages.isEmpty {
             let filteredMessages = item.chatMessages.filter { msg in
-                // Skip if:
-                // 1. It's the first AI message with table markers (the initial report)
-                // 2. Content contains markdown table separators
-                // 3. Content is excessively long (full report typically > 2000 chars)
-                let isReportMessage = msg.content.contains("---|") || 
+                let isReportMessage = msg.content.contains("---|") ||
                                      msg.content.contains("|---") ||
-                                     msg.content.contains("KEY STRENGTHS") ||
-                                     (msg.content.count > 2000 && !msg.isUser)
+                                     msg.content.contains("KEY STRENGTHS")
                 return !isReportMessage
             }
             messages = filteredMessages.map { $0.toMessage() }
@@ -1125,41 +1178,61 @@ struct AskDestinySheet: View {
         dismiss()
     }
     
+    /// Debounced scroll request for compat chat — coalesces rapid calls
+    private func requestCompatScroll(delay: Double = 0.1) {
+        pendingScrollWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [self] in
+            self.compatScrollTrigger = UUID()
+        }
+        pendingScrollWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
+    }
+    
     // MARK: - Welcome View
     private var welcomeView: some View {
         VStack(spacing: 16) {
+            Spacer()
+
             ZStack {
                 Circle()
                     .fill(AppTheme.Colors.gold.opacity(0.1))
-                    .frame(width: 80, height: 80)
+                    .frame(width: 72, height: 72)
                 Image(systemName: "sparkles")
-                    .font(.system(size: 36))
+                    .font(.system(size: 32))
                     .foregroundColor(AppTheme.Colors.gold)
             }
-            
-            Text("Ask about \(boyName) & \(girlName)")
+
+            Text(String(format: "ask_about_match_title".localized, boyName, girlName))
                 .font(AppTheme.Fonts.title(size: 18))
                 .foregroundColor(AppTheme.Colors.textPrimary)
-            
-            Text("I can answer questions about this compatibility match, their relationship dynamics, or individual insights.")
+
+            Text("ask_destiny_welcome".localized)
                 .font(AppTheme.Fonts.body(size: 14))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
-            
-            // Quick Questions
+
+            // Quick Questions — AI-generated from /analyze if available, else hardcoded fallbacks
             VStack(spacing: 8) {
-                quickQuestionButton("Key strengths of this match?")
-                quickQuestionButton("Key challenges of this match?")
-                quickQuestionButton("Best timing for relationship harmony?")
+                let questions = initialQuestions.isEmpty
+                    ? ["suggested_q_strengths".localized, "suggested_q_challenges".localized, "suggested_q_timing".localized]
+                    : initialQuestions
+                ForEach(questions, id: \.self) { q in
+                    quickQuestionButton(q)
+                }
             }
             .padding(.top, 8)
+
+            Spacer()
         }
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, 24)
     }
-    
+
     private func quickQuestionButton(_ text: String) -> some View {
         Button {
+            isInputFocused = false
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             inputText = text
             Task { await sendMessage() }
         } label: {
@@ -1179,88 +1252,78 @@ struct AskDestinySheet: View {
         }
     }
     
-    // MARK: - Inline Suggested Questions (horizontal scrollable pills)
-    private var inlineSuggestedQuestionsView: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Suggested questions")
-                .font(AppTheme.Fonts.caption())
-                .foregroundColor(AppTheme.Colors.textSecondary)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(suggestedQuestions, id: \.self) { question in
-                        Button(action: {
-                            HapticManager.shared.play(.light)
-                            inputText = question
-                            suggestedQuestions = []
-                            Task { await sendMessage() }
-                        }) {
-                            Text(question)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(AppTheme.Colors.gold)
-                                .lineLimit(1)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(AppTheme.Colors.gold.opacity(0.1))
-                                        .overlay(
-                                            Capsule()
-                                                .stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1)
-                                        )
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-        .padding(.top, 4)
-    }
-    
+
     // MARK: - Input Bar
     private var inputBar: some View {
-        HStack(spacing: 12) {
-            TextField("Ask a question...", text: $inputText)
-                .font(AppTheme.Fonts.body(size: 15))
+        HStack(alignment: .bottom, spacing: 0) {
+            // Style selector icon (left, inside pill — same as ChatInputBar)
+            if !isLoading {
+                Button { showStyleSelector = true } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 40, height: 36)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(lengthManager.currentLength.label)
+            }
+
+            // Text field
+            TextField("ask_question_placeholder".localized, text: $inputText, axis: .vertical)
+                .font(AppTheme.Fonts.body(size: 16))
                 .foregroundColor(AppTheme.Colors.textPrimary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.black.opacity(0.4))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                        )
-                )
+                .lineLimit(1...5)
+                .padding(.vertical, 11)
+                .frame(maxWidth: .infinity)
+                .focused($isInputFocused)
                 .onSubmit {
                     Task { await sendMessage() }
                 }
-            
+                .accessibilityIdentifier("compat_chat_input")
+
+            // Send button (right, inside pill)
             Button {
                 Task { await sendMessage() }
             } label: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 36))
-                    .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                ZStack {
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                            .scaleEffect(0.75)
+                            .frame(width: 40, height: 36)
+                    } else {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.4))
+                            .frame(width: 40, height: 36)
+                    }
+                }
             }
             .disabled(!canSend)
-            .accessibilityLabel("Send question")
+            .accessibilityLabel("a11y_send_question".localized)
+            .accessibilityIdentifier("compat_send_button")
+            .animation(.spring(response: 0.3), value: canSend)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.leading, 4)
+        .padding(.trailing, 4)
         .background(
-            Rectangle()
-                .fill(AppTheme.Colors.mainBackground.opacity(0.95))
+            RoundedRectangle(cornerRadius: 24)
+                .fill(AppTheme.Colors.inputBackground)
+                .shadow(color: isInputFocused ? AppTheme.Colors.gold.opacity(0.12) : .clear, radius: 8)
                 .overlay(
-                    Rectangle()
-                        .fill(LinearGradient(colors: [Color.white.opacity(0.05), Color.clear], startPoint: .top, endPoint: .bottom))
-                        .frame(height: 1),
-                    alignment: .top
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(isInputFocused ? AppTheme.Colors.gold : AppTheme.Colors.gold.opacity(0.25),
+                                lineWidth: isInputFocused ? 1.5 : 1)
                 )
         )
-        .accessibilityHidden(true)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .padding(.bottom, 4)
+        .background(AppTheme.Colors.mainBackground)
+        .sheet(isPresented: $showStyleSelector) {
+            ResponseLengthSheet()
+                .onDisappear { lengthManager = ResponseLengthManager.shared }
+        }
     }
     
     private var canSend: Bool {
@@ -1271,7 +1334,10 @@ struct AskDestinySheet: View {
     private func sendMessage() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
-        
+
+        isInputFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []  // Clear previous suggestions
@@ -1286,7 +1352,7 @@ struct AskDestinySheet: View {
         do {
             let access = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: email)
             if !access.canAccess {
-                messages.removeLast() // Remove user message
+                if !messages.isEmpty { messages.removeLast() } // Remove user message (safe)
                 if access.reason == "daily_limit_reached" {
                     errorMessage = "Daily limit reached. Resets tomorrow."
                 } else {
@@ -1299,6 +1365,11 @@ struct AskDestinySheet: View {
         }
         
         isLoading = true
+        startCosmicTimer()
+        defer {
+            isLoading = false
+            stopCosmicTimer()
+        }
         
         // Get session ID
         guard let sessionId = result.sessionId else {
@@ -1309,224 +1380,375 @@ struct AskDestinySheet: View {
         
         do {
             // Call follow-up API
+            let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
             let request = CompatibilityFollowUpRequest(
                 query: query,
                 sessionId: sessionId,
-                userEmail: email
+                userEmail: email,
+                language: appLanguage,
+                responseStyle: ContentStyleManager.shared.currentStyle.rawValue,
+                responseLength: ResponseLengthManager.shared.currentLength.rawValue
             )
             
             let response = try await compatibilityService.followUp(request: request)
             
             // Handle response
-            if response.status == "redirect", let target = response.target {
-                // Individual question - redirect to predict API
-                await handleRedirect(query: query, target: target, response: response)
+            let redirectTarget = response.target  // May be nil if backend returned null
+            if response.status == "redirect" || response.status == "redirect_no_data" {
+                // Stop agentic timer — redirect streaming will manage its own cosmic steps
+                stopCosmicTimer()
+                let resolvedTarget = redirectTarget ?? boyName
+                print("[AskDestiny] redirect status=\(response.status ?? "") target=\(resolvedTarget)")
+                await handleRedirect(query: query, target: resolvedTarget, response: response)
             } else if let answer = response.answer {
                 // Normal compatibility answer
-                let aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
+                var aiMessage = CompatChatMessage(content: answer, isUser: false, type: .ai)
+                aiMessage.executionTimeMs = response.executionTimeMs ?? 0
+                newMessageIds.insert(aiMessage.id)
                 messages.append(aiMessage)
                 saveMessagesToHistory()  // Persist messages
-                
-                // Set follow-up suggestions from API
-                if let followUps = response.followUpSuggestions, !followUps.isEmpty {
-                    suggestedQuestions = followUps
+
+                // Set follow-up suggestions — prefer JSON field, fall back to embedded block
+                if showFollowUpSuggestions {
+                    let followUps = response.followUpSuggestions ?? []
+                    suggestedQuestions = followUps.isEmpty ? extractFollowUpQuestions(from: answer) : followUps
                 }
             } else if let message = response.message {
-                // Info/error message
-                let aiMessage = CompatChatMessage(content: message, isUser: false, type: .info)
-                messages.append(aiMessage)
+                // Info/error message — detect redirect patterns (including "None's chart" from backend bug)
+                let isRedirectMsg = message.contains("Redirecting") || message.contains("individual analysis") ||
+                                    message.contains("None's chart") || message.contains("birth details")
+                if isRedirectMsg && result.analysisData?.boy?.details != nil {
+                    // Fallback: backend sent redirect as message instead of status — use local data
+                    print("[AskDestiny] Redirect fallback from message pattern, using boyName")
+                    await handleRedirectWithLocalData(query: query, target: boyName, response: response)
+                } else {
+                    let aiMessage = CompatChatMessage(content: message, isUser: false, type: .info)
+                    messages.append(aiMessage)
+                }
             }
             
         } catch {
             errorMessage = "Failed to get response. Please try again."
             print("Follow-up error: \(error)")
         }
-        
-        isLoading = false
     }
     
-    // MARK: - Handle Redirect to Individual Analysis
-    private func handleRedirect(query: String, target: String, response: CompatibilityFollowUpResponse) async {
-        // Show redirect message (temporary - will be removed when result arrives)
-        let redirectMsg = CompatChatMessage(
-            content: "🔄 Redirecting to \(target)'s individual analysis...",
-            isUser: false,
-            type: .info
+    // MARK: - Handle Redirect With Local Data (fallback when backend has no cache)
+    private func handleRedirectWithLocalData(query: String, target: String, response: CompatibilityFollowUpResponse) async {
+        // Build a response with birthData = nil so handleRedirect uses result.analysisData (local) instead
+        let localResponse = CompatibilityFollowUpResponse(
+            status: "redirect",
+            target: target,
+            answer: nil,
+            message: nil,
+            birthData: nil,  // Force handleRedirect to use result.analysisData
+            redirectQuery: nil,
+            reason: response.reason,
+            executionTimeMs: nil,
+            followUpSuggestions: nil
         )
-        messages.append(redirectMsg)
-        let redirectMsgId = redirectMsg.id
-        
-        // Get birth data for target
+        await handleRedirect(query: query, target: target, response: localResponse)
+    }
+
+    // MARK: - Handle Redirect to Individual Analysis (Streaming)
+    private func handleRedirect(query: String, target: String, response: CompatibilityFollowUpResponse) async {
+        let targetLower = target.lowercased()
+        let boyNameLower = boyName.lowercased()
+        let girlNameLower = girlName.lowercased()
+        let boyFirst = boyName.components(separatedBy: " ").first ?? boyName
+        let girlFirst = girlName.components(separatedBy: " ").first ?? girlName
+
+        // Determine actual person — match "boy"/"his"/"him" → boyName, "girl"/"her"/"she" → girlName
+        let isBoyTarget = targetLower.contains("boy") || targetLower.contains("him") || targetLower.contains("his") ||
+                          targetLower == boyNameLower ||
+                          boyNameLower.hasPrefix(targetLower) ||
+                          targetLower.hasPrefix(boyNameLower)
+        let isGirlTarget = targetLower.contains("girl") || targetLower.contains("her") || targetLower.contains("she") ||
+                           targetLower == girlNameLower ||
+                           girlNameLower.hasPrefix(targetLower) ||
+                           targetLower.hasPrefix(girlNameLower)
+
+        // Resolved display name — always a real person's name, never "Boy"/"Girl"
+        let resolvedDisplayName: String
         let birthDetails: BirthDetails?
-        if target.lowercased().contains("boy") || target.lowercased() == boyName.lowercased() {
-            birthDetails = response.birthData ?? result.analysisData?.boy?.details
+        if isBoyTarget {
+            resolvedDisplayName = boyFirst
+            birthDetails = result.analysisData?.boy?.details ?? response.birthData
+        } else if isGirlTarget {
+            resolvedDisplayName = girlFirst
+            birthDetails = result.analysisData?.girl?.details ?? response.birthData
         } else {
-            birthDetails = response.birthData ?? result.analysisData?.girl?.details
+            resolvedDisplayName = boyFirst
+            birthDetails = result.analysisData?.boy?.details ?? response.birthData
+            print("[AskDestiny] Ambiguous target '\(target)' — defaulting to \(boyFirst)'s data")
         }
-        
+
         guard let details = birthDetails else {
-            // Remove redirect message and show error
-            messages.removeAll { $0.id == redirectMsgId }
             let errorMsg = CompatChatMessage(
-                content: "Could not retrieve \(target)'s birth data for individual analysis.",
+                content: "Could not retrieve \(resolvedDisplayName)'s birth data for individual analysis.",
                 isUser: false,
                 type: .error
             )
             messages.append(errorMsg)
             return
         }
-        
-        // Call predict API
+
+        // Add placeholder bubble — CompatChatBubble renders CosmicProgressView when redirectStreamingMessageId matches
+        let redirectMsg = CompatChatMessage(content: "", isUser: false, type: .info)
+        messages.append(redirectMsg)
+        let redirectMsgId = redirectMsg.id
+        redirectStreamingMessageId = redirectMsgId
+        startRedirectProgressTimer()
+
+        let birthData = BirthData(
+            dob: details.dob,
+            time: details.time,
+            latitude: details.lat,
+            longitude: details.lon,
+            cityOfBirth: details.place,
+            ayanamsa: "lahiri",
+            houseSystem: "whole_sign"
+        )
+        let email = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        let compatThreadId = result.sessionId  // Already "compat_xxx" — use as-is to link predict to compat chat history
+        let redirectLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        let predictRequest = PredictionRequest(
+            query: response.redirectQuery ?? query,
+            birthData: birthData,
+            sessionId: nil,
+            conversationId: nil,  // No compat context — compat history confuses the LLM for the redirect person's chart
+            userEmail: email,
+            language: redirectLang,
+            responseStyle: ContentStyleManager.shared.currentStyle.rawValue,
+            responseLength: ResponseLengthManager.shared.currentLength.rawValue,
+            quotaContext: "compatibility"
+        )
+
         do {
-            let birthData = BirthData(
-                dob: details.dob,
-                time: details.time,
-                latitude: details.lat,
-                longitude: details.lon,
-                cityOfBirth: details.place,
-                ayanamsa: "lahiri",
-                houseSystem: "whole_sign"
-            )
-            
-            let email = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-            // Ensure conversationId matches the compatibility thread ID (compat_sess_...)
-            let compatThreadId = result.sessionId.map { "compat_\($0)" }
-            
-            let predictRequest = PredictionRequest(
-                query: query,
-                birthData: birthData,
-                sessionId: nil,
-                conversationId: compatThreadId,
-                userEmail: email,
-                quotaContext: "compatibility"  // Marks this as coming from compatibility
-            )
-            
+            // Sub-agent path: non-streaming individual chart lookup
             let predictResponse = try await predictionService.predict(request: predictRequest)
-            
-            // Remove redirect message and display individual analysis
-            messages.removeAll { $0.id == redirectMsgId }
-            let analysisContent = "**Individual Analysis (\(target)):**\n\n\(predictResponse.answer)"
-            let aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
+            stopRedirectProgressTimer()
+            redirectStreamingMessageId = nil
+            withAnimation(.easeInOut(duration: 0.2)) { messages.removeAll { $0.id == redirectMsgId } }
+            let analysisContent = "**Individual Analysis (\(resolvedDisplayName)):**\n\n\(predictResponse.answer)"
+            var aiMessage = CompatChatMessage(content: analysisContent, isUser: false, type: .ai)
+            aiMessage.executionTimeMs = predictResponse.executionTimeMs
+            newMessageIds.insert(aiMessage.id)
             messages.append(aiMessage)
-            saveMessagesToHistory()  // Persist messages
-            
-            // Set follow-up suggestions from predict API
-            if !predictResponse.followUpSuggestions.isEmpty {
-                suggestedQuestions = predictResponse.followUpSuggestions
+            saveMessagesToHistory()
+            if showFollowUpSuggestions {
+                let followUps = predictResponse.followUpSuggestions
+                suggestedQuestions = followUps.isEmpty ? extractFollowUpQuestions(from: analysisContent) : followUps
             }
-            
         } catch let error as NetworkError {
-            // Remove redirect message
-            messages.removeAll { $0.id == redirectMsgId }
-            
-            // Check if it's a quota error
+            stopRedirectProgressTimer()
+            redirectStreamingMessageId = nil
+            withAnimation(.easeInOut(duration: 0.2)) { messages.removeAll { $0.id == redirectMsgId } }
             let errorString = String(describing: error)
             if errorString.contains("maximum free questions") || errorString.contains("quota") || errorString.contains("limit") {
-                // Show quota sheet with sign-in/upgrade options
-                let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-                if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "sign_in_to_continue_asking".localized
-                } else {
-                    quotaMessage = "free_limit_reached".localized
-                }
+                let e = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+                quotaMessage = (e.contains("guest") || e.contains("@gen.com") || isGuest)
+                    ? "sign_in_to_continue_asking".localized
+                    : "create_account_to_continue".localized
                 showQuotaSheet = true
             } else {
-                let errorMsg = CompatChatMessage(
+                messages.append(CompatChatMessage(
                     content: "Failed to get individual analysis: \(error.localizedDescription)",
-                    isUser: false,
-                    type: .error
-                )
-                messages.append(errorMsg)
+                    isUser: false, type: .error
+                ))
             }
         } catch {
-            // Remove redirect message
-            messages.removeAll { $0.id == redirectMsgId }
-            
-            // Check for quota-related errors in the error message
+            stopRedirectProgressTimer()
+            redirectStreamingMessageId = nil
+            withAnimation(.easeInOut(duration: 0.2)) { messages.removeAll { $0.id == redirectMsgId } }
             let errorString = error.localizedDescription.lowercased()
             if errorString.contains("maximum free") || errorString.contains("quota") || errorString.contains("limit") {
-                let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-                if email.contains("guest") || email.contains("@gen.com") || isGuest {
-                    quotaMessage = "sign_in_to_continue_asking".localized
-                } else {
-                    quotaMessage = "free_limit_reached".localized
-                }
+                let e = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+                quotaMessage = (e.contains("guest") || e.contains("@gen.com") || isGuest)
+                    ? "sign_in_to_continue_asking".localized
+                    : "create_account_to_continue".localized
                 showQuotaSheet = true
             } else {
-                let errorMsg = CompatChatMessage(
+                messages.append(CompatChatMessage(
                     content: "Failed to get individual analysis: \(error.localizedDescription)",
-                    isUser: false,
-                    type: .error
-                )
-                messages.append(errorMsg)
+                    isUser: false, type: .error
+                ))
             }
         }
     }
+
+    // MARK: - Follow-up Question Extraction
+
+    /// Parse embedded FOLLOW_UP_QUESTIONS block from content when the JSON field is absent.
+    private func extractFollowUpQuestions(from content: String) -> [String] {
+        guard let markerRange = content.range(of: "\nFOLLOW_UP_QUESTIONS:") else { return [] }
+        let block = String(content[markerRange.upperBound...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        return block.components(separatedBy: "\n").compactMap { line -> String? in
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return nil }
+            let cleaned = trimmed
+                .replacingOccurrences(of: "^[-•*]\\s*", with: "", options: .regularExpression)
+                .replacingOccurrences(of: "^\\d+\\.\\s*", with: "", options: .regularExpression)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            return cleaned.isEmpty ? nil : cleaned
+        }
+    }
+
+    // MARK: - Cosmic Progress Timer Helpers
+
+    private static let cosmicMessageKeys: [String] = [
+        "progress_connecting", "progress_mapping_sky", "progress_reading_planets",
+        "progress_planetary_voice", "progress_chart_secrets", "progress_deeper_patterns",
+        "progress_river_of_time", "progress_cosmic_windows", "progress_destiny_shaped",
+        "progress_oracle_weaving"
+    ]
+
+    private func startCosmicTimer() {
+        cosmicTimerTask?.cancel()
+        cosmicTimerTask = Task { @MainActor in
+            var index = 0
+            while !Task.isCancelled {
+                let key = Self.cosmicMessageKeys[index % 10]
+                let step = CosmicProgressStep(text: LocalizedString.get(key),
+                                              displayKey: key, isCompleted: false, isActive: true)
+                withAnimation(.easeInOut(duration: 0.4)) { cosmicProgressSteps = [step] }
+                index += 1
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+            }
+        }
+    }
+
+    private func stopCosmicTimer() {
+        cosmicTimerTask?.cancel()
+        cosmicTimerTask = nil
+        withAnimation(.easeOut(duration: 0.3)) { cosmicProgressSteps = [] }
+    }
+
+    private func startRedirectProgressTimer() {
+        redirectProgressTimerTask?.cancel()
+        redirectProgressTimerTask = Task { @MainActor in
+            var index = 0
+            while !Task.isCancelled {
+                let key = Self.cosmicMessageKeys[index % 10]
+                let step = CosmicProgressStep(text: LocalizedString.get(key),
+                                              displayKey: key, isCompleted: false, isActive: true)
+                withAnimation(.easeInOut(duration: 0.4)) { redirectCosmicProgressSteps = [step] }
+                index += 1
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+            }
+        }
+    }
+
+    private func stopRedirectProgressTimer() {
+        redirectProgressTimerTask?.cancel()
+        redirectProgressTimerTask = nil
+        withAnimation(.easeOut(duration: 0.3)) { redirectCosmicProgressSteps = [] }
+    }
 }
 
-// MARK: - Chat Bubble View (Follows ChatView Pattern)
+// MARK: - Chat Bubble View (Matches ReadingMessageView fade-in pattern)
 private struct CompatChatBubble: View {
     let message: CompatChatMessage
-    
+    var enableTypewriter: Bool = false  // true = new message, triggers fade-in
+    var cosmicProgressSteps: [CosmicProgressStep] = []
+    var onTypewriterFinished: (() -> Void)? = nil
+    var onTypewriterProgress: (() -> Void)? = nil
+
+    @State private var appeared = false
+    @State private var showCopiedConfirmation = false
+
+    // Cached formatter — DateFormatter is expensive to create
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        return f
+    }()
+
     private var isUser: Bool { message.isUser }
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             if isUser {
                 Spacer(minLength: 60)
             }
-            
+
             VStack(alignment: isUser ? .trailing : .leading, spacing: 6) {
                 messageContent
+
+                // Metadata row — only for completed AI messages (matches ChatView)
+                if !isUser && message.type == .ai && (!enableTypewriter || appeared) {
+                    metadataRow
+                }
             }
-            
+
             if !isUser {
-                Spacer(minLength: 16)  // Modern full-width AI messages
+                Spacer(minLength: 16)
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+        .accessibilityIdentifier(isUser ? "compat_user_message" : "compat_ai_message")
+        .onAppear {
+            guard enableTypewriter && !appeared else { return }
+            withAnimation(.easeIn(duration: 0.5)) {
+                appeared = true
+            }
+            onTypewriterFinished?()
+        }
     }
-    
+
+    private var displayContent: String {
+        let raw = message.content
+        if let markerRange = raw.range(of: "\nFOLLOW_UP_QUESTIONS:") {
+            return String(raw[raw.startIndex..<markerRange.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return raw
+    }
+
     @ViewBuilder
     private var messageContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             if isUser {
-                // User message - plain text in bubble
                 Text(message.content)
-                    .font(AppTheme.Fonts.body(size: 16))
+                    .font(AppTheme.Fonts.body(size: 17))
                     .foregroundColor(AppTheme.Colors.mainBackground)
             } else if message.type == .info {
-                // Info message - styled text
-                HStack(spacing: 8) {
-                    if message.content.contains("Redirecting") {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-                            .scaleEffect(0.8)
+                // Info message — show cosmic progress during redirect streaming, else styled text
+                if !cosmicProgressSteps.isEmpty {
+                    CosmicProgressView(steps: cosmicProgressSteps)
+                        .padding(.horizontal, 4)
+                } else {
+                    HStack(spacing: 8) {
+                        if message.content.contains("Redirecting") {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                                .scaleEffect(0.8)
+                        }
+                        Text(message.content)
+                            .font(AppTheme.Fonts.body(size: 14))
+                            .foregroundColor(AppTheme.Colors.gold)
+                            .italic()
                     }
-                    Text(message.content)
-                        .font(AppTheme.Fonts.body(size: 14))
-                        .foregroundColor(AppTheme.Colors.gold)
-                        .italic()
                 }
             } else if message.type == .error {
-                // Error message
                 Text(message.content)
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.error)
             } else {
-                // AI message - use MarkdownTextView for proper rendering
                 MarkdownTextView(
-                    content: message.content,
+                    content: displayContent,
                     textColor: AppTheme.Colors.textPrimary,
-                    fontSize: 16
+                    fontSize: 17
                 )
+                .opacity(enableTypewriter && !appeared ? 0 : 1)
+                .animation(.easeIn(duration: 0.5), value: appeared)
+                .transition(.opacity)
             }
         }
-        .padding(.horizontal, isUser ? 14 : 4)  // Less padding for AI (no bubble)
+        .padding(.horizontal, isUser ? 14 : 4)
         .padding(.vertical, isUser ? 10 : 4)
         .background(userBubbleBackground)
     }
-    
+
     @ViewBuilder
     private var userBubbleBackground: some View {
         if isUser {
@@ -1534,67 +1756,135 @@ private struct CompatChatBubble: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18))
                 .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 5, y: 2)
         } else {
-            Color.clear  // Modern: no bubble for AI messages
+            Color.clear
+        }
+    }
+
+    // MARK: - Metadata Row (timestamp · exec time · copy · stars)
+    @ViewBuilder
+    private var metadataRow: some View {
+        HStack(spacing: 6) {
+            Text(formatTime(message.timestamp))
+                .font(AppTheme.Fonts.caption(size: 10))
+                .foregroundColor(AppTheme.Colors.textTertiary)
+
+            if message.executionTimeMs > 0 {
+                Text("•")
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary.opacity(0.6))
+                Text(formatExecTime(message.executionTimeMs))
+                    .font(AppTheme.Fonts.caption(size: 10))
+                    .foregroundColor(AppTheme.Colors.textTertiary)
+            }
+
+            Spacer()
+
+            if message.content.count > 50 {
+                Button(action: {
+                    UIPasteboard.general.string = displayContent
+                    showCopiedConfirmation = true
+                    HapticManager.shared.play(.light)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        showCopiedConfirmation = false
+                    }
+                }) {
+                    Image(systemName: showCopiedConfirmation ? "checkmark" : "doc.on.doc")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(showCopiedConfirmation ? AppTheme.Colors.gold : AppTheme.Colors.textTertiary)
+                }
+                .buttonStyle(.plain)
+                .animation(.easeInOut(duration: 0.2), value: showCopiedConfirmation)
+                .accessibilityLabel("a11y_copy_response".localized)
+                .accessibilityIdentifier("copy_button")
+            }
+
+            if message.content.count > 50 {
+                CompatInlineRating(messageContent: displayContent)
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func formatTime(_ date: Date) -> String {
+        Self.timeFormatter.string(from: date)
+    }
+
+    private func formatExecTime(_ ms: Double) -> String {
+        let seconds = ms / 1000
+        if seconds < 1 {
+            return String(format: "%.0fms", ms)
+        } else if seconds < 60 {
+            return String(format: "%.1fs", seconds)
+        } else {
+            let mins = Int(seconds) / 60
+            let secs = Int(seconds) % 60
+            return "\(mins)m \(secs)s"
         }
     }
 }
 
-// MARK: - Typing Indicator (Matches ChatView Style)
-private struct CompatTypingIndicator: View {
-    @State private var animateFirst = false
-    @State private var animateSecond = false
-    @State private var animateThird = false
-    
+// MARK: - Compact Inline Rating for Compatibility Chat
+private struct CompatInlineRating: View {
+    let messageContent: String
+
+    @State private var selectedRating: Int = 0
+    @State private var isSubmitting = false
+    @State private var hasSubmitted = false
+
     var body: some View {
-        HStack(alignment: .center, spacing: 0) {
-            HStack(spacing: 10) {
-                // Animated dots
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(AppTheme.Colors.gold)
-                        .frame(width: 6, height: 6)
-                        .offset(y: animateFirst ? -4 : 0)
-                    Circle()
-                        .fill(AppTheme.Colors.gold)
-                        .frame(width: 6, height: 6)
-                        .offset(y: animateSecond ? -4 : 0)
-                    Circle()
-                        .fill(AppTheme.Colors.gold)
-                        .frame(width: 6, height: 6)
-                        .offset(y: animateThird ? -4 : 0)
-                }
-                
-                Text("Thinking...")
-                    .font(AppTheme.Fonts.body(size: 14))
+        HStack(spacing: 4) {
+            if hasSubmitted {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(.green)
+                Text("rated_status".localized)
+                    .font(.system(size: 10))
                     .foregroundColor(AppTheme.Colors.textSecondary)
+                    .fixedSize()
+            } else {
+                Text("rate_action".localized)
+                    .font(.system(size: 10))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .fixedSize()
+                HStack(spacing: 1) {
+                    ForEach(1...5, id: \.self) { star in
+                        Button {
+                            guard !isSubmitting else { return }
+                            selectedRating = star
+                            submitRating(star)
+                        } label: {
+                            Image(systemName: star <= selectedRating ? "star.fill" : "star")
+                                .font(.system(size: 12))
+                                .foregroundColor(star <= selectedRating ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.6))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isSubmitting)
+                        .accessibilityLabel(String(format: "a11y_star_rating".localized, star))
+                    }
+                }
+                .opacity(isSubmitting ? 0.5 : 1)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(AppTheme.Colors.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
-            )
-            
-            Spacer()
-        }
-        .onAppear {
-            startAnimation()
         }
     }
-    
-    private func startAnimation() {
-        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) {
-            animateFirst = true
-        }
-        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.15)) {
-            animateSecond = true
-        }
-        withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.3)) {
-            animateThird = true
+
+    private func submitRating(_ stars: Int) {
+        isSubmitting = true
+        Task {
+            do {
+                try await FeedbackService.shared.submitRating(
+                    predictionId: nil,
+                    rating: stars,
+                    query: "Compatibility follow-up",
+                    predictionText: String(messageContent.prefix(500)),
+                    area: "compatibility"
+                )
+            } catch {
+                print("[CompatRating] Submit failed: \(error)")
+            }
+            await MainActor.run {
+                isSubmitting = false
+                hasSubmitted = true
+            }
         }
     }
 }
@@ -1606,6 +1896,7 @@ struct CompatChatMessage: Identifiable {
     let isUser: Bool
     let timestamp: Date = Date()
     let type: MessageType
+    var executionTimeMs: Double = 0
     
     enum MessageType: String, Codable {
         case user

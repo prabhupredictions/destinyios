@@ -157,15 +157,15 @@ struct OnboardingSlideView: View {
 struct StatsCard: View {
     var body: some View {
         VStack(spacing: 16) {
-            // Main stat: 2.2M+ questions
+            // Main stat: 3M+ questions
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(AppTheme.Colors.premiumGradient)
                     
-                    Text("2.5M+")
-                        .font(AppTheme.Fonts.premiumDisplay(size: 40))
+                    Text("stat_questions_asked".localized)
+                        .font(AppTheme.Fonts.title(size: 32).weight(.heavy))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 
@@ -204,12 +204,12 @@ struct StatsCard: View {
                         .foregroundStyle(AppTheme.Colors.gold.opacity(0.3))
                 }
                 
-                Text("4/5")
-                    .font(AppTheme.Fonts.title(size: 18))
+                Text("stat_rating".localized)
+                    .font(AppTheme.Fonts.body(size: 14).weight(.bold))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                 
-                Text("rating")
-                    .font(AppTheme.Fonts.body(size: 14))
+                Text("rating_label".localized)
+                    .font(AppTheme.Fonts.caption(size: 11))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
         }

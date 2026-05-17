@@ -3,27 +3,57 @@ import SwiftUI
 // MARK: - MarkdownTextView
 /// A reusable SwiftUI view that renders markdown-formatted text
 /// Handles: Headers, Bold, Italic, Code, Lists, Links, Blockquotes, Tables, Dividers
-/// v2 — Fixed: table rendering, divider handling, paragraph merging, inline parse hangs
+/// v3 — ChatGPT-style: bold-label sections, improved spacing, gold label rendering, better bullets
 struct MarkdownTextView: View {
     let content: String
     var textColor: Color = AppTheme.Colors.textPrimary
     var fontSize: CGFloat = 15
-    
+
     @State private var blocks: [MarkdownBlock] = []
-    
+    @State private var lastParsedContent: String = ""
+
+    // Cache for expensive AttributedString parsing (shared across all instances)
+    private static let attrCache = NSCache<NSString, CachedAttrString>()
+
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 renderBlock(block)
             }
         }
-        .onAppear {
-            if blocks.isEmpty {
-                blocks = parseBlocks()
+        .task(id: content) {
+            // Debounce: skip if content is growing rapidly (typewriter animation).
+            // Only parse when content changes significantly (>20 chars) or stops changing.
+            let text = content
+            if !lastParsedContent.isEmpty && text.hasPrefix(lastParsedContent) && text.count - lastParsedContent.count < 20 {
+                try? await Task.sleep(nanoseconds: 150_000_000) // 150ms debounce
+                guard !Task.isCancelled else { return }
             }
-        }
-        .onChange(of: content) { _, _ in
-            blocks = parseBlocks()
+            let (parsed, _) = await Task.detached(priority: .userInitiated) {
+                let parsedBlocks = Self.parseBlocksStatic(from: text)
+                // Pre-warm the AttributedString cache for every inline text that will
+                // be rendered. This runs off the main thread so the first body render
+                // hits the cache instead of blocking the main thread with synchronous
+                // AttributedString(markdown:) calls (which cause watchdog kills on long
+                // Opus responses with 30-50 paragraphs).
+                for block in parsedBlocks {
+                    switch block {
+                    case .paragraph(let t), .blockquote(let t):
+                        Self.prewarmAttrCache(t)
+                    case .boldLabel(_, let c):
+                        if !c.isEmpty { Self.prewarmAttrCache(c) }
+                    case .bulletList(let items), .numberedList(let items), .diamondList(let items):
+                        for item in items { Self.prewarmAttrCache(item) }
+                    case .takeaway(let t):
+                        Self.prewarmAttrCache(t)
+                    default:
+                        break
+                    }
+                }
+                return (parsedBlocks, ())
+            }.value
+            blocks = parsed
+            lastParsedContent = text
         }
     }
     
@@ -32,8 +62,11 @@ struct MarkdownTextView: View {
     private enum MarkdownBlock: Equatable {
         case header(level: Int, text: String)
         case paragraph(text: String)
+        case boldLabel(label: String, content: String)
         case bulletList(items: [String])
         case numberedList(items: [String])
+        case diamondList(items: [String])   // ◆ bullet items rendered in gold
+        case takeaway(text: String)          // → final takeaway line rendered in gold
         case codeBlock(code: String)
         case blockquote(text: String)
         case table(headers: [String], rows: [[String]])
@@ -42,7 +75,8 @@ struct MarkdownTextView: View {
     
     // MARK: - Block Parser (No Regex - Performance Optimized)
     
-    private func parseBlocks() -> [MarkdownBlock] {
+    /// Static parser that can run off main thread
+    private static func parseBlocksStatic(from content: String) -> [MarkdownBlock] {
         var blocks: [MarkdownBlock] = []
         let lines = content.components(separatedBy: "\n")
         var i = 0
@@ -78,15 +112,15 @@ struct MarkdownTextView: View {
             }
             
             // Header (## or ### or ####)
-            if let headerMatch = parseHeader(trimmed) {
+            if let headerMatch = parseHeaderStatic(trimmed) {
                 blocks.append(headerMatch)
                 i += 1
                 continue
             }
             
             // Table detection: line contains | and next line is separator (|---|)
-            if trimmed.contains("|") && isTableStart(lines: lines, at: i) {
-                let tableBlock = parseTable(lines: lines, at: &i)
+            if trimmed.contains("|") && isTableStartStatic(lines: lines, at: i) {
+                let tableBlock = parseTableStatic(lines: lines, at: &i)
                 if let table = tableBlock {
                     blocks.append(table)
                 }
@@ -127,7 +161,35 @@ struct MarkdownTextView: View {
                 }
                 continue
             }
-            
+
+            // Diamond bullet list (◆ item)
+            if trimmed.hasPrefix("◆ ") {
+                var items: [String] = []
+                while i < lines.count {
+                    let listLine = lines[i].trimmingCharacters(in: .whitespaces)
+                    if listLine.hasPrefix("◆ ") {
+                        items.append(String(listLine.dropFirst(2)))
+                        i += 1
+                    } else if listLine.isEmpty {
+                        i += 1
+                        break
+                    } else {
+                        break
+                    }
+                }
+                if !items.isEmpty {
+                    blocks.append(.diamondList(items: items))
+                }
+                continue
+            }
+
+            // Takeaway line (→ text)
+            if trimmed.hasPrefix("→ ") {
+                blocks.append(.takeaway(text: String(trimmed.dropFirst(2))))
+                i += 1
+                continue
+            }
+
             // Numbered list (1. item, 2. item, etc.) - Simple check without regex
             if isNumberedListItem(trimmed) {
                 var items: [String] = []
@@ -155,11 +217,15 @@ struct MarkdownTextView: View {
                 let pLine = lines[i].trimmingCharacters(in: .whitespaces)
                 if pLine.isEmpty || pLine.hasPrefix("#") || pLine.hasPrefix("> ") || pLine.hasPrefix("```") ||
                    isNumberedListItem(pLine) || isDivider(pLine) ||
-                   (pLine.contains("|") && i + 1 < lines.count && isTableSeparator(lines[i + 1].trimmingCharacters(in: .whitespaces))) {
+                   (pLine.contains("|") && i + 1 < lines.count && isTableSeparatorStatic(lines[i + 1].trimmingCharacters(in: .whitespaces))) {
                     break
                 }
                 // Bullet check (but not --- which is already caught by isDivider)
                 if pLine.hasPrefix("- ") || pLine.hasPrefix("* ") || pLine.hasPrefix("• ") {
+                    break
+                }
+                // Diamond bullet, takeaway, or ✦ section header break the paragraph
+                if pLine.hasPrefix("◆ ") || pLine.hasPrefix("→ ") || pLine.hasPrefix("✦ ") {
                     break
                 }
                 
@@ -173,18 +239,27 @@ struct MarkdownTextView: View {
                 i += 1
             }
             if !paragraphLines.isEmpty {
-                blocks.append(.paragraph(text: paragraphLines.joined(separator: " ")))
+                let joined = paragraphLines.joined(separator: " ")
+                if let labelBlock = parseBoldLabelStatic(joined) {
+                    blocks.append(labelBlock)
+                } else {
+                    blocks.append(.paragraph(text: joined))
+                }
             }
         }
         
         return blocks
     }
     
-    // MARK: - Divider Detection
+    // Instance wrappers for use in view body (call static versions)
+    private func parseBlocks() -> [MarkdownBlock] {
+        Self.parseBlocksStatic(from: content)
+    }
     
-    private func isDivider(_ line: String) -> Bool {
+    // MARK: - Divider Detection (static for background parsing)
+    
+    private static func isDivider(_ line: String) -> Bool {
         let stripped = line.replacingOccurrences(of: " ", with: "")
-        // ---  ***  ___  (3 or more of the same character)
         if stripped.count >= 3 {
             if stripped.allSatisfy({ $0 == "-" }) { return true }
             if stripped.allSatisfy({ $0 == "*" }) { return true }
@@ -193,10 +268,12 @@ struct MarkdownTextView: View {
         return false
     }
     
-    // MARK: - Table Parsing
+    // Instance wrapper
+    private func isDivider(_ line: String) -> Bool { Self.isDivider(line) }
     
-    private func isTableSeparator(_ line: String) -> Bool {
-        // A table separator line looks like: |---|---|---| or |:---:|:---|
+    // MARK: - Table Parsing (static for background parsing)
+    
+    private static func isTableSeparatorStatic(_ line: String) -> Bool {
         let stripped = line.replacingOccurrences(of: " ", with: "")
         return stripped.contains("|") && stripped.contains("-") &&
                stripped.replacingOccurrences(of: "|", with: "")
@@ -205,42 +282,37 @@ struct MarkdownTextView: View {
                        .isEmpty
     }
     
-    private func isTableStart(lines: [String], at index: Int) -> Bool {
+    private static func isTableStartStatic(lines: [String], at index: Int) -> Bool {
         guard index + 1 < lines.count else { return false }
         let nextLine = lines[index + 1].trimmingCharacters(in: .whitespaces)
-        return isTableSeparator(nextLine)
+        return isTableSeparatorStatic(nextLine)
     }
     
-    private func parseTableRow(_ line: String) -> [String] {
+    private static func parseTableRowStatic(_ line: String) -> [String] {
         var trimmed = line.trimmingCharacters(in: .whitespaces)
-        // Remove leading/trailing pipes
         if trimmed.hasPrefix("|") { trimmed = String(trimmed.dropFirst()) }
         if trimmed.hasSuffix("|") { trimmed = String(trimmed.dropLast()) }
         return trimmed.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
     }
     
-    private func parseTable(lines: [String], at index: inout Int) -> MarkdownBlock? {
-        // Line 1: headers
-        let headers = parseTableRow(lines[index])
+    private static func parseTableStatic(lines: [String], at index: inout Int) -> MarkdownBlock? {
+        let headers = parseTableRowStatic(lines[index])
         index += 1
         
-        // Line 2: separator (skip)
         if index < lines.count {
             index += 1
         }
         
-        // Remaining lines: data rows
         var rows: [[String]] = []
         while index < lines.count {
             let rowLine = lines[index].trimmingCharacters(in: .whitespaces)
             if rowLine.isEmpty || !rowLine.contains("|") {
                 break
             }
-            // Don't consume lines that look like next section's table header
-            if index + 1 < lines.count && isTableSeparator(lines[index + 1].trimmingCharacters(in: .whitespaces)) {
+            if index + 1 < lines.count && isTableSeparatorStatic(lines[index + 1].trimmingCharacters(in: .whitespaces)) {
                 break
             }
-            let cells = parseTableRow(rowLine)
+            let cells = parseTableRowStatic(rowLine)
             rows.append(cells)
             index += 1
         }
@@ -249,16 +321,12 @@ struct MarkdownTextView: View {
         return .table(headers: headers, rows: rows)
     }
     
-    // MARK: - Numbered List Helpers
+    // MARK: - Numbered List Helpers (static for background parsing)
     
-    // Check if line starts with number followed by dot and space (e.g., "1. ", "10. ")
-    private func isNumberedListItem(_ line: String) -> Bool {
+    private static func isNumberedListItem(_ line: String) -> Bool {
         guard line.count >= 3 else { return false }
-        
-        // Find the first dot
         if let dotIndex = line.firstIndex(of: ".") {
             let prefix = String(line[..<dotIndex])
-            // Check if prefix is all digits and followed by ". "
             if !prefix.isEmpty && prefix.allSatisfy({ $0.isNumber }) {
                 let afterDot = line.index(dotIndex, offsetBy: 1)
                 if afterDot < line.endIndex && line[afterDot] == " " {
@@ -269,20 +337,17 @@ struct MarkdownTextView: View {
         return false
     }
     
-    // Extract the text after "N. " from a numbered list item
-    private func extractNumberedListItem(_ line: String) -> String? {
+    private static func extractNumberedListItem(_ line: String) -> String? {
         guard isNumberedListItem(line) else { return nil }
-        
         if let dotIndex = line.firstIndex(of: ".") {
-            let afterDot = line.index(dotIndex, offsetBy: 2) // Skip ". "
-            if afterDot < line.endIndex {
-                return String(line[afterDot...])
-            }
+            guard let afterDot = line.index(dotIndex, offsetBy: 2, limitedBy: line.endIndex),
+                  afterDot < line.endIndex else { return nil }
+            return String(line[afterDot...])
         }
         return nil
     }
     
-    private func parseHeader(_ line: String) -> MarkdownBlock? {
+    private static func parseHeaderStatic(_ line: String) -> MarkdownBlock? {
         if line.hasPrefix("#### ") {
             return .header(level: 4, text: String(line.dropFirst(5)))
         } else if line.hasPrefix("### ") {
@@ -291,8 +356,34 @@ struct MarkdownTextView: View {
             return .header(level: 2, text: String(line.dropFirst(3)))
         } else if line.hasPrefix("# ") {
             return .header(level: 1, text: String(line.dropFirst(2)))
+        } else if line.hasPrefix("✦ ") {
+            return .header(level: 3, text: String(line.dropFirst(2)))
         }
         return nil
+    }
+    
+    // MARK: - Bold Label Detection (static for background parsing)
+    
+    private static func parseBoldLabelStatic(_ text: String) -> MarkdownBlock? {
+        guard text.hasPrefix("**") else { return nil }
+
+        let afterOpen = text.index(text.startIndex, offsetBy: 2)
+        guard let closeRange = text.range(of: "**", range: afterOpen..<text.endIndex) else {
+            return nil
+        }
+
+        let label = String(text[afterOpen..<closeRange.lowerBound])
+
+        let contentStart = closeRange.upperBound
+        let content = contentStart < text.endIndex
+            ? String(text[contentStart...]).trimmingCharacters(in: .whitespaces)
+            : ""
+
+        // Match "**Label:**" (label-content format) OR "**Standalone Title**" (section heading)
+        let isLabelWithColon = label.hasSuffix(":") || label.hasSuffix(": ")
+        guard isLabelWithColon || content.isEmpty else { return nil }
+
+        return .boldLabel(label: label.trimmingCharacters(in: .whitespaces), content: content)
     }
     
     // MARK: - Block Renderer
@@ -306,30 +397,42 @@ struct MarkdownTextView: View {
         case .paragraph(let text):
             renderInlineMarkdown(text)
             
+        case .boldLabel(let label, let content):
+            renderBoldLabel(label: label, content: content)
+            
         case .bulletList(let items):
-            VStack(alignment: .leading, spacing: 4) {
-                ForEach(items, id: \.self) { item in
-                    HStack(alignment: .top, spacing: 8) {
-                        Text("•")
-                            .foregroundColor(AppTheme.Colors.gold)
-                            .font(.system(size: fontSize, weight: .bold))
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Circle()
+                            .fill(AppTheme.Colors.gold.opacity(0.7))
+                            .frame(width: 5, height: 5)
+                            .offset(y: 1)
                         renderInlineMarkdown(item)
                     }
+                    .padding(.leading, 4)
                 }
             }
-            
+
         case .numberedList(let items):
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 8) {
                 ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                    HStack(alignment: .top, spacing: 8) {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
                         Text("\(index + 1).")
                             .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: fontSize, weight: .semibold))
                             .frame(minWidth: 20, alignment: .trailing)
                         renderInlineMarkdown(item)
                     }
+                    .padding(.leading, 4)
                 }
             }
+
+        case .diamondList(let items):
+            renderDiamondList(items: items)
+
+        case .takeaway(let text):
+            renderTakeaway(text: text)
             
         case .codeBlock(let code):
             Text(code)
@@ -345,14 +448,16 @@ struct MarkdownTextView: View {
                 )
             
         case .blockquote(let text):
-            HStack(spacing: 12) {
-                Rectangle()
-                    .fill(AppTheme.Colors.gold)
-                    .frame(width: 3)
-                renderInlineMarkdown(text)
-                    .italic()
-            }
-            .padding(.vertical, 4)
+            renderInlineMarkdown(text)
+                .font(AppTheme.Fonts.body(size: fontSize).bold().italic())
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .padding(.vertical, 10)
+                .padding(.leading, 16)
+                .overlay(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 1.5)
+                        .fill(AppTheme.Colors.gold)
+                        .frame(width: 3)
+                }
             
         case .table(let headers, let rows):
             renderTable(headers: headers, rows: rows)
@@ -371,7 +476,7 @@ struct MarkdownTextView: View {
                     )
                 )
                 .frame(height: 1)
-                .padding(.vertical, 8)
+                .padding(.vertical, 4)
         }
     }
     
@@ -446,7 +551,10 @@ struct MarkdownTextView: View {
     // MARK: - Header Renderer
     
     private func renderHeader(level: Int, text: String) -> some View {
-        let cleanText = text.replacingOccurrences(of: ":", with: "").trimmingCharacters(in: .whitespaces)
+        let cleanText = text
+            .replacingOccurrences(of: "**", with: "")
+            .replacingOccurrences(of: ":", with: "")
+            .trimmingCharacters(in: .whitespaces)
         let headerFontSize: CGFloat
         let weight: Font.Weight
         
@@ -470,32 +578,128 @@ struct MarkdownTextView: View {
                 .font(.system(size: headerFontSize, weight: weight))
                 .foregroundColor(AppTheme.Colors.gold)
         }
-        .padding(.top, 8)
+        .padding(.top, 10)
         .padding(.bottom, 2)
     }
     
-    // MARK: - Inline Markdown
+    // MARK: - Bold Label Renderer (ChatGPT-style **Label:** content)
+    
+    @ViewBuilder
+    private func renderBoldLabel(label: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if content.isEmpty {
+                // Label-only line (e.g. "**Chart Promise:**" followed by bullet list)
+                Text(label)
+                    .font(.system(size: fontSize + 1, weight: .bold))
+                    .foregroundColor(AppTheme.Colors.gold)
+            } else {
+                // Label + inline content (e.g. "**Verdict:** Highly Favorable — Confidence: High")
+                (Text(label + " ")
+                    .font(.system(size: fontSize, weight: .bold))
+                    .foregroundColor(AppTheme.Colors.gold)
+                +
+                renderInlineAttributedString(content))
+                    .lineSpacing(6)
+                    .textSelection(.enabled)
+            }
+        }
+    }
+    
+    // MARK: - Diamond List Renderer (◆ items in gold)
+
+    @ViewBuilder
+    private func renderDiamondList(items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("◆")
+                        .font(.system(size: fontSize - 1, weight: .semibold))
+                        .foregroundColor(AppTheme.Colors.gold)
+                    renderInlineMarkdown(item)
+                }
+                .padding(.leading, 4)
+            }
+        }
+    }
+
+    // MARK: - Takeaway Renderer (→ in gold)
+
+    @ViewBuilder
+    private func renderTakeaway(text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text("→")
+                .font(.system(size: fontSize, weight: .semibold))
+                .foregroundColor(AppTheme.Colors.gold)
+            renderInlineMarkdown(text)
+        }
+        .padding(.top, 4)
+    }
+
+    /// Build an AttributedString for inline content (used by bold label renderer)
+    private func renderInlineAttributedString(_ text: String) -> Text {
+        let sanitized = sanitizeForInlineParsing(text)
+        if let attrString = cachedAttributedString(for: sanitized) {
+            return Text(attrString)
+                .font(AppTheme.Fonts.body(size: fontSize))
+                .foregroundColor(textColor)
+        }
+        return Text(stripMarkdownBold(sanitized))
+            .font(AppTheme.Fonts.body(size: fontSize))
+            .foregroundColor(textColor)
+    }
+    
+    // MARK: - Inline Markdown (cached)
     
     @ViewBuilder
     private func renderInlineMarkdown(_ text: String) -> some View {
-        // Sanitize: remove pipe chars that cause AttributedString parser to hang
         let sanitized = sanitizeForInlineParsing(text)
         
+        if let attrString = cachedAttributedString(for: sanitized) {
+            Text(attrString)
+                .font(AppTheme.Fonts.body(size: fontSize))
+                .foregroundColor(textColor)
+                .lineSpacing(6)
+                .textSelection(.enabled)
+        } else {
+            Text(stripMarkdownBold(sanitized))
+                .font(AppTheme.Fonts.body(size: fontSize))
+                .foregroundColor(textColor)
+                .lineSpacing(6)
+        }
+    }
+    
+    /// Cached AttributedString lookup — avoids re-parsing identical text on main thread
+    private func cachedAttributedString(for sanitized: String) -> AttributedString? {
+        let key = sanitized as NSString
+        if let cached = Self.attrCache.object(forKey: key) {
+            return cached.value
+        }
         if let attrString = try? AttributedString(
             markdown: sanitized,
             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
         ) {
-            Text(attrString)
-                .font(AppTheme.Fonts.body(size: fontSize))
-                .foregroundColor(textColor)
-                .lineSpacing(4)
-                .textSelection(.enabled)
-        } else {
-            // Fallback: strip markdown markers and render as plain text
-            Text(stripMarkdownBold(sanitized))
-                .font(AppTheme.Fonts.body(size: fontSize))
-                .foregroundColor(textColor)
-                .lineSpacing(4)
+            Self.attrCache.setObject(CachedAttrString(attrString), forKey: key)
+            return attrString
+        }
+        return nil
+    }
+
+    /// Pre-warm the attrCache off the main thread so body renders are cache hits.
+    /// Called from .task (background thread) before blocks are set on the main thread.
+    private static func prewarmAttrCache(_ text: String) {
+        var result = text
+        result = result.replacingOccurrences(of: "|", with: "·")
+        let boldCount = result.components(separatedBy: "**").count - 1
+        if boldCount % 2 != 0 { result += "**" }
+        let italicSingles = result.components(separatedBy: "*").count - 1 - (boldCount / 2 * 2 + boldCount % 2)
+        if italicSingles > 0 && italicSingles % 2 != 0 { result += "*" }
+        let key = result as NSString
+        guard attrCache.object(forKey: key) == nil else { return }
+        if let attrString = try? AttributedString(
+            markdown: result,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        ) {
+            attrCache.setObject(CachedAttrString(attrString), forKey: key)
         }
     }
     
@@ -522,48 +726,38 @@ struct MarkdownTextView: View {
     }
 }
 
+// MARK: - AttributedString Cache Wrapper (NSCache requires reference type)
+private final class CachedAttrString: NSObject {
+    let value: AttributedString
+    init(_ value: AttributedString) { self.value = value }
+}
+
 // MARK: - Preview
 
 #Preview("Full Markdown") {
     ScrollView {
         MarkdownTextView(content: """
-        ### 🎯 COMPATIBILITY VERDICT
-        
-        **Score:** 27.5/36 Ashtakoot | **Mangal Status:** Compatible (Cancelled)
-        **Overall Rating:** ⭐⭐⭐⭐⭐ Very Good
-        
-        **One-Line Verdict:** The compatibility is strong with excellent Ashtakoot scores and mitigated Mangal Dosha.
-        
-        ---
-        
-        ### 📊 ASHTAKOOT ANALYSIS
-        
-        **Total Score: 27.5/36 (Very Good)**
-        
-        | Koota | Score | Analysis |
-        |-------|-------|----------|
-        | Nadi | 8/8 | Perfect match |
-        | Bhakoot | 7/7 | Excellent emotional bonding |
-        | Gana | 6/6 | Great temperament compatibility |
-        | Varna | 0/1 | Minor work style difference |
-        
-        ---
-        
-        ### 🌟 KEY STRENGTHS
-        
-        1. Excellent Nadi compatibility ensures progeny health
-        2. Strong Bhakoot for emotional bonding
-        3. Mangal Dosha mutually cancelled
-        
-        ---
-        
-        ### ⚠️ KEY CHALLENGES
-        
-        - Varna mismatch may cause minor friction
-        - Maitri score is moderate
-        
-        > Note: Consult a qualified astrologer for personalized guidance.
-        """)
+        **Verdict:** Highly Favorable — Confidence: High
+
+        Your career chart shows exceptionally strong promise for a job change, primarily driven by **Jupiter** as your **10th lord**.
+
+        **Chart Promise:**
+        - **Jupiter** in **D10** — own sign (Sagittarius) in 10th house = high status
+        - **Jupiter** exalted in **D9** (Cancer), confirming D1 promise
+        - **Gajakesari Yoga** active via Jupiter-Moon = professional recognition
+
+        **Best Window:** November 2026 — April 2027
+        - **Saturn-Saturn-Jupiter dasha** directly activates your 10th lord
+        - Transit **Saturn** in Pisces aspecting **10th house** = restructuring
+        - Transit **Jupiter** in Cancer = double transit trigger
+
+        **Challenges:**
+        - Current **Saturn-Saturn** period may feel restrictive until the window opens
+        - **Mars** transit over **6th house** in Jan 2027 = workplace friction
+
+        **Guidance:**
+        Begin preparations now. The Nov 2026 window is strongest when both dasha and transit align. Network actively during **Jupiter's** Cancer transit — this is your career expansion period.
+        """, fontSize: 16)
         .padding()
     }
     .background(AppTheme.Colors.mainBackground)
@@ -576,6 +770,7 @@ struct MarkdownTextView: View {
 struct PremiumTypingIndicator: View {
     @State private var animationPhase: Int = 0
     @State private var dotScales: [CGFloat] = [1.0, 1.0, 1.0]
+    @State private var bounceTimer: Timer?
     
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
@@ -592,7 +787,7 @@ struct PremiumTypingIndicator: View {
                 
                 // Typing label + dots
                 HStack(spacing: 4) {
-                    Text("Analyzing")
+                    Text("analyzing_label".localized)
                         .font(AppTheme.Fonts.body(size: 13))
                         .fontWeight(.medium)
                         .foregroundColor(AppTheme.Colors.textSecondary)
@@ -625,11 +820,15 @@ struct PremiumTypingIndicator: View {
         .onAppear {
             startBouncingAnimation()
         }
+        .onDisappear {
+            bounceTimer?.invalidate()
+            bounceTimer = nil
+        }
     }
     
     private func startBouncingAnimation() {
-        // Continuous bouncing animation
-        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
+        bounceTimer?.invalidate()
+        bounceTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
             withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                 animationPhase = (animationPhase + 1) % 3
             }

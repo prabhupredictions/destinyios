@@ -2,9 +2,13 @@ import SwiftUI
 
 /// Premium cosmic background with rotating nebulae and twinkling stars
 /// Responds to device tilt for parallax effect
+///
+/// BATTERY OPTIMIZATION v2: Made fully static. This view is instantiated 41+ times
+/// across the app — even GPU-driven repeatForever animations compound to significant drain.
+/// Static nebulae + stars provide the same premium look at zero animation cost.
 struct CosmicBackgroundView: View {
-    @State private var nebulaRotation: Double = 0
-    @State private var starPhases: [Double] = []
+    private let nebulaRotation: Double = 25 // Fixed aesthetic angle
+    private let starBrightness: Double = 0.7 // Fixed comfortable brightness
     
     private let stars: [Star]
     
@@ -16,7 +20,7 @@ struct CosmicBackgroundView: View {
                 x: CGFloat.random(in: 0...1),
                 y: CGFloat.random(in: 0...1),
                 size: CGFloat.random(in: AppTheme.Onboarding.starMinSize...AppTheme.Onboarding.starMaxSize),
-                phase: Double.random(in: 0...1)
+                opacity: Double.random(in: 0.3...0.9)
             ))
         }
         self.stars = generatedStars
@@ -56,8 +60,8 @@ struct CosmicBackgroundView: View {
                     .rotationEffect(.degrees(nebulaRotation * 0.5))
                     .motionParallax(intensity: 0.8)
                 
-                // Twinkling stars layer
-                ForEach(Array(stars.enumerated()), id: \.offset) { index, star in
+                // Stars layer — gentle breathing glow (single animation, no timer)
+                ForEach(Array(stars.enumerated()), id: \.offset) { _, star in
                     Circle()
                         .fill(AppTheme.Colors.goldLight)
                         .frame(width: star.size, height: star.size)
@@ -65,47 +69,13 @@ struct CosmicBackgroundView: View {
                             x: star.x * geo.size.width,
                             y: star.y * geo.size.height
                         )
-                        .opacity(starOpacity(for: index))
+                        .opacity(star.opacity * starBrightness)
                         .blur(radius: 0.5)
                 }
                 .motionParallax(intensity: 0.5)
             }
         }
         .accessibilityHidden(true)
-        .onAppear {
-            startAnimations()
-        }
-    }
-    
-    private func starOpacity(for index: Int) -> Double {
-        guard index < starPhases.count else { return 0.6 }
-        let phase = starPhases[index]
-        // Create twinkling effect using sine wave
-        return 0.3 + 0.7 * abs(sin(phase * .pi))
-    }
-    
-    private func startAnimations() {
-        // Initialize star phases
-        starPhases = stars.map { $0.phase }
-        
-        // Continuous nebula rotation
-        withAnimation(.linear(duration: AppTheme.Onboarding.nebulaRotationDuration).repeatForever(autoreverses: false)) {
-            nebulaRotation = 360
-        }
-        
-        // Animate star twinkling
-        animateStars()
-    }
-    
-    private func animateStars() {
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            for i in starPhases.indices {
-                starPhases[i] += 0.05
-                if starPhases[i] > 2 {
-                    starPhases[i] = 0
-                }
-            }
-        }
     }
 }
 
@@ -114,7 +84,7 @@ private struct Star {
     let x: CGFloat
     let y: CGFloat
     let size: CGFloat
-    let phase: Double
+    let opacity: Double
 }
 
 #Preview {

@@ -12,9 +12,9 @@ struct ArchivedGuestError: Error, LocalizedError {
     
     var errorDescription: String? {
         if let email = upgradedToEmail {
-            return "This account was upgraded to \(email). Please sign in."
+            return String(format: "account_upgraded_to_email".localized, email)
         }
-        return "You already have a registered account. Please sign in."
+        return "already_have_account".localized
     }
 }
 
@@ -28,17 +28,17 @@ struct RegisteredUserConflictError: Error, LocalizedError {
         // Show friendly message based on provider - don't confuse users with relay emails
         switch provider {
         case "apple":
-            return "An account already exists with your birth data. Please sign in with Apple to continue."
+            return "conflict_apple".localized
         case "google":
             if let email = maskedEmail {
-                return "An account already exists with your birth data. Please sign in with Google (\(email))."
+                return String(format: "conflict_google_email".localized, email)
             }
-            return "An account already exists with your birth data. Please sign in with Google."
+            return "conflict_google".localized
         default:
             if let email = maskedEmail {
-                return "An account already exists with your birth data. Please sign in with \(email)."
+                return String(format: "conflict_email".localized, email)
             }
-            return "An account already exists with your birth data. Please sign in."
+            return "conflict_generic".localized
         }
     }
 }
@@ -63,17 +63,14 @@ struct BirthDataTakenError: Error, LocalizedError {
         // Show friendly message based on provider - don't confuse users with relay emails
         switch provider {
         case "apple":
-            return "Your birth data is already linked to your Apple account. Please sign in with Apple to continue."
+            return "birth_data_linked_apple".localized
         case "google":
             if let email = existingEmail {
-                return "Your birth data is already linked to \(email). Please sign in with Google."
+                return String(format: "birth_data_linked_google_email".localized, email)
             }
-            return "Your birth data is already linked to your Google account. Please sign in with Google."
+            return "birth_data_linked_google".localized
         default:
-            if let email = existingEmail {
-                return "Your birth data is already linked to \(email). Please sign in with that account to continue."
-            }
-            return "Your birth data is already linked to a registered account. Please sign in to continue."
+            return String(format: "birth_data_linked_email".localized, existingEmail ?? "a_registered_account".localized)
         }
     }
 }
@@ -205,10 +202,10 @@ struct FeatureAccessResponse: Codable, Sendable {
     /// User-friendly denial reason
     var denialMessage: String {
         switch reason {
-        case "daily_limit_reached": return "Daily limit reached. Resets at midnight."
-        case "overall_limit_reached": return "You've used all your questions."
-        case "feature_not_available": return upgradeCta?.message ?? "Upgrade to access this feature."
-        default: return "Unable to access this feature."
+        case "daily_limit_reached": return "daily_limit_reached".localized
+        case "overall_limit_reached": return "overall_limit_reached".localized
+        case "feature_not_available": return upgradeCta?.message ?? "feature_not_available".localized
+        default: return "unable_access_feature".localized
         }
     }
 }
@@ -352,17 +349,20 @@ class QuotaManager: ObservableObject {
             URLQueryItem(name: "feature", value: feature.rawValue),
             URLQueryItem(name: "count", value: String(count))
         ]
-        
+
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
         request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
+        // Short timeout: if Cloud Run is cold, fail fast so the catch block in sendQuery
+        // lets the request proceed. The stream itself handles cold-start wait transparently.
+        request.timeoutInterval = 5
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
-        
+
         return try JSONDecoder().decode(FeatureAccessResponse.self, from: data)
     }
     
@@ -528,17 +528,18 @@ class QuotaManager: ObservableObject {
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
         request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
+        request.timeoutInterval = 10  // fail fast on cold Cloud Run; cache stays valid
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }
-        
+
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
         updateFromStatus(status)
         lastSyncTime = Date()
-        
+
         // Pre-fetch plans to keep cache fresh (fire-and-forget)
         Task { try? await fetchPlans() }
     }
@@ -556,6 +557,9 @@ class QuotaManager: ObservableObject {
         UserDefaults.standard.set(status.planId, forKey: "currentPlanId")
         UserDefaults.standard.set(status.subscriptionStatus, forKey: "subscriptionStatus")
         UserDefaults.standard.set(status.subscriptionExpiresAt, forKey: "subscriptionExpiresAt")
+        if let name = status.plan?.displayName {
+            UserDefaults.standard.set(name, forKey: "currentPlanDisplayName")
+        }
         
         if let profile = dataManager.getCurrentUserProfile() {
             profile.totalQuestionsAsked = status.totalQuestionsAsked
@@ -573,7 +577,7 @@ class QuotaManager: ObservableObject {
             }
             return plan.displayName
         }
-        return "Free Plan"
+        return UserDefaults.standard.string(forKey: "currentPlanDisplayName") ?? "Free Plan"
     }
     
     /// Check if user can upgrade

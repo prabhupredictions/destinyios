@@ -43,8 +43,9 @@ class ProfileContextManager {
     }
     
     /// The main user's email - ALWAYS use this for plan/quota validation
+    /// Returns stored userEmail, or empty string if not yet set (pre-login)
     var ownerEmail: String {
-        UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
+        UserDefaults.standard.string(forKey: "userEmail") ?? ""
     }
     
     /// Main user's display name
@@ -68,7 +69,7 @@ class ProfileContextManager {
             latitude: profile.latitude ?? 0,
             longitude: profile.longitude ?? 0,
             ayanamsa: UserDefaults.standard.string(forKey: "ayanamsa") ?? "lahiri",
-            houseSystem: UserDefaults.standard.string(forKey: "houseSystem") ?? "placidus",
+            houseSystem: UserDefaults.standard.string(forKey: "houseSystem") ?? "whole_sign",
             cityOfBirth: profile.cityOfBirth ?? "",
             gender: profile.gender,
             birthTimeUnknown: profile.birthTimeUnknown

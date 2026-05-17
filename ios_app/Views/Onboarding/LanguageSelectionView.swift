@@ -136,12 +136,12 @@ struct LanguageSelectionView: View {
             }
             .padding(.bottom, 8)
             
-            Text("Destiny AI Astrology")
-                .font(AppTheme.Fonts.display(size: 26))
+            Text("destiny_ai_brand_name".localized)
+                .font(.system(size: 24, weight: .bold, design: .serif))
                 .goldGradient()
             
-            Text("Personalized guidance, in your language")
-                .font(AppTheme.Fonts.body(size: 15))
+            Text("personalized_guidance".localized)
+                .font(.system(size: 16))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
@@ -227,18 +227,9 @@ struct LanguageSelectionView: View {
     
     // MARK: - Helpers
     private var continueButtonText: String {
-        guard let code = selectedCode else { return "Select a language" }
-        switch code {
-        case "hi": return "जारी रखें"
-        case "es": return "Continuar"
-        case "fr": return "Continuer"
-        case "de": return "Weiter"
-        case "pt": return "Continuar"
-        case "ja": return "続ける"
-        case "ru": return "Продолжить"
-        case "zh-Hans": return "继续"
-        default: return "Continue in \(languages.first(where: { $0.code == code })?.name ?? "English")"
-        }
+        guard let code = selectedCode else { return "select_a_language".localized }
+        let nativeName = languages.first(where: { $0.code == code })?.nativeName ?? "English"
+        return String(format: "continue_in_language_format".localized, nativeName)
     }
     
     private func startAnimations() {

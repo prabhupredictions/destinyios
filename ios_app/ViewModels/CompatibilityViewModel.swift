@@ -85,6 +85,7 @@ class CompatibilityViewModel {
     var result: CompatibilityResult?
     var sessionId: String? // For follow-up queries
     var historyLoadedToast = false // Shows brief "Loaded from history" indicator
+    var duplicateMessage: String? // Shows when save attempt finds a duplicate birth chart
     
     // Streaming progress state
     var currentStep: AnalysisStep = .calculatingCharts
@@ -139,13 +140,13 @@ class CompatibilityViewModel {
     // MARK: - Formatted Date Strings
     var formattedBoyDob: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: boyBirthDate)
     }
-    
+
     var formattedGirlDob: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
+        formatter.dateStyle = .long
         return formatter.string(from: girlBirthDate)
     }
     
@@ -269,6 +270,25 @@ class CompatibilityViewModel {
         }
     }
     
+    // MARK: - Age Validation (18+ required for compatibility matching)
+    private static func ageInYears(from date: Date) -> Int {
+        Calendar.current.dateComponents([.year], from: date, to: Date()).year ?? 0
+    }
+    
+    var isUserMinor: Bool {
+        Self.ageInYears(from: boyBirthDate) <= 18
+    }
+    
+    var isPartnerMinor: Bool {
+        guard currentPartner.birthDateSet else { return false }
+        return Self.ageInYears(from: currentPartner.birthDate) <= 18
+    }
+    
+    var ageBlockMessage: String? {
+        guard isUserMinor || isPartnerMinor else { return nil }
+        return "Destiny matching requires both individuals to be 18 or older"
+    }
+    
     // MARK: - Validation
     var isFormValid: Bool {
         // Names, locations, and dates are now required
@@ -281,7 +301,9 @@ class CompatibilityViewModel {
         girlLatitude != 0 &&
         girlLongitude != 0 &&
         currentPartner.birthDateSet &&  // Date must be explicitly selected
-        (currentPartner.birthTimeSet || partnerTimeUnknown)  // Time must be set OR marked as unknown
+        (currentPartner.birthTimeSet || partnerTimeUnknown) &&  // Time must be set OR marked as unknown
+        !isUserMinor &&  // Both must be over 18
+        !isPartnerMinor
     }
     
     // Effective names with fallback
@@ -307,10 +329,10 @@ class CompatibilityViewModel {
         guard partners.count > 1 else { return }  // Keep at least one
         guard partners.indices.contains(index) else { return }
         partners.remove(at: index)
-        // Adjust active index if needed
         if activePartnerIndex >= partners.count {
             activePartnerIndex = partners.count - 1
         }
+        errorMessage = nil
         HapticManager.shared.play(.medium)
     }
     
@@ -318,7 +340,7 @@ class CompatibilityViewModel {
     func selectPartner(at index: Int) {
         guard partners.indices.contains(index) else { return }
         activePartnerIndex = index
-        // Computed properties auto-sync; no manual sync needed
+        errorMessage = nil
     }
     
     /// Load a saved partner into the current slot
@@ -387,7 +409,8 @@ class CompatibilityViewModel {
                 latitude: partner.latitude,
                 longitude: partner.longitude,
                 birthTimeUnknown: partner.timeUnknown,
-                consentGiven: true
+                consentGiven: true,
+                forCompatibility: true
             )
             
             // Save locally (Smart Check)
@@ -397,9 +420,14 @@ class CompatibilityViewModel {
             Task {
                 if let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty {
                     do {
-                        // API usually handles duplicates (returns existing or updates)
                         let created = try await PartnerProfileService.shared.createPartner(newPartner, email: email)
                         print("Synced partner: \(created.name)")
+                    } catch PartnerProfileError.duplicateProfile {
+                        // Surface duplicate message to user
+                        await MainActor.run {
+                            duplicateMessage = "A birth chart with the same birth details already exists for \(partner.name). It was not saved again."
+                        }
+                        print("[CompatibilityViewModel] Duplicate partner detected: \(partner.name)")
                     } catch {
                         print("Failed to sync partner: \(error)")
                     }
@@ -427,8 +455,10 @@ class CompatibilityViewModel {
         if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
             boyDob: dobFmt.string(from: boyBirthDate),
             boyTime: timeFmt.string(from: boyBirthTime),
+            boyCity: boyCity,
             girlDob: dobFmt.string(from: girlBirthDate),
-            girlTime: timeFmt.string(from: girlBirthTime)
+            girlTime: timeFmt.string(from: girlBirthTime),
+            girlCity: girlCity
         ) {
             print("[CompatibilityViewModel] Found existing match in local history — loading FREE (no API call)")
             await MainActor.run {
@@ -511,6 +541,7 @@ class CompatibilityViewModel {
             let roundedGirlLat = (girlLatitude * 1_000_000).rounded() / 1_000_000
             let roundedGirlLon = (girlLongitude * 1_000_000).rounded() / 1_000_000
             
+            let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
             let request = CompatibilityRequest(
                 boy: BirthDetails(
                     dob: dateFormatter.string(from: boyBirthDate),
@@ -531,6 +562,7 @@ class CompatibilityViewModel {
                 sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
                 userEmail: UserDefaults.standard.string(forKey: "userEmail"),  // Pass real email for history storage
                 profileId: ProfileContextManager.shared.activeProfileId,  // Profile-scoped threads
+                language: appLanguage,
                 comparisonGroupId: currentComparisonGroupId,  // Multi-partner grouping
                 partnerIndex: partners.count > 1 ? activePartnerIndex : nil  // Partner order in group
             )
@@ -639,8 +671,10 @@ class CompatibilityViewModel {
             if let existingMatch = CompatibilityHistoryService.shared.findExistingMatch(
                 boyDob: partnerDobFmt.string(from: boyBirthDate),
                 boyTime: partnerTimeFmt.string(from: boyBirthTime),
+                boyCity: boyCity,
                 girlDob: partnerDobFmt.string(from: partner.birthDate),
-                girlTime: partnerTimeFmt.string(from: partner.birthTime)
+                girlTime: partnerTimeFmt.string(from: partner.birthTime),
+                girlCity: partner.city
             ),
             let cachedCompatibilityResult = existingMatch.result {
                 print("[Multi-Partner] Found existing match for \(partner.name) in cache - loading FREE")
@@ -672,6 +706,7 @@ class CompatibilityViewModel {
                 let roundedPartnerLat = (partner.latitude * 1_000_000).rounded() / 1_000_000
                 let roundedPartnerLon = (partner.longitude * 1_000_000).rounded() / 1_000_000
                 
+                let appLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
                 let request = CompatibilityRequest(
                     boy: BirthDetails(
                         dob: dateFormatter.string(from: boyBirthDate),
@@ -692,6 +727,7 @@ class CompatibilityViewModel {
                     sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
                     userEmail: currentEmail,
                     profileId: ProfileContextManager.shared.activeProfileId,  // Profile-scoped threads
+                    language: appLang,
                     comparisonGroupId: currentComparisonGroupId,
                     partnerIndex: index
                 )
@@ -793,6 +829,7 @@ class CompatibilityViewModel {
                 let roundedPartnerLat = (partner.latitude * 1_000_000).rounded() / 1_000_000
                 let roundedPartnerLon = (partner.longitude * 1_000_000).rounded() / 1_000_000
                 
+                let retryLang = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
                 let request = CompatibilityRequest(
                     boy: BirthDetails(
                         dob: dateFormatter.string(from: boyBirthDate),
@@ -813,6 +850,7 @@ class CompatibilityViewModel {
                     sessionId: "sess_\(Int(Date().timeIntervalSince1970 * 1000))",
                     userEmail: currentEmail,
                     profileId: ProfileContextManager.shared.activeProfileId,
+                    language: retryLang,
                     comparisonGroupId: currentComparisonGroupId,
                     partnerIndex: index
                 )
@@ -1075,7 +1113,10 @@ class CompatibilityViewModel {
         } else {
             summary = "This match has some challenging aspects that require awareness and effort."
         }
-        let rec = totalScore >= 18 ? "Favorable for marriage" : "Additional remedies may be helpful"
+        let isRecommended = response.hardNoFlags?.isRecommended ?? true
+        let rec = isRecommended
+            ? (totalScore >= 28 ? "Excellent match for marriage" : "Favorable for marriage")
+            : "Not recommended for marriage"
         
         print("[CompatibilityViewModel] STORING session_id in result: \(response.sessionId ?? "NIL")")
         print("[CompatibilityViewModel] DEBUG hardNoFlags: \(String(describing: response.hardNoFlags))")
@@ -1092,12 +1133,14 @@ class CompatibilityViewModel {
             recommendation: rec,
             analysisData: response.analysisData,
             sessionId: response.sessionId,
-            isRecommended: response.hardNoFlags?.isRecommended ?? true,
+            isRecommended: isRecommended,
             adjustedScore: response.adjustedTotalScore != nil ? Int(response.adjustedTotalScore!) : nil,
             adjustedCategory: response.adjustedCategory,
             doshaSummary: response.doshaSummary,
             rejectionReasons: response.hardNoFlags?.rejectionReasons ?? [],
-            comparisonIndicators: response.comparisonIndicators
+            comparisonIndicators: response.comparisonIndicators,
+            cancelledDoshasSummary: response.hardNoFlags?.cancelledDoshasSummary,
+            initialFollowUpSuggestions: response.followUpSuggestions ?? []
         )
     }
     
@@ -1192,6 +1235,8 @@ struct CompatibilityResult: Identifiable, Codable {
     let doshaSummary: DoshaSummary?
     let rejectionReasons: [String]
     let comparisonIndicators: ComparisonIndicators?
+    let cancelledDoshasSummary: String?
+    let initialFollowUpSuggestions: [String]
     
     var percentage: Double {
         guard maxScore > 0 else { return 0 }
@@ -1216,7 +1261,9 @@ struct CompatibilityResult: Identifiable, Codable {
         adjustedCategory: String? = nil,
         doshaSummary: DoshaSummary? = nil,
         rejectionReasons: [String] = [],
-        comparisonIndicators: ComparisonIndicators? = nil
+        comparisonIndicators: ComparisonIndicators? = nil,
+        cancelledDoshasSummary: String? = nil,
+        initialFollowUpSuggestions: [String] = []
     ) {
         self.totalScore = totalScore
         self.maxScore = maxScore
@@ -1240,6 +1287,8 @@ struct CompatibilityResult: Identifiable, Codable {
         self.doshaSummary = doshaSummary
         self.rejectionReasons = rejectionReasons
         self.comparisonIndicators = comparisonIndicators
+        self.cancelledDoshasSummary = cancelledDoshasSummary
+        self.initialFollowUpSuggestions = initialFollowUpSuggestions
     }
 }
 

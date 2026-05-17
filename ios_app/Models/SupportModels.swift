@@ -42,6 +42,7 @@ struct CompatibilityRequest: Codable, Sendable {
     var sessionId: String?
     var userEmail: String?
     var profileId: String?  // Active profile for thread scoping
+    var language: String = "en"
     
     // Multi-partner comparison support
     var comparisonGroupId: String?
@@ -52,6 +53,7 @@ struct CompatibilityRequest: Codable, Sendable {
         case sessionId = "session_id"
         case userEmail = "user_email"
         case profileId = "profile_id"
+        case language
         case comparisonGroupId = "comparison_group_id"
         case partnerIndex = "partner_index"
     }
@@ -82,14 +84,78 @@ struct DoshaSummary: Codable, Sendable {
     }
 }
 
+struct NadiConstitution: Codable, Sendable {
+    let dosha: String?
+    let qualities: String?
+}
+
 struct DoshaDetail: Codable, Sendable {
     let present: Bool?
     let cancelled: Bool?
     let reasonShort: String?
+    let reasonsAll: [String]?
+    
+    // Nadi-specific transparency fields
+    let doshaType: String?
+    let classicalEffect: String?
+    let boyConstitution: NadiConstitution?
+    let girlConstitution: NadiConstitution?
+    
+    // Bhakoot-specific transparency fields
+    let severity: String?
+    let housePositions: String?
+    let sadbhakootWarning: String?
+    
+    // Tara-specific transparency fields
+    let taraBoyToGirl: Int?
+    let taraGirlToBoy: Int?
+    
+    // Vashya-specific transparency fields
+    let boyVashya: String?
+    let girlVashya: String?
+    let boyToGirlScore: Double?
+    let girlToBoyScore: Double?
+    
+    // Varna-specific transparency fields (V2.3)
+    let boyVarna: String?
+    let girlVarna: String?
+    let complementarityNote: String?
+    
+    // Universal partner values (V2.4)
+    let boyValue: String?
+    let girlValue: String?
+
+    // V2.5 — Plain English enrichment fields
+    let plainEnglishSummary: String?
+    let plainEnglishRejectionReason: String?
+    let boyValueDescription: String?
+    let girlValueDescription: String?
     
     enum CodingKeys: String, CodingKey {
-        case present, cancelled
+        case present, cancelled, severity
         case reasonShort = "reason_short"
+        case reasonsAll = "reasons_all"
+        case doshaType = "dosha_type"
+        case classicalEffect = "classical_effect"
+        case boyConstitution = "boy_constitution"
+        case girlConstitution = "girl_constitution"
+        case housePositions = "house_positions"
+        case sadbhakootWarning = "sadbhakoot_warning"
+        case taraBoyToGirl = "tara_boy_to_girl"
+        case taraGirlToBoy = "tara_girl_to_boy"
+        case boyVashya = "boy_vashya"
+        case girlVashya = "girl_vashya"
+        case boyToGirlScore = "boy_to_girl_score"
+        case girlToBoyScore = "girl_to_boy_score"
+        case boyVarna = "boy_varna"
+        case girlVarna = "girl_varna"
+        case complementarityNote = "complementarity_note"
+        case boyValue = "boy_value"
+        case girlValue = "girl_value"
+        case plainEnglishSummary = "plain_english_summary"
+        case plainEnglishRejectionReason = "plain_english_rejection_reason"
+        case boyValueDescription = "boy_value_description"
+        case girlValueDescription = "girl_value_description"
     }
 }
 
@@ -111,7 +177,8 @@ struct CompatibilityResponse: Codable, Sendable {
     let adjustedCategory: String?
     let doshaSummary: DoshaSummary?
     let comparisonIndicators: ComparisonIndicators?
-    
+    let followUpSuggestions: [String]?
+
     enum CodingKeys: String, CodingKey {
         case sessionId = "session_id"
         case predictionId = "prediction_id"
@@ -124,6 +191,7 @@ struct CompatibilityResponse: Codable, Sendable {
         case adjustedCategory = "adjusted_category"
         case doshaSummary = "dosha_summary"
         case comparisonIndicators = "comparison_indicators"
+        case followUpSuggestions = "follow_up_suggestions"
         case status
     }
 }
@@ -212,10 +280,12 @@ struct AnyCodable: Codable, Sendable {
 struct HardNoFlags: Codable, Sendable {
     let isRecommended: Bool
     let rejectionReasons: [String]
-    
+    let cancelledDoshasSummary: String?
+
     enum CodingKeys: String, CodingKey {
         case isRecommended = "is_recommended"
         case rejectionReasons = "rejection_reasons"
+        case cancelledDoshasSummary = "cancelled_doshas_summary"
     }
 }
 
@@ -257,11 +327,17 @@ struct CompatibilityFollowUpRequest: Codable, Sendable {
     let query: String
     let sessionId: String
     let userEmail: String
-    
+    var language: String = "en"
+    var responseStyle: String?
+    var responseLength: String?
+
     enum CodingKeys: String, CodingKey {
         case query
         case sessionId = "session_id"
         case userEmail = "user_email"
+        case language
+        case responseStyle = "response_style"
+        case responseLength = "response_length"
     }
 }
 
@@ -272,13 +348,15 @@ struct CompatibilityFollowUpResponse: Codable, Sendable {
     let answer: String?       // AI answer for compatibility questions
     let message: String?      // Error or info message
     let birthData: BirthDetails? // For redirect: target's birth details
+    let redirectQuery: String?   // Backend-cleaned query for /predict (boy/girl replaced with real names)
     let reason: String?       // Reason for redirect
     let executionTimeMs: Double?  // Execution time in milliseconds
     let followUpSuggestions: [String]?  // LLM-generated follow-up questions
-    
+
     enum CodingKeys: String, CodingKey {
         case status, target, answer, message, reason
         case birthData = "birth_data"
+        case redirectQuery = "redirect_query"
         case executionTimeMs = "execution_time_ms"
         case followUpSuggestions = "follow_up_suggestions"
     }

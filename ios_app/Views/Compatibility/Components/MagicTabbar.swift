@@ -54,7 +54,7 @@ struct MagicTabbar: View {
                     .scaleEffect(isSelected ? 1.12 : 1.0)
                 
                 // Label
-                Text(tile.rawValue.uppercased())
+                Text(tile.localizedLabel.uppercased())
                     .font(.system(size: 9, weight: isSelected ? .semibold : .medium))
                     .tracking(0.5)
                     .foregroundColor(isSelected ? .white : AppTheme.Colors.textSecondary)

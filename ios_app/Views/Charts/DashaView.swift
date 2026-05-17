@@ -10,7 +10,7 @@ struct DashaView: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(Color("GoldAccent"))
                 
-                Text("Vimshottari Dasha (\(dashaResponse?.year ?? 2024))")
+                Text(String(format: "vimshottari_dasha_year".localized, dashaResponse?.year ?? 2024))
                     .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(AppTheme.Colors.textPrimary)
             }
@@ -30,8 +30,8 @@ struct DashaView: View {
                         .shadow(color: Color.black.opacity(0.05), radius: 5, y: 2)
                 )
             } else {
-                Text("Select a year to view dasha periods")
-                    .font(.caption)
+                Text("select_year_dasha".localized)
+                    .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(.secondary)
             }
         }
@@ -41,6 +41,7 @@ struct DashaView: View {
                 .fill(Color.white)
                 .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
         )
+        .accessibilityIdentifier("chart_tab_dasha")
     }
 }
 
@@ -50,7 +51,7 @@ struct DashaRow: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(period.mahadasha) - \(period.antardasha)")
+                Text("\("planet_\(period.mahadasha.lowercased())".localized) - \("planet_\(period.antardasha.lowercased())".localized)")
                     .font(AppTheme.Fonts.title(size: 14))
                     .foregroundColor(Color("NavyPrimary"))
                 Text(period.pratyantardasha)

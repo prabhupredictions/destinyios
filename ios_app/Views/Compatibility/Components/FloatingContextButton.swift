@@ -39,12 +39,10 @@ struct FloatingContextButton: View {
         .scaleEffect(isPressed ? 0.9 : 1.0)
         .animation(.spring(response: 0.3), value: isPressed)
         .overlay(
-            // "Ask" Label Pulse (Optional)
+            // Static ring indicator
             Circle()
-                .stroke(AppTheme.Colors.gold.opacity(0.5), lineWidth: 1)
+                .stroke(AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
                 .scaleEffect(1.2)
-                .opacity(0.5)
-                .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: true)
         )
     }
 }
