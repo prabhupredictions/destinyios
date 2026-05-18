@@ -35,12 +35,9 @@ struct NotificationItem: Codable, Identifiable, Equatable {
                DateFormatter.backendFormatter.date(from: createdAt)
     }
 
-    /// Calendar-style timestamp: "Today", "Yesterday", or "Mar 27"
+    /// Exact date: "May 17" — always shows month and day
     var timeAgo: String {
         guard let date = createdDate else { return "" }
-        let cal = Calendar.current
-        if cal.isDateInToday(date)     { return "Today" }
-        if cal.isDateInYesterday(date) { return "Yesterday" }
         let fmt = DateFormatter()
         fmt.dateFormat = "MMM d"
         return fmt.string(from: date)
