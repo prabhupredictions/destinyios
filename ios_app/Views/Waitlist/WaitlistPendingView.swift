@@ -28,22 +28,29 @@ struct WaitlistPendingView: View {
                     .font(.system(size: 56))
                     .foregroundStyle(AppTheme.Colors.gold)
 
-                VStack(spacing: 8) {
-                    Text(NSLocalizedString("waitlist_title", value: "You're on the list", comment: "Waitlist pending screen title"))
+                VStack(spacing: 12) {
+                    Text(NSLocalizedString("waitlist_title", value: "You're almost in", comment: "Waitlist pending screen title"))
                         .font(AppTheme.Fonts.title(size: 28))
                         .foregroundStyle(AppTheme.Colors.textPrimary)
 
-                    Text(NSLocalizedString("waitlist_body", value: "Destiny is in early access. You've been added to our waitlist — we'll let you know as soon as you're approved.", comment: "Waitlist pending screen body"))
-                        .font(AppTheme.Fonts.body(size: 16))
-                        .foregroundStyle(AppTheme.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
+                    VStack(spacing: 8) {
+                        Text(NSLocalizedString("waitlist_body_1", value: "Destiny is in early access right now, and we're rolling out in phases.", comment: "Waitlist pending screen body line 1"))
+                            .font(AppTheme.Fonts.body(size: 16))
+                            .foregroundStyle(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
+
+                        Text(NSLocalizedString("waitlist_body_2", value: "Take a moment to fill out this quick form and we'll get you in soon:", comment: "Waitlist pending screen body line 2"))
+                            .font(AppTheme.Fonts.body(size: 16))
+                            .foregroundStyle(AppTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 32)
                 }
 
                 Button {
                     showTally = true
                 } label: {
-                    Text(NSLocalizedString("waitlist_cta", value: "Fill out this form", comment: "Waitlist Tally form CTA"))
+                    Text(NSLocalizedString("waitlist_cta", value: "Join the Waitlist", comment: "Waitlist Tally form CTA"))
                         .font(AppTheme.Fonts.body(size: 16).weight(.semibold))
                         .foregroundStyle(AppTheme.Colors.gold)
                         .padding(.vertical, 14)
@@ -60,10 +67,17 @@ struct WaitlistPendingView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
 
-                Link("support@destinyastrology.com",
-                     destination: URL(string: "mailto:support@destinyastrology.com")!)
-                    .font(AppTheme.Fonts.caption(size: 13))
-                    .foregroundStyle(AppTheme.Colors.gold)
+                VStack(spacing: 4) {
+                    Text(NSLocalizedString("waitlist_support_prefix", value: "Questions or need help? Reach us anytime at", comment: "Waitlist support text prefix"))
+                        .font(AppTheme.Fonts.caption(size: 13))
+                        .foregroundStyle(AppTheme.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                    Link("support@destinyaiastrology.com",
+                         destination: URL(string: "mailto:support@destinyaiastrology.com")!)
+                        .font(AppTheme.Fonts.caption(size: 13))
+                        .foregroundStyle(AppTheme.Colors.gold)
+                }
+                .padding(.horizontal, 32)
 
                 Spacer()
 
