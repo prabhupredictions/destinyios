@@ -523,7 +523,8 @@ struct PlanCardWithFeatures: View {
     private func localizedFallbackPrice(_ usdAmount: Double) -> String {
         let isIndia = Locale.current.region?.identifier == "IN"
         if isIndia {
-            let inrAmount = Int((usdAmount * 100).rounded())
+            // Core ($4.99) → ₹249, Plus ($7.99) → ₹549
+            let inrAmount = usdAmount <= 5.0 ? 249 : 549
             return "₹\(inrAmount)"
         }
         let formatter = NumberFormatter()
