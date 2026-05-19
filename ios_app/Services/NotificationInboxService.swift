@@ -159,7 +159,8 @@ final class NotificationInboxService: ObservableObject {
                             actionUrl: updated.actionUrl,
                             imageUrl: updated.imageUrl,
                             chatPrompt: updated.chatPrompt,
-                            topic: updated.topic
+                            topic: updated.topic,
+                            overallTone: updated.overallTone
                         )
                         self.notifications[index] = readItem
                     }
@@ -206,7 +207,8 @@ final class NotificationInboxService: ObservableObject {
                         actionUrl: item.actionUrl,
                         imageUrl: item.imageUrl,
                         chatPrompt: item.chatPrompt,
-                        topic: item.topic
+                        topic: item.topic,
+                        overallTone: item.overallTone
                     )
                 }
                 self.unreadCount = 0
