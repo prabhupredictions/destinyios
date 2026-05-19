@@ -104,6 +104,10 @@ struct SubscriptionView: View {
             }
             .task {
                 await loadPlans()
+                // Refresh StoreKit products each time screen opens (picks up approved products)
+                if subscriptionManager.products.isEmpty {
+                    await subscriptionManager.loadProducts()
+                }
             }
             .accessibilityIdentifier("subscription_screen")
         }
@@ -437,7 +441,7 @@ struct PlanCardWithFeatures: View {
                             .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     } else {
-                        Text(String(format: "price_monthly_format".localized, String(format: "%.2f", plan.priceMonthly ?? 0)))
+                        Text(localizedFallbackPrice(plan.priceMonthly ?? 0))
                             .font(AppTheme.Fonts.title(size: 20))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                     }
@@ -513,7 +517,19 @@ struct PlanCardWithFeatures: View {
         if let product = product {
             return "\(product.displayPrice) / month"
         }
-        return "$\(String(format: "%.2f", plan.priceMonthly ?? 0)) / month"
+        return "\(localizedFallbackPrice(plan.priceMonthly ?? 0)) / month"
+    }
+
+    private func localizedFallbackPrice(_ usdAmount: Double) -> String {
+        let isIndia = Locale.current.region?.identifier == "IN"
+        if isIndia {
+            let inrAmount = Int((usdAmount * 100).rounded())
+            return "₹\(inrAmount)"
+        }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale(identifier: "en_US")
+        return formatter.string(from: NSNumber(value: usdAmount)) ?? "$\(String(format: "%.2f", usdAmount))"
     }
     
     /// Dynamic button text based on user's current plan
