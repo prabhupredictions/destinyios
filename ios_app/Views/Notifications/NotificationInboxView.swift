@@ -234,58 +234,88 @@ struct NotificationInboxView: View {
 // MARK: - Notification Row
 struct NotificationRow: View {
     let notification: NotificationItem
-    
+
+    private var accentColor: Color {
+        switch (notification.overallTone ?? "").lowercased() {
+        case "positive":            return AppTheme.Colors.gold
+        case "cautionary", "caution": return Color(red: 1.0, green: 0.65, blue: 0.0)
+        default:                    return AppTheme.Colors.textSecondary.opacity(0.5)
+        }
+    }
+
     var body: some View {
-        HStack(alignment: .top, spacing: 14) {
+        HStack(alignment: .top, spacing: 0) {
+            // Tone accent bar
+            RoundedRectangle(cornerRadius: 2)
+                .fill(accentColor)
+                .frame(width: 4)
+                .padding(.vertical, 12)
+                .padding(.leading, 12)
+                .padding(.trailing, 10)
+
             // Icon
             ZStack {
                 Circle()
-                    .fill(notification.read ? AppTheme.Colors.cardBackground : AppTheme.Colors.gold.opacity(0.15))
+                    .fill(notification.read ? AppTheme.Colors.cardBackground : accentColor.opacity(0.15))
                     .frame(width: 44, height: 44)
-                
+
                 Image(systemName: notification.iconName)
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(notification.read ? AppTheme.Colors.textSecondary : AppTheme.Colors.gold)
+                    .foregroundColor(notification.read ? AppTheme.Colors.textSecondary : accentColor)
             }
-            
+            .padding(.top, 14)
+            .padding(.trailing, 12)
+
             // Content
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 HStack {
                     Text(notification.displayTitle)
                         .font(.system(size: 15, weight: notification.read ? .medium : .bold))
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .lineLimit(1)
-                    
+
                     Spacer()
-                    
+
                     Text(notification.timeAgo)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
-                
+
+                if let chip = notification.topicChip {
+                    Text(chip)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(accentColor)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(accentColor.opacity(0.12))
+                        .clipShape(Capsule())
+                }
+
                 Text(notification.displayBody)
                     .font(.system(size: 13))
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .lineLimit(2)
             }
-            
+            .padding(.vertical, 14)
+            .padding(.trailing, 12)
+
             // Unread indicator
             if !notification.read {
                 Circle()
                     .fill(AppTheme.Colors.gold)
                     .frame(width: 8, height: 8)
+                    .padding(.top, 18)
+                    .padding(.trailing, 12)
             }
         }
-        .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(notification.read ? AppTheme.Colors.cardBackground : AppTheme.Colors.cardBackground.opacity(0.8))
+                .fill(notification.read ? AppTheme.Colors.cardBackground : AppTheme.Colors.cardBackground.opacity(0.9))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(notification.read ? Color.clear : AppTheme.Colors.gold.opacity(0.3), lineWidth: 1)
+                        .stroke(notification.read ? Color.clear : accentColor.opacity(0.25), lineWidth: 1)
                 )
         )
-        .opacity(notification.isToday ? 1.0 : 0.6)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: "a11y_notification_detail_format".localized, notification.displayTitle, notification.displayBody, notification.timeAgo, notification.read ? "" : "a11y_unread_suffix".localized))
         .accessibilityIdentifier("notification_row")
@@ -366,8 +396,10 @@ struct NotificationDetailSheet: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 15, weight: .semibold))
-                                Text("ask_more".localized)
-                                    .font(AppTheme.Fonts.caption(size: 16))
+                                Text(notification.chatPrompt ?? "ask_more".localized)
+                                    .font(AppTheme.Fonts.caption(size: 15))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
                             }
                             .foregroundColor(AppTheme.Colors.mainBackground)
                             .frame(maxWidth: .infinity)
@@ -424,8 +456,8 @@ struct NotificationDetailSheet: View {
                 .padding(.bottom, 32)
             }
         }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.hidden)
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
     }
 
     private var canAskMore: Bool {

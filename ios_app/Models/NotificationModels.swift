@@ -16,14 +16,16 @@ struct NotificationItem: Codable, Identifiable, Equatable {
     let imageUrl: String?
     let chatPrompt: String?
     let topic: String?
+    let overallTone: String?
 
     enum CodingKeys: String, CodingKey {
         case id, type, channel, subject, preview, status, read, topic
-        case createdAt  = "created_at"
-        case readAt     = "read_at"
-        case actionUrl  = "action_url"
-        case imageUrl   = "image_url"
-        case chatPrompt = "chat_prompt"
+        case createdAt   = "created_at"
+        case readAt      = "read_at"
+        case actionUrl   = "action_url"
+        case imageUrl    = "image_url"
+        case chatPrompt  = "chat_prompt"
+        case overallTone = "overall_tone"
     }
 
     // MARK: - Computed Properties
@@ -35,14 +37,11 @@ struct NotificationItem: Codable, Identifiable, Equatable {
                DateFormatter.backendFormatter.date(from: createdAt)
     }
 
-    /// Calendar-style timestamp: "Today", "Yesterday", or "Mar 27"
+    /// Exact date: "May 17, 2026"
     var timeAgo: String {
         guard let date = createdDate else { return "" }
-        let cal = Calendar.current
-        if cal.isDateInToday(date)     { return "Today" }
-        if cal.isDateInYesterday(date) { return "Yesterday" }
         let fmt = DateFormatter()
-        fmt.dateFormat = "MMM d"
+        fmt.dateFormat = "MMM d, yyyy"
         return fmt.string(from: date)
     }
 
@@ -61,8 +60,15 @@ struct NotificationItem: Codable, Identifiable, Equatable {
         case "WELCOME":                return "star.fill"
         case "LIFE_ALERT":             return "exclamationmark.triangle.fill"
         case "COMPATIBILITY_READY":    return "heart.fill"
+        case "CUSTOM_ALERT":           return "bell.badge.fill"
         default:                       return "bell.fill"
         }
+    }
+
+    /// Short chip label for the life area topic
+    var topicChip: String? {
+        guard let t = topic, !t.isEmpty, t != "general" else { return nil }
+        return t.replacingOccurrences(of: "_", with: " ").capitalized
     }
 
     /// Title with fallback
