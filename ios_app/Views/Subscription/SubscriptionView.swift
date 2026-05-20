@@ -423,6 +423,19 @@ struct PlanCardWithFeatures: View {
                                     .fill(Color.orange)
                             )
                         }
+
+                        // 7 Days Free trial badge — Plus only, not shown to current subscribers
+                        if isPlus && !isCurrentPlan && !isPendingUpgrade {
+                            Text("7 Days Free")
+                                .font(AppTheme.Fonts.caption(size: 10).weight(.heavy))
+                                .foregroundColor(AppTheme.Colors.gold)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    Capsule()
+                                        .stroke(AppTheme.Colors.gold, lineWidth: 1)
+                                )
+                        }
                     }
                     
                     if let desc = plan.description {
