@@ -108,6 +108,8 @@ struct SubscriptionView: View {
                 if subscriptionManager.products.isEmpty {
                     await subscriptionManager.loadProducts()
                 }
+                // Always re-check trial eligibility when screen opens
+                await subscriptionManager.updateTrialEligibility()
             }
             .accessibilityIdentifier("subscription_screen")
         }

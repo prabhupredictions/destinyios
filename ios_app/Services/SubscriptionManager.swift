@@ -310,7 +310,7 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Trial Eligibility
 
-    private func updateTrialEligibility() async {
+    func updateTrialEligibility() async {
         // User is ineligible for the free trial if they have ever subscribed to Core or Plus
         for await result in Transaction.all {
             guard case .verified(let transaction) = result else { continue }
