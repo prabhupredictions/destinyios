@@ -175,6 +175,7 @@ struct SubscriptionView: View {
                     product: subscriptionManager.monthlyProduct(for: plan.planId),
                     isPurchasing: isPurchasing && purchasingPlanId == plan.planId,
                     isPlus: plan.planId == "plus",
+                    isTrialEligible: plan.planId == "plus" && subscriptionManager.isPlusTrialEligible,
                     corePlan: corePlan,
                     userCurrentPlanId: userCurrentPlanId,
                     pendingUpgradePlanId: subscriptionManager.pendingUpgradePlanId,
@@ -314,10 +315,11 @@ struct PlanCardWithFeatures: View {
     let product: Product?
     let isPurchasing: Bool
     let isPlus: Bool
+    let isTrialEligible: Bool
     let corePlan: PlanInfo?
-    let userCurrentPlanId: String  // User's current plan for dynamic button text
-    let pendingUpgradePlanId: String?  // If non-nil, user has scheduled upgrade to this plan
-    let pendingUpgradeDate: Date?  // When the upgrade takes effect
+    let userCurrentPlanId: String
+    let pendingUpgradePlanId: String?
+    let pendingUpgradeDate: Date?
     let onPurchase: () -> Void
     
     /// Features to display - DYNAMIC based on marketing_text from database
@@ -423,19 +425,6 @@ struct PlanCardWithFeatures: View {
                                     .fill(Color.orange)
                             )
                         }
-
-                        // 7 Days Free trial badge — Plus only, not shown to current subscribers
-                        if isPlus && !isCurrentPlan && !isPendingUpgrade {
-                            Text("7 Days Free")
-                                .font(AppTheme.Fonts.caption(size: 10).weight(.heavy))
-                                .foregroundColor(AppTheme.Colors.gold)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    Capsule()
-                                        .stroke(AppTheme.Colors.gold, lineWidth: 1)
-                                )
-                        }
                     }
                     
                     if let desc = plan.description {
@@ -482,21 +471,33 @@ struct PlanCardWithFeatures: View {
             
             // CTA Button
             Button(action: onPurchase) {
-                HStack {
-                    if isPurchasing {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.mainBackground))
+                Group {
+                    if isTrialEligible && !isCurrentPlan && !isPendingUpgrade && !isPurchasing {
+                        VStack(spacing: 3) {
+                            Text("Start 7-Day Free Trial")
+                                .font(AppTheme.Fonts.title(size: 16))
+                            Text("then \(priceDisplay) · cancel anytime")
+                                .font(AppTheme.Fonts.body(size: 11))
+                                .opacity(0.85)
+                        }
+                    } else {
+                        HStack {
+                            if isPurchasing {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.mainBackground))
+                            }
+                            if isCurrentPlan {
+                                Image(systemName: "checkmark")
+                                    .font(AppTheme.Fonts.title(size: 14))
+                            }
+                            Text(isPurchasing ? "processing".localized : buttonText)
+                                .font(AppTheme.Fonts.title(size: 16))
+                        }
                     }
-                    if isCurrentPlan {
-                        Image(systemName: "checkmark")
-                            .font(AppTheme.Fonts.title(size: 14))
-                    }
-                    Text(isPurchasing ? "processing".localized : buttonText)
-                        .font(AppTheme.Fonts.title(size: 16))
                 }
                 .foregroundColor(isCurrentPlan ? AppTheme.Colors.textSecondary : AppTheme.Colors.mainBackground)
                 .frame(maxWidth: .infinity)
-                .frame(height: 50)
+                .frame(height: (isTrialEligible && !isCurrentPlan && !isPendingUpgrade && !isPurchasing) ? 58 : 50)
                 .background(isCurrentPlan ? AppTheme.Colors.cardBackground : AppTheme.Colors.gold)
                 .cornerRadius(25)
                 .overlay(

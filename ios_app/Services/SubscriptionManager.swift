@@ -17,6 +17,9 @@ class SubscriptionManager: ObservableObject {
     // Pending upgrade tracking (when user upgrades Core→Plus, effective next billing)
     @Published private(set) var pendingUpgradeProductId: String?
     @Published private(set) var pendingUpgradeEffectiveDate: Date?
+
+    // Free trial eligibility — false if user has ever subscribed to Core or Plus
+    @Published private(set) var isPlusTrialEligible: Bool = false
     
     // MARK: - Product IDs (Configure in App Store Connect)
     
@@ -60,6 +63,7 @@ class SubscriptionManager: ObservableObject {
         do {
             products = try await Product.products(for: productIDs)
             products.sort { $0.price < $1.price }
+            await updateTrialEligibility()
             isLoading = false
         } catch {
             errorMessage = "Failed to load products: \(error.localizedDescription)"
@@ -304,6 +308,21 @@ class SubscriptionManager: ObservableObject {
         return nil
     }
     
+    // MARK: - Trial Eligibility
+
+    private func updateTrialEligibility() async {
+        // User is ineligible for the free trial if they have ever subscribed to Core or Plus
+        for await result in Transaction.all {
+            guard case .verified(let transaction) = result else { continue }
+            let id = transaction.productID
+            if id.hasPrefix("com.daa.core.") || id.hasPrefix("com.daa.plus.") {
+                isPlusTrialEligible = false
+                return
+            }
+        }
+        isPlusTrialEligible = true
+    }
+
     // MARK: - Backend Verification
     
     private func verifyWithBackend(jws: String, transaction: Transaction) async {
