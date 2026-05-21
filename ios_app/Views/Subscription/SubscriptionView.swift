@@ -20,6 +20,11 @@ struct SubscriptionView: View {
     
     // Trigger build bump: 2026-02-10-10-20
     
+    // Eligible only if user has never had a paid subscription (from backend DB).
+    private var isPlusTrialEligible: Bool {
+        !quotaManager.hasEverSubscribed
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -108,8 +113,6 @@ struct SubscriptionView: View {
                 if subscriptionManager.products.isEmpty {
                     await subscriptionManager.loadProducts()
                 }
-                // Always re-check trial eligibility when screen opens
-                await subscriptionManager.updateTrialEligibility()
             }
             .accessibilityIdentifier("subscription_screen")
         }
@@ -177,7 +180,7 @@ struct SubscriptionView: View {
                     product: subscriptionManager.monthlyProduct(for: plan.planId),
                     isPurchasing: isPurchasing && purchasingPlanId == plan.planId,
                     isPlus: plan.planId == "plus",
-                    isTrialEligible: plan.planId == "plus" && subscriptionManager.isPlusTrialEligible,
+                    isTrialEligible: plan.planId == "plus" && isPlusTrialEligible,
                     corePlan: corePlan,
                     userCurrentPlanId: userCurrentPlanId,
                     pendingUpgradePlanId: subscriptionManager.pendingUpgradePlanId,

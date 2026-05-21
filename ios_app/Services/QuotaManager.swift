@@ -259,12 +259,13 @@ struct SubscriptionStatus: Codable, Sendable {
     let planId: String?
     let plan: PlanInfo?
     let isGeneratedEmail: Bool
-    let featureUsage: [String: FeatureUsageInfo]  // Per-feature usage (chat, compatibility, etc.)
+    let featureUsage: [String: FeatureUsageInfo]
     let isPremium: Bool
     let features: [String]
     let subscriptionStatus: String?
     let subscriptionExpiresAt: String?
-    
+    let hasEverSubscribed: Bool
+
     enum CodingKeys: String, CodingKey {
         case userEmail = "user_email"
         case planId = "plan_id"
@@ -275,6 +276,7 @@ struct SubscriptionStatus: Codable, Sendable {
         case features
         case subscriptionStatus = "subscription_status"
         case subscriptionExpiresAt = "subscription_expires_at"
+        case hasEverSubscribed = "has_ever_subscribed"
     }
     
     /// Helper to get total questions across all features (for backward compat)
@@ -298,6 +300,7 @@ class QuotaManager: ObservableObject {
     @Published private(set) var availablePlans: [PlanInfo] = []
     @Published private(set) var subscriptionStatus: String?
     @Published private(set) var subscriptionExpiresAtString: String?
+    @Published private(set) var hasEverSubscribed: Bool = false
     
     /// Current plan ID (convenience accessor for dynamic button text)
     var currentPlanId: String? {
@@ -552,7 +555,8 @@ class QuotaManager: ObservableObject {
         totalQuestionsAsked = status.totalQuestionsAsked
         subscriptionStatus = status.subscriptionStatus
         subscriptionExpiresAtString = status.subscriptionExpiresAt
-        
+        hasEverSubscribed = status.hasEverSubscribed
+
         UserDefaults.standard.set(status.isPremium, forKey: "isPremium")
         UserDefaults.standard.set(status.planId, forKey: "currentPlanId")
         UserDefaults.standard.set(status.subscriptionStatus, forKey: "subscriptionStatus")
