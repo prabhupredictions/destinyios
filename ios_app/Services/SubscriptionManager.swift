@@ -330,11 +330,17 @@ class SubscriptionManager: ObservableObject {
             print("No user email for backend verification")
             return
         }
-        
+
+        // Don't send sandbox transactions to the production backend — they would grant
+        // real premium access from a test purchase. The backend also rejects them, but
+        // guarding here prevents unnecessary network noise and confusing log entries.
+        if transaction.subscriptionEnvironment == .sandbox &&
+            APIConfig.baseURL.contains("astroapi-prod") {
+            print("⚠️ [Backend] Skipping sandbox transaction on production API (product=\(transaction.productID))")
+            return
+        }
+
         do {
-            // JWS is extracted from VerificationResult.jwsRepresentation
-            // It contains the actual JWS signed payload for server verification
-            
             let url = URL(string: APIConfig.baseURL + "/subscription/verify")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
