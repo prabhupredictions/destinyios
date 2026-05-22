@@ -265,6 +265,7 @@ struct SubscriptionStatus: Codable, Sendable {
     let subscriptionStatus: String?
     let subscriptionExpiresAt: String?
     let hasEverSubscribed: Bool
+    let autoRenewStatus: Bool?
 
     enum CodingKeys: String, CodingKey {
         case userEmail = "user_email"
@@ -277,6 +278,7 @@ struct SubscriptionStatus: Codable, Sendable {
         case subscriptionStatus = "subscription_status"
         case subscriptionExpiresAt = "subscription_expires_at"
         case hasEverSubscribed = "has_ever_subscribed"
+        case autoRenewStatus = "auto_renew_status"
     }
     
     /// Helper to get total questions across all features (for backward compat)
@@ -301,6 +303,7 @@ class QuotaManager: ObservableObject {
     @Published private(set) var subscriptionStatus: String?
     @Published private(set) var subscriptionExpiresAtString: String?
     @Published private(set) var hasEverSubscribed: Bool = false
+    @Published private(set) var autoRenewStatus: Bool? = nil
     
     /// Current plan ID (convenience accessor for dynamic button text)
     var currentPlanId: String? {
@@ -337,6 +340,9 @@ class QuotaManager: ObservableObject {
         isPremium = UserDefaults.standard.bool(forKey: "isPremium")
         subscriptionStatus = UserDefaults.standard.string(forKey: "subscriptionStatus")
         subscriptionExpiresAtString = UserDefaults.standard.string(forKey: "subscriptionExpiresAt")
+        if UserDefaults.standard.object(forKey: "autoRenewStatus") != nil {
+            autoRenewStatus = UserDefaults.standard.bool(forKey: "autoRenewStatus")
+        }
         if let data = UserDefaults.standard.data(forKey: Self.cachedFeaturesKey),
            let features = try? JSONDecoder().decode([String].self, from: data) {
             availableFeatures = features
@@ -570,18 +576,22 @@ class QuotaManager: ObservableObject {
         subscriptionStatus = status.subscriptionStatus
         subscriptionExpiresAtString = status.subscriptionExpiresAt
         hasEverSubscribed = status.hasEverSubscribed
+        autoRenewStatus = status.autoRenewStatus
 
         UserDefaults.standard.set(status.isPremium, forKey: "isPremium")
         UserDefaults.standard.set(status.planId, forKey: "currentPlanId")
         UserDefaults.standard.set(status.subscriptionStatus, forKey: "subscriptionStatus")
         UserDefaults.standard.set(status.subscriptionExpiresAt, forKey: "subscriptionExpiresAt")
+        if let willRenew = status.autoRenewStatus {
+            UserDefaults.standard.set(willRenew, forKey: "autoRenewStatus")
+        }
         if let name = status.plan?.displayName {
             UserDefaults.standard.set(name, forKey: "currentPlanDisplayName")
         }
         if let data = try? JSONEncoder().encode(status.features) {
             UserDefaults.standard.set(data, forKey: Self.cachedFeaturesKey)
         }
-        
+
         if let profile = dataManager.getCurrentUserProfile() {
             profile.totalQuestionsAsked = status.totalQuestionsAsked
             try? dataManager.context.save()
@@ -669,29 +679,28 @@ class QuotaManager: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
-        
-        // For active subscriptions, say "Renews on"
-        // For cancelled subscriptions (in grace period), say "Ends on"
-        // For others, "Expires on"
+
+        // "Renews on" only when active AND auto-renew is on (or unknown)
+        // "Expires on" when canceled (auto-renew off) or explicitly expired/grace
         let prefix: String
-        if subscriptionStatus == "active" {
+        if subscriptionStatus == "active" && autoRenewStatus != false {
             prefix = "Renews on"
-        } else if subscriptionStatus == "cancelled" || subscriptionStatus == "grace_period" {
+        } else if subscriptionStatus == "grace_period" {
             prefix = "Ends on"
         } else {
             prefix = "Expires on"
         }
-        
+
         return "\(prefix) \(formatter.string(from: expiryDate))"
     }
-    
-    /// Subscription status display: "Active", "Expired", "Grace Period"
+
+    /// Subscription status display: "Active", "Expired", "Grace Period", "Canceled"
     var subscriptionStatusDisplayText: String {
         switch subscriptionStatus {
         case "active": return "Active"
         case "expired": return "Expired"
         case "grace_period": return "Grace Period"
-        case "cancelled": return "Cancelled"
+        case "canceled": return "Canceled"
         default: return ""
         }
     }
