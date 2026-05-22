@@ -49,6 +49,12 @@ struct ios_appApp: App {
                 if oldPhase != .active {
                     BackendWarmUpService.shared.ping()
                     Task { await SubscriptionManager.shared.updatePurchasedProducts() }
+                    // Sync quota status so feature badges (green/gold) stay accurate after extended background
+                    let email = DataManager.shared.getCurrentUserProfile()?.email
+                        ?? UserDefaults.standard.string(forKey: "userEmail")
+                    if let email {
+                        Task { try? await QuotaManager.shared.syncStatus(email: email) }
+                    }
                 }
             default:
                 break

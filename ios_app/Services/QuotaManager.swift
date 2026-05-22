@@ -308,19 +308,21 @@ class QuotaManager: ObservableObject {
     }
     
     private static let cachedPlansKey = "cachedAvailablePlans"
+    private static let cachedFeaturesKey = "cachedAvailableFeatures"
     private let dataManager: DataManager
-    
+
     /// Last time syncStatus was called (for TTL-based short-circuit)
     private var lastSyncTime: Date?
     /// Minimum interval between syncStatus calls (5 minutes)
     private let syncCooldown: TimeInterval = 300
-    
+
     init(dataManager: DataManager? = nil) {
         self.dataManager = dataManager ?? DataManager.shared
-        // Load cached plans immediately so paywall has data on first render
+        // Restore cached state immediately so icons show correct color before first network sync
         loadCachedPlans()
+        loadCachedSubscriptionState()
     }
-    
+
     /// Load plans from UserDefaults cache (synchronous, called on init)
     private func loadCachedPlans() {
         guard let data = UserDefaults.standard.data(forKey: Self.cachedPlansKey) else { return }
@@ -329,7 +331,19 @@ class QuotaManager: ObservableObject {
             print("📦 [QuotaManager] Loaded \(cached.count) cached plans")
         }
     }
-    
+
+    /// Restore subscription state from UserDefaults so UI shows correct badges on cold start
+    private func loadCachedSubscriptionState() {
+        isPremium = UserDefaults.standard.bool(forKey: "isPremium")
+        subscriptionStatus = UserDefaults.standard.string(forKey: "subscriptionStatus")
+        subscriptionExpiresAtString = UserDefaults.standard.string(forKey: "subscriptionExpiresAt")
+        if let data = UserDefaults.standard.data(forKey: Self.cachedFeaturesKey),
+           let features = try? JSONDecoder().decode([String].self, from: data) {
+            availableFeatures = features
+        }
+        print("📦 [QuotaManager] Restored cached state — isPremium: \(isPremium), features: \(availableFeatures.count)")
+    }
+
     /// Persist plans to UserDefaults cache
     private func cachePlans(_ plans: [PlanInfo]) {
         if let data = try? JSONEncoder().encode(plans) {
@@ -563,6 +577,9 @@ class QuotaManager: ObservableObject {
         UserDefaults.standard.set(status.subscriptionExpiresAt, forKey: "subscriptionExpiresAt")
         if let name = status.plan?.displayName {
             UserDefaults.standard.set(name, forKey: "currentPlanDisplayName")
+        }
+        if let data = try? JSONEncoder().encode(status.features) {
+            UserDefaults.standard.set(data, forKey: Self.cachedFeaturesKey)
         }
         
         if let profile = dataManager.getCurrentUserProfile() {
