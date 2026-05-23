@@ -20,9 +20,8 @@ struct SubscriptionView: View {
     
     // Trigger build bump: 2026-02-10-10-20
     
-    // Eligible only if user has never had a paid subscription (from backend DB).
     private var isPlusTrialEligible: Bool {
-        !quotaManager.hasEverSubscribed
+        subscriptionManager.isPlusTrialEligible
     }
 
     var body: some View {

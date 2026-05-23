@@ -311,16 +311,12 @@ class SubscriptionManager: ObservableObject {
     // MARK: - Trial Eligibility
 
     func updateTrialEligibility() async {
-        // User is ineligible for the free trial if they have ever subscribed to Core or Plus
-        for await result in Transaction.all {
-            guard case .verified(let transaction) = result else { continue }
-            let id = transaction.productID
-            if id.hasPrefix("com.daa.core.") || id.hasPrefix("com.daa.plus.") {
-                isPlusTrialEligible = false
-                return
-            }
+        guard let plusProduct = products.first(where: { $0.id.hasPrefix("com.daa.plus.") }),
+              let subscription = plusProduct.subscription else {
+            isPlusTrialEligible = false
+            return
         }
-        isPlusTrialEligible = true
+        isPlusTrialEligible = await subscription.isEligibleForIntroOffer
     }
 
     // MARK: - Backend Verification
