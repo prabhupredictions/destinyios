@@ -20,7 +20,12 @@ class SubscriptionManager: ObservableObject {
 
     // Free trial eligibility — false if user has ever subscribed to Core or Plus
     @Published private(set) var isPlusTrialEligible: Bool = false
-    
+
+    /// True while a direct in-app purchase via SubscriptionView is in flight.
+    /// QuotaManager checks this to suppress the external-plan-change alert
+    /// (because SubscriptionView shows its own success modal in that flow).
+    var directPurchaseInProgress: Bool = false
+
     // MARK: - Product IDs (Configure in App Store Connect)
     
     /// Core plan
@@ -93,7 +98,9 @@ class SubscriptionManager: ObservableObject {
     func purchase(_ product: Product) async throws -> Bool {
         isLoading = true
         errorMessage = nil
-        
+        directPurchaseInProgress = true
+        defer { directPurchaseInProgress = false }
+
         do {
             let result = try await product.purchase()
             

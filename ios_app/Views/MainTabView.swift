@@ -23,6 +23,7 @@ struct MainTabView: View {
     @AppStorage("isGuest") private var isGuestUser = false
 
     private var notificationRouter = NotificationRouter.shared
+    @ObservedObject private var quotaManager = QuotaManager.shared
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -186,6 +187,13 @@ struct MainTabView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
+        .alert(item: $quotaManager.externalPlanChangeAlert) { change in
+            Alert(
+                title: Text("Subscription Activated"),
+                message: Text(externalPlanChangeMessage(for: change)),
+                dismissButton: .default(Text("OK"))
+            )
+        }
         .onAppear {
             // Load home data for Ask sheet instead of .task
             // This prevents duplicate .task loads since HomeView also calls this
@@ -193,6 +201,38 @@ struct MainTabView: View {
                 await homeViewModel.loadHomeData()
             }
         }
+    }
+
+    /// Format the alert body based on what changed.
+    private func externalPlanChangeMessage(for change: ExternalPlanChange) -> String {
+        var lines: [String] = []
+        if let old = change.previousPlanId, old != change.newPlanId, !old.isEmpty {
+            lines.append("Your plan has been updated to \(change.newPlanDisplayName).")
+        } else {
+            lines.append("Your \(change.newPlanDisplayName) subscription is now active.")
+        }
+        if let expires = change.expiresAt, !expires.isEmpty {
+            let formatted = formatExpiryDate(expires)
+            if change.willAutoRenew == true {
+                lines.append("Auto-renews on \(formatted). Cancel anytime in Settings.")
+            } else if change.willAutoRenew == false {
+                lines.append("Ends on \(formatted).")
+            } else {
+                lines.append("Active until \(formatted).")
+            }
+        }
+        return lines.joined(separator: "\n\n")
+    }
+
+    private func formatExpiryDate(_ iso: String) -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let date = isoFormatter.date(from: iso) ?? ISO8601DateFormatter().date(from: iso)
+        guard let date else { return iso }
+        let display = DateFormatter()
+        display.dateStyle = .medium
+        display.timeStyle = .none
+        return display.string(from: date)
     }
 }
 
