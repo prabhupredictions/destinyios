@@ -289,6 +289,19 @@ struct SubscriptionStatus: Codable, Sendable {
 
 // MARK: - QuotaManager
 
+/// One-time alert payload shown when an external transaction (offer code
+/// redemption, family share activation, App Store-side restore) changes the
+/// user's subscription. Direct in-app purchases bypass this and show the
+/// SubscriptionView success modal instead.
+struct ExternalPlanChange: Identifiable {
+    let id = UUID()
+    let previousPlanId: String?
+    let newPlanId: String
+    let newPlanDisplayName: String
+    let expiresAt: String?
+    let willAutoRenew: Bool?
+}
+
 /// Manages user quota and subscription status
 @MainActor
 class QuotaManager: ObservableObject {
@@ -304,6 +317,15 @@ class QuotaManager: ObservableObject {
     @Published private(set) var subscriptionExpiresAtString: String?
     @Published private(set) var hasEverSubscribed: Bool = false
     @Published private(set) var autoRenewStatus: Bool? = nil
+
+    /// Set when a subscription change is detected via Transaction.updates
+    /// (e.g. offer code redemption, plan switch). Consumed by AppRootView
+    /// to show a one-time alert. Direct in-app purchases set this nil
+    /// because SubscriptionView shows its own success modal.
+    @Published var externalPlanChangeAlert: ExternalPlanChange?
+
+    /// Tracks last non-nil plan_id seen during sync, used to detect changes.
+    private var previousObservedPlanId: String?
     
     /// Current plan ID (convenience accessor for dynamic button text)
     var currentPlanId: String? {
@@ -569,6 +591,31 @@ class QuotaManager: ObservableObject {
     
     /// Update local state from server status
     private func updateFromStatus(_ status: SubscriptionStatus) {
+        // Detect external plan changes BEFORE overwriting state.
+        // Skip when:
+        //   - Direct in-app purchase is in progress (SubscriptionView shows its own modal)
+        //   - This is the first observation after launch (previousObservedPlanId is nil)
+        //   - Plan didn't actually change
+        //   - New plan is free (only celebrate paid activations)
+        let oldPlanId = previousObservedPlanId
+        let newPlanId = status.planId
+        let isFirstObservation = (oldPlanId == nil)
+        let planChanged = (oldPlanId != newPlanId)
+        let isPaidNow = status.isPremium
+        let directPurchaseRunning = SubscriptionManager.shared.directPurchaseInProgress
+
+        if !isFirstObservation, planChanged, isPaidNow, !directPurchaseRunning {
+            externalPlanChangeAlert = ExternalPlanChange(
+                previousPlanId: oldPlanId,
+                newPlanId: newPlanId ?? "",
+                newPlanDisplayName: status.plan?.displayName ?? newPlanId ?? "Premium",
+                expiresAt: status.subscriptionExpiresAt,
+                willAutoRenew: status.autoRenewStatus
+            )
+            print("🎁 [QuotaManager] External plan change detected: \(oldPlanId ?? "nil") -> \(newPlanId ?? "nil")")
+        }
+        previousObservedPlanId = newPlanId
+
         currentPlan = status.plan
         isPremium = status.isPremium
         availableFeatures = status.features

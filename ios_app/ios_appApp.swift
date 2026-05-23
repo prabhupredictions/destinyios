@@ -49,11 +49,15 @@ struct ios_appApp: App {
                 if oldPhase != .active {
                     BackendWarmUpService.shared.ping()
                     Task { await SubscriptionManager.shared.updatePurchasedProducts() }
-                    // Sync quota status so feature badges (green/gold) stay accurate after extended background
+                    // Force-sync quota on every foreground so external changes
+                    // (App Store cancellation, auto-renew toggle, offer code
+                    // redemption while app was backgrounded) reflect immediately.
+                    // Bypasses the 5-min cooldown which would otherwise leave
+                    // the UI showing stale subscription state.
                     let email = DataManager.shared.getCurrentUserProfile()?.email
                         ?? UserDefaults.standard.string(forKey: "userEmail")
                     if let email {
-                        Task { try? await QuotaManager.shared.syncStatus(email: email) }
+                        Task { try? await QuotaManager.shared.syncStatus(email: email, force: true) }
                     }
                 }
             default:
