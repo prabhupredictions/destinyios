@@ -153,6 +153,10 @@ class AuthViewModel {
         
         // Also reset ProfileContextManager active profile to prevent stale state
         ProfileContextManager.shared.resetActiveProfile()
+
+        // Clear StoreKit entitlement state — Apple ID-level transactions must not
+        // bleed into the next logged-in account on this device.
+        await SubscriptionManager.shared.resetForAccountSwitch()
     }
     
     // MARK: - Private Helpers
