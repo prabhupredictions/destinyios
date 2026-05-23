@@ -21,7 +21,7 @@ struct SubscriptionView: View {
     // Trigger build bump: 2026-02-10-10-20
     
     private var isPlusTrialEligible: Bool {
-        subscriptionManager.isPlusTrialEligible
+        subscriptionManager.isPlusTrialEligible && !quotaManager.hasEverSubscribed
     }
 
     var body: some View {
