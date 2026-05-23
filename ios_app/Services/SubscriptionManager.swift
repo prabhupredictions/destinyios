@@ -2,6 +2,15 @@ import Foundation
 import StoreKit
 import Combine
 
+/// Surfaced to the UI when the backend rejects a /verify call because the
+/// Apple-side subscription is already linked to a different email account
+/// in our DB. The user needs to sign in with the original email or contact
+/// support — they cannot resolve this in-app without action.
+struct SubscriptionConflict: Identifiable {
+    let id = UUID()
+    let productID: String
+}
+
 /// StoreKit 2 Subscription Manager
 /// Handles product loading, purchasing, and transaction verification
 @MainActor
@@ -25,6 +34,13 @@ class SubscriptionManager: ObservableObject {
     /// QuotaManager checks this to suppress the external-plan-change alert
     /// (because SubscriptionView shows its own success modal in that flow).
     var directPurchaseInProgress: Bool = false
+
+    /// Set when /verify rejects a transaction because the Apple subscription
+    /// is already linked to a different email account in our backend. Surfaced
+    /// to the UI as a clear alert so the user knows to sign in with the
+    /// original email instead of being confused by "you're already subscribed"
+    /// from Apple paired with a free-tier app experience.
+    @Published var subscriptionConflict: SubscriptionConflict?
 
     // MARK: - Product IDs (Configure in App Store Connect)
     
@@ -414,22 +430,43 @@ class SubscriptionManager: ObservableObject {
             ]
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-            let (_, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: request)
 
             guard let httpResponse = response as? HTTPURLResponse else {
                 print("❌ [Backend] No HTTP response — keeping transaction unfinished for retry")
                 return false
             }
 
-            if httpResponse.statusCode == 200 {
-                print("✅ Backend verification successful for \(email)")
-                // Sync quota status after successful verification (force bypass cooldown)
-                try? await QuotaManager.shared.syncStatus(email: email, force: true)
-                return true
-            } else {
+            if httpResponse.statusCode != 200 {
                 print("❌ Backend verification failed: HTTP \(httpResponse.statusCode) — keeping transaction unfinished for retry")
                 return false
             }
+
+            // Backend returns 200 with success:false for application-level rejections
+            // (cross-account conflict, invalid bundle, etc.). Parse the body so we
+            // can surface specific errors to the UI rather than treating all 200s
+            // as success.
+            struct VerifyResponseBody: Decodable {
+                let success: Bool
+                let error: String?
+            }
+            let parsedResponse = (try? JSONDecoder().decode(VerifyResponseBody.self, from: data))
+
+            if let parsedResponse, !parsedResponse.success {
+                let errorCode = parsedResponse.error ?? "unknown"
+                print("❌ Backend verification rejected: \(errorCode)")
+                if errorCode == "transaction_belongs_to_different_user" {
+                    self.subscriptionConflict = SubscriptionConflict(productID: transaction.productID)
+                }
+                // Finish to avoid retry loop — this transaction will never succeed
+                // for the current user (different email already owns it, or invalid bundle, etc.)
+                return true
+            }
+
+            print("✅ Backend verification successful for \(email)")
+            // Sync quota status after successful verification (force bypass cooldown)
+            try? await QuotaManager.shared.syncStatus(email: email, force: true)
+            return true
         } catch {
             print("❌ Backend verification error: \(error) — keeping transaction unfinished for retry")
             return false

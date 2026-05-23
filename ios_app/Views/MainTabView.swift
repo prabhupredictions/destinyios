@@ -24,6 +24,7 @@ struct MainTabView: View {
 
     private var notificationRouter = NotificationRouter.shared
     @ObservedObject private var quotaManager = QuotaManager.shared
+    @ObservedObject private var subscriptionManager = SubscriptionManager.shared
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -191,6 +192,13 @@ struct MainTabView: View {
             Alert(
                 title: Text("Subscription Activated"),
                 message: Text(externalPlanChangeMessage(for: change)),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+        .alert(item: $subscriptionManager.subscriptionConflict) { _ in
+            Alert(
+                title: Text("Apple ID Already Linked"),
+                message: Text("This Apple ID's subscription is registered to a different account in this app.\n\nSign in with the original email to access your subscription, or contact support if you need help."),
                 dismissButton: .default(Text("OK"))
             )
         }
