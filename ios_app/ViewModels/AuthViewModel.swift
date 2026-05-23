@@ -650,6 +650,13 @@ class AuthViewModel {
                 // Skip during guest→registered upgrade - caller will sync after migration
                 if !skipSync {
                     Task {
+                        // Reconcile StoreKit entitlements with backend BEFORE syncing quota.
+                        // Required for offer-code redemptions that happened before app install:
+                        // Transaction.updates won't fire for those, so /verify must be called
+                        // from currentEntitlements after we know the user's email. Otherwise
+                        // backend doesn't know the user is paid and dumps them in waitlist.
+                        await SubscriptionManager.shared.reconcileEntitlementsWithBackend()
+
                         // Coordinated sync: single thread list fetch shared by chat + compat sync
                         async let historySync: () = LoginSyncCoordinator.shared.syncAll(userEmail: email, dataManager: DataManager.shared)
                         async let quotaSync: () = { try? await QuotaManager.shared.syncStatus(email: email, force: true) }()

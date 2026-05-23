@@ -48,7 +48,10 @@ struct ios_appApp: App {
                 // Warm up Cloud Run and refresh subscription state when returning from background
                 if oldPhase != .active {
                     BackendWarmUpService.shared.ping()
-                    Task { await SubscriptionManager.shared.updatePurchasedProducts() }
+                    // Reconcile StoreKit entitlements with backend on every foreground.
+                    // Catches offer-code redemptions that happened while app was killed
+                    // (Transaction.updates may not fire for those). Idempotent.
+                    Task { await SubscriptionManager.shared.reconcileEntitlementsWithBackend() }
                     // Force-sync quota on every foreground so external changes
                     // (App Store cancellation, auto-renew toggle, offer code
                     // redemption while app was backgrounded) reflect immediately.

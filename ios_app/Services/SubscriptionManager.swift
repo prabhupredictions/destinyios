@@ -251,7 +251,7 @@ class SubscriptionManager: ObservableObject {
 
     func updatePurchasedProducts() async {
         var purchased: Set<String> = []
-        
+
         for await result in Transaction.currentEntitlements {
             do {
                 let transaction = try checkVerified(result)
@@ -262,12 +262,40 @@ class SubscriptionManager: ObservableObject {
                 print("Entitlement verification failed: \(error)")
             }
         }
-        
+
         purchasedProductIDs = purchased
         UserDefaults.standard.set(!purchased.isEmpty, forKey: "isPremium")
-        
+
         // Check for pending upgrades
         await checkPendingUpgrade()
+    }
+
+    /// Reconcile every active StoreKit entitlement with the backend.
+    /// Critical for offer-code redemptions that happened BEFORE the app was
+    /// installed (e.g. user taps redeem link, downloads app, signs in).
+    /// In that flow Transaction.updates does NOT fire, so /verify is never
+    /// called and the backend has no record of the paid subscription —
+    /// user gets stuck on free plan and (when waitlist is on) lands in
+    /// waitlist despite having paid.
+    ///
+    /// Call this after sign-in/sign-up succeeds and on every foreground.
+    /// Idempotent — backend dedups by originalTransactionId.
+    func reconcileEntitlementsWithBackend() async {
+        for await result in Transaction.currentEntitlements {
+            do {
+                let jws = result.jwsRepresentation
+                let transaction = try checkVerified(result)
+                if transaction.revocationDate != nil { continue }
+                print("🔄 [Reconcile] Verifying entitlement with backend: \(transaction.productID)")
+                let ok = await verifyWithBackend(jws: jws, transaction: transaction)
+                if ok {
+                    await transaction.finish()
+                }
+            } catch {
+                print("⚠️ [Reconcile] Entitlement verification failed: \(error)")
+            }
+        }
+        await updatePurchasedProducts()
     }
     
     /// Check for pending subscription upgrades (e.g., Core→Plus scheduled for next billing)
