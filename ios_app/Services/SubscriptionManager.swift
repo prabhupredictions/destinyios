@@ -102,8 +102,14 @@ class SubscriptionManager: ObservableObject {
                 // Extract JWS from VerificationResult BEFORE extracting Transaction
                 let jws = verification.jwsRepresentation
                 let transaction = try checkVerified(verification)
-                await verifyWithBackend(jws: jws, transaction: transaction)
-                await transaction.finish()
+                let backendOK = await verifyWithBackend(jws: jws, transaction: transaction)
+                if backendOK {
+                    await transaction.finish()
+                } else {
+                    // Don't finish — StoreKit will re-deliver on next launch via Transaction.updates
+                    print("⚠️ [Purchase] Backend verification failed — leaving transaction unfinished. Will retry on next launch.")
+                    errorMessage = "We've received your payment. Activating your subscription — please reopen the app shortly."
+                }
                 await updatePurchasedProducts()
                 
                 // Delayed re-check for pending upgrades (StoreKit status may not update immediately)
@@ -196,8 +202,13 @@ class SubscriptionManager: ObservableObject {
                     }
                     
                     print("📥 [TransactionListener] Processing transaction: \(transaction.productID), env: \(transaction.environment)")
-                    await self?.verifyWithBackend(jws: jws, transaction: transaction)
-                    await transaction.finish()
+                    let backendOK = await self?.verifyWithBackend(jws: jws, transaction: transaction) ?? false
+                    if backendOK {
+                        await transaction.finish()
+                    } else {
+                        // Don't finish — StoreKit will re-deliver on next launch
+                        print("⚠️ [TransactionListener] Backend failed — leaving unfinished for retry: \(transaction.productID)")
+                    }
                     await self?.updatePurchasedProducts()
                 } catch {
                     print("Transaction verification failed: \(error)")
@@ -330,11 +341,17 @@ class SubscriptionManager: ObservableObject {
     }
 
     // MARK: - Backend Verification
-    
-    private func verifyWithBackend(jws: String, transaction: Transaction) async {
+
+    /// Verify the transaction with our backend.
+    /// Returns true if the backend confirmed (HTTP 200), false otherwise.
+    /// Sandbox transactions on production API return true (skipped path — not a failure).
+    /// Caller must only call transaction.finish() when this returns true,
+    /// so StoreKit will re-deliver the unfinished transaction on retry.
+    @discardableResult
+    private func verifyWithBackend(jws: String, transaction: Transaction) async -> Bool {
         guard let email = getCurrentUserEmail() else {
-            print("No user email for backend verification")
-            return
+            print("⚠️ [Backend] No user email — keeping transaction unfinished for retry on next sign-in")
+            return false
         }
 
         // Don't send sandbox transactions to the production backend — they would grant
@@ -343,7 +360,8 @@ class SubscriptionManager: ObservableObject {
         if transaction.subscriptionEnvironment == .sandbox &&
             APIConfig.baseURL.contains("astroapi-prod") {
             print("⚠️ [Backend] Skipping sandbox transaction on production API (product=\(transaction.productID))")
-            return
+            // Return true so caller finishes it — there's nothing to verify.
+            return true
         }
 
         do {
@@ -352,7 +370,7 @@ class SubscriptionManager: ObservableObject {
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-            
+
             let body: [String: Any] = [
                 "signed_transaction": jws,
                 "user_email": email,
@@ -360,20 +378,26 @@ class SubscriptionManager: ObservableObject {
                 "environment": transaction.subscriptionEnvironment.rawValue
             ]
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
-            
+
             let (_, response) = try await URLSession.shared.data(for: request)
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                if httpResponse.statusCode == 200 {
-                    print("✅ Backend verification successful for \(email)")
-                    // Sync quota status after successful verification (force bypass cooldown)
-                    try? await QuotaManager.shared.syncStatus(email: email, force: true)
-                } else {
-                    print("❌ Backend verification failed: HTTP \(httpResponse.statusCode)")
-                }
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ [Backend] No HTTP response — keeping transaction unfinished for retry")
+                return false
+            }
+
+            if httpResponse.statusCode == 200 {
+                print("✅ Backend verification successful for \(email)")
+                // Sync quota status after successful verification (force bypass cooldown)
+                try? await QuotaManager.shared.syncStatus(email: email, force: true)
+                return true
+            } else {
+                print("❌ Backend verification failed: HTTP \(httpResponse.statusCode) — keeping transaction unfinished for retry")
+                return false
             }
         } catch {
-            print("Backend verification error: \(error)")
+            print("❌ Backend verification error: \(error) — keeping transaction unfinished for retry")
+            return false
         }
     }
     
