@@ -221,6 +221,16 @@ class SubscriptionManager: ObservableObject {
         }
     }
     
+    /// Call on logout/account switch to prevent a previous user's StoreKit
+    /// entitlements from bleeding into the newly logged-in account.
+    func resetForAccountSwitch() {
+        purchasedProductIDs = []
+        pendingUpgradeProductId = nil
+        pendingUpgradeEffectiveDate = nil
+        isPlusTrialEligible = false
+        UserDefaults.standard.set(false, forKey: "isPremium")
+    }
+
     func updatePurchasedProducts() async {
         var purchased: Set<String> = []
         
