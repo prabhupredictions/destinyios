@@ -116,19 +116,35 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Product Loading
     
-    /// Load available products from App Store
+    /// Load available products from App Store.
+    ///
+    /// INV-3 Gap 6: retry up to 3 times with exponential backoff. Without
+    /// products, isPlusTrialEligible defaults to false and the user can't
+    /// see trial pricing. A transient network blip should not lock them out.
     func loadProducts() async {
         isLoading = true
         errorMessage = nil
-        
-        do {
-            products = try await Product.products(for: productIDs)
-            products.sort { $0.price < $1.price }
-            await updateTrialEligibility()
-            isLoading = false
-        } catch {
-            errorMessage = "Failed to load products: \(error.localizedDescription)"
-            isLoading = false
+
+        var attempt = 0
+        let maxAttempts = 3
+        while attempt < maxAttempts {
+            attempt += 1
+            do {
+                products = try await Product.products(for: productIDs)
+                products.sort { $0.price < $1.price }
+                await updateTrialEligibility()
+                isLoading = false
+                return
+            } catch {
+                if attempt >= maxAttempts {
+                    errorMessage = "Failed to load products: \(error.localizedDescription)"
+                    isLoading = false
+                    return
+                }
+                // Exponential backoff: 1s, 2s
+                let delaySeconds = UInt64(attempt) * 1_000_000_000
+                try? await Task.sleep(nanoseconds: delaySeconds)
+            }
         }
     }
     
@@ -207,11 +223,28 @@ class SubscriptionManager: ObservableObject {
             }
         } catch {
             isLoading = false
+
+            // INV-3 Gap 5: detect Apple's "you're already subscribed" error.
+            // StoreKit raises StoreKitError.userCancelled when the user dismisses
+            // Apple's confirmation alert, but the underlying SKError can be
+            // .paymentNotAllowed or product-already-owned states. We recover by
+            // re-running reconcile so backend gets the existing entitlement.
+            let nsErr = error as NSError
+            let lowerDesc = nsErr.localizedDescription.lowercased()
+            let alreadySubscribed = lowerDesc.contains("already")
+                && (lowerDesc.contains("subscrib") || lowerDesc.contains("purchas"))
+            if alreadySubscribed {
+                print("ℹ️ [Purchase] Apple says user is already subscribed — running reconcile")
+                errorMessage = "You're already subscribed. Activating in the app now…"
+                Task { await self.reconcileEntitlementsWithBackend() }
+                return false
+            }
+
             errorMessage = "Purchase failed: \(error.localizedDescription)"
             throw error
         }
     }
-    
+
     // MARK: - Restore Purchases
     
     /// Restore previous purchases
@@ -235,7 +268,30 @@ class SubscriptionManager: ObservableObject {
     var hasActiveSubscription: Bool {
         !purchasedProductIDs.isEmpty
     }
-    
+
+    /// INV-3 gate: should the "Start 7-Day Free Trial" button be visible
+    /// for the given plan? Pure function so it can be unit-tested without
+    /// instantiating SubscriptionManager.
+    ///
+    /// Returns true ONLY when ALL conditions hold:
+    ///   1. The plan is Plus (we only offer trial on Plus today)
+    ///   2. Apple says the user is eligible for the intro offer
+    ///   3. User has NO active subscription (Apple-side truth via
+    ///      Transaction.currentEntitlements). This is the critical
+    ///      check that closes the offer-code-redeemed bug — Apple's
+    ///      intro eligibility flag is true even after offer redemption,
+    ///      so we must additionally verify there is no live entitlement.
+    nonisolated static func shouldShowTrialButton(
+        planId: String,
+        isPlusTrialEligible: Bool,
+        hasActiveSubscription: Bool
+    ) -> Bool {
+        guard planId == "plus" else { return false }
+        guard isPlusTrialEligible else { return false }
+        guard !hasActiveSubscription else { return false }
+        return true
+    }
+
     /// Get the active plan ID from purchased products
     var activePlanId: String? {
         for productId in purchasedProductIDs {
@@ -321,6 +377,11 @@ class SubscriptionManager: ObservableObject {
 
         purchasedProductIDs = purchased
         UserDefaults.standard.set(!purchased.isEmpty, forKey: "isPremium")
+
+        // INV-3 Gap 2: refresh trial eligibility whenever entitlements change.
+        // Apple's isEligibleForIntroOffer is computed lazily and the value
+        // observed at app launch may be stale after a reconcile/redemption.
+        await updateTrialEligibility()
 
         // Check for pending upgrades
         await checkPendingUpgrade()
