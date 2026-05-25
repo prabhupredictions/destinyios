@@ -727,13 +727,19 @@ class QuotaManager: ObservableObject {
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
 
-        // "Renews on" only when active AND auto-renew is on (or unknown)
-        // "Expires on" when canceled (auto-renew off) or explicitly expired/grace
+        // INV-7: differentiate past vs future tense.
+        //   - Active + auto-renew on  → "Renews on" (future renewal)
+        //   - Grace period            → "Ends on"
+        //   - Already past expiry     → "Expired on" (past tense)
+        //   - Active+canceled or any future "expires"  → "Expires on" (future)
         let prefix: String
+        let isPast = expiryDate <= Date()
         if subscriptionStatus == "active" && autoRenewStatus != false {
             prefix = "Renews on"
         } else if subscriptionStatus == "grace_period" {
             prefix = "Ends on"
+        } else if isPast || subscriptionStatus == "expired" {
+            prefix = "Expired on"
         } else {
             prefix = "Expires on"
         }
