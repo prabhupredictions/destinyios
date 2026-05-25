@@ -43,7 +43,12 @@ struct SubscriptionView: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 16)
                             .padding(.top, 4)
-                        
+
+                        // INV-3 Gap 4: transition banner when Apple says active
+                        // but our DB has not yet caught up. Reassures user during
+                        // the reconcile window (offer code redemption etc.).
+                        activatingBanner
+
                         // Plan cards with feature lists
                         planCardsSection
                         
@@ -164,22 +169,76 @@ struct SubscriptionView: View {
         isRefreshing = false
         print("🔄 [SubscriptionView] Manual refresh completed")
     }
-    
+
+    // MARK: - Activating Banner (INV-3 Gap 4)
+    /// Shown when Apple says the user has an active subscription but our
+    /// DB hasn't caught up yet — typical during the reconcile window
+    /// after an offer code redemption. Empty view otherwise.
+    @ViewBuilder
+    private var activatingBanner: some View {
+        if subscriptionManager.hasActiveSubscription && !quotaManager.isPremium {
+            HStack(spacing: 10) {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                    .scaleEffect(0.8)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Activating your subscription…")
+                        .font(AppTheme.Fonts.title(size: 14))
+                        .foregroundColor(AppTheme.Colors.gold)
+                    Text("This usually takes a few seconds. If it persists, sign out and back in.")
+                        .font(AppTheme.Fonts.body(size: 12))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(AppTheme.Colors.cardBackground)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(AppTheme.Colors.gold.opacity(0.4), lineWidth: 1)
+            )
+            .cornerRadius(10)
+            .padding(.horizontal, 16)
+        }
+    }
+
     // MARK: - Plan Cards Section
     private var planCardsSection: some View {
         VStack(spacing: 16) {
             // Find core plan for reference
             let corePlan = plans.first { $0.planId == "core" }
-            // Get user's current plan for dynamic button text
-            let userCurrentPlanId = quotaManager.currentPlanId ?? "free_guest"
-            
+            // Get user's current plan for dynamic button text.
+            // INV-3 Gap 3: prefer Apple's view (purchasedProductIDs) when DB is stale.
+            // During the window between Apple-side activation (offer code redeem) and
+            // backend reconcile completing, quotaManager.currentPlanId may say
+            // "free_registered" while Apple says Plus active. Without this fallback,
+            // the trial button would render because isCurrentPlan would be false.
+            let dbPlan = quotaManager.currentPlanId ?? "free_guest"
+            let applePlan = subscriptionManager.activePlanId
+            let userCurrentPlanId: String = {
+                if dbPlan.starts(with: "free") || dbPlan == "free_guest" || dbPlan == "free_registered" {
+                    return applePlan ?? dbPlan
+                }
+                return dbPlan
+            }()
+
             ForEach(plans) { plan in
                 PlanCardWithFeatures(
                     plan: plan,
                     product: subscriptionManager.monthlyProduct(for: plan.planId),
                     isPurchasing: isPurchasing && purchasingPlanId == plan.planId,
                     isPlus: plan.planId == "plus",
-                    isTrialEligible: plan.planId == "plus" && isPlusTrialEligible,
+                    // INV-3 (gates pinned in SubscriptionManager.shouldShowTrialButton):
+                    // (a) plan must be Plus
+                    // (b) Apple says intro-eligible
+                    // (c) user has NO active subscription anywhere — closes the
+                    //     offer-code-redeemed bug since Apple's intro flag is
+                    //     unaware of offer redemptions.
+                    isTrialEligible: SubscriptionManager.shouldShowTrialButton(
+                        planId: plan.planId,
+                        isPlusTrialEligible: isPlusTrialEligible,
+                        hasActiveSubscription: subscriptionManager.hasActiveSubscription
+                    ),
                     corePlan: corePlan,
                     userCurrentPlanId: userCurrentPlanId,
                     pendingUpgradePlanId: subscriptionManager.pendingUpgradePlanId,

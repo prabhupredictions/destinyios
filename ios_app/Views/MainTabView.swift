@@ -198,7 +198,14 @@ struct MainTabView: View {
         .alert(item: $subscriptionManager.subscriptionConflict) { _ in
             Alert(
                 title: Text("Apple ID Already Linked"),
-                message: Text("This Apple ID's subscription is registered to a different account in this app.\n\nSign in with the original email to access your subscription, or contact support if you need help."),
+                message: Text(
+                    "Your Apple ID has an active subscription that is already linked " +
+                    "to a different Destiny account.\n\n" +
+                    "This was detected automatically while checking your subscription " +
+                    "status.\n\n" +
+                    "To use this subscription, sign in with the original email. " +
+                    "If you need help recovering access, contact support@destinyaiastrology.com."
+                ),
                 dismissButton: .default(Text("OK"))
             )
         }

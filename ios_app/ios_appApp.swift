@@ -43,6 +43,8 @@ struct ios_appApp: App {
             switch newPhase {
             case .background:
                 BackgroundTaskHelper.shared.beginTask()
+                // Stop the foreground sync timer to save resources.
+                SubscriptionManager.shared.stopForegroundSyncTimer()
             case .active:
                 BackgroundTaskHelper.shared.endTask()
                 // Warm up Cloud Run and refresh subscription state when returning from background
@@ -62,6 +64,9 @@ struct ios_appApp: App {
                     if let email {
                         Task { try? await QuotaManager.shared.syncStatus(email: email, force: true) }
                     }
+                    // Start the periodic sync timer (INV-2 Gap A) — keeps UI fresh
+                    // during long foreground sessions. Stops when app backgrounds.
+                    SubscriptionManager.shared.startForegroundSyncTimer()
                 }
             default:
                 break

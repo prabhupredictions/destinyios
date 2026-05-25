@@ -59,11 +59,20 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Transaction Listener
     private var transactionListener: Task<Void, Never>?
-    
+
+    // MARK: - Foreground sync timer (INV-2 Gap A)
+    /// Runs while the app is in foreground and triggers QuotaManager.syncStatus
+    /// every minute. Respects QuotaManager's 5-min cooldown internally, so the
+    /// actual network call happens at most every 5 min — but cancellations or
+    /// expirations that the backend received via webhook reflect in the UI
+    /// without requiring the user to background+foreground the app.
+    private var foregroundSyncTimer: Task<Void, Never>?
+    private static let foregroundSyncTickInterval: TimeInterval = 60
+
     // MARK: - Init
     private init() {
         transactionListener = listenForTransactions()
-        
+
         Task {
             await loadProducts()
             await updatePurchasedProducts()
@@ -72,23 +81,70 @@ class SubscriptionManager: ObservableObject {
     
     deinit {
         transactionListener?.cancel()
+        foregroundSyncTimer?.cancel()
+    }
+
+    // MARK: - Foreground sync timer control (INV-2 Gap A)
+
+    /// Start the periodic sync. Called from scenePhase=.active in ios_appApp.
+    /// Idempotent — safe to call multiple times.
+    func startForegroundSyncTimer() {
+        foregroundSyncTimer?.cancel()
+        foregroundSyncTimer = Task { [weak self] in
+            let interval = Self.foregroundSyncTickInterval
+            while !Task.isCancelled {
+                let nanoseconds = UInt64(interval * 1_000_000_000)
+                try? await Task.sleep(nanoseconds: nanoseconds)
+                guard let self = self, !Task.isCancelled else { return }
+
+                let email = DataManager.shared.getCurrentUserProfile()?.email
+                    ?? UserDefaults.standard.string(forKey: "userEmail")
+                guard let email = email else { continue }
+
+                // force=false respects the 5-min cooldown — actual network
+                // calls happen at most every 5 min while foreground.
+                try? await QuotaManager.shared.syncStatus(email: email, force: false)
+            }
+        }
+    }
+
+    /// Stop the periodic sync. Called from scenePhase=.background.
+    func stopForegroundSyncTimer() {
+        foregroundSyncTimer?.cancel()
+        foregroundSyncTimer = nil
     }
     
     // MARK: - Product Loading
     
-    /// Load available products from App Store
+    /// Load available products from App Store.
+    ///
+    /// INV-3 Gap 6: retry up to 3 times with exponential backoff. Without
+    /// products, isPlusTrialEligible defaults to false and the user can't
+    /// see trial pricing. A transient network blip should not lock them out.
     func loadProducts() async {
         isLoading = true
         errorMessage = nil
-        
-        do {
-            products = try await Product.products(for: productIDs)
-            products.sort { $0.price < $1.price }
-            await updateTrialEligibility()
-            isLoading = false
-        } catch {
-            errorMessage = "Failed to load products: \(error.localizedDescription)"
-            isLoading = false
+
+        var attempt = 0
+        let maxAttempts = 3
+        while attempt < maxAttempts {
+            attempt += 1
+            do {
+                products = try await Product.products(for: productIDs)
+                products.sort { $0.price < $1.price }
+                await updateTrialEligibility()
+                isLoading = false
+                return
+            } catch {
+                if attempt >= maxAttempts {
+                    errorMessage = "Failed to load products: \(error.localizedDescription)"
+                    isLoading = false
+                    return
+                }
+                // Exponential backoff: 1s, 2s
+                let delaySeconds = UInt64(attempt) * 1_000_000_000
+                try? await Task.sleep(nanoseconds: delaySeconds)
+            }
         }
     }
     
@@ -167,11 +223,28 @@ class SubscriptionManager: ObservableObject {
             }
         } catch {
             isLoading = false
+
+            // INV-3 Gap 5: detect Apple's "you're already subscribed" error.
+            // StoreKit raises StoreKitError.userCancelled when the user dismisses
+            // Apple's confirmation alert, but the underlying SKError can be
+            // .paymentNotAllowed or product-already-owned states. We recover by
+            // re-running reconcile so backend gets the existing entitlement.
+            let nsErr = error as NSError
+            let lowerDesc = nsErr.localizedDescription.lowercased()
+            let alreadySubscribed = lowerDesc.contains("already")
+                && (lowerDesc.contains("subscrib") || lowerDesc.contains("purchas"))
+            if alreadySubscribed {
+                print("ℹ️ [Purchase] Apple says user is already subscribed — running reconcile")
+                errorMessage = "You're already subscribed. Activating in the app now…"
+                Task { await self.reconcileEntitlementsWithBackend() }
+                return false
+            }
+
             errorMessage = "Purchase failed: \(error.localizedDescription)"
             throw error
         }
     }
-    
+
     // MARK: - Restore Purchases
     
     /// Restore previous purchases
@@ -195,7 +268,30 @@ class SubscriptionManager: ObservableObject {
     var hasActiveSubscription: Bool {
         !purchasedProductIDs.isEmpty
     }
-    
+
+    /// INV-3 gate: should the "Start 7-Day Free Trial" button be visible
+    /// for the given plan? Pure function so it can be unit-tested without
+    /// instantiating SubscriptionManager.
+    ///
+    /// Returns true ONLY when ALL conditions hold:
+    ///   1. The plan is Plus (we only offer trial on Plus today)
+    ///   2. Apple says the user is eligible for the intro offer
+    ///   3. User has NO active subscription (Apple-side truth via
+    ///      Transaction.currentEntitlements). This is the critical
+    ///      check that closes the offer-code-redeemed bug — Apple's
+    ///      intro eligibility flag is true even after offer redemption,
+    ///      so we must additionally verify there is no live entitlement.
+    nonisolated static func shouldShowTrialButton(
+        planId: String,
+        isPlusTrialEligible: Bool,
+        hasActiveSubscription: Bool
+    ) -> Bool {
+        guard planId == "plus" else { return false }
+        guard isPlusTrialEligible else { return false }
+        guard !hasActiveSubscription else { return false }
+        return true
+    }
+
     /// Get the active plan ID from purchased products
     var activePlanId: String? {
         for productId in purchasedProductIDs {
@@ -281,6 +377,11 @@ class SubscriptionManager: ObservableObject {
 
         purchasedProductIDs = purchased
         UserDefaults.standard.set(!purchased.isEmpty, forKey: "isPremium")
+
+        // INV-3 Gap 2: refresh trial eligibility whenever entitlements change.
+        // Apple's isEligibleForIntroOffer is computed lazily and the value
+        // observed at app launch may be stale after a reconcile/redemption.
+        await updateTrialEligibility()
 
         // Check for pending upgrades
         await checkPendingUpgrade()
