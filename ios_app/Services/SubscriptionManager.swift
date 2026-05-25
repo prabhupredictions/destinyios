@@ -59,11 +59,20 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Transaction Listener
     private var transactionListener: Task<Void, Never>?
-    
+
+    // MARK: - Foreground sync timer (INV-2 Gap A)
+    /// Runs while the app is in foreground and triggers QuotaManager.syncStatus
+    /// every minute. Respects QuotaManager's 5-min cooldown internally, so the
+    /// actual network call happens at most every 5 min — but cancellations or
+    /// expirations that the backend received via webhook reflect in the UI
+    /// without requiring the user to background+foreground the app.
+    private var foregroundSyncTimer: Task<Void, Never>?
+    private static let foregroundSyncTickInterval: TimeInterval = 60
+
     // MARK: - Init
     private init() {
         transactionListener = listenForTransactions()
-        
+
         Task {
             await loadProducts()
             await updatePurchasedProducts()
@@ -72,6 +81,37 @@ class SubscriptionManager: ObservableObject {
     
     deinit {
         transactionListener?.cancel()
+        foregroundSyncTimer?.cancel()
+    }
+
+    // MARK: - Foreground sync timer control (INV-2 Gap A)
+
+    /// Start the periodic sync. Called from scenePhase=.active in ios_appApp.
+    /// Idempotent — safe to call multiple times.
+    func startForegroundSyncTimer() {
+        foregroundSyncTimer?.cancel()
+        foregroundSyncTimer = Task { [weak self] in
+            let interval = Self.foregroundSyncTickInterval
+            while !Task.isCancelled {
+                let nanoseconds = UInt64(interval * 1_000_000_000)
+                try? await Task.sleep(nanoseconds: nanoseconds)
+                guard let self = self, !Task.isCancelled else { return }
+
+                let email = DataManager.shared.getCurrentUserProfile()?.email
+                    ?? UserDefaults.standard.string(forKey: "userEmail")
+                guard let email = email else { continue }
+
+                // force=false respects the 5-min cooldown — actual network
+                // calls happen at most every 5 min while foreground.
+                try? await QuotaManager.shared.syncStatus(email: email, force: false)
+            }
+        }
+    }
+
+    /// Stop the periodic sync. Called from scenePhase=.background.
+    func stopForegroundSyncTimer() {
+        foregroundSyncTimer?.cancel()
+        foregroundSyncTimer = nil
     }
     
     // MARK: - Product Loading
