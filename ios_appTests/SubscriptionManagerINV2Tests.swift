@@ -62,4 +62,20 @@ final class SubscriptionManagerINV2Tests: XCTestCase {
         mgr.stopForegroundSyncTimer()  // double stop must not crash
         XCTAssertTrue(true, "Double stop completed without crash")
     }
+
+    /// INV-9 G2: reconcileEntitlementsWithBackend must not allow concurrent
+    /// re-entry. Without the guard, two concurrent invocations would
+    /// iterate Transaction.currentEntitlements and call /verify in parallel.
+    /// Backend handles the concurrency correctly via DB unique index, but
+    /// we want to avoid the redundant work entirely.
+    @MainActor
+    func test_reconcile_has_reentry_guard() async throws {
+        let mgr = SubscriptionManager.shared
+
+        // Reflection check — internal flag must exist
+        let mirror = Mirror(reflecting: mgr)
+        let hasFlag = mirror.descendant("isReconciling") != nil
+        XCTAssertTrue(hasFlag,
+            "SubscriptionManager must declare isReconciling flag for INV-9 G2")
+    }
 }

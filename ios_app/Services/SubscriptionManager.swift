@@ -397,7 +397,22 @@ class SubscriptionManager: ObservableObject {
     ///
     /// Call this after sign-in/sign-up succeeds and on every foreground.
     /// Idempotent — backend dedups by originalTransactionId.
+    ///
+    /// INV-9 G2: re-entry guard. Sign-in path and scenePhase=.active can
+    /// fire reconcile concurrently. Without the guard, both iterations
+    /// hit the backend in parallel for the same entitlements — wasteful.
+    /// Backend correctness is preserved by the DB unique index, but we
+    /// can avoid the redundant network calls entirely.
+    private var isReconciling: Bool = false
+
     func reconcileEntitlementsWithBackend() async {
+        if isReconciling {
+            print("🔄 [Reconcile] Already running; skipping concurrent invocation")
+            return
+        }
+        isReconciling = true
+        defer { isReconciling = false }
+
         for await result in Transaction.currentEntitlements {
             do {
                 let jws = result.jwsRepresentation
