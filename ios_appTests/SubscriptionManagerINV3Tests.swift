@@ -107,4 +107,33 @@ final class SubscriptionManagerINV3Tests: XCTestCase {
                 "Unknown plan '\(planId)' must default to hiding the trial button")
         }
     }
+
+    // MARK: - INV-E5 / INV-E6: Active-subscriber UX gating
+
+    /// INV-E5: Active Core user looking at the Plus card must NOT see the
+    /// trial paywall. The CTA should fall through to "Upgrade to Plus".
+    /// (`shouldShowTrialButton` returning false is the gate that closes
+    /// E5; the actual button copy is then driven by `buttonText`.)
+    func test_inv_e5_active_core_user_sees_no_trial_on_plus_card() {
+        let result = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,           // Apple may still say yes
+            hasActiveSubscription: true          // Core sub is active
+        )
+        XCTAssertFalse(result,
+            "Active Core subscriber must not see trial paywall on Plus card")
+    }
+
+    /// INV-E6: Active Plus user looking at their own card must NOT see
+    /// the trial paywall. Combined with `isCurrentPlan`, the button text
+    /// becomes "Current Plan" (= "You are subscribed").
+    func test_inv_e6_active_plus_user_sees_no_trial_on_plus_card() {
+        let result = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,
+            hasActiveSubscription: true
+        )
+        XCTAssertFalse(result,
+            "Active Plus subscriber must not see trial paywall on their own card")
+    }
 }

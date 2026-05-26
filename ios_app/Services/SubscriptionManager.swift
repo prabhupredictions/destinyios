@@ -214,7 +214,12 @@ class SubscriptionManager: ObservableObject {
                 
             case .pending:
                 isLoading = false
-                errorMessage = "Purchase is pending approval"
+                // INV-A8: surface a clearer message — .pending means Apple is
+                // waiting on parental approval (Ask to Buy) or SCA bank
+                // confirmation. The transaction will arrive later via
+                // Transaction.updates, so the user shouldn't tap purchase
+                // again. Be explicit so they don't think the flow failed.
+                errorMessage = "Your purchase is awaiting approval (e.g. Ask to Buy or bank confirmation). It will activate automatically once approved — no need to retry."
                 return false
                 
             @unknown default:
@@ -359,6 +364,13 @@ class SubscriptionManager: ObservableObject {
         pendingUpgradeEffectiveDate = nil
         isPlusTrialEligible = false
         UserDefaults.standard.set(false, forKey: "isPremium")
+        // INV-J5: clear ALL subscription cache keys so a different
+        // user signing in on the same device cannot see stale data.
+        UserDefaults.standard.removeObject(forKey: "currentPlanId")
+        UserDefaults.standard.removeObject(forKey: "subscriptionStatus")
+        UserDefaults.standard.removeObject(forKey: "subscriptionExpiresAt")
+        UserDefaults.standard.removeObject(forKey: "autoRenewStatus")
+        UserDefaults.standard.removeObject(forKey: "currentPlanDisplayName")
     }
 
     func updatePurchasedProducts() async {
@@ -367,6 +379,13 @@ class SubscriptionManager: ObservableObject {
         for await result in Transaction.currentEntitlements {
             do {
                 let transaction = try checkVerified(result)
+                // INV-J7: skip transactions that have been superseded by an
+                // upgrade. Without this, a Core+Plus user during the brief
+                // overlap window appears to own BOTH tiers, which can flip
+                // pendingUpgrade UI off prematurely and confuse plan display.
+                if transaction.isUpgraded {
+                    continue
+                }
                 if transaction.revocationDate == nil {
                     purchased.insert(transaction.productID)
                 }
@@ -418,6 +437,10 @@ class SubscriptionManager: ObservableObject {
                 let jws = result.jwsRepresentation
                 let transaction = try checkVerified(result)
                 if transaction.revocationDate != nil { continue }
+                // INV-J7: skip superseded transactions during reconcile too
+                // so we don't push the older tier to the backend after an
+                // upgrade has already been recorded.
+                if transaction.isUpgraded { continue }
                 print("🔄 [Reconcile] Verifying entitlement with backend: \(transaction.productID)")
                 let ok = await verifyWithBackend(jws: jws, transaction: transaction)
                 if ok {

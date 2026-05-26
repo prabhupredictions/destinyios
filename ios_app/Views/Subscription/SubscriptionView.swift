@@ -69,6 +69,12 @@ struct SubscriptionView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 40)
             }
+            .refreshable {
+                // INV-J4: pull-to-refresh — force a full reconcile and
+                // force=true backend sync. Safety net for users who
+                // redeemed an offer code or where webhook delivery lagged.
+                await refreshStatus()
+            }
             .background(AppTheme.Colors.mainBackground.ignoresSafeArea())
             .navigationTitle("choose_plan_title".localized)
             #if os(iOS)
@@ -153,21 +159,32 @@ struct SubscriptionView: View {
     }
     
     // MARK: - Refresh Status
-    /// Manually refresh subscription status from StoreKit
+    /// Manually refresh subscription status from StoreKit AND backend.
+    /// Called by the toolbar refresh button AND pull-to-refresh (INV-J4).
     private func refreshStatus() async {
         isRefreshing = true
-        
+
         // Sync with App Store to get latest entitlements
         try? await AppStore.sync()
-        
+
+        // INV-J4: full reconcile so any out-of-band redemptions
+        // (offer codes redeemed BEFORE app install) are pushed to the
+        // backend, then force a backend sync to clear cached state.
+        await subscriptionManager.reconcileEntitlementsWithBackend()
+
         // Update purchased products and check for pending upgrades
         await subscriptionManager.updatePurchasedProducts()
-        
+
+        // Force backend re-fetch (bypass any local 60s cache)
+        if let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty {
+            try? await quotaManager.syncStatus(email: email, force: true)
+        }
+
         // Small delay to ensure UI updates
         try? await Task.sleep(nanoseconds: 300_000_000)
-        
+
         isRefreshing = false
-        print("🔄 [SubscriptionView] Manual refresh completed")
+        print("🔄 [SubscriptionView] Manual refresh completed (force=true)")
     }
 
     // MARK: - Activating Banner (INV-3 Gap 4)
