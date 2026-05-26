@@ -1,5 +1,6 @@
 import SwiftUI
 import UserNotifications
+import StoreKit
 
 /// Professional Profile screen with account info, settings navigation, and subscription status
 /// Follows standard iOS design patterns with Midnight Gold theme
@@ -110,6 +111,18 @@ struct ProfileView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
+                }
+                .refreshable {
+                    // INV-J4: pull-to-refresh from Profile — full reconcile
+                    // and force=true backend sync. Lets the user recover from
+                    // any state mismatch (offer-code redemption, missed
+                    // webhook) without contacting support.
+                    if !userEmail.isEmpty {
+                        try? await AppStore.sync()
+                        await subscriptionManager.reconcileEntitlementsWithBackend()
+                        await subscriptionManager.updatePurchasedProducts()
+                        try? await quotaManager.syncStatus(email: userEmail, force: true)
+                    }
                 }
                 .accessibilityIdentifier("profile_screen")
             }
