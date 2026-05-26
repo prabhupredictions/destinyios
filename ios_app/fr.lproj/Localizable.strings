@@ -172,6 +172,7 @@
 "get_cosmic_guidance" = "Consultations astro illimitées";
 "cancel_anytime" = "Annule quand tu veux";
 "restore_purchases" = "Restaurer mes achats";
+"no_purchases_to_restore" = "Aucun achat précédent trouvé pour cet identifiant Apple. Si vous vous êtes abonné avec un autre identifiant Apple, connectez-vous à ce compte dans Réglages → Identifiant Apple et réessayez.";
 "subscription_terms" = "L'abonnement se renouvelle automatiquement. Tu peux annuler jusqu'à 24h avant.";
 
 // MARK: - Splash

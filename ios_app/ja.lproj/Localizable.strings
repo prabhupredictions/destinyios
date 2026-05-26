@@ -172,6 +172,7 @@
 "get_cosmic_guidance" = "占い相談し放題";
 "cancel_anytime" = "いつでも解約OK";
 "restore_purchases" = "購入を復元";
+"no_purchases_to_restore" = "この Apple ID では以前の購入が見つかりません。別の Apple ID で登録した場合は、設定 → Apple ID でそのアカウントにサインインしてからもう一度お試しください。";
 "subscription_terms" = "サブスクは自動更新されます。期限の24時間前までに解約してください。";
 
 // MARK: - Splash

@@ -172,6 +172,7 @@
 "get_cosmic_guidance" = "无限占星咨询";
 "cancel_anytime" = "随时取消";
 "restore_purchases" = "恢复购买";
+"no_purchases_to_restore" = "未找到此 Apple ID 的历史购买记录。如果您使用其他 Apple ID 订阅，请在“设置 → Apple ID”中登录该账号后重试。";
 "subscription_terms" = "订阅会自动续期，可在到期前 24 小时取消。";
 
 // MARK: - Splash

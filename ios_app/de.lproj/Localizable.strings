@@ -172,6 +172,7 @@
 "get_cosmic_guidance" = "Unbegrenzte astrologische Beratung";
 "cancel_anytime" = "Jederzeit kündbar";
 "restore_purchases" = "Käufe wiederherstellen";
+"no_purchases_to_restore" = "Keine früheren Käufe für diese Apple-ID gefunden. Falls du dich mit einer anderen Apple-ID abonniert hast, melde dich in Einstellungen → Apple-ID an und versuche es erneut.";
 "subscription_terms" = "Das Abo verlängert sich automatisch, wenn du nicht 24 Stunden vorher kündigst.";
 
 // MARK: - Splash
