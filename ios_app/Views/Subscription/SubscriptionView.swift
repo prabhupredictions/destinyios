@@ -11,8 +11,6 @@ struct SubscriptionView: View {
     @State private var purchasingPlanId: String?
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var showSuccess = false
-    @State private var successPlanName = ""  // For success popup
     @State private var plans: [PlanInfo] = []
     @State private var isLoading = true
     @State private var isRefreshing = false  // For manual refresh button
@@ -109,13 +107,6 @@ struct SubscriptionView: View {
                 Button("ok_action".localized, role: .cancel) {}
             } message: {
                 Text(errorMessage)
-            }
-            .alert("Welcome to \(successPlanName)! 🎉", isPresented: $showSuccess) {
-                Button("lets_go_action".localized) {
-                    dismiss()
-                }
-            } message: {
-                Text("subscription_active_message".localized)
             }
             .task {
                 await loadPlans()
@@ -336,11 +327,28 @@ struct SubscriptionView: View {
                 .font(AppTheme.Fonts.caption(size: 12))
                 .foregroundColor(AppTheme.Colors.textTertiary)
                 .multilineTextAlignment(.center)
-            
+
             Text("fair_use_notice".localized)
                 .font(AppTheme.Fonts.caption(size: 11))
                 .italic()
                 .foregroundColor(AppTheme.Colors.textTertiary)
+
+            // Apple Guideline 3.1.2(a) requires functional Terms + Privacy
+            // links on every auto-renewing subscription paywall. Link to the
+            // same URLs surfaced from the Profile screen.
+            HStack(spacing: 16) {
+                Link("terms_of_service".localized,
+                     destination: URL(string: "https://www.destinyaiastrology.com/terms-of-service/")!)
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(AppTheme.Colors.gold)
+                Text("·")
+                    .foregroundColor(AppTheme.Colors.textTertiary)
+                Link("privacy_policy".localized,
+                     destination: URL(string: "https://www.destinyaiastrology.com/privacy-policy/")!)
+                    .font(AppTheme.Fonts.caption(size: 12))
+                    .foregroundColor(AppTheme.Colors.gold)
+            }
+            .padding(.top, 4)
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
@@ -374,11 +382,24 @@ struct SubscriptionView: View {
             let success = try await subscriptionManager.purchase(product)
             isPurchasing = false
             purchasingPlanId = nil
-            
+
             if success {
-                // Show success popup before dismissing
-                successPlanName = plans.first(where: { $0.planId == planId })?.displayName ?? planId.capitalized
-                showSuccess = true
+                // Standard StoreKit pattern: Apple already showed its own
+                // "Subscription Confirmed" sheet. We just dismiss the
+                // paywall — purchasedProductIDs / quotaManager.currentPlanId
+                // update naturally and the surrounding UI reflects the new
+                // plan (badge, unlocked features) without needing a custom
+                // celebration popup.
+                dismiss()
+            } else if let mgrMsg = subscriptionManager.errorMessage, !mgrMsg.isEmpty {
+                // purchase() returned false because either:
+                //  - backend verification is still pending (we have a payment
+                //    but no DB row yet), or
+                //  - Apple is awaiting parental / SCA approval (.pending).
+                // Surface the manager's message so the user knows what's up
+                // and doesn't think nothing happened.
+                errorMessage = mgrMsg
+                showError = true
             }
         } catch {
             isPurchasing = false

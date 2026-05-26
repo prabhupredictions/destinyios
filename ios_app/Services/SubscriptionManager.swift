@@ -190,23 +190,27 @@ class SubscriptionManager: ObservableObject {
                     errorMessage = "We've received your payment. Activating your subscription — please reopen the app shortly."
                 }
                 await updatePurchasedProducts()
-                
+
                 // Delayed re-check for pending upgrades (StoreKit status may not update immediately)
                 Task {
                     try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
                     await self.checkPendingUpgrade()
                     print("🔄 [purchase] Delayed pending upgrade check completed")
                 }
-                
+
                 isLoading = false
-                
+
                 // Log transaction details for debugging
                 print("✅ [Purchase] Completed: \(product.id), env: \(transaction.environment)")
                 if let expires = transaction.expirationDate {
                     print("   Expires: \(expires)")
                 }
-                
-                return true
+
+                // Return backendOK — caller treats `true` as "fully activated".
+                // If backend verify failed, errorMessage is already set above
+                // so the caller can surface it without flashing a misleading
+                // success state.
+                return backendOK
                 
             case .userCancelled:
                 isLoading = false
@@ -252,13 +256,18 @@ class SubscriptionManager: ObservableObject {
 
     // MARK: - Restore Purchases
     
-    /// Restore previous purchases
+    /// Restore previous purchases — standard StoreKit 2 pattern. Forces a
+    /// fresh receipt sync from Apple AND pushes every active entitlement to
+    /// the backend so a user with a paid sub that the DB never recorded
+    /// (e.g. offer code redeemed pre-install, missed webhook) is fully
+    /// activated by tapping Restore.
     func restorePurchases() async {
         isLoading = true
         errorMessage = nil
-        
+
         do {
             try await AppStore.sync()
+            await reconcileEntitlementsWithBackend()
             await updatePurchasedProducts()
             isLoading = false
         } catch {
