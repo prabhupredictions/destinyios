@@ -14,6 +14,7 @@ struct SubscriptionView: View {
     @State private var plans: [PlanInfo] = []
     @State private var isLoading = true
     @State private var isRefreshing = false  // For manual refresh button
+    @State private var isRestoring = false   // For Restore Purchases button
     @State private var showDestinyMatchingInfo = false
     
     // Trigger build bump: 2026-02-10-10-20
@@ -304,19 +305,46 @@ struct SubscriptionView: View {
     }
     
     // MARK: - Restore Button
+    /// Apple HIG: a Restore Purchases tap MUST give explicit feedback —
+    /// either the paywall dismisses (sub restored) or the user is told
+    /// nothing was restorable. Silent no-op is rejection-prone and
+    /// confuses users who genuinely paid before.
     private var restoreButton: some View {
         Button(action: {
             Task {
-                await subscriptionManager.restorePurchases()
-                if quotaManager.isPremium {
+                isRestoring = true
+                let restored = await subscriptionManager.restorePurchases()
+                isRestoring = false
+
+                if restored {
+                    // At least one entitlement is live — dismiss to let the
+                    // surrounding UI (badge, unlocked features) reflect it.
                     dismiss()
+                } else if let mgrMsg = subscriptionManager.errorMessage,
+                          !mgrMsg.isEmpty {
+                    // AppStore.sync threw — surface the underlying error.
+                    errorMessage = mgrMsg
+                    showError = true
+                } else {
+                    // Apple synced cleanly but found no active entitlements
+                    // for this Apple ID. Required HIG feedback.
+                    errorMessage = "no_purchases_to_restore".localized
+                    showError = true
                 }
             }
         }) {
-            Text("restore_purchases".localized)
-                .font(AppTheme.Fonts.body(size: 15))
-                .foregroundColor(AppTheme.Colors.gold)
+            HStack(spacing: 8) {
+                if isRestoring {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
+                        .scaleEffect(0.8)
+                }
+                Text("restore_purchases".localized)
+                    .font(AppTheme.Fonts.body(size: 15))
+                    .foregroundColor(AppTheme.Colors.gold)
+            }
         }
+        .disabled(isRestoring)
         .padding(.top, 8)
     }
     

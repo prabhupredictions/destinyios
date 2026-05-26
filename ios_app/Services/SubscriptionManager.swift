@@ -260,8 +260,12 @@ class SubscriptionManager: ObservableObject {
     /// fresh receipt sync from Apple AND pushes every active entitlement to
     /// the backend so a user with a paid sub that the DB never recorded
     /// (e.g. offer code redeemed pre-install, missed webhook) is fully
-    /// activated by tapping Restore.
-    func restorePurchases() async {
+    /// activated by tapping Restore. Returns `true` if at least one active
+    /// entitlement was found, `false` if there was nothing to restore. The
+    /// caller is responsible for showing UI feedback in either case
+    /// (Apple HIG requires explicit feedback on Restore).
+    @discardableResult
+    func restorePurchases() async -> Bool {
         isLoading = true
         errorMessage = nil
 
@@ -270,9 +274,11 @@ class SubscriptionManager: ObservableObject {
             await reconcileEntitlementsWithBackend()
             await updatePurchasedProducts()
             isLoading = false
+            return !purchasedProductIDs.isEmpty
         } catch {
             isLoading = false
             errorMessage = "Restore failed: \(error.localizedDescription)"
+            return false
         }
     }
     
