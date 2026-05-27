@@ -175,6 +175,8 @@
 "cancel_anytime" = "Cancel anytime";
 "restore_purchases" = "Restore Purchases";
 "no_purchases_to_restore" = "No previous purchases found for this Apple ID. If you subscribed with a different Apple ID, sign in to that account in Settings → Apple ID and try again.";
+"conflict_banner_title" = "Apple ID linked to another account";
+"conflict_banner_body" = "This Apple ID's subscription is already activated on a different Destiny account. To subscribe here, sign in with the original email or use a different Apple ID in Settings → Apple ID. Need help? Contact support@destinyaiastrology.com.";
 "subscription_terms" = "Subscription automatically renews unless canceled at least 24 hours before the end of the current period.";
 
 // MARK: - Splash

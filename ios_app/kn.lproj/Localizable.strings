@@ -173,6 +173,8 @@
 "cancel_anytime" = "ಯಾವಾಗ ಬೇಕಾದ್ರೂ ರದ್ದು ಮಾಡಬಹುದು";
 "restore_purchases" = "ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಿ";
 "no_purchases_to_restore" = "ಈ Apple ID ಗೆ ಯಾವುದೇ ಹಿಂದಿನ ಖರೀದಿಗಳು ಸಿಗಲಿಲ್ಲ. ನೀವು ಬೇರೆ Apple ID ಯಿಂದ ಚಂದಾದಾರರಾಗಿದ್ದರೆ, Settings → Apple ID ನಲ್ಲಿ ಆ ಖಾತೆಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+"conflict_banner_title" = "Apple ID ಬೇರೆ ಖಾತೆಗೆ ಲಿಂಕ್ ಆಗಿದೆ";
+"conflict_banner_body" = "ಈ Apple ID ಯ ಚಂದಾದಾರಿಕೆ ಈಗಾಗಲೇ ಬೇರೆ Destiny ಖಾತೆಯಲ್ಲಿ ಸಕ್ರಿಯವಾಗಿದೆ. ಇಲ್ಲಿ ಚಂದಾದಾರರಾಗಲು, ಮೂಲ ಇಮೇಲ್‌ನೊಂದಿಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ ಅಥವಾ Settings → Apple ID ನಲ್ಲಿ ಬೇರೆ Apple ID ಬಳಸಿ. ಸಹಾಯ ಬೇಕಾ? support@destinyaiastrology.com ಗೆ ಸಂಪರ್ಕಿಸಿ.";
 "subscription_terms" = "ಸಬ್‌ಸ್ಕ್ರಿಪ್ಶನ್ ಆಟೋಮ್ಯಾಟಿಕ್ ಆಗಿ ರಿನ್ಯೂ ಆಗುತ್ತೆ. 24 ಗಂಟೆ ಮೊದಲು ರದ್ದು ಮಾಡಿ.";
 
 // MARK: - Splash
