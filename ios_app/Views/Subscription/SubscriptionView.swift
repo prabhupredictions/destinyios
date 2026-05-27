@@ -185,7 +185,17 @@ struct SubscriptionView: View {
     /// after an offer code redemption. Empty view otherwise.
     @ViewBuilder
     private var activatingBanner: some View {
-        if subscriptionManager.hasActiveSubscription && !quotaManager.isPremium {
+        // Show "Activating..." ONLY when:
+        //   - StoreKit reports an active sub (we have a valid entitlement)
+        //   - Backend hasn't yet caught up (isPremium=false)
+        //   - AND there's no detected cross-account conflict — otherwise the
+        //     banner deadlocks forever because the backend will keep
+        //     correctly rejecting (different email already owns this Apple
+        //     ID's sub). In that case the conflict alert is the right UX,
+        //     not a perpetual "activating" spinner.
+        if subscriptionManager.hasActiveSubscription &&
+           !quotaManager.isPremium &&
+           subscriptionManager.subscriptionConflict == nil {
             HStack(spacing: 10) {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
@@ -225,6 +235,13 @@ struct SubscriptionView: View {
             let dbPlan = quotaManager.currentPlanId ?? "free_guest"
             let applePlan = subscriptionManager.activePlanId
             let userCurrentPlanId: String = {
+                // If a cross-account conflict was detected, the Apple-side
+                // plan does NOT belong to this email. Trust the DB only —
+                // otherwise we'd show "Plus" as current plan to a user who
+                // is permanently locked out of that Apple sub by INV-1.
+                if subscriptionManager.subscriptionConflict != nil {
+                    return dbPlan
+                }
                 if dbPlan.starts(with: "free") || dbPlan == "free_guest" || dbPlan == "free_registered" {
                     return applePlan ?? dbPlan
                 }
