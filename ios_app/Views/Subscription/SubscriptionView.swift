@@ -260,10 +260,14 @@ struct SubscriptionView: View {
                     // (c) user has NO active subscription anywhere — closes the
                     //     offer-code-redeemed bug since Apple's intro flag is
                     //     unaware of offer redemptions.
+                    // (d) no cross-account conflict — even in the brief window
+                    //     before reconcile finishes, never offer trial when
+                    //     backend has rejected the claim.
                     isTrialEligible: SubscriptionManager.shouldShowTrialButton(
                         planId: plan.planId,
                         isPlusTrialEligible: isPlusTrialEligible,
-                        hasActiveSubscription: subscriptionManager.hasActiveSubscription
+                        hasActiveSubscription: subscriptionManager.hasActiveSubscription,
+                        hasConflict: subscriptionManager.subscriptionConflict != nil
                     ),
                     corePlan: corePlan,
                     userCurrentPlanId: userCurrentPlanId,
