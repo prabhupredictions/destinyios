@@ -48,6 +48,12 @@ struct SubscriptionView: View {
                         // the reconcile window (offer code redemption etc.).
                         activatingBanner
 
+                        // INV-1: cross-account conflict banner — shown when the
+                        // local Apple ID's subscription is already linked to a
+                        // different Destiny email. Tells user the right action
+                        // upfront so they don't tap the plan button repeatedly.
+                        crossAccountConflictBanner
+
                         // Plan cards with feature lists
                         planCardsSection
                         
@@ -218,6 +224,43 @@ struct SubscriptionView: View {
             )
             .cornerRadius(10)
             .padding(.horizontal, 16)
+        }
+    }
+
+    // MARK: - Cross-Account Conflict Banner (INV-1)
+    /// Shown on the paywall when the local Apple ID's subscription is
+    /// already claimed by a different Destiny email per backend. Directs
+    /// the user to the right next action upfront so they don't tap the
+    /// plan button repeatedly and trip Apple's "you're already subscribed"
+    /// alert each time.
+    @ViewBuilder
+    private var crossAccountConflictBanner: some View {
+        if subscriptionManager.subscriptionConflict != nil {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(AppTheme.Fonts.title(size: 16))
+                    .foregroundColor(.orange)
+                    .padding(.top, 1)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("conflict_banner_title".localized)
+                        .font(AppTheme.Fonts.title(size: 14))
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                    Text("conflict_banner_body".localized)
+                        .font(AppTheme.Fonts.body(size: 12))
+                        .foregroundColor(AppTheme.Colors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+            }
+            .padding(12)
+            .background(Color.orange.opacity(0.10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.orange.opacity(0.55), lineWidth: 1)
+            )
+            .cornerRadius(10)
+            .padding(.horizontal, 16)
+            .accessibilityIdentifier("subscription_conflict_banner")
         }
     }
 

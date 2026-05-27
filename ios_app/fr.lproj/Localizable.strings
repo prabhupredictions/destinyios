@@ -173,6 +173,8 @@
 "cancel_anytime" = "Annule quand tu veux";
 "restore_purchases" = "Restaurer mes achats";
 "no_purchases_to_restore" = "Aucun achat précédent trouvé pour cet identifiant Apple. Si vous vous êtes abonné avec un autre identifiant Apple, connectez-vous à ce compte dans Réglages → Identifiant Apple et réessayez.";
+"conflict_banner_title" = "Identifiant Apple lié à un autre compte";
+"conflict_banner_body" = "L'abonnement de cet identifiant Apple est déjà associé à un autre compte Destiny. Pour vous abonner ici, connectez-vous avec l'e-mail d'origine ou utilisez un autre identifiant Apple dans Réglages → Identifiant Apple. Besoin d'aide ? Écrivez à support@destinyaiastrology.com.";
 "subscription_terms" = "L'abonnement se renouvelle automatiquement. Tu peux annuler jusqu'à 24h avant.";
 
 // MARK: - Splash

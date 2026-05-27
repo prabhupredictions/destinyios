@@ -173,6 +173,8 @@
 "cancel_anytime" = "随时取消";
 "restore_purchases" = "恢复购买";
 "no_purchases_to_restore" = "未找到此 Apple ID 的历史购买记录。如果您使用其他 Apple ID 订阅，请在“设置 → Apple ID”中登录该账号后重试。";
+"conflict_banner_title" = "Apple ID 已关联其他账号";
+"conflict_banner_body" = "此 Apple ID 的订阅已绑定到另一个 Destiny 账号。如需在此订阅，请使用原始邮箱登录，或在“设置 → Apple ID”中切换到其他 Apple ID。需要帮助？请联系 support@destinyaiastrology.com。";
 "subscription_terms" = "订阅会自动续期，可在到期前 24 小时取消。";
 
 // MARK: - Splash

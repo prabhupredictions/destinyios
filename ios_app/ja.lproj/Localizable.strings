@@ -173,6 +173,8 @@
 "cancel_anytime" = "いつでも解約OK";
 "restore_purchases" = "購入を復元";
 "no_purchases_to_restore" = "この Apple ID では以前の購入が見つかりません。別の Apple ID で登録した場合は、設定 → Apple ID でそのアカウントにサインインしてからもう一度お試しください。";
+"conflict_banner_title" = "Apple ID は別のアカウントに紐付いています";
+"conflict_banner_body" = "この Apple ID のサブスクリプションは別の Destiny アカウントに既に紐付いています。ここで登録するには、元のメールでサインインするか、設定 → Apple ID で別の Apple ID を使用してください。お困りの際は support@destinyaiastrology.com までご連絡ください。";
 "subscription_terms" = "サブスクは自動更新されます。期限の24時間前までに解約してください。";
 
 // MARK: - Splash
