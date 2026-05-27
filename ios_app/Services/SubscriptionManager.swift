@@ -301,14 +301,21 @@ class SubscriptionManager: ObservableObject {
     ///      check that closes the offer-code-redeemed bug — Apple's
     ///      intro eligibility flag is true even after offer redemption,
     ///      so we must additionally verify there is no live entitlement.
+    ///   4. NO cross-account conflict has been detected. Belt-and-
+    ///      suspenders: even in the brief race window between sign-in
+    ///      and reconcile finishing, if backend has rejected this
+    ///      email's claim on the local Apple ID's sub, never offer the
+    ///      trial — it cannot succeed.
     nonisolated static func shouldShowTrialButton(
         planId: String,
         isPlusTrialEligible: Bool,
-        hasActiveSubscription: Bool
+        hasActiveSubscription: Bool,
+        hasConflict: Bool = false
     ) -> Bool {
         guard planId == "plus" else { return false }
         guard isPlusTrialEligible else { return false }
         guard !hasActiveSubscription else { return false }
+        guard !hasConflict else { return false }
         return true
     }
 

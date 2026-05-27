@@ -136,4 +136,37 @@ final class SubscriptionManagerINV3Tests: XCTestCase {
         XCTAssertFalse(result,
             "Active Plus subscriber must not see trial paywall on their own card")
     }
+
+    // MARK: - INV-1 cross-account conflict gating
+
+    /// INV-1: when a cross-account conflict has been detected (the local
+    /// Apple ID's sub is owned by a different email per backend), the
+    /// trial button must be hidden EVEN IF there's a brief race window
+    /// where hasActiveSubscription hasn't yet flipped to true (e.g.
+    /// reconcile in progress).
+    func test_inv1_conflict_detected_hides_trial_even_during_reconcile_race() {
+        let result = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,        // Apple still says yes
+            hasActiveSubscription: false,     // race: not yet populated
+            hasConflict: true                 // but backend already rejected
+        )
+        XCTAssertFalse(result,
+            "When subscriptionConflict is set, trial must be hidden regardless " +
+            "of hasActiveSubscription state")
+    }
+
+    /// Default value: hasConflict defaults to false, so all the existing
+    /// non-conflict tests remain semantically unchanged (verified by
+    /// passing existing call sites without explicit hasConflict).
+    func test_inv1_default_hasConflict_is_false() {
+        let result = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,
+            hasActiveSubscription: false
+            // hasConflict defaults to false
+        )
+        XCTAssertTrue(result,
+            "Without explicit conflict, gating must allow trial for eligible new user")
+    }
 }
