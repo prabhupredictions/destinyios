@@ -10,6 +10,7 @@
 		E401A9FA2F0CD75E00D75125 /* Local.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E401A9F92F0CD75E00D75125 /* Local.xcconfig */; };
 		E401A9FC2F0CD77E00D75125 /* Production.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E401A9FB2F0CD77E00D75125 /* Production.xcconfig */; };
 		E401A9FE2F0CD79100D75125 /* Test.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E401A9FD2F0CD79100D75125 /* Test.xcconfig */; };
+		E487E9792FC858DE00CA7705 /* Destiny.storekit in Resources */ = {isa = PBXBuildFile; fileRef = E487E9782FC858DE00CA7705 /* Destiny.storekit */; };
 		E49FB9192F17ACAA00123405 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E49FB9182F17ACAA00123405 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +39,7 @@
 		E442EF412EF2B99C00146A8B /* ios_appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E442EF4B2EF2B99C00146A8B /* ios_appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ios_appUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E444AD8C2EFCD75F00782341 /* ios_app.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = ios_app.xctestplan; sourceTree = "<group>"; };
+		E487E9782FC858DE00CA7705 /* Destiny.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = Destiny.storekit; path = ios_app/Destiny.storekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -100,6 +102,7 @@
 		E442EF272EF2B99600146A8B = {
 			isa = PBXGroup;
 			children = (
+				E487E9782FC858DE00CA7705 /* Destiny.storekit */,
 				E444AD8C2EFCD75F00782341 /* ios_app.xctestplan */,
 				E442EF322EF2B99700146A8B /* ios_app */,
 				E442EF442EF2B99C00146A8B /* ios_appTests */,
@@ -267,6 +270,7 @@
 			files = (
 				E401A9FC2F0CD77E00D75125 /* Production.xcconfig in Resources */,
 				E401A9FA2F0CD75E00D75125 /* Local.xcconfig in Resources */,
+				E487E9792FC858DE00CA7705 /* Destiny.storekit in Resources */,
 				E401A9FE2F0CD79100D75125 /* Test.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -409,7 +413,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
 				REGISTER_APP_GROUPS = YES;
@@ -437,7 +441,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -462,7 +466,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -562,7 +566,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
 				REGISTER_APP_GROUPS = YES;
@@ -590,7 +594,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -615,7 +619,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -660,7 +664,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
 				REGISTER_APP_GROUPS = YES;
@@ -707,7 +711,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = Destiny;
 				REGISTER_APP_GROUPS = YES;
@@ -853,7 +857,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -879,7 +883,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -904,7 +908,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -929,7 +933,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.4;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.destinyai.astrology;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
