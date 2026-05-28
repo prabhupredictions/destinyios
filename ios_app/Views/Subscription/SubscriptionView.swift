@@ -121,6 +121,12 @@ struct SubscriptionView: View {
                 if subscriptionManager.products.isEmpty {
                     await subscriptionManager.loadProducts()
                 }
+                // If StoreKit has entitlements but backend says free (isPremium=false),
+                // reconcile immediately so the conflict is detected and the activating
+                // spinner resolves to either "active" or the conflict banner — never stuck.
+                if subscriptionManager.hasActiveSubscription && !quotaManager.isPremium {
+                    await subscriptionManager.reconcileEntitlementsWithBackend()
+                }
             }
             .accessibilityIdentifier("subscription_screen")
         }
@@ -201,7 +207,8 @@ struct SubscriptionView: View {
         //     not a perpetual "activating" spinner.
         if subscriptionManager.hasActiveSubscription &&
            !quotaManager.isPremium &&
-           subscriptionManager.subscriptionConflict == nil {
+           subscriptionManager.subscriptionConflict == nil &&
+           !subscriptionManager.conflictDetectedThisSession {
             HStack(spacing: 10) {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
@@ -282,7 +289,10 @@ struct SubscriptionView: View {
                 // plan does NOT belong to this email. Trust the DB only —
                 // otherwise we'd show "Plus" as current plan to a user who
                 // is permanently locked out of that Apple sub by INV-1.
-                if subscriptionManager.subscriptionConflict != nil {
+                // Also check conflictDetectedThisSession — subscriptionConflict
+                // is cleared to nil by SwiftUI's .alert(item:) on dismiss.
+                if subscriptionManager.subscriptionConflict != nil ||
+                    subscriptionManager.conflictDetectedThisSession {
                     return dbPlan
                 }
                 if dbPlan.starts(with: "free") || dbPlan == "free_guest" || dbPlan == "free_registered" {
@@ -310,7 +320,8 @@ struct SubscriptionView: View {
                         planId: plan.planId,
                         isPlusTrialEligible: isPlusTrialEligible,
                         hasActiveSubscription: subscriptionManager.hasActiveSubscription,
-                        hasConflict: subscriptionManager.subscriptionConflict != nil
+                        hasConflict: subscriptionManager.subscriptionConflict != nil ||
+                        subscriptionManager.conflictDetectedThisSession
                     ),
                     corePlan: corePlan,
                     userCurrentPlanId: userCurrentPlanId,

@@ -41,6 +41,11 @@ class SubscriptionManager: ObservableObject {
     /// original email instead of being confused by "you're already subscribed"
     /// from Apple paired with a free-tier app experience.
     @Published var subscriptionConflict: SubscriptionConflict?
+    /// Set to true when a cross-account conflict is detected this session.
+    /// Unlike subscriptionConflict, this is NOT cleared by SwiftUI's .alert(item:)
+    /// binding — it persists until sign-out so the activating spinner cannot
+    /// re-appear after the conflict alert is dismissed.
+    @Published private(set) var conflictDetectedThisSession: Bool = false
 
     // MARK: - Product IDs (Configure in App Store Connect)
     
@@ -59,6 +64,11 @@ class SubscriptionManager: ObservableObject {
     
     // MARK: - Transaction Listener
     private var transactionListener: Task<Void, Never>?
+
+    // Dedup: tracks original transaction IDs currently in-flight to /verify.
+    // Prevents concurrent calls from listenForTransactions + reconcile both
+    // hitting the backend for the same transaction and firing two conflict popups.
+    private var verifyInFlight: Set<String> = []
 
     // MARK: - Foreground sync timer (INV-2 Gap A)
     /// Runs while the app is in foreground and triggers QuotaManager.syncStatus
@@ -385,6 +395,7 @@ class SubscriptionManager: ObservableObject {
         pendingUpgradeProductId = nil
         pendingUpgradeEffectiveDate = nil
         isPlusTrialEligible = false
+        conflictDetectedThisSession = false
         UserDefaults.standard.set(false, forKey: "isPremium")
         // INV-J5: clear ALL subscription cache keys so a different
         // user signing in on the same device cannot see stale data.
@@ -445,13 +456,22 @@ class SubscriptionManager: ObservableObject {
     /// Backend correctness is preserved by the DB unique index, but we
     /// can avoid the redundant network calls entirely.
     private var isReconciling: Bool = false
+    private var lastReconcileTime: Date = .distantPast
 
     func reconcileEntitlementsWithBackend() async {
         if isReconciling {
             print("🔄 [Reconcile] Already running; skipping concurrent invocation")
             return
         }
+        // Debounce: multiple call sites (app foreground + sign-in + view appear)
+        // can all dispatch Task{} nearly simultaneously, reading isReconciling=false
+        // before any one sets it true. A 5s cooldown absorbs all same-login bursts.
+        guard Date().timeIntervalSince(lastReconcileTime) > 5 else {
+            print("🔄 [Reconcile] Debounced; last ran \(String(format: "%.1f", Date().timeIntervalSince(lastReconcileTime)))s ago")
+            return
+        }
         isReconciling = true
+        lastReconcileTime = Date()
         defer { isReconciling = false }
 
         for await result in Transaction.currentEntitlements {
@@ -566,6 +586,19 @@ class SubscriptionManager: ObservableObject {
             return false
         }
 
+        // Dedup: if another code path (listenForTransactions vs reconcile) is already
+        // calling /verify for this exact transaction, skip. Both paths run on @MainActor
+        // so this set access is safe. Without this guard, two concurrent calls for
+        // transaction "0" (Simulator always uses "0") each get a conflict response from
+        // the DB unique index and fire two separate conflict popups.
+        let txnKey = "\(transaction.originalID)-\(email)"
+        guard !verifyInFlight.contains(txnKey) else {
+            print("🔄 [Backend] /verify already in-flight for \(txnKey) — skipping duplicate call")
+            return false
+        }
+        verifyInFlight.insert(txnKey)
+        defer { verifyInFlight.remove(txnKey) }
+
         // Don't send sandbox transactions to the production backend — they would grant
         // real premium access from a test purchase. The backend also rejects them, but
         // guarding here prevents unnecessary network noise and confusing log entries.
@@ -618,6 +651,7 @@ class SubscriptionManager: ObservableObject {
                 print("❌ Backend verification rejected: \(errorCode)")
                 if errorCode == "transaction_belongs_to_different_user" {
                     self.subscriptionConflict = SubscriptionConflict(productID: transaction.productID)
+                    self.conflictDetectedThisSession = true
                 }
                 // Finish to avoid retry loop — this transaction will never succeed
                 // for the current user (different email already owns it, or invalid bundle, etc.)
