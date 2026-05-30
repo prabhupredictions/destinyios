@@ -2783,6 +2783,10 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "a11y_send_message" = "enviar mensaje";
 "a11y_copy_response" = "Copiar respuesta";
 
+"copy_button_label" = "⎘ Copiar";
+"copy_button_copied" = "Copiado";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

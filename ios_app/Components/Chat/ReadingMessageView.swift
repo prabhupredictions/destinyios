@@ -47,7 +47,7 @@ struct ReadingMessageView: View {
                             showCopied = false
                         }
                     } label: {
-                        Text(showCopied ? "Copied" : "⎘ Copy")
+                        Text(showCopied ? "copy_button_copied".localized : "copy_button_label".localized)
                             .font(.system(size: 11))
                             .foregroundColor(showCopied
                                 ? AppTheme.Colors.gold

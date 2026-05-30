@@ -2768,6 +2768,10 @@
 "a11y_send_message" = "Send message";
 "a11y_copy_response" = "Copy response";
 
+"copy_button_label" = "⎘ Copy";
+"copy_button_copied" = "Copied";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

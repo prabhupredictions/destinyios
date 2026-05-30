@@ -2783,6 +2783,10 @@
 "a11y_send_message" = "Отправить сообщение";
 "a11y_copy_response" = "Копировать ответ";
 
+"copy_button_label" = "⎘ Копировать";
+"copy_button_copied" = "Скопировано";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

@@ -557,6 +557,29 @@ class QuotaManager: ObservableObject {
     }
     
     /// Sync status from server
+    /// Called on sign-out to wipe all subscription state so the next account
+    /// starts from a clean slate. Without this, account A's Plus state bleeds
+    /// into account B via UserDefaults and loadCachedSubscriptionState().
+    func resetForSignOut() {
+        isPremium = false
+        currentPlan = nil
+        subscriptionStatus = nil
+        subscriptionExpiresAtString = nil
+        autoRenewStatus = nil
+        hasEverSubscribed = false
+        previousObservedPlanId = nil
+        lastSyncTime = nil
+        availableFeatures = []
+    }
+
+    #if DEBUG
+    /// Inject isPremium=true for unit tests that need to verify reset clears it.
+    /// Only available in DEBUG builds — stripped from release.
+    func simulatePremiumForTesting() {
+        isPremium = true
+    }
+    #endif
+
     /// - Parameters:
     ///   - email: User email
     ///   - force: If true, bypass cooldown (used after purchase/upgrade)

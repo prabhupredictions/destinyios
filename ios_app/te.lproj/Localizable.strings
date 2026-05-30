@@ -2763,6 +2763,10 @@
 "a11y_send_message" = "సందేశం పంపండి";
 "a11y_copy_response" = "ప్రతిస్పందనను కాపీ చేయండి";
 
+"copy_button_label" = "⎘ కాపీ";
+"copy_button_copied" = "కాపీ అయింది";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

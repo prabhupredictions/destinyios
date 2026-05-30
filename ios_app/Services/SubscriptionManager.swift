@@ -396,6 +396,7 @@ class SubscriptionManager: ObservableObject {
         pendingUpgradeEffectiveDate = nil
         isPlusTrialEligible = false
         conflictDetectedThisSession = false
+        subscriptionConflict = nil
         UserDefaults.standard.set(false, forKey: "isPremium")
         // INV-J5: clear ALL subscription cache keys so a different
         // user signing in on the same device cannot see stale data.
@@ -650,8 +651,16 @@ class SubscriptionManager: ObservableObject {
                 let errorCode = parsedResponse.error ?? "unknown"
                 print("❌ Backend verification rejected: \(errorCode)")
                 if errorCode == "transaction_belongs_to_different_user" {
-                    self.subscriptionConflict = SubscriptionConflict(productID: transaction.productID)
-                    self.conflictDetectedThisSession = true
+                    // BUG-1 fix: only create a new SubscriptionConflict if we haven't
+                    // already shown the alert this session. SwiftUI's .alert(item:)
+                    // fires whenever subscriptionConflict transitions nil→non-nil with
+                    // a new UUID — re-assigning on every foreground reconcile caused the
+                    // popup to fire repeatedly. conflictDetectedThisSession is only
+                    // cleared on sign-out, so this gates to exactly one popup per session.
+                    if !self.conflictDetectedThisSession {
+                        self.subscriptionConflict = SubscriptionConflict(productID: transaction.productID)
+                        self.conflictDetectedThisSession = true
+                    }
                 }
                 // Finish to avoid retry loop — this transaction will never succeed
                 // for the current user (different email already owns it, or invalid bundle, etc.)
@@ -674,6 +683,25 @@ class SubscriptionManager: ObservableObject {
         }
         return UserDefaults.standard.string(forKey: "userEmail")
     }
+
+    // MARK: - Test helpers (DEBUG only)
+    // Used by SubscriptionConflictUXTests to inject conflict state without
+    // needing a live StoreKit session. Stripped from release builds.
+    #if DEBUG
+    /// Simulates verifyWithBackend receiving transaction_belongs_to_different_user.
+    /// Applies the same guard logic as the production path so tests exercise the fix.
+    func simulateConflictDetected(productID: String) {
+        if !conflictDetectedThisSession {
+            subscriptionConflict = SubscriptionConflict(productID: productID)
+            conflictDetectedThisSession = true
+        }
+    }
+
+    /// Simulates SwiftUI's .alert(item:) clearing the binding on dismiss.
+    func simulateAlertDismissed() {
+        subscriptionConflict = nil
+    }
+    #endif
 }
 
 // MARK: - Errors

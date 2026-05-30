@@ -2783,6 +2783,10 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "a11y_send_message" = "Envoyer un message";
 "a11y_copy_response" = "Copier la réponse";
 
+"copy_button_label" = "⎘ Copier";
+"copy_button_copied" = "Copié";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

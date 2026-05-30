@@ -2783,6 +2783,10 @@
 "a11y_send_message" = "发送消息";
 "a11y_copy_response" = "复制回复";
 
+"copy_button_label" = "⎘ 复制";
+"copy_button_copied" = "已复制";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

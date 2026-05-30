@@ -2779,6 +2779,10 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "a11y_send_message" = "Nachricht senden";
 "a11y_copy_response" = "Antwort kopieren";
 
+"copy_button_label" = "⎘ Kopieren";
+"copy_button_copied" = "Kopiert";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

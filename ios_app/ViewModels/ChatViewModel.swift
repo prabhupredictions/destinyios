@@ -549,7 +549,7 @@ class ChatViewModel {
             while !Task.isCancelled {
                 guard let self else { return }
                 let key = Self.cosmicMessageKeys[index % 10]
-                let msg = NSLocalizedString(key, comment: "")
+                let msg = LocalizedString.get(key)
                 let step = CosmicProgressStep(text: msg, displayKey: key, isCompleted: false, isActive: true)
                 withAnimation(.easeInOut(duration: 0.4)) {
                     self.cosmicProgressSteps = [step]

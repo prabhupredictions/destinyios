@@ -242,7 +242,11 @@ struct SubscriptionView: View {
     /// alert each time.
     @ViewBuilder
     private var crossAccountConflictBanner: some View {
-        if subscriptionManager.subscriptionConflict != nil {
+        // BUG-2 fix: use conflictDetectedThisSession (persists until sign-out),
+        // NOT subscriptionConflict (cleared to nil by .alert(item:) on dismiss).
+        // Using subscriptionConflict caused the banner to vanish after the user
+        // tapped OK on the popup, then reappear on the next foreground reconcile.
+        if subscriptionManager.conflictDetectedThisSession {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(AppTheme.Fonts.title(size: 16))

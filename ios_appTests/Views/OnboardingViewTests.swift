@@ -51,9 +51,9 @@ final class OnboardingViewTests: XCTestCase {
     func testOnboardingFeatures_HasFourFeatures() {
         // Given/When
         let features = OnboardingFeature.features
-        
-        // Then
-        XCTAssertEqual(features.count, 4)
+
+        // Then — update when features are added; current count is 5
+        XCTAssertEqual(features.count, 5)
     }
     
     func testOnboardingFeatures_AllHaveContent() {

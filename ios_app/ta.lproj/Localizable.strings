@@ -2772,6 +2772,10 @@
 "a11y_send_message" = "செய்தி அனுப்பு";
 "a11y_copy_response" = "பதிலை நகலெடுக்கவும்";
 
+"copy_button_label" = "⎘ நகலெடு";
+"copy_button_copied" = "நகலெடுக்கப்பட்டது";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

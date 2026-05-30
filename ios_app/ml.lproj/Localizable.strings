@@ -2784,6 +2784,10 @@
 "a11y_send_message" = "സന്ദേശം അയക്കുക";
 "a11y_copy_response" = "പ്രതികരണം പകർത്തുക";
 
+"copy_button_label" = "⎘ പകർത്തുക";
+"copy_button_copied" = "പകർത്തി";
+
+
 // MARK: - Views/Components Missing Keys
 "a11y_orb_status_format" = "%@: %@";
 

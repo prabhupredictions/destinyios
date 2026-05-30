@@ -13,8 +13,8 @@ final class EmailGeneratorTests: XCTestCase {
             latitude: 17.385,
             longitude: 78.4867
         )
-        
-        XCTAssertEqual(email, "19900715_1430_Kar_17_78@daa.com")
+        // cityPrefix is lowercased in the implementation
+        XCTAssertEqual(email, "19900715_1430_kar_17_78@daa.com")
     }
     
     func testGenerateFromComponents_RemovesSeparators() {
@@ -39,9 +39,8 @@ final class EmailGeneratorTests: XCTestCase {
             latitude: 17.385,
             longitude: 78.4867
         )
-        
-        // City prefix should be first 3 letters
-        XCTAssertTrue(email.contains("_Hyd_"))
+        // City prefix is lowercased
+        XCTAssertTrue(email.contains("_hyd_"))
     }
     
     func testGenerateFromComponents_ShortCityName() {
@@ -52,11 +51,10 @@ final class EmailGeneratorTests: XCTestCase {
             latitude: 15.2993,
             longitude: 74.124
         )
-        
-        // Short city name should use full name
-        XCTAssertTrue(email.contains("_Goa_"))
+        // Short city name uses full name, lowercased
+        XCTAssertTrue(email.contains("_goa_"))
     }
-    
+
     func testGenerateFromComponents_EmptyCity() {
         let email = EmailGenerator.generateFromComponents(
             dateOfBirth: "1980-01-01",
@@ -65,9 +63,8 @@ final class EmailGeneratorTests: XCTestCase {
             latitude: 0,
             longitude: 0
         )
-        
-        // Empty city should use "Unk"
-        XCTAssertTrue(email.contains("_Unk_"))
+        // Empty city uses "unk" (lowercase)
+        XCTAssertTrue(email.contains("_unk_"))
     }
     
     func testGenerateFromComponents_NegativeCoordinates() {

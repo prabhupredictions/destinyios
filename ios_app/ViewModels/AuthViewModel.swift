@@ -119,7 +119,7 @@ class AuthViewModel {
         UserDefaults.standard.removeObject(forKey: "userEmail")
         UserDefaults.standard.removeObject(forKey: "userName")
         UserDefaults.standard.set(false, forKey: "isAuthenticated")
-        
+
         // Clear global session keys (UI resets to no birth data)
         UserDefaults.standard.removeObject(forKey: "userBirthData")
         UserDefaults.standard.set(false, forKey: "hasBirthData")
@@ -129,6 +129,14 @@ class AuthViewModel {
         UserDefaults.standard.removeObject(forKey: "appleUserID")
         UserDefaults.standard.removeObject(forKey: "googleUserID")
         UserDefaults.standard.removeObject(forKey: "userGender")
+        // Clear ALL subscription cache keys so account B never inherits account A's plan state.
+        // QuotaManager.loadCachedSubscriptionState() reads these on cold start — if stale from
+        // the previous account, the activating banner shows incorrectly and isPremium is wrong.
+        UserDefaults.standard.removeObject(forKey: "currentPlanId")
+        UserDefaults.standard.removeObject(forKey: "subscriptionStatus")
+        UserDefaults.standard.removeObject(forKey: "subscriptionExpiresAt")
+        UserDefaults.standard.removeObject(forKey: "autoRenewStatus")
+        UserDefaults.standard.removeObject(forKey: "currentPlanDisplayName")
         
         print("[DEBUG] SignOut - hasBirthData set to false, isAuthenticated: \(UserDefaults.standard.bool(forKey: "isAuthenticated"))")
         
@@ -157,6 +165,9 @@ class AuthViewModel {
         // Clear StoreKit entitlement state — Apple ID-level transactions must not
         // bleed into the next logged-in account on this device.
         await SubscriptionManager.shared.resetForAccountSwitch()
+        // Clear QuotaManager in-memory state — isPremium/currentPlan must reset to nil
+        // so the next account starts from a server-authoritative state, not stale cache.
+        await MainActor.run { QuotaManager.shared.resetForSignOut() }
     }
     
     // MARK: - Private Helpers
@@ -649,19 +660,18 @@ class AuthViewModel {
                 // Sync history in background (don't block UI)
                 // Skip during guest→registered upgrade - caller will sync after migration
                 if !skipSync {
-                    Task {
-                        // Reconcile StoreKit entitlements with backend BEFORE syncing quota.
-                        // Required for offer-code redemptions that happened before app install:
-                        // Transaction.updates won't fire for those, so /verify must be called
-                        // from currentEntitlements after we know the user's email. Otherwise
-                        // backend doesn't know the user is paid and dumps them in waitlist.
-                        await SubscriptionManager.shared.reconcileEntitlementsWithBackend()
+                    // Reconcile StoreKit entitlements FIRST and AWAIT it — this ensures
+                    // the subscription state is server-authoritative before the UI renders.
+                    // Previously this was fire-and-forget (Task {}), causing the activating
+                    // banner to flash on every sign-in because isPremium was still false when
+                    // SubscriptionView first rendered. By awaiting here, the plan badge and
+                    // isPremium are correct on the very first paint.
+                    await SubscriptionManager.shared.reconcileEntitlementsWithBackend()
 
-                        // Coordinated sync: single thread list fetch shared by chat + compat sync
-                        async let historySync: () = LoginSyncCoordinator.shared.syncAll(userEmail: email, dataManager: DataManager.shared)
-                        async let quotaSync: () = { try? await QuotaManager.shared.syncStatus(email: email, force: true) }()
-                        _ = await (historySync, quotaSync)
-                    }
+                    // History sync and quota sync run in parallel after reconcile completes.
+                    async let historySync: () = LoginSyncCoordinator.shared.syncAll(userEmail: email, dataManager: DataManager.shared)
+                    async let quotaSync: () = { try? await QuotaManager.shared.syncStatus(email: email, force: true) }()
+                    _ = await (historySync, quotaSync)
                 } else {
                     print("⏭️ [AuthViewModel] Skipping background sync (will sync after migration)")
                 }
