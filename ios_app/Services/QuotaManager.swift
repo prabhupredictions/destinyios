@@ -348,6 +348,27 @@ class QuotaManager: ObservableObject {
         loadCachedSubscriptionState()
     }
 
+    // MARK: - Guest Detection (single source of truth)
+
+    /// Single source of truth for detecting guest emails.
+    ///
+    /// Recognizes the actual guest email formats produced by this app:
+    /// - `EmailGenerator` output: `YYYYMMDD_HHMM_CityPrefix_LatInt_LngInt@daa.com`
+    /// - Legacy generated suffix: `@gen.com`
+    /// - Anonymous-id prefix used by AppleAuthService / mock auth: `guest_<uuid>`
+    ///
+    /// Replaces the previous `email.contains("guest") || email.contains("@gen.com")`
+    /// substring heuristic, which misclassified real users with addresses like
+    /// `bguest@example.com` as guests (iOS-12).
+    ///
+    /// Empty strings are NOT guests (callers should treat empty separately).
+    nonisolated static func isGuestEmail(_ email: String) -> Bool {
+        guard !email.isEmpty else { return false }
+        return email.hasSuffix("@daa.com")
+            || email.hasSuffix("@gen.com")
+            || email.hasPrefix("guest_")
+    }
+
     /// Load plans from UserDefaults cache (synchronous, called on init)
     private func loadCachedPlans() {
         guard let data = UserDefaults.standard.data(forKey: Self.cachedPlansKey) else { return }

@@ -1054,7 +1054,7 @@ struct CompatibilityView: View {
                             // No sheet for daily limit
                         } else if accessResponse.reason == "overall_limit_reached" {
                             // OVERALL LIMIT: Show sheet only
-                            if email.contains("guest") || email.contains("@gen.com") {
+                            if QuotaManager.isGuestEmail(email) {
                                 // Guest users should only see Sign In option (no subscribe)
                                 quotaErrorMessage = "sign_in_to_continue_matching".localized
                             } else {

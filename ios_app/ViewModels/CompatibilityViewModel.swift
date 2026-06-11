@@ -500,7 +500,7 @@ class CompatibilityViewModel {
                         }
                     } else if accessResponse.reason == "overall_limit_reached" {
                         // OVERALL LIMIT: Set flag for View to show sheet
-                        if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
+                        if QuotaManager.isGuestEmail(currentEmail) {
                             errorMessage = "FREE_LIMIT_GUEST"  // Special marker for View to show sheet
                         } else {
                             errorMessage = "FREE_LIMIT_REGISTERED"  // Special marker for View to show sheet

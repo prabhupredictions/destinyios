@@ -187,3 +187,46 @@ final class SubscriptionManagerTests: XCTestCase {
 }
 
 #endif
+
+// MARK: - Guest Email Detection (iOS-12)
+
+/// Tests for `QuotaManager.isGuestEmail` — single source of truth for guest detection.
+///
+/// Replaces the prior substring heuristic
+/// `email.contains("guest") || email.contains("@gen.com")`
+/// which misclassified real users like `bguest@example.com` as guests.
+final class QuotaManagerGuestEmailTests: XCTestCase {
+
+    /// Anonymous-id format from AppleAuthService: `guest_<uuid8>`.
+    func testIsGuestEmail_recognizesGuestPrefix() {
+        XCTAssertTrue(QuotaManager.isGuestEmail("guest_abc12345_deadbeef@guest.destiny.ai"))
+        XCTAssertTrue(QuotaManager.isGuestEmail("guest_a1b2c3d4"))
+    }
+
+    /// Generated-email suffixes recognized by this codebase:
+    ///   `@daa.com` — current `EmailGenerator` output
+    ///   `@gen.com` — legacy suffix still present on existing accounts
+    /// Spec also references `@guest.destiny.ai`; covered via the `guest_` prefix.
+    func testIsGuestEmail_recognizesGuestSuffix() {
+        XCTAssertTrue(QuotaManager.isGuestEmail("19800701_0000_bhi_21_81@daa.com"))
+        XCTAssertTrue(QuotaManager.isGuestEmail("legacy_user@gen.com"))
+    }
+
+    /// KEY TEST proving iOS-12 is fixed: a real user whose local-part *contains*
+    /// "guest" must NOT be misclassified as a guest by the substring heuristic.
+    func testIsGuestEmail_realUserContainingGuest_isFalse() {
+        XCTAssertFalse(QuotaManager.isGuestEmail("bguest@example.com"))
+        XCTAssertFalse(QuotaManager.isGuestEmail("myguest@gmail.com"))
+        XCTAssertFalse(QuotaManager.isGuestEmail("guest.user@company.io"))
+    }
+
+    func testIsGuestEmail_emptyString_isFalse() {
+        XCTAssertFalse(QuotaManager.isGuestEmail(""))
+    }
+
+    func testIsGuestEmail_realEmail_isFalse() {
+        XCTAssertFalse(QuotaManager.isGuestEmail("user@gmail.com"))
+        XCTAssertFalse(QuotaManager.isGuestEmail("prabhukushwaha@gmail.com"))
+        XCTAssertFalse(QuotaManager.isGuestEmail("user@apple.com"))
+    }
+}

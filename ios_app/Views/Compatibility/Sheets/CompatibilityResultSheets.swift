@@ -1547,7 +1547,7 @@ struct AskDestinySheet: View {
             let errorString = String(describing: error)
             if errorString.contains("maximum free questions") || errorString.contains("quota") || errorString.contains("limit") {
                 let e = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-                quotaMessage = (e.contains("guest") || e.contains("@gen.com") || isGuest)
+                quotaMessage = (QuotaManager.isGuestEmail(e) || isGuest)
                     ? "sign_in_to_continue_asking".localized
                     : "create_account_to_continue".localized
                 showQuotaSheet = true
@@ -1564,7 +1564,7 @@ struct AskDestinySheet: View {
             let errorString = error.localizedDescription.lowercased()
             if errorString.contains("maximum free") || errorString.contains("quota") || errorString.contains("limit") {
                 let e = UserDefaults.standard.string(forKey: "userEmail") ?? ""
-                quotaMessage = (e.contains("guest") || e.contains("@gen.com") || isGuest)
+                quotaMessage = (QuotaManager.isGuestEmail(e) || isGuest)
                     ? "sign_in_to_continue_asking".localized
                     : "create_account_to_continue".localized
                 showQuotaSheet = true

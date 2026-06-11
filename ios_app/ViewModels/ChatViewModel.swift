@@ -351,7 +351,7 @@ class ChatViewModel {
                     // generic localized strings if backend didn't supply one.
                     if let serverMessage = accessResponse.upgradeCta?.message, !serverMessage.isEmpty {
                         quotaDetails = serverMessage
-                    } else if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
+                    } else if QuotaManager.isGuestEmail(currentEmail) {
                         quotaDetails = "sign_in_to_continue_asking".localized
                     } else {
                         quotaDetails = "upgrade_to_keep_going".localized
