@@ -332,9 +332,9 @@ class ChatViewModel {
                         let timeFormatter = DateFormatter()
                         timeFormatter.timeStyle = .short
                         let timeStr = timeFormatter.string(from: date)
-                        errorMessage = "Daily limit reached. Resets at \(timeStr)."
+                        errorMessage = String(format: "daily_limit_reset_time".localized, timeStr)
                     } else {
-                        errorMessage = "Daily limit reached. Resets tomorrow."
+                        errorMessage = "daily_limit_reached_tomorrow".localized
                     }
                 } else if accessResponse.reason == "overall_limit_reached" {
                     if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
