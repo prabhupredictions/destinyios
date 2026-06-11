@@ -12,8 +12,20 @@ struct QuotaErrorInfo {
     let resetAt: String?         // ISO datetime for daily reset
     
     /// Determine if this is a fair use violation (Plus user at overall limit)
+    ///
+    /// iOS-13 client-side fix: only treat as fair-use violation if the server didn't
+    /// supply an upgrade target (i.e. there's truly nowhere to go). If `suggestedPlan`
+    /// (carried inline from the backend `upgrade_cta`) is present and non-plus,
+    /// the user CAN upgrade — show that path instead of Contact Support.
+    /// The proper fix (server-side `is_fair_use_violation` flag) is deferred and
+    /// tracked as iOS-13b in `docs/subscription_architecture.md`.
     var isFairUseViolation: Bool {
-        return reason == "overall_limit_reached" && planId == "plus"
+        guard reason == "overall_limit_reached", planId == "plus" else { return false }
+        // If backend supplies an upgrade target other than plus, defer to it.
+        if let suggested = suggestedPlan, !suggested.isEmpty, suggested != "plus" {
+            return false
+        }
+        return true
     }
     
     /// Determine if user should see sign in option (guest only)
