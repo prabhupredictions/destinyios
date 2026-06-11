@@ -100,11 +100,11 @@ struct QuotaExhaustedView: View {
             return custom
         }
         // Different message for guests vs registered users
-        return showSignIn ? "Create an account to keep going and save your progress." : "Upgrade to keep going and unlock unlimited access"
+        return showSignIn ? "quota_create_account_fallback".localized : "upgrade_to_keep_going".localized
     }
     
     private var upgradeText: String {
-        quotaError?.upgradeButtonText ?? "Choose a plan"
+        quotaError?.upgradeButtonText ?? "choose_plan_title".localized
     }
     
     var body: some View {
@@ -156,7 +156,7 @@ struct QuotaExhaustedView: View {
                     
                     // Title - different for fair use and guest
                     VStack(spacing: 8) {
-                        Text(showContactSupport ? "Usage Restricted" : (showSignIn ? "Sign up to continue!" : "You've reached your limit"))
+                        Text(showContactSupport ? "quota_usage_restricted_title".localized : (showSignIn ? "quota_signup_title".localized : "quota_limit_reached_title".localized))
                             .font(AppTheme.Fonts.title(size: 24))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .multilineTextAlignment(.center)

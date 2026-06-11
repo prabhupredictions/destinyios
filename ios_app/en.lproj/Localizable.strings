@@ -3035,3 +3035,9 @@
 "unlock_unlimited_insights" = "Unlock unlimited insights";
 "switch_profile_birth_chart" = "Switch Profile / Birth Chart";
 "dosha_active_badge" = "Dosha Active";
+
+// MARK: - iOS-5: QuotaExhaustedView titles (English-only; other locales deferred as iOS-5b)
+"quota_signup_title" = "Sign up to continue!";
+"quota_limit_reached_title" = "You have reached your limit";
+"quota_create_account_fallback" = "Create an account to keep going and save your progress";
+"quota_usage_restricted_title" = "Usage Restricted";
