@@ -3075,3 +3075,7 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "unlock_unlimited_insights" = "Desbloquear perspectivas ilimitadas";
 "switch_profile_birth_chart" = "Cambiar perfil / Carta natal";
 "dosha_active_badge" = "Dosha activo";
+"quota_signup_title" = "¡Regístrate para continuar!";
+"quota_limit_reached_title" = "Has alcanzado tu límite";
+"quota_create_account_fallback" = "Crea una cuenta para continuar y guardar tu progreso";
+"quota_usage_restricted_title" = "Uso restringido";

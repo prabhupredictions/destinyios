@@ -3075,3 +3075,7 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "unlock_unlimited_insights" = "Débloquer des insights illimités";
 "switch_profile_birth_chart" = "Changer de profil / Thème natal";
 "dosha_active_badge" = "Dosha actif";
+"quota_signup_title" = "Inscrivez-vous pour continuer !";
+"quota_limit_reached_title" = "Vous avez atteint votre limite";
+"quota_create_account_fallback" = "Créez un compte pour continuer et sauvegarder votre progression";
+"quota_usage_restricted_title" = "Utilisation restreinte";

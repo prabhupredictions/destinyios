@@ -2938,3 +2938,7 @@
 "unlock_unlimited_insights" = "असीमित अंतर्दृष्टि अनलॉक करें";
 "switch_profile_birth_chart" = "प्रोफ़ाइल / जन्म कुंडली बदलें";
 "dosha_active_badge" = "दोष सक्रिय";
+"quota_signup_title" = "जारी रखने के लिए साइन अप करें!";
+"quota_limit_reached_title" = "आप अपनी सीमा तक पहुँच गए हैं";
+"quota_create_account_fallback" = "जारी रखने और अपनी प्रगति सहेजने के लिए एक खाता बनाएँ";
+"quota_usage_restricted_title" = "उपयोग प्रतिबंधित";

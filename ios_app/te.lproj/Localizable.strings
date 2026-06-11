@@ -3071,3 +3071,7 @@
 "unlock_unlimited_insights" = "అనంత విశేషాలు అన్‌లాక్ చేయండి";
 "switch_profile_birth_chart" = "ప్రొఫైల్ / జన్మ చార్ట్ మార్చండి";
 "dosha_active_badge" = "దోష సక్రియంగా ఉంది";
+"quota_signup_title" = "కొనసాగించడానికి సైన్ అప్ చేయండి!";
+"quota_limit_reached_title" = "మీరు మీ పరిమితిని చేరుకున్నారు";
+"quota_create_account_fallback" = "కొనసాగించడానికి మరియు మీ పురోగతిని సేవ్ చేయడానికి ఖాతాను సృష్టించండి";
+"quota_usage_restricted_title" = "వినియోగం పరిమితం చేయబడింది";

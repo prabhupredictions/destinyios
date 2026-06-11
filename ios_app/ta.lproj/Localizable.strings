@@ -3073,3 +3073,7 @@
 "unlock_unlimited_insights" = "காலையற்ற உள்நோக்குகளை திறந்துகொள்ளுங்கள்";
 "switch_profile_birth_chart" = "சுயரு / ஜனன சார்ட்டை மாற்றுக";
 "dosha_active_badge" = "தோஞ்சம் சுற்சீல்";
+"quota_signup_title" = "தொடர பதிவு செய்யவும்!";
+"quota_limit_reached_title" = "உங்கள் வரம்பை அடைந்துவிட்டீர்கள்";
+"quota_create_account_fallback" = "தொடரவும் உங்கள் முன்னேற்றத்தை சேமிக்கவும் கணக்கை உருவாக்கவும்";
+"quota_usage_restricted_title" = "பயன்பாடு கட்டுப்படுத்தப்பட்டது";

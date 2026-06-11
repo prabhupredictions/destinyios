@@ -3076,3 +3076,7 @@
 "unlock_unlimited_insights" = "അപരിമിത ഉള്ക്കാഴ്ച അന്ലോക്ക് ചെയ്യുക";
 "switch_profile_birth_chart" = "പ്രൊഫൈല് / ജനന ചാര്ട് മാറ്റുക";
 "dosha_active_badge" = "ദോഷം സക്രിയം";
+"quota_signup_title" = "തുടരാൻ സൈൻ അപ്പ് ചെയ്യുക!";
+"quota_limit_reached_title" = "നിങ്ങൾ പരിധിയിൽ എത്തിയിരിക്കുന്നു";
+"quota_create_account_fallback" = "തുടരാനും നിങ്ങളുടെ പുരോഗതി സംരക്ഷിക്കാനും ഒരു അക്കൗണ്ട് സൃഷ്ടിക്കുക";
+"quota_usage_restricted_title" = "ഉപയോഗം നിയന്ത്രിച്ചിരിക്കുന്നു";

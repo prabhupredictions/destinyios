@@ -3075,3 +3075,7 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "unlock_unlimited_insights" = "Desbloquear insights ilimitados";
 "switch_profile_birth_chart" = "Trocar Perfil / Mapa Natal";
 "dosha_active_badge" = "Dosha Ativo";
+"quota_signup_title" = "Cadastre-se para continuar!";
+"quota_limit_reached_title" = "Você atingiu seu limite";
+"quota_create_account_fallback" = "Crie uma conta para continuar e salvar seu progresso";
+"quota_usage_restricted_title" = "Uso restrito";

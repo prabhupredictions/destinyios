@@ -3075,3 +3075,7 @@
 "unlock_unlimited_insights" = "ಅಪರಿಮಿತ ಒಳನೋಟಗಳನ್ನು ಅನ್ಲಾಕ್ ಮಾಡಿ";
 "switch_profile_birth_chart" = "ಪ್ರೊಫೈಲ್ / ಜನ್ಮ ಚಾರ್ಟ್ ಬದಲಾಯಿಸಿ";
 "dosha_active_badge" = "ದೋಷ ಸಕ್ರಿಯ";
+"quota_signup_title" = "ಮುಂದುವರಿಸಲು ಸೈನ್ ಅಪ್ ಮಾಡಿ!";
+"quota_limit_reached_title" = "ನೀವು ನಿಮ್ಮ ಮಿತಿಯನ್ನು ತಲುಪಿದ್ದೀರಿ";
+"quota_create_account_fallback" = "ಮುಂದುವರಿಸಲು ಮತ್ತು ನಿಮ್ಮ ಪ್ರಗತಿಯನ್ನು ಉಳಿಸಲು ಖಾತೆ ರಚಿಸಿ";
+"quota_usage_restricted_title" = "ಬಳಕೆ ನಿರ್ಬಂಧಿತ";

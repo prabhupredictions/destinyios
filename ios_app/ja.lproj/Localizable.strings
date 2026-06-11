@@ -3075,3 +3075,7 @@
 "unlock_unlimited_insights" = "無限のインサイトを解锁";
 "switch_profile_birth_chart" = "プロフィール / 出生チャートを切り替え";
 "dosha_active_badge" = "ドーシャ アクティブ";
+"quota_signup_title" = "続けるにはサインアップしてください！";
+"quota_limit_reached_title" = "上限に達しました";
+"quota_create_account_fallback" = "続けるにはアカウントを作成して進行状況を保存してください";
+"quota_usage_restricted_title" = "使用制限";
