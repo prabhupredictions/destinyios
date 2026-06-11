@@ -409,4 +409,76 @@ final class ChatViewModelTests: XCTestCase {
             "Fallback localized message must be set when backend omits upgrade_cta"
         )
     }
+
+    // MARK: - iOS-1: Server-side quota race detection
+
+    /// When /can-access succeeds (race opportunity) but the predict stream
+    /// then rejects with HTTP 403 + quota body (server-side check_and_reserve
+    /// rejected the now-too-late reservation), the iOS client must surface a
+    /// QuotaExhaustedError and trigger the paywall — not the generic
+    /// stream-failed banner. Regression test for iOS-1.
+    /// (Backend-side fix — reservation-style /can-access — is deferred and
+    /// tracked as iOS-1b.)
+    func testPredictStream_serverQuotaError_triggersPaywall() async throws {
+        // Given — /can-access allows (race winner path) but /predict/stream
+        // returns HTTP 403 with a quota_exceeded body.
+        MockURLProtocol.stubQuotaAllowAll()
+        MockURLProtocol.stubPredictStreamQuota403(
+            reason: "overall_limit_reached",
+            ctaMessage: "Quota raced — upgrade to keep going."
+        )
+        // Inject a URLSession that routes through MockURLProtocol so the
+        // streaming service hits our stub instead of localhost:8000.
+        StreamingPredictionService.urlSessionFactory = { MockURLProtocol.makeSession() }
+        defer { StreamingPredictionService.urlSessionFactory = nil }
+
+        // Required birth data so sendMessage doesn't bail early.
+        let birthData = BirthData(
+            dob: "1990-01-15",
+            time: "10:30",
+            latitude: 19.076,
+            longitude: 72.877,
+            cityOfBirth: "Mumbai"
+        )
+        if let data = try? JSONEncoder().encode(birthData) {
+            UserDefaults.standard.set(data, forKey: "userBirthData")
+        }
+
+        let originalQuery = "Race condition prompt"
+        viewModel.inputText = originalQuery
+
+        // When
+        await viewModel.sendMessage()
+        // Wait for the streaming task to land in the catch path.
+        // sendMessage returns immediately after launching streamingTask;
+        // the QuotaExhaustedError is thrown asynchronously inside that task.
+        let deadline = Date().addingTimeInterval(5)
+        while viewModel.isStreaming && Date() < deadline {
+            try? await Task.sleep(nanoseconds: 10_000_000) // 10ms
+        }
+
+        // Then — paywall is presented with the server-curated CTA message,
+        // and the in-flight query is buffered for post-upgrade replay.
+        XCTAssertTrue(
+            viewModel.showQuotaSheet,
+            "Server-side quota race must trigger the paywall, not a generic banner"
+        )
+        XCTAssertEqual(
+            viewModel.quotaDetails,
+            "Quota raced — upgrade to keep going.",
+            "Server upgrade_cta.message must be surfaced verbatim"
+        )
+        XCTAssertEqual(
+            viewModel.pendingPostUpgradeQuery,
+            originalQuery,
+            "In-flight query must be buffered so it can be replayed after upgrade"
+        )
+        XCTAssertFalse(viewModel.isStreaming, "Streaming flag must be cleared after quota error")
+        // The streaming bubble must be gone, and the user bubble must also
+        // have been removed (mirroring the upfront /can-access denial path).
+        XCTAssertFalse(
+            viewModel.messages.contains(where: { $0.content == originalQuery }),
+            "User bubble must be removed when quota wall fires server-side"
+        )
+    }
 }

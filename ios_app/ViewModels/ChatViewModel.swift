@@ -503,6 +503,39 @@ class ChatViewModel {
                 self.windowManager.remove(id: streamingMsg.id)
                 self.dataManager.context.delete(streamingMsg)
                 self.isStreaming = false
+            } catch let quota as QuotaExhaustedError {
+                // iOS-1: Server-side quota rejection (race between /can-access
+                // and /predict/stream). Mirror the upfront /can-access denial
+                // path: buffer the query for post-upgrade replay, drop the
+                // streaming bubble, and present the paywall instead of the
+                // generic stream-failed banner.
+                self.stepProgressTask?.cancel()
+                self.progressTimerTask?.cancel()
+                self.progressTimerTask = nil
+                self.cosmicProgressSteps = []
+                self.messages.removeAll { $0.id == streamingMsg.id }
+                self.windowManager.remove(id: streamingMsg.id)
+                self.dataManager.context.delete(streamingMsg)
+                // Also remove the user bubble so the UI matches the upfront
+                // denial path (where the user message is removed before the
+                // paywall is shown).
+                if let userIdx = self.messages.lastIndex(where: { $0.id == userMessage.id }) {
+                    self.messages.remove(at: userIdx)
+                    self.windowManager.remove(id: userMessage.id)
+                    self.dataManager.deleteMessage(userMessage)
+                }
+                self.pendingPostUpgradeQuery = self.lastSentQuery
+                if let serverMsg = quota.upgradeMessage, !serverMsg.isEmpty {
+                    self.quotaDetails = serverMsg
+                } else if quota.reason == "daily_limit_reached" {
+                    self.quotaDetails = "daily_limit_reached_tomorrow".localized
+                } else if QuotaManager.isGuestEmail(self.userEmail) {
+                    self.quotaDetails = "sign_in_to_continue_asking".localized
+                } else {
+                    self.quotaDetails = "upgrade_to_keep_going".localized
+                }
+                self.showQuotaSheet = true
+                self.isStreaming = false
             } catch {
                 self.stepProgressTask?.cancel()
                 self.progressTimerTask?.cancel()

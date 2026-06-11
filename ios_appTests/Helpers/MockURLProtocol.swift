@@ -137,4 +137,29 @@ extension MockURLProtocol {
             return (200, body)
         }
     }
+
+    /// iOS-1: Stub `/vedic/api/predict/stream` to return HTTP 403 with a quota
+    /// exhaustion body, simulating the server-side reject after a /can-access
+    /// vs /predict race. StreamingPredictionService must detect this and throw
+    /// QuotaExhaustedError so ChatViewModel routes to the paywall.
+    static func stubPredictStreamQuota403(reason: String = "overall_limit_reached", ctaMessage: String? = nil) {
+        handler(for: "/vedic/api/predict/stream") { _ in
+            let cta = ctaMessage.map { "{\"message\": \"\($0)\", \"suggested_plan\": \"premium_yearly\"}" } ?? "null"
+            let body = """
+            {"code": "quota_exceeded", "reason": "\(reason)", "message": "Quota exhausted", "upgrade_cta": \(cta)}
+            """.data(using: .utf8)!
+            return (403, body)
+        }
+    }
+
+    /// Returns a URLSession configured with MockURLProtocol so test stubs
+    /// (registered via `handler(for:_:)`) intercept its requests. Used by
+    /// StreamingPredictionService.urlSessionFactory in tests.
+    static func makeSession() -> URLSession {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [MockURLProtocol.self] + (config.protocolClasses ?? [])
+        config.timeoutIntervalForRequest = 5
+        config.timeoutIntervalForResource = 10
+        return URLSession(configuration: config)
+    }
 }

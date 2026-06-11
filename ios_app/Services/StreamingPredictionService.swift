@@ -6,7 +6,13 @@ import Foundation
 class StreamingPredictionService {
     static let shared = StreamingPredictionService()
     private init() {}
-    
+
+    // MARK: - Test Hooks
+
+    /// Optional URLSession factory used by tests to inject MockURLProtocol.
+    /// Production code path leaves this nil and uses the locally-configured session below.
+    static var urlSessionFactory: (() -> URLSession)? = nil
+
     // MARK: - Event Types
     
     enum StreamEvent {
@@ -61,19 +67,47 @@ class StreamingPredictionService {
         urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
         
         // Use dedicated URLSession configuration for SSE
-        let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 300   // 5 min — Opus first-token latency
-        config.timeoutIntervalForResource = 600  // 10 min — full Opus stream
-        config.waitsForConnectivity = true
-        let session = URLSession(configuration: config)
-        
+        let session: URLSession = {
+            if let factory = StreamingPredictionService.urlSessionFactory {
+                return factory()
+            }
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = 300   // 5 min — Opus first-token latency
+            config.timeoutIntervalForResource = 600  // 10 min — full Opus stream
+            config.waitsForConnectivity = true
+            return URLSession(configuration: config)
+        }()
+
         // Use bytes for SSE streaming
         let (asyncBytes, response) = try await session.bytes(for: urlRequest)
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw StreamError.invalidResponse
         }
-        
+
+        // iOS-1: Detect server-side quota rejection (HTTP 403 with quota body marker).
+        // Backend's check_and_reserve race-loser path may surface here if the
+        // streaming endpoint ever switches from SSE-error to HTTP-403. We also
+        // catch SSE-quota errors below in parseEvent → throw QuotaExhaustedError
+        // so ChatViewModel can route both to the paywall instead of a generic banner.
+        if httpResponse.statusCode == 403 {
+            // Drain a small body to inspect quota markers without holding the stream open.
+            var bodyText = ""
+            for try await line in asyncBytes.lines {
+                bodyText += line + "\n"
+                if bodyText.count > 4096 { break }
+            }
+            if Self.bodyIndicatesQuotaExhaustion(bodyText) {
+                throw QuotaExhaustedError(
+                    reason: Self.extractQuotaReason(bodyText) ?? "overall_limit_reached",
+                    upgradeMessage: Self.extractUpgradeMessage(bodyText),
+                    resetAt: Self.extractResetAt(bodyText)
+                )
+            }
+            print("[SSE] HTTP 403 (non-quota): \(bodyText.prefix(200))")
+            throw StreamError.invalidResponse
+        }
+
         guard (200...299).contains(httpResponse.statusCode) else {
             print("[SSE] HTTP error: \(httpResponse.statusCode)")
             throw StreamError.invalidResponse
@@ -86,12 +120,22 @@ class StreamingPredictionService {
         for try await line in asyncBytes.lines {
             // Check for cancellation
             try Task.checkCancellation()
-            
+
             if line.hasPrefix("event: ") {
                 currentEventType = String(line.dropFirst(7))
             } else if line.hasPrefix("data: ") {
                 currentData = String(line.dropFirst(6))
-                
+
+                // iOS-1: If this SSE event is a server-side quota rejection
+                // (race between /can-access and /predict), throw a typed error
+                // so ChatViewModel can route to the paywall instead of the
+                // generic stream-failed banner. Backend emits this for the
+                // streaming endpoint as event:error with code/reason markers.
+                if currentEventType == "error",
+                   let typed = Self.quotaErrorIfQuotaPayload(currentData) {
+                    throw typed
+                }
+
                 // Process complete event on main actor
                 if let event = parseEvent(type: currentEventType, data: currentData) {
                     await MainActor.run {
@@ -214,5 +258,93 @@ class StreamingPredictionService {
     enum StreamError: Error {
         case invalidResponse
         case connectionFailed
+    }
+}
+
+// MARK: - Quota Exhaustion Detection (iOS-1)
+
+/// Typed error surfaced when the backend rejects /predict/stream because the
+/// user's quota is exhausted. ChatViewModel must catch this and present the
+/// paywall (showQuotaSheet=true) instead of the generic stream-failed banner.
+///
+/// The proper backend-side fix is reservation-style /can-access (tracked as
+/// iOS-1b); this client-side mitigation closes the user-visible regression
+/// while that is being designed.
+struct QuotaExhaustedError: Error {
+    /// Backend-supplied reason, e.g. "daily_limit_reached", "overall_limit_reached".
+    let reason: String
+    /// Optional server-curated upgrade message (per-plan CTA).
+    let upgradeMessage: String?
+    /// Optional ISO8601 reset timestamp for daily limits.
+    let resetAt: String?
+}
+
+extension StreamingPredictionService {
+
+    /// Returns a QuotaExhaustedError if the SSE `data:` payload represents a
+    /// quota rejection. Backend (predict.py:946) emits:
+    /// `{"code":"quota_exceeded","message":...,"reason":"...","reset_at":...,"upgrade_cta":...}`
+    static func quotaErrorIfQuotaPayload(_ data: String) -> QuotaExhaustedError? {
+        guard let jsonData = data.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+        else { return nil }
+
+        let code = json["code"] as? String
+        let reason = json["reason"] as? String
+
+        let isQuotaCode = (code == "quota_exceeded" || code == "quota_exhausted" || code == "rate_limited")
+        let quotaReasons: Set<String> = [
+            "daily_limit_reached",
+            "overall_limit_reached",
+            "quota_exhausted",
+            "rate_limited"
+        ]
+        let isQuotaReason = reason.map { quotaReasons.contains($0) } ?? false
+
+        guard isQuotaCode || isQuotaReason else { return nil }
+
+        let cta = json["upgrade_cta"] as? [String: Any]
+        return QuotaExhaustedError(
+            reason: reason ?? "overall_limit_reached",
+            upgradeMessage: cta?["message"] as? String ?? json["message"] as? String,
+            resetAt: json["reset_at"] as? String
+        )
+    }
+
+    /// Cheap substring scan over an HTTP 403 body for quota markers.
+    static func bodyIndicatesQuotaExhaustion(_ body: String) -> Bool {
+        let markers = [
+            "quota_exhausted",
+            "quota_exceeded",
+            "rate_limited",
+            "daily_limit_reached",
+            "overall_limit_reached"
+        ]
+        return markers.contains(where: { body.contains($0) })
+    }
+
+    static func extractQuotaReason(_ body: String) -> String? {
+        guard let jsonData = body.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+        else { return nil }
+        return json["reason"] as? String ?? (json["detail"] as? [String: Any])?["reason"] as? String
+    }
+
+    static func extractUpgradeMessage(_ body: String) -> String? {
+        guard let jsonData = body.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+        else { return nil }
+        if let cta = json["upgrade_cta"] as? [String: Any], let msg = cta["message"] as? String { return msg }
+        if let detail = json["detail"] as? [String: Any],
+           let cta = detail["upgrade_cta"] as? [String: Any],
+           let msg = cta["message"] as? String { return msg }
+        return json["message"] as? String
+    }
+
+    static func extractResetAt(_ body: String) -> String? {
+        guard let jsonData = body.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+        else { return nil }
+        return json["reset_at"] as? String ?? (json["detail"] as? [String: Any])?["reset_at"] as? String
     }
 }
