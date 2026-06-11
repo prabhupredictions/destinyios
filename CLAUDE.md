@@ -44,6 +44,11 @@ ios_app/ios_app/
 ## Simulator: ALWAYS use "iPhone 17 Pro" for xcodebuild commands
 ## APNS: server-side APNS_SANDBOX=false for TestFlight+prod
 
+## Architecture Docs
+- **Subscription / paywall / IAP:** [`../docs/subscription_architecture.md`](../docs/subscription_architecture.md) — full state machine, plans, endpoints, iOS-1..iOS-13 issue catalog with file:line citations
+- **Subscription test matrix:** [`../docs/subscription_test_cases.md`](../docs/subscription_test_cases.md)
+- **Login + guest upgrade:** [`docs/login_upgrade_test_plan.md`](docs/login_upgrade_test_plan.md)
+
 ## E2E Test Suite (Appium)
 
 Location: `ios_app/e2e/`
