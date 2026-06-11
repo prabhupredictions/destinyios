@@ -344,4 +344,150 @@ final class SubscriptionAccountSwitchTests: XCTestCase {
             "iOS-7: cached reader must report false after account switch — " +
             "account B must not inherit account A's hasActiveSubscription cache")
     }
+
+    // MARK: - iOS-7b: trial-flag persistence layer across cold starts
+    //
+    // The original iOS-7 fix persisted hasActiveSubscription to UserDefaults so
+    // the trial CTA could be gated synchronously at cold start before reconcile
+    // completes. The remaining concern was that the live trial-button rendering
+    // across multi-Apple-ID + StoreKit transitions can only be observed in
+    // Sandbox with manual testing. These tests bound the automated coverage to
+    // the persistence layer (the part of iOS-7 that is fully under our control)
+    // and exercise shouldShowTrialButton with each combination of inputs that
+    // the cold-start state machine can produce. Apple-side trial eligibility
+    // (StoreKit's isEligibleForIntroOffer) is treated as an input — we feed
+    // both true and false directly to shouldShowTrialButton and assert the
+    // gate behaves correctly.
+
+    /// iOS-7b: writing the cache flag and reading it back via the synchronous
+    /// cold-start accessor must round-trip — this is the contract that the
+    /// persisted flag survives across SubscriptionManager instantiations.
+    /// (We can't actually reinstantiate the @MainActor singleton inside the
+    /// process, so we verify the static reader — which is what cold-start
+    /// trial gating actually calls.)
+    func testHasActiveSubscription_writeToCache_readBack() {
+        // Arrange: clean slate
+        UserDefaults.standard.removeObject(forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+        XCTAssertFalse(SubscriptionManager.cachedHasActiveSubscription(),
+            "Precondition: cache must be unset (defaults to false)")
+
+        // Act: write true to the cache (mirrors what updatePurchasedProducts
+        // does at line 456 of SubscriptionManager.swift)
+        UserDefaults.standard.set(true, forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+
+        // Assert: the static cold-start reader observes it. This is the same
+        // call site a fresh SubscriptionManager instance would make at launch
+        // before its async reconcile completes.
+        XCTAssertTrue(SubscriptionManager.cachedHasActiveSubscription(),
+            "iOS-7b: write→read round-trip through UserDefaults must succeed — " +
+            "this is what survives a process restart")
+    }
+
+    /// iOS-7b: setting the flag, calling resetForAccountSwitch, then reading
+    /// from a "fresh" perspective (the static reader on a clean process) must
+    /// observe the cache as cleared. Closes the regression where account B
+    /// could inherit account A's trial-gating state.
+    func testHasActiveSubscription_resetForAccountSwitch_clearsCache() {
+        // Arrange: set the cache + verify it round-trips
+        UserDefaults.standard.set(true, forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+        XCTAssertTrue(SubscriptionManager.cachedHasActiveSubscription(),
+            "Precondition: cache set to true")
+
+        // Act: account switch
+        SubscriptionManager.shared.resetForAccountSwitch()
+
+        // Assert: a "fresh instance" (the static reader, which is what a new
+        // SubscriptionManager would observe at cold start) sees no cache.
+        XCTAssertFalse(SubscriptionManager.cachedHasActiveSubscription(),
+            "iOS-7b: after resetForAccountSwitch + cold start, the cached " +
+            "hasActiveSubscription must read false — account B must not " +
+            "inherit account A's trial-gating state")
+    }
+
+    /// iOS-7b: cold-start state where UserDefaults says hasActiveSubscription=true,
+    /// before any reconcile has run — the trial button gate must hide the CTA.
+    /// This is the primary state the iOS-7 persistence layer protects against:
+    /// a user who already owns Plus must NOT see the "Start 7-Day Free Trial"
+    /// button flash on at launch.
+    func testTrialButtonGate_premiumActiveAndCachedFlag_doesNotShowTrial() {
+        // Arrange: cold-start cache says hasActiveSubscription=true
+        UserDefaults.standard.set(true, forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+        let cached = SubscriptionManager.cachedHasActiveSubscription()
+        XCTAssertTrue(cached, "Precondition: cache reports active subscription")
+
+        // Act: ask the gate. Use isPlusTrialEligible=true to isolate the
+        // hasActiveSubscription gate — if it weren't doing its job we'd see
+        // the button slip through.
+        let shouldShow = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,
+            hasActiveSubscription: cached,
+            hasConflict: false
+        )
+
+        // Assert: gate must close the trial button.
+        XCTAssertFalse(shouldShow,
+            "iOS-7b: when cold-start cache reports an active subscription, " +
+            "the trial button must NOT render — this is the exact bug iOS-7 fixed")
+    }
+
+    /// iOS-7b: sign-out + new free user — both UserDefaults cache and the
+    /// live entitlement set are empty. With Apple-side trial eligibility true,
+    /// the trial button SHOULD render. Inverse of the previous test.
+    func testTrialButtonGate_premiumNotActiveAndCacheCleared_showsTrial() {
+        // Arrange: cleared cache (sign-out completed, new free user signed in)
+        UserDefaults.standard.removeObject(forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+        let cached = SubscriptionManager.cachedHasActiveSubscription()
+        XCTAssertFalse(cached, "Precondition: cache cleared, defaults to false")
+
+        // Act: gate with Apple-side trial eligibility=true (free user, never
+        // redeemed Plus offer) and no conflict.
+        let shouldShow = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,
+            hasActiveSubscription: cached,
+            hasConflict: false
+        )
+
+        // Assert: gate must allow the trial button.
+        XCTAssertTrue(shouldShow,
+            "iOS-7b: with cleared cache + Apple eligibility=true + no conflict, " +
+            "the trial button must render for a fresh free user")
+    }
+
+    /// iOS-7b: a cross-account conflict was detected this session AND the
+    /// cache is set — the trial button must stay hidden. Belt-and-suspenders
+    /// gate ensures even a poorly-cleared cache + conflict combo never
+    /// surfaces the trial CTA (which cannot succeed for a conflicted user).
+    func testTrialButtonGate_conflictPresentAndCached_doesNotShowTrial() {
+        // Arrange: cache says active=true (could be a stale/in-flight state)
+        // AND a conflict was detected.
+        UserDefaults.standard.set(true, forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+        let cached = SubscriptionManager.cachedHasActiveSubscription()
+
+        // Act: gate with conflict=true. We pass isPlusTrialEligible=true and
+        // hasActiveSubscription=cached (true) — both individually would close
+        // the gate, but we want to demonstrate the conflict gate is independent.
+        let shouldShowWithActive = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,
+            hasActiveSubscription: cached,
+            hasConflict: true
+        )
+        XCTAssertFalse(shouldShowWithActive,
+            "iOS-7b: when cache reports active subscription AND conflict is " +
+            "set, gate must hide the trial CTA")
+
+        // And independently — even if the cache had been cleared, conflict
+        // alone must close the gate.
+        let shouldShowConflictOnly = SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: true,
+            hasActiveSubscription: false,
+            hasConflict: true
+        )
+        XCTAssertFalse(shouldShowConflictOnly,
+            "iOS-7b: conflict alone must close the trial button gate, " +
+            "even with no active subscription cached — defense in depth")
+    }
 }
