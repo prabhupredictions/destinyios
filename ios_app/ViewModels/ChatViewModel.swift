@@ -347,7 +347,11 @@ class ChatViewModel {
                         errorMessage = "daily_limit_reached_tomorrow".localized
                     }
                 } else if accessResponse.reason == "overall_limit_reached" {
-                    if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
+                    // Prefer server-curated per-plan message (iOS-11 fix). Fall back to
+                    // generic localized strings if backend didn't supply one.
+                    if let serverMessage = accessResponse.upgradeCta?.message, !serverMessage.isEmpty {
+                        quotaDetails = serverMessage
+                    } else if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
                         quotaDetails = "sign_in_to_continue_asking".localized
                     } else {
                         quotaDetails = "upgrade_to_keep_going".localized

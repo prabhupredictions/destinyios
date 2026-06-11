@@ -104,6 +104,29 @@ extension MockURLProtocol {
         }
     }
 
+    /// Stub `/subscription/can-access` to return `can_access: false` with the given reason
+    /// AND a server-curated `upgrade_cta` payload. Used by iOS-11 regression tests that
+    /// verify the iOS client surfaces the per-plan server message instead of a generic
+    /// localized fallback.
+    static func stubQuotaDenyWithUpgradeCta(
+        reason: String,
+        ctaMessage: String,
+        suggestedPlan: String = "premium_yearly",
+        resetAt: String? = nil
+    ) {
+        handler(for: "/subscription/can-access") { _ in
+            let resetAtJson = resetAt.map { "\"\($0)\"" } ?? "null"
+            // Escape quotes in the message so we don't break JSON in tests with special chars.
+            let escaped = ctaMessage
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+            let body = """
+            {"can_access": false, "reason": "\(reason)", "limits": {}, "reset_at": \(resetAtJson), "upgrade_cta": {"message": "\(escaped)", "suggested_plan": "\(suggestedPlan)"}}
+            """.data(using: .utf8)!
+            return (200, body)
+        }
+    }
+
     /// Stub `/subscription/status` to return a minimal valid response — covers
     /// the `loadUserSession → syncStatus` path that fires from ChatViewModel init.
     static func stubSubscriptionStatusEmpty() {

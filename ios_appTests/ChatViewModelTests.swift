@@ -356,4 +356,57 @@ final class ChatViewModelTests: XCTestCase {
         // Then
         XCTAssertNil(viewModel.pendingPostUpgradeQuery)
     }
+
+    // MARK: - iOS-11: Per-plan upgrade_cta.message Tests
+
+    /// When the backend returns `overall_limit_reached` along with a server-curated
+    /// `upgrade_cta.message`, the iOS client must surface that message in
+    /// `quotaDetails` rather than falling back to the generic localized string.
+    /// Regression test for iOS-11.
+    func testSendMessage_OverallLimitReached_PrefersServerUpgradeCtaMessage() async throws {
+        // Given — quota denies with overall_limit_reached AND a per-plan server message
+        let serverMessage = "You've used all 50 questions on the Free plan. Upgrade to Premium for 500/month."
+        MockURLProtocol.stubQuotaDenyWithUpgradeCta(
+            reason: "overall_limit_reached",
+            ctaMessage: serverMessage,
+            suggestedPlan: "premium_yearly"
+        )
+
+        viewModel.inputText = "What's my horoscope?"
+
+        // When
+        await viewModel.sendMessage()
+
+        // Then — quotaDetails reflects the server-curated message verbatim,
+        // NOT a generic "sign_in_to_continue_asking" / "upgrade_to_keep_going" fallback.
+        XCTAssertEqual(
+            viewModel.quotaDetails,
+            serverMessage,
+            "ChatViewModel must prefer server upgrade_cta.message over generic localized fallback"
+        )
+        XCTAssertTrue(viewModel.showQuotaSheet, "Paywall sheet should be presented when quota is exhausted")
+    }
+
+    /// When the backend returns `overall_limit_reached` WITHOUT an upgrade_cta
+    /// (legacy behaviour), the iOS client still falls back to the existing
+    /// localized strings. Locks in the fallback path so iOS-11 fix doesn't
+    /// accidentally drop messaging entirely if the backend omits the field.
+    func testSendMessage_OverallLimitReached_FallsBackToLocalizedWhenNoUpgradeCta() async throws {
+        // Given — quota denies with overall_limit_reached and NO upgrade_cta payload
+        MockURLProtocol.stubQuotaDeny(reason: "overall_limit_reached")
+
+        viewModel.inputText = "What's my horoscope?"
+
+        // When
+        await viewModel.sendMessage()
+
+        // Then — quotaDetails is one of the localized fallback strings, not empty.
+        // We don't pin the exact text (it depends on the test user's email branch)
+        // but it must be set so the paywall has something to show.
+        XCTAssertTrue(viewModel.showQuotaSheet)
+        XCTAssertFalse(
+            (viewModel.quotaDetails ?? "").isEmpty,
+            "Fallback localized message must be set when backend omits upgrade_cta"
+        )
+    }
 }
