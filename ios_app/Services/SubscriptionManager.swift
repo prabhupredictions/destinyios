@@ -47,8 +47,16 @@ class SubscriptionManager: ObservableObject {
     /// re-appear after the conflict alert is dismissed.
     @Published private(set) var conflictDetectedThisSession: Bool = false
 
+    // MARK: - UserDefaults keys
+
+    /// iOS-7: cached `hasActiveSubscription` flag persisted across cold starts.
+    /// Trial-button gating reads this synchronously at launch (before reconcile
+    /// completes) to avoid mis-rendering the trial CTA for a user who is in
+    /// fact already subscribed. Cleared on sign-out via resetForAccountSwitch.
+    static let hasActiveSubscriptionCacheKey = "subscription_has_active_cached"
+
     // MARK: - Product IDs (Configure in App Store Connect)
-    
+
     /// Core plan
     static let coreMonthlyProductID = "com.daa.core.monthly"
     static let coreYearlyProductID = "com.daa.core.yearly"
@@ -299,6 +307,15 @@ class SubscriptionManager: ObservableObject {
         !purchasedProductIDs.isEmpty
     }
 
+    /// iOS-7: synchronous reader for the persisted `hasActiveSubscription`
+    /// state. Use this during cold-start trial gating BEFORE reconcile
+    /// completes so the trial CTA does not flash on for a user who already
+    /// owns a paid entitlement on their last known good state.
+    /// Returns false if no value is cached (fail-closed for trial visibility).
+    nonisolated static func cachedHasActiveSubscription() -> Bool {
+        UserDefaults.standard.bool(forKey: hasActiveSubscriptionCacheKey)
+    }
+
     /// INV-3 gate: should the "Start 7-Day Free Trial" button be visible
     /// for the given plan? Pure function so it can be unit-tested without
     /// instantiating SubscriptionManager.
@@ -405,6 +422,10 @@ class SubscriptionManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "subscriptionExpiresAt")
         UserDefaults.standard.removeObject(forKey: "autoRenewStatus")
         UserDefaults.standard.removeObject(forKey: "currentPlanDisplayName")
+        // iOS-7: clear cached hasActiveSubscription so a different user signing
+        // in on the same device cannot inherit the previous user's trial-gating
+        // state at cold start.
+        UserDefaults.standard.removeObject(forKey: Self.hasActiveSubscriptionCacheKey)
     }
 
     func updatePurchasedProducts() async {
@@ -430,6 +451,9 @@ class SubscriptionManager: ObservableObject {
 
         purchasedProductIDs = purchased
         UserDefaults.standard.set(!purchased.isEmpty, forKey: "isPremium")
+        // iOS-7: persist hasActiveSubscription so cold-start trial gating
+        // can use the last known good state until reconcile lands.
+        UserDefaults.standard.set(!purchased.isEmpty, forKey: Self.hasActiveSubscriptionCacheKey)
 
         // INV-3 Gap 2: refresh trial eligibility whenever entitlements change.
         // Apple's isEligibleForIntroOffer is computed lazily and the value
@@ -577,7 +601,9 @@ class SubscriptionManager: ObservableObject {
 
     /// Verify the transaction with our backend.
     /// Returns true if the backend confirmed (HTTP 200), false otherwise.
-    /// Sandbox transactions on production API return true (skipped path — not a failure).
+    /// Sandbox transactions on a production API build return false — they are
+    /// neither verified nor finished, so StoreKit will redeliver them later
+    /// on a build whose environment actually matches (iOS-4).
     /// Caller must only call transaction.finish() when this returns true,
     /// so StoreKit will re-deliver the unfinished transaction on retry.
     @discardableResult
@@ -600,14 +626,19 @@ class SubscriptionManager: ObservableObject {
         verifyInFlight.insert(txnKey)
         defer { verifyInFlight.remove(txnKey) }
 
-        // Don't send sandbox transactions to the production backend — they would grant
-        // real premium access from a test purchase. The backend also rejects them, but
-        // guarding here prevents unnecessary network noise and confusing log entries.
+        // iOS-4 fix: Sandbox transactions on a production-API build must NOT be
+        // finished locally. Returning false here ensures the caller (purchase /
+        // listenForTransactions / reconcile) does NOT call transaction.finish(),
+        // so StoreKit will redeliver the transaction on a future launch when the
+        // user is on the matching environment (or on the sandbox/test build).
+        // The backend also rejects these (test cases I1-I4 / INV-10) — this is
+        // a defense-in-depth guard. We never set isPremium locally for these:
+        // isPremium flips only via updatePurchasedProducts, which is driven by
+        // Transaction.currentEntitlements on the production environment.
         if transaction.subscriptionEnvironment == .sandbox &&
             APIConfig.baseURL.contains("astroapi-prod") {
-            print("⚠️ [Backend] Skipping sandbox transaction on production API (product=\(transaction.productID))")
-            // Return true so caller finishes it — there's nothing to verify.
-            return true
+            print("⚠️ [Backend] Sandbox transaction on production API — NOT finishing, NOT granting premium. StoreKit will redeliver on env match. (product=\(transaction.productID))")
+            return false
         }
 
         do {

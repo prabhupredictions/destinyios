@@ -50,7 +50,8 @@ final class SubscriptionAccountSwitchTests: XCTestCase {
     private func clearAllSubscriptionUserDefaultsKeys() {
         let keys = [
             "isPremium", "currentPlanId", "subscriptionStatus",
-            "subscriptionExpiresAt", "autoRenewStatus", "currentPlanDisplayName"
+            "subscriptionExpiresAt", "autoRenewStatus", "currentPlanDisplayName",
+            SubscriptionManager.hasActiveSubscriptionCacheKey
         ]
         keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
     }
@@ -299,5 +300,48 @@ final class SubscriptionAccountSwitchTests: XCTestCase {
             "Account B: currentPlanId UserDefaults must be nil")
         XCTAssertFalse(UserDefaults.standard.bool(forKey: "isPremium"),
             "Account B: isPremium UserDefaults must be false")
+    }
+
+    // MARK: - iOS-7: hasActiveSubscription persistence across cold starts
+
+    /// iOS-7: setting the cached hasActiveSubscription flag must round-trip
+    /// through UserDefaults so a fresh instance (cold start) reads the last
+    /// known good state via the static accessor before reconcile lands.
+    func testHasActiveSubscription_persistsAcrossInstances() {
+        // Arrange: simulate a previous session writing the cached flag
+        UserDefaults.standard.set(true, forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+
+        // Act + Assert: the static reader (used by cold-start trial gating
+        // BEFORE the singleton's reconcile completes) returns the cached
+        // value, exactly what a "new SubscriptionManager instance" would
+        // observe on launch.
+        XCTAssertTrue(SubscriptionManager.cachedHasActiveSubscription(),
+            "iOS-7: cachedHasActiveSubscription must read the persisted flag — " +
+            "cold-start trial gating depends on this until reconcile completes")
+
+        // And flipping the cache flips the read.
+        UserDefaults.standard.set(false, forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+        XCTAssertFalse(SubscriptionManager.cachedHasActiveSubscription(),
+            "iOS-7: cachedHasActiveSubscription must reflect the latest written value")
+    }
+
+    /// iOS-7: resetForAccountSwitch must clear the persisted hasActiveSubscription
+    /// cache so a different user signing in on the same device does not inherit
+    /// the previous user's trial-gating state at cold start.
+    func testResetForAccountSwitch_clearsHasActiveSubscriptionCache() {
+        // Arrange: previous user's session left the cache set to true
+        UserDefaults.standard.set(true, forKey: SubscriptionManager.hasActiveSubscriptionCacheKey)
+        XCTAssertTrue(SubscriptionManager.cachedHasActiveSubscription(),
+            "Precondition: cache must be set before reset")
+
+        // Act
+        SubscriptionManager.shared.resetForAccountSwitch()
+
+        // Assert: key was removed (default bool read returns false)
+        XCTAssertNil(UserDefaults.standard.object(forKey: SubscriptionManager.hasActiveSubscriptionCacheKey),
+            "iOS-7: hasActiveSubscription cache key must be removed on account switch")
+        XCTAssertFalse(SubscriptionManager.cachedHasActiveSubscription(),
+            "iOS-7: cached reader must report false after account switch — " +
+            "account B must not inherit account A's hasActiveSubscription cache")
     }
 }
