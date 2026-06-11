@@ -294,14 +294,66 @@ final class ChatViewModelTests: XCTestCase {
         if let data = try? encoder.encode(birthData) {
             UserDefaults.standard.set(data, forKey: "userBirthData")
         }
-        
+
         viewModel.inputText = "What's my horoscope?"
         let initialCount = viewModel.messages.count
-        
+
         // When
         await viewModel.sendMessage()
-        
+
         // Then - should have user message and AI response
         XCTAssertGreaterThan(viewModel.messages.count, initialCount)
+    }
+
+    // MARK: - Post-Upgrade Replay Tests (iOS-2)
+
+    /// When the quota wall fires (overall_limit_reached), the in-flight query
+    /// must be buffered so ChatView can replay it after a successful upgrade.
+    /// Regression test for iOS-2: the user message bubble was removed AND
+    /// inputText was already cleared, forcing the user to retype.
+    func testSendMessage_QuotaDenied_BuffersQueryForPostUpgradeReplay() async throws {
+        // Given — quota gate denies with overall_limit_reached
+        MockURLProtocol.stubQuotaDeny(reason: "overall_limit_reached")
+
+        let originalQuery = "What's my horoscope?"
+        viewModel.inputText = originalQuery
+
+        // When
+        await viewModel.sendMessage()
+
+        // Then — query is buffered for replay after upgrade
+        XCTAssertEqual(
+            viewModel.pendingPostUpgradeQuery,
+            originalQuery,
+            "Query must be buffered when quota wall fires so it can be replayed post-upgrade"
+        )
+        // And — paywall is presented
+        XCTAssertTrue(viewModel.showQuotaSheet)
+        // And — inputText was cleared (existing behaviour)
+        XCTAssertTrue(viewModel.inputText.isEmpty)
+
+        // When — consumePendingPostUpgradeQuery is called
+        let consumed = viewModel.consumePendingPostUpgradeQuery()
+
+        // Then — buffered query is returned and cleared atomically
+        XCTAssertEqual(consumed, originalQuery)
+        XCTAssertNil(
+            viewModel.pendingPostUpgradeQuery,
+            "consumePendingPostUpgradeQuery() must clear the buffer"
+        )
+    }
+
+    /// clearPendingPostUpgradeQuery() discards the buffered query. Used by
+    /// ChatView when the user dismisses the paywall WITHOUT upgrading so a
+    /// stale query doesn't auto-fire later.
+    func testClearPendingPostUpgradeQuery_DiscardsBuffer() async throws {
+        // Given — a buffered query
+        viewModel.pendingPostUpgradeQuery = "stale query"
+
+        // When
+        viewModel.clearPendingPostUpgradeQuery()
+
+        // Then
+        XCTAssertNil(viewModel.pendingPostUpgradeQuery)
     }
 }

@@ -18,6 +18,7 @@ struct ChatView: View {
     var starterQuestions: [String] = []
     
     @State private var viewModel = ChatViewModel()
+    @ObservedObject private var quotaManager = QuotaManager.shared
     @FocusState private var isInputFocused: Bool
     @State private var showHistory = false
     @State private var showChart = false
@@ -164,7 +165,24 @@ struct ChatView: View {
         .onChange(of: showQuotaExhausted) { oldValue, newValue in
              if !newValue {
                  viewModel.showQuotaSheet = false
+                 // Paywall dismissed. If the user did NOT upgrade (still not
+                 // premium), discard the buffered query so it doesn't replay
+                 // unexpectedly later. If they DID upgrade, the isPremium
+                 // false→true onChange below will replay before this fires.
+                 if !quotaManager.isPremium {
+                     viewModel.clearPendingPostUpgradeQuery()
+                 }
              }
+        }
+        // Auto-replay buffered query when the user successfully upgrades.
+        // QuotaManager.isPremium flips false→true after SubscriptionManager
+        // notifies QuotaManager.syncStatus(force: true) on a successful purchase.
+        .onChange(of: quotaManager.isPremium) { wasPremium, isPremiumNow in
+            guard !wasPremium, isPremiumNow else { return }
+            if let buffered = viewModel.consumePendingPostUpgradeQuery() {
+                viewModel.inputText = buffered
+                Task { await viewModel.sendMessage() }
+            }
         }
         // Switch Profile: reset chat to new profile's latest thread or new chat
         .onReceive(NotificationCenter.default.publisher(for: .activeProfileChanged)) { _ in

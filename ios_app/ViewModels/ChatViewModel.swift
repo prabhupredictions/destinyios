@@ -39,6 +39,10 @@ class ChatViewModel {
     /// Short label shown in the user bubble when a home card sends a rich contextual query.
     /// The full inputText is still sent to the LLM; this only affects what the user sees.
     var pendingDisplayLabel: String? = nil
+    /// Buffered query captured when the quota wall fires before a send completes.
+    /// ChatView observes `quotaManager.isPremium` and replays this when the user
+    /// successfully upgrades. Cleared if the user dismisses the paywall without upgrading.
+    var pendingPostUpgradeQuery: String? = nil
     private var streamingTask: Task<Void, Never>? = nil
     private var stepProgressTask: Task<Void, Never>? = nil
     // Tracks whether the app backgrounded mid-stream so we show retry instead of error
@@ -318,7 +322,13 @@ class ChatViewModel {
             let accessResponse = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: currentEmail)
             if !accessResponse.canAccess {
                 isLoading = false
-                
+
+                // Buffer the in-flight query so ChatView can replay it after a
+                // successful upgrade (paywall closes, isPremium flips false→true).
+                // Captured BEFORE the user bubble is removed so the original
+                // text is preserved even if displayContent differs (home cards).
+                pendingPostUpgradeQuery = query
+
                 // Remove message
                 if let idx = messages.lastIndex(where: { $0.id == userMessage.id }) {
                     messages.remove(at: idx)
@@ -515,6 +525,23 @@ class ChatViewModel {
         interruptedQuestion = nil
         inputText = question
         Task { await sendMessage() }
+    }
+
+    // MARK: - Post-Upgrade Replay
+
+    /// Returns the buffered query (set when the quota wall fired before send completed)
+    /// and clears the buffer atomically. Caller is responsible for refilling inputText
+    /// and triggering sendMessage().
+    func consumePendingPostUpgradeQuery() -> String? {
+        let query = pendingPostUpgradeQuery
+        pendingPostUpgradeQuery = nil
+        return query
+    }
+
+    /// Discards the buffered post-upgrade query. Call this when the user dismisses
+    /// the paywall WITHOUT upgrading so a stale query doesn't auto-fire later.
+    func clearPendingPostUpgradeQuery() {
+        pendingPostUpgradeQuery = nil
     }
 
     // Format tool names for display — user-friendly cosmic text
