@@ -230,3 +230,60 @@ final class QuotaManagerGuestEmailTests: XCTestCase {
         XCTAssertFalse(QuotaManager.isGuestEmail("user@apple.com"))
     }
 }
+
+// MARK: - canAsk fail-open behavior (iOS-6)
+
+/// Tests for `QuotaManager.canAsk` — must fail OPEN on network error so that
+/// flaky-network users are not locked out of the predict pipeline. The server
+/// (atomic `check_and_reserve` in `/vedic/api/predict/stream`) is the source
+/// of truth and will reject the request if the user is truly out of quota.
+///
+/// Standardizes posture across `canAsk` (was: fails closed) and `canAddProfile`
+/// (was: fails open) — both now fail open.
+final class QuotaManagerCanAskFailOpenTests: XCTestCase {
+
+    override func setUp() {
+        super.setUp()
+        MockURLProtocol.reset()
+        URLProtocol.registerClass(MockURLProtocol.self)
+    }
+
+    override func tearDown() {
+        URLProtocol.unregisterClass(MockURLProtocol.self)
+        MockURLProtocol.reset()
+        super.tearDown()
+    }
+
+    /// Server returns 500 → canAccessFeature throws → canAsk must return true
+    /// (fail open) so the call site proceeds to the predict endpoint where the
+    /// server-side check_and_reserve enforces quota authoritatively.
+    func testCanAsk_networkError_failsOpen() async {
+        MockURLProtocol.handler(for: "/subscription/can-access") { _ in
+            return (500, Data("internal server error".utf8))
+        }
+
+        let result = await QuotaManager.shared.canAsk(email: "test@example.com")
+
+        XCTAssertTrue(result, "canAsk must fail open on network error so flaky network does not lock users out; server enforces quota authoritatively")
+    }
+
+    /// Sanity: explicit can_access:false from the server is still respected.
+    /// Fail-open only applies to network/decode errors, not to authoritative
+    /// server denials.
+    func testCanAsk_can_access_false_returnsFalse() async {
+        MockURLProtocol.stubQuotaDeny(reason: "overall_limit_reached")
+
+        let result = await QuotaManager.shared.canAsk(email: "test@example.com")
+
+        XCTAssertFalse(result, "Authoritative server denial (can_access:false) must propagate; only network errors fail open")
+    }
+
+    /// Sanity: explicit can_access:true is respected.
+    func testCanAsk_can_access_true_returnsTrue() async {
+        MockURLProtocol.stubQuotaAllowAll()
+
+        let result = await QuotaManager.shared.canAsk(email: "test@example.com")
+
+        XCTAssertTrue(result)
+    }
+}

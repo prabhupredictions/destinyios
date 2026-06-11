@@ -438,8 +438,13 @@ class QuotaManager: ObservableObject {
             let response = try await canAccessFeature(feature, email: email)
             return response.canAccess
         } catch {
-            print("❌ canAsk error: \(error)")
-            return false
+            // iOS-6 fix: fail open on network error. Server-side check_and_reserve
+            // in /vedic/api/predict/stream is the source of truth — the client gate
+            // is purely a UX hint. Locking users out on a flaky network when the
+            // server would allow the action is worse than letting them through and
+            // having the predict endpoint reject if truly out of quota.
+            print("⚠️ canAsk: network check failed, failing open (server will enforce): \(error)")
+            return true
         }
     }
     
@@ -833,7 +838,10 @@ class QuotaManager: ObservableObject {
             return (true, -1, false)
         } catch {
             print("❌ canAddProfile error: \(error)")
-            // Fail open - allow on network error
+            // iOS-6: fail open on network error (consistent with canAsk). The
+            // server enforces the maintain_profile entitlement on the actual
+            // profile-create call; the client gate is purely UX. A flaky
+            // network must not block legitimate users.
             return (true, -1, false)
         }
     }
