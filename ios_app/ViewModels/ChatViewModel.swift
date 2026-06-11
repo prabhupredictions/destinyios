@@ -340,7 +340,7 @@ class ChatViewModel {
                     if currentEmail.contains("guest") || currentEmail.contains("@gen.com") {
                         quotaDetails = "sign_in_to_continue_asking".localized
                     } else {
-                        quotaDetails = "create_account_to_continue".localized
+                        quotaDetails = "upgrade_to_keep_going".localized
                     }
                     showQuotaSheet = true
                 } else {
