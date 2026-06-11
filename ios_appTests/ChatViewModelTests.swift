@@ -17,6 +17,15 @@ final class ChatViewModelTests: XCTestCase {
         // Set up test user
         UserDefaults.standard.set("test@example.com", forKey: "userEmail")
 
+        // Reset and register MockURLProtocol so tests don't hit a real backend
+        // for QuotaManager.canAccessFeature / SubscriptionManager / etc. Each
+        // test that exercises sendMessage past the quota gate must call
+        // MockURLProtocol.stubQuotaAllowAll() (or similar) before invoking the
+        // ViewModel. Without a stub the request falls through and fails — which
+        // is correct behaviour for tests that DON'T expect a network call.
+        MockURLProtocol.reset()
+        URLProtocol.registerClass(MockURLProtocol.self)
+
         // Initialize ViewModel with test data manager
         viewModel = ChatViewModel(dataManager: testDataManager)
 
@@ -24,8 +33,10 @@ final class ChatViewModelTests: XCTestCase {
         await Task.yield()
         await Task.yield()
     }
-    
+
     override func tearDown() async throws {
+        URLProtocol.unregisterClass(MockURLProtocol.self)
+        MockURLProtocol.reset()
         UserDefaults.standard.removeObject(forKey: "userEmail")
         UserDefaults.standard.removeObject(forKey: "userBirthData")
         viewModel = nil
@@ -216,19 +227,31 @@ final class ChatViewModelTests: XCTestCase {
     // MARK: - Send Message Tests
     
     func testSendMessage_WithoutBirthData_SetsError() async throws {
+        // Stub quota gate so the message can reach the birth-data check at
+        // ChatViewModel.swift:357. Without this, sendMessage's quota check
+        // returns can_access=false (test backend refuses unknown email),
+        // user bubble is removed, and birth-data check never runs.
+        MockURLProtocol.stubQuotaAllowAll()
+
         // Given
         viewModel.inputText = "What's my horoscope?"
         UserDefaults.standard.removeObject(forKey: "userBirthData")
-        
+
         // When
         await viewModel.sendMessage()
-        
+
         // Then
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertTrue(viewModel.errorMessage?.contains("birth data") ?? false)
     }
     
     func testSendMessage_ClearsInputText() async throws {
+        // Stub quota gate — same rationale as testSendMessage_AddsUserMessage.
+        // (Existing test currently passes because inputText is cleared at the
+        // top of sendMessage BEFORE the quota check, but stub it anyway for
+        // clarity and to keep behaviour stable if the order changes.)
+        MockURLProtocol.stubQuotaAllowAll()
+
         // Given
         viewModel.inputText = "Hello"
         
@@ -253,6 +276,12 @@ final class ChatViewModelTests: XCTestCase {
     }
     
     func testSendMessage_AddsUserMessage() async throws {
+        // Stub quota gate so the user message survives past the quota check
+        // at ChatViewModel.swift:319-327. Without this, the test backend
+        // returns can_access=false for the unknown email and the user bubble
+        // is removed before the assertion runs.
+        MockURLProtocol.stubQuotaAllowAll()
+
         // Given
         let birthData = BirthData(
             dob: "1990-01-15",
