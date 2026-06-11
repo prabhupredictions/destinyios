@@ -106,6 +106,7 @@ struct ChatView: View {
             )
             .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
+            .interactiveDismissDisabled()
         }
         .sheet(isPresented: $showSubscription) {
             SubscriptionView()
