@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 /// Quota error information passed from backend
 struct QuotaErrorInfo {
@@ -65,15 +66,21 @@ struct QuotaErrorInfo {
 /// Dynamic messages based on plan, feature, and limit type
 struct QuotaExhaustedView: View {
     @Environment(\.dismiss) private var dismiss
-    
+    @ObservedObject private var subscriptionManager = SubscriptionManager.shared
+
     // New: Dynamic quota error info from backend
     var quotaError: QuotaErrorInfo?
-    
+
     // Legacy: Keep for backward compatibility
     var isGuest: Bool = false
     var customMessage: String?
     var onSignIn: (() -> Void)?
     var onUpgrade: (() -> Void)?
+    /// Paywall v2: secondary "See Core" tap-target. Wired in Phase 6
+    /// to push SubscriptionView so trial-eligible users can still pick the
+    /// lighter plan. nil-safe — link is rendered only when the closure is
+    /// supplied AND the trial-CTA gate is open.
+    var onSeeCore: (() -> Void)?
     
     // Computed properties using new error info or legacy props
     private var showSignIn: Bool {
@@ -105,6 +112,56 @@ struct QuotaExhaustedView: View {
     
     private var upgradeText: String {
         quotaError?.upgradeButtonText ?? "choose_plan_title".localized
+    }
+
+    // MARK: - Paywall v2 derivations
+    //
+    // shouldShowTrialCTA closes the trial gate (iOS-7 / iOS-12 / iOS-13 preserved):
+    //   - never for guests (showSignIn) — guest path stays sign-up only
+    //   - never for fair-use violations — Contact Support path stays
+    //   - else delegate to the existing pure SubscriptionManager.shouldShowTrialButton
+    //     (planId="plus", isPlusTrialEligible, hasActiveSubscription, hasConflict default)
+    private var shouldShowTrialCTA: Bool {
+        guard !showSignIn else { return false }
+        guard !showContactSupport else { return false }
+        return SubscriptionManager.shouldShowTrialButton(
+            planId: "plus",
+            isPlusTrialEligible: subscriptionManager.isPlusTrialEligible,
+            hasActiveSubscription: subscriptionManager.hasActiveSubscription
+        )
+    }
+
+    /// Backend-supplied upgrade headline (iOS-11). Promoted to active when the
+    /// upgrade-CTA payload carried a non-empty `message`.
+    private var backendUpgradeMessage: String? {
+        if let msg = quotaError?.message, !msg.isEmpty { return msg }
+        return nil
+    }
+
+    /// Headline shown on the upgrade path (showUpgrade && !isFairUseViolation):
+    ///   1. Backend `upgrade_cta.message` (iOS-11), if non-empty
+    ///   2. Trial-eligible → paywall_v2_headline
+    ///   3. Otherwise → existing localized title (iOS-5 fallback preserved)
+    private var v2Headline: String {
+        if let msg = backendUpgradeMessage { return msg }
+        if shouldShowTrialCTA { return "paywall_v2_headline".localized }
+        return showSignIn
+            ? "quota_signup_title".localized
+            : "quota_limit_reached_title".localized
+    }
+
+    /// Subheadline shown on the upgrade path:
+    ///   - Trial-eligible → paywall_v2_subheadline
+    ///   - Otherwise → existing displayMessage (preserves daily_limit_reset_time / iOS-9)
+    private var v2Subheadline: String {
+        if shouldShowTrialCTA { return "paywall_v2_subheadline".localized }
+        return displayMessage
+    }
+
+    /// Currency-adaptive (Q2) display price for the trial disclaimer. Falls
+    /// back to "$7.99" when StoreKit hasn't loaded the monthly Plus product.
+    private var trialDisplayPrice: String {
+        subscriptionManager.monthlyProduct(for: "plus")?.displayPrice ?? "$7.99"
     }
     
     var body: some View {
@@ -154,20 +211,48 @@ struct QuotaExhaustedView: View {
                     }
                     .padding(.top, 12)
                     
-                    // Title - different for fair use and guest
+                    // Title - different for fair use, guest, and v2 trial path
                     VStack(spacing: 8) {
-                        Text(showContactSupport ? "quota_usage_restricted_title".localized : (showSignIn ? "quota_signup_title".localized : "quota_limit_reached_title".localized))
-                            .font(AppTheme.Fonts.title(size: 24))
-                            .foregroundColor(AppTheme.Colors.textPrimary)
-                            .multilineTextAlignment(.center)
-                        
-                        Text(displayMessage)
-                            .font(AppTheme.Fonts.body(size: 16))
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 20)
+                        if showContactSupport {
+                            Text("quota_usage_restricted_title".localized)
+                                .font(AppTheme.Fonts.title(size: 24))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                .multilineTextAlignment(.center)
+
+                            Text(displayMessage)
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 20)
+                        } else if showUpgrade {
+                            // Paywall v2 path (registered users): backend message →
+                            // trial headline → existing fallback. Subheadline:
+                            // trial copy or existing displayMessage (iOS-9 preserved).
+                            Text(v2Headline)
+                                .font(AppTheme.Fonts.title(size: 24))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                .multilineTextAlignment(.center)
+
+                            Text(v2Subheadline)
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 20)
+                        } else {
+                            // Guest sign-up path (iOS-12 preserved).
+                            Text(showSignIn ? "quota_signup_title".localized : "quota_limit_reached_title".localized)
+                                .font(AppTheme.Fonts.title(size: 24))
+                                .foregroundColor(AppTheme.Colors.textPrimary)
+                                .multilineTextAlignment(.center)
+
+                            Text(displayMessage)
+                                .font(AppTheme.Fonts.body(size: 16))
+                                .foregroundColor(AppTheme.Colors.textSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 20)
+                        }
                     }
-                    
+
                     // Benefits - different for guests vs paid users
                     if !showContactSupport {
                         VStack(alignment: .leading, spacing: 12) {
@@ -179,11 +264,11 @@ struct QuotaExhaustedView: View {
                                 benefitRow(icon: "heart.fill", text: "Unlock Destiny Matching™ (compatibility matching)")
                                 benefitRow(icon: "arrow.turn.down.right", text: "Ask follow-up questions after your match report")
                             } else {
-                                // Paid user benefits (subscription)
-                                benefitRow(icon: "infinity", text: "Unlimited questions")
-                                benefitRow(icon: "heart.fill", text: "Unlimited Destiny Matching™")
-                                benefitRow(icon: "person.3.fill", text: "Multiple birth charts/profiles")
-                                benefitRow(icon: "sparkles", text: "Daily personalized insights")
+                                // Paywall v2: 4-bullet trial benefits.
+                                benefitRow(icon: "infinity", text: "paywall_v2_bullet_unlimited_questions".localized)
+                                benefitRow(icon: "heart.fill", text: "paywall_v2_bullet_unlimited_matching".localized)
+                                benefitRow(icon: "person.3.fill", text: "paywall_v2_bullet_profiles".localized)
+                                benefitRow(icon: "bell.fill", text: "paywall_v2_bullet_alerts".localized)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -194,19 +279,21 @@ struct QuotaExhaustedView: View {
                         )
                         .padding(.horizontal, 20)
                     }
-                    
+
                     // Action buttons
                     VStack(spacing: 16) {
                         // Upgrade button (hide for fair use violation)
                         if showUpgrade {
-                            Button(action: { 
+                            Button(action: {
                                 onUpgrade?()
                                 dismiss()
                             }) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "crown.fill")
                                         .font(.system(size: 16))
-                                    Text(upgradeText)
+                                    Text(shouldShowTrialCTA
+                                         ? "paywall_v2_cta_start_trial".localized
+                                         : upgradeText)
                                         .font(AppTheme.Fonts.title(size: 17))
                                 }
                                 .foregroundColor(AppTheme.Colors.textOnGold)
@@ -216,11 +303,32 @@ struct QuotaExhaustedView: View {
                                 .cornerRadius(16)
                                 .shadow(color: AppTheme.Colors.gold.opacity(0.3), radius: 10, y: 5)
                             }
+
+                            // Trial-only pricing disclaimer (Q2: currency-adaptive
+                            // via Product.displayPrice).
+                            if shouldShowTrialCTA {
+                                Text(String(format: "paywall_v2_pricing_disclaimer".localized, trialDisplayPrice))
+                                    .font(AppTheme.Fonts.body(size: 12))
+                                    .foregroundColor(AppTheme.Colors.textTertiary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 8)
+                            }
+
+                            // Trial-only "See Core" secondary link. Wired in Phase 6.
+                            if shouldShowTrialCTA, let onSeeCore = onSeeCore {
+                                Button(action: { onSeeCore() }) {
+                                    Text("paywall_v2_see_core_link".localized)
+                                        .font(AppTheme.Fonts.body(size: 14))
+                                        .foregroundColor(AppTheme.Colors.textSecondary)
+                                        .underline()
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
-                        
+
                         // Contact Support button (fair use violation only)
                         if showContactSupport {
-                            Button(action: { 
+                            Button(action: {
                                 openSupportEmail()
                             }) {
                                 HStack(spacing: 10) {
@@ -236,10 +344,10 @@ struct QuotaExhaustedView: View {
                                 .cornerRadius(16)
                             }
                         }
-                        
+
                         // Sign up button (for guests only)
                         if showSignIn && !showContactSupport {
-                            Button(action: { 
+                            Button(action: {
                                 onSignIn?()
                                 dismiss()
                             }) {
@@ -258,14 +366,10 @@ struct QuotaExhaustedView: View {
                                 )
                             }
                         }
-                        
-                        // Maybe later
-                        Button(action: { dismiss() }) {
-                            Text("not_now".localized)
-                                .font(AppTheme.Fonts.body(size: 14))
-                                .foregroundColor(AppTheme.Colors.textTertiary)
-                        }
-                        .padding(.top, 8)
+
+                        // Paywall v2: "Maybe later" / "not now" removed. The X close
+                        // button (above) is the sole dismiss affordance. ChatView's
+                        // .interactiveDismissDisabled() (iOS-10) is preserved.
                     }
                     .padding(.horizontal, 24)
                     .padding(.bottom, 20)
