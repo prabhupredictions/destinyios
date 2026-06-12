@@ -592,7 +592,23 @@ struct ProfileView: View {
     
     /// Card for free users showing upgrade CTA
     private var freeUpgradeCard: some View {
-        Button(action: {
+        // Paywall v2 (Phase 6): trial-aware row label.
+        //   - guest → existing sign-up CTA
+        //   - trial-eligible (Plus, eligible, no active sub) → "Start my free week"
+        //   - else → existing "Upgrade to Premium" fallback
+        // Tap action is unchanged below — both labels open SubscriptionView.
+        let upgradeCtaLabel: String = {
+            if isGuestUser { return "sign_up_button".localized }
+            if SubscriptionManager.shouldShowTrialButton(
+                planId: "plus",
+                isPlusTrialEligible: SubscriptionManager.shared.isPlusTrialEligible,
+                hasActiveSubscription: SubscriptionManager.shared.hasActiveSubscription
+            ) {
+                return "paywall_v2_cta_start_trial".localized
+            }
+            return "upgrade_to_premium".localized
+        }()
+        return Button(action: {
             // Guest users must sign in first to view plans
             if isGuestUser {
                 showGuestSignInSheet = true
@@ -614,7 +630,7 @@ struct ProfileView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(isGuestUser ? "sign_up".localized : "upgrade_to_premium".localized)
+                        Text(upgradeCtaLabel)
                             .font(AppTheme.Fonts.title(size: 16))
                             .foregroundColor(.white)
 
