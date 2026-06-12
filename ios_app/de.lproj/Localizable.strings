@@ -3075,3 +3075,14 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "quota_limit_reached_title" = "Sie haben Ihr Limit erreicht";
 "quota_create_account_fallback" = "Erstellen Sie ein Konto, um fortzufahren und Ihren Fortschritt zu speichern";
 "quota_usage_restricted_title" = "Nutzung eingeschränkt";
+
+/* Paywall v2 */
+"paywall_v2_headline" = "In Ihrem Chart steckt mehr";
+"paywall_v2_subheadline" = "7 Tage Premium kostenlos testen und weiter fragen.";
+"paywall_v2_bullet_unlimited_questions" = "Unbegrenzt Fragen stellen";
+"paywall_v2_bullet_unlimited_matching" = "Unbegrenztes Destiny Matching™";
+"paywall_v2_bullet_profiles" = "Profile für Partner, Familie und Freunde anlegen";
+"paywall_v2_bullet_alerts" = "Personalisierte Hinweise, wie „Guter Tag zum Investieren\"";
+"paywall_v2_cta_start_trial" = "Meine Gratiswoche starten";
+"paywall_v2_pricing_disclaimer" = "7 Tage gratis, dann %@/Monat. Jederzeit kündbar.";
+"paywall_v2_see_core_link" = "Möchten Sie einen leichteren Tarif? Core anzeigen";

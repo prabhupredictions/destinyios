@@ -2942,3 +2942,14 @@
 "quota_limit_reached_title" = "आप अपनी सीमा तक पहुँच गए हैं";
 "quota_create_account_fallback" = "जारी रखने और अपनी प्रगति सहेजने के लिए एक खाता बनाएँ";
 "quota_usage_restricted_title" = "उपयोग प्रतिबंधित";
+
+/* Paywall v2 */
+"paywall_v2_headline" = "आपके चार्ट में और भी बहुत कुछ है";
+"paywall_v2_subheadline" = "Premium को 7 दिन मुफ्त आज़माएँ और सवाल पूछते रहें।";
+"paywall_v2_bullet_unlimited_questions" = "असीमित सवाल पूछें";
+"paywall_v2_bullet_unlimited_matching" = "असीमित Destiny Matching™";
+"paywall_v2_bullet_profiles" = "अपने साथी, परिवार और दोस्तों के लिए प्रोफ़ाइल बनाएँ";
+"paywall_v2_bullet_alerts" = "व्यक्तिगत अलर्ट, जैसे \"निवेश के लिए शुभ दिन\"";
+"paywall_v2_cta_start_trial" = "मेरा मुफ्त सप्ताह शुरू करें";
+"paywall_v2_pricing_disclaimer" = "7 दिन मुफ्त, फिर %@/माह। कभी भी रद्द करें।";
+"paywall_v2_see_core_link" = "हल्की योजना चाहिए? Core देखें";

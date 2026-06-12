@@ -3079,3 +3079,14 @@
 "quota_limit_reached_title" = "上限に達しました";
 "quota_create_account_fallback" = "続けるにはアカウントを作成して進行状況を保存してください";
 "quota_usage_restricted_title" = "使用制限";
+
+/* Paywall v2 */
+"paywall_v2_headline" = "あなたのチャートにはまだまだあります";
+"paywall_v2_subheadline" = "Premiumを7日間無料でお試しください。";
+"paywall_v2_bullet_unlimited_questions" = "質問し放題";
+"paywall_v2_bullet_unlimited_matching" = "Destiny Matching™ 使い放題";
+"paywall_v2_bullet_profiles" = "パートナー、家族、友人のプロフィールを作成";
+"paywall_v2_bullet_alerts" = "「投資に最適な日」などのパーソナライズされた通知";
+"paywall_v2_cta_start_trial" = "無料お試しを開始";
+"paywall_v2_pricing_disclaimer" = "7日間無料、その後%@/月。いつでもキャンセル可能。";
+"paywall_v2_see_core_link" = "もっと軽いプランをお探しですか？Coreを見る";

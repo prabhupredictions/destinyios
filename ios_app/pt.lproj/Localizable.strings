@@ -3079,3 +3079,14 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "quota_limit_reached_title" = "Você atingiu seu limite";
 "quota_create_account_fallback" = "Crie uma conta para continuar e salvar seu progresso";
 "quota_usage_restricted_title" = "Uso restrito";
+
+/* Paywall v2 */
+"paywall_v2_headline" = "Há mais no seu mapa";
+"paywall_v2_subheadline" = "Experimente o Premium grátis por 7 dias e continue perguntando.";
+"paywall_v2_bullet_unlimited_questions" = "Faça perguntas ilimitadas";
+"paywall_v2_bullet_unlimited_matching" = "Destiny Matching™ ilimitado";
+"paywall_v2_bullet_profiles" = "Crie perfis para seu parceiro, família e amigos";
+"paywall_v2_bullet_alerts" = "Alertas personalizados, como \"bom dia para investir\"";
+"paywall_v2_cta_start_trial" = "Iniciar minha semana grátis";
+"paywall_v2_pricing_disclaimer" = "7 dias grátis, depois %@/mês. Cancele quando quiser.";
+"paywall_v2_see_core_link" = "Prefere um plano mais leve? Ver Core";

@@ -3079,3 +3079,14 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "quota_limit_reached_title" = "Vous avez atteint votre limite";
 "quota_create_account_fallback" = "Créez un compte pour continuer et sauvegarder votre progression";
 "quota_usage_restricted_title" = "Utilisation restreinte";
+
+/* Paywall v2 */
+"paywall_v2_headline" = "Il y a plus dans votre carte";
+"paywall_v2_subheadline" = "Essayez Premium gratuitement pendant 7 jours et continuez à poser des questions.";
+"paywall_v2_bullet_unlimited_questions" = "Posez des questions illimitées";
+"paywall_v2_bullet_unlimited_matching" = "Destiny Matching™ illimité";
+"paywall_v2_bullet_profiles" = "Créez des profils pour votre partenaire, votre famille et vos amis";
+"paywall_v2_bullet_alerts" = "Alertes personnalisées, comme « bon jour pour investir »";
+"paywall_v2_cta_start_trial" = "Démarrer ma semaine gratuite";
+"paywall_v2_pricing_disclaimer" = "7 jours gratuits, puis %@/mois. Annulable à tout moment.";
+"paywall_v2_see_core_link" = "Préférez un plan plus léger ? Voir Core";
