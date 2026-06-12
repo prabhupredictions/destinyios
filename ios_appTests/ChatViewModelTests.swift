@@ -481,4 +481,57 @@ final class ChatViewModelTests: XCTestCase {
             "User bubble must be removed when quota wall fires server-side"
         )
     }
+
+    // MARK: - Paywall v2 Phase 7 — K19: buffer-replay survives direct purchase
+
+    /// K19: When the trial-eligible user upgrades via the v2 popup's direct
+    /// `purchasePlusDirect` path (NOT via SubscriptionView), the buffered
+    /// post-upgrade query must still be present in the ChatViewModel so
+    /// ChatView's `quotaManager.isPremium` onChange observer can consume it.
+    ///
+    /// The mechanism:
+    ///   1. /predict denies with overall_limit_reached → buffer the query
+    ///   2. User taps "Start my free week" → `purchasePlusDirect()` runs
+    ///      WITHOUT touching ChatViewModel (it's a SubscriptionManager call)
+    ///   3. On success, QuotaManager flips `isPremium` → ChatView observer
+    ///      calls `consumePendingPostUpgradeQuery()` and replays
+    ///
+    /// We can't drive a real StoreKit purchase from a unit test, but we
+    /// CAN pin steps 1 and 3: that the buffered query is present after the
+    /// quota wall fires AND survives a no-op purchase code path that
+    /// doesn't touch ViewModel state. If a future refactor accidentally
+    /// clears the buffer inside SubscriptionManager (e.g. as part of a
+    /// reset flow), this test fails.
+    func testBufferReplay_SurvivesAcrossDirectPurchaseCodePath() async throws {
+        // Given — quota gate denies; query is buffered.
+        MockURLProtocol.stubQuotaDeny(reason: "overall_limit_reached")
+        let originalQuery = "Will I get the job?"
+        viewModel.inputText = originalQuery
+
+        // When — sendMessage triggers buffer.
+        await viewModel.sendMessage()
+
+        // Sanity: buffer is set.
+        XCTAssertEqual(viewModel.pendingPostUpgradeQuery, originalQuery)
+
+        // When — caller toggles directPurchaseInProgress (the only state
+        // mutation purchasePlusDirect performs aside from StoreKit). This
+        // simulates the v2 popup's onUpgrade closure invoking
+        // SubscriptionManager.purchasePlusDirect().
+        SubscriptionManager.shared.directPurchaseInProgress = true
+        SubscriptionManager.shared.directPurchaseInProgress = false
+
+        // Then — buffer is still present and ready for the
+        // `quotaManager.isPremium` onChange observer to consume.
+        XCTAssertEqual(
+            viewModel.pendingPostUpgradeQuery,
+            originalQuery,
+            "Direct-purchase code path must NOT clear the post-upgrade buffer"
+        )
+
+        // And — onChange observer's consume call still works as expected.
+        let consumed = viewModel.consumePendingPostUpgradeQuery()
+        XCTAssertEqual(consumed, originalQuery)
+        XCTAssertNil(viewModel.pendingPostUpgradeQuery)
+    }
 }
