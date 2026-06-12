@@ -136,7 +136,11 @@ struct SubscriptionView: View {
     private func loadPlans() async {
         // Step 1: Immediately show cached plans (no spinner, no flicker)
         let cachedPlans = quotaManager.paidPlans
-            .sorted { ($0.priceMonthly ?? 0) < ($1.priceMonthly ?? 0) }
+            .sorted { lhs, rhs in
+                if lhs.planId == "plus" { return true }
+                if rhs.planId == "plus" { return false }
+                return (lhs.priceMonthly ?? 0) < (rhs.priceMonthly ?? 0)
+            }
         
         if !cachedPlans.isEmpty {
             plans = cachedPlans
@@ -148,7 +152,11 @@ struct SubscriptionView: View {
         do {
             var fetchedPlans = try await quotaManager.fetchPlans()
             fetchedPlans = fetchedPlans.filter { !$0.isFree && $0.planId != "free_guest" && $0.planId != "free_registered" }
-            fetchedPlans.sort { ($0.priceMonthly ?? 0) < ($1.priceMonthly ?? 0) }
+            fetchedPlans.sort { lhs, rhs in
+                if lhs.planId == "plus" { return true }
+                if rhs.planId == "plus" { return false }
+                return (lhs.priceMonthly ?? 0) < (rhs.priceMonthly ?? 0)
+            }
             await MainActor.run {
                 plans = fetchedPlans
                 isLoading = false

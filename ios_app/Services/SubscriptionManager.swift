@@ -183,7 +183,31 @@ class SubscriptionManager: ObservableObject {
     }
     
     // MARK: - Purchase
-    
+
+    /// Direct-to-Plus purchase helper.
+    ///
+    /// Exists for Paywall v2 paths where the UI skips the SubscriptionView
+    /// picker and commits the user straight to the monthly Plus plan. Resolves
+    /// the monthly Plus product via `monthlyProduct(for:)` and delegates to the
+    /// existing `purchase(_:)` method, which already handles JWS verification,
+    /// `transaction.finish()`, `syncStatus(force:true)`, and error states.
+    /// Returns `true` only when the underlying purchase fully activates;
+    /// returns `false` (and logs) when the product is missing or the purchase
+    /// fails / is cancelled / is pending.
+    public func purchasePlusDirect() async -> Bool {
+        guard let product = monthlyProduct(for: "plus") else {
+            print("⚠️ [purchasePlusDirect] No monthly Plus product available — cannot purchase")
+            errorMessage = "Plus subscription is unavailable right now. Please try again."
+            return false
+        }
+        do {
+            return try await purchase(product)
+        } catch {
+            print("⚠️ [purchasePlusDirect] purchase failed: \(error)")
+            return false
+        }
+    }
+
     /// Purchase a subscription product
     func purchase(_ product: Product) async throws -> Bool {
         isLoading = true

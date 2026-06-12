@@ -3041,3 +3041,17 @@
 "quota_limit_reached_title" = "You have reached your limit";
 "quota_create_account_fallback" = "Create an account to keep going and save your progress";
 "quota_usage_restricted_title" = "Usage Restricted";
+
+// MARK: - Paywall v2 (trial-eligible direct-to-Plus path)
+// Used when the user is in the 7-day free-trial window and we skip the
+// SubscriptionView picker. The existing iOS-5 quota_* keys above remain in
+// place for the trial-ineligible fallback branch.
+"paywall_v2_headline" = "There's more in your chart";
+"paywall_v2_subheadline" = "Try Premium free for 7 days and keep asking.";
+"paywall_v2_bullet_unlimited_questions" = "Ask unlimited questions";
+"paywall_v2_bullet_unlimited_matching" = "Unlimited Destiny Matching™";
+"paywall_v2_bullet_profiles" = "Create profiles for your partner, family, and friends";
+"paywall_v2_bullet_alerts" = "Personalized alerts, like \"good day to invest\"";
+"paywall_v2_cta_start_trial" = "Start my free week";
+"paywall_v2_pricing_disclaimer" = "7 days free, then %@/month. Cancel anytime.";
+"paywall_v2_see_core_link" = "Prefer a lighter plan? See Core";
