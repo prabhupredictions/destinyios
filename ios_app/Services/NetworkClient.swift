@@ -29,32 +29,88 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
         method: String,
         body: Encodable?
     ) async throws -> T {
-        
+        return try await requestWithRetry(
+            endpoint: endpoint, method: method, body: body, allowRetry: true,
+        )
+    }
+
+    /// W7: actual request execution. On 401 session_expired, we
+    /// transparently call /auth/refresh and retry ONCE. Any second 401
+    /// surfaces to the caller (which should route to sign-in).
+    private func requestWithRetry<T: Decodable>(
+        endpoint: String,
+        method: String,
+        body: Encodable?,
+        allowRetry: Bool
+    ) async throws -> T {
+
         // Build URL
         guard let url = URL(string: baseURL + endpoint) else {
             throw NetworkError.invalidURL
         }
-        
+
         // Build Request
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        
+        // W7: bundled API key in X-API-Key (anti-bot / app-identity).
+        // Session JWT in Authorization: Bearer when available; otherwise
+        // we send the API key in Authorization too so pre-W7 endpoints
+        // continue to work.
+        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        request.setValue("DestinyAI-iOS/1.6", forHTTPHeaderField: "User-Agent")
+
+        if let sessionJwt = SessionTokenStore.shared.currentSessionJwt(),
+           SessionTokenStore.shared.sessionIsFresh() {
+            request.setValue("Bearer \(sessionJwt)", forHTTPHeaderField: "Authorization")
+        } else {
+            // Pre-W7 path: bearer = API key. Backend's APIKeyAuthMiddleware
+            // (W7 step 8) skips JWT-shaped tokens, so this works.
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        }
+
         // Encode body (models have CodingKeys for snake_case)
         if let body = body {
             let encoder = JSONEncoder()
             request.httpBody = try encoder.encode(body)
         }
-        
+
         // Execute request
         let (data, response) = try await session.data(for: request)
-        
+
         // Validate response
         guard let httpResponse = response as? HTTPURLResponse else {
             throw NetworkError.noData
         }
-        
+
+        // W7: on 401, attempt one refresh + retry.
+        if httpResponse.statusCode == 401 && allowRetry {
+            if let detailCode = Self.detailCode(data: data),
+               detailCode == "session_expired" {
+                do {
+                    _ = try await AuthExchangeClient.shared.refresh()
+                    // Retry once with the new token.
+                    return try await requestWithRetry(
+                        endpoint: endpoint, method: method, body: body, allowRetry: false,
+                    )
+                } catch let exchangeErr as AuthExchangeError {
+                    // refresh_reused / refresh_unknown / refresh_expired:
+                    // server told us to re-sign-in. Clear local state.
+                    if case .reauthRequired = exchangeErr {
+                        SessionTokenStore.shared.clearActiveSession()
+                    }
+                    throw NetworkError.unauthorized
+                } catch {
+                    throw NetworkError.unauthorized
+                }
+            }
+            // Other 401 codes (session_revoked etc.): clear + surface
+            if let detailCode = Self.detailCode(data: data),
+               detailCode == "session_revoked" {
+                SessionTokenStore.shared.clearActiveSession()
+            }
+        }
+
         // Handle status codes
         switch httpResponse.statusCode {
         case 200...299:
@@ -124,6 +180,19 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
 
     // MARK: - Quota Error Detection
 
+    /// W7: extract detail.code from a FastAPI error envelope.
+    /// FastAPI returns `{"detail": {"code": "session_expired", ...}}`
+    /// for our auth errors. Returns nil if no code is present.
+    static func detailCode(data: Data) -> String? {
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return nil
+        }
+        if let detail = json["detail"] as? [String: Any] {
+            return detail["code"] as? String
+        }
+        return nil
+    }
+
     /// Returns a `QuotaExhaustedError` if the 4xx response body matches the
     /// backend's quota-rejection shape:
     ///   { "detail": { "code": "quota_exceeded", "reason": "...",
@@ -151,12 +220,14 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
 
         let isQuotaCode = (code == "quota_exceeded"
                            || code == "quota_exhausted"
-                           || code == "rate_limited")
+                           || code == "rate_limited"
+                           || code == "subscription_expired")
         let quotaReasons: Set<String> = [
             "daily_limit_reached",
             "overall_limit_reached",
             "quota_exhausted",
             "rate_limited",
+            "subscription_expired",
         ]
         let isQuotaReason = reason.map { quotaReasons.contains($0) } ?? false
         guard isQuotaCode || isQuotaReason else { return nil }
