@@ -217,16 +217,15 @@ class SubscriptionManager: ObservableObject {
         defer { directPurchaseInProgress = false }
 
         do {
-            // W4: bind a deterministic UUIDv5 derived from the user's
-            // email as `appAccountToken`. This is Apple's recommended
-            // hint for refund + support correlation — NOT auth. Same
-            // email always produces the same token, so two purchases
-            // by the same user are correlatable in App Store Connect
-            // even after reinstall. Backend treats it as audit-only;
-            // unforgeable user-binding is W4b (server-issued random
-            // UUID per user, fetched at login).
+            // W4b: bind a server-minted random UUID as `appAccountToken`.
+            // iOS fetches the UUID from /subscription/app-account-token at
+            // login + caches in Keychain. Apple includes it in the signed
+            // transaction; backend rejects /verify if the JWS-embedded
+            // token doesn't match the user's stored UUID — REAL cross-
+            // account replay defense (the W4a UUIDv5(email) was forgeable
+            // and only logged for support correlation).
             let result: Product.PurchaseResult
-            if let appAccountToken = deriveAppAccountToken() {
+            if let appAccountToken = await fetchOrCacheAppAccountToken() {
                 result = try await product.purchase(options: [
                     .appAccountToken(appAccountToken),
                 ])
@@ -765,15 +764,98 @@ class SubscriptionManager: ObservableObject {
         return UserDefaults.standard.string(forKey: "userEmail")
     }
 
-    /// W4: Derive a stable UUIDv5 from the user's email so every purchase
-    /// for the same email reuses the same `appAccountToken`. This is
-    /// Apple's recommended hint for refund / customer-support correlation
-    /// — NOT an authentication mechanism. The value is computable by
-    /// anyone who knows the email, so the backend treats it as audit-only.
-    /// True cross-account replay defense lives server-side in the
-    /// `existing.user_email != user_email` check on /verify, and (planned)
-    /// in W4b's server-issued random UUID minted per user.
-    /// Returns nil when no email is available (anonymous purchase).
+    // W4b-fix #7: in-flight dedup so two simultaneous purchase taps
+    // don't race the server's mint. Same pattern as verifyInFlight.
+    private var appAccountTokenFetchInFlight: Task<UUID?, Never>?
+
+    /// W4b: Fetch the server-minted random UUID this user must use as
+    /// `appAccountToken` on Apple purchases. The backend stores it in
+    /// `user_subscriptions.apple_app_account_token`, mints lazily on
+    /// first GET, and enforces match on /verify. Cached in Keychain
+    /// (per-email key) so we only hit the network once.
+    ///
+    /// SECURITY MODEL: this UUID is treated as a secret on the iOS
+    /// side. Stored in Keychain (encrypted, device-bound), NEVER
+    /// UserDefaults.
+    ///
+    /// W4b-fix #5: on ANY fetch failure, return nil. Caller MUST then
+    /// call product.purchase() WITHOUT the appAccountToken option so
+    /// the JWS goes through the backend's backward-compat path. The
+    /// previous behavior (fall back to deriveAppAccountToken's UUIDv5
+    /// of email) BAKED a bad UUID into Apple's signed JWS, which the
+    /// strict backend then rejected forever — user charged, no
+    /// recovery in code. Sending no token is strictly safer than
+    /// sending the wrong one.
+    private func fetchOrCacheAppAccountToken() async -> UUID? {
+        guard let email = getCurrentUserEmail()?.lowercased(),
+              !email.isEmpty else { return nil }
+
+        let keychainKey = "appAccountToken::\(email)"
+        if let cached = KeychainService.shared.loadString(forKey: keychainKey),
+           let uuid = UUID(uuidString: cached) {
+            return uuid
+        }
+
+        // W4b-fix #7: dedup concurrent fetches.
+        if let existing = appAccountTokenFetchInFlight {
+            return await existing.value
+        }
+        let task = Task<UUID?, Never> { [weak self] in
+            guard let self = self else { return nil }
+            defer { self.appAccountTokenFetchInFlight = nil }
+            return await self.performAppAccountTokenFetch(
+                email: email, keychainKey: keychainKey
+            )
+        }
+        appAccountTokenFetchInFlight = task
+        return await task.value
+    }
+
+    private func performAppAccountTokenFetch(email: String, keychainKey: String) async -> UUID? {
+        // Re-check Keychain inside the task — another caller may have
+        // populated it between our cache miss and task scheduling.
+        if let cached = KeychainService.shared.loadString(forKey: keychainKey),
+           let uuid = UUID(uuidString: cached) {
+            return uuid
+        }
+
+        guard var components = URLComponents(string: APIConfig.baseURL + "/subscription/app-account-token") else {
+            return nil  // W4b-fix #5: fail safe (no token) rather than poison JWS
+        }
+        components.queryItems = [URLQueryItem(name: "email", value: email)]
+        guard let url = components.url else { return nil }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 8
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                print("⚠️ [appAccountToken] fetch returned non-200 — purchase will proceed without token (backward-compat path)")
+                return nil
+            }
+            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let tokenStr = json["app_account_token"] as? String,
+                  let uuid = UUID(uuidString: tokenStr) else {
+                print("⚠️ [appAccountToken] fetch returned malformed body — purchase will proceed without token")
+                return nil
+            }
+            // Cache in Keychain
+            try? KeychainService.shared.saveString(tokenStr, forKey: keychainKey)
+            return uuid
+        } catch {
+            print("⚠️ [appAccountToken] fetch failed: \(error) — purchase will proceed without token")
+            return nil
+        }
+    }
+
+    /// W4a (kept for golden-test parity ONLY): UUIDv5 derivation from
+    /// email. FORGEABLE — DO NOT USE in any production code path. The
+    /// backend test suite pins this helper's output to detect drift; iOS
+    /// no longer calls it (W4b-fix #5 removed the fallback that did).
     private func deriveAppAccountToken() -> UUID? {
         guard let email = getCurrentUserEmail()?.lowercased(),
               !email.isEmpty else { return nil }
