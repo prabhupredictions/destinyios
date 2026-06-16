@@ -732,11 +732,14 @@ class QuotaManager: ObservableObject {
     }
 
     /// True when the user's most recent paid subscription has ended
-    /// (expired/canceled/revoked/refunded). Drives "Plus (expired)" labels
-    /// and the trial-eligibility gate.
+    /// (expired/billing_retry/revoked/refunded). Drives "Plus (expired)"
+    /// labels and the trial-eligibility gate. NOTE: `canceled` is NOT
+    /// terminal — Apple's contract says canceled users keep entitlement
+    /// until expires_at; W1 hotfix removed it from the server's terminal
+    /// set too. Mirror that here.
     private var _isInTerminalPaidStatus: Bool {
         switch (subscriptionStatus ?? "") {
-        case "expired", "canceled", "revoked", "refunded":
+        case "expired", "billing_retry", "revoked", "refunded":
             return true
         default:
             return false
@@ -845,6 +848,11 @@ class QuotaManager: ObservableObject {
         case "expired": return "Expired"
         case "grace_period": return "Grace Period"
         case "canceled": return "Canceled"
+        // W3: cover the rest of the state machine so ProfileView / paywall
+        // copy is honest about why entitlement is/isn't granted.
+        case "billing_retry": return "Payment Failed"
+        case "revoked": return "Revoked"
+        case "refunded": return "Refunded"
         default: return ""
         }
     }

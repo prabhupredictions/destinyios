@@ -296,7 +296,23 @@ struct SubscriptionView: View {
             // the trial button would render because isCurrentPlan would be false.
             let dbPlan = quotaManager.currentPlanId ?? "free_guest"
             let applePlan = subscriptionManager.activePlanId
+            // When the user's paid subscription has lapsed (expired/canceled/
+            // revoked/refunded), they have NO current plan from a billing
+            // perspective. plan_id still records their history (so Profile
+            // can show "Plus (expired)") but the SubscriptionView should
+            // show NO "Current" badge — every paid plan should look
+            // available for renewal/upgrade. Treat as "no current plan"
+            // by returning an empty string (no plan card matches).
+            // W3: align with QuotaManager._isInTerminalPaidStatus — `canceled`
+            // users still hold entitlement until expires_at, so we don't
+            // treat them as expired here. `billing_retry` IS terminal.
+            let isPaidPlanExpired = !dbPlan.starts(with: "free")
+                && quotaManager.subscriptionStatus.map { ["expired", "billing_retry", "revoked", "refunded"].contains($0) } ?? false
             let userCurrentPlanId: String = {
+                if isPaidPlanExpired {
+                    // No current plan — user is between subscriptions.
+                    return ""
+                }
                 // If a cross-account conflict was detected, the Apple-side
                 // plan does NOT belong to this email. Trust the DB only —
                 // otherwise we'd show "Plus" as current plan to a user who
