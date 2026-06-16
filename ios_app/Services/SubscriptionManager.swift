@@ -217,13 +217,14 @@ class SubscriptionManager: ObservableObject {
         defer { directPurchaseInProgress = false }
 
         do {
-            // W4: bind a deterministic UUIDv5 derived from the user's email
-            // as `appAccountToken`. Apple includes this in the signed
-            // transaction & renewalInfo, so the backend can verify the
-            // purchase belongs to the email on record. Same email →
-            // same token across reinstalls / device changes / family
-            // members, so refunds and cross-account disputes are
-            // resolvable. Anonymous (no email) purchase → no token.
+            // W4: bind a deterministic UUIDv5 derived from the user's
+            // email as `appAccountToken`. This is Apple's recommended
+            // hint for refund + support correlation — NOT auth. Same
+            // email always produces the same token, so two purchases
+            // by the same user are correlatable in App Store Connect
+            // even after reinstall. Backend treats it as audit-only;
+            // unforgeable user-binding is W4b (server-issued random
+            // UUID per user, fetched at login).
             let result: Product.PurchaseResult
             if let appAccountToken = deriveAppAccountToken() {
                 result = try await product.purchase(options: [
@@ -765,11 +766,13 @@ class SubscriptionManager: ObservableObject {
     }
 
     /// W4: Derive a stable UUIDv5 from the user's email so every purchase
-    /// for the same email reuses the same `appAccountToken`. The backend
-    /// can then trust that two transactions with the same token belong
-    /// to the same user — useful for refund / family-share / cross-account
-    /// dispute resolution. Uses the URL namespace + lowercased email so
-    /// "Foo@Bar.com" and "foo@bar.com" produce identical tokens.
+    /// for the same email reuses the same `appAccountToken`. This is
+    /// Apple's recommended hint for refund / customer-support correlation
+    /// — NOT an authentication mechanism. The value is computable by
+    /// anyone who knows the email, so the backend treats it as audit-only.
+    /// True cross-account replay defense lives server-side in the
+    /// `existing.user_email != user_email` check on /verify, and (planned)
+    /// in W4b's server-issued random UUID minted per user.
     /// Returns nil when no email is available (anonymous purchase).
     private func deriveAppAccountToken() -> UUID? {
         guard let email = getCurrentUserEmail()?.lowercased(),
