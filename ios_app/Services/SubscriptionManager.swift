@@ -1,6 +1,7 @@
 import Foundation
 import StoreKit
 import Combine
+import CryptoKit  // W4: SHA1 for UUIDv5(appAccountToken) derivation
 
 /// Surfaced to the UI when the backend rejects a /verify call because the
 /// Apple-side subscription is already linked to a different email account
@@ -216,7 +217,21 @@ class SubscriptionManager: ObservableObject {
         defer { directPurchaseInProgress = false }
 
         do {
-            let result = try await product.purchase()
+            // W4: bind a deterministic UUIDv5 derived from the user's email
+            // as `appAccountToken`. Apple includes this in the signed
+            // transaction & renewalInfo, so the backend can verify the
+            // purchase belongs to the email on record. Same email →
+            // same token across reinstalls / device changes / family
+            // members, so refunds and cross-account disputes are
+            // resolvable. Anonymous (no email) purchase → no token.
+            let result: Product.PurchaseResult
+            if let appAccountToken = deriveAppAccountToken() {
+                result = try await product.purchase(options: [
+                    .appAccountToken(appAccountToken),
+                ])
+            } else {
+                result = try await product.purchase()
+            }
             
             switch result {
             case .success(let verification):
@@ -747,6 +762,37 @@ class SubscriptionManager: ObservableObject {
             return profile.email
         }
         return UserDefaults.standard.string(forKey: "userEmail")
+    }
+
+    /// W4: Derive a stable UUIDv5 from the user's email so every purchase
+    /// for the same email reuses the same `appAccountToken`. The backend
+    /// can then trust that two transactions with the same token belong
+    /// to the same user — useful for refund / family-share / cross-account
+    /// dispute resolution. Uses the URL namespace + lowercased email so
+    /// "Foo@Bar.com" and "foo@bar.com" produce identical tokens.
+    /// Returns nil when no email is available (anonymous purchase).
+    private func deriveAppAccountToken() -> UUID? {
+        guard let email = getCurrentUserEmail()?.lowercased(),
+              !email.isEmpty else { return nil }
+        // RFC 4122 §4.3 — namespace UUIDs. Use URL namespace.
+        let urlNamespace = UUID(uuidString: "6BA7B811-9DAD-11D1-80B4-00C04FD430C8")!
+        let nsBytes = withUnsafeBytes(of: urlNamespace.uuid) { Array($0) }
+        let emailBytes = Array(email.utf8)
+        var data = Data()
+        data.append(contentsOf: nsBytes)
+        data.append(contentsOf: emailBytes)
+        let digest = Insecure.SHA1.hash(data: data)
+        var bytes = Array(digest.prefix(16))
+        // Set version (5) and variant (RFC 4122) per RFC 4122 §4.3
+        bytes[6] = (bytes[6] & 0x0F) | 0x50
+        bytes[8] = (bytes[8] & 0x3F) | 0x80
+        let tuple = (
+            bytes[0],  bytes[1],  bytes[2],  bytes[3],
+            bytes[4],  bytes[5],  bytes[6],  bytes[7],
+            bytes[8],  bytes[9],  bytes[10], bytes[11],
+            bytes[12], bytes[13], bytes[14], bytes[15]
+        )
+        return UUID(uuid: tuple)
     }
 
     // MARK: - Test helpers (DEBUG only)
