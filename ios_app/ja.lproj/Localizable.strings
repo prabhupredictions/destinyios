@@ -3090,3 +3090,9 @@
 "paywall_v2_cta_start_trial" = "無料お試しを開始";
 "paywall_v2_pricing_disclaimer" = "7日間無料、その後%@/月。いつでもキャンセル可能。";
 "paywall_v2_see_core_link" = "もっと軽いプランをお探しですか？Coreを見る";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "上限に達しました。宇宙の旅を続けるにはアップグレードしてください。";
+"quota_fallback_daily_limit" = "今日はお忙しかったですね!明日 UTC 午前 0:00 に再度ご利用いただくか、より高い上限のためにアップグレードしてください。";
+"quota_fallback_fair_use" = "フェアユース違反。ご利用が制限されています。サポートが必要な場合は support@destinyaiastrology.com までお問い合わせください。";
+"quota_fallback_default" = "アップグレードして無制限アクセスをアンロックしてください。";

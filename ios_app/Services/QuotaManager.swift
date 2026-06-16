@@ -699,6 +699,15 @@ class QuotaManager: ObservableObject {
     /// Display name for current plan (shows "Free Plan" for free tiers)
     var planDisplayName: String {
         if let plan = currentPlan {
+            // Two-channel state model: plan_id encodes the user's plan
+            // history; subscription_status encodes whether the paid
+            // relationship is still active. When a paid plan is expired,
+            // surface "Plus (expired)" / "Core (expired)" so the UI is
+            // honest about the user's history without claiming active
+            // entitlements.
+            if !plan.isFree && _isInTerminalPaidStatus {
+                return "\(plan.displayName) (expired)"
+            }
             if plan.isFree {
                 return "Free Plan"
             }
@@ -706,20 +715,38 @@ class QuotaManager: ObservableObject {
         }
         return UserDefaults.standard.string(forKey: "currentPlanDisplayName") ?? "Free Plan"
     }
-    
+
+    /// True when the user's most recent paid subscription has ended
+    /// (expired/canceled/revoked/refunded). Drives "Plus (expired)" labels
+    /// and the trial-eligibility gate.
+    private var _isInTerminalPaidStatus: Bool {
+        switch (subscriptionStatus ?? "") {
+        case "expired", "canceled", "revoked", "refunded":
+            return true
+        default:
+            return false
+        }
+    }
+
     /// Check if user can upgrade
     var canUpgrade: Bool {
-        currentPlan?.isFree ?? true
+        // A paid-but-expired user can also upgrade (renew). Don't gate this
+        // on isFree alone or expired Plus users will see no upgrade CTA.
+        if _isInTerminalPaidStatus { return true }
+        return currentPlan?.isFree ?? true
     }
-    
+
     /// Simple sync check for UI - uses cached features list
     /// For authoritative check, use `canAsk(feature:email:)` async method
     var canAsk: Bool {
         availableFeatures.contains(FeatureID.aiQuestions.rawValue)
     }
-    
-    /// Check if user is on a free plan (free_guest or free_registered)
+
+    /// Check if user is on a free plan (free_guest or free_registered) OR
+    /// a paid plan in terminal expired/canceled/revoked/refunded status.
+    /// In all those cases the effective entitlements are free_registered.
     var isFreePlan: Bool {
+        if _isInTerminalPaidStatus { return true }
         let planId = currentPlan?.planId ?? ""
         return planId == "free_guest" || planId == "free_registered"
     }

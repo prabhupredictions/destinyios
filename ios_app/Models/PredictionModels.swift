@@ -17,7 +17,12 @@ struct PredictionRequest: Codable, Sendable {
     /// - "chat": Default for main chat screen questions
     /// - "compatibility": For redirects from compatibility follow-up (so quota is recorded against compatibility)
     var quotaContext: String?
-    
+
+    /// Active profile (Switch Profile feature). Backend uses this when
+    /// creating new chat threads so multi-profile users get correctly
+    /// scoped history. Optional — guests / single-profile users send nil.
+    var profileId: String?
+
     enum CodingKeys: String, CodingKey {
         case query
         case birthData = "birth_data"
@@ -30,6 +35,7 @@ struct PredictionRequest: Codable, Sendable {
         case responseStyle = "response_style"
         case responseLength = "response_length"
         case quotaContext = "quota_context"
+        case profileId = "profile_id"
     }
 }
 

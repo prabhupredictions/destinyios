@@ -333,7 +333,8 @@ struct SubscriptionView: View {
                         isPlusTrialEligible: isPlusTrialEligible,
                         hasActiveSubscription: subscriptionManager.hasActiveSubscription,
                         hasConflict: subscriptionManager.subscriptionConflict != nil ||
-                        subscriptionManager.conflictDetectedThisSession
+                        subscriptionManager.conflictDetectedThisSession,
+                        hasEverSubscribed: QuotaManager.shared.hasEverSubscribed
                     ),
                     corePlan: corePlan,
                     userCurrentPlanId: userCurrentPlanId,

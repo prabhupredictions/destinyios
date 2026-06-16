@@ -357,16 +357,26 @@ class SubscriptionManager: ObservableObject {
     ///      and reconcile finishing, if backend has rejected this
     ///      email's claim on the local Apple ID's sub, never offer the
     ///      trial — it cannot succeed.
+    ///   5. Backend says the user has NEVER subscribed before. This is
+    ///      authoritative truth from /subscription/status — survives
+    ///      across devices and sandbox sim transaction-cache wipes.
+    ///      Apple's `isEligibleForIntroOffer` resets to true if the
+    ///      sandbox tester deletes their StoreKit transactions; backend
+    ///      `has_ever_subscribed` does not. Defaults to false (trust
+    ///      Apple) when the param is omitted so existing callers and
+    ///      tests are unchanged.
     nonisolated static func shouldShowTrialButton(
         planId: String,
         isPlusTrialEligible: Bool,
         hasActiveSubscription: Bool,
-        hasConflict: Bool = false
+        hasConflict: Bool = false,
+        hasEverSubscribed: Bool = false
     ) -> Bool {
         guard planId == "plus" else { return false }
         guard isPlusTrialEligible else { return false }
         guard !hasActiveSubscription else { return false }
         guard !hasConflict else { return false }
+        guard !hasEverSubscribed else { return false }
         return true
     }
 

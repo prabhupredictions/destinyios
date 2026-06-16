@@ -164,7 +164,7 @@ struct CompatibilityView: View {
                 isGuest: isGuest,
                 customMessage: quotaErrorMessage,
                 onSignIn: { signOutAndReauth() },
-                onUpgrade: {
+                onUpgrade: { _ in
                     if isGuest {
                         signOutAndReauth()
                     } else {

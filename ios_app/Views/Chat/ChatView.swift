@@ -96,20 +96,19 @@ struct ChatView: View {
                 isGuest: isGuest,
                 customMessage: viewModel.quotaDetails,
                 onSignIn: { signOutAndReauth() },
-                onUpgrade: {
+                onUpgrade: { isTrialCTA in
                     // Paywall v2 (Phase 6) onUpgrade branching:
                     //   - guest → existing signOutAndReauth (iOS-12 preserved)
                     //   - trial-eligible → direct purchasePlusDirect per Q4 decision.
                     //     Buffer-replay (iOS-2) auto-fires via the
                     //     QuotaManager.isPremium onChange below on success.
                     //   - else → existing fallback to plan picker.
+                    //
+                    // `isTrialCTA` is the gate the view ACTUALLY rendered
+                    // with — using it here prevents paint/tap state skew.
                     if isGuest {
                         signOutAndReauth()
-                    } else if SubscriptionManager.shouldShowTrialButton(
-                        planId: "plus",
-                        isPlusTrialEligible: SubscriptionManager.shared.isPlusTrialEligible,
-                        hasActiveSubscription: SubscriptionManager.shared.hasActiveSubscription
-                    ) {
+                    } else if isTrialCTA {
                         Task {
                             _ = await SubscriptionManager.shared.purchasePlusDirect()
                             // Buffer-replay handled by quotaManager.isPremium onChange (iOS-2).
@@ -122,7 +121,14 @@ struct ChatView: View {
                     // Paywall v2 lighter-plan escape hatch — opens the existing
                     // SubscriptionView plan picker so trial-eligible users can
                     // still choose Core instead of Plus.
-                    showSubscription = true
+                    //
+                    // Two-step: dismiss the quota sheet first, then present the
+                    // subscription sheet on the next runloop. SwiftUI will silently
+                    // drop a second `.sheet()` if the first is still presented.
+                    showQuotaExhausted = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        showSubscription = true
+                    }
                 }
             )
             .presentationDetents([.large])

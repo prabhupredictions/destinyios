@@ -3055,3 +3055,9 @@
 "paywall_v2_cta_start_trial" = "Start my free week";
 "paywall_v2_pricing_disclaimer" = "7 days free, then %@/month. Cancel anytime.";
 "paywall_v2_see_core_link" = "Prefer a lighter plan? See Core";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "You've reached your limit. Upgrade to continue your cosmic journey.";
+"quota_fallback_daily_limit" = "You've been busy today! Come back tomorrow at 12:00 AM UTC, or upgrade for higher limits.";
+"quota_fallback_fair_use" = "Fair use violation. Your usage has been restricted. Please contact support@destinyaiastrology.com for assistance.";
+"quota_fallback_default" = "Upgrade to unlock unlimited access.";

@@ -3086,3 +3086,9 @@
 "paywall_v2_cta_start_trial" = "నా ఉచిత వారాన్ని ప్రారంభించండి";
 "paywall_v2_pricing_disclaimer" = "7 రోజులు ఉచితం, తర్వాత %@/నెల. ఎప్పుడైనా రద్దు చేయవచ్చు.";
 "paywall_v2_see_core_link" = "తేలికైన ప్లాన్ కావాలా? Core చూడండి";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "మీరు మీ పరిమితిని చేరుకున్నారు. మీ విశ్వ ప్రయాణాన్ని కొనసాగించడానికి అప్‌గ్రేడ్ చేయండి.";
+"quota_fallback_daily_limit" = "ఈరోజు మీరు చాలా బిజీగా ఉన్నారు! రేపు UTC అర్ధరాత్రి 12:00 గంటలకు తిరిగి రండి, లేదా ఎక్కువ పరిమితుల కోసం అప్‌గ్రేడ్ చేయండి.";
+"quota_fallback_fair_use" = "ఫెయిర్ యూస్ ఉల్లంఘన. మీ వినియోగం పరిమితం చేయబడింది. సహాయం కోసం దయచేసి support@destinyaiastrology.com ని సంప్రదించండి.";
+"quota_fallback_default" = "అపరిమిత యాక్సెస్‌ను అన్‌లాక్ చేయడానికి అప్‌గ్రేడ్ చేయండి.";

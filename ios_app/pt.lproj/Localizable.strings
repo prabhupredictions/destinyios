@@ -3090,3 +3090,9 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "paywall_v2_cta_start_trial" = "Iniciar minha semana grátis";
 "paywall_v2_pricing_disclaimer" = "7 dias grátis, depois %@/mês. Cancele quando quiser.";
 "paywall_v2_see_core_link" = "Prefere um plano mais leve? Ver Core";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "Você atingiu seu limite. Faça upgrade para continuar sua jornada cósmica.";
+"quota_fallback_daily_limit" = "Você esteve ocupado hoje! Volte amanhã à meia-noite UTC, ou faça upgrade para limites maiores.";
+"quota_fallback_fair_use" = "Violação de uso justo. Seu uso foi restrito. Entre em contato com support@destinyaiastrology.com para obter assistência.";
+"quota_fallback_default" = "Faça upgrade para desbloquear acesso ilimitado.";

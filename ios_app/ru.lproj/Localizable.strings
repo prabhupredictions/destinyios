@@ -3090,3 +3090,9 @@
 "paywall_v2_cta_start_trial" = "Начать мою бесплатную неделю";
 "paywall_v2_pricing_disclaimer" = "7 дней бесплатно, затем %@/месяц. Отмена в любой момент.";
 "paywall_v2_see_core_link" = "Хотите план попроще? Посмотреть Core";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "Вы достигли своего лимита. Перейдите на более высокий план, чтобы продолжить космическое путешествие.";
+"quota_fallback_daily_limit" = "Вы были заняты сегодня! Возвращайтесь завтра в 00:00 UTC или перейдите на более высокий план для увеличения лимитов.";
+"quota_fallback_fair_use" = "Нарушение правил справедливого использования. Ваше использование было ограничено. Пожалуйста, свяжитесь с support@destinyaiastrology.com для получения помощи.";
+"quota_fallback_default" = "Перейдите на более высокий план, чтобы получить неограниченный доступ.";

@@ -301,23 +301,12 @@ class ChatViewModel {
 
         let currentEmail = userEmail
 
-        // Add user message immediately for responsiveness
-        let userMessage = LocalChatMessage(
-            threadId: currentThreadId,
-            role: .user,
-            content: displayContent
-        )
-        // Always insert into context so SwiftData backing data is valid for SwiftUI rendering
-        dataManager.context.insert(userMessage)
-        messages.append(userMessage)
-        windowManager.append(userMessage)
-        if HistorySettingsManager.shared.isHistoryEnabled {
-            dataManager.saveMessage(userMessage)
-        }
-        
         isLoading = true
-        
-        // Verify quota with backend
+
+        // Verify quota with backend BEFORE inserting the user bubble.
+        // If we inserted first (the old "responsiveness" path), an exhausted
+        // user briefly saw their question accepted before the paywall popped —
+        // misleading and looked like the request had been served.
         do {
             let accessResponse = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: currentEmail)
             if !accessResponse.canAccess {
@@ -325,17 +314,8 @@ class ChatViewModel {
 
                 // Buffer the in-flight query so ChatView can replay it after a
                 // successful upgrade (paywall closes, isPremium flips false→true).
-                // Captured BEFORE the user bubble is removed so the original
-                // text is preserved even if displayContent differs (home cards).
                 pendingPostUpgradeQuery = query
 
-                // Remove message
-                if let idx = messages.lastIndex(where: { $0.id == userMessage.id }) {
-                    messages.remove(at: idx)
-                    windowManager.remove(id: userMessage.id)
-                    dataManager.deleteMessage(userMessage)
-                }
-                
                 if accessResponse.reason == "daily_limit_reached" {
                     if let resetAtStr = accessResponse.resetAt,
                        let date = ISO8601DateFormatter().date(from: resetAtStr) {
@@ -380,6 +360,27 @@ class ChatViewModel {
         let responseLength = UserDefaults.standard.string(forKey: "userResponseLength") ?? "detailed"
         let responseStyle = UserDefaults.standard.string(forKey: "userContentStyle") ?? "guidance"
 
+        // Two-phase commit for the chat bubbles. We construct LocalChatMessage
+        // instances now (so they're available for the streaming closures) but
+        // DEFER the actual append to `messages` / `windowManager` until the
+        // server has accepted the request and emitted its first SSE event.
+        // Rationale: an earlier-than-server-confirmed append created a "ghost
+        // bubble" — the user briefly saw their question rendered before a
+        // server-side quota rejection snatched it away. Premium UX demands
+        // that we never show content that can be revoked. The 100-300ms
+        // window between Send and first SSE event is covered by the input
+        // bar's `isLoading` spinner; no chat bubble is ever shown unless the
+        // server has committed to streaming a real reply.
+        let userMessage = LocalChatMessage(
+            threadId: currentThreadId,
+            role: .user,
+            content: displayContent
+        )
+        dataManager.context.insert(userMessage)
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            dataManager.saveMessage(userMessage)
+        }
+
         let request = PredictionRequest(
             query: query,
             birthData: birthData,
@@ -388,10 +389,15 @@ class ChatViewModel {
             userEmail: userEmail,
             language: appLanguage,
             responseStyle: responseStyle,
-            responseLength: responseLength
+            responseLength: responseLength,
+            profileId: ProfileContextManager.shared.activeProfileId
         )
-        
-        // Streaming API call — replaces fake typewriter
+
+        // Non-streaming sync request. Single atomic commit — bubble appears
+        // ONLY when the server has responded successfully. No two-phase
+        // commit, no ghost-bubble race, no SSE state machine.
+        // The cosmic progress timer covers the wait (8-30s on Opus is
+        // expected; NetworkClient timeout is 600s).
         isLoading = false
         isStreaming = true
         cosmicProgressSteps = []
@@ -403,97 +409,49 @@ class ChatViewModel {
             content: "",
             isStreaming: true
         )
-        // Insert into context so SwiftData backing data is valid for SwiftUI rendering
+        // The user bubble + assistant placeholder are committed together
+        // BEFORE the network call so the user sees feedback immediately
+        // (cosmic progress card under their question). The sync endpoint
+        // either returns 200 with the answer or 4xx — atomic outcome,
+        // safe to commit upfront.
+        dataManager.context.insert(userMessage)
         dataManager.context.insert(streamingMsg)
+        messages.append(userMessage)
+        windowManager.append(userMessage)
         messages.append(streamingMsg)
         windowManager.append(streamingMsg)
 
         streamingTask = Task { [weak self] in
             guard let self else { return }
-            var finalResponse: PredictionResponse? = nil
-            var accumulatedAnswer = ""
-            var receivedDone = false
-
             do {
-                try await StreamingPredictionService.shared.predictStream(
-                    request: request
-                ) { event in
-                    switch event {
-                    case .action:
-                        break
+                let response = try await self.predictionService.predict(request: request)
 
-                    case .progressStep:
-                        break
+                // Stop cosmic progress + commit final answer atomically.
+                self.stepProgressTask?.cancel()
+                self.progressTimerTask?.cancel()
+                self.progressTimerTask = nil
 
-                    case .finalAnswer(let content):
-                        accumulatedAnswer = content
-                        if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
-                            self.messages[idx].content = accumulatedAnswer
-                        }
+                if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                    self.messages[idx].content = response.answer
+                    self.messages[idx].area = response.lifeArea
+                    self.messages[idx].advice = response.advice
+                    self.messages[idx].executionTimeMs = response.executionTimeMs
+                }
+                self.suggestedQuestions = response.followUpSuggestions
 
-                    case .answer(let response):
-                        finalResponse = response
-
-                    case .done:
-                        receivedDone = true
-                        self.stepProgressTask?.cancel()
-                        self.progressTimerTask?.cancel()
-                        self.progressTimerTask = nil
-
-                        let answer = finalResponse?.answer ?? accumulatedAnswer
-                        if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
-                            self.messages[idx].content = answer
-                            self.messages[idx].area = finalResponse?.lifeArea
-                            self.messages[idx].advice = finalResponse?.advice
-                            self.messages[idx].executionTimeMs = finalResponse?.executionTimeMs ?? 0
-                        }
-                        self.suggestedQuestions = finalResponse?.followUpSuggestions ?? []
-
-                        Task { @MainActor [weak self] in
-                            guard let self else { return }
-                            withAnimation(.easeOut(duration: 0.3)) {
-                                self.cosmicProgressSteps = []
-                            }
-                            try? await Task.sleep(nanoseconds: 300_000_000)
-                            if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
-                                withAnimation(.easeIn(duration: 0.5)) {
-                                    self.messages[idx].isStreaming = false
-                                }
-                                if HistorySettingsManager.shared.isHistoryEnabled {
-                                    self.dataManager.saveMessage(self.messages[idx])
-                                }
-                            }
-                            self.isStreaming = false
-                        }
-
-                    case .error(let msg):
-                        self.stepProgressTask?.cancel()
-                        self.progressTimerTask?.cancel()
-                        self.progressTimerTask = nil
-                        self.errorMessage = msg
-                        self.cosmicProgressSteps = []
-                        self.messages.removeAll { $0.id == streamingMsg.id }
-                        self.windowManager.remove(id: streamingMsg.id)
-                        self.dataManager.context.delete(streamingMsg)
-                        self.isStreaming = false
-
-                    default: break
+                withAnimation(.easeOut(duration: 0.3)) {
+                    self.cosmicProgressSteps = []
+                }
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
+                    withAnimation(.easeIn(duration: 0.5)) {
+                        self.messages[idx].isStreaming = false
+                    }
+                    if HistorySettingsManager.shared.isHistoryEnabled {
+                        self.dataManager.saveMessage(self.messages[idx])
                     }
                 }
-
-                // Stream ended without .done — connection dropped silently
-                if !receivedDone && self.isStreaming {
-                    self.stepProgressTask?.cancel()
-                    self.progressTimerTask?.cancel()
-                    self.progressTimerTask = nil
-                    self.cosmicProgressSteps = []
-                    self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
-                    self.messages.removeAll { $0.id == streamingMsg.id }
-                    self.windowManager.remove(id: streamingMsg.id)
-                    self.dataManager.context.delete(streamingMsg)
-                    self.isStreaming = false
-                    print("[ChatViewModel] Stream ended without done event — connection dropped")
-                }
+                self.isStreaming = false
             } catch is CancellationError {
                 self.stepProgressTask?.cancel()
                 self.progressTimerTask?.cancel()
@@ -504,11 +462,11 @@ class ChatViewModel {
                 self.dataManager.context.delete(streamingMsg)
                 self.isStreaming = false
             } catch let quota as QuotaExhaustedError {
-                // iOS-1: Server-side quota rejection (race between /can-access
-                // and /predict/stream). Mirror the upfront /can-access denial
-                // path: buffer the query for post-upgrade replay, drop the
-                // streaming bubble, and present the paywall instead of the
-                // generic stream-failed banner.
+                // Server-side quota rejection (race between /can-access and
+                // /predict — possible if quota was consumed by a parallel
+                // session between the two calls). Mirror the upfront denial
+                // path: drop both bubbles, buffer the query for replay,
+                // present the paywall.
                 self.stepProgressTask?.cancel()
                 self.progressTimerTask?.cancel()
                 self.progressTimerTask = nil
@@ -516,9 +474,6 @@ class ChatViewModel {
                 self.messages.removeAll { $0.id == streamingMsg.id }
                 self.windowManager.remove(id: streamingMsg.id)
                 self.dataManager.context.delete(streamingMsg)
-                // Also remove the user bubble so the UI matches the upfront
-                // denial path (where the user message is removed before the
-                // paywall is shown).
                 if let userIdx = self.messages.lastIndex(where: { $0.id == userMessage.id }) {
                     self.messages.remove(at: userIdx)
                     self.windowManager.remove(id: userMessage.id)

@@ -3091,3 +3091,9 @@
 "paywall_v2_cta_start_trial" = "എന്റെ സൗജന്യ ആഴ്ച ആരംഭിക്കുക";
 "paywall_v2_pricing_disclaimer" = "7 ദിവസം സൗജന്യം, പിന്നീട് %@/മാസം. എപ്പോൾ വേണമെങ്കിലും റദ്ദാക്കാം.";
 "paywall_v2_see_core_link" = "ലഘു പ്ലാൻ വേണോ? Core കാണുക";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "നിങ്ങൾ പരിധിയിലെത്തി. നിങ്ങളുടെ പ്രപഞ്ച യാത്ര തുടരാൻ അപ്‌ഗ്രേഡ് ചെയ്യുക.";
+"quota_fallback_daily_limit" = "ഇന്ന് നിങ്ങൾ വളരെ തിരക്കിലായിരുന്നു! നാളെ UTC അർദ്ധരാത്രി 12:00 മണിക്ക് മടങ്ങിവരൂ, അല്ലെങ്കിൽ ഉയർന്ന പരിധികൾക്കായി അപ്‌ഗ്രേഡ് ചെയ്യുക.";
+"quota_fallback_fair_use" = "ഫെയർ യൂസ് ലംഘനം. നിങ്ങളുടെ ഉപയോഗം നിയന്ത്രിച്ചിരിക്കുന്നു. സഹായത്തിനായി ദയവായി support@destinyaiastrology.com നെ ബന്ധപ്പെടുക.";
+"quota_fallback_default" = "പരിധിയില്ലാത്ത ആക്‌സസ് അൺലോക്ക് ചെയ്യാൻ അപ്‌ഗ്രേഡ് ചെയ്യുക.";

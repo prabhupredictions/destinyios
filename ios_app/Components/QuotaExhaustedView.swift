@@ -34,22 +34,25 @@ struct QuotaErrorInfo {
         return planId == "free_guest"
     }
     
-    /// Display message (prefer backend message, fallback to generated)
+    /// Display message (prefer backend message, fallback to localized).
+    /// Backend returns null `upgrade_cta.message` for the lifetime-cap case
+    /// (count == 1) so users see translated text instead of raw counts like
+    /// "You need 1 but only have 0 remaining" — see quota_service.py.
     var displayMessage: String {
         if let msg = message, !msg.isEmpty {
             return msg
         }
-        // Fallback messages
+        // Fallback messages — all 13 locales
         if isFairUseViolation {
-            return "Fair use violation. Your usage has been restricted. Please contact support@destinyaiastrology.com for assistance."
+            return "quota_fallback_fair_use".localized
         }
         switch reason {
         case "daily_limit_reached":
-            return "You've been busy today! Come back tomorrow at 12:00 AM UTC, or upgrade for higher limits."
+            return "quota_fallback_daily_limit".localized
         case "overall_limit_reached":
-            return "You've reached your limit. Upgrade to continue your cosmic journey."
+            return "quota_fallback_overall_limit".localized
         default:
-            return "Upgrade to unlock unlimited access."
+            return "quota_fallback_default".localized
         }
     }
     
@@ -75,7 +78,12 @@ struct QuotaExhaustedView: View {
     var isGuest: Bool = false
     var customMessage: String?
     var onSignIn: (() -> Void)?
-    var onUpgrade: (() -> Void)?
+    /// Paywall v2: callback receives the *rendered* trial-CTA state so the
+    /// caller routes on the same snapshot the user saw. Without this, the
+    /// caller would re-query SubscriptionManager and could land on the
+    /// opposite branch if `hasActiveSubscription` or `isPlusTrialEligible`
+    /// flipped between paint and tap (Transaction.updates fires async).
+    var onUpgrade: ((Bool) -> Void)?
     /// Paywall v2: secondary "See Core" tap-target. Wired in Phase 6
     /// to push SubscriptionView so trial-eligible users can still pick the
     /// lighter plan. nil-safe — link is rendered only when the closure is
@@ -127,7 +135,8 @@ struct QuotaExhaustedView: View {
         return SubscriptionManager.shouldShowTrialButton(
             planId: "plus",
             isPlusTrialEligible: subscriptionManager.isPlusTrialEligible,
-            hasActiveSubscription: subscriptionManager.hasActiveSubscription
+            hasActiveSubscription: subscriptionManager.hasActiveSubscription,
+            hasEverSubscribed: QuotaManager.shared.hasEverSubscribed
         )
     }
 
@@ -285,7 +294,7 @@ struct QuotaExhaustedView: View {
                         // Upgrade button (hide for fair use violation)
                         if showUpgrade {
                             Button(action: {
-                                onUpgrade?()
+                                onUpgrade?(shouldShowTrialCTA)
                                 dismiss()
                             }) {
                                 HStack(spacing: 10) {

@@ -1092,7 +1092,7 @@ struct AskDestinySheet: View {
                 isGuest: isGuest,
                 customMessage: quotaMessage,
                 onSignIn: { signOutAndReauth() },
-                onUpgrade: {
+                onUpgrade: { _ in
                     if isGuest {
                         signOutAndReauth()
                     } else {
@@ -1341,32 +1341,45 @@ struct AskDestinySheet: View {
         inputText = ""
         errorMessage = nil
         suggestedQuestions = []  // Clear previous suggestions
-        
-        // Add user message
-        let userMessage = CompatChatMessage(content: query, isUser: true, type: .user)
-        messages.append(userMessage)
-        
-        // Check quota
+
+        // Check quota BEFORE appending the user bubble. If we appended first,
+        // an exhausted user briefly saw their question accepted before the
+        // paywall popped — same bug pattern fixed in ChatViewModel.
         let email = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        
+
         do {
             let access = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: email)
             if !access.canAccess {
-                if !messages.isEmpty { messages.removeLast() } // Remove user message (safe)
                 if access.reason == "daily_limit_reached" {
                     errorMessage = "Daily limit reached. Resets tomorrow."
                 } else {
                     showQuotaSheet = true
                 }
-                return
+                return  // No user bubble was ever appended — nothing to roll back
             }
         } catch {
             print("Quota check failed: \(error)")
+            // Fail-open: continue to append + send. Server-side enforcement
+            // still gates the followUp endpoint.
         }
+
+        // Quota passed — NOW it's safe to append the user bubble.
+        let userMessage = CompatChatMessage(content: query, isUser: true, type: .user)
+        messages.append(userMessage)
         
         isLoading = true
-        startCosmicTimer()
+        // Defer cosmic timer by 600ms. If the followUp REST call returns
+        // a quota rejection in <600ms, no "Mapping the sky..." flash is shown
+        // before the paywall. If the call takes longer (real work), the
+        // cosmic UI kicks in and the user gets feedback.
+        let cosmicStartTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            if !Task.isCancelled, isLoading {
+                startCosmicTimer()
+            }
+        }
         defer {
+            cosmicStartTask.cancel()
             isLoading = false
             stopCosmicTimer()
         }

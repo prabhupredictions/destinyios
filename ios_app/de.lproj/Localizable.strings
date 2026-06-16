@@ -3086,3 +3086,9 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "paywall_v2_cta_start_trial" = "Meine Gratiswoche starten";
 "paywall_v2_pricing_disclaimer" = "7 Tage gratis, dann %@/Monat. Jederzeit kündbar.";
 "paywall_v2_see_core_link" = "Möchten Sie einen leichteren Tarif? Core anzeigen";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "Sie haben Ihr Limit erreicht. Führen Sie ein Upgrade durch, um Ihre kosmische Reise fortzusetzen.";
+"quota_fallback_daily_limit" = "Sie waren heute fleißig! Kommen Sie morgen um 0:00 Uhr UTC zurück oder upgraden Sie für höhere Limits.";
+"quota_fallback_fair_use" = "Verstoß gegen die Fair-Use-Richtlinie. Ihre Nutzung wurde eingeschränkt. Wenden Sie sich für Hilfe bitte an support@destinyaiastrology.com.";
+"quota_fallback_default" = "Führen Sie ein Upgrade durch, um unbegrenzten Zugriff freizuschalten.";

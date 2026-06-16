@@ -602,7 +602,8 @@ struct ProfileView: View {
             if SubscriptionManager.shouldShowTrialButton(
                 planId: "plus",
                 isPlusTrialEligible: SubscriptionManager.shared.isPlusTrialEligible,
-                hasActiveSubscription: SubscriptionManager.shared.hasActiveSubscription
+                hasActiveSubscription: SubscriptionManager.shared.hasActiveSubscription,
+                hasEverSubscribed: QuotaManager.shared.hasEverSubscribed
             ) {
                 return "paywall_v2_cta_start_trial".localized
             }

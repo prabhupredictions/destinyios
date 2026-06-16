@@ -3090,3 +3090,9 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "paywall_v2_cta_start_trial" = "Démarrer ma semaine gratuite";
 "paywall_v2_pricing_disclaimer" = "7 jours gratuits, puis %@/mois. Annulable à tout moment.";
 "paywall_v2_see_core_link" = "Préférez un plan plus léger ? Voir Core";
+
+// Quota fallback messages (iOS-11 fallback when backend message=null)
+"quota_fallback_overall_limit" = "Vous avez atteint votre limite. Passez à un plan supérieur pour poursuivre votre voyage cosmique.";
+"quota_fallback_daily_limit" = "Vous avez été bien occupé aujourd'hui ! Revenez demain à minuit UTC, ou passez à un plan supérieur pour des limites plus élevées.";
+"quota_fallback_fair_use" = "Violation de l'usage équitable. Votre utilisation a été restreinte. Veuillez contacter support@destinyaiastrology.com pour obtenir de l'aide.";
+"quota_fallback_default" = "Passez à un plan supérieur pour débloquer un accès illimité.";
