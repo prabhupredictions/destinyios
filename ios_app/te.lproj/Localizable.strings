@@ -3092,3 +3092,6 @@
 "quota_fallback_daily_limit" = "ఈరోజు మీరు చాలా బిజీగా ఉన్నారు! రేపు UTC అర్ధరాత్రి 12:00 గంటలకు తిరిగి రండి, లేదా ఎక్కువ పరిమితుల కోసం అప్‌గ్రేడ్ చేయండి.";
 "quota_fallback_fair_use" = "ఫెయిర్ యూస్ ఉల్లంఘన. మీ వినియోగం పరిమితం చేయబడింది. సహాయం కోసం దయచేసి support@destinyaiastrology.com ని సంప్రదించండి.";
 "quota_fallback_default" = "అపరిమిత యాక్సెస్‌ను అన్‌లాక్ చేయడానికి అప్‌గ్రేడ్ చేయండి.";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "రోజువారీ పరిమితి చేరింది";

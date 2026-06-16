@@ -3096,3 +3096,6 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "quota_fallback_daily_limit" = "Você esteve ocupado hoje! Volte amanhã à meia-noite UTC, ou faça upgrade para limites maiores.";
 "quota_fallback_fair_use" = "Violação de uso justo. Seu uso foi restrito. Entre em contato com support@destinyaiastrology.com para obter assistência.";
 "quota_fallback_default" = "Faça upgrade para desbloquear acesso ilimitado.";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "Limite diário atingido";

@@ -187,7 +187,13 @@ struct FeatureAccessResponse: Codable, Sendable {
     let limits: [String: LimitInfo]?
     let resetAt: String?
     let upgradeCta: UpgradeCTA?
-    
+    /// Server-set when an active Plus subscriber hits a feature's overall
+    /// lifetime cap. iOS uses this to render "Usage Restricted" / Contact
+    /// Support flow instead of an upgrade paywall (Plus has no higher tier
+    /// to upgrade to). Optional — older API responses won't carry it; iOS
+    /// falls back to the heuristic isFairUseViolation in that case.
+    let isFairUseViolation: Bool?
+
     enum CodingKeys: String, CodingKey {
         case canAccess = "can_access"
         case feature
@@ -197,6 +203,7 @@ struct FeatureAccessResponse: Codable, Sendable {
         case limits
         case resetAt = "reset_at"
         case upgradeCta = "upgrade_cta"
+        case isFairUseViolation = "is_fair_use_violation"
     }
     
     /// User-friendly denial reason
@@ -211,9 +218,17 @@ struct FeatureAccessResponse: Codable, Sendable {
 }
 
 struct UpgradeCTA: Codable, Sendable {
-    let message: String
+    /// Server-curated upgrade message. Optional because backend deliberately
+    /// returns null for overall-limit rejections so iOS falls back to its
+    /// 13-locale `quota_fallback_*` strings rather than surfacing a verbatim
+    /// "0 remaining" line. A non-Optional decoder threw DecodingError on
+    /// null, fell through to the catch-all in ChatViewModel.sendMessage,
+    /// and the gate failed-open — letting the cosmic-progress UI render
+    /// before /predict 403'd. NEVER make this required again without
+    /// auditing every catch block that calls canAccessFeature.
+    let message: String?
     let suggestedPlan: String
-    
+
     enum CodingKeys: String, CodingKey {
         case message
         case suggestedPlan = "suggested_plan"

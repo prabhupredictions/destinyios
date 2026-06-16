@@ -3096,3 +3096,6 @@
 "quota_fallback_daily_limit" = "今日はお忙しかったですね!明日 UTC 午前 0:00 に再度ご利用いただくか、より高い上限のためにアップグレードしてください。";
 "quota_fallback_fair_use" = "フェアユース違反。ご利用が制限されています。サポートが必要な場合は support@destinyaiastrology.com までお問い合わせください。";
 "quota_fallback_default" = "アップグレードして無制限アクセスをアンロックしてください。";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "本日の上限に達しました";

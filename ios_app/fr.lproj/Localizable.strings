@@ -3096,3 +3096,6 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "quota_fallback_daily_limit" = "Vous avez été bien occupé aujourd'hui ! Revenez demain à minuit UTC, ou passez à un plan supérieur pour des limites plus élevées.";
 "quota_fallback_fair_use" = "Violation de l'usage équitable. Votre utilisation a été restreinte. Veuillez contacter support@destinyaiastrology.com pour obtenir de l'aide.";
 "quota_fallback_default" = "Passez à un plan supérieur pour débloquer un accès illimité.";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "Limite quotidienne atteinte";

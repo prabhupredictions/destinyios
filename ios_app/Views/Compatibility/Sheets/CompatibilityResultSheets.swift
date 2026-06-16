@@ -927,6 +927,10 @@ struct AskDestinySheet: View {
     @State private var errorMessage: String?
     @State private var showQuotaSheet: Bool = false
     @State private var quotaMessage: String = ""
+    /// Rich quota-blockage state to drive QuotaExhaustedView's plan-aware
+    /// branching (Plus fair-use → Contact Support; otherwise upgrade CTA).
+    /// Populated alongside quotaMessage when a 403 fires from /follow-up.
+    @State private var quotaError: QuotaErrorInfo? = nil
     @State private var showSubscription: Bool = false
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
@@ -1089,12 +1093,25 @@ struct AskDestinySheet: View {
         }
         .sheet(isPresented: $showQuotaSheet) {
             QuotaExhaustedView(
+                quotaError: quotaError,
                 isGuest: isGuest,
                 customMessage: quotaMessage,
                 onSignIn: { signOutAndReauth() },
-                onUpgrade: { _ in
+                onUpgrade: { isTrialCTA in
+                    // Mirror ChatView's onUpgrade routing (parity gap fix):
+                    //   - guest → re-auth
+                    //   - trial-eligible (CTA reads "Start my free week") →
+                    //     direct StoreKit purchase via purchasePlusDirect()
+                    //   - otherwise → plan picker
+                    // Without `isTrialCTA` branching, every tap routed to
+                    // SubscriptionView even when the gold "Start my free
+                    // week" button promised a direct purchase.
                     if isGuest {
                         signOutAndReauth()
+                    } else if isTrialCTA {
+                        Task {
+                            _ = await SubscriptionManager.shared.purchasePlusDirect()
+                        }
                     } else {
                         showQuotaSheet = false
                         showSubscription = true
@@ -1440,6 +1457,39 @@ struct AskDestinySheet: View {
                 }
             }
             
+        } catch let quota as QuotaExhaustedError {
+            // Server-side quota rejection from /vedic/api/compatibility/follow-up.
+            // The pre-call /can-access gate may have said canAccess=true (race
+            // window between two ai_questions on borderline quota, or the gate
+            // throwing DecodingError and failing open). Mirror the chat path:
+            // drop the user bubble, surface the paywall sheet instead of the
+            // generic "Failed to get response" banner.
+            if !messages.isEmpty, messages.last?.isUser == true {
+                messages.removeLast()
+            }
+            // Build the rich struct so QuotaExhaustedView renders Plus
+            // fair-use Contact Support flow (instead of an upgrade paywall
+            // that doesn't apply) when the server flagged it.
+            quotaError = QuotaErrorInfo(
+                reason: quota.reason,
+                planId: quota.planId,
+                featureId: "ai_questions",
+                message: quota.upgradeMessage,
+                action: nil,
+                suggestedPlan: quota.suggestedPlan,
+                supportEmail: nil,
+                resetAt: quota.resetAt,
+                serverIsFairUseViolation: quota.isFairUseViolation
+            )
+            if let serverMsg = quota.upgradeMessage, !serverMsg.isEmpty {
+                quotaMessage = serverMsg
+            } else if quota.reason == "daily_limit_reached" {
+                quotaMessage = "daily_limit_reached_tomorrow".localized
+            } else {
+                quotaMessage = "upgrade_to_keep_going".localized
+            }
+            showQuotaSheet = true
+            print("[AskDestiny] Quota exhausted: \(quota.reason)")
         } catch {
             errorMessage = "Failed to get response. Please try again."
             print("Follow-up error: \(error)")

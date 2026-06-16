@@ -165,7 +165,10 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
         return QuotaExhaustedError(
             reason: reason ?? "overall_limit_reached",
             upgradeMessage: (cta?["message"] as? String) ?? (payload["message"] as? String),
-            resetAt: payload["reset_at"] as? String
+            resetAt: payload["reset_at"] as? String,
+            planId: payload["plan_id"] as? String,
+            suggestedPlan: cta?["suggested_plan"] as? String,
+            isFairUseViolation: payload["is_fair_use_violation"] as? Bool
         )
     }
 }

@@ -3061,3 +3061,6 @@
 "quota_fallback_daily_limit" = "You've been busy today! Come back tomorrow at 12:00 AM UTC, or upgrade for higher limits.";
 "quota_fallback_fair_use" = "Fair use violation. Your usage has been restricted. Please contact support@destinyaiastrology.com for assistance.";
 "quota_fallback_default" = "Upgrade to unlock unlimited access.";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "Daily limit reached";

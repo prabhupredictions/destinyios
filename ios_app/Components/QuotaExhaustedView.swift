@@ -11,18 +11,27 @@ struct QuotaErrorInfo {
     let suggestedPlan: String?   // "core", "plus"
     let supportEmail: String?    // "support@destinyaiastrology.com"
     let resetAt: String?         // ISO datetime for daily reset
-    
-    /// Determine if this is a fair use violation (Plus user at overall limit)
+    /// Authoritative server-set flag. When non-nil, takes precedence over
+    /// the heuristic fallback below. Server returns true ONLY when the
+    /// effective plan is Plus AND a feature's overall lifetime cap is hit.
+    /// `var` (not `let`) so the synthesized memberwise init exposes it as
+    /// a parameter — Swift doesn't synthesize init params for `let` fields
+    /// with default values.
+    var serverIsFairUseViolation: Bool? = nil
+
+    /// True when the user has hit a fair-use ceiling — render Contact
+    /// Support flow instead of an upgrade paywall.
     ///
-    /// iOS-13 client-side fix: only treat as fair-use violation if the server didn't
-    /// supply an upgrade target (i.e. there's truly nowhere to go). If `suggestedPlan`
-    /// (carried inline from the backend `upgrade_cta`) is present and non-plus,
-    /// the user CAN upgrade — show that path instead of Contact Support.
-    /// The proper fix (server-side `is_fair_use_violation` flag) is deferred and
-    /// tracked as iOS-13b in `docs/subscription_architecture.md`.
+    /// Source-of-truth order:
+    ///   1. Server-set `serverIsFairUseViolation` (added 2026-06-16)
+    ///   2. Heuristic (back-compat for older API responses): plan_id == plus
+    ///      AND reason == overall_limit_reached AND no upgrade target
     var isFairUseViolation: Bool {
+        if let server = serverIsFairUseViolation {
+            return server
+        }
+        // Heuristic fallback for older API responses without the flag.
         guard reason == "overall_limit_reached", planId == "plus" else { return false }
-        // If backend supplies an upgrade target other than plus, defer to it.
         if let suggested = suggestedPlan, !suggested.isEmpty, suggested != "plus" {
             return false
         }
@@ -148,10 +157,17 @@ struct QuotaExhaustedView: View {
     }
 
     /// Headline shown on the upgrade path (showUpgrade && !isFairUseViolation):
-    ///   1. Backend `upgrade_cta.message` (iOS-11), if non-empty
-    ///   2. Trial-eligible → paywall_v2_headline
-    ///   3. Otherwise → existing localized title (iOS-5 fallback preserved)
+    ///   1. Daily limit → "Daily limit reached" (resets at midnight UTC)
+    ///   2. Backend `upgrade_cta.message` (iOS-11), if non-empty
+    ///   3. Trial-eligible → paywall_v2_headline
+    ///   4. Otherwise → existing localized title (iOS-5 fallback preserved)
     private var v2Headline: String {
+        // Daily-reset headline takes precedence over the upgrade-CTA copy:
+        // "You have reached your limit" implies permanent, but daily limits
+        // reset at midnight UTC. Tell the user that explicitly.
+        if quotaError?.reason == "daily_limit_reached" {
+            return "quota_daily_limit_title".localized
+        }
         if let msg = backendUpgradeMessage { return msg }
         if shouldShowTrialCTA { return "paywall_v2_headline".localized }
         return showSignIn

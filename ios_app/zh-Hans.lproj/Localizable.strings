@@ -3096,3 +3096,6 @@
 "quota_fallback_daily_limit" = "您今天很忙！请明天 UTC 凌晨 12:00 再来,或升级以获得更高的限额。";
 "quota_fallback_fair_use" = "公平使用违规。您的使用已受到限制。请联系 support@destinyaiastrology.com 获取帮助。";
 "quota_fallback_default" = "升级以解锁无限访问。";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "已达每日上限";

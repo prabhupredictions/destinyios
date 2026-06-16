@@ -19,6 +19,12 @@ class ChatViewModel {
     var suggestedQuestions: [String] = []  // Follow-up suggestions from API
     var showQuotaSheet = false
     var quotaDetails: String?
+    /// Rich quota-blockage state passed to QuotaExhaustedView. Carries the
+    /// reason, plan_id, suggested_plan, fair-use flag, and reset_at so the
+    /// view can branch headline + body + CTA precisely. quotaDetails (above)
+    /// is kept as a back-compat shortcut for older call sites that read
+    /// just the message.
+    var quotaError: QuotaErrorInfo?
     var typewriterMessageId: String?  // Message currently being typewritten
     var windowManager = MessageWindowManager()
     var cosmicProgressSteps: [CosmicProgressStep] = []
@@ -316,6 +322,23 @@ class ChatViewModel {
                 // successful upgrade (paywall closes, isPremium flips false→true).
                 pendingPostUpgradeQuery = query
 
+                // Build the rich QuotaErrorInfo struct so QuotaExhaustedView
+                // can branch headline / body / CTA on reason + plan_id + the
+                // server-set is_fair_use_violation flag instead of relying
+                // on an opaque string. quotaDetails is still set below for
+                // back-compat with call sites that haven't been migrated.
+                quotaError = QuotaErrorInfo(
+                    reason: accessResponse.reason,
+                    planId: accessResponse.planId,
+                    featureId: accessResponse.feature,
+                    message: accessResponse.upgradeCta?.message,
+                    action: nil,
+                    suggestedPlan: accessResponse.upgradeCta?.suggestedPlan,
+                    supportEmail: nil,
+                    resetAt: accessResponse.resetAt,
+                    serverIsFairUseViolation: accessResponse.isFairUseViolation
+                )
+
                 if accessResponse.reason == "daily_limit_reached" {
                     if let resetAtStr = accessResponse.resetAt,
                        let date = ISO8601DateFormatter().date(from: resetAtStr) {
@@ -338,7 +361,7 @@ class ChatViewModel {
                     }
                     showQuotaSheet = true
                 } else {
-                    quotaDetails = accessResponse.upgradeCta?.message ?? "Upgrade to unlock this feature."
+                    quotaDetails = accessResponse.upgradeCta?.message ?? "feature_not_available".localized
                     showQuotaSheet = true
                 }
                 return
@@ -480,6 +503,22 @@ class ChatViewModel {
                     self.dataManager.deleteMessage(userMessage)
                 }
                 self.pendingPostUpgradeQuery = self.lastSentQuery
+                // Build the rich error info so QuotaExhaustedView can render
+                // plan-aware copy (Plus fair-use → Contact Support; otherwise
+                // upgrade CTA). Mid-flight rejections come through
+                // NetworkClient.quotaErrorIf403 which now carries plan_id +
+                // is_fair_use_violation directly from the server.
+                self.quotaError = QuotaErrorInfo(
+                    reason: quota.reason,
+                    planId: quota.planId,
+                    featureId: "ai_questions",
+                    message: quota.upgradeMessage,
+                    action: nil,
+                    suggestedPlan: quota.suggestedPlan,
+                    supportEmail: nil,
+                    resetAt: quota.resetAt,
+                    serverIsFairUseViolation: quota.isFairUseViolation
+                )
                 if let serverMsg = quota.upgradeMessage, !serverMsg.isEmpty {
                     self.quotaDetails = serverMsg
                 } else if quota.reason == "daily_limit_reached" {

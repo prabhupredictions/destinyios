@@ -277,6 +277,15 @@ struct QuotaExhaustedError: Error {
     let upgradeMessage: String?
     /// Optional ISO8601 reset timestamp for daily limits.
     let resetAt: String?
+    /// User's plan_id at time of rejection — needed by QuotaErrorInfo so
+    /// the paywall can render plan-specific copy. Optional for back-compat
+    /// with older payloads.
+    var planId: String? = nil
+    /// Backend-suggested upgrade plan ("core" / "plus") from upgrade_cta.
+    var suggestedPlan: String? = nil
+    /// Authoritative server flag: Plus user hit the lifetime cap → Contact
+    /// Support flow. Optional; iOS falls back to heuristic when nil.
+    var isFairUseViolation: Bool? = nil
 }
 
 extension StreamingPredictionService {

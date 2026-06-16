@@ -3092,3 +3092,6 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "quota_fallback_daily_limit" = "Sie waren heute fleißig! Kommen Sie morgen um 0:00 Uhr UTC zurück oder upgraden Sie für höhere Limits.";
 "quota_fallback_fair_use" = "Verstoß gegen die Fair-Use-Richtlinie. Ihre Nutzung wurde eingeschränkt. Wenden Sie sich für Hilfe bitte an support@destinyaiastrology.com.";
 "quota_fallback_default" = "Führen Sie ein Upgrade durch, um unbegrenzten Zugriff freizuschalten.";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "Tageslimit erreicht";

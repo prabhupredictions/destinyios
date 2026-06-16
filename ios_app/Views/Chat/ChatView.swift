@@ -93,6 +93,7 @@ struct ChatView: View {
         }
         .sheet(isPresented: $showQuotaExhausted) {
             QuotaExhaustedView(
+                quotaError: viewModel.quotaError,
                 isGuest: isGuest,
                 customMessage: viewModel.quotaDetails,
                 onSignIn: { signOutAndReauth() },

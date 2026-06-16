@@ -512,7 +512,22 @@ class CompatibilityViewModel {
                 }
                 return
             }
+        } catch let quota as QuotaExhaustedError {
+            // Server-side quota rejection. Surface the paywall via the
+            // existing FREE_LIMIT_* / FEATURE_UPGRADE_REQUIRED markers
+            // instead of falling through to /analyze.
+            await MainActor.run {
+                isAnalyzing = false
+                showStreamingView = false
+                errorMessage = QuotaManager.isGuestEmail(currentEmail)
+                    ? "FREE_LIMIT_GUEST"
+                    : "FREE_LIMIT_REGISTERED"
+            }
+            print("[CompatibilityViewModel] Quota exhausted: \(quota.reason)")
+            return
         } catch {
+            // Network / decoding errors — log but fail-open. Server-side
+            // /analyze enforcement is the safety net.
             print("Quota check failed: \(error)")
         }
         
@@ -641,7 +656,22 @@ class CompatibilityViewModel {
                 }
                 return
             }
+        } catch let quota as QuotaExhaustedError {
+            // Server-side quota rejection. Surface the paywall via the
+            // existing FREE_LIMIT_* / FEATURE_UPGRADE_REQUIRED markers
+            // instead of falling through to /analyze.
+            await MainActor.run {
+                isAnalyzing = false
+                showStreamingView = false
+                errorMessage = QuotaManager.isGuestEmail(currentEmail)
+                    ? "FREE_LIMIT_GUEST"
+                    : "FREE_LIMIT_REGISTERED"
+            }
+            print("[CompatibilityViewModel] Quota exhausted: \(quota.reason)")
+            return
         } catch {
+            // Network / decoding errors — log but fail-open. Server-side
+            // /analyze enforcement is the safety net.
             print("Quota check failed: \(error)")
         }
         

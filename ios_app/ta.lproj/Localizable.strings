@@ -3094,3 +3094,6 @@
 "quota_fallback_daily_limit" = "இன்று நீங்கள் மிகவும் பணிமிகுந்திருந்தீர்கள்! நாளை UTC இரவு 12:00 மணிக்கு திரும்பவும், அல்லது அதிக வரம்புகளுக்கு மேம்படுத்துங்கள்.";
 "quota_fallback_fair_use" = "நியாயமான பயன்பாட்டு மீறல். உங்கள் பயன்பாடு கட்டுப்படுத்தப்பட்டுள்ளது. உதவிக்கு support@destinyaiastrology.com ஐ தொடர்பு கொள்ளவும்.";
 "quota_fallback_default" = "வரம்பற்ற அணுகலைத் திறக்க மேம்படுத்துங்கள்.";
+
+// Daily-limit headline (chunk 5 — distinguishes from permanent limit)
+"quota_daily_limit_title" = "தினசரி வரம்பு எட்டப்பட்டது";

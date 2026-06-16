@@ -29,6 +29,10 @@ struct CompatibilityView: View {
     // Quota and subscription UI state
     @State private var showQuotaExhausted = false
     @State private var quotaErrorMessage: String?
+    /// Rich quota-blockage state — drives QuotaExhaustedView's plan-aware
+    /// branching (Plus fair-use → Contact Support; otherwise upgrade CTA).
+    /// Populated alongside quotaErrorMessage from the access-response.
+    @State private var quotaError: QuotaErrorInfo? = nil
     @State private var showSubscription = false
     @AppStorage("isGuest") private var isGuest = false
     @AppStorage("isAuthenticated") private var isAuthenticated = false
@@ -161,12 +165,20 @@ struct CompatibilityView: View {
         }
         .sheet(isPresented: $showQuotaExhausted) {
             QuotaExhaustedView(
+                quotaError: quotaError,
                 isGuest: isGuest,
                 customMessage: quotaErrorMessage,
                 onSignIn: { signOutAndReauth() },
-                onUpgrade: { _ in
+                onUpgrade: { isTrialCTA in
+                    // Parity with ChatView: trial-eligible "Start my free
+                    // week" tap goes directly to StoreKit instead of the
+                    // plan picker.
                     if isGuest {
                         signOutAndReauth()
+                    } else if isTrialCTA {
+                        Task {
+                            _ = await SubscriptionManager.shared.purchasePlusDirect()
+                        }
                     } else {
                         showSubscription = true
                     }
@@ -1039,6 +1051,21 @@ struct CompatibilityView: View {
                     // Quota is recorded server-side per API call (each partner = 1 usage)
                 } else {
                     await MainActor.run {
+                        // Build the rich error info so QuotaExhaustedView
+                        // gets plan_id, suggested_plan, and the server's
+                        // is_fair_use_violation flag — drives the right
+                        // headline / CTA branching.
+                        quotaError = QuotaErrorInfo(
+                            reason: accessResponse.reason,
+                            planId: accessResponse.planId,
+                            featureId: accessResponse.feature,
+                            message: accessResponse.upgradeCta?.message,
+                            action: nil,
+                            suggestedPlan: accessResponse.upgradeCta?.suggestedPlan,
+                            supportEmail: nil,
+                            resetAt: accessResponse.resetAt,
+                            serverIsFairUseViolation: accessResponse.isFairUseViolation
+                        )
                         // Professional Quota UI - Daily=banner, Overall/Feature=sheet
                         if accessResponse.reason == "daily_limit_reached" {
                             // DAILY LIMIT: Show message (for banner), no sheet
