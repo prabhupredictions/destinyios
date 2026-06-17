@@ -223,6 +223,21 @@ enum AuthExchangeError: Error, LocalizedError {
 // MARK: - JSONDecoder ISO8601 with fractional seconds
 
 extension JSONDecoder {
+    /// W7 P3-HIGH fix: pre-fix fell back to Date(timeIntervalSince1970: 0)
+    /// on unparseable timestamps. Backend datetime.utcnow() emits NAIVE
+    /// timestamps without timezone; iOS ISO8601DateFormatter requires
+    /// .withInternetDateTime which mandates a Z or +HH:MM. The mismatch
+    /// silently produced a 1970 expiry, sessionIsFresh() returned false
+    /// forever, and NetworkClient downgraded to API-key bearer for every
+    /// subsequent request — defeating W7 entirely.
+    ///
+    /// New strategy:
+    ///   1. Try ISO8601 with fractional seconds + tz
+    ///   2. Try ISO8601 without fractional but with tz
+    ///   3. Try the same WITH a synthetic "Z" appended (handles
+    ///      Pydantic's naive-utcnow output)
+    ///   4. THROW DecodingError.dataCorrupted — caller surfaces the
+    ///      sign-in failure rather than silently downgrading to 1970.
     static func iso8601() -> JSONDecoder {
         let decoder = JSONDecoder()
         let formatter = ISO8601DateFormatter()
@@ -231,9 +246,20 @@ extension JSONDecoder {
         formatterNoFrac.formatOptions = [.withInternetDateTime]
         decoder.dateDecodingStrategy = .custom { container in
             let s = try container.singleValueContainer().decode(String.self)
-            return formatter.date(from: s)
-                ?? formatterNoFrac.date(from: s)
-                ?? Date(timeIntervalSince1970: 0)
+            // Direct attempts.
+            if let d = formatter.date(from: s) { return d }
+            if let d = formatterNoFrac.date(from: s) { return d }
+            // Pydantic naive-utcnow fallback: append Z and retry.
+            let withZ = s.hasSuffix("Z") || s.contains("+") || s.range(of: "-", options: .backwards)?.lowerBound != nil && s.contains(":")
+                ? s : s + "Z"
+            if let d = formatter.date(from: withZ) { return d }
+            if let d = formatterNoFrac.date(from: withZ) { return d }
+            // Don't silently produce a 1970 epoch — let the caller fail
+            // the sign-in and route the user to retry.
+            throw DecodingError.dataCorrupted(.init(
+                codingPath: container.codingPath,
+                debugDescription: "Unparseable ISO8601 datetime: \(s)"
+            ))
         }
         return decoder
     }

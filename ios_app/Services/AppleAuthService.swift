@@ -182,27 +182,44 @@ extension AppleAuthService: ASAuthorizationControllerDelegate {
 
         print("[AppleAuth] User: id=\(userId), email=\(email ?? "nil"), name=\(displayName ?? "nil")")
 
-        // W7: trade the Apple-issued id_token for a server-issued
-        // session JWT + refresh token. We do this BEFORE returning
-        // the User up the call stack so APIClient.request can pick
-        // up the new tokens on its very next call.
+        // W7 P3 fix: trade the Apple-issued id_token for a server-issued
+        // session JWT + refresh token. We do this BEFORE resuming the
+        // continuation so APIClient.request always has the new tokens
+        // on its first call.
+        //
+        // Pre-fix used Task.detached fire-and-forget which raced the
+        // first API call after sign-in. Worse, on /auth/exchange
+        // failure the continuation still resumed with success, leaving
+        // the user "signed in" client-side but locked out server-side.
+        // Now: clear any stale active session BEFORE exchange, await
+        // the result, fail loud on error.
         if let identityTokenData = credential.identityToken,
            let idToken = String(data: identityTokenData, encoding: .utf8) {
             let nonce = currentNonce
             currentNonce = nil
-            Task.detached { [idToken, nonce] in
+            // Clear any stale active session so a slow /auth/exchange
+            // can't be observed mid-flight returning the previous
+            // user's JWT.
+            SessionTokenStore.shared.clearActiveSession()
+            // Await the exchange before resuming. If it fails, throw —
+            // AuthViewModel.performSignIn will route to the sign-in
+            // screen rather than into MainTabView with no session.
+            Task { [idToken, nonce, weak self] in
                 do {
                     _ = try await AuthExchangeClient.shared.signInWithApple(
                         idToken: idToken, nonce: nonce,
                     )
                     print("[AppleAuth] W7 session minted via /auth/exchange")
+                    self?.signInContinuation?.resume(returning: user)
                 } catch {
-                    // Non-fatal: legacy flow still works (the iOS user
-                    // is signed in via Apple, just not bound to a
-                    // server session). We log and continue.
-                    print("⚠️ [AppleAuth] W7 /auth/exchange failed: \(error). Falling back to legacy auth.")
+                    print("⚠️ [AppleAuth] W7 /auth/exchange failed: \(error)")
+                    self?.signInContinuation?.resume(throwing: AuthError.networkError(error.localizedDescription))
                 }
+                self?.signInContinuation = nil
             }
+            // Skip the immediate resume below — we'll resume from the
+            // Task above.
+            return
         } else {
             print("⚠️ [AppleAuth] No identityToken in credential — W7 sign-in skipped")
         }
@@ -224,12 +241,15 @@ enum AuthError: Error, LocalizedError {
     case invalidCredential
     case cancelled
     case notImplemented(String)
-    
+    /// W7 P3 fix: surface /auth/exchange failures.
+    case networkError(String)
+
     var errorDescription: String? {
         switch self {
         case .invalidCredential: return "Invalid Apple ID credential"
         case .cancelled: return "Sign in was cancelled"
         case .notImplemented(let msg): return msg
+        case .networkError(let msg): return "Sign in network error: \(msg)"
         }
     }
 }
