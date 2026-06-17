@@ -851,9 +851,60 @@ class QuotaManager: ObservableObject {
         // W3: cover the rest of the state machine so ProfileView / paywall
         // copy is honest about why entitlement is/isn't granted.
         case "billing_retry": return "Payment Failed"
-        case "revoked": return "Revoked"
+        case "revoked": return "Family Share Ended"
         case "refunded": return "Refunded"
         default: return ""
+        }
+    }
+
+    /// W5 F5.3: longer-form description for ProfileView. Each variant
+    /// gets its own copy because the user-action and the framing are
+    /// different per status.
+    var subscriptionStatusDetailText: String {
+        switch subscriptionStatus {
+        case "active":
+            if autoRenewStatus == false {
+                return "Your plan is active and will end at the next renewal date."
+            }
+            return "Your subscription is active and renews automatically."
+        case "expired":
+            return "Your subscription has ended. Renew to keep premium features."
+        case "grace_period":
+            return "Apple is retrying your payment. Update your payment method to keep your subscription active."
+        case "canceled":
+            return "Auto-renew is off. You'll keep premium features until the period ends."
+        case "billing_retry":
+            return "Your payment failed. Update your payment method in Settings → Apple ID to restore access."
+        case "revoked":
+            return "Family sharing for this app ended. Subscribe with your own Apple ID to keep premium features."
+        case "refunded":
+            return "Your purchase was refunded. Contact support if this was unexpected."
+        default:
+            return ""
+        }
+    }
+
+    /// W5 F5.3: CTA label per status. iOS uses this on the
+    /// ProfileView "Manage subscription" button. Returns nil when no
+    /// CTA is appropriate (e.g., active+autorenew).
+    var subscriptionStatusCTA: String? {
+        switch subscriptionStatus {
+        case "active":
+            return autoRenewStatus == false ? "Re-enable auto-renew" : nil
+        case "expired":
+            return "Renew subscription"
+        case "grace_period":
+            return "Update payment method"
+        case "canceled":
+            return "Manage subscription"
+        case "billing_retry":
+            return "Update payment method"
+        case "revoked":
+            return "Subscribe with your Apple ID"
+        case "refunded":
+            return "Contact support"
+        default:
+            return nil
         }
     }
     

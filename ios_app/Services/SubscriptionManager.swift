@@ -23,6 +23,19 @@ class SubscriptionManager: ObservableObject {
     @Published private(set) var purchasedProductIDs: Set<String> = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
+
+    /// W5 F5.4: restore-purchases UX. Pre-fix, restorePurchases()
+    /// returned a Bool that callers often discarded — failures were
+    /// silent. Now the LAST result is published so the SubscriptionView
+    /// alert / ProfileView toast can render the right message.
+    enum RestoreResult: Equatable {
+        case idle
+        case inProgress
+        case restoredEntitlements
+        case nothingToRestore
+        case failed(String)
+    }
+    @Published private(set) var lastRestoreResult: RestoreResult = .idle
     
     // Pending upgrade tracking (when user upgrades Core→Plus, effective next billing)
     @Published private(set) var pendingUpgradeProductId: String?
@@ -325,16 +338,21 @@ class SubscriptionManager: ObservableObject {
     func restorePurchases() async -> Bool {
         isLoading = true
         errorMessage = nil
+        lastRestoreResult = .inProgress
 
         do {
             try await AppStore.sync()
             await reconcileEntitlementsWithBackend()
             await updatePurchasedProducts()
             isLoading = false
-            return !purchasedProductIDs.isEmpty
+            let restored = !purchasedProductIDs.isEmpty
+            lastRestoreResult = restored ? .restoredEntitlements : .nothingToRestore
+            return restored
         } catch {
             isLoading = false
-            errorMessage = "Restore failed: \(error.localizedDescription)"
+            let msg = "Restore failed: \(error.localizedDescription)"
+            errorMessage = msg
+            lastRestoreResult = .failed(msg)
             return false
         }
     }
