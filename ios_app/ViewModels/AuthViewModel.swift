@@ -100,19 +100,27 @@ class AuthViewModel {
     func signOutAsync() async {
         let wasGuest = UserDefaults.standard.bool(forKey: "isGuest")
         let previousEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        
+
         await authService.signOut()
-        
+
         // Clear state
         isAuthenticated = false
         isGuest = false
         userEmail = nil
         userName = nil
         errorMessage = nil
-        
+
         // Clear secure storage
         keychain.delete(forKey: KeychainService.Keys.userId)
         keychain.delete(forKey: KeychainService.Keys.authToken)
+
+        // W7 P2 fix: clear session JWT + refresh token from
+        // SessionTokenStore. Pre-fix, signing out one user left
+        // their tokens in Keychain so the NEXT user's API calls
+        // would attach the previous user's session JWT (which
+        // SessionAuthMiddleware would honor until expiry, allowing
+        // unauthorized cross-account access).
+        SessionTokenStore.shared.clearActiveSession()
         
         // Clear user session defaults
         UserDefaults.standard.removeObject(forKey: "isGuest")
