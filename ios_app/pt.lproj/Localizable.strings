@@ -493,7 +493,7 @@
 "dosha_cancelled" = "Dosha cancelado";
 
 // MARK: - Kala Sarpa Premium UI
-"dosha_details" = "Yoga Details";
+"dosha_details" = "Detalhes do dosha";
 "rahu_ketu_axis" = "Eixo Rahu-Ketu";
 "planets" = "Planetas";
 "planets_trapped" = "planetas presos";
@@ -3083,6 +3083,8 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 /* Paywall v2 */
 "paywall_v2_headline" = "Há mais no seu mapa";
 "paywall_v2_subheadline" = "Experimente o Premium grátis por 7 dias e continue perguntando.";
+"paywall_v2_headline_compatibility" = "Algumas conexões estão escritas nas estrelas";
+"paywall_v2_subheadline_compatibility" = "Experimente o Premium grátis por 7 dias e descubra quem é realmente seu destino.";
 "paywall_v2_bullet_unlimited_questions" = "Faça perguntas ilimitadas";
 "paywall_v2_bullet_unlimited_matching" = "Destiny Matching™ ilimitado";
 "paywall_v2_bullet_profiles" = "Crie perfis para seu parceiro, família e amigos";

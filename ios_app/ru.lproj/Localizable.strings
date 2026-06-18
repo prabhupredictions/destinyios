@@ -107,7 +107,7 @@
 // MARK: - Language Selection
 "select_language" = "Выбери язык";
 "english" = "Английский";
-"hindi" = "Hindi";
+"hindi" = "Хинди";
 "language_note" = "Приложение перезапустится на выбранном языке";
 
 // MARK: - Tab Bar
@@ -493,7 +493,7 @@
 "dosha_cancelled" = "Доша отменена";
 
 // MARK: - Kala Sarpa Premium UI
-"dosha_details" = "Yoga Details";
+"dosha_details" = "Детали доши";
 "rahu_ketu_axis" = "Ось Раху-Кету";
 "planets" = "Планеты";
 "planets_trapped" = "планеты попали в ловушку";
@@ -3083,6 +3083,8 @@
 /* Paywall v2 */
 "paywall_v2_headline" = "В вашей карте есть нечто большее";
 "paywall_v2_subheadline" = "Попробуйте Premium бесплатно 7 дней и продолжайте задавать вопросы.";
+"paywall_v2_headline_compatibility" = "Некоторые связи написаны в звёздах";
+"paywall_v2_subheadline_compatibility" = "Попробуйте Premium бесплатно 7 дней и узнайте, кто действительно ваша судьба.";
 "paywall_v2_bullet_unlimited_questions" = "Задавайте неограниченные вопросы";
 "paywall_v2_bullet_unlimited_matching" = "Безлимитный Destiny Matching™";
 "paywall_v2_bullet_profiles" = "Создавайте профили для партнёра, семьи и друзей";

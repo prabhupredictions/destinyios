@@ -107,7 +107,7 @@
 // MARK: - Language Selection
 "select_language" = "选择语言";
 "english" = "英语";
-"hindi" = "Hindi";
+"hindi" = "印地语";
 "language_note" = "App 将以所选语言重启";
 
 // MARK: - Tab Bar
@@ -493,7 +493,7 @@
 "dosha_cancelled" = "多夏取消";
 
 // MARK: - Kala Sarpa Premium UI
-"dosha_details" = "Yoga Details";
+"dosha_details" = "多沙详情";
 "rahu_ketu_axis" = "罗胡-克图轴";
 "planets" = "行星";
 "planets_trapped" = "行星被困";
@@ -3083,6 +3083,8 @@
 /* Paywall v2 */
 "paywall_v2_headline" = "你的星盘里还有更多";
 "paywall_v2_subheadline" = "免费试用 Premium 7 天,继续提问。";
+"paywall_v2_headline_compatibility" = "有些缘分写在星辰之间";
+"paywall_v2_subheadline_compatibility" = "免费试用 Premium 7 天，发现谁才是你真正命中注定的人。";
 "paywall_v2_bullet_unlimited_questions" = "无限提问";
 "paywall_v2_bullet_unlimited_matching" = "无限 Destiny Matching™";
 "paywall_v2_bullet_profiles" = "为伴侣、家人和朋友创建星盘";

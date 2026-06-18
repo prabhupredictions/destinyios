@@ -56,6 +56,8 @@ struct QuotaErrorInfo {
             return "quota_fallback_fair_use".localized
         }
         switch reason {
+        case "subscription_expired":
+            return "subscription_expired_body".localized
         case "daily_limit_reached":
             return "quota_fallback_daily_limit".localized
         case "overall_limit_reached":
@@ -67,6 +69,12 @@ struct QuotaErrorInfo {
     
     /// Button text for upgrade
     var upgradeButtonText: String {
+        // Subscription_expired = user has history; CTA says "Renew" not
+        // "Upgrade". The button still leads to StoreKit (purchasePlusDirect)
+        // but the copy reflects intent.
+        if reason == "subscription_expired" {
+            return "subscription_expired_cta".localized
+        }
         if let plan = suggestedPlan?.capitalized {
             return "Upgrade to \(plan)"
         }
@@ -79,6 +87,16 @@ struct QuotaErrorInfo {
 struct QuotaExhaustedView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var subscriptionManager = SubscriptionManager.shared
+
+    /// W5 paywall-context (added 2026-06-18): different headline/subheadline
+    /// per surface that triggered the paywall. Default `.chat` keeps every
+    /// pre-existing caller (legacy QuotaExhaustedView() invocations) on the
+    /// "There's more in your chart" copy.
+    enum Context {
+        case chat
+        case compatibility
+    }
+    var context: Context = .chat
 
     // New: Dynamic quota error info from backend
     var quotaError: QuotaErrorInfo?
@@ -156,12 +174,28 @@ struct QuotaExhaustedView: View {
         return nil
     }
 
+    /// True when the backend's reason is "subscription_expired" — a lapsed
+    /// paid user is blocked entirely from quota features until they renew.
+    /// Distinct from quota-cap reached: paywall says "ended", CTA says
+    /// "Renew" (not "Choose a plan" — they already have history).
+    private var isSubscriptionExpired: Bool {
+        quotaError?.reason == "subscription_expired"
+    }
+
     /// Headline shown on the upgrade path (showUpgrade && !isFairUseViolation):
-    ///   1. Daily limit → "Daily limit reached" (resets at midnight UTC)
-    ///   2. Backend `upgrade_cta.message` (iOS-11), if non-empty
-    ///   3. Trial-eligible → paywall_v2_headline
-    ///   4. Otherwise → existing localized title (iOS-5 fallback preserved)
+    ///   1. Subscription expired → "Your subscription has ended"
+    ///   2. Daily limit → "Daily limit reached" (resets at midnight UTC)
+    ///   3. Backend `upgrade_cta.message` (iOS-11), if non-empty
+    ///   4. Trial-eligible AND context=.compatibility → compatibility-specific headline
+    ///   5. Trial-eligible → paywall_v2_headline
+    ///   6. Otherwise → existing localized title (iOS-5 fallback preserved)
     private var v2Headline: String {
+        // Lapsed paid user — their subscription ended, they need to renew.
+        // This takes precedence over trial CTA (they have history) and
+        // over the daily-limit branch (different paywall entirely).
+        if isSubscriptionExpired {
+            return "subscription_expired_title".localized
+        }
         // Daily-reset headline takes precedence over the upgrade-CTA copy:
         // "You have reached your limit" implies permanent, but daily limits
         // reset at midnight UTC. Tell the user that explicitly.
@@ -169,17 +203,30 @@ struct QuotaExhaustedView: View {
             return "quota_daily_limit_title".localized
         }
         if let msg = backendUpgradeMessage { return msg }
-        if shouldShowTrialCTA { return "paywall_v2_headline".localized }
+        if shouldShowTrialCTA {
+            switch context {
+            case .compatibility: return "paywall_v2_headline_compatibility".localized
+            case .chat:          return "paywall_v2_headline".localized
+            }
+        }
         return showSignIn
             ? "quota_signup_title".localized
             : "quota_limit_reached_title".localized
     }
 
     /// Subheadline shown on the upgrade path:
+    ///   - Subscription expired → subscription_expired_body (renew copy)
+    ///   - Trial-eligible AND context=.compatibility → compatibility-specific copy
     ///   - Trial-eligible → paywall_v2_subheadline
     ///   - Otherwise → existing displayMessage (preserves daily_limit_reset_time / iOS-9)
     private var v2Subheadline: String {
-        if shouldShowTrialCTA { return "paywall_v2_subheadline".localized }
+        if isSubscriptionExpired { return "subscription_expired_body".localized }
+        if shouldShowTrialCTA {
+            switch context {
+            case .compatibility: return "paywall_v2_subheadline_compatibility".localized
+            case .chat:          return "paywall_v2_subheadline".localized
+            }
+        }
         return displayMessage
     }
 
@@ -310,15 +357,22 @@ struct QuotaExhaustedView: View {
                         // Upgrade button (hide for fair use violation)
                         if showUpgrade {
                             Button(action: {
-                                onUpgrade?(shouldShowTrialCTA)
+                                // Expired user → "Renew" intent. Pass true so
+                                // callers route to purchasePlusDirect() (the
+                                // same StoreKit-direct path trial users take).
+                                // The user already has subscription history;
+                                // no plan-picker needed.
+                                onUpgrade?(shouldShowTrialCTA || isSubscriptionExpired)
                                 dismiss()
                             }) {
                                 HStack(spacing: 10) {
                                     Image(systemName: "crown.fill")
                                         .font(.system(size: 16))
-                                    Text(shouldShowTrialCTA
-                                         ? "paywall_v2_cta_start_trial".localized
-                                         : upgradeText)
+                                    Text(isSubscriptionExpired
+                                         ? "subscription_expired_cta".localized
+                                         : (shouldShowTrialCTA
+                                            ? "paywall_v2_cta_start_trial".localized
+                                            : upgradeText))
                                         .font(AppTheme.Fonts.title(size: 17))
                                 }
                                 .foregroundColor(AppTheme.Colors.textOnGold)

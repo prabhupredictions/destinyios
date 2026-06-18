@@ -1093,6 +1093,7 @@ struct AskDestinySheet: View {
         }
         .sheet(isPresented: $showQuotaSheet) {
             QuotaExhaustedView(
+                context: .compatibility,
                 quotaError: quotaError,
                 isGuest: isGuest,
                 customMessage: quotaMessage,
@@ -1114,6 +1115,15 @@ struct AskDestinySheet: View {
                         }
                     } else {
                         showQuotaSheet = false
+                        showSubscription = true
+                    }
+                },
+                onSeeCore: {
+                    // Parity with ChatView: trial-eligible users tapping
+                    // "Prefer a lighter plan? See Core" should land on the
+                    // SubscriptionView plan picker.
+                    showQuotaSheet = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                         showSubscription = true
                     }
                 }

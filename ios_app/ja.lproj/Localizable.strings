@@ -107,7 +107,7 @@
 // MARK: - Language Selection
 "select_language" = "言語を選ぶ";
 "english" = "英語";
-"hindi" = "Hindi";
+"hindi" = "ヒンディー語";
 "language_note" = "選んだ言語でアプリが再起動します";
 
 // MARK: - Tab Bar
@@ -493,7 +493,7 @@
 "dosha_cancelled" = "ドーシャキャンセル";
 
 // MARK: - Kala Sarpa Premium UI
-"dosha_details" = "Yoga Details";
+"dosha_details" = "ドーシャの詳細";
 "rahu_ketu_axis" = "ラーフ・ケートゥ軸";
 "planets" = "惑星";
 "planets_trapped" = "閉じ込められた惑星";
@@ -3083,6 +3083,8 @@
 /* Paywall v2 */
 "paywall_v2_headline" = "あなたのチャートにはまだまだあります";
 "paywall_v2_subheadline" = "Premiumを7日間無料でお試しください。";
+"paywall_v2_headline_compatibility" = "星に刻まれた縁があります";
+"paywall_v2_subheadline_compatibility" = "Premium を 7 日間無料でお試しください — あなたの本当の運命の相手を見つけましょう。";
 "paywall_v2_bullet_unlimited_questions" = "質問し放題";
 "paywall_v2_bullet_unlimited_matching" = "Destiny Matching™ 使い放題";
 "paywall_v2_bullet_profiles" = "パートナー、家族、友人のプロフィールを作成";

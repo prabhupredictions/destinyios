@@ -493,7 +493,7 @@
 "dosha_cancelled" = "Dosha annulé";
 
 // MARK: - Kala Sarpa Premium UI
-"dosha_details" = "Yoga Details";
+"dosha_details" = "Détails du dosha";
 "rahu_ketu_axis" = "Axe Rahu-Ketu";
 "planets" = "Planètes";
 "planets_trapped" = "planètes piégées";
@@ -3083,6 +3083,8 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 /* Paywall v2 */
 "paywall_v2_headline" = "Il y a plus dans votre carte";
 "paywall_v2_subheadline" = "Essayez Premium gratuitement pendant 7 jours et continuez à poser des questions.";
+"paywall_v2_headline_compatibility" = "Certaines connexions sont écrites dans les étoiles";
+"paywall_v2_subheadline_compatibility" = "Essayez Premium gratuitement pendant 7 jours et découvrez qui vous est vraiment destiné.";
 "paywall_v2_bullet_unlimited_questions" = "Posez des questions illimitées";
 "paywall_v2_bullet_unlimited_matching" = "Destiny Matching™ illimité";
 "paywall_v2_bullet_profiles" = "Créez des profils pour votre partenaire, votre famille et vos amis";

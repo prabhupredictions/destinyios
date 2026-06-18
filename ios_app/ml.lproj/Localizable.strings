@@ -493,7 +493,7 @@
 "dosha_cancelled" = "ദോശ റദ്ദാക്കി";
 
 // MARK: - Kala Sarpa Premium UI
-"dosha_details" = "Yoga Details";
+"dosha_details" = "ദോഷ വിശദാംശങ്ങൾ";
 "rahu_ketu_axis" = "രാഹു-കേതു അക്ഷം";
 "planets" = "ഗ്രഹങ്ങൾ";
 "planets_trapped" = "ഗ്രഹങ്ങൾ കുടുങ്ങി";
@@ -3084,6 +3084,8 @@
 /* Paywall v2 */
 "paywall_v2_headline" = "നിങ്ങളുടെ ചാർട്ടിൽ കൂടുതൽ ഉണ്ട്";
 "paywall_v2_subheadline" = "Premium 7 ദിവസം സൗജന്യമായി പരീക്ഷിച്ച് ചോദിച്ചുകൊണ്ടേയിരിക്കുക.";
+"paywall_v2_headline_compatibility" = "ചില ബന്ധങ്ങൾ നക്ഷത്രങ്ങളിൽ എഴുതപ്പെട്ടവയാണ്";
+"paywall_v2_subheadline_compatibility" = "Premium 7 ദിവസം സൗജന്യമായി പരീക്ഷിച്ച് നിങ്ങളുടെ യഥാർത്ഥ ഇണയെ കണ്ടെത്തുക.";
 "paywall_v2_bullet_unlimited_questions" = "പരിധിയില്ലാത്ത ചോദ്യങ്ങൾ ചോദിക്കുക";
 "paywall_v2_bullet_unlimited_matching" = "പരിധിയില്ലാത്ത Destiny Matching™";
 "paywall_v2_bullet_profiles" = "നിങ്ങളുടെ പങ്കാളി, കുടുംബം, സുഹൃത്തുക്കൾക്കായി പ്രൊഫൈലുകൾ സൃഷ്ടിക്കുക";

@@ -493,7 +493,7 @@
 "dosha_cancelled" = "Dosha abgesagt";
 
 // MARK: - Kala Sarpa Premium UI
-"dosha_details" = "Yoga Details";
+"dosha_details" = "Dosha-Details";
 "rahu_ketu_axis" = "Rahu-Ketu-Achse";
 "planets" = "Planeten";
 "planets_trapped" = "Planeten gefangen";
@@ -3079,6 +3079,8 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 /* Paywall v2 */
 "paywall_v2_headline" = "In Ihrem Chart steckt mehr";
 "paywall_v2_subheadline" = "7 Tage Premium kostenlos testen und weiter fragen.";
+"paywall_v2_headline_compatibility" = "Manche Verbindungen stehen in den Sternen";
+"paywall_v2_subheadline_compatibility" = "Testen Sie Premium 7 Tage kostenlos und entdecken Sie, wer wirklich für Sie bestimmt ist.";
 "paywall_v2_bullet_unlimited_questions" = "Unbegrenzt Fragen stellen";
 "paywall_v2_bullet_unlimited_matching" = "Unbegrenztes Destiny Matching™";
 "paywall_v2_bullet_profiles" = "Profile für Partner, Familie und Freunde anlegen";

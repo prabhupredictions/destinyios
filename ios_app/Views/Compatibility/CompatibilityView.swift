@@ -165,6 +165,7 @@ struct CompatibilityView: View {
         }
         .sheet(isPresented: $showQuotaExhausted) {
             QuotaExhaustedView(
+                context: .compatibility,
                 quotaError: quotaError,
                 isGuest: isGuest,
                 customMessage: quotaErrorMessage,
@@ -180,6 +181,15 @@ struct CompatibilityView: View {
                             _ = await SubscriptionManager.shared.purchasePlusDirect()
                         }
                     } else {
+                        showSubscription = true
+                    }
+                },
+                onSeeCore: {
+                    // Parity with ChatView: trial-eligible users tapping
+                    // "Prefer a lighter plan? See Core" should land on the
+                    // SubscriptionView plan picker.
+                    showQuotaExhausted = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                         showSubscription = true
                     }
                 }

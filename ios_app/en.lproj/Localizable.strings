@@ -3048,6 +3048,8 @@
 // place for the trial-ineligible fallback branch.
 "paywall_v2_headline" = "There's more in your chart";
 "paywall_v2_subheadline" = "Try Premium free for 7 days and keep asking.";
+"paywall_v2_headline_compatibility" = "Some connections are written in the stars";
+"paywall_v2_subheadline_compatibility" = "Try Premium free for 7 days and discover who you’re truly meant for.";
 "paywall_v2_bullet_unlimited_questions" = "Ask unlimited questions";
 "paywall_v2_bullet_unlimited_matching" = "Unlimited Destiny Matching™";
 "paywall_v2_bullet_profiles" = "Create profiles for your partner, family, and friends";
