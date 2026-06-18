@@ -3099,3 +3099,15 @@
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "本日の上限に達しました";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "サブスクリプションが終了しました";
+"subscription_expired_body" = "更新して質問とプレミアム機能のご利用を続けてください。";
+"subscription_expired_cta" = "Plus を更新する";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Google でサインイン";
+"auth.cross_idp.action.apple" = "Apple でサインイン";
+"auth.cross_idp_collision.google" = "このメールは Google に登録されています。続行するには Google でサインインしてください。";
+"auth.cross_idp_collision.apple" = "このメールは Apple に登録されています。続行するには Apple でサインインしてください。";
+"auth.cross_idp_collision.generic" = "このメールは別のサインイン方法で登録されています。";

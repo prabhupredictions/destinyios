@@ -3099,3 +3099,15 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "Limite diário atingido";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "Sua assinatura terminou";
+"subscription_expired_body" = "Renove para continuar fazendo perguntas e acessando recursos premium.";
+"subscription_expired_cta" = "Renovar Plus";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Entrar com Google";
+"auth.cross_idp.action.apple" = "Entrar com Apple";
+"auth.cross_idp_collision.google" = "Este e-mail está registrado com Google. Entre com Google para continuar.";
+"auth.cross_idp_collision.apple" = "Este e-mail está registrado com Apple. Entre com Apple para continuar.";
+"auth.cross_idp_collision.generic" = "Este e-mail está registrado com outro método de login.";

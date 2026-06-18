@@ -3099,3 +3099,15 @@
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "Дневной лимит достигнут";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "Ваша подписка закончилась";
+"subscription_expired_body" = "Обновите подписку, чтобы продолжать задавать вопросы и пользоваться премиум-функциями.";
+"subscription_expired_cta" = "Возобновить Plus";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Войти через Google";
+"auth.cross_idp.action.apple" = "Войти через Apple";
+"auth.cross_idp_collision.google" = "Этот email зарегистрирован через Google. Войдите через Google для продолжения.";
+"auth.cross_idp_collision.apple" = "Этот email зарегистрирован через Apple. Войдите через Apple для продолжения.";
+"auth.cross_idp_collision.generic" = "Этот email зарегистрирован через другой способ входа.";

@@ -10,6 +10,11 @@ class AuthViewModel {
     // MARK: - Published State
     var isLoading = false
     var errorMessage: String?
+    /// W7: when set non-empty after a failed sign-in, indicates the
+    /// email is bound to a different IdP. Value is "google" or
+    /// "apple" — UI shows "Sign in with <bound_idp>" and routes to
+    /// the correct flow. Cleared on every fresh sign-in attempt.
+    var crossIdpHint: String = ""
     var isAuthenticated = false
     var userEmail: String?
     var userName: String?
@@ -184,8 +189,9 @@ class AuthViewModel {
         await MainActor.run {
             isLoading = true
             errorMessage = nil
+            crossIdpHint = ""
         }
-        
+
         // PHASE 12: Capture guest birth data BEFORE sign-in changes user context
         // This enables seamless upgrade: guest birth data → registered user profile
         let wasGuest = UserDefaults.standard.bool(forKey: "isGuest")
@@ -530,6 +536,23 @@ class AuthViewModel {
             print("🚫 [AuthViewModel] Birth data conflict: \(error)")
             await MainActor.run {
                 errorMessage = error.localizedDescription
+            }
+        } catch let authErr as AuthError {
+            // Cross-IdP collision — surface as a structured hint so
+            // the sign-in screen can show "Sign in with <bound_idp>"
+            // and route the user to the right IdP. Generic AuthError
+            // values fall through to the default branch below.
+            if case .crossIdpCollision(let boundIdp) = authErr {
+                print("🔁 [AuthViewModel] cross-IdP collision → bound_idp=\(boundIdp ?? "?")")
+                await MainActor.run {
+                    crossIdpHint = boundIdp ?? ""
+                    errorMessage = authErr.errorDescription
+                }
+            } else {
+                print("❌ [AuthViewModel] AuthError: \(authErr)")
+                await MainActor.run {
+                    errorMessage = "sign_in_failed".localized + " (\(authErr.localizedDescription))"
+                }
             }
         } catch {
             print("❌ [AuthViewModel] Sign in error: \(error)")

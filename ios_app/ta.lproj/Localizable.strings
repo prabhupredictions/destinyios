@@ -3097,3 +3097,15 @@
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "தினசரி வரம்பு எட்டப்பட்டது";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "உங்கள் சந்தாக்கால அமைப்பு முடிவடைந்துவிட்டது";
+"subscription_expired_body" = "கேள்விகள் கேட்கவும் பிரீமியம் அம்சங்களை அணுகவும் புதுப்பிக்கவும்.";
+"subscription_expired_cta" = "Plus புதுப்பிக்கவும்";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Google உடன் உள்நுழைக";
+"auth.cross_idp.action.apple" = "Apple உடன் உள்நுழைக";
+"auth.cross_idp_collision.google" = "இந்த மின்னஞ்சல் Google உடன் பதிவு செய்யப்பட்டுள்ளது. தொடர Google உடன் உள்நுழையவும்.";
+"auth.cross_idp_collision.apple" = "இந்த மின்னஞ்சல் Apple உடன் பதிவு செய்யப்பட்டுள்ளது. தொடர Apple உடன் உள்நுழையவும்.";
+"auth.cross_idp_collision.generic" = "இந்த மின்னஞ்சல் வேறு உள்நுழைவு முறையுடன் பதிவு செய்யப்பட்டுள்ளது.";

@@ -3095,3 +3095,15 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "Tageslimit erreicht";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "Ihr Abonnement ist abgelaufen";
+"subscription_expired_body" = "Verlängern Sie, um weiterhin Fragen zu stellen und Premium-Funktionen zu nutzen.";
+"subscription_expired_cta" = "Plus erneuern";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Mit Google anmelden";
+"auth.cross_idp.action.apple" = "Mit Apple anmelden";
+"auth.cross_idp_collision.google" = "Diese E-Mail ist mit Google registriert. Melden Sie sich mit Google an, um fortzufahren.";
+"auth.cross_idp_collision.apple" = "Diese E-Mail ist mit Apple registriert. Melden Sie sich mit Apple an, um fortzufahren.";
+"auth.cross_idp_collision.generic" = "Diese E-Mail ist mit einer anderen Anmeldemethode registriert.";

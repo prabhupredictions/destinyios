@@ -161,6 +161,19 @@ final class AuthExchangeClient: @unchecked Sendable {
             case "refresh_reused", "refresh_unknown", "refresh_expired",
                  "session_revoked", "google_reattest_required":
                 return .reauthRequired(code: code)
+            case "cross_idp_collision":
+                // Server told us the email is already bound to a
+                // different IdP. Surface the bound_idp so AuthView can
+                // route the user to the correct sign-in instead of
+                // showing a generic error.
+                let boundIdp = detail["bound_idp"] as? String
+                let attemptedIdp = detail["attempted_idp"] as? String
+                let userEmail = detail["user_email"] as? String
+                return .crossIdpCollision(
+                    boundIdp: boundIdp,
+                    attemptedIdp: attemptedIdp,
+                    userEmail: userEmail
+                )
             default:
                 return .idpRejected(code: code, status: status)
             }
@@ -201,6 +214,12 @@ enum AuthExchangeError: Error, LocalizedError {
     case idpRejected(code: String, status: Int)
     /// Server told us to re-sign-in. Clear local state, route to login.
     case reauthRequired(code: String)
+    /// Email is already registered with a DIFFERENT IdP. iOS should
+    /// surface a specific "Sign in with <bound_idp>" prompt instead
+    /// of a generic error. boundIdp is "google" or "apple" (or nil
+    /// if older backend doesn't include it — caller should fall back
+    /// to a generic message).
+    case crossIdpCollision(boundIdp: String?, attemptedIdp: String?, userEmail: String?)
     /// Transient network issue. Caller can retry.
     case network(String)
     /// No refresh token stored — caller should not have called refresh.
@@ -212,6 +231,20 @@ enum AuthExchangeError: Error, LocalizedError {
             return "Sign-in rejected (code=\(code), http=\(status))"
         case .reauthRequired(let code):
             return "Please sign in again (\(code))"
+        case .crossIdpCollision(let boundIdp, _, _):
+            if let idp = boundIdp {
+                let pretty = idp.capitalized
+                return NSLocalizedString(
+                    "auth.cross_idp_collision.\(idp)",
+                    value: "This email is registered with \(pretty). Sign in with \(pretty) to continue.",
+                    comment: "Shown when user tries to sign in with the wrong IdP"
+                )
+            }
+            return NSLocalizedString(
+                "auth.cross_idp_collision.generic",
+                value: "This email is registered with a different sign-in method.",
+                comment: "Shown when user tries to sign in with the wrong IdP (no IdP hint from server)"
+            )
         case .network(let msg):
             return "Network error: \(msg)"
         case .noRefreshToken:

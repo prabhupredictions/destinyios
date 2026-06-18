@@ -211,6 +211,19 @@ extension AppleAuthService: ASAuthorizationControllerDelegate {
                     )
                     print("[AppleAuth] W7 session minted via /auth/exchange")
                     self?.signInContinuation?.resume(returning: user)
+                } catch let exchangeErr as AuthExchangeError {
+                    // Cross-IdP collision: surface as a typed AuthError
+                    // so AuthView can show "Sign in with <bound_idp>"
+                    // instead of a generic network error.
+                    if case .crossIdpCollision(let boundIdp, _, _) = exchangeErr {
+                        print("⚠️ [AppleAuth] cross-IdP collision: bound_idp=\(boundIdp ?? "?")")
+                        self?.signInContinuation?.resume(throwing:
+                            AuthError.crossIdpCollision(boundIdp: boundIdp))
+                    } else {
+                        print("⚠️ [AppleAuth] W7 /auth/exchange failed: \(exchangeErr)")
+                        self?.signInContinuation?.resume(throwing:
+                            AuthError.networkError(exchangeErr.localizedDescription))
+                    }
                 } catch {
                     print("⚠️ [AppleAuth] W7 /auth/exchange failed: \(error)")
                     self?.signInContinuation?.resume(throwing: AuthError.networkError(error.localizedDescription))
@@ -243,6 +256,10 @@ enum AuthError: Error, LocalizedError {
     case notImplemented(String)
     /// W7 P3 fix: surface /auth/exchange failures.
     case networkError(String)
+    /// Email is registered with a different IdP. boundIdp is "google"
+    /// or "apple" (or nil if older backend). AuthView routes to the
+    /// correct sign-in flow based on this.
+    case crossIdpCollision(boundIdp: String?)
 
     var errorDescription: String? {
         switch self {
@@ -250,6 +267,20 @@ enum AuthError: Error, LocalizedError {
         case .cancelled: return "Sign in was cancelled"
         case .notImplemented(let msg): return msg
         case .networkError(let msg): return "Sign in network error: \(msg)"
+        case .crossIdpCollision(let boundIdp):
+            if let idp = boundIdp {
+                let pretty = idp.capitalized
+                return NSLocalizedString(
+                    "auth.cross_idp_collision.\(idp)",
+                    value: "This email is registered with \(pretty). Sign in with \(pretty) to continue.",
+                    comment: "Cross-IdP collision — wrong sign-in method"
+                )
+            }
+            return NSLocalizedString(
+                "auth.cross_idp_collision.generic",
+                value: "This email is registered with a different sign-in method.",
+                comment: "Cross-IdP collision — no IdP hint from server"
+            )
         }
     }
 }

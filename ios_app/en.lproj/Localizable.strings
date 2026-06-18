@@ -3064,3 +3064,15 @@
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "Daily limit reached";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "Your subscription has ended";
+"subscription_expired_body" = "Renew to keep asking questions and accessing premium features.";
+"subscription_expired_cta" = "Renew Plus";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Sign in with Google";
+"auth.cross_idp.action.apple" = "Sign in with Apple";
+"auth.cross_idp_collision.google" = "This email is registered with Google. Sign in with Google to continue.";
+"auth.cross_idp_collision.apple" = "This email is registered with Apple. Sign in with Apple to continue.";
+"auth.cross_idp_collision.generic" = "This email is registered with a different sign-in method.";

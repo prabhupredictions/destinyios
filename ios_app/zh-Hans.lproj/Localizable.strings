@@ -3099,3 +3099,15 @@
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "已达每日上限";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "您的订阅已结束";
+"subscription_expired_body" = "续订以继续提问和使用高级功能。";
+"subscription_expired_cta" = "续订 Plus";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "使用 Google 登录";
+"auth.cross_idp.action.apple" = "使用 Apple 登录";
+"auth.cross_idp_collision.google" = "此邮箱已通过 Google 注册。请使用 Google 登录以继续。";
+"auth.cross_idp_collision.apple" = "此邮箱已通过 Apple 注册。请使用 Apple 登录以继续。";
+"auth.cross_idp_collision.generic" = "此邮箱已通过其他登录方式注册。";

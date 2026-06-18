@@ -227,6 +227,44 @@ struct AuthView: View {
                     .padding(.top, 8)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
+
+            // Cross-IdP collision: server told us this email is bound
+            // to a different IdP. Show a one-tap "Sign in with <X>"
+            // button instead of leaving the user stuck on a generic
+            // error. AuthViewModel.crossIdpHint is "google" or "apple".
+            if !viewModel.crossIdpHint.isEmpty {
+                let hint = viewModel.crossIdpHint
+                let label = hint == "google"
+                    ? NSLocalizedString("auth.cross_idp.action.google",
+                        value: "Sign in with Google",
+                        comment: "Button shown when email is google-bound")
+                    : NSLocalizedString("auth.cross_idp.action.apple",
+                        value: "Sign in with Apple",
+                        comment: "Button shown when email is apple-bound")
+                Button(action: {
+                    Task {
+                        if hint == "google" {
+                            await viewModel.signInWithGoogle()
+                        } else {
+                            await viewModel.signInWithApple()
+                        }
+                    }
+                }) {
+                    Text(label)
+                        .font(AppTheme.Fonts.body(size: 15))
+                        .fontWeight(.semibold)
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(AppTheme.Colors.gold, lineWidth: 1)
+                        )
+                }
+                .padding(.top, 8)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
         }
         .padding(.horizontal, 32)
         .disabled(viewModel.isLoading)

@@ -3099,3 +3099,15 @@
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "ದೈನಂದಿನ ಮಿತಿ ತಲುಪಿದೆ";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "ನಿಮ್ಮ ಚಂದಾದಾರಿಕೆ ಮುಗಿದಿದೆ";
+"subscription_expired_body" = "ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಲು ಮತ್ತು ಪ್ರೀಮಿಯಂ ವೈಶಿಷ್ಟ್ಯಗಳನ್ನು ಪ್ರವೇಶಿಸಲು ನವೀಕರಿಸಿ.";
+"subscription_expired_cta" = "Plus ನವೀಕರಿಸಿ";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Google ಜೊತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ";
+"auth.cross_idp.action.apple" = "Apple ಜೊತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ";
+"auth.cross_idp_collision.google" = "ಈ ಇಮೇಲ್ Google ಜೊತೆ ನೋಂದಾಯಿಸಲಾಗಿದೆ. ಮುಂದುವರಿಯಲು Google ಜೊತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ.";
+"auth.cross_idp_collision.apple" = "ಈ ಇಮೇಲ್ Apple ಜೊತೆ ನೋಂದಾಯಿಸಲಾಗಿದೆ. ಮುಂದುವರಿಯಲು Apple ಜೊತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ.";
+"auth.cross_idp_collision.generic" = "ಈ ಇಮೇಲ್ ಬೇರೆ ಸೈನ್-ಇನ್ ವಿಧಾನದೊಂದಿಗೆ ನೋಂದಾಯಿಸಲಾಗಿದೆ.";

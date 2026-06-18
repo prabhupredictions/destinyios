@@ -3100,3 +3100,15 @@
 
 // Daily-limit headline (chunk 5 — distinguishes from permanent limit)
 "quota_daily_limit_title" = "ദൈനംദിന പരിധി എത്തി";
+
+// Subscription-expired paywall (state model: lapsed paid users)
+"subscription_expired_title" = "നിങ്ങളുടെ സബ്‌സ്‌ക്രിപ്‌ഷൻ അവസാനിച്ചു";
+"subscription_expired_body" = "ചോദ്യങ്ങൾ ചോദിക്കാനും പ്രീമിയം ഫീച്ചറുകൾ ഉപയോഗിക്കാനും പുതുക്കുക.";
+"subscription_expired_cta" = "Plus പുതുക്കുക";
+
+// MARK: - W7 Cross-IdP Collision (sign-in with wrong provider)
+"auth.cross_idp.action.google" = "Google ഉപയോഗിച്ച് സൈൻ ഇൻ ചെയ്യുക";
+"auth.cross_idp.action.apple" = "Apple ഉപയോഗിച്ച് സൈൻ ഇൻ ചെയ്യുക";
+"auth.cross_idp_collision.google" = "ഈ ഇമെയിൽ Google ഉപയോഗിച്ച് രജിസ്റ്റർ ചെയ്തിട്ടുണ്ട്. തുടരാൻ Google ഉപയോഗിച്ച് സൈൻ ഇൻ ചെയ്യുക.";
+"auth.cross_idp_collision.apple" = "ഈ ഇമെയിൽ Apple ഉപയോഗിച്ച് രജിസ്റ്റർ ചെയ്തിട്ടുണ്ട്. തുടരാൻ Apple ഉപയോഗിച്ച് സൈൻ ഇൻ ചെയ്യുക.";
+"auth.cross_idp_collision.generic" = "ഈ ഇമെയിൽ മറ്റൊരു സൈൻ-ഇൻ രീതിയിൽ രജിസ്റ്റർ ചെയ്തിട്ടുണ്ട്.";
