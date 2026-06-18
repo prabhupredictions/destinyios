@@ -18,6 +18,9 @@ struct AppRootView: View {
     @State private var showSplash = true
     @State private var languageRefreshID = UUID()
     @State private var appStartup = AppStartupService.shared
+    /// Observed singleton so AppRootView can react to subscriptionConflict
+    /// changes (cross-account Apple ID detection during sign-in).
+    @ObservedObject private var subscriptionManager = SubscriptionManager.shared
     
     // Computed property to check if guest needs birth data
     private var guestNeedsBirthData: Bool {
@@ -131,6 +134,30 @@ struct AppRootView: View {
             }
         }
         .id(languageRefreshID)
+        // Cross-account subscription conflict alert — duplicate of the
+        // alert wired in MainTabView, attached here at root level too
+        // because the conflict can be detected during the AuthView →
+        // MainTabView transition (sign-in fires reconcile immediately;
+        // backend returns the conflict before MainTabView has mounted
+        // and observed `subscriptionConflict`). SwiftUI doesn't queue
+        // alerts across view-hierarchy changes, so without a root-level
+        // binding the alert silently drops. .alert(item:) auto-clears
+        // the binding on dismiss, so only ONE of (root, MainTabView)
+        // will fire — whichever observes the change first.
+        .alert(item: $subscriptionManager.subscriptionConflict) { _ in
+            Alert(
+                title: Text("Apple ID Already Linked"),
+                message: Text(
+                    "Your Apple ID has an active subscription that is already linked " +
+                    "to a different Destiny account.\n\n" +
+                    "This was detected automatically while checking your subscription " +
+                    "status.\n\n" +
+                    "To use this subscription, sign in with the original email. " +
+                    "If you need help recovering access, contact support@destinyaiastrology.com."
+                ),
+                dismissButton: .default(Text("OK"))
+            )
+        }
     }
 
     // MARK: - Waitlist Recheck
