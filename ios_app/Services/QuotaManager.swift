@@ -851,7 +851,7 @@ class QuotaManager: ObservableObject {
         // W3: cover the rest of the state machine so ProfileView / paywall
         // copy is honest about why entitlement is/isn't granted.
         case "billing_retry": return "Payment Failed"
-        case "revoked": return "Family Share Ended"
+        case "revoked": return "Subscription Revoked"
         case "refunded": return "Refunded"
         default: return ""
         }
@@ -876,7 +876,7 @@ class QuotaManager: ObservableObject {
         case "billing_retry":
             return "Your payment failed. Update your payment method in Settings → Apple ID to restore access."
         case "revoked":
-            return "Family sharing for this app ended. Subscribe with your own Apple ID to keep premium features."
+            return "Your subscription was revoked. This can happen after a refund or billing dispute. Subscribe again to restore premium features."
         case "refunded":
             return "Your purchase was refunded. Contact support if this was unexpected."
         default:
@@ -900,7 +900,7 @@ class QuotaManager: ObservableObject {
         case "billing_retry":
             return "Update payment method"
         case "revoked":
-            return "Subscribe with your Apple ID"
+            return "Resubscribe"
         case "refunded":
             return "Contact support"
         default:
