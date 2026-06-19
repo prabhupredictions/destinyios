@@ -566,6 +566,13 @@ class SubscriptionManager: ObservableObject {
         lastReconcileTime = Date()
         defer { isReconciling = false }
 
+        // Track whether we found ANY entitlement to forward. If we
+        // didn't but the backend's last known cache says we're paid,
+        // fire the empty-reconcile ping so the backend can self-heal
+        // (catches lost EXPIRED webhooks + local Xcode .storekit
+        // cancellations).
+        var anyEntitlementForwarded = false
+
         for await result in Transaction.currentEntitlements {
             do {
                 let jws = result.jwsRepresentation
@@ -579,12 +586,72 @@ class SubscriptionManager: ObservableObject {
                 let ok = await verifyWithBackend(jws: jws, transaction: transaction)
                 if ok {
                     await transaction.finish()
+                    anyEntitlementForwarded = true
                 }
             } catch {
                 print("⚠️ [Reconcile] Entitlement verification failed: \(error)")
             }
         }
         await updatePurchasedProducts()
+
+        // Empty-reconcile ping (W7 follow-up):
+        // When iOS finds zero active entitlements AND the cached
+        // QuotaManager.isPremium was true, send a "negative" signal to
+        // backend so it can re-evaluate. Backend's expires_at < now()
+        // guard ensures cross-device sign-in (legitimate paid user
+        // on a fresh device) is preserved.
+        if !anyEntitlementForwarded && QuotaManager.shared.isPremium {
+            await sendEmptyReconcilePing()
+        }
+    }
+
+    /// W7 follow-up — POST /subscription/reconcile-empty when iOS sees
+    /// zero StoreKit entitlements but backend's last known state was
+    /// active. Backend self-heals if its expires_at is past; preserves
+    /// state if user just signed in on a fresh device (cross-device).
+    private func sendEmptyReconcilePing() async {
+        guard let email = getCurrentUserEmail(), !email.isEmpty else {
+            print("🔄 [Reconcile-Empty] no signed-in user; skipping")
+            return
+        }
+        guard let url = URL(string: APIConfig.baseURL + "/subscription/reconcile-empty") else {
+            return
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+        // Default URLSession UA so backend's _is_legacy_ios_request matches.
+        // (Standard iOS apps send CFNetwork/Darwin which the predicate accepts.)
+        if let sessionJwt = SessionTokenStore.shared.currentSessionJwt(),
+           SessionTokenStore.shared.sessionIsFresh() {
+            request.setValue("Bearer \(sessionJwt)", forHTTPHeaderField: "Authorization")
+        }
+        let body: [String: Any] = ["user_email": email]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else { return }
+            if httpResponse.statusCode == 200 {
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let updated = json["updated"] as? Bool {
+                    if updated {
+                        print("✅ [Reconcile-Empty] backend marked expired — refreshing status")
+                        // Backend changed state; force refresh QuotaManager
+                        try? await QuotaManager.shared.syncStatus(email: email, force: true)
+                    } else {
+                        let reason = json["reason"] as? String ?? "unknown"
+                        print("ℹ️ [Reconcile-Empty] backend preserved state (\(reason))")
+                    }
+                }
+            } else {
+                print("⚠️ [Reconcile-Empty] HTTP \(httpResponse.statusCode); ignoring")
+            }
+        } catch {
+            // Best-effort; never throw out of reconcile path
+            print("⚠️ [Reconcile-Empty] error: \(error)")
+        }
     }
     
     /// Check for pending subscription upgrades (e.g., Core→Plus scheduled for next billing)

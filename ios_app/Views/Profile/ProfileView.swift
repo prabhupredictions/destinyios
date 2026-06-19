@@ -580,14 +580,36 @@ struct ProfileView: View {
     // MARK: - Subscription Section
     private var subscriptionSection: some View {
         Group {
-            if quotaManager.isPremium {
-                // Paid user: Show current plan details
+            if showPaidCard {
+                // Paid user OR lapsed-paid user (expired/revoked/etc.):
+                // show paidSubscriptionCard so the W5 F5.3 status copy
+                // (Display + Detail + CTA) renders properly. The CTA
+                // routes the lapsed user to renew/manage/contact-support
+                // based on their actual status — much more useful than
+                // a generic "Upgrade to Premium" card.
                 paidSubscriptionCard
             } else {
-                // Free user: Show upgrade CTA
+                // True free user (never paid): show upgrade CTA
                 freeUpgradeCard
             }
         }
+    }
+
+    /// W5 F5.3 routing: show paidSubscriptionCard when the user has any
+    /// subscription history (active OR lapsed). The card's body uses
+    /// QuotaManager.subscriptionStatusDisplayText/Detail/CTA which
+    /// already branches per-status to show the right copy.
+    private var showPaidCard: Bool {
+        if quotaManager.isPremium { return true }
+        // Lapsed-paid user — render paid card with Renew CTA, not generic upgrade
+        let lapsedStatuses: Set<String> = [
+            "expired", "canceled", "revoked", "refunded", "billing_retry"
+        ]
+        if let status = quotaManager.subscriptionStatus,
+           lapsedStatuses.contains(status) {
+            return true
+        }
+        return false
     }
     
     /// Card for free users showing upgrade CTA
@@ -708,30 +730,85 @@ struct ProfileView: View {
                     }
                 }
             }
-            
-            // Manage subscription button - opens App Store subscriptions
-            Button(action: {
-                // Open Apple's subscription management page
-                if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
-                    openURL(url)
-                }
-            }) {
-                HStack {
-                    Image(systemName: "gear")
-                        .font(AppTheme.Fonts.body(size: 14))
-                    Text("manage_subscription".localized)
-                        .font(AppTheme.Fonts.body(size: 15))
-                }
-                .foregroundColor(AppTheme.Colors.gold)
+
+            // W5 F5.3: detail text below the Plus card.
+            // Renders only when subscriptionStatusDetailText is non-empty
+            // (default-case returns "" so this auto-hides for unknown
+            // states without leaving a blank line).
+            if !quotaManager.subscriptionStatusDetailText.isEmpty {
+                Text(quotaManager.subscriptionStatusDetailText)
+                    .font(AppTheme.Fonts.body(size: 13))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            
-            // View plans button
+
+            // W5 F5.3: dynamic CTA button — label varies per status.
+            // Routes:
+            //   - "Renew subscription" / "Resubscribe" → SubscriptionView (paywall)
+            //   - "Manage subscription" / "Re-enable auto-renew" / "Update payment method"
+            //     → Apple's subscription management page (only place to actually
+            //     toggle auto-renew or change payment)
+            //   - "Contact support" → mailto: link
+            //   - nil → no button rendered (e.g. active+autorenew=true)
+            if let ctaLabel = quotaManager.subscriptionStatusCTA {
+                Button(action: {
+                    handleStatusCTA(label: ctaLabel)
+                }) {
+                    HStack {
+                        Image(systemName: ctaIconName(label: ctaLabel))
+                            .font(AppTheme.Fonts.body(size: 14))
+                        Text(ctaLabel)
+                            .font(AppTheme.Fonts.body(size: 15))
+                    }
+                    .foregroundColor(AppTheme.Colors.gold)
+                }
+            }
+
+            // View plans button (always visible — lets user see all tiers)
             Button(action: { showSubscription = true }) {
                 Text("view_all_plans".localized)
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
             .accessibilityIdentifier("profile_subscription")
+        }
+    }
+
+    /// W5 F5.3: route the dynamic-CTA tap to the correct destination
+    /// based on the label. Match against localized text would be brittle —
+    /// instead we match the small set of canonical English CTAs the
+    /// QuotaManager getter returns (see QuotaManager.subscriptionStatusCTA).
+    private func handleStatusCTA(label: String) {
+        if label == "Renew subscription" || label == "Resubscribe" {
+            // Open paywall in-app
+            showSubscription = true
+        } else if label == "Contact support" {
+            // Email support@
+            if let url = URL(string: "mailto:support@destinyaiastrology.com") {
+                openURL(url)
+            }
+        } else {
+            // Manage subscription / Re-enable auto-renew / Update payment method —
+            // all require Apple's iOS Settings flow.
+            if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
+                openURL(url)
+            }
+        }
+    }
+
+    private func ctaIconName(label: String) -> String {
+        switch label {
+        case "Renew subscription", "Resubscribe":
+            return "arrow.clockwise.circle"
+        case "Contact support":
+            return "envelope"
+        case "Update payment method":
+            return "creditcard"
+        case "Re-enable auto-renew":
+            return "arrow.triangle.2.circlepath"
+        default:
+            return "gear"  // Manage subscription
         }
     }
     
