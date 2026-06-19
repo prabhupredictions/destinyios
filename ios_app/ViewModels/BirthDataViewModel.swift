@@ -256,6 +256,30 @@ class BirthDataViewModel {
             // Store generated email for guests
             if isGuest {
                 UserDefaults.standard.set(email, forKey: "userEmail")
+
+                // W7 P3 fix — mint a guest session JWT now so when this
+                // user later signs in with Apple/Google, the W7-protected
+                // /subscription/upgrade call has a guest JWT to authorize
+                // chat-history migration. Without this, /subscription/upgrade
+                // returns 401 session_required and the migration is silently
+                // dropped (see ProfileService.upgradeGuestToRegistered).
+                let trimmedName = userName.trimmingCharacters(in: .whitespacesAndNewlines)
+                let guestUserName: String? = trimmedName.isEmpty ? nil : trimmedName
+                Task.detached(priority: .userInitiated) {
+                    do {
+                        _ = try await AuthExchangeClient.shared.signInAsGuest(
+                            email: email,
+                            isGeneratedEmail: true,
+                            userName: guestUserName
+                        )
+                        print("[BirthDataViewModel] ✅ W7 guest session JWT minted for \(email)")
+                    } catch {
+                        // Lazy-mint in ProfileService.upgradeGuestToRegistered
+                        // is the safety net — log but don't block birth-data
+                        // save (offline first launches still work).
+                        print("[BirthDataViewModel] ⚠️ W7 guest JWT mint failed (will lazy-mint at upgrade): \(error)")
+                    }
+                }
             }
             
             // NOTE: Server profile sync is now handled by BirthDataView.registerWithBackend()

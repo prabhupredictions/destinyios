@@ -3113,3 +3113,9 @@
 "auth.cross_idp_collision.google" = "ಈ ಇಮೇಲ್ Google ಜೊತೆ ನೋಂದಾಯಿಸಲಾಗಿದೆ. ಮುಂದುವರಿಯಲು Google ಜೊತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ.";
 "auth.cross_idp_collision.apple" = "ಈ ಇಮೇಲ್ Apple ಜೊತೆ ನೋಂದಾಯಿಸಲಾಗಿದೆ. ಮುಂದುವರಿಯಲು Apple ಜೊತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ.";
 "auth.cross_idp_collision.generic" = "ಈ ಇಮೇಲ್ ಬೇರೆ ಸೈನ್-ಇನ್ ವಿಧಾನದೊಂದಿಗೆ ನೋಂದಾಯಿಸಲಾಗಿದೆ.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Core ಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ";
+"paywall_cta_upgrade_to_plus" = "Plus ಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ";
+"paywall_cta_upgrade_premium" = "ಪ್ರೀಮಿಯಂಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ";
+"purchase_verification_failed" = "ನಿಮ್ಮ ಖರೀದಿಯನ್ನು ನಾವು ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಚಂದಾದಾರಿಕೆ ಪರದೆಯಲ್ಲಿ 'ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಿ' ಟ್ಯಾಪ್ ಮಾಡಿ, ಅಥವಾ ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ.";

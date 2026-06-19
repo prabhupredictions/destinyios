@@ -3078,3 +3078,9 @@
 "auth.cross_idp_collision.google" = "This email is registered with Google. Sign in with Google to continue.";
 "auth.cross_idp_collision.apple" = "This email is registered with Apple. Sign in with Apple to continue.";
 "auth.cross_idp_collision.generic" = "This email is registered with a different sign-in method.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Upgrade to Core";
+"paywall_cta_upgrade_to_plus" = "Upgrade to Plus";
+"paywall_cta_upgrade_premium" = "Upgrade to Premium";
+"purchase_verification_failed" = "We couldn't verify your purchase. Please tap 'Restore Purchases' from the subscription screen, or contact support if the problem persists.";

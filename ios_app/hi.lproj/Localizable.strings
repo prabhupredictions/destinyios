@@ -2976,3 +2976,9 @@
 "auth.cross_idp_collision.google" = "यह ईमेल Google के साथ पंजीकृत है। जारी रखने के लिए Google से साइन इन करें।";
 "auth.cross_idp_collision.apple" = "यह ईमेल Apple के साथ पंजीकृत है। जारी रखने के लिए Apple से साइन इन करें।";
 "auth.cross_idp_collision.generic" = "यह ईमेल किसी अन्य साइन-इन विधि के साथ पंजीकृत है।";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Core में अपग्रेड करें";
+"paywall_cta_upgrade_to_plus" = "Plus में अपग्रेड करें";
+"paywall_cta_upgrade_premium" = "Premium में अपग्रेड करें";
+"purchase_verification_failed" = "हम आपकी खरीदारी सत्यापित नहीं कर सके। कृपया सब्सक्रिप्शन स्क्रीन पर 'Restore Purchases' टैप करें, या समस्या बनी रहे तो सहायता से संपर्क करें।";

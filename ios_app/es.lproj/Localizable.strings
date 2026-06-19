@@ -3113,3 +3113,9 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "auth.cross_idp_collision.google" = "Este correo está registrado con Google. Inicia sesión con Google para continuar.";
 "auth.cross_idp_collision.apple" = "Este correo está registrado con Apple. Inicia sesión con Apple para continuar.";
 "auth.cross_idp_collision.generic" = "Este correo está registrado con otro método de inicio de sesión.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Mejorar a Core";
+"paywall_cta_upgrade_to_plus" = "Mejorar a Plus";
+"paywall_cta_upgrade_premium" = "Mejorar a Premium";
+"purchase_verification_failed" = "No pudimos verificar tu compra. Toca 'Restaurar compras' en la pantalla de suscripción o contacta con soporte si el problema persiste.";

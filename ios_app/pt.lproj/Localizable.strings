@@ -3113,3 +3113,9 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "auth.cross_idp_collision.google" = "Este e-mail está registrado com Google. Entre com Google para continuar.";
 "auth.cross_idp_collision.apple" = "Este e-mail está registrado com Apple. Entre com Apple para continuar.";
 "auth.cross_idp_collision.generic" = "Este e-mail está registrado com outro método de login.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Atualizar para Core";
+"paywall_cta_upgrade_to_plus" = "Atualizar para Plus";
+"paywall_cta_upgrade_premium" = "Atualizar para Premium";
+"purchase_verification_failed" = "Não conseguimos verificar a sua compra. Toque em 'Restaurar compras' na tela de assinatura ou contacte o suporte se o problema persistir.";

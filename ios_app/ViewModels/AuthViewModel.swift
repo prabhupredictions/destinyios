@@ -286,32 +286,51 @@ class AuthViewModel {
                 // Use the server-returned email (critical for apple_id/google_id recovery)
                 let actualEmail = registerResponse?.userEmail ?? email
                 print("📧 [AuthViewModel] Using actualEmail for profile fetch: \(actualEmail)")
-                
+
                 // Fetch profile to check if user already has birth data
                 // Skip background sync during guest→registered upgrade (we'll sync after migration)
                 let isGuestUpgrade = guestBirthData != nil
                 var profileHasBirthData = await fetchAndRestoreProfile(email: actualEmail, skipSync: isGuestUpgrade)
                 print("📊 [AuthViewModel] fetchAndRestoreProfile returned: \(profileHasBirthData)")
-                
+
+                // W7 P3 fix — chat-history migration must run on EVERY
+                // guest→registered transition, not only when the registered
+                // row lacks birth data. Pre-fix, returning users (whose row
+                // already had birth data from a prior sign-in) skipped the
+                // entire migration block, so any chat threads accumulated
+                // in the latest guest session stayed orphaned on the
+                // archived guest row. The legacy /subscription/upgrade
+                // endpoint is idempotent — calling it for a same-email
+                // upgrade or with no orphaned threads is a no-op on the DB,
+                // so it's safe to always invoke when wasGuest && we have a
+                // distinct guest email to migrate from.
+                if wasGuest && !guestEmail.isEmpty && guestEmail != actualEmail {
+                    print("🔄 [AuthViewModel] Migrating guest chat threads (guest=\(guestEmail) → \(actualEmail))")
+                    do {
+                        try await ProfileService.shared.upgradeGuestToRegistered(
+                            oldEmail: guestEmail,
+                            newEmail: actualEmail
+                        )
+                        print("✅ [AuthViewModel] Guest chat thread migration succeeded")
+                    } catch {
+                        // Sign-in continues even if migration fails (UX
+                        // priority), but log LOUDLY so any future regression
+                        // surfaces. Pre-fix this was just "non-fatal".
+                        print("❌❌❌ [AuthViewModel] GUEST MIGRATION FAILED — chat history orphaned")
+                        print("    guestEmail=\(guestEmail) actualEmail=\(actualEmail) error=\(error)")
+                    }
+                    // Re-sync history so newly-migrated threads appear locally.
+                    print("🔄 [AuthViewModel] Re-syncing history post-migration…")
+                    await LoginSyncCoordinator.shared.syncAll(userEmail: actualEmail, dataManager: DataManager.shared)
+                }
+
                 // PHASE 12: Guest birth data carry-forward
                 // If registered user has no birth data BUT guest had birth data, save it now
                 if !profileHasBirthData, let guestData = guestBirthData {
                     print("🔄 [AuthViewModel] Carrying forward guest birth data to registered user...")
-                    
-                    // Migrate guest chat threads to registered email on backend
-                    if !guestEmail.isEmpty {
-                        do {
-                            try await ProfileService.shared.upgradeGuestToRegistered(
-                                oldEmail: guestEmail,
-                                newEmail: actualEmail
-                            )
-                        } catch {
-                            print("⚠️ [AuthViewModel] Guest thread migration failed (non-fatal): \(error)")
-                        }
-                    }
-                    
+
                     let userName = user.name ?? guestUserName ?? "User"
-                    
+
                     do {
                         try await saveGuestBirthDataForRegisteredUser(
                             email: actualEmail,
@@ -319,17 +338,17 @@ class AuthViewModel {
                             birthData: guestData,
                             gender: guestGender
                         )
-                        
+
                         profileHasBirthData = true
                         print("✅ [AuthViewModel] Guest birth data saved to registered user. Migration happened on backend.")
-                        
+
                         // Sync history AFTER migration completes on backend
                         // Local guest history was cleared before sign-in
                         // This sync fetches the migrated threads with correct IDs
                         print("🔄 [AuthViewModel] Syncing migrated history from server...")
                         await LoginSyncCoordinator.shared.syncAll(userEmail: actualEmail, dataManager: DataManager.shared)
                         print("✅ [AuthViewModel] Post-migration history sync complete")
-                        
+
                     } catch let error as ProfileError {
                         if case .birthDataTaken(let existingEmail, let provider) = error {
                             // Birth data belongs to another registered user - block sign-in
@@ -339,7 +358,7 @@ class AuthViewModel {
                             // Other profile errors - continue without birth data
                             print("⚠️ [AuthViewModel] Profile error: \(error). User will need to re-enter birth data.")
                         }
-                        
+
                     } catch {
                         // Other errors - continue without birth data, user will need to re-enter
                         print("⚠️ [AuthViewModel] Failed to save guest birth data: \(error). User will need to re-enter.")
@@ -421,10 +440,32 @@ class AuthViewModel {
                 if let storedEmail = registerResponse?.userEmail, storedEmail != "lookup-by-id@placeholder.local" {
                     // Found existing user! Fetch their profile
                     print("✅ [AuthViewModel] Found existing user by ID! Email: \(storedEmail)")
-                    
+
                     let profileHasBirthData = await fetchAndRestoreProfile(email: storedEmail)
                     print("📊 [AuthViewModel] fetchAndRestoreProfile returned: \(profileHasBirthData)")
-                    
+
+                    // W7 P3 fix — chat-history migration must run on EVERY
+                    // guest→registered transition (returning-user-by-ID
+                    // branch). See parallel comment in the email-known
+                    // branch above. This path fires when Apple/Google
+                    // returns no email (subsequent sign-in) but the
+                    // backend recovers the user via apple_id/google_id.
+                    if wasGuest && !guestEmail.isEmpty && guestEmail != storedEmail {
+                        print("🔄 [AuthViewModel] Migrating guest chat threads (ID-recovery) (guest=\(guestEmail) → \(storedEmail))")
+                        do {
+                            try await ProfileService.shared.upgradeGuestToRegistered(
+                                oldEmail: guestEmail,
+                                newEmail: storedEmail
+                            )
+                            print("✅ [AuthViewModel] Guest chat thread migration succeeded (ID-recovery)")
+                        } catch {
+                            print("❌❌❌ [AuthViewModel] GUEST MIGRATION FAILED (ID-recovery) — chat history orphaned")
+                            print("    guestEmail=\(guestEmail) storedEmail=\(storedEmail) error=\(error)")
+                        }
+                        print("🔄 [AuthViewModel] Re-syncing history post-migration (ID-recovery)…")
+                        await LoginSyncCoordinator.shared.syncAll(userEmail: storedEmail, dataManager: DataManager.shared)
+                    }
+
                     await MainActor.run {
                         if profileHasBirthData {
                             UserDefaults.standard.set(true, forKey: "hasBirthData")
@@ -455,26 +496,33 @@ class AuthViewModel {
                     // Skip background sync during guest→registered upgrade (we'll sync after migration)
                     var profileHasBirthData = await fetchAndRestoreProfile(email: effectiveEmail, skipSync: isGuestUpgrade)
                     print("📊 [AuthViewModel] fetchAndRestoreProfile (new user) returned: \(profileHasBirthData)")
-                    
+
+                    // W7 P3 fix — chat-history migration must run on EVERY
+                    // guest→registered transition (Hide-My-Email branch).
+                    // See parallel comment in the email-known branch above.
+                    if wasGuest && !guestEmail.isEmpty && guestEmail != effectiveEmail {
+                        print("🔄 [AuthViewModel] Migrating guest chat threads (HME) (guest=\(guestEmail) → \(effectiveEmail))")
+                        do {
+                            try await ProfileService.shared.upgradeGuestToRegistered(
+                                oldEmail: guestEmail,
+                                newEmail: effectiveEmail
+                            )
+                            print("✅ [AuthViewModel] Guest chat thread migration succeeded (HME)")
+                        } catch {
+                            print("❌❌❌ [AuthViewModel] GUEST MIGRATION FAILED (HME) — chat history orphaned")
+                            print("    guestEmail=\(guestEmail) effectiveEmail=\(effectiveEmail) error=\(error)")
+                        }
+                        print("🔄 [AuthViewModel] Re-syncing history post-migration (HME)…")
+                        await LoginSyncCoordinator.shared.syncAll(userEmail: effectiveEmail, dataManager: DataManager.shared)
+                    }
+
                     // PHASE 12: Guest birth data carry-forward for Apple Hide My Email flow
                     // If registered user has no birth data BUT guest had birth data, save it now
                     if !profileHasBirthData, let guestData = guestBirthData {
                         print("🔄 [AuthViewModel] Carrying forward guest birth data to Apple Hide My Email user...")
-                        
-                        // Migrate guest chat threads to registered email on backend
-                        if !guestEmail.isEmpty {
-                            do {
-                                try await ProfileService.shared.upgradeGuestToRegistered(
-                                    oldEmail: guestEmail,
-                                    newEmail: effectiveEmail
-                                )
-                            } catch {
-                                print("⚠️ [AuthViewModel] Guest thread migration failed (non-fatal): \(error)")
-                            }
-                        }
-                        
+
                         let userName = user.name ?? guestUserName ?? "User"
-                        
+
                         do {
                             try await saveGuestBirthDataForRegisteredUser(
                                 email: effectiveEmail,
@@ -482,15 +530,15 @@ class AuthViewModel {
                                 birthData: guestData,
                                 gender: guestGender
                             )
-                            
+
                             profileHasBirthData = true
                             print("✅ [AuthViewModel] Guest birth data saved to Apple Hide My Email user. Migration happened on backend.")
-                            
+
                             // Sync history AFTER migration completes on backend
                             print("🔄 [AuthViewModel] Syncing migrated history from server...")
                             await LoginSyncCoordinator.shared.syncAll(userEmail: effectiveEmail, dataManager: DataManager.shared)
                             print("✅ [AuthViewModel] Post-migration history sync complete")
-                            
+
                         } catch let error as ProfileError {
                             if case .birthDataTaken(let existingEmail, let provider) = error {
                                 print("🚫 [AuthViewModel] Guest birth data conflict (Hide My Email): \(existingEmail ?? "unknown")")

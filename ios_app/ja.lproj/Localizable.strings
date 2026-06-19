@@ -3113,3 +3113,9 @@
 "auth.cross_idp_collision.google" = "このメールは Google に登録されています。続行するには Google でサインインしてください。";
 "auth.cross_idp_collision.apple" = "このメールは Apple に登録されています。続行するには Apple でサインインしてください。";
 "auth.cross_idp_collision.generic" = "このメールは別のサインイン方法で登録されています。";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Core にアップグレード";
+"paywall_cta_upgrade_to_plus" = "Plus にアップグレード";
+"paywall_cta_upgrade_premium" = "プレミアムにアップグレード";
+"purchase_verification_failed" = "購入を確認できませんでした。サブスクリプション画面の「購入の復元」をタップするか、問題が続く場合はサポートにお問い合わせください。";

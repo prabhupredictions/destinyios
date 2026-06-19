@@ -3113,3 +3113,9 @@
 "auth.cross_idp_collision.google" = "Этот email зарегистрирован через Google. Войдите через Google для продолжения.";
 "auth.cross_idp_collision.apple" = "Этот email зарегистрирован через Apple. Войдите через Apple для продолжения.";
 "auth.cross_idp_collision.generic" = "Этот email зарегистрирован через другой способ входа.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Перейти на Core";
+"paywall_cta_upgrade_to_plus" = "Перейти на Plus";
+"paywall_cta_upgrade_premium" = "Перейти на Premium";
+"purchase_verification_failed" = "Не удалось подтвердить вашу покупку. Нажмите «Восстановить покупки» на экране подписки или свяжитесь со службой поддержки, если проблема не исчезнет.";

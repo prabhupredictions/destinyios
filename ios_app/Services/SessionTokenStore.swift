@@ -85,6 +85,34 @@ final class SessionTokenStore: @unchecked Sendable {
         }
     }
 
+    /// W7 P3 fix — look up the session JWT for a SPECIFIC email,
+    /// regardless of which email is currently the active session.
+    /// Used during guest→registered upgrade where the active session
+    /// has already been swapped to the IdP user but we still need
+    /// the GUEST's JWT to authorize the /subscription/upgrade call
+    /// (W7 ownership check binds caller identity to old_email).
+    func sessionJwt(forEmail email: String) -> String? {
+        return queue.sync { () -> String? in
+            keychain.loadString(forKey: Self.sessionJwtKey(email: email.lowercased()))
+        }
+    }
+
+    /// W7 P3 fix — drop only the keychain entries for one email
+    /// (used after a successful guest→registered upgrade where the
+    /// guest row no longer exists server-side).
+    func clearSession(forEmail email: String) {
+        queue.sync {
+            let normalized = email.lowercased()
+            keychain.delete(forKey: Self.sessionJwtKey(email: normalized))
+            keychain.delete(forKey: Self.refreshTokenKey(email: normalized))
+            keychain.delete(forKey: Self.sessionExpiryKey(email: normalized))
+            keychain.delete(forKey: Self.refreshExpiryKey(email: normalized))
+            if userDefaults.string(forKey: Self.activeEmailKey)?.lowercased() == normalized {
+                userDefaults.removeObject(forKey: Self.activeEmailKey)
+            }
+        }
+    }
+
     /// True if the current session JWT is still valid (with 60s skew).
     /// Returns false if no JWT or it's about to expire.
     func sessionIsFresh() -> Bool {

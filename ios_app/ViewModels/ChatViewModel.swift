@@ -349,6 +349,13 @@ class ChatViewModel {
                     } else {
                         errorMessage = "daily_limit_reached_tomorrow".localized
                     }
+                } else if accessResponse.reason == "subscription_expired" {
+                    // Lapsed paid user — show the renew paywall, not the
+                    // upgrade-to-keep-going copy. quotaError already carries
+                    // reason='subscription_expired' so QuotaExhaustedView's
+                    // isSubscriptionExpired branch fires for headline/body/CTA.
+                    quotaDetails = "subscription_expired_body".localized
+                    showQuotaSheet = true
                 } else if accessResponse.reason == "overall_limit_reached" {
                     // Prefer server-curated per-plan message (iOS-11 fix). Fall back to
                     // generic localized strings if backend didn't supply one.

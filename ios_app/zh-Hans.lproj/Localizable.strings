@@ -3113,3 +3113,9 @@
 "auth.cross_idp_collision.google" = "此邮箱已通过 Google 注册。请使用 Google 登录以继续。";
 "auth.cross_idp_collision.apple" = "此邮箱已通过 Apple 注册。请使用 Apple 登录以继续。";
 "auth.cross_idp_collision.generic" = "此邮箱已通过其他登录方式注册。";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "升级到 Core";
+"paywall_cta_upgrade_to_plus" = "升级到 Plus";
+"paywall_cta_upgrade_premium" = "升级到高级版";
+"purchase_verification_failed" = "我们无法验证您的购买。请在订阅页面点击「恢复购买」,或在问题持续时联系客服。";

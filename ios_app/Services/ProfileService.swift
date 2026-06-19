@@ -207,6 +207,24 @@ class ProfileService {
     /// Upgrade guest user to registered user and migrate chat history
     /// Called when a guest signs in with Apple/Google
     /// This migrates chat_threads from old guest email to new registered email
+    ///
+    /// W7 P3 fix (2026-06-19): /subscription/upgrade requires the GUEST
+    /// session JWT in the Authorization header (the W7 ownership check at
+    /// subscription_router.py:575 demands identity.user_email == old_email).
+    /// Pre-fix, this method sent only the bundled API key — the API-key
+    /// middleware accepted it, but SessionAuthMiddleware skipped it (not
+    /// JWT-shaped), leaving request.state.identity = None → backend 401
+    /// session_required. iOS then swallowed the 401 as non-fatal and
+    /// silently dropped chat-thread migration on every guest→registered
+    /// transition.
+    /// Fix: look up the guest's JWT by email in SessionTokenStore (the
+    /// active session has already been swapped to the IdP user by the
+    /// time we reach here), and send it via Authorization: Bearer while
+    /// putting the API key in the explicit X-API-Key header. Backend
+    /// accepts both. Lazy-mint via /auth/exchange for legacy installs
+    /// that became guests before the BirthDataViewModel mint hook
+    /// landed. Fail loud on non-2xx so future regressions surface
+    /// instead of being swallowed.
     func upgradeGuestToRegistered(
         oldEmail: String,
         newEmail: String
@@ -215,41 +233,77 @@ class ProfileService {
             print("[ProfileService] upgradeGuestToRegistered: old and new email same, skipping")
             return
         }
-        
+
+        // W7: pull the GUEST session JWT (active session is now the IdP user).
+        var guestJwt = SessionTokenStore.shared.sessionJwt(forEmail: oldEmail)
+
+        // Lazy-mint for legacy installs whose guest session predates
+        // the BirthDataViewModel mint hook — hit /auth/exchange now
+        // so we have a JWT bound to oldEmail.
+        if guestJwt == nil {
+            print("[ProfileService] ⚠️ No cached guest JWT — lazy-minting via /auth/exchange")
+            do {
+                _ = try await AuthExchangeClient.shared.signInAsGuest(
+                    email: oldEmail,
+                    isGeneratedEmail: true,
+                    userName: UserDefaults.standard.string(forKey: "userName")
+                )
+                guestJwt = SessionTokenStore.shared.sessionJwt(forEmail: oldEmail)
+            } catch {
+                print("[ProfileService] ⚠️ Lazy guest JWT mint failed: \(error)")
+            }
+        }
+
+        guard let jwt = guestJwt else {
+            print("[ProfileService] ❌ No guest JWT available — cannot migrate \(oldEmail)")
+            throw ProfileError.invalidResponse
+        }
+
         guard let url = URL(string: "\(APIConfig.baseURL)\(APIConfig.subscriptionUpgrade)") else {
             throw ProfileError.invalidURL
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
+        // CRITICAL: BOTH headers required.
+        // - X-API-Key authenticates the iOS app to APIKeyAuthMiddleware
+        // - Authorization: Bearer <guestJwt> identifies the caller to
+        //   SessionAuthMiddleware so /subscription/upgrade's W7 owner
+        //   check (identity.user_email == old_email) passes.
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+        request.setValue("Bearer \(jwt)", forHTTPHeaderField: "Authorization")
+
         let body: [String: Any] = [
             "old_email": oldEmail,
             "new_email": newEmail
         ]
-        
+
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        
-        print("[ProfileService] 🔄 Upgrading guest to registered...")
+
+        print("[ProfileService] 🔄 Upgrading guest to registered (with guest JWT)…")
         print("   - old_email: \(oldEmail)")
         print("   - new_email: \(newEmail)")
-        
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw ProfileError.invalidResponse
         }
-        
+
         if httpResponse.statusCode == 200 {
-            print("[ProfileService] ✅ Guest upgrade successful - chat history migrated!")
+            print("[ProfileService] ✅ Guest upgrade successful — chat history migrated!")
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                 print("   - response: \(json)")
             }
+            // Guest row archived/removed server-side: drop the local
+            // keychain entry for the guest email.
+            SessionTokenStore.shared.clearSession(forEmail: oldEmail)
         } else {
-            print("[ProfileService] ⚠️ Guest upgrade returned status \(httpResponse.statusCode)")
-            // Non-fatal - don't throw, just log
+            // FAIL LOUD — silent 401s here were how the bug went undetected.
+            let bodyStr = String(data: data, encoding: .utf8) ?? "<no body>"
+            print("[ProfileService] ❌ Guest upgrade FAILED status=\(httpResponse.statusCode) body=\(bodyStr)")
+            throw ProfileError.invalidResponse
         }
     }
     

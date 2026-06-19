@@ -3113,3 +3113,9 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "auth.cross_idp_collision.google" = "Cet e-mail est enregistré avec Google. Connectez-vous avec Google pour continuer.";
 "auth.cross_idp_collision.apple" = "Cet e-mail est enregistré avec Apple. Connectez-vous avec Apple pour continuer.";
 "auth.cross_idp_collision.generic" = "Cet e-mail est enregistré avec une autre méthode de connexion.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Passer à Core";
+"paywall_cta_upgrade_to_plus" = "Passer à Plus";
+"paywall_cta_upgrade_premium" = "Passer à Premium";
+"purchase_verification_failed" = "Nous n'avons pas pu vérifier votre achat. Appuyez sur « Restaurer les achats » sur l'écran d'abonnement, ou contactez l'assistance si le problème persiste.";

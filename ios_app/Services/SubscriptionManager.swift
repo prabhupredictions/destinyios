@@ -92,6 +92,16 @@ class SubscriptionManager: ObservableObject {
     // hitting the backend for the same transaction and firing two conflict popups.
     private var verifyInFlight: Set<String> = []
 
+    // W4b-fix #8 (iOS): retry counter for app_account_token_unknown self-heal.
+    // When backend rejects with that code, we delete the stale Keychain entry
+    // and let StoreKit redeliver the transaction so the next purchase or
+    // reconcile pass mints a fresh token. We CAP retries per originalID at
+    // `appAccountTokenSelfHealMaxAttempts` to prevent infinite redelivery
+    // loops if the backend keeps rejecting (e.g. cross-account where the
+    // token is owned by another user — distinct from "unknown").
+    private var appAccountTokenSelfHealAttempts: [String: Int] = [:]
+    private let appAccountTokenSelfHealMaxAttempts = 1
+
     // MARK: - Foreground sync timer (INV-2 Gap A)
     /// Runs while the app is in foreground and triggers QuotaManager.syncStatus
     /// every minute. Respects QuotaManager's 5-min cooldown internally, so the
@@ -815,6 +825,44 @@ class SubscriptionManager: ObservableObject {
             if let parsedResponse, !parsedResponse.success {
                 let errorCode = parsedResponse.error ?? "unknown"
                 print("❌ Backend verification rejected: \(errorCode)")
+
+                // W4b-fix #8 (iOS): self-heal on app_account_token_unknown.
+                // The Keychain-cached UUID is orphaned (backend doesn't know
+                // it — happens after DB wipe in dev, or rarely in prod after
+                // account-deletion + same-email re-register / DB restore).
+                // Delete the stale entry so the next fetchOrCacheAppAccountToken
+                // re-mints from the server, then return false so StoreKit
+                // redelivers and the next pass picks up the fresh token.
+                //
+                // Cap retries per transaction to avoid infinite redelivery
+                // when the rejection is permanent (e.g. backend keeps
+                // returning unknown for some other reason). After the cap,
+                // we surface the error and finish the transaction.
+                if errorCode == "app_account_token_unknown" {
+                    let txnIDKey = "\(transaction.originalID)"
+                    let attempts = (self.appAccountTokenSelfHealAttempts[txnIDKey] ?? 0) + 1
+                    self.appAccountTokenSelfHealAttempts[txnIDKey] = attempts
+
+                    if attempts <= self.appAccountTokenSelfHealMaxAttempts {
+                        let lowerEmail = email.lowercased()
+                        let keychainKey = "appAccountToken::\(lowerEmail)"
+                        KeychainService.shared.delete(forKey: keychainKey)
+                        print("♻️ [Backend] app_account_token_unknown — cleared Keychain entry, will re-mint on retry (attempt \(attempts)/\(self.appAccountTokenSelfHealMaxAttempts))")
+                        // Return false → caller does NOT call transaction.finish() →
+                        // StoreKit will redeliver via Transaction.updates next launch
+                        // / next reconcile foreground pass.
+                        return false
+                    } else {
+                        print("⛔ [Backend] app_account_token_unknown — exhausted self-heal retries, surfacing error and finishing transaction")
+                        self.errorMessage = NSLocalizedString(
+                            "purchase_verification_failed",
+                            value: "We couldn't verify your purchase. Please tap 'Restore Purchases' from the subscription screen, or contact support if the problem persists.",
+                            comment: "Shown when /verify rejects a purchase that iOS could not self-heal"
+                        )
+                        // Fall through to terminal-finish below
+                    }
+                }
+
                 if errorCode == "transaction_belongs_to_different_user" {
                     // BUG-1 fix: only create a new SubscriptionConflict if we haven't
                     // already shown the alert this session. SwiftUI's .alert(item:)
@@ -826,13 +874,30 @@ class SubscriptionManager: ObservableObject {
                         self.subscriptionConflict = SubscriptionConflict(productID: transaction.productID)
                         self.conflictDetectedThisSession = true
                     }
+                } else if errorCode != "app_account_token_unknown" {
+                    // Any other terminal rejection (invalid_bundle_id,
+                    // sandbox_transaction_rejected_in_production, etc.) —
+                    // surface a generic message so the user knows
+                    // something went wrong instead of the silent "paywall
+                    // after successful purchase" gaslighting.
+                    if self.errorMessage == nil {
+                        self.errorMessage = NSLocalizedString(
+                            "purchase_verification_failed",
+                            value: "We couldn't verify your purchase. Please tap 'Restore Purchases' from the subscription screen, or contact support if the problem persists.",
+                            comment: "Shown when /verify rejects a purchase"
+                        )
+                    }
                 }
                 // Finish to avoid retry loop — this transaction will never succeed
-                // for the current user (different email already owns it, or invalid bundle, etc.)
+                // for the current user (different email already owns it, invalid bundle, etc.)
                 return true
             }
 
             print("✅ Backend verification successful for \(email)")
+            // Reset self-heal counter on success — fresh slate for any
+            // future redelivery of the same originalID (e.g. after refund
+            // reversal).
+            self.appAccountTokenSelfHealAttempts.removeValue(forKey: "\(transaction.originalID)")
             // Sync quota status after successful verification (force bypass cooldown)
             try? await QuotaManager.shared.syncStatus(email: email, force: true)
             return true

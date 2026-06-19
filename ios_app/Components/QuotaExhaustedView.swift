@@ -75,10 +75,14 @@ struct QuotaErrorInfo {
         if reason == "subscription_expired" {
             return "subscription_expired_cta".localized
         }
-        if let plan = suggestedPlan?.capitalized {
-            return "Upgrade to \(plan)"
-        }
-        return "Upgrade Now"
+        // Generic "Upgrade to Premium" for all other quota-exhausted
+        // states (free, billing_retry, etc.). Showing the server's
+        // suggested_plan name (Core/Plus) here gaslit users — e.g. a
+        // user whose billing failed on Plus saw "Upgrade to Core",
+        // implying a downgrade. Generic copy avoids that and lets the
+        // sheet itself surface the plan picker. Keys still localized
+        // in every .lproj bundle (paywall localization Phase 6).
+        return "paywall_cta_upgrade_premium".localized
     }
 }
 

@@ -3109,3 +3109,9 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "auth.cross_idp_collision.google" = "Diese E-Mail ist mit Google registriert. Melden Sie sich mit Google an, um fortzufahren.";
 "auth.cross_idp_collision.apple" = "Diese E-Mail ist mit Apple registriert. Melden Sie sich mit Apple an, um fortzufahren.";
 "auth.cross_idp_collision.generic" = "Diese E-Mail ist mit einer anderen Anmeldemethode registriert.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Auf Core upgraden";
+"paywall_cta_upgrade_to_plus" = "Auf Plus upgraden";
+"paywall_cta_upgrade_premium" = "Auf Premium upgraden";
+"purchase_verification_failed" = "Wir konnten deinen Kauf nicht verifizieren. Tippe im Abonnementbildschirm auf „Käufe wiederherstellen“ oder wende dich an den Support, falls das Problem weiterhin besteht.";

@@ -3111,3 +3111,9 @@
 "auth.cross_idp_collision.google" = "இந்த மின்னஞ்சல் Google உடன் பதிவு செய்யப்பட்டுள்ளது. தொடர Google உடன் உள்நுழையவும்.";
 "auth.cross_idp_collision.apple" = "இந்த மின்னஞ்சல் Apple உடன் பதிவு செய்யப்பட்டுள்ளது. தொடர Apple உடன் உள்நுழையவும்.";
 "auth.cross_idp_collision.generic" = "இந்த மின்னஞ்சல் வேறு உள்நுழைவு முறையுடன் பதிவு செய்யப்பட்டுள்ளது.";
+
+/* W4b-fix #8 / paywall localization (Phase 6 — 2026-06-19) */
+"paywall_cta_upgrade_to_core" = "Core க்கு அப்கிரேட் செய்யவும்";
+"paywall_cta_upgrade_to_plus" = "Plus க்கு அப்கிரேட் செய்யவும்";
+"paywall_cta_upgrade_premium" = "பிரீமியத்திற்கு அப்கிரேட் செய்யவும்";
+"purchase_verification_failed" = "உங்கள் வாங்குதலை எங்களால் சரிபார்க்க முடியவில்லை. சந்தா திரையில் 'வாங்கியதை மீட்டமை' என்பதை தட்டவும், அல்லது சிக்கல் தொடர்ந்தால் ஆதரவைத் தொடர்பு கொள்ளவும்.";
