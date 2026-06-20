@@ -56,7 +56,8 @@ final class NotificationInboxService: ObservableObject {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+            request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
             
             let (data, response) = try await URLSession.shared.data(for: request)
             
@@ -105,7 +106,8 @@ final class NotificationInboxService: ObservableObject {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+            request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
             
             let (data, response) = try await URLSession.shared.data(for: request)
             
@@ -132,7 +134,8 @@ final class NotificationInboxService: ObservableObject {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+            request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
             
             let (data, response) = try await URLSession.shared.data(for: request)
             
@@ -185,7 +188,8 @@ final class NotificationInboxService: ObservableObject {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+            request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
             
             let (_, response) = try await URLSession.shared.data(for: request)
             

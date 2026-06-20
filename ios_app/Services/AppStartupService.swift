@@ -27,7 +27,8 @@ final class AppStartupService {
         }
         guard let url = URL(string: "\(APIConfig.baseURL)/api/v2/app/config") else { return }
         var request = URLRequest(url: url)
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         request.timeoutInterval = 10
 
         do {

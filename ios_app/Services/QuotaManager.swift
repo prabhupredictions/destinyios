@@ -433,7 +433,8 @@ class QuotaManager: ObservableObject {
 
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         // Short timeout: if Cloud Run is cold, fail fast so the catch block in sendQuery
         // lets the request proceed. The stream itself handles cold-start wait transparently.
         request.timeoutInterval = 5
@@ -471,8 +472,9 @@ class QuotaManager: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+
         let body: [String: String] = [
             "email": email,
             "feature_id": feature.rawValue
@@ -505,7 +507,8 @@ class QuotaManager: ObservableObject {
         let url = URL(string: APIConfig.baseURL + "/subscription/plans")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -533,8 +536,9 @@ class QuotaManager: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-        
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+
         let body: [String: Any] = [
             "email": email,
             "is_generated_email": isGeneratedEmail
@@ -636,7 +640,8 @@ class QuotaManager: ObservableObject {
         
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         request.timeoutInterval = 10  // fail fast on cold Cloud Run; cache stays valid
 
         let (data, response) = try await URLSession.shared.data(for: request)

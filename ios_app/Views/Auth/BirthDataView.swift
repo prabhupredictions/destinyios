@@ -622,7 +622,8 @@ struct BirthDataView: View {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: profileRequest)

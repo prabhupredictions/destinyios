@@ -243,3 +243,31 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
         )
     }
 }
+
+extension NetworkClient {
+    /// W7 — shared auth header for ALL URLSession callers.
+    /// Returns Authorization Bearer value: JWT if available + fresh,
+    /// else falls back to bundled API key. Use this anywhere you
+    /// build a URLRequest manually instead of going through
+    /// NetworkClient.request(...).
+    ///
+    /// Usage:
+    ///     request.setValue(NetworkClient.authBearer(),
+    ///                      forHTTPHeaderField: "Authorization")
+    ///     request.setValue(APIConfig.apiKey,
+    ///                      forHTTPHeaderField: "X-API-Key")
+    static func authBearer() -> String {
+        if let sessionJwt = SessionTokenStore.shared.currentSessionJwt(),
+           SessionTokenStore.shared.sessionIsFresh() {
+            return "Bearer \(sessionJwt)"
+        }
+        return "Bearer \(APIConfig.apiKey)"
+    }
+
+    /// Always returns the bundled API key. Use for X-API-Key header
+    /// alongside authBearer() so backend's APIKeyAuthMiddleware can
+    /// validate the iOS app identity on every request (W7 step 8).
+    static func apiKeyHeader() -> String {
+        return APIConfig.apiKey
+    }
+}

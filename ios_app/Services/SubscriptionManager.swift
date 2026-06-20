@@ -790,7 +790,8 @@ class SubscriptionManager: ObservableObject {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+            request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
 
             let body: [String: Any] = [
                 "signed_transaction": jws,
@@ -977,7 +978,8 @@ class SubscriptionManager: ObservableObject {
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         request.timeoutInterval = 8
 
         do {

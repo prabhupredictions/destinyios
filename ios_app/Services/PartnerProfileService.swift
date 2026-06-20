@@ -29,7 +29,8 @@ class PartnerProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -79,7 +80,8 @@ class PartnerProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         request.httpBody = try JSONEncoder().encode(createRequest)
         
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -114,22 +116,36 @@ class PartnerProfileService {
         struct UpdateRequest: Codable {
             let userEmail: String
             let profile: PartnerProfileRequest
-            
+            // W7 audit fix (2026-06-20): backend reads top-level
+            // consent_given + guardian_consent_given on PUT (subscription_router.py:
+            // 1488-1489 — partner.consent_given = request.consent_given,
+            // partner.guardian_consent_given = request.guardian_consent_given).
+            // Pre-fix iOS only sent profile-nested fields, so backend silently
+            // overwrote top-level flags to False (CreatePartnerRequest defaults).
+            // Send both top-level flags so updates preserve consent state.
+            let consentGiven: Bool
+            let guardianConsentGiven: Bool
+
             enum CodingKeys: String, CodingKey {
                 case userEmail = "user_email"
                 case profile
+                case consentGiven = "consent_given"
+                case guardianConsentGiven = "guardian_consent_given"
             }
         }
-        
+
         let updateRequest = UpdateRequest(
             userEmail: email,
-            profile: PartnerProfileRequest(from: profile)
+            profile: PartnerProfileRequest(from: profile),
+            consentGiven: profile.consentGiven,
+            guardianConsentGiven: profile.guardianConsentGiven
         )
         
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         request.httpBody = try JSONEncoder().encode(updateRequest)
         
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -169,7 +185,8 @@ class PartnerProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         

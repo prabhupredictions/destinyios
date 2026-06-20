@@ -68,7 +68,9 @@ final class CompatibilityService: CompatibilityServiceProtocol {
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-        urlRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        // W7 — send session JWT when available, else fall back to bundled API key.
+        urlRequest.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        urlRequest.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         urlRequest.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
         urlRequest.httpBody = try JSONEncoder().encode(request)
         

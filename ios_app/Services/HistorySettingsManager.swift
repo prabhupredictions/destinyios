@@ -49,7 +49,8 @@ final class HistorySettingsManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -85,7 +86,8 @@ final class HistorySettingsManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         Task {
             do {
@@ -138,7 +140,8 @@ final class HistorySettingsManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)

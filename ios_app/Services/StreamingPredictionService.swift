@@ -38,7 +38,11 @@ class StreamingPredictionService {
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
-        urlRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        // W7 — send session JWT when available, else fall back to bundled API key.
+        // Adding X-API-Key alongside lets backend's APIKeyAuthMiddleware identify
+        // the iOS app while SessionAuthMiddleware reads the Bearer for user identity.
+        urlRequest.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        urlRequest.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("text/event-stream", forHTTPHeaderField: "Accept")
         urlRequest.timeoutInterval = 300  // 5 min — Opus first-token can be slow

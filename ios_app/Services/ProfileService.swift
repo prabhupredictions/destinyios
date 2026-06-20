@@ -119,7 +119,8 @@ class ProfileService {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -164,7 +165,8 @@ class ProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         var body: [String: Any] = [
             "email": email,
@@ -324,7 +326,8 @@ class ProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let body: [String: Any] = [
             "email": email,
@@ -384,7 +387,8 @@ class ProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let body: [String: Any] = [
             "email": email,
@@ -574,7 +578,8 @@ class ProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let body: [String: String] = [
             "user_email": email,
@@ -588,19 +593,41 @@ class ProfileService {
             throw ProfileError.invalidResponse
         }
         
+        if httpResponse.statusCode == 409 {
+            // W7 fix (2026-06-20): backend returns 409 with dict body
+            // {"code": "active_subscription", "message": "...",
+            //  "subscription_expires_at": "..."} when paid period is active.
+            // Pre-fix iOS only handled 403 with string detail and missed
+            // the 409 dict shape, so users never saw "cancel subscription
+            // first" — fell into generic serverError(409).
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any] {
+                if let message = detail["message"] as? String {
+                    throw ProfileError.accountDeletionBlocked(message)
+                }
+                if let code = detail["code"] as? String, code == "active_subscription" {
+                    throw ProfileError.accountDeletionBlocked(
+                        "Please cancel your subscription before deleting your account."
+                    )
+                }
+            }
+            throw ProfileError.accountDeletionBlocked(
+                "Please cancel your subscription before deleting your account."
+            )
+        }
         if httpResponse.statusCode == 403 {
-            // Active subscription — parse detail message
+            // Backwards-compat for any legacy 403 string-body response.
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let detail = json["detail"] as? String {
                 throw ProfileError.accountDeletionBlocked(detail)
             }
             throw ProfileError.accountDeletionBlocked("Please cancel your subscription before deleting your account.")
         }
-        
+
         guard httpResponse.statusCode == 200 else {
             throw ProfileError.serverError(statusCode: httpResponse.statusCode)
         }
-        
+
         print("[ProfileService] Account deleted successfully for \(email)")
     }
     
@@ -641,7 +668,8 @@ class ProfileService {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -668,7 +696,8 @@ class ProfileService {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let body: [String: Any] = [
             "user_email": email,

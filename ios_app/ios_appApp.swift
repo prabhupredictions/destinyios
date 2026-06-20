@@ -170,7 +170,9 @@ final class BackendWarmUpService {
         let session = URLSession(configuration: config)
 
         var request = URLRequest(url: url)
-        request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        // W7 — send session JWT when available, else fall back to bundled API key.
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
 
         let task = session.dataTask(with: request) { _, response, _ in
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0

@@ -301,7 +301,8 @@ final class CompatibilityHistoryService {
                 
                 var request = URLRequest(url: url)
                 request.httpMethod = "DELETE"
-                request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+                request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+                request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
                 
                 do {
                     let (data, response) = try await URLSession.shared.data(for: request)
@@ -419,8 +420,9 @@ final class CompatibilityHistoryService {
         do {
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
-            request.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
-            
+            request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+            request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+
             let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse,
@@ -471,7 +473,8 @@ final class CompatibilityHistoryService {
                 
                 var detailRequest = URLRequest(url: detailURL)
                 detailRequest.httpMethod = "GET"
-                detailRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+                detailRequest.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+                detailRequest.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
                 
                 do {
                     let (detailData, detailResponse) = try await URLSession.shared.data(for: detailRequest)
@@ -695,7 +698,8 @@ final class CompatibilityHistoryService {
             
             var detailRequest = URLRequest(url: detailURL)
             detailRequest.httpMethod = "GET"
-            detailRequest.setValue("Bearer \(APIConfig.apiKey)", forHTTPHeaderField: "Authorization")
+            detailRequest.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+            detailRequest.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
             
             do {
                 let (detailData, detailResponse) = try await URLSession.shared.data(for: detailRequest)
