@@ -17,6 +17,26 @@ struct ios_appApp: App {
     @Environment(\.scenePhase) private var scenePhase
     
     init() {
+        // C3 (1.7) — First-launch keychain wipe. iOS keychain SURVIVES app uninstall,
+        // but UserDefaults does not. Without this guard, a reinstalled app inherits
+        // stale session JWTs / appAccountTokens / Apple Sign-In credentials from the
+        // previous install, leading to weird auth/Storekit states that even sign-out
+        // can't reach.
+        //
+        // We only wipe when ALL of the following indicate a true fresh install:
+        //   - hasLaunchedBefore == false
+        //   - userEmail UserDefault is nil
+        //   - w7_current_session_email UserDefault is nil
+        //   - no keychain keys with prefix "w7_session_jwt::"
+        //   - no keychain keys with prefix "appAccountToken::"
+        //   - no keychain keys with prefix "appleEmail_" or "appleName_"
+        //     (Apple Sign-In writes these once and Apple returns nil on subsequent
+        //     sign-ins for the same Apple ID — wiping them would lock the user out.)
+        //
+        // If ANY probe is .indeterminate (keychain locked at launch), we DO NOT wipe
+        // and DO NOT set hasLaunchedBefore so a future unlocked launch can re-evaluate.
+        Self.performFirstLaunchKeychainWipeIfNeeded()
+
         // Configure Google Sign-In on app launch
         #if canImport(GoogleSignIn)
         if let clientID = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String {
@@ -26,6 +46,56 @@ struct ios_appApp: App {
             print("❌ [App] GIDClientID not found in Info.plist")
         }
         #endif
+    }
+
+    private static func performFirstLaunchKeychainWipeIfNeeded() {
+        let ud = UserDefaults.standard
+        guard !ud.bool(forKey: "hasLaunchedBefore") else { return }
+
+        let keychain = KeychainService.shared
+
+        // Probe every signal that survives uninstall.
+        let prefixesToProbe = [
+            "w7_session_jwt::",
+            "appAccountToken::",
+            "appleEmail_",
+            "appleName_"
+        ]
+
+        var sawPresent = false
+        var sawIndeterminate = false
+        for prefix in prefixesToProbe {
+            switch keychain.probeAnyKey(withPrefix: prefix) {
+            case .present:
+                sawPresent = true
+            case .indeterminate:
+                sawIndeterminate = true
+            case .absent:
+                break
+            }
+        }
+
+        // UserDefaults signals (cannot survive uninstall, but cover the
+        // sign-out-then-relaunch case where keychain has been cleared).
+        if let s = ud.string(forKey: "userEmail"), !s.isEmpty { sawPresent = true }
+        if let s = ud.string(forKey: "w7_current_session_email"), !s.isEmpty { sawPresent = true }
+
+        if sawIndeterminate && !sawPresent {
+            // Keychain locked + no other definitive signal — DEFER. Do not wipe,
+            // do not latch hasLaunchedBefore, so we can re-evaluate next launch.
+            print("⏸ [App] First launch but keychain probe indeterminate — deferring first-launch wipe decision")
+            return
+        }
+
+        // Latch the flag BEFORE the wipe so a crash mid-wipe doesn't loop us.
+        ud.set(true, forKey: "hasLaunchedBefore")
+
+        if sawPresent {
+            print("✅ [App] First launch but prior state detected — preserving keychain")
+        } else {
+            print("🧹 [App] First launch with no prior state — clearing keychain")
+            keychain.clearAll()
+        }
     }
     
     var body: some Scene {

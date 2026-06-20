@@ -25,6 +25,12 @@ final class ChatViewModelTests: XCTestCase {
         // is correct behaviour for tests that DON'T expect a network call.
         MockURLProtocol.reset()
         URLProtocol.registerClass(MockURLProtocol.self)
+        // 1.7 fix — URLProtocol.registerClass() only intercepts URLSession.shared.
+        // NetworkClient creates its own URLSessionConfiguration, so we must inject
+        // a session whose configuration explicitly includes MockURLProtocol in
+        // protocolClasses. Without this, NetworkClient calls fall through to the
+        // real network and fail with -1004 connection refused.
+        NetworkClient.urlSessionFactory = { MockURLProtocol.makeSession() }
 
         // Initialize ViewModel with test data manager
         viewModel = ChatViewModel(dataManager: testDataManager)
@@ -37,6 +43,7 @@ final class ChatViewModelTests: XCTestCase {
     override func tearDown() async throws {
         URLProtocol.unregisterClass(MockURLProtocol.self)
         MockURLProtocol.reset()
+        NetworkClient.urlSessionFactory = nil
         UserDefaults.standard.removeObject(forKey: "userEmail")
         UserDefaults.standard.removeObject(forKey: "userBirthData")
         viewModel = nil
@@ -420,9 +427,17 @@ final class ChatViewModelTests: XCTestCase {
     /// (Backend-side fix — reservation-style /can-access — is deferred and
     /// tracked as iOS-1b.)
     func testPredictStream_serverQuotaError_triggersPaywall() async throws {
-        // Given — /can-access allows (race winner path) but /predict/stream
-        // returns HTTP 403 with a quota_exceeded body.
+        // Given — /can-access allows (race winner path) but /predict
+        // returns HTTP 403 with a quota_exceeded body. (Test was written
+        // against /predict/stream when ChatViewModel routed through
+        // StreamingPredictionService; the production path now uses the
+        // non-stream PredictionService.predict — this test now stubs both
+        // endpoints so it works regardless of which one ChatViewModel calls.)
         MockURLProtocol.stubQuotaAllowAll()
+        MockURLProtocol.stubPredictQuota403(
+            reason: "overall_limit_reached",
+            ctaMessage: "Quota raced — upgrade to keep going."
+        )
         MockURLProtocol.stubPredictStreamQuota403(
             reason: "overall_limit_reached",
             ctaMessage: "Quota raced — upgrade to keep going."

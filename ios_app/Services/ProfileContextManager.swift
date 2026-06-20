@@ -144,8 +144,16 @@ class ProfileContextManager {
     /// Generate a profile-scoped storage key
     /// - Parameter baseKey: The base key (e.g., "todaysPrediction_response")
     /// - Returns: Key scoped to current profile: "{baseKey}_{email}_{profileId}"
+    ///   L3 (1.7) — when ownerEmail is empty (pre-login or post-sign-out), return
+    ///   the bare baseKey so callers don't read/write into an ambiguous key like
+    ///   "todaysPrediction_response__self" that would survive a real user signing in.
+    ///   Note: most callers check userEmail before invoking; this is belt-and-suspenders.
     func profileScopedKey(_ baseKey: String) -> String {
-        "\(baseKey)_\(ownerEmail)_\(activeProfileId)"
+        let email = ownerEmail
+        guard !email.isEmpty else {
+            return baseKey
+        }
+        return "\(baseKey)_\(email)_\(activeProfileId)"
     }
     
     /// Reset active profile state on logout

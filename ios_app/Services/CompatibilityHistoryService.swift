@@ -6,12 +6,55 @@ import Foundation
 final class CompatibilityHistoryService {
     
     // MARK: - Constants
-    private static let storageKeyPrefix = "compatibility_history"
+    // H5 (1.7) — bumped to v2 so a future schema change re-keys instead of
+    // silently dropping persisted history on decode failure.
+    private static let storageKeyPrefix = "compatibility_history_v2"
+    private static let legacyStorageKeyPrefix = "compatibility_history"
     private static let maxItems = 50
-    
+    private static let migrationFlagKey = "compatibility_history_v2_migrated"
+
     // MARK: - Singleton
     static let shared = CompatibilityHistoryService()
-    private init() {}
+    private init() {
+        migrateLegacyStorageIfNeeded()
+    }
+
+    // MARK: - Legacy Migration (one-shot)
+    /// Migrates legacy `compatibility_history_<email>_<profileId>` keys to
+    /// `compatibility_history_v2_<email>_<profileId>`. Best-effort decode: if old data
+    /// decodes, re-save under v2; otherwise just delete the old key. Idempotent via flag.
+    private func migrateLegacyStorageIfNeeded() {
+        let defaults = UserDefaults.standard
+        guard !defaults.bool(forKey: Self.migrationFlagKey) else { return }
+
+        let allKeys = defaults.dictionaryRepresentation().keys
+        let legacyPrefix = Self.legacyStorageKeyPrefix + "_"           // anchor to underscore
+        let v2Prefix = Self.storageKeyPrefix + "_"                     // anchor to underscore
+
+        for key in allKeys {
+            // Match legacy `compatibility_history_<...>` but NOT `compatibility_history_v2_<...>`.
+            // The trailing underscore on each anchor prevents collisions with emails that
+            // happen to start with "v2" (e.g. `v2admin@...`) under the old scheme.
+            guard key.hasPrefix(legacyPrefix), !key.hasPrefix(v2Prefix) else { continue }
+
+            let suffix = String(key.dropFirst(legacyPrefix.count))
+            let newKey = v2Prefix + suffix
+
+            if let data = defaults.data(forKey: key) {
+                do {
+                    let items = try JSONDecoder().decode([CompatibilityHistoryItem].self, from: data)
+                    let reEncoded = try JSONEncoder().encode(items)
+                    defaults.set(reEncoded, forKey: newKey)
+                    print("[CompatibilityHistoryService] Migrated legacy key \(key) → \(newKey) (\(items.count) items)")
+                } catch {
+                    print("[CompatibilityHistoryService] Legacy decode failed for \(key): \(error) — discarding")
+                }
+            }
+            defaults.removeObject(forKey: key)
+        }
+
+        defaults.set(true, forKey: Self.migrationFlagKey)
+    }
     
     /// Profile context for scoped keys
     private var profileContext: ProfileContextManager { .shared }

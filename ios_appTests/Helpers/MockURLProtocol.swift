@@ -152,6 +152,26 @@ extension MockURLProtocol {
         }
     }
 
+    /// iOS-1 (1.7) — Stub `/vedic/api/predict/` (the non-stream endpoint that
+    /// PredictionService.predict actually calls) to return HTTP 403 with a
+    /// FastAPI-style quota body wrapped in `detail` so NetworkClient.quotaErrorIf403
+    /// recognizes it and throws QuotaExhaustedError. The handler matches BOTH
+    /// "/vedic/api/predict/" (current code path) and "/vedic/api/predict/stream"
+    /// (legacy path); set both up if a test exercises either.
+    static func stubPredictQuota403(reason: String = "overall_limit_reached", ctaMessage: String? = nil) {
+        handler(for: "/vedic/api/predict/") { request in
+            // Skip /predict/stream — separate stub.
+            if request.url?.absoluteString.contains("/predict/stream") == true {
+                return (404, Data())  // canInit will pick the stream stub if registered first
+            }
+            let cta = ctaMessage.map { "\"upgrade_cta\": {\"message\": \"\($0)\", \"suggested_plan\": \"premium_yearly\"}" } ?? "\"upgrade_cta\": null"
+            let body = """
+            {"detail": {"code": "quota_exceeded", "reason": "\(reason)", "message": "Quota exhausted", \(cta), "plan_id": "free_registered"}}
+            """.data(using: .utf8)!
+            return (403, body)
+        }
+    }
+
     /// Returns a URLSession configured with MockURLProtocol so test stubs
     /// (registered via `handler(for:_:)`) intercept its requests. Used by
     /// StreamingPredictionService.urlSessionFactory in tests.

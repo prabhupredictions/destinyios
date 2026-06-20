@@ -107,8 +107,54 @@ final class KeychainService: @unchecked Sendable {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service
         ]
-        
+
         SecItemDelete(query as CFDictionary)
+    }
+
+    /// C3 (1.7) — tri-state probe: does any keychain key for this service start with `prefix`?
+    /// - Returns: `.present` if a match is found, `.absent` if explicitly not found,
+    ///   `.indeterminate` when the keychain is locked or returns an unknown status.
+    /// Used by the first-launch wipe at App init to distinguish "no leftover state"
+    /// from "we don't yet know" — the wipe is suppressed in the indeterminate case
+    /// AND the hasLaunchedBefore latch is NOT set, so a future unlocked launch can
+    /// re-evaluate.
+    enum KeyProbeResult {
+        case present
+        case absent
+        case indeterminate
+    }
+
+    func probeAnyKey(withPrefix prefix: String) -> KeyProbeResult {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecMatchLimit as String: kSecMatchLimitAll,
+            kSecReturnAttributes as String: true
+        ]
+
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+        switch status {
+        case errSecSuccess:
+            guard let items = result as? [[String: Any]] else { return .absent }
+            for item in items {
+                if let account = item[kSecAttrAccount as String] as? String,
+                   account.hasPrefix(prefix) {
+                    return .present
+                }
+            }
+            return .absent
+        case errSecItemNotFound:
+            return .absent
+        case errSecInteractionNotAllowed:
+            // Keychain locked — defer the decision to a future unlocked launch.
+            return .indeterminate
+        default:
+            // Unknown error — assume state exists (fail-safe; the wipe is irreversible).
+            print("[Keychain] probeAnyKey unexpected OSStatus=\(status) for prefix=\(prefix); assuming .indeterminate")
+            return .indeterminate
+        }
     }
 }
 

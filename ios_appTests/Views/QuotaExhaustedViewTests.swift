@@ -403,7 +403,13 @@ final class QuotaExhaustedViewTests: XCTestCase {
             resetAt: nil
         )
         let cta = ctaLabel(quotaError: info, isGuest: false, trialGateOpen: gate)
-        XCTAssertEqual(cta, "Upgrade to Plus")
+        // 1.7 — production returns the generic "Upgrade to Premium" label here.
+        // Showing the server's suggested_plan name (Core/Plus) gaslit users
+        // whose billing failed on Plus by saying "Upgrade to Core" (implies
+        // downgrade); QuotaExhaustedView.upgradeButtonText now returns
+        // "paywall_cta_upgrade_premium" for ALL non-expired reasons. The
+        // sheet itself surfaces the plan picker for tier selection.
+        XCTAssertEqual(cta, "Upgrade to Premium")
         XCTAssertNotEqual(cta, "Start my free week")
 
         // ChatView source must still wire the trial-ineligible branch through

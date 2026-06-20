@@ -92,8 +92,7 @@ struct LanguageSettingsSheet: View {
         
         // Update the app's locale
         UserDefaults.standard.set([language.code], forKey: "AppleLanguages")
-        UserDefaults.standard.synchronize()
-        
+
         // Post notification to refresh UI across the app
         NotificationCenter.default.post(name: .appLanguageChanged, object: language.code)
         

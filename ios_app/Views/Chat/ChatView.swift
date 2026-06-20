@@ -554,26 +554,35 @@ struct ChatView: View {
 struct ChatHistorySidebar: View {
     let viewModel: ChatViewModel
     let onDismiss: () -> Void
-    
-    // Pagination state
+
+    // F1 (1.7) — Pagination state. We still hold [LocalChatThread] (needed to call
+    // viewModel.loadThread / togglePinThread which take @Model). The crash fix
+    // (rank #1 candidate for wishva.shah's repro) is in two parts: (a) groupedThreads
+    // is now a CACHED @State instead of a body-time computed property, and (b) every
+    // mutation (delete, pagination, search change) recomputes it INSIDE withAnimation,
+    // so SwiftUI's section/row diffing runs against a settled snapshot rather than
+    // a different identity each layout pass. The previous code re-bucketed on every
+    // body invocation, which combined with section-disappearance on last-of-bucket
+    // delete trips a UICollectionView assertion.
     @State private var loadedThreads: [LocalChatThread] = []
+    @State private var groupedThreads: [(String, [LocalChatThread])] = []
     @State private var hasMore = false
     @State private var isLoadingMore = false
     private let pageSize = 20
     @State private var currentOffset = 0
-    
+
     // Search
     @State private var searchText = ""
-    
+
     // Delete confirmation
     @State private var threadToDelete: LocalChatThread?
     @State private var showDeleteConfirmation = false
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
                 CosmicBackgroundView().ignoresSafeArea()
-                
+
                 if !HistorySettingsManager.shared.isHistoryEnabled {
                     chatHistoryDisabledView
                 } else {
@@ -593,7 +602,7 @@ struct ChatHistorySidebar: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
-                
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("done_action".localized) { onDismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
@@ -605,7 +614,7 @@ struct ChatHistorySidebar: View {
                             .foregroundColor(AppTheme.Colors.gold)
                     }
                 }
-                
+
                 ToolbarItem(placement: .confirmationAction) {
                     Button("done_action".localized) { onDismiss() }
                         .foregroundColor(AppTheme.Colors.gold)
@@ -615,13 +624,30 @@ struct ChatHistorySidebar: View {
             .onAppear {
                 loadFirstPage()
             }
+            // F1 — search filter is applied inside recomputeGroups(); recompute when text changes.
+            .onChange(of: searchText) { _, _ in
+                recomputeGroups()
+            }
             .alert("Delete", isPresented: $showDeleteConfirmation) {
                 Button("cancel_action".localized, role: .cancel) { threadToDelete = nil }
                 Button("delete_action".localized, role: .destructive) {
                     if let thread = threadToDelete {
-                        viewModel.deleteThread(thread)
-                        loadedThreads.removeAll { $0.id == thread.id }
+                        let threadId = thread.id
+                        // F1 — mutate local state + recompute groups INSIDE withAnimation
+                        // so the section/row diff runs as one transaction. Capture the id
+                        // first so the SwiftData @Model isn't re-read after deletion.
+                        withAnimation {
+                            loadedThreads.removeAll { $0.id == threadId }
+                            recomputeGroups()
+                        }
                         threadToDelete = nil
+                        // Dispatch the SwiftData + server delete after the animation
+                        // is queued, so we never re-render a row whose @Model is gone.
+                        Task { @MainActor in
+                            if let live = DataManager.shared.getThread(id: threadId) {
+                                viewModel.deleteThread(live)
+                            }
+                        }
                     }
                 }
             } message: {
@@ -629,24 +655,24 @@ struct ChatHistorySidebar: View {
             }
         }
     }
-    
+
     // MARK: - History Disabled View
     private var chatHistoryDisabledView: some View {
         VStack(spacing: 20) {
             Image(systemName: "clock.badge.xmark")
                 .font(AppTheme.Fonts.display(size: 48))
                 .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.4))
-            
+
             Text("history_turned_off".localized)
                 .font(AppTheme.Fonts.title(size: 20))
                 .foregroundColor(AppTheme.Colors.textPrimary)
-            
+
             Text("conversations_not_saved".localized)
                 .font(AppTheme.Fonts.body(size: 15))
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-            
+
             Button(action: {
                 onDismiss()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -666,40 +692,48 @@ struct ChatHistorySidebar: View {
             }
         }
     }
-    
+
     // MARK: - Pagination
     private func loadFirstPage() {
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         let activeProfileId = ProfileContextManager.shared.activeProfileId
         let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: 0)
-        loadedThreads = result.threads
+        withAnimation {
+            loadedThreads = result.threads
+            recomputeGroups()
+        }
         hasMore = result.hasMore
         currentOffset = result.threads.count
     }
-    
+
     private func loadMore() {
         guard hasMore, !isLoadingMore else { return }
         isLoadingMore = true
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         let activeProfileId = ProfileContextManager.shared.activeProfileId
         let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: currentOffset)
-        loadedThreads.append(contentsOf: result.threads)
+        withAnimation {
+            loadedThreads.append(contentsOf: result.threads)
+            recomputeGroups()
+        }
         hasMore = result.hasMore
         currentOffset += result.threads.count
         isLoadingMore = false
     }
-    
-    // MARK: - Group threads by date (operates on loaded page only)
-    private var groupedThreads: [(String, [LocalChatThread])] {
+
+    // F1 — Recompute the cached groupedThreads from loadedThreads + searchText.
+    // Always called inside an explicit withAnimation transaction so SwiftUI's
+    // section/row diff runs against a settled snapshot.
+    private func recomputeGroups() {
         let calendar = Calendar.current
         let now = Date()
         var grouped: [String: [LocalChatThread]] = [:]
-        
+
         let filtered = searchText.isEmpty ? loadedThreads : loadedThreads.filter {
             $0.title.localizedCaseInsensitiveContains(searchText) ||
             $0.preview.localizedCaseInsensitiveContains(searchText)
         }
-        
+
         for thread in filtered {
             let key: String
             if calendar.isDateInToday(thread.updatedAt) {
@@ -715,32 +749,30 @@ struct ChatHistorySidebar: View {
             }
             grouped[key, default: []].append(thread)
         }
-        
+
         let order = ["Today", "Yesterday", "Last 7 Days", "Last 30 Days", "Older"]
-        return order.compactMap { key in
+        groupedThreads = order.compactMap { key in
             if let threads = grouped[key], !threads.isEmpty {
                 return (key, threads)
             }
             return nil
         }
     }
-    
+
     // MARK: - History List with Swipe Actions
     private var historyList: some View {
-        let grouped = groupedThreads
-        
-        return VStack(spacing: 0) {
+        VStack(spacing: 0) {
             // Search bar
             HStack(spacing: 10) {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .font(.system(size: 15))
-                
+
                 TextField("search_chats_placeholder".localized, text: $searchText)
                     .font(AppTheme.Fonts.body(size: 15))
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .autocorrectionDisabled()
-                
+
                 if !searchText.isEmpty {
                     Button(action: { searchText = "" }) {
                         Image(systemName: "xmark.circle.fill")
@@ -755,13 +787,13 @@ struct ChatHistorySidebar: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 4)
-            
-            if grouped.isEmpty {
+
+            if groupedThreads.isEmpty {
                 VStack(spacing: 16) {
                     Image(systemName: "bubble.left.and.bubble.right")
                         .font(AppTheme.Fonts.display(size: 48))
                         .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.2))
-                    
+
                     Text(searchText.isEmpty ? "no_chat_history".localized : "no_results_found".localized)
                         .font(AppTheme.Fonts.body(size: 16))
                         .foregroundColor(AppTheme.Colors.textSecondary)
@@ -770,7 +802,7 @@ struct ChatHistorySidebar: View {
                 .padding(.top, 80)
             } else {
                 List {
-                    ForEach(grouped, id: \.0) { group in
+                    ForEach(groupedThreads, id: \.0) { group in
                         Section(header:
                             Text(group.0)
                                 .font(AppTheme.Fonts.caption())
@@ -790,7 +822,12 @@ struct ChatHistorySidebar: View {
                                         showDeleteConfirmation = true
                                     },
                                     onPin: {
+                                        // F1 — pin mutates the @Model in place; force a
+                                        // fresh recompute so the row order/badge updates.
                                         viewModel.togglePinThread(thread)
+                                        withAnimation {
+                                            recomputeGroups()
+                                        }
                                     }
                                 )
                                 .listRowBackground(Color.clear)
@@ -804,7 +841,7 @@ struct ChatHistorySidebar: View {
                             }
                         }
                     }
-                    
+
                     // Loading more indicator
                     if isLoadingMore {
                         HStack {

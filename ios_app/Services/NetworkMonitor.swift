@@ -42,7 +42,10 @@ class NetworkMonitor: ObservableObject {
         monitor.start(queue: queue)
     }
     
-    deinit {
+    // F5 (1.7) — nonisolated deinit avoids the back-deploy
+    // swift_task_deinitOnExecutorMainActorBackDeploy mis-free crash on iOS 17.
+    // monitor.cancel() is nonisolated and Sendable-safe.
+    nonisolated deinit {
         monitor.cancel()
     }
 }

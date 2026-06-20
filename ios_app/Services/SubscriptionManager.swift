@@ -121,7 +121,10 @@ class SubscriptionManager: ObservableObject {
         }
     }
     
-    deinit {
+    // F5 (1.7) — nonisolated deinit avoids the back-deploy
+    // swift_task_deinitOnExecutorMainActorBackDeploy mis-free crash on iOS 17.
+    // Safe because both fields are Sendable and .cancel() is nonisolated.
+    nonisolated deinit {
         transactionListener?.cancel()
         foregroundSyncTimer?.cancel()
     }

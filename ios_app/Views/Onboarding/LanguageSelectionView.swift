@@ -268,8 +268,7 @@ struct LanguageSelectionView: View {
         guard let code = selectedCode else { return }
         
         UserDefaults.standard.set([code], forKey: "AppleLanguages")
-        UserDefaults.standard.synchronize()
-        
+
         // Post notification for language change
         NotificationCenter.default.post(name: .appLanguageChanged, object: code)
         

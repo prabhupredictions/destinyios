@@ -341,7 +341,15 @@ class QuotaManager: ObservableObject {
 
     /// Tracks last non-nil plan_id seen during sync, used to detect changes.
     private var previousObservedPlanId: String?
-    
+
+    /// C2 (1.7) — tracks the in-flight fire-and-forget fetchPlans() Task spawned by
+    /// syncStatus / registerUser. Without a handle, a Task started just before
+    /// signOutAsync runs can re-populate availablePlans (and the UserDefaults
+    /// cache) AFTER resetForSignOut() wipes them, leaking account A's plan
+    /// catalog into account B's pre-login UI. resetForSignOut cancels this
+    /// before wiping state.
+    private var pendingFetchPlansTask: Task<Void, Never>?
+
     /// Current plan ID (convenience accessor for dynamic button text)
     var currentPlanId: String? {
         currentPlan?.planId ?? UserDefaults.standard.string(forKey: "currentPlanId")
@@ -596,9 +604,14 @@ class QuotaManager: ObservableObject {
         let status = try JSONDecoder().decode(SubscriptionStatus.self, from: data)
         updateFromStatus(status)
         lastSyncTime = Date() // Prevent immediate redundant syncStatus call
-        
-        // Pre-fetch plans to keep cache fresh (fire-and-forget)
-        Task { try? await fetchPlans() }
+
+        // Pre-fetch plans to keep cache fresh (fire-and-forget).
+        // C2 (1.7) — track the Task so resetForSignOut can cancel it before wiping state.
+        pendingFetchPlansTask?.cancel()
+        pendingFetchPlansTask = Task { [weak self] in
+            guard let self else { return }
+            try? await self.fetchPlans()
+        }
     }
     
     /// Sync status from server
@@ -606,6 +619,14 @@ class QuotaManager: ObservableObject {
     /// starts from a clean slate. Without this, account A's Plus state bleeds
     /// into account B via UserDefaults and loadCachedSubscriptionState().
     func resetForSignOut() {
+        // C2 (1.7) — cancel any in-flight fetchPlans Task BEFORE wiping state.
+        // Otherwise the fire-and-forget Task spawned by a syncStatus call moments
+        // earlier can complete after this reset and re-populate availablePlans +
+        // cachedAvailablePlans with account A's catalog, which then leaks into
+        // account B's paywall UI on first paint.
+        pendingFetchPlansTask?.cancel()
+        pendingFetchPlansTask = nil
+
         isPremium = false
         currentPlan = nil
         subscriptionStatus = nil
@@ -615,6 +636,20 @@ class QuotaManager: ObservableObject {
         previousObservedPlanId = nil
         lastSyncTime = nil
         availableFeatures = []
+    }
+
+    /// C2 (1.7) — Wipe persisted plan catalog + the @Published array that drives
+    /// the paywall UI. Called from AuthViewModel.signOutAsync so account B never
+    /// sees account A's cached plans on first paint. Kept separate from
+    /// resetForSignOut so unit tests covering subscription reset don't have to
+    /// also assert on plan-cache wiping.
+    func clearCachedPlanData() {
+        pendingFetchPlansTask?.cancel()
+        pendingFetchPlansTask = nil
+        availablePlans = []
+        UserDefaults.standard.removeObject(forKey: Self.cachedPlansKey)
+        UserDefaults.standard.removeObject(forKey: Self.cachedFeaturesKey)
+        print("🧹 [QuotaManager] Cleared cached plan data on sign-out")
     }
 
     #if DEBUG
@@ -654,8 +689,13 @@ class QuotaManager: ObservableObject {
         updateFromStatus(status)
         lastSyncTime = Date()
 
-        // Pre-fetch plans to keep cache fresh (fire-and-forget)
-        Task { try? await fetchPlans() }
+        // Pre-fetch plans to keep cache fresh (fire-and-forget).
+        // C2 (1.7) — track the Task so resetForSignOut can cancel it before wiping state.
+        pendingFetchPlansTask?.cancel()
+        pendingFetchPlansTask = Task { [weak self] in
+            guard let self else { return }
+            try? await self.fetchPlans()
+        }
     }
     
     /// Update local state from server status

@@ -5,12 +5,18 @@ import SwiftUI
 struct NotificationInboxView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var service = NotificationInboxService.shared
     @StateObject private var quotaManager = QuotaManager.shared
     @State private var selectedNotification: NotificationItem? = nil
     @State private var showNotificationPreferences = false
     @State private var showUpgradePrompt = false
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for alerts
+    // F6 (1.7) — cached bucket grouping. Recomputed on (a) initial seed BEFORE
+    // fetch starts (avoids empty flash if service has data from a prior open),
+    // (b) notifications change, (c) scene returning to .active (cross-midnight bucket
+    // reassignment).
+    @State private var groupedNotifications: [InboxBucket: [NotificationItem]] = [:]
 
     var onNavigateToHome: (() -> Void)? = nil
     
@@ -40,8 +46,22 @@ struct NotificationInboxView: View {
             .navigationBarHidden(true)
             .accessibilityIdentifier("notifications_screen")
             .task {
+                // Seed cache synchronously BEFORE the await so a re-opened inbox
+                // doesn't render empty for one frame when service.notifications
+                // already has data from the previous open.
+                recomputeGroupedNotifications()
                 await service.fetchNotifications(refresh: true)
                 await service.fetchUnreadCount()
+                recomputeGroupedNotifications()
+            }
+            .onChange(of: service.notifications) { _, _ in
+                recomputeGroupedNotifications()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    // Cross-midnight: re-bucket whenever the app returns to foreground.
+                    recomputeGroupedNotifications()
+                }
             }
             .sheet(item: $selectedNotification) { notification in
                 NotificationDetailSheet(notification: notification) {
@@ -161,21 +181,22 @@ struct NotificationInboxView: View {
     
     // MARK: - Notification List
     private var notificationList: some View {
-        // Group notifications into buckets, preserving newest-first within each bucket
-        let grouped = Dictionary(grouping: service.notifications, by: { $0.inboxBucket })
-        return ScrollView {
+        ScrollView {
             LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
                 ForEach(InboxBucket.allCases, id: \.self) { bucket in
-                    if let items = grouped[bucket], !items.isEmpty {
+                    if let items = groupedNotifications[bucket], !items.isEmpty {
                         Section(header: bucketHeader(bucket)) {
                             VStack(spacing: 12) {
                                 ForEach(items) { notification in
                                     NotificationRow(notification: notification)
                                         .onTapGesture {
+                                            // F4 (1.7) — set selection synchronously BEFORE any await,
+                                            // so the sheet presents on the same runloop tick as the tap.
+                                            // Avoids state mutation while ForEach iterates.
+                                            selectedNotification = notification
                                             Task {
                                                 await service.markAsRead(notification.id)
                                             }
-                                            selectedNotification = notification
                                         }
                                         .onAppear {
                                             // Load more when reaching end
@@ -202,6 +223,10 @@ struct NotificationInboxView: View {
         .refreshable {
             await service.fetchNotifications(refresh: true)
         }
+    }
+
+    private func recomputeGroupedNotifications() {
+        groupedNotifications = Dictionary(grouping: service.notifications, by: { $0.inboxBucket })
     }
 
     private func bucketHeader(_ bucket: InboxBucket) -> some View {

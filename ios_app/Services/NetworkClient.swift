@@ -1,24 +1,36 @@
 import Foundation
 
 final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
-    
+
     // MARK: - Properties
     private let session: URLSessionProtocol
     private let baseURL: String
     private let apiKey: String
-    
+
+    /// Test hook (1.7) — when set, NetworkClient's default session is replaced
+    /// with the factory's output. Production code leaves this nil and uses the
+    /// locally-configured session below. Used by unit tests to inject a session
+    /// that includes MockURLProtocol in its protocolClasses (URLProtocol.registerClass
+    /// only intercepts URLSession.shared; custom sessions need the class added
+    /// directly to their configuration).
+    static var urlSessionFactory: (() -> URLSessionProtocol)? = nil
+
     // MARK: - Init
     init(
-        session: URLSessionProtocol = {
-            let config = URLSessionConfiguration.default
-            config.waitsForConnectivity = true
-            config.timeoutIntervalForResource = 600  // 10 min — Opus can take 3-5 min
-            return URLSession(configuration: config)
-        }(),
+        session: URLSessionProtocol? = nil,
         baseURL: String = APIConfig.baseURL,
         apiKey: String = APIConfig.apiKey
     ) {
-        self.session = session
+        if let session {
+            self.session = session
+        } else if let factory = NetworkClient.urlSessionFactory {
+            self.session = factory()
+        } else {
+            let config = URLSessionConfiguration.default
+            config.waitsForConnectivity = true
+            config.timeoutIntervalForResource = 600  // 10 min — Opus can take 3-5 min
+            self.session = URLSession(configuration: config)
+        }
         self.baseURL = baseURL
         self.apiKey = apiKey
     }

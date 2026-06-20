@@ -49,6 +49,9 @@ final class SessionTokenStore: @unchecked Sendable {
 
     /// Set the active email + persist all four tokens for it.
     /// Atomic per email: if any write fails, all are rolled back.
+    /// H2 (1.7) — all 4 writes use throwing saveString; on failure,
+    /// the partial state is rolled back so the keychain never holds
+    /// a half-written rotation pair.
     func setActiveSession(
         email: String,
         sessionJwt: String,
@@ -60,12 +63,20 @@ final class SessionTokenStore: @unchecked Sendable {
             let normalized = email.lowercased()
             let formatter = ISO8601DateFormatter()
             formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            // Keychain writes throw — wrap.
-            try keychain.saveString(sessionJwt, forKey: Self.sessionJwtKey(email: normalized))
-            try keychain.saveString(refreshToken, forKey: Self.refreshTokenKey(email: normalized))
-            keychain.saveStringSafe(formatter.string(from: sessionExpiresAt), forKey: Self.sessionExpiryKey(email: normalized))
-            keychain.saveStringSafe(formatter.string(from: refreshExpiresAt), forKey: Self.refreshExpiryKey(email: normalized))
-            userDefaults.set(normalized, forKey: Self.activeEmailKey)
+            do {
+                try keychain.saveString(sessionJwt, forKey: Self.sessionJwtKey(email: normalized))
+                try keychain.saveString(refreshToken, forKey: Self.refreshTokenKey(email: normalized))
+                try keychain.saveString(formatter.string(from: sessionExpiresAt), forKey: Self.sessionExpiryKey(email: normalized))
+                try keychain.saveString(formatter.string(from: refreshExpiresAt), forKey: Self.refreshExpiryKey(email: normalized))
+                userDefaults.set(normalized, forKey: Self.activeEmailKey)
+            } catch {
+                // Rollback partial state — never leave keychain inconsistent.
+                keychain.delete(forKey: Self.sessionJwtKey(email: normalized))
+                keychain.delete(forKey: Self.refreshTokenKey(email: normalized))
+                keychain.delete(forKey: Self.sessionExpiryKey(email: normalized))
+                keychain.delete(forKey: Self.refreshExpiryKey(email: normalized))
+                throw error
+            }
         }
     }
 
@@ -131,21 +142,43 @@ final class SessionTokenStore: @unchecked Sendable {
 
     // MARK: - Update (refresh)
 
-    /// Update only the session JWT and expiry (typical refresh result).
+    /// H2 (1.7) — Update the session JWT + refresh token + both expiries on
+    /// rotation. ATOMIC: all 4 writes succeed, or we clear the session
+    /// entirely and return false. A partial write (e.g. JWT saved but
+    /// refresh token failed) would leave the device with a token that
+    /// can never be rotated again — silent lockout. Better to force
+    /// the user back through sign-in than to persist an inconsistent
+    /// keychain state.
+    ///
+    /// Returns true on success, false if any save threw (in which case
+    /// the active session has been cleared as a safety measure — the
+    /// caller MUST treat this as "not signed in" and surface to UX).
+    @discardableResult
     func updateSession(
         sessionJwt: String,
         sessionExpiresAt: Date,
         refreshToken: String,
         refreshExpiresAt: Date
-    ) {
-        queue.sync {
-            guard let email = userDefaults.string(forKey: Self.activeEmailKey) else { return }
+    ) -> Bool {
+        return queue.sync { () -> Bool in
+            guard let email = userDefaults.string(forKey: Self.activeEmailKey) else { return false }
             let formatter = ISO8601DateFormatter()
             formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            keychain.saveStringSafe(sessionJwt, forKey: Self.sessionJwtKey(email: email))
-            keychain.saveStringSafe(refreshToken, forKey: Self.refreshTokenKey(email: email))
-            keychain.saveStringSafe(formatter.string(from: sessionExpiresAt), forKey: Self.sessionExpiryKey(email: email))
-            keychain.saveStringSafe(formatter.string(from: refreshExpiresAt), forKey: Self.refreshExpiryKey(email: email))
+            do {
+                try keychain.saveString(sessionJwt, forKey: Self.sessionJwtKey(email: email))
+                try keychain.saveString(refreshToken, forKey: Self.refreshTokenKey(email: email))
+                try keychain.saveString(formatter.string(from: sessionExpiresAt), forKey: Self.sessionExpiryKey(email: email))
+                try keychain.saveString(formatter.string(from: refreshExpiresAt), forKey: Self.refreshExpiryKey(email: email))
+                return true
+            } catch {
+                print("⚠️ [SessionTokenStore] updateSession failed (\(error)) — clearing session to avoid inconsistent state")
+                keychain.delete(forKey: Self.sessionJwtKey(email: email))
+                keychain.delete(forKey: Self.refreshTokenKey(email: email))
+                keychain.delete(forKey: Self.sessionExpiryKey(email: email))
+                keychain.delete(forKey: Self.refreshExpiryKey(email: email))
+                userDefaults.removeObject(forKey: Self.activeEmailKey)
+                return false
+            }
         }
     }
 

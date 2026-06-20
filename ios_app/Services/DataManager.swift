@@ -9,6 +9,40 @@ final class DataManager {
     
     let container: ModelContainer
     var context: ModelContext { container.mainContext }
+
+    // F3 (1.7) — Serial queue for outbound DELETE /chat-history/threads/... requests.
+    // Pre-fix: 5 rapid swipe-deletes produced 5 concurrent unstructured Tasks racing
+    // URLSession + the main SwiftData context, contributing to the wishva.shah crash
+    // window (rapid taps → high main-thread + main-context pressure → SwiftUI List
+    // diffing trips a UICollectionView assertion at the next layout pass).
+    //
+    // The chained-Task pattern below ACTUALLY serializes (Swift actors are reentrant
+    // at every await suspension point, so a naive `actor.enqueue { await work() }`
+    // does not serialize across awaits — see F3-v3 round-3 verifier feedback).
+    //
+    // Each new enqueue captures the previous Task and awaits its completion before
+    // running its own work; the chain guarantees one in-flight DELETE at a time.
+    private actor DeleteQueue {
+        private var tail: Task<Void, Never>?
+
+        func enqueue(_ work: @Sendable @escaping () async -> Void) {
+            let previous = tail
+            tail = Task {
+                await previous?.value
+                await work()
+            }
+        }
+    }
+    nonisolated private let deleteQueue = DeleteQueue()
+
+    // Dedicated URLSession with explicit timeouts so a single hung DELETE
+    // doesn't head-of-line-block the entire serialized queue.
+    nonisolated private let deleteURLSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 15   // per-stall watchdog
+        config.timeoutIntervalForResource = 30  // hard cap per delete
+        return URLSession(configuration: config)
+    }()
     
     /// Initialize with optional in-memory storage (for testing)
     init(inMemory: Bool = false) {
@@ -283,43 +317,65 @@ final class DataManager {
         }
         context.delete(thread)
         persistContext()
-        
-        // Also delete from server so it doesn't re-sync on login
-        deleteThreadFromServer(threadId: threadId)
+
+        // F3 (1.7) — Capture email AT ENQUEUE TIME, not at execute time. Otherwise
+        // sign-out between rapid deletes silently no-ops still-pending server
+        // deletes (via the userEmail==nil guard inside deleteThreadFromServer)
+        // and stale threads re-sync to the next login.
+        let email = UserDefaults.standard.string(forKey: "userEmail") ?? ""
+        guard !email.isEmpty else {
+            print("[DataManager] ⚠️ No userEmail at enqueue — skipping server delete for \(threadId)")
+            return
+        }
+        // Serialized via DeleteQueue — one DELETE in flight at a time.
+        Task { [weak self] in
+            await self?.deleteQueue.enqueue { [weak self] in
+                await self?.performServerDelete(threadId: threadId, email: email)
+            }
+        }
     }
-    
-    /// Fire-and-forget server-side thread deletion
+
+    /// F3 (1.7) — Nonisolated server delete worker. Lives outside the main actor so
+    /// the serialized URLSession.data(for:) doesn't compete with main-thread layout.
+    nonisolated private func performServerDelete(threadId: String, email: String) async {
+        let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
+        print("[DataManager] DELETE → \(urlString)")
+        guard let url = URL(string: urlString) else {
+            print("[DataManager] ⚠️ Invalid URL for delete: \(urlString)")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        // NetworkClient.authBearer() reads UserDefaults/keychain — both thread-safe.
+        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+
+        do {
+            let (data, response) = try await deleteURLSession.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    print("[DataManager] ✅ Server delete thread \(threadId): HTTP 200")
+                } else {
+                    let body = String(data: data, encoding: .utf8) ?? ""
+                    print("[DataManager] ⚠️ Server delete thread \(threadId): HTTP \(httpResponse.statusCode) — \(body)")
+                }
+            }
+        } catch {
+            print("[DataManager] ❌ Failed to delete server thread \(threadId): \(error)")
+        }
+    }
+
+    /// (Legacy entry point retained for compatibility — routes through the
+    /// serialized worker above. New callers should use deleteThread.)
     private func deleteThreadFromServer(threadId: String) {
         guard let email = UserDefaults.standard.string(forKey: "userEmail"), !email.isEmpty else {
             print("[DataManager] ⚠️ No userEmail — skipping server delete for \(threadId)")
             return
         }
-        
-        Task {
-            let urlString = "\(APIConfig.baseURL)/chat-history/threads/\(email)/\(threadId)"
-            print("[DataManager] DELETE → \(urlString)")
-            guard let url = URL(string: urlString) else {
-                print("[DataManager] ⚠️ Invalid URL for delete: \(urlString)")
-                return
-            }
-            
-            var request = URLRequest(url: url)
-            request.httpMethod = "DELETE"
-            request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
-            request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
-            
-            do {
-                let (data, response) = try await URLSession.shared.data(for: request)
-                if let httpResponse = response as? HTTPURLResponse {
-                    if httpResponse.statusCode == 200 {
-                        print("[DataManager] ✅ Server delete thread \(threadId): HTTP 200")
-                    } else {
-                        let body = String(data: data, encoding: .utf8) ?? ""
-                        print("[DataManager] ⚠️ Server delete thread \(threadId): HTTP \(httpResponse.statusCode) — \(body)")
-                    }
-                }
-            } catch {
-                print("[DataManager] ❌ Failed to delete server thread \(threadId): \(error)")
+        Task { [weak self] in
+            await self?.deleteQueue.enqueue { [weak self] in
+                await self?.performServerDelete(threadId: threadId, email: email)
             }
         }
     }

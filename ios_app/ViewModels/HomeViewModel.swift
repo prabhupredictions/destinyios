@@ -138,7 +138,25 @@ class HomeViewModel {
         }
         
         // Load cached quota (will be updated from backend in loadHomeData)
-        let cachedUsed = UserDefaults.standard.integer(forKey: "quotaUsed")
+        // M1 (1.7) — migrate legacy non-Int values stored under "quotaUsed" (e.g. String written by older builds).
+        // UserDefaults.integer(forKey:) returns 0 for type-mismatched values, but we still want to clean the slot
+        // so subsequent .object(forKey:) reads don't surface stale strings.
+        let cachedUsed: Int
+        if let raw = UserDefaults.standard.object(forKey: "quotaUsed") {
+            if let intVal = raw as? Int {
+                cachedUsed = intVal
+            } else if let strVal = raw as? String, let parsed = Int(strVal) {
+                cachedUsed = parsed
+                UserDefaults.standard.set(parsed, forKey: "quotaUsed")
+                print("[HomeViewModel] M1: migrated legacy String quotaUsed='\(strVal)' → Int \(parsed)")
+            } else {
+                cachedUsed = 0
+                UserDefaults.standard.removeObject(forKey: "quotaUsed")
+                print("[HomeViewModel] M1: cleared unparseable legacy quotaUsed value of type \(type(of: raw))")
+            }
+        } else {
+            cachedUsed = 0
+        }
         quotaRemaining = max(0, quotaTotal - cachedUsed)
         
         // Set renewal date (first of next month)
@@ -439,8 +457,18 @@ class HomeViewModel {
         }
         
         // Fallback: Try userBirthData (new) then birthData (legacy)
-        let key = UserDefaults.standard.object(forKey: "userBirthData") != nil ? "userBirthData" : "birthData"
-        guard let data = UserDefaults.standard.data(forKey: key),
+        // M2 (1.7) — one-shot migration: if only the legacy "birthData" key exists AND its
+        // contents decode cleanly under the current UserBirthData schema, copy to "userBirthData"
+        // and remove the legacy slot. Decode-first ordering protects against schema-drift
+        // data loss — if decode fails we leave the legacy blob in place for manual recovery.
+        if UserDefaults.standard.object(forKey: "userBirthData") == nil,
+           let legacyData = UserDefaults.standard.data(forKey: "birthData"),
+           (try? JSONDecoder().decode(UserBirthData.self, from: legacyData)) != nil {
+            UserDefaults.standard.set(legacyData, forKey: "userBirthData")
+            UserDefaults.standard.removeObject(forKey: "birthData")
+            print("[HomeViewModel] M2: migrated legacy \"birthData\" key → \"userBirthData\"")
+        }
+        guard let data = UserDefaults.standard.data(forKey: "userBirthData"),
               var birthData = try? JSONDecoder().decode(UserBirthData.self, from: data) else {
             return nil
         }

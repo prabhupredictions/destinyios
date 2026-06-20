@@ -137,12 +137,22 @@ final class AuthExchangeClient: @unchecked Sendable {
         }
         let result = try JSONDecoder.iso8601().decode(RefreshResponseRaw.self, from: data)
 
-        SessionTokenStore.shared.updateSession(
+        // H2 (1.7) — updateSession is now atomic and returns false if the
+        // keychain rotation couldn't be fully written. In that case the
+        // store has already cleared the active session, so we must NOT
+        // pretend the refresh succeeded: throw reauthRequired so the
+        // caller (APIClient retry path) routes the user back to sign-in
+        // instead of looping on a token that no longer exists locally.
+        let ok = SessionTokenStore.shared.updateSession(
             sessionJwt: result.session_jwt,
             sessionExpiresAt: result.session_jwt_expires_at,
             refreshToken: result.refresh_token,
             refreshExpiresAt: result.refresh_token_expires_at
         )
+        if !ok {
+            print("⚠️ [AuthExchangeClient] refresh succeeded server-side but local persistence failed — forcing reauth")
+            throw AuthExchangeError.reauthRequired(code: "local_persist_failed")
+        }
         return ExchangeResult(
             userEmail: SessionTokenStore.shared.activeEmail ?? "",
             sessionJwt: result.session_jwt,

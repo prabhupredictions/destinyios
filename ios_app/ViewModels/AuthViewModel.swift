@@ -133,6 +133,16 @@ class AuthViewModel {
         UserDefaults.standard.removeObject(forKey: "userName")
         UserDefaults.standard.set(false, forKey: "isAuthenticated")
 
+        // L1 (1.7) — clear per-user hasSeenFirstPrediction_<email> guard so the next
+        // sign-in for this email starts fresh (the HomeViewModel-scoped flag would
+        // otherwise persist across sign-out / sign-in cycles for the same email,
+        // accumulating one orphaned key per signed-in account forever).
+        if !previousEmail.isEmpty {
+            UserDefaults.standard.removeObject(forKey: "hasSeenFirstPrediction_\(previousEmail)")
+        }
+        if wasGuest {
+            UserDefaults.standard.removeObject(forKey: "hasSeenFirstPrediction_guest")
+        }
         // Clear global session keys (UI resets to no birth data)
         UserDefaults.standard.removeObject(forKey: "userBirthData")
         UserDefaults.standard.set(false, forKey: "hasBirthData")
@@ -159,8 +169,13 @@ class AuthViewModel {
             // Clear all user-scoped data for this guest
             let keys = StorageKeys.allKeys(for: previousEmail)
             keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
-            
-            // Also clear caches for guest
+        }
+
+        // STORAGE C1 (1.7) — Clear TodaysPredictionCache + AstroDataCache for ALL users
+        // (guest AND registered) on signOut. Pre-fix, registered users kept these caches
+        // across signOut so the next account briefly saw the previous account's data on
+        // first load (cross-account leak).
+        if !previousEmail.isEmpty {
             TodaysPredictionCache.shared.clear(forUser: previousEmail)
             AstroDataCache.shared.clearAll(forUser: previousEmail)
         }
@@ -180,7 +195,15 @@ class AuthViewModel {
         await SubscriptionManager.shared.resetForAccountSwitch()
         // Clear QuotaManager in-memory state — isPremium/currentPlan must reset to nil
         // so the next account starts from a server-authoritative state, not stale cache.
-        await MainActor.run { QuotaManager.shared.resetForSignOut() }
+        // C2 (1.7) — also clear the cached plan catalog (UserDefaults + @Published arrays).
+        // resetForSignOut cancels any in-flight fetchPlans Task before wiping; we then
+        // explicitly call clearCachedPlanData to drop availablePlans and the
+        // cachedAvailablePlans / cachedAvailableFeatures UserDefaults keys, so account B's
+        // pre-login paywall doesn't render account A's plans on first paint.
+        await MainActor.run {
+            QuotaManager.shared.resetForSignOut()
+            QuotaManager.shared.clearCachedPlanData()
+        }
     }
     
     // MARK: - Private Helpers
@@ -203,24 +226,30 @@ class AuthViewModel {
         
         if wasGuest && guestHadBirthData {
             // Capture guest's birth data before we switch users
-            if let data = UserDefaults.standard.data(forKey: "userBirthData"),
-               let birthData = try? JSONDecoder().decode(BirthData.self, from: data) {
-                guestBirthData = birthData
-                guestUserName = UserDefaults.standard.string(forKey: "userName")
-                
-                // Gender is stored with user-scoped key: userGender_<email>
-                let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: guestEmail)
-                guestGender = UserDefaults.standard.string(forKey: genderKey) ?? ""
-                
-                print("🔄 [AuthViewModel] Captured guest birth data for carry-forward (gender: \(guestGender))")
-                
-                // CRITICAL: Clear local guest history BEFORE sign-in
-                // Backend already has guest's history (synced during guest session)
-                // After migration, we'll re-sync from server with correct user email
-                // This prevents duplicates from local (guest IDs) vs server (migrated IDs)
-                print("🗑️ [AuthViewModel] Clearing local guest history before sign-in...")
-                DataManager.shared.deleteAllThreads(for: guestEmail)
-                print("✅ [AuthViewModel] Local guest history cleared")
+            // M3 (1.7) — replace `try?` swallow with explicit do/catch + loud log so a decode
+            // failure during guest carry-forward is visible in console (was previously silent).
+            if let data = UserDefaults.standard.data(forKey: "userBirthData") {
+                do {
+                    let birthData = try JSONDecoder().decode(BirthData.self, from: data)
+                    guestBirthData = birthData
+                    guestUserName = UserDefaults.standard.string(forKey: "userName")
+
+                    // Gender is stored with user-scoped key: userGender_<email>
+                    let genderKey = StorageKeys.userKey(for: StorageKeys.userGender, email: guestEmail)
+                    guestGender = UserDefaults.standard.string(forKey: genderKey) ?? ""
+
+                    print("🔄 [AuthViewModel] Captured guest birth data for carry-forward (gender: \(guestGender))")
+
+                    // CRITICAL: Clear local guest history BEFORE sign-in
+                    // Backend already has guest's history (synced during guest session)
+                    // After migration, we'll re-sync from server with correct user email
+                    // This prevents duplicates from local (guest IDs) vs server (migrated IDs)
+                    print("🗑️ [AuthViewModel] Clearing local guest history before sign-in...")
+                    DataManager.shared.deleteAllThreads(for: guestEmail)
+                    print("✅ [AuthViewModel] Local guest history cleared")
+                } catch {
+                    print("❌ [AuthViewModel] M3: failed to decode guest birth data for carry-forward: \(error). Skipping carry-forward; user may need to re-enter birth details.")
+                }
             }
         }
         
@@ -379,12 +408,7 @@ class AuthViewModel {
                     }
                     print("🚀 [AuthViewModel] Calling handleAuthSuccess...")
                     handleAuthSuccess(user: user, isGuest: false, skipHydration: !profileHasBirthData)
-                    
-                    // Force immediate UserDefaults persistence
-                    // This fixes race condition where ProfileSwitcherSheet may open before
-                    // userEmail is updated, causing it to use stale guest email for API calls
-                    UserDefaults.standard.synchronize()
-                    
+
                     print("✅ [AuthViewModel] handleAuthSuccess completed. isAuthenticated=\(isAuthenticated)")
                 }
             } else {
@@ -480,7 +504,6 @@ class AuthViewModel {
                         UserDefaults.standard.set(storedEmail, forKey: "userEmail")
                         print("🚀 [AuthViewModel] Calling handleAuthSuccess with recovered email...")
                         handleAuthSuccess(user: user, isGuest: false, skipHydration: !profileHasBirthData)
-                        UserDefaults.standard.synchronize()  // Force immediate persistence
                         print("✅ [AuthViewModel] handleAuthSuccess completed. isAuthenticated=\(isAuthenticated)")
                     }
                 } else {
@@ -571,7 +594,6 @@ class AuthViewModel {
                             provider: user.provider
                         )
                         handleAuthSuccess(user: userWithEmail, isGuest: false, skipHydration: !profileHasBirthData)
-                        UserDefaults.standard.synchronize()  // Force immediate persistence
                     }
                 }
             }
