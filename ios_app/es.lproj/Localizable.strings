@@ -3119,3 +3119,11 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "paywall_cta_upgrade_to_plus" = "Mejorar a Plus";
 "paywall_cta_upgrade_premium" = "Mejorar a Premium";
 "purchase_verification_failed" = "No pudimos verificar tu compra. Toca 'Restaurar compras' en la pantalla de suscripción o contacta con soporte si el problema persiste.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "Hoy";
+"notif_section_yesterday" = "Ayer";
+"notif_section_this_week" = "Esta semana";
+"notif_section_last_week" = "Semana pasada";
+"notif_section_earlier" = "Anteriores";
+"notif_just_now" = "Ahora mismo";

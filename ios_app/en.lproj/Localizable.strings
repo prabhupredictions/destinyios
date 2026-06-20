@@ -3084,3 +3084,11 @@
 "paywall_cta_upgrade_to_plus" = "Upgrade to Plus";
 "paywall_cta_upgrade_premium" = "Upgrade to Premium";
 "purchase_verification_failed" = "We couldn't verify your purchase. Please tap 'Restore Purchases' from the subscription screen, or contact support if the problem persists.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "Today";
+"notif_section_yesterday" = "Yesterday";
+"notif_section_this_week" = "This Week";
+"notif_section_last_week" = "Last Week";
+"notif_section_earlier" = "Earlier";
+"notif_just_now" = "Just now";

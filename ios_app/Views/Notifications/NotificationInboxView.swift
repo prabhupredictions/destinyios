@@ -161,24 +161,34 @@ struct NotificationInboxView: View {
     
     // MARK: - Notification List
     private var notificationList: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(service.notifications) { notification in
-                    NotificationRow(notification: notification)
-                        .onTapGesture {
-                            Task {
-                                await service.markAsRead(notification.id)
+        // Group notifications into buckets, preserving newest-first within each bucket
+        let grouped = Dictionary(grouping: service.notifications, by: { $0.inboxBucket })
+        return ScrollView {
+            LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
+                ForEach(InboxBucket.allCases, id: \.self) { bucket in
+                    if let items = grouped[bucket], !items.isEmpty {
+                        Section(header: bucketHeader(bucket)) {
+                            VStack(spacing: 12) {
+                                ForEach(items) { notification in
+                                    NotificationRow(notification: notification)
+                                        .onTapGesture {
+                                            Task {
+                                                await service.markAsRead(notification.id)
+                                            }
+                                            selectedNotification = notification
+                                        }
+                                        .onAppear {
+                                            // Load more when reaching end
+                                            if notification.id == service.notifications.last?.id {
+                                                Task { await service.loadMore() }
+                                            }
+                                        }
+                                }
                             }
-                            selectedNotification = notification
                         }
-                        .onAppear {
-                            // Load more when reaching end
-                            if notification.id == service.notifications.last?.id {
-                                Task { await service.loadMore() }
-                            }
-                        }
+                    }
                 }
-                
+
                 // Loading indicator for pagination
                 if service.isLoading && !service.notifications.isEmpty {
                     ProgressView()
@@ -192,6 +202,18 @@ struct NotificationInboxView: View {
         .refreshable {
             await service.fetchNotifications(refresh: true)
         }
+    }
+
+    private func bucketHeader(_ bucket: InboxBucket) -> some View {
+        HStack {
+            Text(bucket.localizedLabel)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+            Spacer()
+        }
+        .background(AppTheme.Colors.mainBackground.opacity(0.95))
     }
     
     // MARK: - Loading View
@@ -276,7 +298,7 @@ struct NotificationRow: View {
 
                     Spacer()
 
-                    Text(notification.timeAgo)
+                    Text(notification.relativeTime)
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                 }
@@ -317,7 +339,7 @@ struct NotificationRow: View {
                 )
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(String(format: "a11y_notification_detail_format".localized, notification.displayTitle, notification.displayBody, notification.timeAgo, notification.read ? "" : "a11y_unread_suffix".localized))
+        .accessibilityLabel(String(format: "a11y_notification_detail_format".localized, notification.displayTitle, notification.displayBody, notification.relativeTime, notification.read ? "" : "a11y_unread_suffix".localized))
         .accessibilityIdentifier("notification_row")
     }
 }
@@ -354,7 +376,7 @@ struct NotificationDetailSheet: View {
                         Text(notification.displayTitle)
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(AppTheme.Colors.textPrimary)
-                        Text(notification.timeAgo)
+                        Text(notification.relativeTime)
                             .font(.system(size: 12))
                             .foregroundColor(AppTheme.Colors.textSecondary)
                     }

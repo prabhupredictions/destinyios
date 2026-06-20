@@ -3115,3 +3115,11 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "paywall_cta_upgrade_to_plus" = "Auf Plus upgraden";
 "paywall_cta_upgrade_premium" = "Auf Premium upgraden";
 "purchase_verification_failed" = "Wir konnten deinen Kauf nicht verifizieren. Tippe im Abonnementbildschirm auf „Käufe wiederherstellen“ oder wende dich an den Support, falls das Problem weiterhin besteht.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "Heute";
+"notif_section_yesterday" = "Gestern";
+"notif_section_this_week" = "Diese Woche";
+"notif_section_last_week" = "Letzte Woche";
+"notif_section_earlier" = "Früher";
+"notif_just_now" = "Gerade eben";

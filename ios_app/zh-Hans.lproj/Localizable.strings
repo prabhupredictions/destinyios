@@ -3119,3 +3119,11 @@
 "paywall_cta_upgrade_to_plus" = "升级到 Plus";
 "paywall_cta_upgrade_premium" = "升级到高级版";
 "purchase_verification_failed" = "我们无法验证您的购买。请在订阅页面点击「恢复购买」,或在问题持续时联系客服。";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "今天";
+"notif_section_yesterday" = "昨天";
+"notif_section_this_week" = "本周";
+"notif_section_last_week" = "上周";
+"notif_section_earlier" = "更早";
+"notif_just_now" = "刚刚";

@@ -2982,3 +2982,11 @@
 "paywall_cta_upgrade_to_plus" = "Plus में अपग्रेड करें";
 "paywall_cta_upgrade_premium" = "Premium में अपग्रेड करें";
 "purchase_verification_failed" = "हम आपकी खरीदारी सत्यापित नहीं कर सके। कृपया सब्सक्रिप्शन स्क्रीन पर 'Restore Purchases' टैप करें, या समस्या बनी रहे तो सहायता से संपर्क करें।";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "आज";
+"notif_section_yesterday" = "कल";
+"notif_section_this_week" = "इस सप्ताह";
+"notif_section_last_week" = "पिछला सप्ताह";
+"notif_section_earlier" = "पहले";
+"notif_just_now" = "अभी";

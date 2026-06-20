@@ -3119,3 +3119,11 @@
 "paywall_cta_upgrade_to_plus" = "Plus ಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ";
 "paywall_cta_upgrade_premium" = "ಪ್ರೀಮಿಯಂಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ";
 "purchase_verification_failed" = "ನಿಮ್ಮ ಖರೀದಿಯನ್ನು ನಾವು ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಚಂದಾದಾರಿಕೆ ಪರದೆಯಲ್ಲಿ 'ಖರೀದಿಗಳನ್ನು ಮರುಸ್ಥಾಪಿಸಿ' ಟ್ಯಾಪ್ ಮಾಡಿ, ಅಥವಾ ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "ಇಂದು";
+"notif_section_yesterday" = "ನಿನ್ನೆ";
+"notif_section_this_week" = "ಈ ವಾರ";
+"notif_section_last_week" = "ಕಳೆದ ವಾರ";
+"notif_section_earlier" = "ಹಿಂದಿನ";
+"notif_just_now" = "ಈಗಷ್ಟೇ";

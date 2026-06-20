@@ -45,6 +45,49 @@ struct NotificationItem: Codable, Identifiable, Equatable {
         return fmt.string(from: date)
     }
 
+    /// Relative time display ("2h ago", "Yesterday at 3:14 PM"). Falls
+    /// back to absolute date for items older than 7 days.
+    var relativeTime: String {
+        guard let date = createdAtDate else { return "" }
+        let now = Date()
+        let interval = now.timeIntervalSince(date)
+        if interval < 60 {
+            return NSLocalizedString("notif_just_now", value: "Just now", comment: "")
+        }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short
+        if interval < 86_400 * 7 {
+            return formatter.localizedString(for: date, relativeTo: now)
+        }
+        let abs = DateFormatter()
+        abs.dateStyle = .medium
+        return abs.string(from: date)
+    }
+
+    /// Date bucket for grouping in the inbox list.
+    var inboxBucket: InboxBucket {
+        guard let date = createdAtDate else { return .earlier }
+        let cal = Calendar.current
+        if cal.isDateInToday(date) { return .today }
+        if cal.isDateInYesterday(date) { return .yesterday }
+        let weekOfYear = cal.component(.weekOfYear, from: date)
+        let nowWeek = cal.component(.weekOfYear, from: Date())
+        let year = cal.component(.year, from: date)
+        let nowYear = cal.component(.year, from: Date())
+        if year == nowYear && weekOfYear == nowWeek { return .thisWeek }
+        if year == nowYear && weekOfYear == nowWeek - 1 { return .lastWeek }
+        return .earlier
+    }
+
+    private var createdAtDate: Date? {
+        guard let createdAt else { return nil }
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let d = isoFormatter.date(from: createdAt) { return d }
+        isoFormatter.formatOptions = [.withInternetDateTime]
+        return isoFormatter.date(from: createdAt)
+    }
+
     /// True if the notification was created today
     var isToday: Bool {
         guard let date = createdDate else { return false }
@@ -118,4 +161,22 @@ extension DateFormatter {
         formatter.timeZone = TimeZone(abbreviation: "UTC")
         return formatter
     }()
+}
+
+// MARK: - Inbox Bucket
+
+enum InboxBucket: Int, CaseIterable, Comparable {
+    case today, yesterday, thisWeek, lastWeek, earlier
+    var localizedLabel: String {
+        switch self {
+        case .today:     return NSLocalizedString("notif_section_today",     value: "Today",     comment: "")
+        case .yesterday: return NSLocalizedString("notif_section_yesterday", value: "Yesterday", comment: "")
+        case .thisWeek:  return NSLocalizedString("notif_section_this_week", value: "This Week", comment: "")
+        case .lastWeek:  return NSLocalizedString("notif_section_last_week", value: "Last Week", comment: "")
+        case .earlier:   return NSLocalizedString("notif_section_earlier",   value: "Earlier",   comment: "")
+        }
+    }
+    static func < (lhs: InboxBucket, rhs: InboxBucket) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
 }

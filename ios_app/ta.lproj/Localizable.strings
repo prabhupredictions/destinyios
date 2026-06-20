@@ -3117,3 +3117,11 @@
 "paywall_cta_upgrade_to_plus" = "Plus க்கு அப்கிரேட் செய்யவும்";
 "paywall_cta_upgrade_premium" = "பிரீமியத்திற்கு அப்கிரேட் செய்யவும்";
 "purchase_verification_failed" = "உங்கள் வாங்குதலை எங்களால் சரிபார்க்க முடியவில்லை. சந்தா திரையில் 'வாங்கியதை மீட்டமை' என்பதை தட்டவும், அல்லது சிக்கல் தொடர்ந்தால் ஆதரவைத் தொடர்பு கொள்ளவும்.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "இன்று";
+"notif_section_yesterday" = "நேற்று";
+"notif_section_this_week" = "இந்த வாரம்";
+"notif_section_last_week" = "கடந்த வாரம்";
+"notif_section_earlier" = "முன்பு";
+"notif_just_now" = "இப்போதுதான்";

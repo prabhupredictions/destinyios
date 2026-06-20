@@ -3119,3 +3119,11 @@
 "paywall_cta_upgrade_to_plus" = "Перейти на Plus";
 "paywall_cta_upgrade_premium" = "Перейти на Premium";
 "purchase_verification_failed" = "Не удалось подтвердить вашу покупку. Нажмите «Восстановить покупки» на экране подписки или свяжитесь со службой поддержки, если проблема не исчезнет.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "Сегодня";
+"notif_section_yesterday" = "Вчера";
+"notif_section_this_week" = "На этой неделе";
+"notif_section_last_week" = "На прошлой неделе";
+"notif_section_earlier" = "Ранее";
+"notif_just_now" = "Только что";

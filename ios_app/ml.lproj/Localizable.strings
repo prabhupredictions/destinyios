@@ -3120,3 +3120,11 @@
 "paywall_cta_upgrade_to_plus" = "Plus ലേക്ക് അപ്‌ഗ്രേഡ് ചെയ്യുക";
 "paywall_cta_upgrade_premium" = "പ്രീമിയത്തിലേക്ക് അപ്‌ഗ്രേഡ് ചെയ്യുക";
 "purchase_verification_failed" = "നിങ്ങളുടെ വാങ്ങൽ പരിശോധിക്കാൻ ഞങ്ങൾക്ക് കഴിഞ്ഞില്ല. സബ്സ്ക്രിപ്ഷൻ സ്ക്രീനിൽ 'വാങ്ങലുകൾ പുനഃസ്ഥാപിക്കുക' ടാപ്പ് ചെയ്യുക, അല്ലെങ്കിൽ പ്രശ്നം തുടരുകയാണെങ്കിൽ പിന്തുണയുമായി ബന്ധപ്പെടുക.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "ഇന്ന്";
+"notif_section_yesterday" = "ഇന്നലെ";
+"notif_section_this_week" = "ഈ ആഴ്ച";
+"notif_section_last_week" = "കഴിഞ്ഞ ആഴ്ച";
+"notif_section_earlier" = "മുമ്പ്";
+"notif_just_now" = "ഇപ്പോൾ തന്നെ";

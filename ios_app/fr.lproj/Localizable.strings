@@ -3119,3 +3119,11 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "paywall_cta_upgrade_to_plus" = "Passer à Plus";
 "paywall_cta_upgrade_premium" = "Passer à Premium";
 "purchase_verification_failed" = "Nous n'avons pas pu vérifier votre achat. Appuyez sur « Restaurer les achats » sur l'écran d'abonnement, ou contactez l'assistance si le problème persiste.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "Aujourd'hui";
+"notif_section_yesterday" = "Hier";
+"notif_section_this_week" = "Cette semaine";
+"notif_section_last_week" = "Semaine dernière";
+"notif_section_earlier" = "Plus tôt";
+"notif_just_now" = "À l'instant";

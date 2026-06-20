@@ -3119,3 +3119,11 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "paywall_cta_upgrade_to_plus" = "Atualizar para Plus";
 "paywall_cta_upgrade_premium" = "Atualizar para Premium";
 "purchase_verification_failed" = "Não conseguimos verificar a sua compra. Toque em 'Restaurar compras' na tela de assinatura ou contacte o suporte se o problema persistir.";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "Hoje";
+"notif_section_yesterday" = "Ontem";
+"notif_section_this_week" = "Esta semana";
+"notif_section_last_week" = "Semana passada";
+"notif_section_earlier" = "Anteriores";
+"notif_just_now" = "Agora mesmo";

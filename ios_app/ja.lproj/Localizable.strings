@@ -3119,3 +3119,11 @@
 "paywall_cta_upgrade_to_plus" = "Plus にアップグレード";
 "paywall_cta_upgrade_premium" = "プレミアムにアップグレード";
 "purchase_verification_failed" = "購入を確認できませんでした。サブスクリプション画面の「購入の復元」をタップするか、問題が続く場合はサポートにお問い合わせください。";
+
+// Inbox grouping (issue #4)
+"notif_section_today" = "今日";
+"notif_section_yesterday" = "昨日";
+"notif_section_this_week" = "今週";
+"notif_section_last_week" = "先週";
+"notif_section_earlier" = "それ以前";
+"notif_just_now" = "たった今";
