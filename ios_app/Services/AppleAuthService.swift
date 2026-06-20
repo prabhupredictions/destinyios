@@ -69,7 +69,7 @@ class AppleAuthService: NSObject, AuthServiceProtocol {
     }
     
     // MARK: - Google Sign In
-    
+
     @MainActor
     func signInWithGoogle() async throws -> User {
         #if canImport(GoogleSignIn)
@@ -78,16 +78,54 @@ class AppleAuthService: NSObject, AuthServiceProtocol {
             print("❌ [AppleAuth] No root view controller found")
             throw AuthError.notImplemented("No root view controller found")
         }
-        
+
         print("🚀 [AppleAuth] Starting Google Sign-In...")
         let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
         print("✅ [AppleAuth] Google Sign-In Success!")
-        let user = result.user
-        
+        let googleUser = result.user
+
+        // W7 P3 — exchange Google id_token for backend session JWT.
+        // Mirrors the Apple flow above. Without this, Google users
+        // never mint a session JWT → APIClient relies on legacy UA
+        // passthrough → strict-mode kill-switch (W7_REQUIRE_NEW_AGENT=1)
+        // would lock them out of every authenticated endpoint.
+        // Fail loud on exchange error so AuthViewModel.performSignIn
+        // routes to the sign-in screen instead of MainTabView with
+        // no session.
+        guard let idToken = googleUser.idToken?.tokenString else {
+            print("⚠️ [AppleAuth] Google sign-in returned no id_token — W7 exchange skipped")
+            // Without an id_token we can't mint a backend session.
+            // Fail rather than proceed sessionless (would silently break
+            // strict-mode features like /predict-stream once kill-switch fires).
+            throw AuthError.networkError("Google sign-in did not return an id_token")
+        }
+        // Clear any stale active session so a slow /auth/exchange
+        // can't be observed mid-flight returning the previous user's JWT.
+        SessionTokenStore.shared.clearActiveSession()
+        do {
+            _ = try await AuthExchangeClient.shared.signInWithGoogle(
+                idToken: idToken, nonce: nil,
+            )
+            print("[AppleAuth] W7 session minted via /auth/exchange (google)")
+        } catch let exchangeErr as AuthExchangeError {
+            // Cross-IdP collision: surface as a typed AuthError so the
+            // sign-in screen can show "Sign in with <bound_idp>"
+            // instead of a generic network error.
+            if case .crossIdpCollision(let boundIdp, _, _) = exchangeErr {
+                print("⚠️ [AppleAuth] cross-IdP collision (google): bound_idp=\(boundIdp ?? "?")")
+                throw AuthError.crossIdpCollision(boundIdp: boundIdp)
+            }
+            print("⚠️ [AppleAuth] W7 /auth/exchange failed (google): \(exchangeErr)")
+            throw AuthError.networkError(exchangeErr.localizedDescription)
+        } catch {
+            print("⚠️ [AppleAuth] W7 /auth/exchange failed (google): \(error)")
+            throw AuthError.networkError(error.localizedDescription)
+        }
+
         return User(
-            id: user.userID ?? "unknown_google_id",
-            email: user.profile?.email,
-            name: user.profile?.name,
+            id: googleUser.userID ?? "unknown_google_id",
+            email: googleUser.profile?.email,
+            name: googleUser.profile?.name,
             provider: "google"
         )
         #else

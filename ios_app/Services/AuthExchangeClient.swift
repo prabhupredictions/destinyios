@@ -77,7 +77,7 @@ final class AuthExchangeClient: @unchecked Sendable {
         // /auth/exchange is in the backend's PUBLIC_ENDPOINTS list; no
         // bearer required. We still send X-API-Key as anti-bot signal.
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
-        request.setValue("DestinyAI-iOS/1.6", forHTTPHeaderField: "User-Agent")
+        request.setValue("DestinyAI-iOS/1.7", forHTTPHeaderField: "User-Agent")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await session.data(for: request)
@@ -119,7 +119,7 @@ final class AuthExchangeClient: @unchecked Sendable {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
-        request.setValue("DestinyAI-iOS/1.6", forHTTPHeaderField: "User-Agent")
+        request.setValue("DestinyAI-iOS/1.7", forHTTPHeaderField: "User-Agent")
         var body: [String: Any] = ["refresh_token": refreshToken]
         if let id = idToken {
             // Optional: needed for Google sessions older than 7 days

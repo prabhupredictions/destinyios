@@ -58,7 +58,7 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
         // we send the API key in Authorization too so pre-W7 endpoints
         // continue to work.
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
-        request.setValue("DestinyAI-iOS/1.6", forHTTPHeaderField: "User-Agent")
+        request.setValue("DestinyAI-iOS/1.7", forHTTPHeaderField: "User-Agent")
 
         if let sessionJwt = SessionTokenStore.shared.currentSessionJwt(),
            SessionTokenStore.shared.sessionIsFresh() {
