@@ -264,6 +264,33 @@ class SubscriptionManager: ObservableObject {
                 // Extract JWS from VerificationResult BEFORE extracting Transaction
                 let jws = verification.jwsRepresentation
                 let transaction = try checkVerified(verification)
+
+                // Cross-account / cross-env guard (1.7) — Apple may return a
+                // pre-existing transaction (e.g. "you're already subscribed"
+                // path) whose appAccountToken belongs to a DIFFERENT user on
+                // this device. Surfacing it to /verify lets backend reject
+                // with app_account_token_unknown, but the iOS-side UX would
+                // show "We've received your payment" — misleading. Catch
+                // this here and tell the user exactly what to do.
+                let expectedToken = readCurrentUserAppAccountTokenFromKeychain()
+                if !shouldHonorEntitlement(transaction: transaction,
+                                           expectedToken: expectedToken,
+                                           reason: "Purchase") {
+                    // FINISH the txn for cross-account (env-OK) — it will
+                    // never be claimable by this user.
+                    if environmentMatchesBuild(transaction: transaction) {
+                        await transaction.finish()
+                    }
+                    isLoading = false
+                    if !environmentMatchesBuild(transaction: transaction) {
+                        let want = Self.buildIsProduction ? "production" : "sandbox"
+                        errorMessage = "This purchase belongs to a different App Store environment (expected \(want)). It cannot be activated on this build."
+                    } else {
+                        errorMessage = "This subscription is bound to a different account on this device. To reset, go to Settings → Developer → Sandbox Apple Account → Clear Purchase History, then try again."
+                    }
+                    return false
+                }
+
                 let backendOK = await verifyWithBackend(jws: jws, transaction: transaction)
                 if backendOK {
                     await transaction.finish()
