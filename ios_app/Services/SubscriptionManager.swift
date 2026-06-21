@@ -444,7 +444,7 @@ class SubscriptionManager: ObservableObject {
                     // Extract JWS from VerificationResult BEFORE extracting Transaction
                     let jws = result.jwsRepresentation
                     let transaction = try Self.checkVerifiedStatic(result)
-                    
+
                     // Skip expired transactions to prevent stale sandbox renewals
                     // from overwriting the user's plan
                     if let expiresDate = transaction.expirationDate,
@@ -453,7 +453,24 @@ class SubscriptionManager: ObservableObject {
                         await transaction.finish()
                         continue
                     }
-                    
+
+                    // Cross-account / cross-env filter (1.7) — same gate as
+                    // updatePurchasedProducts / reconcile. If this txn is a
+                    // production txn arriving at a test build, or a sandbox
+                    // txn at prod, or carries an appAccountToken bound to a
+                    // different user, do NOT forward to /verify. Don't
+                    // .finish() either — StoreKit redelivers if the user
+                    // ever signs in on the matching env.
+                    let expectedToken = await self?.readCurrentUserAppAccountTokenFromKeychain()
+                    if let self,
+                       !self.shouldHonorEntitlement(transaction: transaction,
+                                                    expectedToken: expectedToken,
+                                                    reason: "TransactionListener") {
+                        // Leave unfinished so StoreKit can redeliver to the
+                        // correct user / env later.
+                        continue
+                    }
+
                     print("📥 [TransactionListener] Processing transaction: \(transaction.productID), env: \(transaction.environment)")
                     let backendOK = await self?.verifyWithBackend(jws: jws, transaction: transaction) ?? false
                     if backendOK {
@@ -511,19 +528,41 @@ class SubscriptionManager: ObservableObject {
     func updatePurchasedProducts() async {
         var purchased: Set<String> = []
 
+        // Cross-account / cross-environment leak fix (1.7) — read the
+        // signed-in user's expected appAccountToken from Keychain ONCE up
+        // front, then filter every entitlement through the canonical
+        // `entitlementBelongsToCurrentUser` check below.
+        //
+        // Three orthogonal boundaries are enforced:
+        //   1. Build environment vs StoreKit environment
+        //      - Test/Local builds → only `.sandbox` transactions count.
+        //      - Production build  → only `.production` transactions count.
+        //      Without this, a tester on TestFlight who has real-money
+        //      Plus history from production sees that production entitlement
+        //      bleed into the test build (the bug the user hit 2026-06-21:
+        //      prabhukushwaha's expired-June-2 Plus showing as "Current
+        //      Plan" on prabhukumar010780's test account).
+        //   2. appAccountToken match
+        //      - Every legitimate purchase carries a per-user server-minted
+        //        UUID (W4b). Entitlements whose token doesn't match the
+        //        signed-in user's expected token are rejected — closes
+        //        family-share / multi-tester-on-same-device leakage.
+        //   3. Revocation + upgrade succession (existing INV-J7 logic).
+        //
+        // The filter is honored both here (UI display) and in
+        // reconcileEntitlementsWithBackend (server-side sync) so we never
+        // forward cross-account JWS to /verify either.
+        let expectedToken: UUID? = readCurrentUserAppAccountTokenFromKeychain()
+
         for await result in Transaction.currentEntitlements {
             do {
                 let transaction = try checkVerified(result)
-                // INV-J7: skip transactions that have been superseded by an
-                // upgrade. Without this, a Core+Plus user during the brief
-                // overlap window appears to own BOTH tiers, which can flip
-                // pendingUpgrade UI off prematurely and confuse plan display.
-                if transaction.isUpgraded {
+                if !shouldHonorEntitlement(transaction: transaction,
+                                           expectedToken: expectedToken,
+                                           reason: "updatePurchasedProducts") {
                     continue
                 }
-                if transaction.revocationDate == nil {
-                    purchased.insert(transaction.productID)
-                }
+                purchased.insert(transaction.productID)
             } catch {
                 print("Entitlement verification failed: \(error)")
             }
@@ -542,6 +581,131 @@ class SubscriptionManager: ObservableObject {
 
         // Check for pending upgrades
         await checkPendingUpgrade()
+    }
+
+    /// Cross-account-leak fix (1.7) — read the current user's appAccountToken
+    /// directly from Keychain WITHOUT making a network call. Used inside the
+    /// hot path of `updatePurchasedProducts` + `reconcileEntitlementsWithBackend`.
+    nonisolated private func readCurrentUserAppAccountTokenFromKeychain() -> UUID? {
+        guard let email = (
+            UserDefaults.standard.string(forKey: "userEmail")
+        )?.lowercased(), !email.isEmpty else {
+            return nil
+        }
+        let key = "appAccountToken::\(email)"
+        guard let cached = KeychainService.shared.loadString(forKey: key),
+              let uuid = UUID(uuidString: cached) else {
+            return nil
+        }
+        return uuid
+    }
+
+    /// Single source of truth for "does this StoreKit entitlement belong
+    /// to the current user on the current build environment?"
+    ///
+    /// Returns false (and logs the rejection reason) for any of:
+    ///   - Transaction is superseded by an upgrade (INV-J7).
+    ///   - Transaction has been revoked.
+    ///   - StoreKit environment doesn't match build environment (sandbox
+    ///     txn on prod build, or prod txn on test/local build).
+    ///   - appAccountToken doesn't match the signed-in user's expected token.
+    ///
+    /// Used by both updatePurchasedProducts (UI state) and
+    /// reconcileEntitlementsWithBackend (server-side /verify forwarding)
+    /// so the two paths can never diverge.
+    nonisolated private func shouldHonorEntitlement(
+        transaction: Transaction,
+        expectedToken: UUID?,
+        reason: String
+    ) -> Bool {
+        // INV-J7: superseded by an upgrade.
+        if transaction.isUpgraded {
+            print("⏭ [\(reason)] Skipping superseded txn productID=\(transaction.productID) id=\(transaction.id)")
+            return false
+        }
+        // Revoked.
+        if transaction.revocationDate != nil {
+            print("⏭ [\(reason)] Skipping revoked txn productID=\(transaction.productID) id=\(transaction.id)")
+            return false
+        }
+        // Environment mismatch.
+        if !environmentMatchesBuild(transaction: transaction) {
+            print("⛔ [\(reason)] Skipping cross-env txn productID=\(transaction.productID) txn.env=\(transaction.subscriptionEnvironment) build=\(Self.buildIsProduction ? "prod" : "test")")
+            return false
+        }
+        // appAccountToken mismatch.
+        if !entitlementBelongsToCurrentUser(
+            txnAppAccountToken: transaction.appAccountToken,
+            expectedToken: expectedToken
+        ) {
+            print("⛔ [\(reason)] Skipping cross-account txn productID=\(transaction.productID) — appAccountToken mismatch (expected=\(expectedToken?.uuidString ?? "nil"), got=\(transaction.appAccountToken?.uuidString ?? "nil"))")
+            return false
+        }
+        return true
+    }
+
+    /// Build env classifier — production builds connect to the prod API URL.
+    /// Both Local and Test builds are treated as "test" for entitlement
+    /// purposes (both should consume only `.sandbox` StoreKit transactions).
+    nonisolated static var buildIsProduction: Bool {
+        APIConfig.baseURL.contains("astroapi-prod")
+    }
+
+    /// Permanent sandbox/prod separation (1.7) — the StoreKit environment
+    /// of every transaction must match the build environment. Without this,
+    /// a TestFlight build on a device with a real production Plus entitlement
+    /// will read that prod entitlement and treat it as the user's current
+    /// plan. The defense:
+    ///   - Production build: accept ONLY `.production` transactions.
+    ///   - Test/Local build: accept ONLY `.sandbox` transactions.
+    /// This means EVERY subscription scenario can be exercised in sandbox
+    /// without bleeding through real-world Apple ID state on the device.
+    nonisolated private func environmentMatchesBuild(transaction: Transaction) -> Bool {
+        let txnEnv = transaction.subscriptionEnvironment
+        if Self.buildIsProduction {
+            return txnEnv == .production
+        } else {
+            return txnEnv == .sandbox
+        }
+    }
+
+    /// Cross-account-leak fix (1.7) — decide whether an Apple entitlement's
+    /// appAccountToken matches the currently-signed-in user.
+    ///
+    /// Rules:
+    ///   1. Both tokens present → MUST match exactly.
+    ///   2. Transaction has NO appAccountToken (pre-W4b legacy):
+    ///      - PRODUCTION build: accept iff we also don't know the user's
+    ///        expected token yet (true first launch / fresh install). If
+    ///        we DO know the user's token, the bare-token txn most likely
+    ///        belongs to a different user on the same device.
+    ///      - TEST build: reject. Sandbox testers should only see their
+    ///        own bound purchases — all sandbox builds carry an
+    ///        appAccountToken from W4b onward.
+    ///   3. Txn has a token but we don't yet know the user's: reject
+    ///      defensively. Once the user's token caches (post first
+    ///      Keychain fetch), the next Transaction.updates cycle will
+    ///      re-evaluate.
+    nonisolated private func entitlementBelongsToCurrentUser(
+        txnAppAccountToken: UUID?,
+        expectedToken: UUID?
+    ) -> Bool {
+        if let txnTok = txnAppAccountToken, let expected = expectedToken {
+            return txnTok == expected
+        }
+        if txnAppAccountToken == nil {
+            // Pre-W4b legacy purchase.
+            if Self.buildIsProduction {
+                // Accept on prod ONLY when we have no expected token cached
+                // (true first launch). If we know the user's token, a
+                // bare-token txn is suspicious — probably belongs to a
+                // different Apple ID on this device.
+                return expectedToken == nil
+            }
+            return false
+        }
+        // Txn has a token but we don't know what to compare against.
+        return false
     }
 
     /// Reconcile every active StoreKit entitlement with the backend.
@@ -586,15 +750,23 @@ class SubscriptionManager: ObservableObject {
         // cancellations).
         var anyEntitlementForwarded = false
 
+        // Cross-account / cross-environment filter (1.7) — same canonical
+        // honoring logic as updatePurchasedProducts. Without this, we'd
+        // forward cross-account JWS to /verify and the backend would
+        // either reject with app_account_token_unknown (best case) or
+        // worse, in the brief pre-W4b legacy path, accept it. The
+        // shouldHonorEntitlement gate makes both paths identical.
+        let expectedToken: UUID? = readCurrentUserAppAccountTokenFromKeychain()
+
         for await result in Transaction.currentEntitlements {
             do {
                 let jws = result.jwsRepresentation
                 let transaction = try checkVerified(result)
-                if transaction.revocationDate != nil { continue }
-                // INV-J7: skip superseded transactions during reconcile too
-                // so we don't push the older tier to the backend after an
-                // upgrade has already been recorded.
-                if transaction.isUpgraded { continue }
+                if !shouldHonorEntitlement(transaction: transaction,
+                                           expectedToken: expectedToken,
+                                           reason: "Reconcile") {
+                    continue
+                }
                 print("🔄 [Reconcile] Verifying entitlement with backend: \(transaction.productID)")
                 let ok = await verifyWithBackend(jws: jws, transaction: transaction)
                 if ok {
@@ -785,6 +957,18 @@ class SubscriptionManager: ObservableObject {
         if transaction.subscriptionEnvironment == .sandbox &&
             APIConfig.baseURL.contains("astroapi-prod") {
             print("⚠️ [Backend] Sandbox transaction on production API — NOT finishing, NOT granting premium. StoreKit will redeliver on env match. (product=\(transaction.productID))")
+            return false
+        }
+
+        // Permanent sandbox/prod separation (1.7) — inverse guard. Production
+        // transactions arriving at a test/local build must also be rejected
+        // so sandbox builds NEVER honor real-money entitlements that happen
+        // to exist on the device's App Store Apple ID. This is what made
+        // prabhukushwaha's expired-June-2 Plus appear as "Current Plan"
+        // when prabhukumar010780 was signed into the app on TestFlight.
+        if transaction.subscriptionEnvironment == .production &&
+            !APIConfig.baseURL.contains("astroapi-prod") {
+            print("⚠️ [Backend] Production transaction on test/local API — NOT finishing, NOT granting premium. Real prod entitlements MUST NOT leak into test builds. (product=\(transaction.productID))")
             return false
         }
 
