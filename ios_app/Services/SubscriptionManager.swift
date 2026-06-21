@@ -455,20 +455,34 @@ class SubscriptionManager: ObservableObject {
                     }
 
                     // Cross-account / cross-env filter (1.7) — same gate as
-                    // updatePurchasedProducts / reconcile. If this txn is a
-                    // production txn arriving at a test build, or a sandbox
-                    // txn at prod, or carries an appAccountToken bound to a
-                    // different user, do NOT forward to /verify. Don't
-                    // .finish() either — StoreKit redelivers if the user
-                    // ever signs in on the matching env.
+                    // updatePurchasedProducts / reconcile. Two reject classes:
+                    //   - ENV mismatch (e.g. .production txn on test build):
+                    //     DO NOT .finish() — a future build on the matching
+                    //     env (production) may legitimately claim it.
+                    //   - APP-ACCOUNT-TOKEN mismatch (env OK, but txn was
+                    //     bound to a different user): .finish() the txn.
+                    //     This device's signed-in user will NEVER claim it,
+                    //     so leaving it unfinished triggers an aggressive
+                    //     StoreKit redelivery loop (sandbox "Every 5 min"
+                    //     renewals make this acute) — the loop saturated
+                    //     the main runloop and hung the app on the 2nd
+                    //     chat question in 2026-06-21 testing.
                     let expectedToken = await self?.readCurrentUserAppAccountTokenFromKeychain()
-                    if let self,
-                       !self.shouldHonorEntitlement(transaction: transaction,
-                                                    expectedToken: expectedToken,
-                                                    reason: "TransactionListener") {
-                        // Leave unfinished so StoreKit can redeliver to the
-                        // correct user / env later.
-                        continue
+                    if let self {
+                        let envOK = self.environmentMatchesBuild(transaction: transaction)
+                        if !envOK {
+                            print("⛔ [TransactionListener] Cross-env txn — leaving unfinished for matching env: productID=\(transaction.productID)")
+                            continue
+                        }
+                        let accountOK = self.entitlementBelongsToCurrentUser(
+                            txnAppAccountToken: transaction.appAccountToken,
+                            expectedToken: expectedToken
+                        )
+                        if !accountOK {
+                            print("⛔ [TransactionListener] Cross-account txn — FINISHING permanently to stop redelivery loop: productID=\(transaction.productID), txn.token=\(transaction.appAccountToken?.uuidString ?? "nil"), expected=\(expectedToken?.uuidString ?? "nil")")
+                            await transaction.finish()
+                            continue
+                        }
                     }
 
                     print("📥 [TransactionListener] Processing transaction: \(transaction.productID), env: \(transaction.environment)")

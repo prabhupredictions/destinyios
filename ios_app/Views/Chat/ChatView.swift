@@ -550,22 +550,54 @@ struct ChatView: View {
     
 }
 
+// MARK: - Thread Row DTO
+/// Value-type snapshot of a chat thread, safe to hold in SwiftUI @State.
+///
+/// PERMANENT FIX (1.7+): the previous design stored `[LocalChatThread]` (a
+/// SwiftData @Model) in @State and called .title/.preview/.updatedAt on those
+/// references during view body / recomputeGroups. SwiftData @Model instances
+/// are NOT safe to hold across runloop boundaries — they get faulted, expired,
+/// or invalidated by background context activity. Reading a property on a
+/// faulted @Model can:
+///   - Stall on a synchronous fetch from the persistent store (the "hung
+///     loading history" symptom)
+///   - Crash with an EXC_BAD_ACCESS if the row was deleted by another path
+///   - Return stale data after a parallel context save
+///
+/// ThreadRow takes a value-type snapshot at fetch time and is safe to hold
+/// indefinitely. We re-fetch the live @Model only at the moment of action
+/// (tap → loadThread, swipe-delete → viewModel.deleteThread, pin → toggle).
+fileprivate struct ThreadRow: Identifiable, Equatable, Sendable {
+    let id: String
+    let title: String
+    let preview: String
+    let messageCount: Int
+    let isPinned: Bool
+    let updatedAt: Date
+
+    init(_ thread: LocalChatThread) {
+        self.id = thread.id
+        self.title = thread.title
+        self.preview = thread.preview
+        self.messageCount = thread.messageCount
+        self.isPinned = thread.isPinned
+        self.updatedAt = thread.updatedAt
+    }
+}
+
 // MARK: - Chat History Sidebar
 struct ChatHistorySidebar: View {
     let viewModel: ChatViewModel
     let onDismiss: () -> Void
 
-    // F1 (1.7) — Pagination state. We still hold [LocalChatThread] (needed to call
-    // viewModel.loadThread / togglePinThread which take @Model). The crash fix
-    // (rank #1 candidate for wishva.shah's repro) is in two parts: (a) groupedThreads
-    // is now a CACHED @State instead of a body-time computed property, and (b) every
-    // mutation (delete, pagination, search change) recomputes it INSIDE withAnimation,
-    // so SwiftUI's section/row diffing runs against a settled snapshot rather than
-    // a different identity each layout pass. The previous code re-bucketed on every
-    // body invocation, which combined with section-disappearance on last-of-bucket
-    // delete trips a UICollectionView assertion.
-    @State private var loadedThreads: [LocalChatThread] = []
-    @State private var groupedThreads: [(String, [LocalChatThread])] = []
+    // PERMANENT FIX (1.7+) — Pagination state holds value-type DTOs ONLY,
+    // never live SwiftData @Model objects. This eliminates the entire class
+    // of crashes / hangs caused by faulted @Model attribute reads during
+    // SwiftUI body recomputation. groupedRows is also a cached @State (NOT
+    // a body-time computed property) so SwiftUI's section/row diffing runs
+    // against a settled snapshot rather than a fresh identity each pass.
+    @State private var loadedRows: [ThreadRow] = []
+    @State private var groupedRows: [(String, [ThreadRow])] = []
     @State private var hasMore = false
     @State private var isLoadingMore = false
     private let pageSize = 20
@@ -574,8 +606,8 @@ struct ChatHistorySidebar: View {
     // Search
     @State private var searchText = ""
 
-    // Delete confirmation
-    @State private var threadToDelete: LocalChatThread?
+    // Delete confirmation — DTO only, not @Model
+    @State private var rowToDelete: ThreadRow?
     @State private var showDeleteConfirmation = false
 
     var body: some View {
@@ -624,25 +656,25 @@ struct ChatHistorySidebar: View {
             .onAppear {
                 loadFirstPage()
             }
-            // F1 — search filter is applied inside recomputeGroups(); recompute when text changes.
+            // Search filter is applied inside recomputeGroups(); recompute on text change.
             .onChange(of: searchText) { _, _ in
                 recomputeGroups()
             }
             .alert("Delete", isPresented: $showDeleteConfirmation) {
-                Button("cancel_action".localized, role: .cancel) { threadToDelete = nil }
+                Button("cancel_action".localized, role: .cancel) { rowToDelete = nil }
                 Button("delete_action".localized, role: .destructive) {
-                    if let thread = threadToDelete {
-                        let threadId = thread.id
-                        // F1 — mutate local state + recompute groups INSIDE withAnimation
-                        // so the section/row diff runs as one transaction. Capture the id
-                        // first so the SwiftData @Model isn't re-read after deletion.
+                    if let row = rowToDelete {
+                        let threadId = row.id
+                        // Mutate local DTO state + recompute groups INSIDE withAnimation
+                        // so the section/row diff runs as one transaction.
                         withAnimation {
-                            loadedThreads.removeAll { $0.id == threadId }
+                            loadedRows.removeAll { $0.id == threadId }
                             recomputeGroups()
                         }
-                        threadToDelete = nil
-                        // Dispatch the SwiftData + server delete after the animation
-                        // is queued, so we never re-render a row whose @Model is gone.
+                        rowToDelete = nil
+                        // Dispatch the SwiftData + server delete via DataManager.
+                        // We resolve the live @Model from the store at this moment
+                        // only — never store it.
                         Task { @MainActor in
                             if let live = DataManager.shared.getThread(id: threadId) {
                                 viewModel.deleteThread(live)
@@ -651,7 +683,7 @@ struct ChatHistorySidebar: View {
                     }
                 }
             } message: {
-                Text(String(format: "chat_delete_thread_confirm".localized, threadToDelete?.title ?? ""))
+                Text(String(format: "chat_delete_thread_confirm".localized, rowToDelete?.title ?? ""))
             }
         }
     }
@@ -698,12 +730,14 @@ struct ChatHistorySidebar: View {
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         let activeProfileId = ProfileContextManager.shared.activeProfileId
         let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: 0)
+        // Snapshot to DTOs BEFORE the @State assignment so we never hold @Model refs.
+        let rows = result.threads.map(ThreadRow.init)
         withAnimation {
-            loadedThreads = result.threads
+            loadedRows = rows
             recomputeGroups()
         }
         hasMore = result.hasMore
-        currentOffset = result.threads.count
+        currentOffset = rows.count
     }
 
     private func loadMore() {
@@ -712,48 +746,70 @@ struct ChatHistorySidebar: View {
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
         let activeProfileId = ProfileContextManager.shared.activeProfileId
         let result = viewModel.dataManager.fetchChatThreadsPaginated(for: userEmail, profileId: activeProfileId, limit: pageSize, offset: currentOffset)
+        let newRows = result.threads.map(ThreadRow.init)
         withAnimation {
-            loadedThreads.append(contentsOf: result.threads)
+            loadedRows.append(contentsOf: newRows)
             recomputeGroups()
         }
         hasMore = result.hasMore
-        currentOffset += result.threads.count
+        currentOffset += newRows.count
         isLoadingMore = false
     }
 
-    // F1 — Recompute the cached groupedThreads from loadedThreads + searchText.
+    /// Re-fetch the live @Model for a given thread id, snapshot a new DTO,
+    /// and update loadedRows in place. Called after pin toggle so the row's
+    /// isPinned + position update without re-paginating.
+    private func refreshRow(threadId: String) {
+        guard let live = DataManager.shared.getThread(id: threadId) else {
+            // Thread was deleted under us — remove it.
+            withAnimation {
+                loadedRows.removeAll { $0.id == threadId }
+                recomputeGroups()
+            }
+            return
+        }
+        let updated = ThreadRow(live)
+        if let idx = loadedRows.firstIndex(where: { $0.id == threadId }) {
+            loadedRows[idx] = updated
+        }
+        withAnimation {
+            recomputeGroups()
+        }
+    }
+
+    // Recompute the cached groupedRows from loadedRows + searchText.
     // Always called inside an explicit withAnimation transaction so SwiftUI's
     // section/row diff runs against a settled snapshot.
     private func recomputeGroups() {
         let calendar = Calendar.current
         let now = Date()
-        var grouped: [String: [LocalChatThread]] = [:]
+        var grouped: [String: [ThreadRow]] = [:]
 
-        let filtered = searchText.isEmpty ? loadedThreads : loadedThreads.filter {
+        let filtered = searchText.isEmpty ? loadedRows : loadedRows.filter {
             $0.title.localizedCaseInsensitiveContains(searchText) ||
             $0.preview.localizedCaseInsensitiveContains(searchText)
         }
 
-        for thread in filtered {
+        for row in filtered {
             let key: String
-            if calendar.isDateInToday(thread.updatedAt) {
+            if calendar.isDateInToday(row.updatedAt) {
                 key = "Today"
-            } else if calendar.isDateInYesterday(thread.updatedAt) {
+            } else if calendar.isDateInYesterday(row.updatedAt) {
                 key = "Yesterday"
-            } else if let daysAgo = calendar.dateComponents([.day], from: thread.updatedAt, to: now).day, daysAgo < 7 {
+            } else if let daysAgo = calendar.dateComponents([.day], from: row.updatedAt, to: now).day, daysAgo < 7 {
                 key = "Last 7 Days"
-            } else if let daysAgo = calendar.dateComponents([.day], from: thread.updatedAt, to: now).day, daysAgo < 30 {
+            } else if let daysAgo = calendar.dateComponents([.day], from: row.updatedAt, to: now).day, daysAgo < 30 {
                 key = "Last 30 Days"
             } else {
                 key = "Older"
             }
-            grouped[key, default: []].append(thread)
+            grouped[key, default: []].append(row)
         }
 
         let order = ["Today", "Yesterday", "Last 7 Days", "Last 30 Days", "Older"]
-        groupedThreads = order.compactMap { key in
-            if let threads = grouped[key], !threads.isEmpty {
-                return (key, threads)
+        groupedRows = order.compactMap { key in
+            if let rows = grouped[key], !rows.isEmpty {
+                return (key, rows)
             }
             return nil
         }
@@ -788,7 +844,7 @@ struct ChatHistorySidebar: View {
             .padding(.top, 8)
             .padding(.bottom, 4)
 
-            if groupedThreads.isEmpty {
+            if groupedRows.isEmpty {
                 VStack(spacing: 16) {
                     Image(systemName: "bubble.left.and.bubble.right")
                         .font(AppTheme.Fonts.display(size: 48))
@@ -802,31 +858,34 @@ struct ChatHistorySidebar: View {
                 .padding(.top, 80)
             } else {
                 List {
-                    ForEach(groupedThreads, id: \.0) { group in
+                    ForEach(groupedRows, id: \.0) { group in
                         Section(header:
                             Text(group.0)
                                 .font(AppTheme.Fonts.caption())
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                                 .textCase(.uppercase)
                         ) {
-                            ForEach(group.1, id: \.id) { thread in
+                            ForEach(group.1, id: \.id) { row in
                                 HistoryRow(
-                                    thread: thread,
-                                    isSelected: thread.id == viewModel.currentThreadId,
+                                    row: row,
+                                    isSelected: row.id == viewModel.currentThreadId,
                                     onTap: {
-                                        viewModel.loadThread(thread)
+                                        // Resolve the live @Model only at tap time.
+                                        if let live = DataManager.shared.getThread(id: row.id) {
+                                            viewModel.loadThread(live)
+                                        }
                                         onDismiss()
                                     },
                                     onDelete: {
-                                        threadToDelete = thread
+                                        rowToDelete = row
                                         showDeleteConfirmation = true
                                     },
                                     onPin: {
-                                        // F1 — pin mutates the @Model in place; force a
-                                        // fresh recompute so the row order/badge updates.
-                                        viewModel.togglePinThread(thread)
-                                        withAnimation {
-                                            recomputeGroups()
+                                        // Resolve live @Model, toggle pin, then refresh
+                                        // the row's DTO and recompute groups.
+                                        if let live = DataManager.shared.getThread(id: row.id) {
+                                            viewModel.togglePinThread(live)
+                                            refreshRow(threadId: row.id)
                                         }
                                     }
                                 )
@@ -834,7 +893,7 @@ struct ChatHistorySidebar: View {
                                 .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                                 .onAppear {
                                     // Load more when near the end
-                                    if thread.id == loadedThreads.last?.id {
+                                    if row.id == loadedRows.last?.id {
                                         loadMore()
                                     }
                                 }
@@ -861,39 +920,39 @@ struct ChatHistorySidebar: View {
 }
 
 // MARK: - History Row
-struct HistoryRow: View {
-    let thread: LocalChatThread
+fileprivate struct HistoryRow: View {
+    let row: ThreadRow
     let isSelected: Bool
     let onTap: () -> Void
     let onDelete: () -> Void
     let onPin: () -> Void
-    
+
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 // Pin indicator
-                if thread.isPinned {
+                if row.isPinned {
                     Image(systemName: "pin.fill")
                         .font(AppTheme.Fonts.caption(size: 12))
                         .foregroundColor(AppTheme.Colors.gold)
                 }
-                
+
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(thread.title)
+                    Text(row.title)
                         .font(AppTheme.Fonts.body(size: 15))
                         .fontWeight(.medium)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .lineLimit(1)
-                    
-                    Text(thread.preview)
+
+                    Text(row.preview)
                         .font(AppTheme.Fonts.body(size: 13))
                         .foregroundColor(AppTheme.Colors.textSecondary)
                         .lineLimit(1)
                 }
-                
+
                 Spacer()
-                
-                Text("\(thread.messageCount)")
+
+                Text("\(row.messageCount)")
                     .font(AppTheme.Fonts.caption())
                     .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.6))
             }
@@ -910,11 +969,11 @@ struct HistoryRow: View {
                 Label("delete_action".localized, systemImage: "trash")
             }
             .tint(AppTheme.Colors.error)
-            
+
             Button(action: onPin) {
                 Label(
-                    thread.isPinned ? "unpin".localized : "pin".localized,
-                    systemImage: thread.isPinned ? "pin.slash" : "pin"
+                    row.isPinned ? "unpin".localized : "pin".localized,
+                    systemImage: row.isPinned ? "pin.slash" : "pin"
                 )
             }
             .tint(AppTheme.Colors.gold)
@@ -922,11 +981,11 @@ struct HistoryRow: View {
         .contextMenu {
             Button(action: onPin) {
                 Label(
-                    thread.isPinned ? "unpin".localized : "pin".localized,
-                    systemImage: thread.isPinned ? "pin.slash" : "pin"
+                    row.isPinned ? "unpin".localized : "pin".localized,
+                    systemImage: row.isPinned ? "pin.slash" : "pin"
                 )
             }
-            
+
             Button(role: .destructive, action: onDelete) {
                 Label("delete_action".localized, systemImage: "trash")
             }
