@@ -3127,3 +3127,15 @@
 "notif_section_last_week" = "ಕಳೆದ ವಾರ";
 "notif_section_earlier" = "ಹಿಂದಿನ";
 "notif_just_now" = "ಈಗಷ್ಟೇ";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "ಹೆಚ್ಚು ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ";
+"quota_guest_bullet_save_chart" = "ನಿಮ್ಮ ಜನ್ಮ ಚಾರ್ಟ್ ಉಳಿಸಿ";
+"quota_guest_bullet_daily_insights" = "ದೈನಂದಿನ ಒಳನೋಟಗಳನ್ನು ಪಡೆಯಿರಿ";
+"quota_guest_bullet_destiny_matching" = "Destiny Matching™ (ಹೊಂದಾಣಿಕೆ ವಿಶ್ಲೇಷಣೆ) ಅನ್‌ಲಾಕ್ ಮಾಡಿ";
+"quota_guest_bullet_followups" = "ನಿಮ್ಮ ಹೊಂದಾಣಿಕೆ ವರದಿಯ ನಂತರ ಹೆಚ್ಚುವರಿ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 ದಿನ ಉಚಿತ, ನಂತರ ಮಾಸಿಕ ಚಂದಾದಾರಿಕೆ. ಯಾವಾಗ ಬೇಕಾದರೂ ರದ್ದುಗೊಳಿಸಿ.";
+"subscription_plus_unavailable" = "Plus ಚಂದಾದಾರಿಕೆ ಇದೀಗ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";

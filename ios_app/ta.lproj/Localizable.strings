@@ -3125,3 +3125,15 @@
 "notif_section_last_week" = "கடந்த வாரம்";
 "notif_section_earlier" = "முன்பு";
 "notif_just_now" = "இப்போதுதான்";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "கூடுதல் கேள்விகளைக் கேளுங்கள்";
+"quota_guest_bullet_save_chart" = "உங்கள் ஜாதகத்தைச் சேமியுங்கள்";
+"quota_guest_bullet_daily_insights" = "தினசரி பலன்களைப் பெறுங்கள்";
+"quota_guest_bullet_destiny_matching" = "Destiny Matching™ (பொருத்தம் பார்த்தல்) திறக்கவும்";
+"quota_guest_bullet_followups" = "உங்கள் பொருத்த அறிக்கைக்குப் பிறகு கூடுதல் கேள்விகளைக் கேளுங்கள்";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 நாட்கள் இலவசம், பின்னர் மாதாந்திர சந்தா. எப்போது வேண்டுமானாலும் ரத்து செய்யலாம்.";
+"subscription_plus_unavailable" = "Plus சந்தா இப்போது கிடைக்கவில்லை. மீண்டும் முயற்சிக்கவும்.";

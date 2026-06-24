@@ -3127,3 +3127,15 @@
 "notif_section_last_week" = "先週";
 "notif_section_earlier" = "それ以前";
 "notif_just_now" = "たった今";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "もっと質問する";
+"quota_guest_bullet_save_chart" = "出生図を保存";
+"quota_guest_bullet_daily_insights" = "毎日のインサイトを受け取る";
+"quota_guest_bullet_destiny_matching" = "Destiny Matching™（相性診断）を解放";
+"quota_guest_bullet_followups" = "相性レポート後に追加で質問できる";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7日間無料、その後は月額サブスクリプション。いつでもキャンセル可能。";
+"subscription_plus_unavailable" = "Plus サブスクリプションは現在利用できません。もう一度お試しください。";

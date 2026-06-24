@@ -3128,3 +3128,15 @@
 "notif_section_last_week" = "കഴിഞ്ഞ ആഴ്ച";
 "notif_section_earlier" = "മുമ്പ്";
 "notif_just_now" = "ഇപ്പോൾ തന്നെ";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "കൂടുതൽ ചോദ്യങ്ങൾ ചോദിക്കുക";
+"quota_guest_bullet_save_chart" = "നിങ്ങളുടെ ജന്മചാർട്ട് സംരക്ഷിക്കുക";
+"quota_guest_bullet_daily_insights" = "ദൈനംദിന ഉൾക്കാഴ്ചകൾ നേടുക";
+"quota_guest_bullet_destiny_matching" = "Destiny Matching™ അൺലോക്ക് ചെയ്യുക (പൊരുത്ത പരിശോധന)";
+"quota_guest_bullet_followups" = "നിങ്ങളുടെ പൊരുത്ത റിപ്പോർട്ടിന് ശേഷം തുടർ ചോദ്യങ്ങൾ ചോദിക്കുക";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 ദിവസം സൗജന്യം, പിന്നീട് മാസ വരിസംഖ്യ. എപ്പോൾ വേണമെങ്കിലും റദ്ദാക്കാം.";
+"subscription_plus_unavailable" = "Plus സബ്സ്ക്രിപ്ഷൻ ഇപ്പോൾ ലഭ്യമല്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.";

@@ -3042,6 +3042,13 @@
 "quota_create_account_fallback" = "Create an account to keep going and save your progress";
 "quota_usage_restricted_title" = "Usage Restricted";
 
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "Ask more questions";
+"quota_guest_bullet_save_chart" = "Save your birth chart";
+"quota_guest_bullet_daily_insights" = "Get daily insights";
+"quota_guest_bullet_destiny_matching" = "Unlock Destiny Matching™ (compatibility matching)";
+"quota_guest_bullet_followups" = "Ask follow-up questions after your match report";
+
 // MARK: - Paywall v2 (trial-eligible direct-to-Plus path)
 // Used when the user is in the 7-day free-trial window and we skip the
 // SubscriptionView picker. The existing iOS-5 quota_* keys above remain in
@@ -3056,6 +3063,8 @@
 "paywall_v2_bullet_alerts" = "Personalized alerts, like \"good day to invest\"";
 "paywall_v2_cta_start_trial" = "Start my free week";
 "paywall_v2_pricing_disclaimer" = "7 days free, then %@/month. Cancel anytime.";
+"paywall_v2_pricing_disclaimer_loading" = "7 days free, monthly subscription after. Cancel anytime.";
+"subscription_plus_unavailable" = "Plus subscription is unavailable right now. Please try again.";
 "paywall_v2_see_core_link" = "Prefer a lighter plan? See Core";
 
 // Quota fallback messages (iOS-11 fallback when backend message=null)

@@ -3127,3 +3127,15 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "notif_section_last_week" = "Semana passada";
 "notif_section_earlier" = "Anteriores";
 "notif_just_now" = "Agora mesmo";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "Faça mais perguntas";
+"quota_guest_bullet_save_chart" = "Salve seu mapa astral";
+"quota_guest_bullet_daily_insights" = "Receba insights diários";
+"quota_guest_bullet_destiny_matching" = "Desbloqueie o Destiny Matching™ (compatibilidade amorosa)";
+"quota_guest_bullet_followups" = "Faça perguntas adicionais após seu relatório de compatibilidade";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 dias grátis, depois assinatura mensal. Cancele quando quiser.";
+"subscription_plus_unavailable" = "A assinatura Plus não está disponível no momento. Tente novamente.";

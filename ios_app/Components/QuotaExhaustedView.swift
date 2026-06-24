@@ -234,10 +234,13 @@ struct QuotaExhaustedView: View {
         return displayMessage
     }
 
-    /// Currency-adaptive (Q2) display price for the trial disclaimer. Falls
-    /// back to "$7.99" when StoreKit hasn't loaded the monthly Plus product.
-    private var trialDisplayPrice: String {
-        subscriptionManager.monthlyProduct(for: "plus")?.displayPrice ?? "$7.99"
+    /// Currency-adaptive (Q2) display price for the trial disclaimer.
+    /// Returns nil when StoreKit hasn't loaded the monthly Plus product yet
+    /// (cold start / poor network). Caller picks a price-less localized
+    /// disclaimer instead of a hardcoded "$7.99" that would mismatch the
+    /// real StoreKit price for non-US users — App Store guideline 3.1.2.
+    private var trialDisplayPrice: String? {
+        subscriptionManager.monthlyProduct(for: "plus")?.displayPrice
     }
     
     var body: some View {
@@ -333,12 +336,14 @@ struct QuotaExhaustedView: View {
                     if !showContactSupport {
                         VStack(alignment: .leading, spacing: 12) {
                             if showSignIn {
-                                // Guest-specific benefits (sign-up)
-                                benefitRow(icon: "bubble.left.and.bubble.right.fill", text: "Ask more questions")
-                                benefitRow(icon: "person.circle.fill", text: "Save your birth chart")
-                                benefitRow(icon: "sparkles", text: "Get daily insights")
-                                benefitRow(icon: "heart.fill", text: "Unlock Destiny Matching™ (compatibility matching)")
-                                benefitRow(icon: "arrow.turn.down.right", text: "Ask follow-up questions after your match report")
+                                // Guest-specific benefits (sign-up).
+                                // Localized 2026-06-24: previously hardcoded
+                                // English broke 12 non-English locales.
+                                benefitRow(icon: "bubble.left.and.bubble.right.fill", text: "quota_guest_bullet_ask_more".localized)
+                                benefitRow(icon: "person.circle.fill", text: "quota_guest_bullet_save_chart".localized)
+                                benefitRow(icon: "sparkles", text: "quota_guest_bullet_daily_insights".localized)
+                                benefitRow(icon: "heart.fill", text: "quota_guest_bullet_destiny_matching".localized)
+                                benefitRow(icon: "arrow.turn.down.right", text: "quota_guest_bullet_followups".localized)
                             } else {
                                 // Paywall v2: 4-bullet trial benefits.
                                 benefitRow(icon: "infinity", text: "paywall_v2_bullet_unlimited_questions".localized)
@@ -388,9 +393,16 @@ struct QuotaExhaustedView: View {
                             }
 
                             // Trial-only pricing disclaimer (Q2: currency-adaptive
-                            // via Product.displayPrice).
+                            // via Product.displayPrice). When StoreKit hasn't
+                            // loaded yet, render a price-less localized string
+                            // instead of a US-dollar fallback that would mismatch
+                            // the real localized price (App Store guideline 3.1.2).
                             if shouldShowTrialCTA {
-                                Text(String(format: "paywall_v2_pricing_disclaimer".localized, trialDisplayPrice))
+                                Text(
+                                    trialDisplayPrice.map { price in
+                                        String(format: "paywall_v2_pricing_disclaimer".localized, price)
+                                    } ?? "paywall_v2_pricing_disclaimer_loading".localized
+                                )
                                     .font(AppTheme.Fonts.body(size: 12))
                                     .foregroundColor(AppTheme.Colors.textTertiary)
                                     .multilineTextAlignment(.center)

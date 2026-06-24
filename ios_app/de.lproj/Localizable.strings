@@ -3123,3 +3123,15 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "notif_section_last_week" = "Letzte Woche";
 "notif_section_earlier" = "Früher";
 "notif_just_now" = "Gerade eben";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "Mehr Fragen stellen";
+"quota_guest_bullet_save_chart" = "Ihr Geburtshoroskop speichern";
+"quota_guest_bullet_daily_insights" = "Tägliche Einblicke erhalten";
+"quota_guest_bullet_destiny_matching" = "Destiny Matching™ freischalten (Partnerkompatibilität)";
+"quota_guest_bullet_followups" = "Anschlussfragen zu Ihrem Match-Bericht stellen";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 Tage gratis, danach Monats-Abo. Jederzeit kündbar.";
+"subscription_plus_unavailable" = "Das Plus-Abonnement ist derzeit nicht verfügbar. Bitte versuchen Sie es erneut.";
