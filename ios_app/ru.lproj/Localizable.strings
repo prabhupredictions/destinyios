@@ -3127,3 +3127,15 @@
 "notif_section_last_week" = "На прошлой неделе";
 "notif_section_earlier" = "Ранее";
 "notif_just_now" = "Только что";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "Задавайте больше вопросов";
+"quota_guest_bullet_save_chart" = "Сохраните свою натальную карту";
+"quota_guest_bullet_daily_insights" = "Получайте ежедневные прогнозы";
+"quota_guest_bullet_destiny_matching" = "Откройте Destiny Matching™ (анализ совместимости)";
+"quota_guest_bullet_followups" = "Задавайте уточняющие вопросы после отчёта о совместимости";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 дней бесплатно, затем месячная подписка. Отмена в любое время.";
+"subscription_plus_unavailable" = "Подписка Plus сейчас недоступна. Пожалуйста, попробуйте снова.";

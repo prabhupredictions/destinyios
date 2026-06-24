@@ -3127,3 +3127,15 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "notif_section_last_week" = "Semaine dernière";
 "notif_section_earlier" = "Plus tôt";
 "notif_just_now" = "À l'instant";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "Posez plus de questions";
+"quota_guest_bullet_save_chart" = "Sauvegardez votre carte du ciel";
+"quota_guest_bullet_daily_insights" = "Recevez des analyses quotidiennes";
+"quota_guest_bullet_destiny_matching" = "Débloquez Destiny Matching™ (compatibilité amoureuse)";
+"quota_guest_bullet_followups" = "Posez des questions de suivi après votre rapport de compatibilité";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 jours gratuits, puis abonnement mensuel. Annulez à tout moment.";
+"subscription_plus_unavailable" = "L'abonnement Plus n'est pas disponible pour le moment. Veuillez réessayer.";

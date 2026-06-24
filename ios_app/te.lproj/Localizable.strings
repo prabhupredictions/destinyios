@@ -3123,3 +3123,15 @@
 "notif_section_last_week" = "గత వారం";
 "notif_section_earlier" = "మునుపటి";
 "notif_just_now" = "ఇప్పుడే";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "మరిన్ని ప్రశ్నలు అడగండి";
+"quota_guest_bullet_save_chart" = "మీ జన్మ కుండలిని సేవ్ చేయండి";
+"quota_guest_bullet_daily_insights" = "రోజువారీ అంతర్దృష్టులను పొందండి";
+"quota_guest_bullet_destiny_matching" = "Destiny Matching™ అన్‌లాక్ చేయండి (అనుకూలత జతపరిచే విధానం)";
+"quota_guest_bullet_followups" = "మీ మ్యాచ్ నివేదిక తర్వాత తదుపరి ప్రశ్నలు అడగండి";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 రోజులు ఉచితం, ఆపై నెలవారీ సబ్‌స్క్రిప్షన్. ఎప్పుడైనా రద్దు చేయండి.";
+"subscription_plus_unavailable" = "Plus సబ్‌స్క్రిప్షన్ ప్రస్తుతం అందుబాటులో లేదు. దయచేసి మళ్లీ ప్రయత్నించండి.";

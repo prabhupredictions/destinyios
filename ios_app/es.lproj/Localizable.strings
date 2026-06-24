@@ -3127,3 +3127,15 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "notif_section_last_week" = "Semana pasada";
 "notif_section_earlier" = "Anteriores";
 "notif_just_now" = "Ahora mismo";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "Haz más preguntas";
+"quota_guest_bullet_save_chart" = "Guarda tu carta natal";
+"quota_guest_bullet_daily_insights" = "Recibe perspectivas diarias";
+"quota_guest_bullet_destiny_matching" = "Desbloquea Destiny Matching™ (compatibilidad de pareja)";
+"quota_guest_bullet_followups" = "Haz preguntas de seguimiento tras tu informe de compatibilidad";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 días gratis, luego suscripción mensual. Cancela cuando quieras.";
+"subscription_plus_unavailable" = "La suscripción Plus no está disponible en este momento. Inténtalo de nuevo.";

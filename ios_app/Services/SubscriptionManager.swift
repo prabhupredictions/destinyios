@@ -224,7 +224,13 @@ class SubscriptionManager: ObservableObject {
     public func purchasePlusDirect() async -> Bool {
         guard let product = monthlyProduct(for: "plus") else {
             print("⚠️ [purchasePlusDirect] No monthly Plus product available — cannot purchase")
-            errorMessage = "Plus subscription is unavailable right now. Please try again."
+            // Localized 2026-06-24 (Paywall v2 fix). Falls back to English
+            // when the localization key is missing so behavior is preserved.
+            errorMessage = NSLocalizedString(
+                "subscription_plus_unavailable",
+                value: "Plus subscription is unavailable right now. Please try again.",
+                comment: "Error shown when Plus monthly product hasn't loaded from StoreKit"
+            )
             return false
         }
         do {

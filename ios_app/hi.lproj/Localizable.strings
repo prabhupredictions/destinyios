@@ -2990,3 +2990,15 @@
 "notif_section_last_week" = "पिछला सप्ताह";
 "notif_section_earlier" = "पहले";
 "notif_just_now" = "अभी";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "अधिक प्रश्न पूछें";
+"quota_guest_bullet_save_chart" = "अपनी जन्म कुंडली सहेजें";
+"quota_guest_bullet_daily_insights" = "दैनिक अंतर्दृष्टि पाएं";
+"quota_guest_bullet_destiny_matching" = "Destiny Matching™ अनलॉक करें (अनुकूलता मिलान)";
+"quota_guest_bullet_followups" = "अपनी मिलान रिपोर्ट के बाद फ़ॉलो-अप प्रश्न पूछें";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 दिन निःशुल्क, फिर मासिक सदस्यता। कभी भी रद्द करें।";
+"subscription_plus_unavailable" = "Plus सब्सक्रिप्शन अभी उपलब्ध नहीं है। कृपया पुनः प्रयास करें।";

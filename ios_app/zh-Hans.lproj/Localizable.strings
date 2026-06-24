@@ -3127,3 +3127,15 @@
 "notif_section_last_week" = "上周";
 "notif_section_earlier" = "更早";
 "notif_just_now" = "刚刚";
+
+
+// MARK: - Guest paywall bullets (sign-up path, 2026-06-24)
+"quota_guest_bullet_ask_more" = "提出更多问题";
+"quota_guest_bullet_save_chart" = "保存你的星盘";
+"quota_guest_bullet_daily_insights" = "获取每日运势";
+"quota_guest_bullet_destiny_matching" = "解锁 Destiny Matching™（缘分匹配）";
+"quota_guest_bullet_followups" = "在缘分报告后追问更多问题";
+
+// Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
+"paywall_v2_pricing_disclaimer_loading" = "7 天免费试用，之后按月订阅。可随时取消。";
+"subscription_plus_unavailable" = "Plus 订阅当前不可用。请稍后重试。";
