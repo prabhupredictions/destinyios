@@ -137,6 +137,8 @@ struct ios_appApp: App {
                     // Start the periodic sync timer (INV-2 Gap A) — keeps UI fresh
                     // during long foreground sessions. Stops when app backgrounds.
                     SubscriptionManager.shared.startForegroundSyncTimer()
+                    // Sync app icon badge to server unread count on every foreground.
+                    Task { await NotificationInboxService.shared.fetchUnreadCount() }
                 }
             default:
                 break

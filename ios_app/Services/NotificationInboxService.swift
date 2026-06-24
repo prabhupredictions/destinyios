@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import UserNotifications
 
 /// Service for managing in-app notification inbox
 /// Handles fetching, reading, and tracking notifications from backend
@@ -141,6 +142,13 @@ final class NotificationInboxService: ObservableObject {
         await fetchNotifications(refresh: false)
     }
     
+    private func syncBadge() {
+        let count = unreadCount
+        UNUserNotificationCenter.current().setBadgeCount(count) { error in
+            if let error { print("❌ Failed to set badge: \(error)") }
+        }
+    }
+
     /// Fetch unread count for badge
     func fetchUnreadCount() async {
         guard let userEmail = UserDefaults.standard.string(forKey: "userEmail") else { return }
@@ -164,6 +172,7 @@ final class NotificationInboxService: ObservableObject {
 
             // F2 (1.7) — class is @MainActor, no need for MainActor.run.
             self.unreadCount = decoded.count
+            syncBadge()
 
         } catch {
             print("❌ Failed to fetch unread count: \(error)")
@@ -217,6 +226,7 @@ final class NotificationInboxService: ObservableObject {
                 )
                 self.notifications[index] = readItem
                 self.unreadCount = max(0, self.unreadCount - 1)
+                syncBadge()
             }
             
         } catch {
@@ -264,6 +274,7 @@ final class NotificationInboxService: ObservableObject {
                 )
             }
             self.unreadCount = 0
+            syncBadge()
 
         } catch {
             print("❌ Failed to mark all as read: \(error)")
