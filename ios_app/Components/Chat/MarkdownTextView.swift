@@ -12,10 +12,41 @@ struct MarkdownTextView: View {
     @State private var blocks: [MarkdownBlock] = []
     @State private var lastParsedContent: String = ""
 
-    // Cache for expensive AttributedString parsing (shared across all instances)
-    private static let attrCache = NSCache<NSString, CachedAttrString>()
+    /// Hard backstop: skip the markdown parser entirely for inputs above this
+    /// size. Above this threshold the main-thread cost of N inline
+    /// AttributedString(markdown:) calls exceeds Springboard's 5-second
+    /// watchdog. 40 KB is well above grok-4.3 detailed (~16 KB) and Bedrock
+    /// Opus 4.6 (~32 KB) ceilings. Render as plain Text instead — the user
+    /// still sees the content, just without bold/italic styling.
+    private static let MAX_MARKDOWN_BYTES = 40_000
+
+    // Cache for expensive AttributedString parsing (shared across all instances).
+    // Bounded so cumulative cache size can't pin > 8 MB and counts can't grow
+    // unbounded across long sessions.
+    private static let attrCache: NSCache<NSString, CachedAttrString> = {
+        let cache = NSCache<NSString, CachedAttrString>()
+        cache.countLimit = 200
+        cache.totalCostLimit = 8 * 1024 * 1024  // 8 MB
+        return cache
+    }()
 
     var body: some View {
+        if content.utf8.count > Self.MAX_MARKDOWN_BYTES {
+            // Backstop: render as plain Text. stripMarkdownBold removes the
+            // ** markers but keeps the text — no synchronous parser cost,
+            // no watchdog risk.
+            Text(stripMarkdownBold(content))
+                .font(.system(size: fontSize))
+                .foregroundColor(textColor)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+        } else {
+            parsedBody
+        }
+    }
+
+    @ViewBuilder
+    private var parsedBody: some View {
         VStack(alignment: .leading, spacing: 12) {
             ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 renderBlock(block)

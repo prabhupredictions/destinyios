@@ -387,7 +387,13 @@ struct ChatView: View {
                 if isNewChat && !viewModel.isLoading {
                     starterQuestionsView
                 } else {
-                    VStack(spacing: 24) {
+                    // LazyVStack (was VStack) — instantiates rows only as they
+                    // become visible. Prevents main-thread watchdog kills
+                    // (0x8badf00d) when reopening a thread with many long
+                    // assistant messages: cold static attrCache + non-lazy
+                    // mount = N×M synchronous AttributedString(markdown:) on
+                    // main thread. See 2026-06-24 paywall/chat audit.
+                    LazyVStack(spacing: 24) {
                         if viewModel.windowManager.hasOlderMessages {
                             Button("load_earlier_messages".localized) {
                                 // Pagination: future implementation

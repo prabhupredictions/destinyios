@@ -2,6 +2,27 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+/// Hard cap on persisted message body size. Defends against future backend
+/// regressions (max_tokens bump, runaway reasoning model output) from
+/// poisoning the SwiftData store with content too large for the markdown
+/// renderer to handle without watchdog kills. 64 KB is far above the
+/// largest currently-shipping ceiling (Bedrock Opus at 8000 tokens ~ 32 KB)
+/// while staying well below the MarkdownTextView backstop (40 KB before
+/// plain-text fallback). See 2026-06-24 chat-crash audit.
+fileprivate let MAX_PERSISTED_CONTENT_BYTES = 64 * 1024
+
+fileprivate func capPersistedContent(_ s: String) -> String {
+    guard s.utf8.count > MAX_PERSISTED_CONTENT_BYTES else { return s }
+    // Trim to a safe UTF-8 boundary by working with Substring (which
+    // splits on Character boundaries, never mid-codepoint).
+    let trimmed = String(s.prefix(MAX_PERSISTED_CONTENT_BYTES))
+    return trimmed + "\n\n[…response truncated to protect chat performance]"
+}
+
+fileprivate func capPersistedContent(_ s: String?) -> String? {
+    s.map(capPersistedContent)
+}
+
 /// ViewModel for Chat screen with streaming and history support
 @MainActor
 @Observable
@@ -165,7 +186,26 @@ class ChatViewModel {
 
     /// Load latest thread for current profile, or start a new chat if none exist.
     /// Called from ChatView.onAppear when no initial question or thread ID is pending.
+    ///
+    /// Self-heal for poisoned threads: if the previous launch crashed before
+    /// the chat finished rendering (watchdog kill, OOM, etc.), the flag
+    /// "chat_load_started" stays true in UserDefaults. On the NEXT launch we
+    /// skip auto-reopen of the latest thread and start a fresh chat instead,
+    /// breaking the crash loop without requiring app reinstall. The user can
+    /// still navigate to the toxic thread manually via History — but no
+    /// longer gets trapped on app launch.
     func loadDefaultState() {
+        let defaults = UserDefaults.standard
+        if defaults.bool(forKey: "chat_load_started") {
+            // Previous launch never reached chat_load_completed — assume crash.
+            // Clear the flag, skip auto-reopen, start fresh.
+            defaults.set(false, forKey: "chat_load_started")
+            print("⚠️ [ChatViewModel] Detected prior chat-load crash — starting fresh thread instead of auto-reopening latest")
+            startNewChat()
+            return
+        }
+        defaults.set(true, forKey: "chat_load_started")
+
         let threads = dataManager.fetchThreads(
             for: currentSessionId,
             profileId: ProfileContextManager.shared.activeProfileId
@@ -174,6 +214,14 @@ class ChatViewModel {
             loadThread(latestThread)
         } else {
             startNewChat()
+        }
+
+        // Clear the in-progress flag after a short delay — long enough for
+        // SwiftUI to mount the thread + finish first paint. If the app
+        // crashes before this fires, the next launch enters recovery mode.
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 3_000_000_000)  // 3 seconds
+            defaults.set(false, forKey: "chat_load_started")
         }
     }
 
@@ -462,9 +510,12 @@ class ChatViewModel {
                 self.progressTimerTask = nil
 
                 if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
-                    self.messages[idx].content = response.answer
+                    // Cap persisted content at 64 KB (UTF-8) — see comment at
+                    // top of file. Prevents future runaway responses from
+                    // poisoning the SwiftData store.
+                    self.messages[idx].content = capPersistedContent(response.answer)
                     self.messages[idx].area = response.lifeArea
-                    self.messages[idx].advice = response.advice
+                    self.messages[idx].advice = capPersistedContent(response.advice)
                     self.messages[idx].executionTimeMs = response.executionTimeMs
                 }
                 self.suggestedQuestions = response.followUpSuggestions
