@@ -984,8 +984,12 @@ struct AskDestinySheet: View {
                             if messages.isEmpty && !isLoading {
                                 welcomeView
                             } else {
-                                VStack(spacing: 24) {
-                                    ForEach(Array(messages.enumerated()), id: \.element.id) { _, message in
+                                // LazyVStack (was VStack) — prevents main-thread
+                                // watchdog kills on Ask Destiny follow-up threads
+                                // with long persisted messages. Same fix as
+                                // ChatView.swift:390. See 2026-06-24 audit.
+                                LazyVStack(spacing: 24) {
+                                    ForEach(messages, id: \.id) { message in
                                         CompatChatBubble(
                                             message: message,
                                             enableTypewriter: newMessageIds.contains(message.id),

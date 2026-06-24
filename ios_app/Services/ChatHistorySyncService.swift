@@ -1,5 +1,16 @@
 import Foundation
 
+/// Mirror of capPersistedContent in ChatViewModel.swift. Applies the same
+/// 64 KB cap when ingesting server-side chat messages so a poisoned server
+/// row can't re-poison the local SwiftData store. See 2026-06-24 audit.
+fileprivate let MAX_PERSISTED_CONTENT_BYTES = 64 * 1024
+
+fileprivate func capPersistedContent(_ s: String) -> String {
+    guard s.utf8.count > MAX_PERSISTED_CONTENT_BYTES else { return s }
+    let trimmed = String(s.prefix(MAX_PERSISTED_CONTENT_BYTES))
+    return trimmed + "\n\n[…response truncated to protect chat performance]"
+}
+
 /// Service to sync chat history from server to local storage
 /// Similar pattern to ProfileService for subscription sync
 @MainActor
@@ -214,7 +225,7 @@ class ChatHistorySyncService {
                             id: message.id,
                             threadId: thread.id,
                             role: MessageRole(rawValue: message.role) ?? .assistant,
-                            content: message.content,
+                            content: capPersistedContent(message.content),
                             area: message.area,
                             confidence: message.confidence,
                             traceId: message.traceId,
