@@ -695,31 +695,26 @@ struct MarkdownTextView: View {
         // Pre-render crash guard: if the sanitized text contains any
         // pattern known to crash AttributedString(markdown:) on iOS device,
         // route to the plain-Text path which cannot trigger the parser bug.
+        // Note: branches must use @ViewBuilder if/else (no explicit returns),
+        // otherwise SwiftUI view-identity tracking breaks and the view
+        // stops re-rendering when @State updates land.
         if !isSafeForAttributedString(sanitized) {
-            return AnyView(
-                Text(stripMarkdownBold(sanitized))
-                    .font(AppTheme.Fonts.body(size: fontSize))
-                    .foregroundColor(textColor)
-                    .lineSpacing(6)
-                    .textSelection(.enabled)
-            )
-        }
-
-        if let attrString = cachedAttributedString(for: sanitized) {
-            return AnyView(
-                Text(attrString)
-                    .font(AppTheme.Fonts.body(size: fontSize))
-                    .foregroundColor(textColor)
-                    .lineSpacing(6)
-                    .textSelection(.enabled)
-            )
+            Text(stripMarkdownBold(sanitized))
+                .font(AppTheme.Fonts.body(size: fontSize))
+                .foregroundColor(textColor)
+                .lineSpacing(6)
+                .textSelection(.enabled)
+        } else if let attrString = cachedAttributedString(for: sanitized) {
+            Text(attrString)
+                .font(AppTheme.Fonts.body(size: fontSize))
+                .foregroundColor(textColor)
+                .lineSpacing(6)
+                .textSelection(.enabled)
         } else {
-            return AnyView(
-                Text(stripMarkdownBold(sanitized))
-                    .font(AppTheme.Fonts.body(size: fontSize))
-                    .foregroundColor(textColor)
-                    .lineSpacing(6)
-            )
+            Text(stripMarkdownBold(sanitized))
+                .font(AppTheme.Fonts.body(size: fontSize))
+                .foregroundColor(textColor)
+                .lineSpacing(6)
         }
     }
     
