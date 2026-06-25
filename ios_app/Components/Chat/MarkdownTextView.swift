@@ -301,21 +301,52 @@ struct MarkdownTextView: View {
 
     // MARK: - Safe attributed string (crash-proof)
 
-    /// Convert text with inline markdown to an AttributedString.
-    /// Strips nested bold-italic patterns that are known to crash the
-    /// iOS Foundation markdown parser on real devices. Falls through to
-    /// a plain-text representation on any parse failure.
-    private static func safeAttributedString(_ text: String) -> AttributedString {
-        let cleaned = neutralizeDangerousMarkers(text)
+    /// Convert text with inline markdown to an AttributedString that
+    /// carries the correct base font + color so that `Text(...)` can
+    /// render inline `**bold**` and `_italic_` correctly without us
+    /// applying a `.font()` modifier that would wipe inline traits.
+    private func safeAttributedString(_ text: String) -> AttributedString {
+        let cleaned = Self.neutralizeDangerousMarkers(text)
+        var attr: AttributedString
         if let parsed = try? AttributedString(
             markdown: cleaned,
             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
         ) {
-            return parsed
+            attr = parsed
+        } else {
+            attr = AttributedString(stringLiteral: Self.stripAllMarkers(cleaned))
         }
-        return AttributedString(stringLiteral: stripAllMarkers(cleaned))
+        // Apply the base font to the entire AttributedString as the
+        // container default. Markdown-emitted bold/italic runs keep
+        // their own trait overrides on top of this.
+        attr.font = AppTheme.Fonts.body(size: fontSize)
+        attr.foregroundColor = textColor
+        return attr
     }
 
+    /// Same as above but with a custom base font (used for blockquote
+    /// bold+italic styling).
+    private func safeAttributedString(_ text: String, baseFont: Font, color: Color) -> AttributedString {
+        let cleaned = Self.neutralizeDangerousMarkers(text)
+        var attr: AttributedString
+        if let parsed = try? AttributedString(
+            markdown: cleaned,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        ) {
+            attr = parsed
+        } else {
+            attr = AttributedString(stringLiteral: Self.stripAllMarkers(cleaned))
+        }
+        attr.font = baseFont
+        attr.foregroundColor = color
+        return attr
+    }
+
+    /// Replace `**_x_**`, `__**x**__`, `**__x__**`, `_**x**_` -> `**x**`
+    /// and lone `__y__` -> `y`. Preserves visible content; only changes
+    /// dangerous nested or italic-underscore markers. The blockquote
+    /// view modifier already applies bold+italic so dropping italic is
+    /// visually lossless within blockquotes.
     /// Replace `**_x_**`, `__**x**__`, `**__x__**`, `_**x**_` -> `**x**`
     /// and lone `__y__` -> `y`. Preserves visible content; only changes
     /// dangerous nested or italic-underscore markers. The blockquote
@@ -362,9 +393,11 @@ struct MarkdownTextView: View {
             renderHeader(level: level, text: text)
 
         case .paragraph(let text):
-            Text(Self.safeAttributedString(text))
-                .font(AppTheme.Fonts.body(size: fontSize))
-                .foregroundColor(textColor)
+            // Base font + color are baked into the AttributedString by
+            // safeAttributedString, so we MUST NOT apply .font() here —
+            // doing so would override the inline bold/italic runs from
+            // markdown parsing.
+            Text(safeAttributedString(text))
                 .lineSpacing(6)
                 .textSelection(.enabled)
 
@@ -379,9 +412,7 @@ struct MarkdownTextView: View {
                             .fill(AppTheme.Colors.gold.opacity(0.7))
                             .frame(width: 5, height: 5)
                             .offset(y: 1)
-                        Text(Self.safeAttributedString(items[idx]))
-                            .font(AppTheme.Fonts.body(size: fontSize))
-                            .foregroundColor(textColor)
+                        Text(safeAttributedString(items[idx]))
                             .lineSpacing(6)
                             .textSelection(.enabled)
                     }
@@ -397,9 +428,7 @@ struct MarkdownTextView: View {
                             .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: fontSize, weight: .semibold))
                             .frame(minWidth: 20, alignment: .trailing)
-                        Text(Self.safeAttributedString(items[idx]))
-                            .font(AppTheme.Fonts.body(size: fontSize))
-                            .foregroundColor(textColor)
+                        Text(safeAttributedString(items[idx]))
                             .lineSpacing(6)
                             .textSelection(.enabled)
                     }
@@ -414,9 +443,7 @@ struct MarkdownTextView: View {
                         Text("◆")
                             .foregroundColor(AppTheme.Colors.gold)
                             .font(.system(size: fontSize - 2, weight: .semibold))
-                        Text(Self.safeAttributedString(items[idx]))
-                            .font(AppTheme.Fonts.body(size: fontSize))
-                            .foregroundColor(textColor)
+                        Text(safeAttributedString(items[idx]))
                             .lineSpacing(6)
                             .textSelection(.enabled)
                     }
@@ -429,9 +456,10 @@ struct MarkdownTextView: View {
                 Text("→")
                     .foregroundColor(AppTheme.Colors.gold)
                     .font(.system(size: fontSize + 1, weight: .bold))
-                Text(Self.safeAttributedString(text))
-                    .font(AppTheme.Fonts.body(size: fontSize).weight(.medium))
-                    .foregroundColor(AppTheme.Colors.gold)
+                Text(safeAttributedString(
+                    text,
+                    baseFont: AppTheme.Fonts.body(size: fontSize).weight(.medium),
+                    color: AppTheme.Colors.gold))
                     .lineSpacing(6)
                     .textSelection(.enabled)
             }
@@ -451,12 +479,13 @@ struct MarkdownTextView: View {
                 )
 
         case .blockquote(let text):
-            // The view modifier .bold().italic() supplies emphasis even
-            // when the text itself has no markers — this is intentional
-            // and is the visual identity for takeaway lines.
-            Text(Self.safeAttributedString(text))
-                .font(AppTheme.Fonts.body(size: fontSize).bold().italic())
-                .foregroundColor(AppTheme.Colors.textPrimary)
+            // Force the whole blockquote bold+italic via the AttributedString
+            // base font. Inline emphasis (if any survives sanitization) keeps
+            // its own trait on top.
+            Text(safeAttributedString(
+                text,
+                baseFont: AppTheme.Fonts.body(size: fontSize).bold().italic(),
+                color: AppTheme.Colors.textPrimary))
                 .lineSpacing(6)
                 .textSelection(.enabled)
                 .padding(.vertical, 10)
@@ -512,9 +541,7 @@ struct MarkdownTextView: View {
                 .font(AppTheme.Fonts.body(size: fontSize).weight(.bold))
                 .foregroundColor(AppTheme.Colors.gold)
             if !content.isEmpty {
-                Text(Self.safeAttributedString(content))
-                    .font(AppTheme.Fonts.body(size: fontSize))
-                    .foregroundColor(textColor)
+                Text(safeAttributedString(content))
                     .lineSpacing(6)
                     .textSelection(.enabled)
             }
@@ -547,9 +574,10 @@ struct MarkdownTextView: View {
                 HStack(spacing: 0) {
                     let row = rows[rowIdx]
                     ForEach(row.indices, id: \.self) { colIdx in
-                        Text(Self.safeAttributedString(row[colIdx]))
-                            .font(AppTheme.Fonts.caption(size: fontSize - 2))
-                            .foregroundColor(AppTheme.Colors.textPrimary)
+                        Text(safeAttributedString(
+                            row[colIdx],
+                            baseFont: AppTheme.Fonts.caption(size: fontSize - 2),
+                            color: AppTheme.Colors.textPrimary))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 6)
