@@ -739,8 +739,8 @@ struct ProfileView: View {
                 Text(quotaManager.subscriptionStatusDetailText)
                     .font(AppTheme.Fonts.body(size: 13))
                     .foregroundColor(AppTheme.Colors.textSecondary)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
 
             // W5 F5.3: dynamic CTA button — label varies per status.
@@ -763,6 +763,7 @@ struct ProfileView: View {
                     }
                     .foregroundColor(AppTheme.Colors.gold)
                 }
+                .frame(maxWidth: .infinity)
             }
 
             // View plans button (always visible — lets user see all tiers)
@@ -771,6 +772,7 @@ struct ProfileView: View {
                     .font(AppTheme.Fonts.body(size: 14))
                     .foregroundColor(AppTheme.Colors.textSecondary)
             }
+            .frame(maxWidth: .infinity)
             .accessibilityIdentifier("profile_subscription")
         }
     }
