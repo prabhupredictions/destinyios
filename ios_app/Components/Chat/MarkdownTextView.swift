@@ -259,10 +259,22 @@ struct MarkdownTextView: View {
         guard let closeBold = text.range(of: "**", range: afterOpen..<text.endIndex)
         else { return nil }
         let label = String(text[afterOpen..<closeBold.lowerBound])
-        guard label.hasSuffix(":") else { return nil }
-        let labelClean = String(label.dropLast())  // strip trailing :
         let rest = String(text[closeBold.upperBound...])
             .trimmingCharacters(in: .whitespaces)
+
+        // Two accepted patterns (v3 behavior preserved):
+        //   `**Label:** content`     → bold gold label + body content
+        //   `**Standalone Title**`   → bold gold heading on its own (no `:`)
+        // Anything else (e.g. `**bold word** in middle of paragraph` or
+        // `**multi-word inline**` followed by more content without colon)
+        // should fall through and stay as a paragraph with inline bold.
+        let isLabelWithColon = label.hasSuffix(":") || label.hasSuffix(": ")
+        guard isLabelWithColon || rest.isEmpty else { return nil }
+
+        let labelClean = isLabelWithColon
+            ? String(label.dropLast())  // strip trailing :
+                .trimmingCharacters(in: .whitespaces)
+            : label.trimmingCharacters(in: .whitespaces)
         return .boldLabel(label: labelClean, content: rest)
     }
 
@@ -536,11 +548,18 @@ struct MarkdownTextView: View {
 
     @ViewBuilder
     private func renderBoldLabel(label: String, content: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        if content.isEmpty {
+            // Standalone title — gold heading, slightly larger weight.
             Text(MarkdownTextView.stripAllMarkers(label))
-                .font(AppTheme.Fonts.body(size: fontSize).weight(.bold))
+                .font(.system(size: fontSize + 1, weight: .bold))
                 .foregroundColor(AppTheme.Colors.gold)
-            if !content.isEmpty {
+                .padding(.top, 4)
+        } else {
+            // Label + content — gold label on top, body content below.
+            VStack(alignment: .leading, spacing: 4) {
+                Text(MarkdownTextView.stripAllMarkers(label))
+                    .font(AppTheme.Fonts.body(size: fontSize).weight(.bold))
+                    .foregroundColor(AppTheme.Colors.gold)
                 Text(safeAttributedString(content))
                     .lineSpacing(6)
                     .textSelection(.enabled)
