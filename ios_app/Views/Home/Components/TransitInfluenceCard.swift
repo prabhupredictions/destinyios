@@ -140,13 +140,15 @@ struct TransitInfluenceCard: View {
         }
     }
     
-    /// Localized sign name from abbreviation
+    /// Localized sign name from abbreviation.
+    /// Accepts BOTH "Cn" (Sanskrit-style) and "Ca" (two-letter) for Cancer
+    /// since the backend emits both.
     func localizedSignName(for sign: String) -> String {
         switch sign {
         case "Ar": return "sign_ar".localized
         case "Ta": return "sign_ta".localized
         case "Ge": return "sign_ge".localized
-        case "Ca": return "sign_ca".localized
+        case "Cn", "Ca": return "sign_ca".localized
         case "Le": return "sign_le".localized
         case "Vi": return "sign_vi".localized
         case "Li": return "sign_li".localized
@@ -202,7 +204,7 @@ struct TransitInfluenceCard: View {
     func fullSignName(for sign: String) -> String {
         let signMap: [String: String] = [
             "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini",
-            "Ca": "Cancer", "Le": "Leo", "Vi": "Virgo",
+            "Cn": "Cancer", "Ca": "Cancer", "Le": "Leo", "Vi": "Virgo",
             "Li": "Libra", "Sc": "Scorpio", "Sg": "Sagittarius",
             "Cp": "Capricorn", "Aq": "Aquarius", "Pi": "Pisces"
         ]
@@ -292,13 +294,15 @@ struct TransitOrbView: View {
         }
     }
     
-    /// Localized sign name from abbreviation
+    /// Localized sign name from abbreviation.
+    /// Accepts BOTH Cancer abbreviations the backend emits ("Cn" Sanskrit-style
+    /// and "Ca" two-letter style). Other signs are unambiguous.
     var localizedSignName: String {
         switch transit.sign {
         case "Ar": return "sign_ar".localized
         case "Ta": return "sign_ta".localized
         case "Ge": return "sign_ge".localized
-        case "Ca": return "sign_ca".localized
+        case "Cn", "Ca": return "sign_ca".localized
         case "Le": return "sign_le".localized
         case "Vi": return "sign_vi".localized
         case "Li": return "sign_li".localized
@@ -331,7 +335,7 @@ struct TransitOrbView: View {
     var fullSignName: String {
         let signMap: [String: String] = [
             "Ar": "Aries", "Ta": "Taurus", "Ge": "Gemini",
-            "Ca": "Cancer", "Le": "Leo", "Vi": "Virgo",
+            "Cn": "Cancer", "Ca": "Cancer", "Le": "Leo", "Vi": "Virgo",
             "Li": "Libra", "Sc": "Scorpio", "Sg": "Sagittarius",
             "Cp": "Capricorn", "Aq": "Aquarius", "Pi": "Pisces"
         ]

@@ -549,11 +549,14 @@ struct MarkdownTextView: View {
     @ViewBuilder
     private func renderBoldLabel(label: String, content: String) -> some View {
         if content.isEmpty {
-            // Standalone title — gold heading, slightly larger weight.
+            // Standalone title — gold heading, distinctly larger than body.
+            // Sized at fontSize + 4 (matches h2) so the opening answer
+            // visually reads as a section title, not a bold paragraph.
             Text(MarkdownTextView.stripAllMarkers(label))
-                .font(.system(size: fontSize + 1, weight: .bold))
+                .font(.system(size: fontSize + 4, weight: .bold))
                 .foregroundColor(AppTheme.Colors.gold)
                 .padding(.top, 4)
+                .padding(.bottom, 2)
         } else {
             // Label + content — gold label on top, body content below.
             VStack(alignment: .leading, spacing: 4) {
