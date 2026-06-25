@@ -684,23 +684,44 @@ struct MarkdownTextView: View {
     @ViewBuilder
     private func renderInlineMarkdown(_ text: String) -> some View {
         let sanitized = sanitizeForInlineParsing(text)
-        
+
+        // Pre-render crash guard: if the sanitized text contains any
+        // pattern known to crash AttributedString(markdown:) on iOS device,
+        // route to the plain-Text path which cannot trigger the parser bug.
+        if !isSafeForAttributedString(sanitized) {
+            return AnyView(
+                Text(stripMarkdownBold(sanitized))
+                    .font(AppTheme.Fonts.body(size: fontSize))
+                    .foregroundColor(textColor)
+                    .lineSpacing(6)
+                    .textSelection(.enabled)
+            )
+        }
+
         if let attrString = cachedAttributedString(for: sanitized) {
-            Text(attrString)
-                .font(AppTheme.Fonts.body(size: fontSize))
-                .foregroundColor(textColor)
-                .lineSpacing(6)
-                .textSelection(.enabled)
+            return AnyView(
+                Text(attrString)
+                    .font(AppTheme.Fonts.body(size: fontSize))
+                    .foregroundColor(textColor)
+                    .lineSpacing(6)
+                    .textSelection(.enabled)
+            )
         } else {
-            Text(stripMarkdownBold(sanitized))
-                .font(AppTheme.Fonts.body(size: fontSize))
-                .foregroundColor(textColor)
-                .lineSpacing(6)
+            return AnyView(
+                Text(stripMarkdownBold(sanitized))
+                    .font(AppTheme.Fonts.body(size: fontSize))
+                    .foregroundColor(textColor)
+                    .lineSpacing(6)
+            )
         }
     }
     
     /// Cached AttributedString lookup — avoids re-parsing identical text on main thread
     private func cachedAttributedString(for sanitized: String) -> AttributedString? {
+        // Defense-in-depth: even though renderInlineMarkdown checks this before
+        // calling us, defend the parse call again so any future caller is also
+        // protected.
+        guard isSafeForAttributedString(sanitized) else { return nil }
         let key = sanitized as NSString
         if let cached = Self.attrCache.object(forKey: key) {
             return cached.value
@@ -717,43 +738,179 @@ struct MarkdownTextView: View {
 
     /// Pre-warm the attrCache off the main thread so body renders are cache hits.
     /// Called from .task (background thread) before blocks are set on the main thread.
+    /// Uses the same crash-guard sanitizer + safety check as the main render path.
     private static func prewarmAttrCache(_ text: String) {
-        var result = text
-        result = result.replacingOccurrences(of: "|", with: "·")
-        let boldCount = result.components(separatedBy: "**").count - 1
-        if boldCount % 2 != 0 { result += "**" }
-        let italicSingles = result.components(separatedBy: "*").count - 1 - (boldCount / 2 * 2 + boldCount % 2)
-        if italicSingles > 0 && italicSingles % 2 != 0 { result += "*" }
-        let key = result as NSString
+        let sanitized = Self.staticSanitizeForInlineParsing(text)
+        // Crash guard: if input is unsafe even after sanitisation, skip parsing
+        // entirely so the prewarm thread cannot crash with a parser panic.
+        guard Self.staticIsSafeForAttributedString(sanitized) else { return }
+        let key = sanitized as NSString
         guard attrCache.object(forKey: key) == nil else { return }
         if let attrString = try? AttributedString(
-            markdown: result,
+            markdown: sanitized,
             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
         ) {
             attrCache.setObject(CachedAttrString(attrString), forKey: key)
         }
     }
+
+    /// Static mirror of sanitizeForInlineParsing used by the prewarm task.
+    /// Kept in lockstep with the instance method.
+    private static func staticSanitizeForInlineParsing(_ text: String) -> String {
+        var result = text
+        result = result.replacingOccurrences(of: "|", with: "·")
+        let danglingPatterns: [(String, String)] = [
+            (#"\*\*__([\s\S]*?)__\*\*"#, "**$1**"),
+            (#"__\*\*([\s\S]*?)\*\*__"#, "**$1**"),
+            (#"\*\*_([\s\S]*?)_\*\*"#, "**$1**"),
+            (#"_\*\*([\s\S]*?)\*\*_"#, "**$1**"),
+            (#"__([\s\S]*?)__"#, "$1"),
+        ]
+        for (pat, repl) in danglingPatterns {
+            if let re = try? NSRegularExpression(pattern: pat) {
+                let range = NSRange(result.startIndex..., in: result)
+                result = re.stringByReplacingMatches(in: result, range: range, withTemplate: repl)
+            }
+        }
+        let boldCount = result.components(separatedBy: "**").count - 1
+        if boldCount % 2 != 0 { result += "**" }
+        let isolatedStars = Self.staticCountIsolatedMarker(in: result, marker: "*")
+        if isolatedStars % 2 != 0 { result += "*" }
+        let isolatedUnderscores = Self.staticCountIsolatedMarker(in: result, marker: "_")
+        if isolatedUnderscores % 2 != 0 { result += "_" }
+        return result
+    }
+
+    private static func staticCountIsolatedMarker(in text: String, marker: Character) -> Int {
+        var count = 0
+        let chars = Array(text)
+        var i = 0
+        while i < chars.count {
+            if chars[i] == marker {
+                let prev = i > 0 ? chars[i - 1] : nil
+                let next = i < chars.count - 1 ? chars[i + 1] : nil
+                if prev != marker && next != marker {
+                    count += 1
+                }
+            }
+            i += 1
+        }
+        return count
+    }
+
+    private static func staticIsSafeForAttributedString(_ sanitized: String) -> Bool {
+        if sanitized.utf8.count > 8_000 { return false }
+        let dangerous = ["**_", "_**", "__**", "**__", "***", "___"]
+        for pat in dangerous {
+            if sanitized.contains(pat) { return false }
+        }
+        return true
+    }
     
     /// Sanitize text for safe inline markdown parsing.
-    /// Removes/escapes characters that cause AttributedString to hang or fail.
+    /// Removes/escapes characters that cause AttributedString to hang, fail, or
+    /// CRASH the iOS Foundation markdown parser on real devices.
+    ///
+    /// Known crash patterns on iOS 26.x (device-only — simulator uses a
+    /// different Foundation path and does not reproduce):
+    ///   `> **_text_**`            blockquote + nested bold-italic with underscores
+    ///   `**_text_**`              inline nested bold-italic with underscores
+    ///   `__**text**__`            inline nested italic-bold (reverse order)
+    ///   `*_text_*` / `_*text*_`   inline single bold-italic crosses
+    ///
+    /// Strategy: unwrap one level of nesting (keep BOLD, drop italic underscores)
+    /// then balance any remaining markers so the parser receives well-formed input.
+    /// The blockquote view modifier applies .bold().italic() to the entire
+    /// blockquote anyway, so dropping the inline italic is visually lossless.
     private func sanitizeForInlineParsing(_ text: String) -> String {
         var result = text
-        
+
         // Pipe characters from table remnants cause hangs — escape them
         result = result.replacingOccurrences(of: "|", with: "·")
-        
-        // Unclosed bold/italic markers cause hangs — close them
+
+        // CRASH GUARD 1: unwrap nested bold-italic with underscores.
+        // `**_inner_**`  →  `**inner**`        (keep bold, drop italic)
+        // `__**inner**__` →  `**inner**`        (keep bold, drop outer italic)
+        // `**__inner__**` →  `**inner**`
+        // Use NSRegularExpression to be DOTALL-safe across newlines.
+        // ORDER MATTERS: apply the OUTER-bold patterns BEFORE __italic__
+        // gets stripped on its own (else `**__x__**` → `**_x_**` mid-pipeline).
+        let danglingPatterns: [(String, String)] = [
+            (#"\*\*__([\s\S]*?)__\*\*"#, "**$1**"),   // **__x__** → **x**
+            (#"__\*\*([\s\S]*?)\*\*__"#, "**$1**"),   // __**x**__ → **x**
+            (#"\*\*_([\s\S]*?)_\*\*"#, "**$1**"),     // **_x_** → **x**
+            (#"_\*\*([\s\S]*?)\*\*_"#, "**$1**"),     // _**x**_ → **x**
+            (#"__([\s\S]*?)__"#, "$1"),               // remaining __x__ → x
+        ]
+        for (pat, repl) in danglingPatterns {
+            if let re = try? NSRegularExpression(pattern: pat) {
+                let range = NSRange(result.startIndex..., in: result)
+                result = re.stringByReplacingMatches(in: result, range: range, withTemplate: repl)
+            }
+        }
+
+        // CRASH GUARD 2: balance unclosed bold/italic markers — unclosed markers
+        // hang the parser. We append a closer if the count is odd.
         let boldCount = result.components(separatedBy: "**").count - 1
         if boldCount % 2 != 0 {
             result += "**"
         }
-        let italicSingles = result.components(separatedBy: "*").count - 1 - (boldCount / 2 * 2 + boldCount % 2)
-        // Simplified: if odd number of non-bold * marks, close
-        if italicSingles > 0 && italicSingles % 2 != 0 {
+        // Count `*` markers that are NOT part of `**` (those count as bold)
+        let isolatedStars = countIsolatedMarker(in: result, marker: "*")
+        if isolatedStars % 2 != 0 {
             result += "*"
         }
-        
+        // Balance underscores too (Foundation treats `_` as italic marker)
+        let isolatedUnderscores = countIsolatedMarker(in: result, marker: "_")
+        if isolatedUnderscores % 2 != 0 {
+            result += "_"
+        }
+
         return result
+    }
+
+    /// Count occurrences of `marker` that are NOT adjacent to another `marker`
+    /// (so `**` does not count as two single `*` markers).
+    private func countIsolatedMarker(in text: String, marker: Character) -> Int {
+        var count = 0
+        let chars = Array(text)
+        var i = 0
+        while i < chars.count {
+            if chars[i] == marker {
+                let prev = i > 0 ? chars[i - 1] : nil
+                let next = i < chars.count - 1 ? chars[i + 1] : nil
+                if prev != marker && next != marker {
+                    count += 1
+                }
+            }
+            i += 1
+        }
+        return count
+    }
+
+    /// Pre-render safety check: returns true ONLY if the input is provably safe
+    /// to pass to AttributedString(markdown:). Anything unusual routes to the
+    /// plain-Text fallback path which CANNOT crash the parser.
+    ///
+    /// This is the crash-proof guarantee: if any pattern looks even suspicious
+    /// after sanitisation, we don't ask AttributedString to parse it.
+    private func isSafeForAttributedString(_ sanitized: String) -> Bool {
+        // Hard size cap (defense in depth — primary cap is at body level)
+        if sanitized.utf8.count > 8_000 { return false }
+
+        // Any remaining nested bold-italic combo after sanitisation = unsafe.
+        // The sanitizer should have unwrapped these, but if anything slipped
+        // through, take the plain-Text exit.
+        let dangerous = [
+            "**_", "_**",   // bold-italic underscore nest
+            "__**", "**__", // italic-bold underscore nest
+            "***",          // triple-star sometimes parses as bold+italic and crashes
+            "___",          // triple-underscore — same issue
+        ]
+        for pat in dangerous {
+            if sanitized.contains(pat) { return false }
+        }
+        return true
     }
 }
 

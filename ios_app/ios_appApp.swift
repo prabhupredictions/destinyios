@@ -103,10 +103,23 @@ struct ios_appApp: App {
             AppRootView()
                 .preferredColorScheme(.dark)
                 .onOpenURL { url in
-                    // Handle Google Sign-In callback
-                    #if canImport(GoogleSignIn)
-                    GIDSignIn.sharedInstance.handle(url)
-                    #endif
+                    // Crash fix (1.8.x): the legacy `GIDSignIn.handle(url)`
+                    // call has been removed. This app uses the modern
+                    // `signIn(withPresenting:)` API (see AppleAuthService.swift)
+                    // which manages its own URL callback through
+                    // ASWebAuthenticationSession — no manual URL forwarding
+                    // is required. The previous unconditional call forwarded
+                    // to AppAuth's OIDAuthorizationSession, which raises an
+                    // NSException ("resumeExternalUserAgentFlowWithURL must
+                    // be called while a flow is in progress.") when no
+                    // sign-in is pending — killing the app via SIGABRT.
+                    // Seen in production (1.7 build 418) when iOS delivered
+                    // a stale OAuth callback URL after the app was relaunched.
+                    //
+                    // If we add other URL-scheme features (deep links, magic
+                    // links), route them here with a scheme guard — never
+                    // forward unconditionally to a third-party SDK.
+                    print("🔗 [App] Received URL: \(url.scheme ?? "?") \(url.host ?? "")")
                 }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
