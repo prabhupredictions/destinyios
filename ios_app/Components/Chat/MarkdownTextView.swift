@@ -23,7 +23,14 @@ struct MarkdownTextView: View {
     // Cache for expensive AttributedString parsing (shared across all instances).
     // Bounded so cumulative cache size can't pin > 8 MB and counts can't grow
     // unbounded across long sessions.
-    private static let attrCache: NSCache<NSString, CachedAttrString> = {
+    //
+    // `nonisolated` is critical: MarkdownTextView is a SwiftUI View which is
+    // @MainActor by default, so its static members inherit @MainActor too.
+    // Without `nonisolated`, the Task.detached block in parsedBody that calls
+    // Self.parseBlocksStatic / Self.prewarmAttrCache silently hops back to
+    // main, undoing the whole point of detaching. NSCache is internally
+    // thread-safe, so concurrent access is fine.
+    nonisolated(unsafe) private static let attrCache: NSCache<NSString, CachedAttrString> = {
         let cache = NSCache<NSString, CachedAttrString>()
         cache.countLimit = 200
         cache.totalCostLimit = 8 * 1024 * 1024  // 8 MB
@@ -107,7 +114,7 @@ struct MarkdownTextView: View {
     // MARK: - Block Parser (No Regex - Performance Optimized)
     
     /// Static parser that can run off main thread
-    private static func parseBlocksStatic(from content: String) -> [MarkdownBlock] {
+    nonisolated private static func parseBlocksStatic(from content: String) -> [MarkdownBlock] {
         var blocks: [MarkdownBlock] = []
         let lines = content.components(separatedBy: "\n")
         var i = 0
@@ -289,7 +296,7 @@ struct MarkdownTextView: View {
     
     // MARK: - Divider Detection (static for background parsing)
     
-    private static func isDivider(_ line: String) -> Bool {
+    nonisolated private static func isDivider(_ line: String) -> Bool {
         let stripped = line.replacingOccurrences(of: " ", with: "")
         if stripped.count >= 3 {
             if stripped.allSatisfy({ $0 == "-" }) { return true }
@@ -304,7 +311,7 @@ struct MarkdownTextView: View {
     
     // MARK: - Table Parsing (static for background parsing)
     
-    private static func isTableSeparatorStatic(_ line: String) -> Bool {
+    nonisolated private static func isTableSeparatorStatic(_ line: String) -> Bool {
         let stripped = line.replacingOccurrences(of: " ", with: "")
         return stripped.contains("|") && stripped.contains("-") &&
                stripped.replacingOccurrences(of: "|", with: "")
@@ -313,20 +320,20 @@ struct MarkdownTextView: View {
                        .isEmpty
     }
     
-    private static func isTableStartStatic(lines: [String], at index: Int) -> Bool {
+    nonisolated private static func isTableStartStatic(lines: [String], at index: Int) -> Bool {
         guard index + 1 < lines.count else { return false }
         let nextLine = lines[index + 1].trimmingCharacters(in: .whitespaces)
         return isTableSeparatorStatic(nextLine)
     }
     
-    private static func parseTableRowStatic(_ line: String) -> [String] {
+    nonisolated private static func parseTableRowStatic(_ line: String) -> [String] {
         var trimmed = line.trimmingCharacters(in: .whitespaces)
         if trimmed.hasPrefix("|") { trimmed = String(trimmed.dropFirst()) }
         if trimmed.hasSuffix("|") { trimmed = String(trimmed.dropLast()) }
         return trimmed.components(separatedBy: "|").map { $0.trimmingCharacters(in: .whitespaces) }
     }
     
-    private static func parseTableStatic(lines: [String], at index: inout Int) -> MarkdownBlock? {
+    nonisolated private static func parseTableStatic(lines: [String], at index: inout Int) -> MarkdownBlock? {
         let headers = parseTableRowStatic(lines[index])
         index += 1
         
@@ -354,7 +361,7 @@ struct MarkdownTextView: View {
     
     // MARK: - Numbered List Helpers (static for background parsing)
     
-    private static func isNumberedListItem(_ line: String) -> Bool {
+    nonisolated private static func isNumberedListItem(_ line: String) -> Bool {
         guard line.count >= 3 else { return false }
         if let dotIndex = line.firstIndex(of: ".") {
             let prefix = String(line[..<dotIndex])
@@ -368,7 +375,7 @@ struct MarkdownTextView: View {
         return false
     }
     
-    private static func extractNumberedListItem(_ line: String) -> String? {
+    nonisolated private static func extractNumberedListItem(_ line: String) -> String? {
         guard isNumberedListItem(line) else { return nil }
         if let dotIndex = line.firstIndex(of: ".") {
             guard let afterDot = line.index(dotIndex, offsetBy: 2, limitedBy: line.endIndex),
@@ -378,7 +385,7 @@ struct MarkdownTextView: View {
         return nil
     }
     
-    private static func parseHeaderStatic(_ line: String) -> MarkdownBlock? {
+    nonisolated private static func parseHeaderStatic(_ line: String) -> MarkdownBlock? {
         if line.hasPrefix("#### ") {
             return .header(level: 4, text: String(line.dropFirst(5)))
         } else if line.hasPrefix("### ") {
@@ -395,7 +402,7 @@ struct MarkdownTextView: View {
     
     // MARK: - Bold Label Detection (static for background parsing)
     
-    private static func parseBoldLabelStatic(_ text: String) -> MarkdownBlock? {
+    nonisolated private static func parseBoldLabelStatic(_ text: String) -> MarkdownBlock? {
         guard text.hasPrefix("**") else { return nil }
 
         let afterOpen = text.index(text.startIndex, offsetBy: 2)
@@ -739,7 +746,7 @@ struct MarkdownTextView: View {
     /// Pre-warm the attrCache off the main thread so body renders are cache hits.
     /// Called from .task (background thread) before blocks are set on the main thread.
     /// Uses the same crash-guard sanitizer + safety check as the main render path.
-    private static func prewarmAttrCache(_ text: String) {
+    nonisolated private static func prewarmAttrCache(_ text: String) {
         let sanitized = Self.staticSanitizeForInlineParsing(text)
         // Crash guard: if input is unsafe even after sanitisation, skip parsing
         // entirely so the prewarm thread cannot crash with a parser panic.
@@ -756,7 +763,7 @@ struct MarkdownTextView: View {
 
     /// Static mirror of sanitizeForInlineParsing used by the prewarm task.
     /// Kept in lockstep with the instance method.
-    private static func staticSanitizeForInlineParsing(_ text: String) -> String {
+    nonisolated private static func staticSanitizeForInlineParsing(_ text: String) -> String {
         var result = text
         result = result.replacingOccurrences(of: "|", with: "·")
         let danglingPatterns: [(String, String)] = [
@@ -781,7 +788,7 @@ struct MarkdownTextView: View {
         return result
     }
 
-    private static func staticCountIsolatedMarker(in text: String, marker: Character) -> Int {
+    nonisolated private static func staticCountIsolatedMarker(in text: String, marker: Character) -> Int {
         var count = 0
         let chars = Array(text)
         var i = 0
@@ -798,7 +805,7 @@ struct MarkdownTextView: View {
         return count
     }
 
-    private static func staticIsSafeForAttributedString(_ sanitized: String) -> Bool {
+    nonisolated private static func staticIsSafeForAttributedString(_ sanitized: String) -> Bool {
         if sanitized.utf8.count > 8_000 { return false }
         let dangerous = ["**_", "_**", "__**", "**__", "***", "___"]
         for pat in dangerous {
@@ -915,7 +922,12 @@ struct MarkdownTextView: View {
 }
 
 // MARK: - AttributedString Cache Wrapper (NSCache requires reference type)
-private final class CachedAttrString: NSObject {
+// `nonisolated` so MarkdownTextView's nonisolated static helpers
+// (prewarmAttrCache, etc.) can construct + read instances from a detached
+// task. AttributedString is value-type and Sendable; CachedAttrString is
+// a write-once wrapper used as NSCache value, which is internally
+// thread-safe.
+nonisolated private final class CachedAttrString: NSObject, @unchecked Sendable {
     let value: AttributedString
     init(_ value: AttributedString) { self.value = value }
 }
