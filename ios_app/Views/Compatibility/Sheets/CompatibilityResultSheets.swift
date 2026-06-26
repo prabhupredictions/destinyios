@@ -933,7 +933,13 @@ struct AskDestinySheet: View {
     @State private var quotaError: QuotaErrorInfo? = nil
     @State private var showSubscription: Bool = false
     @State private var suggestedQuestions: [String] = []  // Follow-up suggestions from API
-    @State private var compatScrollTrigger = UUID()  // Debounced scroll trigger
+    @State private var compatScrollTrigger = UUID()  // Debounced bottom-scroll trigger
+    // Pin-to-top state — see ChatView.swift for the full design rationale.
+    // When the user taps Send, we anchor THEIR message to the top of the
+    // viewport so the answer that lands below reads top-down, instead of
+    // dumping the user at the bottom of a long markdown response.
+    @State private var compatPinToTopTrigger = UUID()
+    @State private var compatPinToTopMessageId: UUID?
     @State private var newMessageIds: Set<UUID> = []  // IDs of newly arrived messages (fade-in targets)
     @State private var pendingScrollWorkItem: DispatchWorkItem?  // Coalesced scroll debounce
     @State private var showStyleSelector = false
@@ -995,9 +1001,13 @@ struct AskDestinySheet: View {
                                             enableTypewriter: newMessageIds.contains(message.id),
                                             cosmicProgressSteps: message.id == redirectStreamingMessageId
                                                 ? redirectCosmicProgressSteps : [],
+                                            // When typewriter finishes we deliberately do NOT
+                                            // scroll to bottom — the user is reading from the
+                                            // top of the answer (pin-to-top behavior). Just
+                                            // remove the id from newMessageIds so the bubble
+                                            // stops animating; leave scroll position alone.
                                             onTypewriterFinished: newMessageIds.contains(message.id) ? {
                                                 newMessageIds.remove(message.id)
-                                                requestCompatScroll()
                                             } : nil,
                                             onTypewriterProgress: nil
                                         )
@@ -1017,8 +1027,14 @@ struct AskDestinySheet: View {
                                             HapticManager.shared.play(.light)
                                             isInputFocused = false
                                             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                            inputText = question
-                                            suggestedQuestions = []
+                                            // Batch state mutations into one transaction so
+                                            // SwiftUI does a single layout pass — pre-fix this
+                                            // produced a jarring viewport stutter when tapping
+                                            // a follow-up from a deep scroll position.
+                                            withTransaction(Transaction(animation: nil)) {
+                                                suggestedQuestions = []
+                                                inputText = question
+                                            }
                                             Task { await sendMessage() }
                                         }
                                         .id("suggestions")
@@ -1033,31 +1049,81 @@ struct AskDestinySheet: View {
                                 .frame(height: 1)
                                 .id("bottomAnchor")
                         }
+                        // Reserve top scroll content space so pin-to-top
+                        // doesn't slide the user's question behind the
+                        // sibling header. iOS 17+.
+                        .contentMargins(.top, 8, for: .scrollContent)
                         .scrollDismissesKeyboard(.interactively)
-                        // Single consolidated scroll handler — debounced
+                        // Bottom-scroll handler (loading reveal + suggestions + keyboard).
                         .onChange(of: compatScrollTrigger) { _, _ in
                             withAnimation(.easeOut(duration: 0.25)) {
                                 proxy.scrollTo("bottomAnchor", anchor: .bottom)
                             }
                         }
-                        .onChange(of: messages.count) { _, _ in
-                            requestCompatScroll()
+                        // Pin-to-top handler: scroll the just-appended user
+                        // message to the TOP of the visible area. Same design
+                        // as ChatView.
+                        .onChange(of: compatPinToTopTrigger) { _, _ in
+                            guard let id = compatPinToTopMessageId else { return }
+                            withAnimation(.easeOut(duration: 0.3)) {
+                                proxy.scrollTo(id, anchor: .top)
+                            }
                         }
-                        .onChange(of: isLoading) { _, loading in
-                            if loading { requestCompatScroll() }
+                        // Messages.count change: pin-to-top when a user message
+                        // was just appended. Assistant-only appends (e.g. the
+                        // redirect ".info" / ".ai" bubbles produced during the
+                        // sub-agent path) intentionally do NOT scroll — they
+                        // arrive while the typewriter is running and the user
+                        // is already reading from the pinned position.
+                        .onChange(of: messages.count) { oldCount, newCount in
+                            guard newCount > oldCount else { return }
+                            let appendedSuffix = messages.suffix(newCount - oldCount)
+                            if let userMsg = appendedSuffix.first(where: { $0.isUser }) {
+                                compatPinToTopMessageId = userMsg.id
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    compatPinToTopTrigger = UUID()
+                                }
+                            }
                         }
+                        // Cosmic progress card reveal — only on loading→true.
+                        .onChange(of: isLoading) { oldVal, newVal in
+                            if newVal { requestCompatScroll() }
+                            // Loading flips false ↔ response arrived. If a
+                            // pin target is still active (user hasn't moved
+                            // on), re-trigger pin-to-top so the user lands
+                            // at the start of the freshly-rendered answer
+                            // instead of mid-bubble where layout shifts
+                            // left them.
+                            if oldVal == true && newVal == false, compatPinToTopMessageId != nil {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    compatPinToTopTrigger = UUID()
+                                }
+                            }
+                        }
+                        // Follow-up suggestions appear below the answer.
                         .onChange(of: suggestedQuestions) { _, q in
                             if !q.isEmpty { requestCompatScroll() }
                         }
-                        .onChange(of: newMessageIds) { _, ids in
-                            if ids.isEmpty { requestCompatScroll(delay: 0.3) }
-                        }
+                        // Keyboard-up reveal.
                         .onChange(of: isInputFocused) { _, focused in
                             if focused { requestCompatScroll(delay: 0.3) }
                         }
-                        .onChange(of: cosmicProgressSteps.count) { _, _ in
-                            requestCompatScroll()
-                        }
+                        // REMOVED (intentionally) — see ChatView.swift for full rationale:
+                        //   .onChange(of: newMessageIds) { _, ids in
+                        //       if ids.isEmpty { requestCompatScroll(delay: 0.3) }
+                        //   }
+                        //     ↑ Fired the moment the typewriter finished — and
+                        //       parked the user at the bottom of a long answer
+                        //       they wanted to read from the top. The pin-to-top
+                        //       on user-send already provided the correct
+                        //       starting position; once typewriter completes
+                        //       we leave them wherever they scrolled to during
+                        //       the reveal.
+                        //
+                        //   .onChange(of: cosmicProgressSteps.count) { _, _ in
+                        //       requestCompatScroll()
+                        //   }
+                        //     ↑ Jittery — see ChatView.swift comment.
                     }
                     
                     // Error Banner
