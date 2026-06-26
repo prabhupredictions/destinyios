@@ -348,8 +348,16 @@ struct ChatView: View {
             HapticManager.shared.play(.light)
             isInputFocused = false
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            viewModel.inputText = question
-            viewModel.suggestedQuestions = []
+            // Batch all state mutations into a single transaction so SwiftUI
+            // performs one layout pass instead of three. Pre-fix, the order
+            // was: clear suggestions (viewport compacts upward) → set input
+            // → sendMessage (appends user bubble at the new content tail) →
+            // pin-to-top yanks the viewport back up. Result: jarring
+            // up→down→up visual stutter when tapping a follow-up.
+            withTransaction(Transaction(animation: nil)) {
+                viewModel.suggestedQuestions = []
+                viewModel.inputText = question
+            }
             if viewModel.canAskQuestion {
                 Task { await viewModel.sendMessage() }
             } else {
@@ -377,8 +385,29 @@ struct ChatView: View {
         return lookup
     }
     
-    // MARK: - Scroll State (single debounced trigger replaces 5 competing handlers)
+    // MARK: - Scroll State
+    //
+    // Two trigger UUIDs feed two distinct scroll behaviors:
+    //
+    //   scrollTrigger        — scroll to bottomAnchor (used for revealing
+    //                          the cosmic-progress card after Send, follow-up
+    //                          suggestions, and keyboard-up reveals).
+    //   pinToTopTrigger      — scroll the just-appended user message to the
+    //                          TOP of the visible area. This is the ChatGPT
+    //                          pattern: when a long response lands below the
+    //                          user's question, the user reads top-down from
+    //                          their own question instead of being parked at
+    //                          the bottom of the answer.
+    //
+    // pinToTopMessageId is the target for pinToTopTrigger. We snapshot it
+    // at Send-time AND re-trigger after the answer arrives — the second
+    // pin corrects for layout-shifts from the cosmic-progress card and
+    // the answer's height jumping in.
     @State private var scrollTrigger = UUID()
+    @State private var pinToTopTrigger = UUID()
+    @State private var pinToTopMessageId: String?
+    @State private var previousMessageCount: Int = 0
+    @State private var previousIsStreaming: Bool = false
     
     // MARK: - Messages View (matches compat chat scroll pattern exactly)
     private var messagesView: some View {
@@ -430,35 +459,116 @@ struct ChatView: View {
                     .frame(height: 1)
                     .id("bottomAnchor")
             }
+            // Reserve top scroll content space so pin-to-top doesn't slide
+            // the user's question behind the sibling ChatHeader (which is
+            // outside the ScrollView). 8pt visual breathing room below the
+            // header. iOS 17+. Falls back gracefully on older OS.
+            .contentMargins(.top, 8, for: .scrollContent)
             .scrollDismissesKeyboard(.interactively)
-            // Single consolidated scroll handler — debounced to prevent racing animations
+            // Single consolidated bottom-scroll handler — debounced to prevent racing animations.
             .onChange(of: scrollTrigger) { _, _ in
                 withAnimation(.easeOut(duration: 0.25)) {
                     proxy.scrollTo("bottomAnchor", anchor: .bottom)
                 }
             }
-            // Coalesce all state changes into one scroll trigger
-            .onChange(of: viewModel.messages.count) { _, _ in
-                requestScrollToBottom()
+            // Pin-to-top handler: scroll the just-appended user message to
+            // the TOP of the visible area so the answer that lands below it
+            // reads from the start, not from the bottom of a multi-screen
+            // markdown response.
+            //
+            // anchor: .top would align the target's top edge flush with the
+            // ScrollView's top edge. Combined with .contentMargins(.top, ...)
+            // below, that puts the user message comfortably below the
+            // ChatHeader (which is a sibling view above the ScrollView in
+            // the parent VStack).
+            .onChange(of: pinToTopTrigger) { _, _ in
+                guard let id = pinToTopMessageId else { return }
+                withAnimation(.easeOut(duration: 0.3)) {
+                    proxy.scrollTo(id, anchor: .top)
+                }
             }
+            // Messages.count change: ONLY pin-to-top when the new tail is a
+            // user-role message (the Send moment). Append-pairs of [user,
+            // empty assistant] are fine — we pin to the user message's id
+            // and the empty assistant bubble + cosmic-progress card flow
+            // naturally below it.
+            //
+            // We deliberately do NOT scroll on assistant-only appends,
+            // history loads, or count-unchanged content mutations — those
+            // produced the "answer dumped at bottom" symptom.
+            .onChange(of: viewModel.messages.count) { oldCount, newCount in
+                defer { previousMessageCount = newCount }
+                // Only react to growth, and only when the new tail contains
+                // a user message (covers append of [user] OR [user, empty
+                // assistant] within the same runloop tick).
+                guard newCount > oldCount else { return }
+                let appendedSuffix = viewModel.messages.suffix(newCount - oldCount)
+                if let userMsg = appendedSuffix.first(where: { $0.role == MessageRole.user.rawValue }) {
+                    pinToTopMessageId = userMsg.id
+                    // Defer slightly so SwiftUI commits the new rows before
+                    // we measure & scroll to the id.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        pinToTopTrigger = UUID()
+                    }
+                }
+            }
+            // Cosmic progress card reveal: scroll only on the loading→true
+            // transition (already gated). This makes the card visible right
+            // under the user's freshly-pinned question.
             .onChange(of: viewModel.isLoading) { _, loading in
                 if loading { requestScrollToBottom() }
             }
+            // When the answer arrives (isStreaming flips true→false), the
+            // bubble's height jumps from ~0 to its full size. If we don't
+            // re-anchor, the user is left looking at wherever they were at
+            // pin-time — often mid-answer because the cosmic progress card
+            // pushed layout around. Re-trigger pin-to-top here so the
+            // user's question ends up cleanly at the top of the viewport
+            // ABOVE the freshly-rendered answer.
+            .onChange(of: viewModel.isStreaming) { oldVal, newVal in
+                if oldVal == true && newVal == false, pinToTopMessageId != nil {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        pinToTopTrigger = UUID()
+                    }
+                }
+            }
+            // Follow-up suggestion pills appear AFTER the answer is fully
+            // rendered. They live below the answer, so a small bottom-scroll
+            // is correct UX (mirrors what the user would scroll themselves
+            // to reach them).
             .onChange(of: viewModel.suggestedQuestions) { _, q in
                 if !q.isEmpty { requestScrollToBottom() }
             }
-            .onChange(of: viewModel.isStreaming) { _, streaming in
-                if !streaming { requestScrollToBottom(delay: 0.3) }
-            }
-            .onChange(of: viewModel.cosmicProgressSteps.count) { _, _ in
-                requestScrollToBottom()
-            }
-            .onChange(of: viewModel.typewriterMessageId) { _, newId in
-                if newId == nil { requestScrollToBottom() }
-            }
+            // Keyboard-up reveal — standard chat UX. Delay covers the
+            // keyboard slide animation.
             .onChange(of: isInputFocused) { _, focused in
                 if focused { requestScrollToBottom(delay: 0.3) }
             }
+            // REMOVED (intentionally):
+            //   .onChange(of: viewModel.isStreaming) { _, streaming in
+            //       if !streaming { requestScrollToBottom(delay: 0.3) }
+            //   }
+            //     ↑ This was the smoking gun. isStreaming flips false at the
+            //       exact moment the assistant bubble's content mutates from
+            //       "" to a 1000-3000 word markdown response — scrolling to
+            //       the bottom right then dumps the user at the END of the
+            //       answer they wanted to read from the top.
+            //
+            //   .onChange(of: viewModel.cosmicProgressSteps.count) { _, _ in
+            //       requestScrollToBottom()
+            //   }
+            //     ↑ Jittery. Fires on populate (0→1) and clear (1→0); the
+            //       clear-fire arrives just before isStreaming=false during
+            //       response landing and compounds the same symptom.
+            //
+            //   .onChange(of: viewModel.typewriterMessageId) { _, newId in
+            //       if newId == nil { requestScrollToBottom() }
+            //   }
+            //     ↑ Dead code. typewriterMessageId is never assigned non-nil
+            //       in the ChatView path (enableTypewriter: false on every
+            //       MessageBubble at line 412), so the newId == nil check
+            //       can never transition from non-nil. Removed with the rest
+            //       of the typewriter scaffolding that no longer applies.
         }
     }
     
