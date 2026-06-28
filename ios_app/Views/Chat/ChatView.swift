@@ -380,24 +380,21 @@ struct ChatView: View {
 
     // MARK: - Adaptive Tail Spacer
     /// Height of the always-rendered Color.clear spacer at the end of the
-    /// LazyVStack. Adaptive so we have enough room to pin-to-top on Send
-    /// without leaving an ugly empty void below the conversation at rest.
-    /// Always > 0 so contentSize never has a structural diff (which would
-    /// trigger SwiftUI re-anchoring on .done). See ChatView.swift:481-501
-    /// for the full rationale.
+    /// LazyVStack. Adaptive: large during active generation so pin-to-top
+    /// has scroll room; ZERO at rest so the conversation reads cleanly
+    /// with no empty void below the follow-up pills.
+    ///
+    /// We KEEP the view always-rendered (just animate the frame height
+    /// to 0) so SwiftUI doesn't see a structural diff in the LazyVStack
+    /// on .done. A frame-height animation is a non-disruptive layout
+    /// pass; a view appearing/disappearing IS a structural diff and
+    /// triggers ScrollView re-anchoring (the original "answer dumped
+    /// at bottom" bug).
     private var tailSpacerHeight: CGFloat {
-        let screenH = UIScreen.main.bounds.height
-        if viewModel.isLoading || viewModel.isStreaming {
-            // Active generation — need lots of room so the user's question
-            // can scroll-to-top while the placeholder bubble is still empty.
-            return screenH * 0.7
-        }
-        // Idle (post-.done or fresh open). Use enough room that the NEXT
-        // Send's pin-to-top still works against whatever sits below the
-        // most-recent user message, but not so much that the rest state
-        // looks empty. ~32% of viewport is enough to scroll any short
-        // assistant answer to the top, and barely shows below long answers.
-        return screenH * 0.32
+        guard viewModel.isLoading || viewModel.isStreaming else { return 0 }
+        // Active generation — need lots of room so the user's question
+        // can scroll-to-top while the placeholder bubble is still empty.
+        return UIScreen.main.bounds.height * 0.7
     }
     
     // MARK: - User Query Lookup (pre-computed, avoids O(n²) per-message scan)
