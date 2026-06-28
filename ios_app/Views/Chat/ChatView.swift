@@ -442,14 +442,24 @@ struct ChatView: View {
                             .padding(.bottom, 8)
                         }
                         ForEach(visibleMessages) { message in
-                            MessageBubble(
-                                message: message,
-                                userQuery: userQueryLookup[message.id] ?? "",
-                                streamingContent: nil,
-                                thinkingSteps: [],
-                                cosmicProgressSteps: message.isStreaming ? viewModel.cosmicProgressSteps : []
-                            )
-                            .id(message.id)
+                            if message.isStreaming && message.content.isEmpty {
+                                // Path A — transient streaming bubble (plain Text).
+                                // Never feeds MarkdownTextView. The .done handler in
+                                // ChatViewModel flips isStreaming to false and commits
+                                // the final answer; the next render uses Path B.
+                                StreamingBubbleView(text: viewModel.streamingContent)
+                                    .id(message.id)
+                            } else {
+                                // Path B — persisted bubble (markdown).
+                                MessageBubble(
+                                    message: message,
+                                    userQuery: userQueryLookup[message.id] ?? "",
+                                    streamingContent: nil,
+                                    thinkingSteps: [],
+                                    cosmicProgressSteps: message.isStreaming ? viewModel.cosmicProgressSteps : []
+                                )
+                                .id(message.id)
+                            }
                         }
                         
                         // Inline suggested questions — only after streaming finishes

@@ -371,8 +371,21 @@ class ChatViewModel {
         }
     }
     
-    // MARK: - Send Message (Non-Streaming — matches compat chat pattern)
+    // MARK: - Send Message (flag-routed)
+
+    /// Public entry. Routes to streaming or sync based on AppConfig cohort flag.
+    /// Per docs/superpowers/plans/2026-06-28-streaming-typewriter-v2.md task 12.
     func sendMessage() async {
+        let userId = userEmail
+        if AppConfig.shared.shouldStreamFor(userId: userId) {
+            await sendMessageStreaming()
+        } else {
+            await sendMessageSync()
+        }
+    }
+
+    // MARK: - Send Message (Non-Streaming — matches compat chat pattern)
+    func sendMessageSync() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
 
@@ -561,9 +574,11 @@ class ChatViewModel {
                 self.progressTimerTask = nil
 
                 if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
-                    // Cap persisted content at 64 KB (UTF-8) — see comment at
-                    // top of file. Prevents future runaway responses from
-                    // poisoning the SwiftData store.
+                    // DONE-ONLY-MUTATION: the single content commit on the sync path
+                    // (mirrors the streaming-path invariant enforced by
+                    // StreamingPredictionServiceTests). Cap persisted content at
+                    // 64 KB (UTF-8) — see comment at top of file. Prevents future
+                    // runaway responses from poisoning the SwiftData store.
                     self.messages[idx].content = capPersistedContent(response.answer)
                     self.messages[idx].area = response.lifeArea
                     self.messages[idx].advice = capPersistedContent(response.advice)
@@ -651,6 +666,275 @@ class ChatViewModel {
                 self.isStreaming = false
             }
         }
+    }
+
+    // MARK: - Streaming path (Task 12)
+
+    /// Storage for the .answer event's full PredictionResponse — captured ahead
+    /// of .done so the SINGLE atomic flip in commitFinalAnswer has everything
+    /// (answer, lifeArea, advice, executionTimeMs, followUpSuggestions).
+    private var pendingFinalResponse: PredictionResponse?
+    private var streamErrorMessage: String?
+
+    /// Streaming send path. Consumes SSE events from StreamingPredictionService
+    /// and feeds streamingContent (only — never messages[idx].content). The
+    /// atomic flip into the persisted bubble happens in commitFinalAnswer
+    /// (called from the single .done handler).
+    func sendMessageStreaming() async {
+        let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty, !isLoading, !isStreaming else { return }
+
+        // Re-entry safety: tear down any prior generation cleanly.
+        tearDownGenerationState(reason: .sendReentry)
+
+        // Short label for the user bubble; full query still goes to LLM.
+        let displayContent = pendingDisplayLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? query
+        pendingDisplayLabel = nil
+
+        lastSentQuery = query
+        inputText = ""
+        errorMessage = nil
+        suggestedQuestions = []
+        interruptedQuestion = nil
+        isLoading = true
+
+        let currentEmail = userEmail
+
+        // Verify quota with backend BEFORE inserting the user bubble (mirrors sync path).
+        do {
+            let accessResponse = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: currentEmail)
+            if !accessResponse.canAccess {
+                isLoading = false
+                pendingPostUpgradeQuery = query
+                quotaError = QuotaErrorInfo(
+                    reason: accessResponse.reason,
+                    planId: accessResponse.planId,
+                    featureId: accessResponse.feature,
+                    message: accessResponse.upgradeCta?.message,
+                    action: nil,
+                    suggestedPlan: accessResponse.upgradeCta?.suggestedPlan,
+                    supportEmail: nil,
+                    resetAt: accessResponse.resetAt,
+                    serverIsFairUseViolation: accessResponse.isFairUseViolation
+                )
+                if accessResponse.reason == "daily_limit_reached" {
+                    if let resetAtStr = accessResponse.resetAt,
+                       let date = ISO8601DateFormatter().date(from: resetAtStr) {
+                        let timeFormatter = DateFormatter()
+                        timeFormatter.timeStyle = .short
+                        let timeStr = timeFormatter.string(from: date)
+                        errorMessage = String(format: "daily_limit_reset_time".localized, timeStr)
+                    } else {
+                        errorMessage = "daily_limit_reached_tomorrow".localized
+                    }
+                } else if accessResponse.reason == "subscription_expired" {
+                    quotaDetails = "subscription_expired_body".localized
+                    showQuotaSheet = true
+                } else if accessResponse.reason == "overall_limit_reached" {
+                    if let serverMessage = accessResponse.upgradeCta?.message, !serverMessage.isEmpty {
+                        quotaDetails = serverMessage
+                    } else if QuotaManager.isGuestEmail(currentEmail) {
+                        quotaDetails = "sign_in_to_continue_asking".localized
+                    } else {
+                        quotaDetails = "upgrade_to_keep_going".localized
+                    }
+                    showQuotaSheet = true
+                } else {
+                    quotaDetails = accessResponse.upgradeCta?.message ?? "feature_not_available".localized
+                    showQuotaSheet = true
+                }
+                return
+            }
+        } catch {
+            print("Quota check failed: \(error)")
+        }
+
+        guard let birthData = loadBirthData() else {
+            errorMessage = "Please complete your birth data first"
+            isLoading = false
+            return
+        }
+
+        let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        let responseLength = UserDefaults.standard.string(forKey: "userResponseLength") ?? "detailed"
+        let responseStyle = UserDefaults.standard.string(forKey: "userContentStyle") ?? "guidance"
+
+        // Build the user + assistant-placeholder pair atomically.
+        let userMessage = LocalChatMessage(
+            threadId: currentThreadId,
+            role: .user,
+            content: displayContent
+        )
+        let streamingMsg = LocalChatMessage(
+            threadId: currentThreadId,
+            role: .assistant,
+            content: "",
+            isStreaming: true
+        )
+        dataManager.context.insert(userMessage)
+        dataManager.context.insert(streamingMsg)
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            dataManager.saveMessage(userMessage)
+        }
+        messages.append(userMessage)
+        windowManager.append(userMessage)
+        messages.append(streamingMsg)
+        windowManager.append(streamingMsg)
+
+        let request = PredictionRequest(
+            query: query,
+            birthData: birthData,
+            sessionId: currentSessionId,
+            conversationId: currentThreadId,
+            userEmail: userEmail,
+            language: appLanguage,
+            responseStyle: responseStyle,
+            responseLength: responseLength,
+            profileId: ProfileContextManager.shared.activeProfileId
+        )
+
+        isLoading = false
+        isStreaming = true
+        cosmicProgressSteps = []
+        startCosmicProgressTimer()
+
+        let idempotencyKey = UUID().uuidString
+
+        streamingTask = Task { [weak self] in
+            guard let self else { return }
+            // 30 Hz coalescer note: the Bedrock backend currently emits the
+            // final answer as a single .finalAnswer event, so the coalescer
+            // runs effectively once. When token-level streaming lands
+            // server-side, this is the buffer that will replay at 30 Hz.
+            var accumulatedAnswer = ""
+
+            do {
+                try await StreamingPredictionService.shared.predictStream(
+                    request: request,
+                    idempotencyKey: idempotencyKey
+                ) { [weak self] event in
+                    guard let self else { return }
+                    Task { @MainActor in
+                        switch event {
+                        case .thought, .action, .observation, .progressStep:
+                            self.handleProgressEvent(event)
+                        case .finalAnswer(let content):
+                            accumulatedAnswer = content
+                            // Force-flush — only writes streamingContent, NOT messages[idx].content.
+                            self.streamingContent = accumulatedAnswer
+                        case .answer(let response):
+                            // Capture full response for the single atomic flip in .done.
+                            self.pendingFinalResponse = response
+                        case .done:
+                            await self.commitFinalAnswer(
+                                streamingMsgId: streamingMsg.id,
+                                response: self.pendingFinalResponse
+                            )
+                        case .error(let message):
+                            self.streamErrorMessage = message
+                        }
+                    }
+                }
+            } catch is CancellationError {
+                // Stop button or teardown — discard partial; banner shows lastSentQuery.
+                self.tearDownGenerationState(reason: .userStop)
+                self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
+            } catch let quota as QuotaExhaustedError {
+                await self.handleQuotaErrorFromStream(
+                    quota: quota,
+                    streamingMsgId: streamingMsg.id,
+                    userMessage: userMessage
+                )
+            } catch {
+                // Transparent fallback to sync /predict.
+                self.tearDownGenerationState(reason: .userStop)
+                self.inputText = query
+                await self.sendMessageSync()
+            }
+        }
+    }
+
+    /// SINGLE point in this file where a streaming message's content is committed.
+    /// Called only from the .done event handler in sendMessageStreaming.
+    @MainActor
+    private func commitFinalAnswer(streamingMsgId: String, response: PredictionResponse?) async {
+        guard let response else { return }
+        stepProgressTask?.cancel(); stepProgressTask = nil
+        progressTimerTask?.cancel(); progressTimerTask = nil
+
+        if let idx = messages.lastIndex(where: { $0.id == streamingMsgId }) {
+            // DONE-ONLY-MUTATION: the single point in this file where a streaming
+            // message's content is committed. Enforced by StreamingPredictionServiceTests.
+            messages[idx].content = capPersistedContent(response.answer)
+            messages[idx].area = response.lifeArea
+            messages[idx].advice = capPersistedContent(response.advice)
+            messages[idx].executionTimeMs = response.executionTimeMs
+            messages[idx].isStreaming = false
+            if HistorySettingsManager.shared.isHistoryEnabled {
+                dataManager.saveMessage(messages[idx])
+            }
+        }
+        suggestedQuestions = response.followUpSuggestions
+        streamingContent = ""
+        cosmicProgressSteps = []
+        isStreaming = false
+        pendingFinalResponse = nil
+    }
+
+    /// Translate streaming progress events into cosmicProgressSteps entries.
+    /// The startCosmicProgressTimer() fallback cycles canned messages every
+    /// 1.5s; when real .progressStep events arrive they overwrite that single
+    /// active step, so the timer becomes a no-op in practice.
+    private func handleProgressEvent(_ event: StreamingPredictionService.StreamEvent) {
+        switch event {
+        case .progressStep(_, _, _, _, let displayKey, _):
+            guard let key = displayKey else { return }
+            let msg = LocalizedString.get(key)
+            let step = CosmicProgressStep(text: msg, displayKey: key, isCompleted: false, isActive: true)
+            withAnimation(.easeInOut(duration: 0.4)) {
+                cosmicProgressSteps = [step]
+            }
+        default:
+            return
+        }
+    }
+
+    /// Mirror of the sync path's quota-error handling — drop both bubbles,
+    /// buffer the query for replay, present the paywall.
+    @MainActor
+    private func handleQuotaErrorFromStream(
+        quota: QuotaExhaustedError,
+        streamingMsgId: String,
+        userMessage: LocalChatMessage
+    ) async {
+        tearDownGenerationState(reason: .userStop)
+        if let userIdx = messages.lastIndex(where: { $0.id == userMessage.id }) {
+            messages.remove(at: userIdx)
+            windowManager.remove(id: userMessage.id)
+            dataManager.deleteMessage(userMessage)
+        }
+        pendingPostUpgradeQuery = lastSentQuery
+        quotaError = QuotaErrorInfo(
+            reason: quota.reason,
+            planId: quota.planId,
+            featureId: "ai_questions",
+            message: quota.upgradeMessage,
+            action: nil,
+            suggestedPlan: quota.suggestedPlan,
+            supportEmail: nil,
+            resetAt: quota.resetAt,
+            serverIsFairUseViolation: quota.isFairUseViolation
+        )
+        if let serverMsg = quota.upgradeMessage, !serverMsg.isEmpty {
+            quotaDetails = serverMsg
+        } else if quota.reason == "daily_limit_reached" {
+            quotaDetails = "daily_limit_reached_tomorrow".localized
+        } else if QuotaManager.isGuestEmail(userEmail) {
+            quotaDetails = "sign_in_to_continue_asking".localized
+        } else {
+            quotaDetails = "upgrade_to_keep_going".localized
+        }
+        showQuotaSheet = true
     }
 
     /// Public cancel — wired to the Stop button in ChatInputBar.
