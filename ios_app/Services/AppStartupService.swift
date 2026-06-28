@@ -54,11 +54,9 @@ final class AppStartupService {
     }
 
     func refreshAppConfig() async {
-        // L-1: 15-min TTL guard — skip if cache is still fresh.
-        let now = Date()
-        if let last = lastFetchedAt, now.timeIntervalSince(last) < cacheTTL {
-            return
-        }
+        // C-1: This is the explicit force-fresh entry (foreground / kill-switch).
+        // No TTL guard — kill-switch SLA is ≤60s, must always hit the network.
+        // fetchConfig() retains its TTL for launch-time dedupe.
         do {
             let url = URL(string: "\(APIConfig.baseURL)/api/v2/app/config")!
             var req = URLRequest(url: url)

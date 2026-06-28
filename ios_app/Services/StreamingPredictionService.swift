@@ -32,6 +32,7 @@ class StreamingPredictionService {
         case finalAnswer(content: String)
         case answer(response: PredictionResponse)
         case done(totalSteps: Int)
+        case backpressure(retryAfterSeconds: Int)
         case error(message: String)
     }
     
@@ -276,6 +277,13 @@ class StreamingPredictionService {
             
         case "done":
             return .done(totalSteps: json["total_steps"] as? Int ?? 0)
+
+        case "backpressure":
+            // C-2: server is shedding load; client must fall back to sync /predict.
+            // ChatViewModel handles this event by tearing down the streaming bubble
+            // and replaying via sendMessageSync.
+            let retryAfter = json["retry_after_seconds"] as? Int ?? 5
+            return .backpressure(retryAfterSeconds: retryAfter)
             
         case "error":
             // Backend sends 'error' for exceptions, but 'message' for quota errors

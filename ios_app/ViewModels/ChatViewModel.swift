@@ -55,6 +55,9 @@ class ChatViewModel {
     /// (background-expiry, sendMessage re-entry, thread switch, etc.) all
     /// funnel through here so we never leak a Task or a placeholder bubble.
     func tearDownGenerationState(reason: TearDownReason) {
+        #if DEBUG
+        print("[ChatViewModel] teardown reason: \(reason)")
+        #endif
         streamingTask?.cancel()
         streamingTask = nil
         stepProgressTask?.cancel()
@@ -826,10 +829,31 @@ class ChatViewModel {
                             // Capture full response for the single atomic flip in .done.
                             self.pendingFinalResponse = response
                         case .done:
+                            // C-2: defensive — if server emitted .done without ever
+                            // sending an .answer frame (malformed completion), treat as
+                            // a stream error and fall back to sync /predict instead of
+                            // letting commitFinalAnswer silently early-return and leave
+                            // the streaming bubble on screen.
+                            if self.pendingFinalResponse == nil &&
+                               (self.messages.first(where: { $0.id == streamingMsg.id })?.content.isEmpty ?? true) {
+                                self.tearDownGenerationState(reason: .userStop)
+                                self.inputText = query
+                                await self.sendMessageSync()
+                                return
+                            }
                             await self.commitFinalAnswer(
                                 streamingMsgId: streamingMsg.id,
                                 response: self.pendingFinalResponse
                             )
+                        case .backpressure:
+                            // C-2: server is shedding load (semaphore overflow).
+                            // Transparently fall back to sync /predict — tear down the
+                            // streaming bubble and replay the user's query via sync so
+                            // the UI never hangs waiting for a stream that won't come.
+                            self.tearDownGenerationState(reason: .userStop)
+                            self.inputText = query
+                            await self.sendMessageSync()
+                            return
                         case .error(let message):
                             self.streamErrorMessage = message
                         }
