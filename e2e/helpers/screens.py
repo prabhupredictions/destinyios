@@ -7,7 +7,6 @@ from selenium.webdriver.support import expected_conditions as EC
 class _Base:
     def __init__(self, driver):
         self.d = driver
-        self._wait = WebDriverWait(driver, 20)
 
     def find(self, aid):
         return self.d.find_element(AppiumBy.ACCESSIBILITY_ID, aid)
@@ -27,7 +26,9 @@ class _Base:
         self.d.save_screenshot(f"ios_app/e2e/screenshots/{name}.png")
 
     def wait_for(self, aid, timeout=20):
-        self._wait.until(EC.presence_of_element_located((AppiumBy.ACCESSIBILITY_ID, aid)))
+        WebDriverWait(self.d, timeout).until(
+            EC.presence_of_element_located((AppiumBy.ACCESSIBILITY_ID, aid))
+        )
 
     def wait_gone(self, aid, timeout=90):
         WebDriverWait(self.d, timeout).until_not(
