@@ -6,18 +6,16 @@ struct MessageBubble: View {
     var userQuery: String = ""
     var streamingContent: String? = nil
     var thinkingSteps: [ThinkingStep] = []  // For streaming progress
-    var enableTypewriter: Bool = false
-    var onTypewriterFinished: (() -> Void)? = nil
-    var onTypewriterProgress: (() -> Void)? = nil
     // Pipeline step state for reading layout
     var cosmicProgressSteps: [CosmicProgressStep] = []
-    
-    // Local typewriter state (only this bubble re-renders, no parent jitter)
-    @State private var revealedContent: String = ""
-    @State private var typewriterFinished = false
-    @State private var typewriterTimer: Timer?
+
     @State private var showCopiedConfirmation = false
-    
+
+    // Typewriter removed 2026-06-28. The reveal effect is now performed by
+    // StreamingBubbleView (plain Text + 30 Hz coalesced buffer) BEFORE the
+    // message is persisted. Once persisted, MessageBubble renders the final
+    // markdown through MarkdownTextView — no per-bubble timer needed.
+    //
     // Cached formatter (DateFormatter is expensive to create)
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -30,9 +28,6 @@ struct MessageBubble: View {
     }
     
     private var displayContent: String {
-        if enableTypewriter && !typewriterFinished {
-            return revealedContent
-        }
         return streamingContent ?? message.content
     }
     
@@ -78,54 +73,6 @@ struct MessageBubble: View {
                 cosmicProgressSteps: cosmicProgressSteps,
                 isStreaming: message.isStreaming
             )
-            .onDisappear {
-                typewriterTimer?.invalidate()
-                typewriterTimer = nil
-            }
-        }
-    }
-    
-    // MARK: - Typewriter Effect (local @State, no parent re-renders)
-    private func startTypewriter() {
-        // Guard against double-start when LazyVStack re-appears
-        typewriterTimer?.invalidate()
-        typewriterTimer = nil
-
-        let fullText = message.content
-        let words = fullText.components(separatedBy: " ")
-        guard !words.isEmpty else {
-            typewriterFinished = true
-            return
-        }
-
-        var wordIndex = 0
-        revealedContent = ""
-        
-        // Reveal 1 word every 50ms (~20 words/sec for faster smooth reading pace)
-        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
-            let batchEnd = min(wordIndex + 1, words.count)
-            let batch = words[wordIndex..<batchEnd].joined(separator: " ")
-
-            if revealedContent.isEmpty {
-                revealedContent = batch
-            } else {
-                revealedContent += " " + batch
-            }
-
-            wordIndex = batchEnd
-
-            if wordIndex % 10 == 0 {
-                onTypewriterProgress?()
-            }
-
-            if wordIndex >= words.count {
-                timer.invalidate()
-                typewriterTimer = nil
-                withAnimation(.easeIn(duration: 0.25)) {
-                    typewriterFinished = true
-                }
-                onTypewriterFinished?()
-            }
         }
     }
     
@@ -142,22 +89,13 @@ struct MessageBubble: View {
                 // AI loading state - show progress inside bubble
                 streamingProgressView
             } else if !displayContent.isEmpty {
-                // Plain text during typewriter — avoids 600+ MarkdownTextView re-parse cycles
-                // that cause watchdog kills on long responses. Switch to full markdown after.
-                if enableTypewriter && !typewriterFinished {
-                    Text(revealedContent)
-                        .font(AppTheme.Fonts.body(size: 17))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                        .lineSpacing(6)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } else {
-                    MarkdownTextView(
-                        content: streamingContent ?? message.content,
-                        textColor: AppTheme.Colors.textPrimary,
-                        fontSize: 17
-                    )
-                    .transition(.opacity)
-                }
+                // (typewriter branch deleted 2026-06-28); markdown path is the only path.
+                MarkdownTextView(
+                    content: streamingContent ?? message.content,
+                    textColor: AppTheme.Colors.textPrimary,
+                    fontSize: 17
+                )
+                .transition(.opacity)
             }
             
             // Tool calls chips (if any)
@@ -363,23 +301,6 @@ struct AvatarView: View {
                 .foregroundColor(AppTheme.Colors.mainBackground)
         }
         .accessibilityHidden(true)
-    }
-}
-
-// MARK: - Blinking Cursor
-struct BlinkingCursor: View {
-    @State private var isVisible = true
-    
-    var body: some View {
-        Rectangle()
-            .fill(AppTheme.Colors.gold)
-            .frame(width: 2, height: 16)
-            .opacity(isVisible ? 1 : 0)
-            .onAppear {
-                withAnimation(.easeInOut(duration: 0.5).repeatForever()) {
-                    isVisible.toggle()
-                }
-            }
     }
 }
 

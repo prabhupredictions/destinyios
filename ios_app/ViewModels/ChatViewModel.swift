@@ -46,7 +46,6 @@ class ChatViewModel {
     /// is kept as a back-compat shortcut for older call sites that read
     /// just the message.
     var quotaError: QuotaErrorInfo?
-    var typewriterMessageId: String?  // Message currently being typewritten
     var windowManager = MessageWindowManager()
     var cosmicProgressSteps: [CosmicProgressStep] = []
     private var progressTimerTask: Task<Void, Never>? = nil
@@ -234,7 +233,6 @@ class ChatViewModel {
         suggestedQuestions = []
         errorMessage = nil
         streamingContent = ""
-        typewriterMessageId = nil
         stopStreaming()
 
         // Reload history filtered for the new profile and load its latest thread

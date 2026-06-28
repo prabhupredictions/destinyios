@@ -68,8 +68,7 @@ struct ChatView: View {
                     text: $viewModel.inputText,
                     isFocused: $isInputFocused,
                     isLoading: viewModel.isLoading,
-                    isStreaming: viewModel.isStreaming,
-                    isTyping: viewModel.typewriterMessageId != nil
+                    isStreaming: viewModel.isStreaming
                 ) {
                     // Check quota before sending
                     if viewModel.canAskQuestion {
@@ -438,7 +437,6 @@ struct ChatView: View {
                                 userQuery: userQueryLookup[message.id] ?? "",
                                 streamingContent: nil,
                                 thinkingSteps: [],
-                                enableTypewriter: false,
                                 cosmicProgressSteps: message.isStreaming ? viewModel.cosmicProgressSteps : []
                             )
                             .id(message.id)
@@ -560,15 +558,6 @@ struct ChatView: View {
             //     ↑ Jittery. Fires on populate (0→1) and clear (1→0); the
             //       clear-fire arrives just before isStreaming=false during
             //       response landing and compounds the same symptom.
-            //
-            //   .onChange(of: viewModel.typewriterMessageId) { _, newId in
-            //       if newId == nil { requestScrollToBottom() }
-            //   }
-            //     ↑ Dead code. typewriterMessageId is never assigned non-nil
-            //       in the ChatView path (enableTypewriter: false on every
-            //       MessageBubble at line 412), so the newId == nil check
-            //       can never transition from non-nil. Removed with the rest
-            //       of the typewriter scaffolding that no longer applies.
         }
     }
     
