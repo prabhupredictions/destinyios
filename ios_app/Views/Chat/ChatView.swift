@@ -566,52 +566,30 @@ struct ChatView: View {
                     }
                 }
             }
-            // Cosmic progress card reveal: scroll only on the loading→true
-            // transition (already gated). This makes the card visible right
-            // under the user's freshly-pinned question.
-            .onChange(of: viewModel.isLoading) { _, loading in
-                if loading { requestScrollToBottom() }
-            }
+            // Cosmic progress card reveal: deliberately NO bottom-scroll
+            // here. The pin-to-top from the messages.count handler (above)
+            // already placed the user's question + the empty assistant
+            // placeholder (which holds cosmic progress) at the top of the
+            // viewport on Send. A bottom-scroll here would pull everything
+            // down past the user question, defeating the pin. The viewport
+            // stays put; cosmic progress fades in below the question; first
+            // token continues to grow below.
             // When the answer arrives (isStreaming flips true→false), the
-            // bubble's height jumps from ~0 to its full size. If we don't
-            // re-anchor, the user is left looking at wherever they were at
-            // pin-time — often mid-answer because the cosmic progress card
-            // pushed layout around. Re-trigger pin-to-top here so the
-            // user's question ends up cleanly at the top of the viewport
-            // ABOVE the freshly-rendered answer.
-            .onChange(of: viewModel.isStreaming) { oldVal, newVal in
-                guard oldVal == true && newVal == false else { return }
-                // Don't yank the screen if the user has scrolled up to read
-                // prior context. They'll see a "New message" hint instead.
-                if !userScrolledAway {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        pinToTopTrigger = UUID()
-                    }
-                }
-            }
-            // First-token / first-typewriter-char: pin the user's question to
-            // the top the moment ANY answer text lands on screen. This is the
-            // "real" pin — earlier than the isStreaming-false handler above,
-            // which now functions as a safety net. After this, no further
-            // auto-scroll observers chase streamingContent growth — the
-            // viewport stays put so the user reads top-down naturally.
-            //
-            // NOTE: we deliberately do NOT honor userScrolledAway here. During
-            // the cosmic-progress phase the PreferenceKey offset reader can
-            // misread content-driven layout changes as user-initiated scroll,
-            // latching userScrolledAway=true even when the user is sitting
-            // still. The first-token moment is the most important UX beat —
-            // we always pin. If the user has genuinely scrolled away during
-            // generation, the absent chase-observer keeps the viewport where
-            // they put it after this pin (no further auto-scrolls).
-            .onChange(of: viewModel.streamingContent.isEmpty) { wasEmpty, isEmpty in
-                print("[SCROLL] streamingContent.isEmpty: \(wasEmpty) → \(isEmpty), userScrolledAway=\(userScrolledAway), pinToTopMessageId=\(pinToTopMessageId ?? "nil")")
-                guard wasEmpty == true && isEmpty == false else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    print("[SCROLL] first-token pin firing (ignoring userScrolledAway)")
-                    pinToTopTrigger = UUID()
-                }
-            }
+            // bubble's content is now fully committed to message.content.
+            // We do NOT re-pin here — the Send-time pin already placed the
+            // user's question at the top, the tokens streamed in below, and
+            // the user has been reading top-down throughout. A re-pin here
+            // would yank the viewport mid-read for the (typical) case where
+            // the answer is taller than one screen and the user is part-way
+            // through. The footer (timestamp, copy, rate) fades in below
+            // the final character; that's the only visual completion cue.
+            // First-token pin observer removed: the Send-time pin (in the
+            // messages.count handler above) already placed the user's
+            // question at the top of the viewport. Cosmic progress fades
+            // in below it; the first token + subsequent stream grow below
+            // that. The viewport stays put — no further auto-scroll —
+            // so the user reads top-down naturally from Send → cosmic →
+            // first token → full answer, all in one continuous view.
             // Follow-up suggestion pills appear AFTER the answer is fully
             // rendered. They live below the answer, so a small bottom-scroll
             // is correct UX (mirrors what the user would scroll themselves
