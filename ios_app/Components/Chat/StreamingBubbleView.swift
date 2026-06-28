@@ -59,6 +59,7 @@ struct StreamingBubbleView: View {
                 caretVisible.toggle()
             }
         }
+        .accessibilityIdentifier("chat_assistant_streaming_bubble")
     }
 }
 

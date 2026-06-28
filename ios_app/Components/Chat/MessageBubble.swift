@@ -73,6 +73,7 @@ struct MessageBubble: View {
                 cosmicProgressSteps: cosmicProgressSteps,
                 isStreaming: message.isStreaming
             )
+            .accessibilityIdentifier("chat_assistant_final_bubble")
         }
     }
     

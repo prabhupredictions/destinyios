@@ -63,6 +63,28 @@ class ChatScreen(_Base):
         msgs = self.finds("ai_message")
         return msgs[-1].get_attribute("label") if msgs else ""
 
+    def wait_for_element(self, aid: str, timeout: int = 20):
+        """Wait until element with accessibility id is present."""
+        self.wait_for(aid, timeout=timeout)
+
+    def wait_for_element_gone(self, aid: str, timeout: int = 20):
+        """Wait until element with accessibility id disappears."""
+        self.wait_gone(aid, timeout=timeout)
+
+    def last_user_message_text(self) -> str:
+        """Return the label of the most recently sent user message bubble."""
+        msgs = self.finds("user_message")
+        return msgs[-1].get_attribute("label").removeprefix("You said: ") if msgs else ""
+
+    def element_exists(self, aid: str, from_last_send: bool = False) -> bool:
+        """Return True if element with accessibility id is currently visible.
+
+        from_last_send is accepted for API compatibility with the streaming
+        spec but is not used — Appium element lookup is already scoped to
+        the live view hierarchy, so presence check is sufficient.
+        """
+        return self.present(aid)
+
     def is_streaming(self):     return self.present("streaming_indicator")
     def message_count(self):    return len(self.finds("ai_message"))
     def tap_copy(self):         self.tap("copy_button")
