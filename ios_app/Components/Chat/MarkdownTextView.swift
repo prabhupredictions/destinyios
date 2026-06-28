@@ -79,7 +79,7 @@ struct MarkdownTextView: View {
 
     // MARK: - Parser (pure, no statics, no isolation)
 
-    fileprivate static func parse(_ content: String) -> [Block] {
+    nonisolated fileprivate static func parse(_ content: String) -> [Block] {
         var blocks: [Block] = []
         let lines = content.components(separatedBy: "\n")
         var i = 0
@@ -229,7 +229,7 @@ struct MarkdownTextView: View {
 
     // MARK: - Block helpers (pure)
 
-    private static func isDivider(_ line: String) -> Bool {
+    nonisolated private static func isDivider(_ line: String) -> Bool {
         let s = line.replacingOccurrences(of: " ", with: "")
         guard s.count >= 3 else { return false }
         return s.allSatisfy({ $0 == "-" })
@@ -237,7 +237,7 @@ struct MarkdownTextView: View {
             || s.allSatisfy({ $0 == "_" })
     }
 
-    private static func parseHeader(_ line: String) -> Block? {
+    nonisolated private static func parseHeader(_ line: String) -> Block? {
         if line.hasPrefix("#### ") {
             return .header(level: 4, text: String(line.dropFirst(5)))
         }
@@ -253,7 +253,7 @@ struct MarkdownTextView: View {
         return nil
     }
 
-    private static func parseBoldLabel(_ text: String) -> Block? {
+    nonisolated private static func parseBoldLabel(_ text: String) -> Block? {
         guard text.hasPrefix("**") else { return nil }
         let afterOpen = text.index(text.startIndex, offsetBy: 2)
         guard let closeBold = text.range(of: "**", range: afterOpen..<text.endIndex)
@@ -278,7 +278,7 @@ struct MarkdownTextView: View {
         return .boldLabel(label: labelClean, content: rest)
     }
 
-    private static func isTableSeparator(_ line: String) -> Bool {
+    nonisolated private static func isTableSeparator(_ line: String) -> Bool {
         let s = line.replacingOccurrences(of: " ", with: "")
         guard s.contains("|"), s.contains("-") else { return false }
         return s.replacingOccurrences(of: "|", with: "")
@@ -287,7 +287,7 @@ struct MarkdownTextView: View {
             .isEmpty
     }
 
-    private static func parseTableRow(_ line: String) -> [String] {
+    nonisolated private static func parseTableRow(_ line: String) -> [String] {
         var t = line.trimmingCharacters(in: .whitespaces)
         if t.hasPrefix("|") { t = String(t.dropFirst()) }
         if t.hasSuffix("|") { t = String(t.dropLast()) }
@@ -295,7 +295,7 @@ struct MarkdownTextView: View {
             .map { $0.trimmingCharacters(in: .whitespaces) }
     }
 
-    private static func isNumberedListItem(_ line: String) -> Bool {
+    nonisolated private static func isNumberedListItem(_ line: String) -> Bool {
         guard line.count >= 3, let dot = line.firstIndex(of: ".") else { return false }
         let prefix = String(line[..<dot])
         guard !prefix.isEmpty, prefix.allSatisfy({ $0.isNumber }) else { return false }
@@ -303,7 +303,7 @@ struct MarkdownTextView: View {
         return afterDot < line.endIndex && line[afterDot] == " "
     }
 
-    private static func extractNumberedItem(_ line: String) -> String? {
+    nonisolated private static func extractNumberedItem(_ line: String) -> String? {
         guard isNumberedListItem(line),
               let dot = line.firstIndex(of: "."),
               let afterSpace = line.index(dot, offsetBy: 2, limitedBy: line.endIndex)
@@ -364,7 +364,7 @@ struct MarkdownTextView: View {
     /// dangerous nested or italic-underscore markers. The blockquote
     /// view modifier already applies bold+italic so dropping italic is
     /// visually lossless within blockquotes.
-    private static func neutralizeDangerousMarkers(_ text: String) -> String {
+    nonisolated private static func neutralizeDangerousMarkers(_ text: String) -> String {
         // Apply outer-bold patterns BEFORE __italic__ strip, otherwise
         // `**__x__**` becomes `**_x_**` mid-pipeline (still dangerous).
         let patterns: [(String, String)] = [
@@ -387,7 +387,7 @@ struct MarkdownTextView: View {
 
     /// Strip every markdown emphasis marker from text. Used as the
     /// ultimate fallback when AttributedString parsing fails.
-    fileprivate static func stripAllMarkers(_ text: String) -> String {
+    nonisolated fileprivate static func stripAllMarkers(_ text: String) -> String {
         return text
             .replacingOccurrences(of: "**", with: "")
             .replacingOccurrences(of: "__", with: "")
