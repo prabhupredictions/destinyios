@@ -66,19 +66,20 @@ struct ChatView: View {
                 // Input bar
                 ChatInputBar(
                     text: $viewModel.inputText,
-                    isFocused: $isInputFocused,
                     isLoading: viewModel.isLoading,
-                    isStreaming: viewModel.isStreaming
-                ) {
-                    // Check quota before sending
-                    if viewModel.canAskQuestion {
-                        isInputFocused = false  // Dismiss keyboard on send
-                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                        Task { await viewModel.sendMessage() }
-                    } else {
-                        showQuotaExhausted = true
-                    }
-                }
+                    isStreaming: viewModel.isStreaming,
+                    onSend: {
+                        // Check quota before sending
+                        if viewModel.canAskQuestion {
+                            isInputFocused = false  // Dismiss keyboard on send
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            Task { await viewModel.sendMessage() }
+                        } else {
+                            showQuotaExhausted = true
+                        }
+                    },
+                    onStop: { viewModel.stopGeneration() }
+                )
             }
         }
         .navigationBarHidden(true)

@@ -233,7 +233,7 @@ class ChatViewModel {
         suggestedQuestions = []
         errorMessage = nil
         streamingContent = ""
-        stopStreaming()
+        stopGeneration()
 
         // Reload history filtered for the new profile and load its latest thread
         loadHistory()
@@ -600,11 +600,18 @@ class ChatViewModel {
         }
     }
 
-    func stopStreaming() {
+    /// Public cancel — wired to the Stop button in ChatInputBar.
+    /// Idempotent; safe to call while no stream is active.
+    func stopGeneration() {
         streamingTask?.cancel()
         streamingTask = nil
         stepProgressTask?.cancel()
         stepProgressTask = nil
+        progressTimerTask?.cancel()
+        progressTimerTask = nil
+        // Note: do NOT mutate messages here. The CancellationError handler
+        // in sendMessageStreaming (Task 12) is the single place that removes
+        // the orphan placeholder bubble.
     }
 
     func retryInterruptedQuestion() {
