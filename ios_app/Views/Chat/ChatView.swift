@@ -377,6 +377,28 @@ struct ChatView: View {
     private var visibleMessages: [LocalChatMessage] {
         viewModel.windowManager.visibleMessages.filter { !$0.content.isEmpty || $0.isStreaming }
     }
+
+    // MARK: - Adaptive Tail Spacer
+    /// Height of the always-rendered Color.clear spacer at the end of the
+    /// LazyVStack. Adaptive so we have enough room to pin-to-top on Send
+    /// without leaving an ugly empty void below the conversation at rest.
+    /// Always > 0 so contentSize never has a structural diff (which would
+    /// trigger SwiftUI re-anchoring on .done). See ChatView.swift:481-501
+    /// for the full rationale.
+    private var tailSpacerHeight: CGFloat {
+        let screenH = UIScreen.main.bounds.height
+        if viewModel.isLoading || viewModel.isStreaming {
+            // Active generation — need lots of room so the user's question
+            // can scroll-to-top while the placeholder bubble is still empty.
+            return screenH * 0.7
+        }
+        // Idle (post-.done or fresh open). Use enough room that the NEXT
+        // Send's pin-to-top still works against whatever sits below the
+        // most-recent user message, but not so much that the rest state
+        // looks empty. ~32% of viewport is enough to scroll any short
+        // assistant answer to the top, and barely shows below long answers.
+        return screenH * 0.32
+    }
     
     // MARK: - User Query Lookup (pre-computed, avoids O(n²) per-message scan)
     private var userQueryLookup: [String: String] {
@@ -498,9 +520,32 @@ struct ChatView: View {
                         // stream→done transition (no re-anchor), and the
                         // suggestions appear directly below the answer with
                         // no visible gap.
+                        // Reserved tail-space — adaptive height to give pin-to-top
+                        // room when needed without leaving a visible empty void
+                        // below the conversation at rest.
+                        //
+                        // Three cases:
+                        //   a) During isLoading || isStreaming: large (70% of viewport).
+                        //      The user just hit Send; the assistant placeholder bubble
+                        //      is short or empty; we need lots of tail-space so
+                        //      scrollTo(userMessage, anchor: .top) can actually reach
+                        //      the top of the viewport.
+                        //   b) Idle, last message is short: medium (32% of viewport).
+                        //      Just enough so the next Send's pin still works without
+                        //      leaving an ugly half-screen of black below the answer.
+                        //   c) Idle, last message is tall: small (16% of viewport).
+                        //      A short answer that already fills the viewport doesn't
+                        //      need much tail — the natural content already gives
+                        //      scrollTo room. Keeps the rest state visually tight.
+                        //
+                        // We always render the spacer (never branch the view on/off)
+                        // so SwiftUI doesn't trigger a content-size diff that causes
+                        // re-anchoring on .done. Only the height animates, which is
+                        // a non-disruptive layout pass.
                         Color.clear
-                            .frame(height: UIScreen.main.bounds.height * 0.7)
+                            .frame(height: tailSpacerHeight)
                             .id("tailSpacer")
+                            .animation(.easeInOut(duration: 0.35), value: tailSpacerHeight)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
