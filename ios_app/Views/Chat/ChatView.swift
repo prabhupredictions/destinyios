@@ -463,18 +463,25 @@ struct ChatView: View {
                             .id(message.id)
                         }
 
-                        // Reserved tail-space during generation. Without this, scrollTo
-                        // with anchor: .top can't actually move the latest user message
-                        // to the top — there's not enough content below it to scroll up
-                        // against. Reserving ~viewport-height worth of clear space below
-                        // the streaming bubble lets the pin do its job. Removed once the
-                        // answer has rendered fully (which itself replaces the space).
-                        // This mirrors how ChatGPT / Gemini compose their chat scroll.
-                        if viewModel.isStreaming || viewModel.isLoading {
-                            Color.clear
-                                .frame(height: UIScreen.main.bounds.height * 0.7)
-                                .id("streamingTailSpacer")
-                        }
+                        // Reserved tail-space. Without this, scrollTo with
+                        // anchor: .top can't actually move the latest user
+                        // message to the top — there's not enough content
+                        // below it to scroll up against. Reserving ~70% of
+                        // viewport-height of clear space below the last
+                        // message lets the pin do its job.
+                        //
+                        // Kept ALWAYS visible (not just during streaming).
+                        // Earlier version gated this on isStreaming/isLoading,
+                        // but removing 70% of the content tail on .done
+                        // caused the ScrollView to re-anchor and jump the
+                        // viewport to the bottom — exactly the "answer
+                        // suddenly snaps to bottom" symptom the user reported.
+                        // The empty space below the answer is harmless; the
+                        // ScrollView pads correctly and the next Send pins
+                        // the new question to the top against this same tail.
+                        Color.clear
+                            .frame(height: UIScreen.main.bounds.height * 0.7)
+                            .id("tailSpacer")
                         
                         // Inline suggested questions — only after streaming finishes
                         if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && !viewModel.isStreaming {
