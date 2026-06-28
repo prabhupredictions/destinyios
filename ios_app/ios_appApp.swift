@@ -152,6 +152,8 @@ struct ios_appApp: App {
                     SubscriptionManager.shared.startForegroundSyncTimer()
                     // Sync app icon badge to server unread count on every foreground.
                     Task { await NotificationInboxService.shared.fetchUnreadCount() }
+                    // Refresh server-driven feature flags (streaming cohort, gate mode).
+                    Task { await AppStartupService.shared.refreshAppConfig() }
                 }
             default:
                 break
