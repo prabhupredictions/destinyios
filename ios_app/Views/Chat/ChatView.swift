@@ -463,6 +463,23 @@ struct ChatView: View {
                             .id(message.id)
                         }
 
+                        // Inline suggested questions render BEFORE the tail
+                        // spacer so they sit flush below the answer with no
+                        // visible gap. The spacer below them is off-screen
+                        // and only provides scroll room for the next Send's
+                        // pin-to-top.
+                        //
+                        // Transition is pure .opacity (not .move(edge:
+                        // .bottom)). With suggestions now immediately under
+                        // the answer, a slide-from-bottom motion would
+                        // visually pull the viewport; fade is the correct
+                        // cue.
+                        if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && !viewModel.isStreaming {
+                            inlineSuggestedQuestionsView
+                                .id("suggestions")
+                                .transition(.opacity)
+                        }
+
                         // Reserved tail-space. Without this, scrollTo with
                         // anchor: .top can't actually move the latest user
                         // message to the top — there's not enough content
@@ -475,20 +492,15 @@ struct ChatView: View {
                         // but removing 70% of the content tail on .done
                         // caused the ScrollView to re-anchor and jump the
                         // viewport to the bottom — exactly the "answer
-                        // suddenly snaps to bottom" symptom the user reported.
-                        // The empty space below the answer is harmless; the
-                        // ScrollView pads correctly and the next Send pins
-                        // the new question to the top against this same tail.
+                        // suddenly snaps to bottom" symptom. Keeping it
+                        // always-present AND placing it AFTER suggestions
+                        // means total contentSize stays stable across the
+                        // stream→done transition (no re-anchor), and the
+                        // suggestions appear directly below the answer with
+                        // no visible gap.
                         Color.clear
                             .frame(height: UIScreen.main.bounds.height * 0.7)
                             .id("tailSpacer")
-                        
-                        // Inline suggested questions — only after streaming finishes
-                        if !viewModel.suggestedQuestions.isEmpty && !viewModel.isLoading && !viewModel.isStreaming {
-                            inlineSuggestedQuestionsView
-                                .id("suggestions")
-                                .transition(.opacity.combined(with: .move(edge: .bottom)))
-                        }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
@@ -611,12 +623,21 @@ struct ChatView: View {
             // so the user reads top-down naturally from Send → cosmic →
             // first token → full answer, all in one continuous view.
             // Follow-up suggestion pills appear AFTER the answer is fully
-            // rendered. They live below the answer, so a small bottom-scroll
-            // is correct UX (mirrors what the user would scroll themselves
-            // to reach them).
-            .onChange(of: viewModel.suggestedQuestions) { _, q in
-                if !q.isEmpty { requestScrollToBottom() }
-            }
+            // rendered. They sit immediately below the answer in the
+            // LazyVStack (BEFORE the tail spacer), so the viewport — which
+            // was pinned to the user's question on Send and stayed put
+            // during the stream — already shows the natural reading flow:
+            // question at top, answer below, suggestions appearing under
+            // the answer's last line as the user scrolls or reads down.
+            //
+            // We deliberately do NOT auto-scroll here. A scroll-to-bottom
+            // at .done would jump past the answer to the tail spacer +
+            // suggestions, producing the "viewport snaps to bottom with
+            // a big empty gap" symptom (bottomAnchor lives outside the
+            // LazyVStack at the end of the ScrollView, so scrolling to it
+            // overshoots past the answer end + 70% spacer).
+            //
+            // No .onChange(of: viewModel.suggestedQuestions) retained.
             // Keyboard-up reveal — standard chat UX. Delay covers the
             // keyboard slide animation.
             .onChange(of: isInputFocused) { _, focused in
