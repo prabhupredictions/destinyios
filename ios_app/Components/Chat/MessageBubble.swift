@@ -85,6 +85,7 @@ struct MessageBubble: View {
                 Text(message.content)
                     .font(AppTheme.Fonts.body(size: 17)) // HIG standard body text
                     .foregroundColor(AppTheme.Colors.mainBackground) // Dark text on gold gradient
+                    .textSelection(.enabled)
             } else if isLoadingState {
                 // AI loading state - show progress inside bubble
                 streamingProgressView

@@ -147,47 +147,43 @@ struct AppTheme {
         private static let canelaRegular = "Canela-Regular" // Font name for canela_roman.otf
         private static let canelaMedium = "Canela-Medium"   // Font name for canela_bold.otf
         
-        /// Premium display font (Canela Regular) - for headlines that need luxury feel
+        /// Premium display font (Canela Regular) — for headlines that need luxury feel.
+        /// Sized relative to .largeTitle so Dynamic Type scales it.
         static func premiumDisplay(size: CGFloat) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
-                return .custom(canelaRegular, size: size)
+                return .custom(canelaRegular, size: size, relativeTo: .largeTitle)
             }
-            return .system(size: size, weight: .regular, design: .serif)
+            return .system(.largeTitle, design: .serif).weight(.regular)
         }
-        
-        /// Semantic Alias for 'Soul' Font (Sensory Stack)
-        static func soul(size: CGFloat) -> Font {
-            return premiumDisplay(size: size)
-        }
-        
-        /// Standard display font - for general headlines
+
+        static func soul(size: CGFloat) -> Font { premiumDisplay(size: size) }
+
         static func display(size: CGFloat) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
-                return .custom(canelaRegular, size: size)
+                return .custom(canelaRegular, size: size, relativeTo: .title)
             }
-            return .system(size: size, weight: .regular, design: .serif)
+            return .system(.title, design: .serif).weight(.regular)
         }
-        
+
         static func title(size: CGFloat) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
-                return .custom(canelaRegular, size: size)
+                return .custom(canelaRegular, size: size, relativeTo: .title2)
             }
-            return .system(size: size, weight: .semibold, design: .serif)
+            return .system(.title2, design: .serif).weight(.semibold)
         }
-        
+
         static func body(size: CGFloat) -> Font {
-            // Canela Roman for body text
             if let _ = UIFont(name: canelaRegular, size: size) {
-                return .custom(canelaRegular, size: size)
+                return .custom(canelaRegular, size: size, relativeTo: .body)
             }
-            return .system(size: size, weight: .regular, design: .serif)
+            return .system(.body, design: .serif)
         }
-        
+
         static func caption(size: CGFloat = 12) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
-                return .custom(canelaRegular, size: size)
+                return .custom(canelaRegular, size: size, relativeTo: .caption)
             }
-            return .system(size: size, weight: .regular, design: .serif)
+            return .system(.caption, design: .serif)
         }
     }
     

@@ -25,7 +25,8 @@ struct CosmicProgressView: View {
             .padding(.vertical, 14)
             .animation(.easeInOut(duration: 0.4), value: currentText)
             .accessibilityIdentifier("cosmic_progress_view")
-            .accessibilityLabel("Loading: \(currentText)")
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Destiny is composing your reading")
         }
     }
 }
@@ -33,6 +34,7 @@ struct CosmicProgressView: View {
 private struct SparkleIcon: View {
     @State private var rotation: Double = 0
     @State private var scale: CGFloat = 1.0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Image(systemName: "sparkle")
@@ -47,11 +49,19 @@ private struct SparkleIcon: View {
             .rotationEffect(.degrees(rotation))
             .scaleEffect(scale)
             .onAppear {
-                withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
-                    rotation = 360
+                if !reduceMotion && !ProcessInfo.processInfo.isLowPowerModeEnabled {
+                    withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                        rotation = 360
+                    }
+                } else {
+                    rotation = 0  // static; no spin under Reduce Motion / Low Power
                 }
-                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                    scale = 1.15
+                if !reduceMotion && !ProcessInfo.processInfo.isLowPowerModeEnabled {
+                    withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                        scale = 1.15
+                    }
+                } else {
+                    scale = 1.0  // static; no pulse under Reduce Motion / Low Power
                 }
             }
     }
