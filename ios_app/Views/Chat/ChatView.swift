@@ -1,5 +1,12 @@
 import SwiftUI
 
+private struct ChatScrollOffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 /// Main chat view with messages, input, and history sidebar
 struct ChatView: View {
     // Navigation callback for back button
@@ -408,6 +415,8 @@ struct ChatView: View {
     @State private var pinToTopMessageId: String?
     @State private var previousMessageCount: Int = 0
     @State private var previousIsStreaming: Bool = false
+    @State private var userScrolledAway: Bool = false
+    @State private var lastContentOffset: CGFloat = 0
     
     // MARK: - Messages View (matches compat chat scroll pattern exactly)
     private var messagesView: some View {
@@ -457,6 +466,13 @@ struct ChatView: View {
                 Color.clear
                     .frame(height: 1)
                     .id("bottomAnchor")
+                GeometryReader { proxy in
+                    Color.clear.preference(
+                        key: ChatScrollOffsetKey.self,
+                        value: proxy.frame(in: .named("chatScroll")).maxY
+                    )
+                }
+                .frame(height: 0)
             }
             // Reserve top scroll content space so pin-to-top doesn't slide
             // the user's question behind the sibling ChatHeader (which is
@@ -464,6 +480,19 @@ struct ChatView: View {
             // header. iOS 17+. Falls back gracefully on older OS.
             .contentMargins(.top, 8, for: .scrollContent)
             .scrollDismissesKeyboard(.interactively)
+            .coordinateSpace(name: "chatScroll")
+            .onPreferenceChange(ChatScrollOffsetKey.self) { newOffset in
+                // Treat the user as "scrolled away" if the bottom of the
+                // content list is more than 100pt above the visible bottom
+                // (i.e. the user has scrolled up to read prior context).
+                // The exact threshold is forgiving; under-scrolling is
+                // the safer failure mode (we still pin to top on .done).
+                let scrollDelta = lastContentOffset - newOffset
+                if abs(scrollDelta) > 5 {
+                    userScrolledAway = scrollDelta > 0 && newOffset < (UIScreen.main.bounds.height - 100)
+                    lastContentOffset = newOffset
+                }
+            }
             // Single consolidated bottom-scroll handler — debounced to prevent racing animations.
             .onChange(of: scrollTrigger) { _, _ in
                 withAnimation(.easeOut(duration: 0.25)) {
@@ -525,8 +554,11 @@ struct ChatView: View {
             // user's question ends up cleanly at the top of the viewport
             // ABOVE the freshly-rendered answer.
             .onChange(of: viewModel.isStreaming) { oldVal, newVal in
-                if oldVal == true && newVal == false, pinToTopMessageId != nil {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                guard oldVal == true && newVal == false else { return }
+                // Don't yank the screen if the user has scrolled up to read
+                // prior context. They'll see a "New message" hint instead.
+                if !userScrolledAway {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         pinToTopTrigger = UUID()
                     }
                 }

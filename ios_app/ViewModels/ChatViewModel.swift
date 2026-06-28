@@ -32,6 +32,54 @@ class ChatViewModel {
     var isLoading = false
     var isStreaming = false
     var streamingContent = ""
+
+    // MARK: - Teardown
+
+    enum TearDownReason {
+        case userStop
+        case viewDisappear
+        case threadSwitch
+        case profileSwitch
+        case backgroundExpiry
+        case paywallPresent
+        case deepLink
+        case sendReentry
+    }
+
+    /// Single chokepoint for cancelling an active generation. Cancels every
+    /// outstanding Task/Timer, clears transient UI state, deletes the orphan
+    /// assistant-placeholder bubble (Task 12 wires this for streaming), and
+    /// resets `isStreaming`/`isLoading`.
+    ///
+    /// Idempotent. Safe to call from any path; the 9 historical cancel sites
+    /// (background-expiry, sendMessage re-entry, thread switch, etc.) all
+    /// funnel through here so we never leak a Task or a placeholder bubble.
+    func tearDownGenerationState(reason: TearDownReason) {
+        streamingTask?.cancel()
+        streamingTask = nil
+        stepProgressTask?.cancel()
+        stepProgressTask = nil
+        progressTimerTask?.cancel()
+        progressTimerTask = nil
+
+        cosmicProgressSteps = []
+        streamingContent = ""
+
+        // Delete orphan assistant placeholders (rows with content == ""
+        // and isStreaming == true). Sync path's success branch sets
+        // isStreaming=false BEFORE this would run, so a successful
+        // commit is never touched.
+        let orphaned = messages.filter { $0.isStreaming && $0.content.isEmpty }
+        for msg in orphaned {
+            messages.removeAll { $0.id == msg.id }
+            windowManager.remove(id: msg.id)
+            dataManager.context.delete(msg)
+        }
+
+        isStreaming = false
+        isLoading = false
+    }
+
     var thinkingSteps: [ThinkingStep] = []
     var errorMessage: String?
     var inputText = ""
@@ -250,6 +298,11 @@ class ChatViewModel {
     }
     
     func loadThread(_ thread: LocalChatThread) {
+        // Streaming-safety: tear down any active generation BEFORE the
+        // thread id swaps. Otherwise the .done handler for thread A could
+        // land on thread B's messages array. Discovered missing during
+        // 2026-06-28 audit.
+        tearDownGenerationState(reason: .threadSwitch)
         currentThreadId = thread.id
         messages = dataManager.fetchMessages(for: thread.id)
         windowManager.replaceAll(messages)
@@ -603,15 +656,7 @@ class ChatViewModel {
     /// Public cancel — wired to the Stop button in ChatInputBar.
     /// Idempotent; safe to call while no stream is active.
     func stopGeneration() {
-        streamingTask?.cancel()
-        streamingTask = nil
-        stepProgressTask?.cancel()
-        stepProgressTask = nil
-        progressTimerTask?.cancel()
-        progressTimerTask = nil
-        // Note: do NOT mutate messages here. The CancellationError handler
-        // in sendMessageStreaming (Task 12) is the single place that removes
-        // the orphan placeholder bubble.
+        tearDownGenerationState(reason: .userStop)
     }
 
     func retryInterruptedQuestion() {
