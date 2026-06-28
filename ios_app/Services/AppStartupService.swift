@@ -53,19 +53,37 @@ final class AppStartupService {
         }
     }
 
-    @MainActor
     func refreshAppConfig() async {
+        // L-1: 15-min TTL guard — skip if cache is still fresh.
+        let now = Date()
+        if let last = lastFetchedAt, now.timeIntervalSince(last) < cacheTTL {
+            return
+        }
         do {
             let url = URL(string: "\(APIConfig.baseURL)/api/v2/app/config")!
             var req = URLRequest(url: url)
+            // I-2b: include Authorization header matching fetchConfig() pattern.
+            req.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
             req.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+            // I-1: URLSession I/O is off-main; only writes happen inside MainActor.run.
             let (data, _) = try await URLSession.shared.data(for: req)
             let dto = try JSONDecoder().decode(AppConfigDTO.self, from: data)
-            if let gate = dto.gate_mode { AppConfig.shared.gateMode = gate }
-            if let guest = dto.allow_guest { AppConfig.shared.allowGuest = guest }
-            if let enabled = dto.streaming_enabled { AppConfig.shared.streamingEnabled = enabled }
-            if let cohort = dto.streaming_cohort_percent { AppConfig.shared.streamingCohortPercent = cohort }
-            if let minV = dto.streaming_min_app_version { AppConfig.shared.streamingMinAppVersion = minV }
+            await MainActor.run {
+                // I-2a: write to both AppConfig.shared (streaming/cohort fields) and
+                // self (gateMode/allowGuest) so AuthView/AppRootView see the update.
+                if let gate = dto.gate_mode {
+                    AppConfig.shared.gateMode = gate
+                    self.gateMode = gate
+                }
+                if let guest = dto.allow_guest {
+                    AppConfig.shared.allowGuest = guest
+                    self.allowGuest = guest
+                }
+                if let enabled = dto.streaming_enabled { AppConfig.shared.streamingEnabled = enabled }
+                if let cohort = dto.streaming_cohort_percent { AppConfig.shared.streamingCohortPercent = cohort }
+                if let minV = dto.streaming_min_app_version { AppConfig.shared.streamingMinAppVersion = minV }
+                self.lastFetchedAt = Date()
+            }
         } catch {
             // Defaults are conservative — streaming stays off on network failure.
         }
