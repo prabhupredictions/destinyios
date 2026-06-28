@@ -64,6 +64,9 @@ class ChatViewModel {
         stepProgressTask = nil
         progressTimerTask?.cancel()
         progressTimerTask = nil
+        revealTask?.cancel()
+        revealTask = nil
+        revealComplete = false
 
         cosmicProgressSteps = []
         streamingContent = ""
@@ -122,6 +125,14 @@ class ChatViewModel {
     var pendingPostUpgradeQuery: String? = nil
     private var streamingTask: Task<Void, Never>? = nil
     private var stepProgressTask: Task<Void, Never>? = nil
+    /// Typewriter reveal task — paces .finalAnswer content into streamingContent
+    /// character-by-character so the UI shows a ChatGPT-style reveal even when
+    /// the backend emits the answer as a single blob (current Bedrock behavior).
+    /// Cancelled by tearDownGenerationState and by reduce-motion clients.
+    private var revealTask: Task<Void, Never>? = nil
+    /// Set to true once the typewriter reveal has consumed the full answer.
+    /// .done waits on this before committing the atomic flip to MarkdownTextView.
+    private var revealComplete: Bool = false
     // Tracks whether the app backgrounded mid-stream so we show retry instead of error
     private var backgroundedWhileStreaming = false
     nonisolated(unsafe) private var notificationObservers: [Any] = []
@@ -380,7 +391,13 @@ class ChatViewModel {
     /// Per docs/superpowers/plans/2026-06-28-streaming-typewriter-v2.md task 12.
     func sendMessage() async {
         let userId = userEmail
-        if AppConfig.shared.shouldStreamFor(userId: userId) {
+        let cfg = AppConfig.shared
+        let stream = cfg.shouldStreamFor(userId: userId)
+        #if DEBUG
+        let bundleVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?"
+        print("[ChatViewModel] sendMessage routing decision: stream=\(stream) | enabled=\(cfg.streamingEnabled) cohortPct=\(cfg.streamingCohortPercent) minVer=\(cfg.streamingMinAppVersion) bundleVer=\(bundleVersion) versionAllowed=\(cfg.versionAllowed) inCohort=\(cfg.inCohort(userId)) UI_TEST_MODE=\(ProcessInfo.processInfo.environment["UI_TEST_MODE"] ?? "nil") userId=\(userId)")
+        #endif
+        if stream {
             await sendMessageStreaming()
         } else {
             await sendMessageSync()
@@ -684,11 +701,17 @@ class ChatViewModel {
     /// atomic flip into the persisted bubble happens in commitFinalAnswer
     /// (called from the single .done handler).
     func sendMessageStreaming() async {
+        print("[STREAM] step 1 — entered sendMessageStreaming")
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty, !isLoading, !isStreaming else { return }
+        guard !query.isEmpty, !isLoading, !isStreaming else {
+            print("[STREAM] EARLY-RETURN guard@694: empty=\(query.isEmpty) isLoading=\(isLoading) isStreaming=\(isStreaming)")
+            return
+        }
+        print("[STREAM] step 2 — past guard, query='\(query.prefix(40))'")
 
         // Re-entry safety: tear down any prior generation cleanly.
         tearDownGenerationState(reason: .sendReentry)
+        print("[STREAM] step 3 — past tearDown")
 
         // Short label for the user bubble; full query still goes to LLM.
         let displayContent = pendingDisplayLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? query
@@ -704,9 +727,12 @@ class ChatViewModel {
         let currentEmail = userEmail
 
         // Verify quota with backend BEFORE inserting the user bubble (mirrors sync path).
+        print("[STREAM] step 4 — about to call canAccessFeature")
         do {
             let accessResponse = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: currentEmail)
+            print("[STREAM] step 5 — quota returned canAccess=\(accessResponse.canAccess) reason=\(accessResponse.reason ?? "nil")")
             if !accessResponse.canAccess {
+                print("[STREAM] EARLY-RETURN quota denied reason=\(accessResponse.reason ?? "nil")")
                 isLoading = false
                 pendingPostUpgradeQuery = query
                 quotaError = QuotaErrorInfo(
@@ -749,14 +775,17 @@ class ChatViewModel {
                 return
             }
         } catch {
-            print("Quota check failed: \(error)")
+            print("[STREAM] quota check threw: \(error)")
         }
+        print("[STREAM] step 6 — past quota check")
 
         guard let birthData = loadBirthData() else {
+            print("[STREAM] EARLY-RETURN loadBirthData returned nil")
             errorMessage = "Please complete your birth data first"
             isLoading = false
             return
         }
+        print("[STREAM] step 7 — birthData ok, building request")
 
         let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
         let responseLength = UserDefaults.standard.string(forKey: "userResponseLength") ?? "detailed"
@@ -776,6 +805,7 @@ class ChatViewModel {
         )
         dataManager.context.insert(userMessage)
         dataManager.context.insert(streamingMsg)
+        print("[STREAM] step 8 — inserted user + streaming msgs into SwiftData context")
         if HistorySettingsManager.shared.isHistoryEnabled {
             dataManager.saveMessage(userMessage)
         }
@@ -783,6 +813,7 @@ class ChatViewModel {
         windowManager.append(userMessage)
         messages.append(streamingMsg)
         windowManager.append(streamingMsg)
+        print("[STREAM] step 9 — appended to messages array + windowManager")
 
         let request = PredictionRequest(
             query: query,
@@ -795,16 +826,24 @@ class ChatViewModel {
             responseLength: responseLength,
             profileId: ProfileContextManager.shared.activeProfileId
         )
+        print("[STREAM] step 10 — built PredictionRequest")
 
         isLoading = false
         isStreaming = true
         cosmicProgressSteps = []
         startCosmicProgressTimer()
+        print("[STREAM] step 11 — set isStreaming=true, started cosmic timer")
 
         let idempotencyKey = UUID().uuidString
+        print("[STREAM] step 12 — about to spawn streamingTask")
 
         streamingTask = Task { [weak self] in
-            guard let self else { return }
+            print("[StreamingTask] Task body began — self=\(self == nil ? "nil" : "alive")")
+            guard let self else {
+                print("[StreamingTask] ABORTED — weak self was nil; VM deallocated before Task ran")
+                return
+            }
+            print("[StreamingTask] entered — about to open SSE stream")
             // 30 Hz coalescer note: the Bedrock backend currently emits the
             // final answer as a single .finalAnswer event, so the coalescer
             // runs effectively once. When token-level streaming lands
@@ -817,14 +856,33 @@ class ChatViewModel {
                     idempotencyKey: idempotencyKey
                 ) { [weak self] event in
                     guard let self else { return }
+                    #if DEBUG
+                    switch event {
+                    case .thought: print("[StreamingTask] event=.thought")
+                    case .action: print("[StreamingTask] event=.action")
+                    case .observation: print("[StreamingTask] event=.observation")
+                    case .progressStep: print("[StreamingTask] event=.progressStep")
+                    case .finalAnswer: print("[StreamingTask] event=.finalAnswer")
+                    case .answer: print("[StreamingTask] event=.answer")
+                    case .done: print("[StreamingTask] event=.done")
+                    case .error(let msg): print("[StreamingTask] event=.error msg=\(msg)")
+                    case .backpressure(let r): print("[StreamingTask] event=.backpressure retry=\(r)s")
+                    }
+                    #endif
                     Task { @MainActor in
                         switch event {
                         case .thought, .action, .observation, .progressStep:
                             self.handleProgressEvent(event)
                         case .finalAnswer(let content):
+                            // Start the client-side typewriter reveal immediately.
+                            // Bedrock currently emits the full answer as a single
+                            // .finalAnswer blob, so without this the user would see
+                            // cosmic progress → entire bubble appears at once. The
+                            // reveal paces the text at ~120 chars/sec for a
+                            // ChatGPT/Gemini feel. When backend token streaming lands,
+                            // this same accumulator gets fed incrementally.
                             accumulatedAnswer = content
-                            // Force-flush — only writes streamingContent, NOT messages[idx].content.
-                            self.streamingContent = accumulatedAnswer
+                            self.startTypewriterReveal(fullText: content, streamingMsgId: streamingMsg.id)
                         case .answer(let response):
                             // Capture full response for the single atomic flip in .done.
                             self.pendingFinalResponse = response
@@ -841,6 +899,10 @@ class ChatViewModel {
                                 await self.sendMessageSync()
                                 return
                             }
+                            // Wait for the typewriter reveal to finish before flipping
+                            // to the persisted MarkdownTextView path — otherwise the
+                            // user sees the reveal truncate halfway and snap to formatted.
+                            await self.waitForRevealCompletion()
                             await self.commitFinalAnswer(
                                 streamingMsgId: streamingMsg.id,
                                 response: self.pendingFinalResponse
@@ -860,21 +922,101 @@ class ChatViewModel {
                     }
                 }
             } catch is CancellationError {
+                #if DEBUG
+                print("[StreamingTask] CancellationError — discarded partial")
+                #endif
                 // Stop button or teardown — discard partial; banner shows lastSentQuery.
                 self.tearDownGenerationState(reason: .userStop)
                 self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
             } catch let quota as QuotaExhaustedError {
+                #if DEBUG
+                print("[StreamingTask] QuotaExhaustedError reason=\(quota.reason)")
+                #endif
                 await self.handleQuotaErrorFromStream(
                     quota: quota,
                     streamingMsgId: streamingMsg.id,
                     userMessage: userMessage
                 )
             } catch {
+                #if DEBUG
+                print("[StreamingTask] FALLBACK-TO-SYNC error=\(error) localizedDescription=\(error.localizedDescription)")
+                #endif
                 // Transparent fallback to sync /predict.
                 self.tearDownGenerationState(reason: .userStop)
                 self.inputText = query
                 await self.sendMessageSync()
             }
+        }
+    }
+
+    // MARK: - Client-side Typewriter Reveal
+
+    /// Pace `fullText` into `streamingContent` character-by-character so the
+    /// UI shows a smooth reveal even when the backend emits the answer as a
+    /// single `.finalAnswer` blob (current Bedrock behavior — see Task 12).
+    ///
+    /// Rate: ~120 chars/sec (~8 chars per 66ms tick on a 15Hz timeline).
+    /// This is faster than typical human typing (~40–60 wpm = ~300 chars/min)
+    /// and slower than an instant paste — it reads as "AI is composing" without
+    /// dragging out 1KB+ answers to >10 seconds.
+    ///
+    /// Cancellable via `revealTask?.cancel()` (called by `tearDownGenerationState`
+    /// on user-stop / thread-switch / etc.). Honors Reduce Motion by skipping
+    /// the reveal entirely and showing the full text immediately.
+    @MainActor
+    private func startTypewriterReveal(fullText: String, streamingMsgId: String) {
+        revealTask?.cancel()
+        revealComplete = false
+
+        // Reduce Motion: skip the typewriter, show full text immediately.
+        if UIAccessibility.isReduceMotionEnabled {
+            streamingContent = fullText
+            revealComplete = true
+            return
+        }
+
+        let chars = Array(fullText)
+        let total = chars.count
+        guard total > 0 else {
+            revealComplete = true
+            return
+        }
+
+        // Adaptive pacing: long answers reveal faster so the user isn't
+        // staring at a half-revealed bubble for 20s. ~120 chars/sec floor,
+        // ~400 chars/sec ceiling for very long responses.
+        let charsPerTick: Int
+        if total < 200 { charsPerTick = 4 }       // ~60 chars/sec — short answers feel deliberate
+        else if total < 1000 { charsPerTick = 8 } // ~120 chars/sec — normal
+        else if total < 3000 { charsPerTick = 16 } // ~240 chars/sec — long
+        else { charsPerTick = 32 }                 // ~480 chars/sec — very long
+
+        let tickInterval: UInt64 = 66_000_000 // 66ms → ~15Hz tick rate
+
+        revealTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            var revealed = 0
+            while revealed < total {
+                if Task.isCancelled { return }
+                let next = min(revealed + charsPerTick, total)
+                self.streamingContent = String(chars[0..<next])
+                revealed = next
+                if revealed >= total { break }
+                try? await Task.sleep(nanoseconds: tickInterval)
+            }
+            self.revealComplete = true
+        }
+    }
+
+    /// Wait until the typewriter reveal has consumed the full `.finalAnswer`
+    /// text, so `.done` doesn't flip to `MarkdownTextView` mid-reveal.
+    /// Polls every 50ms. Returns immediately if reveal is already done.
+    /// Bounded at 30s as a safety valve so a stuck reveal never blocks `.done`.
+    @MainActor
+    private func waitForRevealCompletion() async {
+        let deadline = Date().addingTimeInterval(30)
+        while !revealComplete && Date() < deadline {
+            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
         }
     }
 
