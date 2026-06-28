@@ -493,11 +493,17 @@ struct ChatView: View {
             .scrollDismissesKeyboard(.interactively)
             .coordinateSpace(name: "chatScroll")
             .onPreferenceChange(ChatScrollOffsetKey.self) { newOffset in
-                // Treat the user as "scrolled away" if the bottom of the
-                // content list is more than 100pt above the visible bottom
-                // (i.e. the user has scrolled up to read prior context).
-                // The exact threshold is forgiving; under-scrolling is
-                // the safer failure mode (we still pin to top on .done).
+                // Treat the user as "scrolled away" only on REAL scrolling.
+                // During streaming, cosmic-progress reveal + token-by-token
+                // text growth cause content-driven offset changes that the
+                // PreferenceKey can't distinguish from user drags. To avoid
+                // false-latching during generation, suppress detection while
+                // a stream is active. The reset on Send (above) clears the
+                // latch each new conversation turn.
+                guard !viewModel.isStreaming else {
+                    lastContentOffset = newOffset
+                    return
+                }
                 let scrollDelta = lastContentOffset - newOffset
                 if abs(scrollDelta) > 5 {
                     userScrolledAway = scrollDelta > 0 && newOffset < (UIScreen.main.bounds.height - 100)
@@ -521,7 +527,11 @@ struct ChatView: View {
             // ChatHeader (which is a sibling view above the ScrollView in
             // the parent VStack).
             .onChange(of: pinToTopTrigger) { _, _ in
-                guard let id = pinToTopMessageId else { return }
+                guard let id = pinToTopMessageId else {
+                    print("[SCROLL] pinToTopTrigger fired but pinToTopMessageId is nil — abort")
+                    return
+                }
+                print("[SCROLL] pinToTopTrigger fired → scrolling to message id=\(id) anchor=.top")
                 withAnimation(.easeOut(duration: 0.3)) {
                     proxy.scrollTo(id, anchor: .top)
                 }
@@ -544,6 +554,11 @@ struct ChatView: View {
                 let appendedSuffix = viewModel.messages.suffix(newCount - oldCount)
                 if let userMsg = appendedSuffix.first(where: { $0.role == MessageRole.user.rawValue }) {
                     pinToTopMessageId = userMsg.id
+                    // The user just tapped Send — reset the userScrolledAway
+                    // latch. Content-driven layout shifts during cosmic
+                    // progress can wrongly latch this true; resetting on
+                    // Send guarantees the upcoming first-token pin fires.
+                    userScrolledAway = false
                     // Defer slightly so SwiftUI commits the new rows before
                     // we measure & scroll to the id.
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -580,12 +595,21 @@ struct ChatView: View {
             // which now functions as a safety net. After this, no further
             // auto-scroll observers chase streamingContent growth — the
             // viewport stays put so the user reads top-down naturally.
+            //
+            // NOTE: we deliberately do NOT honor userScrolledAway here. During
+            // the cosmic-progress phase the PreferenceKey offset reader can
+            // misread content-driven layout changes as user-initiated scroll,
+            // latching userScrolledAway=true even when the user is sitting
+            // still. The first-token moment is the most important UX beat —
+            // we always pin. If the user has genuinely scrolled away during
+            // generation, the absent chase-observer keeps the viewport where
+            // they put it after this pin (no further auto-scrolls).
             .onChange(of: viewModel.streamingContent.isEmpty) { wasEmpty, isEmpty in
+                print("[SCROLL] streamingContent.isEmpty: \(wasEmpty) → \(isEmpty), userScrolledAway=\(userScrolledAway), pinToTopMessageId=\(pinToTopMessageId ?? "nil")")
                 guard wasEmpty == true && isEmpty == false else { return }
-                if !userScrolledAway {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                        pinToTopTrigger = UUID()
-                    }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    print("[SCROLL] first-token pin firing (ignoring userScrolledAway)")
+                    pinToTopTrigger = UUID()
                 }
             }
             // Follow-up suggestion pills appear AFTER the answer is fully
