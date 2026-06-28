@@ -862,6 +862,7 @@ class ChatViewModel {
                     case .action: print("[StreamingTask] event=.action")
                     case .observation: print("[StreamingTask] event=.observation")
                     case .progressStep: print("[StreamingTask] event=.progressStep")
+                    case .token: print("[StreamingTask] event=.token")
                     case .finalAnswer: print("[StreamingTask] event=.finalAnswer")
                     case .answer: print("[StreamingTask] event=.answer")
                     case .done: print("[StreamingTask] event=.done")
@@ -873,16 +874,44 @@ class ChatViewModel {
                         switch event {
                         case .thought, .action, .observation, .progressStep:
                             self.handleProgressEvent(event)
+                        case .token(let chunk):
+                            // Real per-token SSE path. Append the chunk into the
+                            // accumulator and mirror straight into streamingContent —
+                            // no client-side typewriter because the backend is pacing
+                            // the tokens. Cancel any stale typewriter task defensively
+                            // (e.g. from a malformed mixed stream where a .finalAnswer
+                            // landed before tokens) so the two don't race.
+                            self.revealTask?.cancel()
+                            self.revealComplete = true
+                            accumulatedAnswer += chunk
+                            // On the FIRST token: hide cosmic progress and pin the
+                            // user's question to the top so the answer has full
+                            // screen real estate to grow into. After this, no further
+                            // auto-scroll — the user reads top-down naturally.
+                            if !self.cosmicProgressSteps.isEmpty {
+                                self.cosmicProgressSteps = []
+                                self.stepProgressTask?.cancel(); self.stepProgressTask = nil
+                                self.progressTimerTask?.cancel(); self.progressTimerTask = nil
+                            }
+                            self.streamingContent = accumulatedAnswer
                         case .finalAnswer(let content):
-                            // Start the client-side typewriter reveal immediately.
-                            // Bedrock currently emits the full answer as a single
-                            // .finalAnswer blob, so without this the user would see
-                            // cosmic progress → entire bubble appears at once. The
-                            // reveal paces the text at ~120 chars/sec for a
-                            // ChatGPT/Gemini feel. When backend token streaming lands,
-                            // this same accumulator gets fed incrementally.
-                            accumulatedAnswer = content
-                            self.startTypewriterReveal(fullText: content, streamingMsgId: streamingMsg.id)
+                            // Two paths:
+                            //  (a) Backends that already streamed tokens — accumulatedAnswer
+                            //      is populated. Reconcile to the server's canonical text
+                            //      (in case of post-trim) but DO NOT replay the typewriter.
+                            //  (b) Backends that only emit a single .finalAnswer blob
+                            //      (e.g. flag rollback). Fall back to the existing
+                            //      typewriter reveal so users still get a paced reveal.
+                            if accumulatedAnswer.isEmpty {
+                                accumulatedAnswer = content
+                                self.startTypewriterReveal(fullText: content, streamingMsgId: streamingMsg.id)
+                            } else {
+                                if content != accumulatedAnswer {
+                                    accumulatedAnswer = content
+                                    self.streamingContent = content
+                                }
+                                self.revealComplete = true
+                            }
                         case .answer(let response):
                             // Capture full response for the single atomic flip in .done.
                             self.pendingFinalResponse = response
@@ -892,8 +921,13 @@ class ChatViewModel {
                             // a stream error and fall back to sync /predict instead of
                             // letting commitFinalAnswer silently early-return and leave
                             // the streaming bubble on screen.
+                            //
+                            // Tightened: also require streamingContent to be empty so a
+                            // token-only stream that lost its `.answer` frame doesn't
+                            // silently commit an empty message.
                             if self.pendingFinalResponse == nil &&
-                               (self.messages.first(where: { $0.id == streamingMsg.id })?.content.isEmpty ?? true) {
+                               (self.messages.first(where: { $0.id == streamingMsg.id })?.content.isEmpty ?? true) &&
+                               self.streamingContent.isEmpty {
                                 self.tearDownGenerationState(reason: .userStop)
                                 self.inputText = query
                                 await self.sendMessageSync()

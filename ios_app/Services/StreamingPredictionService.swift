@@ -29,6 +29,11 @@ class StreamingPredictionService {
         case action(step: Int, tool: String, display: String)
         case observation(step: Int, display: String)
         case progressStep(phase: String, group: Int, groupCount: Int, isDone: Bool, displayKey: String?, elapsedMs: Int)
+        // Real per-token streaming frame emitted by the backend during final
+        // synthesis. iOS appends each chunk to streamingContent live; on
+        // backends that don't emit `.token`, the existing `.finalAnswer`
+        // typewriter fallback (see ChatViewModel) still works unchanged.
+        case token(content: String)
         case finalAnswer(content: String)
         case answer(response: PredictionResponse)
         case done(totalSteps: Int)
@@ -237,6 +242,12 @@ class StreamingPredictionService {
                 displayKey: json["display_key"] as? String,
                 elapsedMs:  json["elapsed_ms"]  as? Int    ?? 0
             )
+
+        case "token":
+            // Per-token SSE frame: { "content": "..." }. Backend may emit
+            // many of these per answer. ChatViewModel appends each chunk
+            // into streamingContent live (no client-side typewriter).
+            return .token(content: json["content"] as? String ?? "")
 
         case "final_answer":
             return .finalAnswer(

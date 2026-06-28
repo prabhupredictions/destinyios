@@ -574,6 +574,20 @@ struct ChatView: View {
                     }
                 }
             }
+            // First-token / first-typewriter-char: pin the user's question to
+            // the top the moment ANY answer text lands on screen. This is the
+            // "real" pin — earlier than the isStreaming-false handler above,
+            // which now functions as a safety net. After this, no further
+            // auto-scroll observers chase streamingContent growth — the
+            // viewport stays put so the user reads top-down naturally.
+            .onChange(of: viewModel.streamingContent.isEmpty) { wasEmpty, isEmpty in
+                guard wasEmpty == true && isEmpty == false else { return }
+                if !userScrolledAway {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        pinToTopTrigger = UUID()
+                    }
+                }
+            }
             // Follow-up suggestion pills appear AFTER the answer is fully
             // rendered. They live below the answer, so a small bottom-scroll
             // is correct UX (mirrors what the user would scroll themselves

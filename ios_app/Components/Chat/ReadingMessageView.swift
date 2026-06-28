@@ -30,9 +30,12 @@ struct ReadingMessageView: View {
         VStack(alignment: .leading, spacing: 0) {
 
             // Cosmic progress (fades in step by step during streaming, hidden
-            // once the typewriter has any text — no need for two indicators).
-            if cosmicProgressSteps.contains(where: { !$0.text.isEmpty }) {
+            // the moment ANY answer text is on screen — token-stream or
+            // typewriter — so the user never sees the progress card lingering
+            // above the growing answer).
+            if displayContent.isEmpty && cosmicProgressSteps.contains(where: { !$0.text.isEmpty }) {
                 CosmicProgressView(steps: cosmicProgressSteps)
+                    .transition(.opacity)
             }
 
             // Reading body — rendered markdown, SF Pro Text 16px.
