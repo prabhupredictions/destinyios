@@ -8,26 +8,46 @@ struct ReadingMessageView: View {
     let userQuery: String
     let cosmicProgressSteps: [CosmicProgressStep]
     let isStreaming: Bool
+    /// During streaming, the typewriter-revealed prefix of the answer (fed by
+    /// ChatViewModel.streamingContent). Renders as live markdown so the user
+    /// sees **bold**/headers/lists formatting appear as the text grows.
+    /// On `.done`, ChatViewModel commits the full text to `message.content`
+    /// and clears `streamingContent` — this view then renders `message.content`
+    /// without re-parsing because the same MarkdownTextView instance receives
+    /// the same final string at that instant.
+    let streamingContent: String?
 
     @State private var showCopied = false
+
+    /// What to render in the body. During the stream we show the typewriter
+    /// buffer (live markdown); after `.done` we show the persisted content.
+    private var displayContent: String {
+        if isStreaming, let s = streamingContent, !s.isEmpty { return s }
+        return message.content
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-            // Cosmic progress (fades in step by step during streaming)
-            CosmicProgressView(steps: cosmicProgressSteps)
+            // Cosmic progress (fades in step by step during streaming, hidden
+            // once the typewriter has any text — no need for two indicators).
+            if cosmicProgressSteps.contains(where: { !$0.text.isEmpty }) {
+                CosmicProgressView(steps: cosmicProgressSteps)
+            }
 
-            // Reading body — rendered markdown, SF Pro Text 16px
-            if !message.content.isEmpty && !isStreaming {
+            // Reading body — rendered markdown, SF Pro Text 16px.
+            // Shown during streaming (typewriter buffer) AND after .done
+            // (persisted content). The transition is just a content swap;
+            // no opacity flash because the view is already on screen.
+            if !displayContent.isEmpty {
                 MarkdownTextView(
-                    content: message.content,
+                    content: displayContent,
                     textColor: Color.white.opacity(0.92),
                     fontSize: 16
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityIdentifier("reading_body_text")
                 .padding(.bottom, 2)
-                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
 
             // Depth layers and footer — only once streaming is done
@@ -82,7 +102,6 @@ struct ReadingMessageView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .animation(.easeIn(duration: 0.5), value: isStreaming)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Destiny said: \(message.content)")
         .accessibilityIdentifier("reading_entry")

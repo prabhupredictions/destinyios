@@ -71,7 +71,8 @@ struct MessageBubble: View {
                 message: message,
                 userQuery: userQuery,
                 cosmicProgressSteps: cosmicProgressSteps,
-                isStreaming: message.isStreaming
+                isStreaming: message.isStreaming,
+                streamingContent: streamingContent
             )
             .accessibilityIdentifier("chat_assistant_final_bubble")
         }

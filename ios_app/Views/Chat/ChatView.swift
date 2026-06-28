@@ -442,24 +442,25 @@ struct ChatView: View {
                             .padding(.bottom, 8)
                         }
                         ForEach(visibleMessages) { message in
-                            if message.isStreaming && message.content.isEmpty {
-                                // Path A — transient streaming bubble (plain Text).
-                                // Never feeds MarkdownTextView. The .done handler in
-                                // ChatViewModel flips isStreaming to false and commits
-                                // the final answer; the next render uses Path B.
-                                StreamingBubbleView(text: viewModel.streamingContent)
-                                    .id(message.id)
-                            } else {
-                                // Path B — persisted bubble (markdown).
-                                MessageBubble(
-                                    message: message,
-                                    userQuery: userQueryLookup[message.id] ?? "",
-                                    streamingContent: nil,
-                                    thinkingSteps: [],
-                                    cosmicProgressSteps: message.isStreaming ? viewModel.cosmicProgressSteps : []
-                                )
-                                .id(message.id)
-                            }
+                            // Single unified bubble path. During streaming, the assistant
+                            // message's `content` stays empty and `streamingContent` is
+                            // fed by the typewriter reveal — MessageBubble renders that
+                            // through MarkdownTextView so **bold**/lists/headers format
+                            // live, without a separate gold-bordered "streaming card".
+                            //
+                            // The original v1 plan used a plain-Text firewall bubble to
+                            // avoid the @MainActor isolation trap that caused 0x8BADF00D.
+                            // That trap was fixed in commit 8dc2a32 (all parse helpers
+                            // nonisolated) + LazyVStack swap. Incremental markdown is
+                            // safe at <40 KB; MarkdownTextView already caps inputs there.
+                            MessageBubble(
+                                message: message,
+                                userQuery: userQueryLookup[message.id] ?? "",
+                                streamingContent: message.isStreaming ? viewModel.streamingContent : nil,
+                                thinkingSteps: [],
+                                cosmicProgressSteps: message.isStreaming ? viewModel.cosmicProgressSteps : []
+                            )
+                            .id(message.id)
                         }
                         
                         // Inline suggested questions — only after streaming finishes

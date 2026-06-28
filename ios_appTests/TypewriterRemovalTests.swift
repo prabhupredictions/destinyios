@@ -27,7 +27,7 @@ final class TypewriterRemovalTests: XCTestCase {
                 XCTAssertFalse(
                     text.contains(sym),
                     "Banned typewriter symbol '\(sym)' found in \(url.lastPathComponent). " +
-                    "Streaming-typewriter v2 uses StreamingBubbleView, not in-bubble timers."
+                    "Streaming-typewriter v2 uses ChatViewModel.startTypewriterReveal, not in-bubble Timers."
                 )
             }
         }

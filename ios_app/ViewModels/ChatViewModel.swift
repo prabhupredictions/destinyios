@@ -982,16 +982,20 @@ class ChatViewModel {
             return
         }
 
-        // Adaptive pacing: long answers reveal faster so the user isn't
-        // staring at a half-revealed bubble for 20s. ~120 chars/sec floor,
-        // ~400 chars/sec ceiling for very long responses.
-        let charsPerTick: Int
-        if total < 200 { charsPerTick = 4 }       // ~60 chars/sec — short answers feel deliberate
-        else if total < 1000 { charsPerTick = 8 } // ~120 chars/sec — normal
-        else if total < 3000 { charsPerTick = 16 } // ~240 chars/sec — long
-        else { charsPerTick = 32 }                 // ~480 chars/sec — very long
+        // Adaptive pacing — total reveal time stays in the 3–8s window across
+        // all answer lengths so the user never waits >8s for the reveal to
+        // finish but short answers still feel deliberate. ~33ms tick = 30 Hz.
+        // Markdown re-parse cost is bounded by MarkdownTextView's 40 KB cap
+        // and `nonisolated` static helpers (commit 8dc2a32).
+        let targetSeconds: Double
+        if total < 300 { targetSeconds = 2.0 }       // short answer — quick
+        else if total < 1000 { targetSeconds = 3.5 } // normal
+        else if total < 3000 { targetSeconds = 5.0 } // long
+        else { targetSeconds = 7.0 }                  // very long — never drag past ~7s
 
-        let tickInterval: UInt64 = 66_000_000 // 66ms → ~15Hz tick rate
+        let tickInterval: UInt64 = 33_000_000 // 33ms → 30 Hz
+        let totalTicks = max(1, Int(targetSeconds / 0.033))
+        let charsPerTick = max(1, Int(ceil(Double(total) / Double(totalTicks))))
 
         revealTask = Task { @MainActor [weak self] in
             guard let self else { return }
