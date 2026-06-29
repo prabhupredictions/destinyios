@@ -962,6 +962,7 @@ class ChatViewModel {
                             }
                         case .answer(let response):
                             // Capture full response for the single atomic flip in .done.
+                            print("[FOLLOWUPS] .answer received: followUpSuggestions.count=\(response.followUpSuggestions.count) values=\(response.followUpSuggestions)")
                             self.pendingFinalResponse = response
                         case .done:
                             // C-2: defensive — if server emitted .done without ever
@@ -1152,9 +1153,26 @@ class ChatViewModel {
 
                 let backlog = totalCh - shownCh
                 let charsThisTick: Int
-                if backlog <= 2 {
-                    // Tiny backlog: pause to avoid stuttering when tokens
-                    // are arriving slower than reveal rate.
+
+                // FAST-DRAIN MODE: when the SSE stream is closed (server
+                // sent .finalAnswer or .done), no more tokens are coming.
+                // Race to the end at maximum rate so the typewriter doesn't
+                // crawl for minutes after the answer is fully received.
+                // The user complaint "took 5 min to show followups" was
+                // this exact case — Bedrock pacing the stream at ~60ch/sec
+                // matched our pump's 1-ch/tick rate, so the backlog never
+                // grew enough to trigger the >80 fast branch. Once .done
+                // arrives, we should not pace anymore — just paint the
+                // rest as fast as the renderer can take it.
+                if !self.smoothPumpStreamOpen {
+                    // Drain the remaining backlog in ≤3 frames (~50ms total)
+                    // regardless of size, so the followup pills + chrome
+                    // appear immediately after .done.
+                    charsThisTick = max(1, backlog / 2)
+                } else if backlog <= 2 {
+                    // Tiny backlog WHILE STREAM IS OPEN: pause to avoid
+                    // stuttering when tokens are arriving slower than
+                    // reveal rate.
                     try? await Task.sleep(nanoseconds: tick * 3)
                     continue
                 } else if backlog <= 20 {
