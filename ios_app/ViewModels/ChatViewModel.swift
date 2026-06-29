@@ -1131,30 +1131,36 @@ class ChatViewModel {
     // Bedrock. This pump runs at 60Hz on the main actor and reveals
     // characters into `streamingContent` at a smooth cadence.
     //
-    // Rate formula (single tier, no thresholds):
-    //   charsThisTick = max(1, ceil(backlog / DRAIN_FRAMES))
-    //
-    // Where DRAIN_FRAMES = 20 while streaming, 1 once stream closes.
-    //
-    //   - While streaming open: any backlog drains in ≤20 frames (~333ms).
-    //     A 60-char chunk lands → next tick reveals 3 chars, then 3, then
-    //     3 ... draining in ~20 frames. Steady cadence regardless of how
-    //     bursty Bedrock is.
+    // Rate model (2026-06-29):
+    //   - Target: BASE_CHARS_PER_SEC chars/sec with ±JITTER_PCT random jitter
+    //     per tick — feels like a person typing, not a robot.
+    //   - At 60Hz this is BASE_CHARS_PER_SEC/60 chars/tick (fractional);
+    //     a Double accumulator carries the remainder forward so the
+    //     long-run rate is exact.
+    //   - Catchup: if backlog exceeds MAX_BUFFER_SECONDS worth of base
+    //     rate, scale this tick's reveal by (backlog/maxBuffer) so we
+    //     never fall more than ~MAX_BUFFER_SECONDS behind Bedrock during
+    //     bursts. Without this, the older bounded-frame pump (drain in
+    //     20 frames) was needed to keep up — but it was fixed-window,
+    //     not rate-targeted. New design gives us both: human-feeling rate
+    //     normally, automatic catch-up under burst.
     //   - Stream closed (.finalAnswer or .done): drain in 1 tick. Followup
     //     pills + chrome appear within ~16ms of stream close.
-    //
-    // Previous design had threshold tiers (≤20 / ≤80 / >80) that got stuck
-    // at the slowest tier when ingestion rate (~60ch/sec) matched the
-    // pump's slow-tier rate (60ch/sec) — backlog never grew past 20,
-    // pump ran at typing-speed indefinitely, then took another 30s+ to
-    // drain after .done. The new ceil(backlog/20) formula has NO threshold
-    // — drain time is bounded by frames, not by absolute rate.
     @MainActor
     private func startSmoothPump() {
         smoothPumpTask?.cancel()
         smoothPumpTask = Task { @MainActor [weak self] in
             guard let self else { return }
             let tick: UInt64 = 16_666_667 // 60Hz
+            // Rate targets
+            let BASE_CHARS_PER_SEC: Double = 70.0
+            let TICK_HZ: Double = 60.0
+            let JITTER_PCT: Double = 0.20            // ±20%
+            let MAX_BUFFER_SECONDS: Double = 2.0     // accelerate if backlog > this many seconds of base rate
+            let basePerTick = BASE_CHARS_PER_SEC / TICK_HZ          // 1.1667
+            let maxBacklog = BASE_CHARS_PER_SEC * MAX_BUFFER_SECONDS // 140 chars
+            var fractionalAccum: Double = 0.0
+
             while !Task.isCancelled {
                 let target = self.smoothPumpTarget
                 // Use utf8 byte count instead of grapheme cluster count —
@@ -1167,16 +1173,37 @@ class ChatViewModel {
                 if shownCh >= totalCh {
                     if !self.smoothPumpStreamOpen { break }
                     // Stream still open, nothing to draw. Brief wait.
+                    fractionalAccum = 0.0  // reset so the first new char doesn't burst
                     try? await Task.sleep(nanoseconds: tick * 2)
                     continue
                 }
 
                 let backlog = totalCh - shownCh
-                // Closed: drain everything in 1 frame.
-                // Open: drain over 20 frames (~333ms) — short enough to
-                // keep up with bursts, long enough to feel smooth.
-                let drainFrames = self.smoothPumpStreamOpen ? 20 : 1
-                let charsThisTick = max(1, (backlog + drainFrames - 1) / drainFrames)
+                let charsThisTick: Int
+                if !self.smoothPumpStreamOpen {
+                    // Stream closed — flush everything in one frame so
+                    // followup chips render immediately.
+                    charsThisTick = backlog
+                } else {
+                    // Jitter: uniform in [1-JITTER_PCT, 1+JITTER_PCT]
+                    let jitter = 1.0 + Double.random(in: -JITTER_PCT...JITTER_PCT)
+                    var thisTick = basePerTick * jitter
+                    // Catchup: backlog above maxBacklog → scale up linearly
+                    if Double(backlog) > maxBacklog {
+                        thisTick *= Double(backlog) / maxBacklog
+                    }
+                    fractionalAccum += thisTick
+                    let whole = Int(fractionalAccum)
+                    fractionalAccum -= Double(whole)
+                    charsThisTick = whole
+                }
+
+                if charsThisTick == 0 {
+                    // Accumulator hasn't reached 1 yet — wait one tick
+                    // without advancing. Long-run rate stays correct.
+                    try? await Task.sleep(nanoseconds: tick)
+                    continue
+                }
 
                 let nextCount = min(shownCh + charsThisTick, totalCh)
                 // Slice safely on a utf8 byte offset that lands on a
