@@ -342,7 +342,19 @@ class ChatViewModel {
         currentThreadId = thread.id
         messages = dataManager.fetchMessages(for: thread.id)
         windowManager.replaceAll(messages)
-        
+
+        // Rehydrate follow-up suggestion pills from the LAST assistant message
+        // (if it has persisted followUps). Without this, reopening a thread
+        // from History shows the answer text but no pills until a new question
+        // is asked. The companion fix on the write side is followUps on
+        // LocalChatMessage + persistence in commitFinalAnswer.
+        if let lastAssistant = messages.reversed().first(where: { $0.messageRole == .assistant }),
+           !lastAssistant.followUps.isEmpty {
+            suggestedQuestions = lastAssistant.followUps
+        } else {
+            suggestedQuestions = []
+        }
+
         // Add welcome if empty
         if messages.isEmpty {
             addWelcomeMessage()
@@ -1181,23 +1193,63 @@ class ChatViewModel {
     /// Called only from the .done event handler in sendMessageStreaming.
     @MainActor
     private func commitFinalAnswer(streamingMsgId: String, response: PredictionResponse?) async {
-        guard let response else { return }
+        #if DEBUG
+        print("[FOLLOWUPS] commitFinalAnswer: pendingFinalResponse=\(self.pendingFinalResponse == nil ? "nil" : "set"), response.followUpSuggestions.count=\(response?.followUpSuggestions.count ?? -1)")
+        #endif
         stepProgressTask?.cancel(); stepProgressTask = nil
         progressTimerTask?.cancel(); progressTimerTask = nil
+
+        // Resolve the final content + followups. If the `.answer` SSE frame
+        // never arrived (server emitted `.done` without it), fall back to
+        // whatever the token stream / typewriter accumulated so we still
+        // commit the answer text — just with no followups. Prior behavior
+        // here was a guard-let-return that left the streaming bubble on
+        // screen AND wiped suggestedQuestions, which is what caused pills
+        // to vanish until the thread was reopened from History.
+        let finalAnswer: String
+        let finalArea: String?
+        let finalAdvice: String?
+        let finalExecutionMs: Double
+        let finalFollowUps: [String]
+        if let response {
+            finalAnswer = response.answer
+            finalArea = response.lifeArea
+            finalAdvice = response.advice
+            finalExecutionMs = response.executionTimeMs
+            finalFollowUps = response.followUpSuggestions
+        } else {
+            // Synthetic fallback: prefer the just-rendered streamingContent;
+            // if even that is empty fall back to the message bubble's current
+            // content (already committed token-by-token in some code paths).
+            let bubbleContent = messages.first(where: { $0.id == streamingMsgId })?.content ?? ""
+            let synthetic = !streamingContent.isEmpty ? streamingContent : bubbleContent
+            finalAnswer = synthetic
+            finalArea = nil
+            finalAdvice = nil
+            finalExecutionMs = 0
+            finalFollowUps = []
+            #if DEBUG
+            print("[FOLLOWUPS] commitFinalAnswer: response was nil — synthesizing commit (no followups)")
+            #endif
+        }
 
         if let idx = messages.lastIndex(where: { $0.id == streamingMsgId }) {
             // DONE-ONLY-MUTATION: the single point in this file where a streaming
             // message's content is committed. Enforced by StreamingPredictionServiceTests.
-            messages[idx].content = capPersistedContent(response.answer)
-            messages[idx].area = response.lifeArea
-            messages[idx].advice = capPersistedContent(response.advice)
-            messages[idx].executionTimeMs = response.executionTimeMs
+            messages[idx].content = capPersistedContent(finalAnswer)
+            messages[idx].area = finalArea
+            messages[idx].advice = capPersistedContent(finalAdvice)
+            messages[idx].executionTimeMs = finalExecutionMs
+            messages[idx].followUps = finalFollowUps
             messages[idx].isStreaming = false
             if HistorySettingsManager.shared.isHistoryEnabled {
                 dataManager.saveMessage(messages[idx])
             }
         }
-        suggestedQuestions = response.followUpSuggestions
+        suggestedQuestions = finalFollowUps
+        #if DEBUG
+        print("[FOLLOWUPS] suggestedQuestions set to \(finalFollowUps.count) items: \(finalFollowUps.prefix(3))")
+        #endif
         streamingContent = ""
         cosmicProgressSteps = []
         isStreaming = false

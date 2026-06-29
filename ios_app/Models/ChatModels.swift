@@ -25,7 +25,13 @@ final class LocalChatMessage {
     var isStreaming: Bool
     var executionTimeMs: Double = 0  // Prediction execution time in milliseconds
     var rating: Int? // User rating (1-5)
-    
+    // Follow-up suggestion pills shown beneath this assistant message.
+    // Persisted so reopening a thread from History rehydrates the pills
+    // (otherwise they vanish after the in-memory @Published array clears).
+    // SwiftData auto-migrates: optional default makes existing rows decode
+    // as [] without forcing a schema migration.
+    var followUps: [String] = []
+
     init(
         id: String = UUID().uuidString,
         threadId: String,
@@ -40,7 +46,8 @@ final class LocalChatMessage {
         createdAt: Date = Date(),
         isStreaming: Bool = false,
         executionTimeMs: Double = 0,
-        rating: Int? = nil
+        rating: Int? = nil,
+        followUps: [String] = []
     ) {
         self.id = id
         self.threadId = threadId
@@ -56,6 +63,7 @@ final class LocalChatMessage {
         self.isStreaming = isStreaming
         self.executionTimeMs = executionTimeMs
         self.rating = rating
+        self.followUps = followUps
     }
     
     var messageRole: MessageRole {
