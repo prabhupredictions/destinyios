@@ -22,12 +22,35 @@ final class AppStartupService {
 
     /// Internal — performs the network fetch + writes to both sinks.
     /// Caller decides whether to gate on TTL.
+    ///
+    /// Cold-start hardening (2026-06-29): Cloud Run scales to zero after
+    /// ~15 min idle; cold starts of this image take 20–60s (Docker pull +
+    /// uvicorn boot + DB pool). The previous 10s timeout lost that race on
+    /// every "open app after 1 hr" launch, leaving AppConfig.streamingEnabled
+    /// at its conservative default (false) and silently routing chat to the
+    /// legacy non-streaming path until the user signed out + back in (which
+    /// inadvertently gave Cloud Run enough wall-clock to warm). Two changes:
+    ///   1. timeoutInterval 10 → 60 (covers the cold-start window)
+    ///   2. one retry after 5s on failure (catches transient timeouts so
+    ///      the user doesn't have to sign out to recover)
     private func _fetch() async {
-        guard let url = URL(string: "\(APIConfig.baseURL)/api/v2/app/config") else { return }
+        if await _attemptFetch() { return }
+        // First attempt failed (timeout, transient 5xx, parse error). Wait
+        // 5s — by now Cloud Run has almost certainly warmed from the first
+        // request hitting the container — then try once more. If this also
+        // fails, AppConfig defaults stay in place and the next foreground
+        // transition (refreshAppConfig) re-tries.
+        try? await Task.sleep(nanoseconds: 5_000_000_000)
+        _ = await _attemptFetch()
+    }
+
+    /// One fetch attempt. Returns true on success, false on any failure.
+    private func _attemptFetch() async -> Bool {
+        guard let url = URL(string: "\(APIConfig.baseURL)/api/v2/app/config") else { return false }
         var req = URLRequest(url: url)
         req.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
         req.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
-        req.timeoutInterval = 10
+        req.timeoutInterval = 60
 
         do {
             let (data, _) = try await URLSession.shared.data(for: req)
@@ -48,9 +71,11 @@ final class AppStartupService {
                 if let minV = dto.streaming_min_app_version { AppConfig.shared.streamingMinAppVersion = minV }
                 self.lastFetchedAt = Date()
             }
+            return true
         } catch {
             // Defaults are conservative — streaming stays off on network failure.
             // Leave prior cached values intact.
+            return false
         }
     }
 
