@@ -909,16 +909,18 @@ class ChatViewModel {
                         case .thought, .action, .observation, .progressStep:
                             self.handleProgressEvent(event)
                         case .token(let chunk):
-                            // Real per-token SSE path. Bedrock emits tokens in
-                            // BURSTS (10ch, 50ms pause, 30ch, 200ms pause, ...).
-                            // If we mirror those bursts straight to the UI, the
-                            // typewriter feels chunky — a stutter the user sees
-                            // as "block, pause, block, pause". ChatGPT/Claude.ai
-                            // hide this by interpolating: the raw token stream
-                            // grows accumulatedAnswer, and a separate display
-                            // pump reveals characters at a smooth, constant rate.
-                            // We do the same — see startSmoothPump() below for
-                            // the ~60Hz ticker that drives self.streamingContent.
+                            // Real per-token SSE path. Mirror Bedrock chunks
+                            // straight to streamingContent — no separate smooth
+                            // pump. The earlier interpolated pump produced
+                            // 15-20s+ delays between the answer fully arriving
+                            // and the followup pills appearing, because the
+                            // pump's adaptive rate (60ch/sec on backlog ≤20)
+                            // got stuck at Bedrock's ingestion rate forever.
+                            // Streaming feels slightly chunky on bursty
+                            // tokens but the LLM bursts are usually small
+                            // enough that it reads as natural typewriter
+                            // cadence. Followups now appear within ~50ms of
+                            // .done as the user expects.
                             self.revealTask?.cancel()
                             self.revealComplete = true
                             accumulatedAnswer += chunk
@@ -931,18 +933,13 @@ class ChatViewModel {
                                 self.stepProgressTask?.cancel(); self.stepProgressTask = nil
                                 self.progressTimerTask?.cancel(); self.progressTimerTask = nil
                             }
-                            self.smoothPumpTarget = accumulatedAnswer
-                            self.smoothPumpStreamOpen = true
-                            if self.smoothPumpTask == nil {
-                                self.startSmoothPump()
-                            }
+                            self.streamingContent = accumulatedAnswer
                         case .finalAnswer(let content):
                             // Two paths:
                             //  (a) Backends that already streamed tokens — accumulatedAnswer
                             //      is populated. Reconcile to the server's canonical text
-                            //      (in case of post-trim) and signal the smooth pump that
-                            //      no more tokens are coming — the pump will drain to
-                            //      the final character at the same smooth rate.
+                            //      (in case of post-trim) by writing directly to
+                            //      streamingContent.
                             //  (b) Backends that only emit a single .finalAnswer blob
                             //      (e.g. flag rollback). Fall back to the existing
                             //      typewriter reveal so users still get a paced reveal.
@@ -952,12 +949,8 @@ class ChatViewModel {
                             } else {
                                 if content != accumulatedAnswer {
                                     accumulatedAnswer = content
+                                    self.streamingContent = content
                                 }
-                                // Tell the smooth pump this is the canonical final text,
-                                // then close the stream so the pump drains to the end
-                                // at the normal rate (no jumpy reveal).
-                                self.smoothPumpTarget = accumulatedAnswer
-                                self.smoothPumpStreamOpen = false
                                 self.revealComplete = true
                             }
                         case .answer(let response):
@@ -982,15 +975,16 @@ class ChatViewModel {
                                 await self.sendMessageSync()
                                 return
                             }
-                            // Close the smooth pump's stream window so it knows no more
-                            // tokens are coming and can drain to the final char.
+                            // Close the smooth pump's stream window so any
+                            // legacy in-flight pump task can drain. With the
+                            // direct-mirror token path, there is normally no
+                            // pump running — this is a no-op safety net.
                             self.smoothPumpStreamOpen = false
-                            // Wait for the typewriter / smooth pump to finish revealing
-                            // before flipping to the persisted MarkdownTextView path —
-                            // otherwise the user sees the reveal truncate halfway and
-                            // snap to formatted.
+                            // Wait for the typewriter reveal (legacy single-blob
+                            // path) to finish before flipping to the persisted
+                            // MarkdownTextView. For the streamed path,
+                            // revealComplete is already true so this is a no-op.
                             await self.waitForRevealCompletion()
-                            await self.waitForSmoothPumpDrain()
                             await self.commitFinalAnswer(
                                 streamingMsgId: streamingMsg.id,
                                 response: self.pendingFinalResponse
