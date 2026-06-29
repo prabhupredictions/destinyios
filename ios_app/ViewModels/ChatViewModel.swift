@@ -67,6 +67,10 @@ class ChatViewModel {
         revealTask?.cancel()
         revealTask = nil
         revealComplete = false
+        smoothPumpTask?.cancel()
+        smoothPumpTask = nil
+        smoothPumpTarget = ""
+        smoothPumpStreamOpen = false
 
         cosmicProgressSteps = []
         streamingContent = ""
@@ -133,6 +137,24 @@ class ChatViewModel {
     /// Set to true once the typewriter reveal has consumed the full answer.
     /// .done waits on this before committing the atomic flip to MarkdownTextView.
     private var revealComplete: Bool = false
+
+    // MARK: - Smooth pump state (real-streaming display interpolation)
+    //
+    // Bedrock emits tokens in bursts (10ch, 50ms pause, 30ch, 200ms pause, ...).
+    // If the .token handler writes `streamingContent = accumulatedAnswer`
+    // synchronously on each chunk, the typewriter looks chunky — the user sees
+    // a block of text, then a pause, then another block. ChatGPT/Claude.ai
+    // hide this with display interpolation: tokens grow a TARGET string, but
+    // a separate display pump reveals characters at a smooth ~60Hz rate. We
+    // do the same. See startSmoothPump() for the rate-adaptive logic.
+    private var smoothPumpTask: Task<Void, Never>? = nil
+    /// The latest target text from the .token / .finalAnswer accumulator.
+    /// The pump never reads beyond this — once it reaches the end, it parks.
+    private var smoothPumpTarget: String = ""
+    /// True while the SSE stream is open (tokens still arriving). Goes false
+    /// on .finalAnswer or .done. When false AND pump has reached the target,
+    /// the pump exits.
+    private var smoothPumpStreamOpen: Bool = false
     // Tracks whether the app backgrounded mid-stream so we show retry instead of error
     private var backgroundedWhileStreaming = false
     nonisolated(unsafe) private var notificationObservers: [Any] = []
@@ -875,12 +897,16 @@ class ChatViewModel {
                         case .thought, .action, .observation, .progressStep:
                             self.handleProgressEvent(event)
                         case .token(let chunk):
-                            // Real per-token SSE path. Append the chunk into the
-                            // accumulator and mirror straight into streamingContent —
-                            // no client-side typewriter because the backend is pacing
-                            // the tokens. Cancel any stale typewriter task defensively
-                            // (e.g. from a malformed mixed stream where a .finalAnswer
-                            // landed before tokens) so the two don't race.
+                            // Real per-token SSE path. Bedrock emits tokens in
+                            // BURSTS (10ch, 50ms pause, 30ch, 200ms pause, ...).
+                            // If we mirror those bursts straight to the UI, the
+                            // typewriter feels chunky — a stutter the user sees
+                            // as "block, pause, block, pause". ChatGPT/Claude.ai
+                            // hide this by interpolating: the raw token stream
+                            // grows accumulatedAnswer, and a separate display
+                            // pump reveals characters at a smooth, constant rate.
+                            // We do the same — see startSmoothPump() below for
+                            // the ~60Hz ticker that drives self.streamingContent.
                             self.revealTask?.cancel()
                             self.revealComplete = true
                             accumulatedAnswer += chunk
@@ -893,12 +919,18 @@ class ChatViewModel {
                                 self.stepProgressTask?.cancel(); self.stepProgressTask = nil
                                 self.progressTimerTask?.cancel(); self.progressTimerTask = nil
                             }
-                            self.streamingContent = accumulatedAnswer
+                            self.smoothPumpTarget = accumulatedAnswer
+                            self.smoothPumpStreamOpen = true
+                            if self.smoothPumpTask == nil {
+                                self.startSmoothPump()
+                            }
                         case .finalAnswer(let content):
                             // Two paths:
                             //  (a) Backends that already streamed tokens — accumulatedAnswer
                             //      is populated. Reconcile to the server's canonical text
-                            //      (in case of post-trim) but DO NOT replay the typewriter.
+                            //      (in case of post-trim) and signal the smooth pump that
+                            //      no more tokens are coming — the pump will drain to
+                            //      the final character at the same smooth rate.
                             //  (b) Backends that only emit a single .finalAnswer blob
                             //      (e.g. flag rollback). Fall back to the existing
                             //      typewriter reveal so users still get a paced reveal.
@@ -908,8 +940,12 @@ class ChatViewModel {
                             } else {
                                 if content != accumulatedAnswer {
                                     accumulatedAnswer = content
-                                    self.streamingContent = content
                                 }
+                                // Tell the smooth pump this is the canonical final text,
+                                // then close the stream so the pump drains to the end
+                                // at the normal rate (no jumpy reveal).
+                                self.smoothPumpTarget = accumulatedAnswer
+                                self.smoothPumpStreamOpen = false
                                 self.revealComplete = true
                             }
                         case .answer(let response):
@@ -933,10 +969,15 @@ class ChatViewModel {
                                 await self.sendMessageSync()
                                 return
                             }
-                            // Wait for the typewriter reveal to finish before flipping
-                            // to the persisted MarkdownTextView path — otherwise the
-                            // user sees the reveal truncate halfway and snap to formatted.
+                            // Close the smooth pump's stream window so it knows no more
+                            // tokens are coming and can drain to the final char.
+                            self.smoothPumpStreamOpen = false
+                            // Wait for the typewriter / smooth pump to finish revealing
+                            // before flipping to the persisted MarkdownTextView path —
+                            // otherwise the user sees the reveal truncate halfway and
+                            // snap to formatted.
                             await self.waitForRevealCompletion()
+                            await self.waitForSmoothPumpDrain()
                             await self.commitFinalAnswer(
                                 streamingMsgId: streamingMsg.id,
                                 response: self.pendingFinalResponse
@@ -1054,6 +1095,84 @@ class ChatViewModel {
     private func waitForRevealCompletion() async {
         let deadline = Date().addingTimeInterval(30)
         while !revealComplete && Date() < deadline {
+            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        }
+    }
+
+    // MARK: - Smooth Pump (rate-adaptive display interpolation)
+    //
+    // The .token handler feeds `smoothPumpTarget` raw (bursty) text from
+    // Bedrock. This pump runs at ~60Hz on the main actor and reveals
+    // characters into `streamingContent` at a smooth, ADAPTIVE rate:
+    //
+    //   - If the unrevealed backlog is tiny (≤2 chars), pause briefly so
+    //     the reveal doesn't outpace incoming tokens and stutter.
+    //   - If the backlog is small (≤20 chars), reveal 1 char/tick — slow,
+    //     human-typing-speed feel (~60 chars/sec).
+    //   - If the backlog is medium (≤80 chars), reveal 2 chars/tick — keeps
+    //     pace with most Bedrock burst rates (~120 chars/sec).
+    //   - If the backlog is large (>80 chars), reveal up to N/40 chars/tick
+    //     so we drain backlogs >1.5s in ≤1.5s — prevents the visible reveal
+    //     from falling far behind the actual completion.
+    //
+    // When the stream closes (.finalAnswer / .done set smoothPumpStreamOpen
+    // = false), the pump drains to the end and exits. waitForSmoothPumpDrain()
+    // is the .done waiter equivalent of waitForRevealCompletion().
+    @MainActor
+    private func startSmoothPump() {
+        smoothPumpTask?.cancel()
+        smoothPumpTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            let tick: UInt64 = 16_666_667 // ~60Hz (1/60 s in ns)
+            while !Task.isCancelled {
+                let target = self.smoothPumpTarget
+                let shown = self.streamingContent
+                let totalCh = target.count
+                let shownCh = shown.count
+
+                if shownCh >= totalCh {
+                    // Caught up to target. If stream is closed, we're done.
+                    if !self.smoothPumpStreamOpen { break }
+                    // Otherwise wait briefly for more tokens.
+                    try? await Task.sleep(nanoseconds: tick * 2)
+                    continue
+                }
+
+                let backlog = totalCh - shownCh
+                let charsThisTick: Int
+                if backlog <= 2 {
+                    // Tiny backlog: pause to avoid stuttering when tokens
+                    // are arriving slower than reveal rate.
+                    try? await Task.sleep(nanoseconds: tick * 3)
+                    continue
+                } else if backlog <= 20 {
+                    charsThisTick = 1
+                } else if backlog <= 80 {
+                    charsThisTick = 2
+                } else {
+                    // Drain large backlogs proportionally — at 60Hz with
+                    // N/40 chars/tick, an 800-char backlog drains in ~0.33s.
+                    charsThisTick = max(3, backlog / 40)
+                }
+
+                let nextCount = min(shownCh + charsThisTick, totalCh)
+                // String.prefix is O(n) on Substring index walk; for our
+                // sizes (≤40 KB MarkdownTextView cap) this is fine.
+                self.streamingContent = String(target.prefix(nextCount))
+
+                try? await Task.sleep(nanoseconds: tick)
+            }
+            self.smoothPumpTask = nil
+        }
+    }
+
+    /// Wait for the smooth pump to drain to the end of the target before
+    /// committing the final message. Mirrors waitForRevealCompletion's role
+    /// for the legacy single-blob typewriter path.
+    @MainActor
+    private func waitForSmoothPumpDrain() async {
+        let deadline = Date().addingTimeInterval(30)
+        while smoothPumpTask != nil && Date() < deadline {
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
         }
     }
