@@ -909,18 +909,18 @@ class ChatViewModel {
                         case .thought, .action, .observation, .progressStep:
                             self.handleProgressEvent(event)
                         case .token(let chunk):
-                            // Real per-token SSE path. Mirror Bedrock chunks
-                            // straight to streamingContent — no separate smooth
-                            // pump. The earlier interpolated pump produced
-                            // 15-20s+ delays between the answer fully arriving
-                            // and the followup pills appearing, because the
-                            // pump's adaptive rate (60ch/sec on backlog ≤20)
-                            // got stuck at Bedrock's ingestion rate forever.
-                            // Streaming feels slightly chunky on bursty
-                            // tokens but the LLM bursts are usually small
-                            // enough that it reads as natural typewriter
-                            // cadence. Followups now appear within ~50ms of
-                            // .done as the user expects.
+                            // Real per-token SSE path. Tokens grow the target
+                            // buffer; the smooth pump drives streamingContent
+                            // at a controlled 60Hz cadence so bursty Bedrock
+                            // chunks read as a steady typewriter — but the
+                            // pump rate is "drain backlog in ≤333ms" so it
+                            // catches up the moment new chunks arrive AND
+                            // commits to the final char within one frame of
+                            // .done. Combined with the .finalAnswer
+                            // reconciliation below (which strips the
+                            // FOLLOW_UP_QUESTIONS: marker block from any
+                            // already-revealed text), followups land
+                            // immediately after the typewriter finishes.
                             self.revealTask?.cancel()
                             self.revealComplete = true
                             accumulatedAnswer += chunk
@@ -933,7 +933,11 @@ class ChatViewModel {
                                 self.stepProgressTask?.cancel(); self.stepProgressTask = nil
                                 self.progressTimerTask?.cancel(); self.progressTimerTask = nil
                             }
-                            self.streamingContent = accumulatedAnswer
+                            self.smoothPumpTarget = accumulatedAnswer
+                            self.smoothPumpStreamOpen = true
+                            if self.smoothPumpTask == nil {
+                                self.startSmoothPump()
+                            }
                         case .finalAnswer(let content):
                             // Two paths:
                             //  (a) Backends that already streamed tokens — accumulatedAnswer
@@ -947,10 +951,25 @@ class ChatViewModel {
                                 accumulatedAnswer = content
                                 self.startTypewriterReveal(fullText: content, streamingMsgId: streamingMsg.id)
                             } else {
-                                if content != accumulatedAnswer {
-                                    accumulatedAnswer = content
+                                // Server may have stripped the FOLLOW_UP_QUESTIONS:
+                                // marker block from the raw token stream — `content`
+                                // is the cleaned text. Reconcile:
+                                // - accumulatedAnswer becomes the canonical text
+                                //   (used by commitFinalAnswer for SwiftData persistence)
+                                // - smoothPumpTarget becomes the canonical text
+                                //   (so the pump stops growing past the visible end)
+                                // - if the pump has already revealed past the cleaned
+                                //   text's length, truncate streamingContent so the
+                                //   user doesn't briefly see the marker block before
+                                //   the bubble flips to MarkdownTextView on .done
+                                accumulatedAnswer = content
+                                self.smoothPumpTarget = content
+                                if self.streamingContent.count > content.count {
                                     self.streamingContent = content
                                 }
+                                // Signal the pump that no more tokens are coming —
+                                // it will fast-drain any remaining backlog in 1 tick.
+                                self.smoothPumpStreamOpen = false
                                 self.revealComplete = true
                             }
                         case .answer(let response):
@@ -975,16 +994,16 @@ class ChatViewModel {
                                 await self.sendMessageSync()
                                 return
                             }
-                            // Close the smooth pump's stream window so any
-                            // legacy in-flight pump task can drain. With the
-                            // direct-mirror token path, there is normally no
-                            // pump running — this is a no-op safety net.
+                            // Close the smooth pump's stream window so it
+                            // fast-drains any remaining backlog in 1 tick
+                            // (typically ≤16ms). The pump exit triggers
+                            // waitForSmoothPumpDrain to return, then
+                            // commitFinalAnswer commits the message and
+                            // suggestedQuestions = response.followUpSuggestions
+                            // is assigned in the same runloop tick.
                             self.smoothPumpStreamOpen = false
-                            // Wait for the typewriter reveal (legacy single-blob
-                            // path) to finish before flipping to the persisted
-                            // MarkdownTextView. For the streamed path,
-                            // revealComplete is already true so this is a no-op.
                             await self.waitForRevealCompletion()
+                            await self.waitForSmoothPumpDrain()
                             await self.commitFinalAnswer(
                                 streamingMsgId: streamingMsg.id,
                                 response: self.pendingFinalResponse
@@ -1109,81 +1128,68 @@ class ChatViewModel {
     // MARK: - Smooth Pump (rate-adaptive display interpolation)
     //
     // The .token handler feeds `smoothPumpTarget` raw (bursty) text from
-    // Bedrock. This pump runs at ~60Hz on the main actor and reveals
-    // characters into `streamingContent` at a smooth, ADAPTIVE rate:
+    // Bedrock. This pump runs at 60Hz on the main actor and reveals
+    // characters into `streamingContent` at a smooth cadence.
     //
-    //   - If the unrevealed backlog is tiny (≤2 chars), pause briefly so
-    //     the reveal doesn't outpace incoming tokens and stutter.
-    //   - If the backlog is small (≤20 chars), reveal 1 char/tick — slow,
-    //     human-typing-speed feel (~60 chars/sec).
-    //   - If the backlog is medium (≤80 chars), reveal 2 chars/tick — keeps
-    //     pace with most Bedrock burst rates (~120 chars/sec).
-    //   - If the backlog is large (>80 chars), reveal up to N/40 chars/tick
-    //     so we drain backlogs >1.5s in ≤1.5s — prevents the visible reveal
-    //     from falling far behind the actual completion.
+    // Rate formula (single tier, no thresholds):
+    //   charsThisTick = max(1, ceil(backlog / DRAIN_FRAMES))
     //
-    // When the stream closes (.finalAnswer / .done set smoothPumpStreamOpen
-    // = false), the pump drains to the end and exits. waitForSmoothPumpDrain()
-    // is the .done waiter equivalent of waitForRevealCompletion().
+    // Where DRAIN_FRAMES = 20 while streaming, 1 once stream closes.
+    //
+    //   - While streaming open: any backlog drains in ≤20 frames (~333ms).
+    //     A 60-char chunk lands → next tick reveals 3 chars, then 3, then
+    //     3 ... draining in ~20 frames. Steady cadence regardless of how
+    //     bursty Bedrock is.
+    //   - Stream closed (.finalAnswer or .done): drain in 1 tick. Followup
+    //     pills + chrome appear within ~16ms of stream close.
+    //
+    // Previous design had threshold tiers (≤20 / ≤80 / >80) that got stuck
+    // at the slowest tier when ingestion rate (~60ch/sec) matched the
+    // pump's slow-tier rate (60ch/sec) — backlog never grew past 20,
+    // pump ran at typing-speed indefinitely, then took another 30s+ to
+    // drain after .done. The new ceil(backlog/20) formula has NO threshold
+    // — drain time is bounded by frames, not by absolute rate.
     @MainActor
     private func startSmoothPump() {
         smoothPumpTask?.cancel()
         smoothPumpTask = Task { @MainActor [weak self] in
             guard let self else { return }
-            let tick: UInt64 = 16_666_667 // ~60Hz (1/60 s in ns)
+            let tick: UInt64 = 16_666_667 // 60Hz
             while !Task.isCancelled {
                 let target = self.smoothPumpTarget
-                let shown = self.streamingContent
-                let totalCh = target.count
-                let shownCh = shown.count
+                // Use utf8 byte count instead of grapheme cluster count —
+                // String.count is O(n) per tick and dominates the pump for
+                // long answers. utf8.count is O(1) (cached) and gives the
+                // same monotone-increasing measure for ASCII-heavy content.
+                let totalCh = target.utf8.count
+                let shownCh = self.streamingContent.utf8.count
 
                 if shownCh >= totalCh {
-                    // Caught up to target. If stream is closed, we're done.
                     if !self.smoothPumpStreamOpen { break }
-                    // Otherwise wait briefly for more tokens.
+                    // Stream still open, nothing to draw. Brief wait.
                     try? await Task.sleep(nanoseconds: tick * 2)
                     continue
                 }
 
                 let backlog = totalCh - shownCh
-                let charsThisTick: Int
-
-                // FAST-DRAIN MODE: when the SSE stream is closed (server
-                // sent .finalAnswer or .done), no more tokens are coming.
-                // Race to the end at maximum rate so the typewriter doesn't
-                // crawl for minutes after the answer is fully received.
-                // The user complaint "took 5 min to show followups" was
-                // this exact case — Bedrock pacing the stream at ~60ch/sec
-                // matched our pump's 1-ch/tick rate, so the backlog never
-                // grew enough to trigger the >80 fast branch. Once .done
-                // arrives, we should not pace anymore — just paint the
-                // rest as fast as the renderer can take it.
-                if !self.smoothPumpStreamOpen {
-                    // Drain the remaining backlog in ≤3 frames (~50ms total)
-                    // regardless of size, so the followup pills + chrome
-                    // appear immediately after .done.
-                    charsThisTick = max(1, backlog / 2)
-                } else if backlog <= 2 {
-                    // Tiny backlog WHILE STREAM IS OPEN: pause to avoid
-                    // stuttering when tokens are arriving slower than
-                    // reveal rate.
-                    try? await Task.sleep(nanoseconds: tick * 3)
-                    continue
-                } else if backlog <= 20 {
-                    charsThisTick = 1
-                } else if backlog <= 80 {
-                    charsThisTick = 2
-                } else {
-                    // Drain large backlogs proportionally — at 60Hz with
-                    // N/40 chars/tick, an 800-char backlog drains in ~0.33s.
-                    charsThisTick = max(3, backlog / 40)
-                }
+                // Closed: drain everything in 1 frame.
+                // Open: drain over 20 frames (~333ms) — short enough to
+                // keep up with bursts, long enough to feel smooth.
+                let drainFrames = self.smoothPumpStreamOpen ? 20 : 1
+                let charsThisTick = max(1, (backlog + drainFrames - 1) / drainFrames)
 
                 let nextCount = min(shownCh + charsThisTick, totalCh)
-                // String.prefix is O(n) on Substring index walk; for our
-                // sizes (≤40 KB MarkdownTextView cap) this is fine.
-                self.streamingContent = String(target.prefix(nextCount))
-
+                // Slice safely on a utf8 byte offset that lands on a
+                // valid char boundary. For ASCII-heavy LLM output this is
+                // almost always nextCount itself; for multi-byte sequences
+                // we walk back to the previous boundary.
+                if let endIndex = target.utf8.index(target.utf8.startIndex, offsetBy: nextCount, limitedBy: target.utf8.endIndex),
+                   let safeEnd = endIndex.samePosition(in: target) {
+                    self.streamingContent = String(target[..<safeEnd])
+                } else {
+                    // Fallback: prefix by character count (slower but always valid).
+                    self.streamingContent = String(target.prefix(nextCount))
+                }
                 try? await Task.sleep(nanoseconds: tick)
             }
             self.smoothPumpTask = nil
