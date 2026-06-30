@@ -32,6 +32,64 @@ class ChatViewModel {
     var isLoading = false
     var isStreaming = false
     var streamingContent = ""
+
+    // MARK: - Teardown
+
+    enum TearDownReason {
+        case userStop
+        case viewDisappear
+        case threadSwitch
+        case profileSwitch
+        case backgroundExpiry
+        case paywallPresent
+        case deepLink
+        case sendReentry
+    }
+
+    /// Single chokepoint for cancelling an active generation. Cancels every
+    /// outstanding Task/Timer, clears transient UI state, deletes the orphan
+    /// assistant-placeholder bubble (Task 12 wires this for streaming), and
+    /// resets `isStreaming`/`isLoading`.
+    ///
+    /// Idempotent. Safe to call from any path; the 9 historical cancel sites
+    /// (background-expiry, sendMessage re-entry, thread switch, etc.) all
+    /// funnel through here so we never leak a Task or a placeholder bubble.
+    func tearDownGenerationState(reason: TearDownReason) {
+        #if DEBUG
+        print("[ChatViewModel] teardown reason: \(reason)")
+        #endif
+        streamingTask?.cancel()
+        streamingTask = nil
+        stepProgressTask?.cancel()
+        stepProgressTask = nil
+        progressTimerTask?.cancel()
+        progressTimerTask = nil
+        revealTask?.cancel()
+        revealTask = nil
+        revealComplete = false
+        smoothPumpTask?.cancel()
+        smoothPumpTask = nil
+        smoothPumpTarget = ""
+        smoothPumpStreamOpen = false
+
+        cosmicProgressSteps = []
+        streamingContent = ""
+
+        // Delete orphan assistant placeholders (rows with content == ""
+        // and isStreaming == true). Sync path's success branch sets
+        // isStreaming=false BEFORE this would run, so a successful
+        // commit is never touched.
+        let orphaned = messages.filter { $0.isStreaming && $0.content.isEmpty }
+        for msg in orphaned {
+            messages.removeAll { $0.id == msg.id }
+            windowManager.remove(id: msg.id)
+            dataManager.context.delete(msg)
+        }
+
+        isStreaming = false
+        isLoading = false
+    }
+
     var thinkingSteps: [ThinkingStep] = []
     var errorMessage: String?
     var inputText = ""
@@ -46,7 +104,6 @@ class ChatViewModel {
     /// is kept as a back-compat shortcut for older call sites that read
     /// just the message.
     var quotaError: QuotaErrorInfo?
-    var typewriterMessageId: String?  // Message currently being typewritten
     var windowManager = MessageWindowManager()
     var cosmicProgressSteps: [CosmicProgressStep] = []
     private var progressTimerTask: Task<Void, Never>? = nil
@@ -72,6 +129,32 @@ class ChatViewModel {
     var pendingPostUpgradeQuery: String? = nil
     private var streamingTask: Task<Void, Never>? = nil
     private var stepProgressTask: Task<Void, Never>? = nil
+    /// Typewriter reveal task — paces .finalAnswer content into streamingContent
+    /// character-by-character so the UI shows a ChatGPT-style reveal even when
+    /// the backend emits the answer as a single blob (current Bedrock behavior).
+    /// Cancelled by tearDownGenerationState and by reduce-motion clients.
+    private var revealTask: Task<Void, Never>? = nil
+    /// Set to true once the typewriter reveal has consumed the full answer.
+    /// .done waits on this before committing the atomic flip to MarkdownTextView.
+    private var revealComplete: Bool = false
+
+    // MARK: - Smooth pump state (real-streaming display interpolation)
+    //
+    // Bedrock emits tokens in bursts (10ch, 50ms pause, 30ch, 200ms pause, ...).
+    // If the .token handler writes `streamingContent = accumulatedAnswer`
+    // synchronously on each chunk, the typewriter looks chunky — the user sees
+    // a block of text, then a pause, then another block. ChatGPT/Claude.ai
+    // hide this with display interpolation: tokens grow a TARGET string, but
+    // a separate display pump reveals characters at a smooth ~60Hz rate. We
+    // do the same. See startSmoothPump() for the rate-adaptive logic.
+    private var smoothPumpTask: Task<Void, Never>? = nil
+    /// The latest target text from the .token / .finalAnswer accumulator.
+    /// The pump never reads beyond this — once it reaches the end, it parks.
+    private var smoothPumpTarget: String = ""
+    /// True while the SSE stream is open (tokens still arriving). Goes false
+    /// on .finalAnswer or .done. When false AND pump has reached the target,
+    /// the pump exits.
+    private var smoothPumpStreamOpen: Bool = false
     // Tracks whether the app backgrounded mid-stream so we show retry instead of error
     private var backgroundedWhileStreaming = false
     nonisolated(unsafe) private var notificationObservers: [Any] = []
@@ -234,8 +317,7 @@ class ChatViewModel {
         suggestedQuestions = []
         errorMessage = nil
         streamingContent = ""
-        typewriterMessageId = nil
-        stopStreaming()
+        stopGeneration()
 
         // Reload history filtered for the new profile and load its latest thread
         loadHistory()
@@ -252,10 +334,27 @@ class ChatViewModel {
     }
     
     func loadThread(_ thread: LocalChatThread) {
+        // Streaming-safety: tear down any active generation BEFORE the
+        // thread id swaps. Otherwise the .done handler for thread A could
+        // land on thread B's messages array. Discovered missing during
+        // 2026-06-28 audit.
+        tearDownGenerationState(reason: .threadSwitch)
         currentThreadId = thread.id
         messages = dataManager.fetchMessages(for: thread.id)
         windowManager.replaceAll(messages)
-        
+
+        // Rehydrate follow-up suggestion pills from the LAST assistant message
+        // (if it has persisted followUps). Without this, reopening a thread
+        // from History shows the answer text but no pills until a new question
+        // is asked. The companion fix on the write side is followUps on
+        // LocalChatMessage + persistence in commitFinalAnswer.
+        if let lastAssistant = messages.reversed().first(where: { $0.messageRole == .assistant }),
+           !lastAssistant.followUps.isEmpty {
+            suggestedQuestions = lastAssistant.followUps
+        } else {
+            suggestedQuestions = []
+        }
+
         // Add welcome if empty
         if messages.isEmpty {
             addWelcomeMessage()
@@ -320,8 +419,27 @@ class ChatViewModel {
         }
     }
     
-    // MARK: - Send Message (Non-Streaming — matches compat chat pattern)
+    // MARK: - Send Message (flag-routed)
+
+    /// Public entry. Routes to streaming or sync based on AppConfig cohort flag.
+    /// Per docs/superpowers/plans/2026-06-28-streaming-typewriter-v2.md task 12.
     func sendMessage() async {
+        let userId = userEmail
+        let cfg = AppConfig.shared
+        let stream = cfg.shouldStreamFor(userId: userId)
+        #if DEBUG
+        let bundleVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?"
+        print("[ChatViewModel] sendMessage routing decision: stream=\(stream) | enabled=\(cfg.streamingEnabled) cohortPct=\(cfg.streamingCohortPercent) minVer=\(cfg.streamingMinAppVersion) bundleVer=\(bundleVersion) versionAllowed=\(cfg.versionAllowed) inCohort=\(cfg.inCohort(userId)) UI_TEST_MODE=\(ProcessInfo.processInfo.environment["UI_TEST_MODE"] ?? "nil") userId=\(userId)")
+        #endif
+        if stream {
+            await sendMessageStreaming()
+        } else {
+            await sendMessageSync()
+        }
+    }
+
+    // MARK: - Send Message (Non-Streaming — matches compat chat pattern)
+    func sendMessageSync() async {
         let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return }
 
@@ -510,9 +628,11 @@ class ChatViewModel {
                 self.progressTimerTask = nil
 
                 if let idx = self.messages.lastIndex(where: { $0.id == streamingMsg.id }) {
-                    // Cap persisted content at 64 KB (UTF-8) — see comment at
-                    // top of file. Prevents future runaway responses from
-                    // poisoning the SwiftData store.
+                    // DONE-ONLY-MUTATION: the single content commit on the sync path
+                    // (mirrors the streaming-path invariant enforced by
+                    // StreamingPredictionServiceTests). Cap persisted content at
+                    // 64 KB (UTF-8) — see comment at top of file. Prevents future
+                    // runaway responses from poisoning the SwiftData store.
                     self.messages[idx].content = capPersistedContent(response.answer)
                     self.messages[idx].area = response.lifeArea
                     self.messages[idx].advice = capPersistedContent(response.advice)
@@ -602,11 +722,645 @@ class ChatViewModel {
         }
     }
 
-    func stopStreaming() {
-        streamingTask?.cancel()
-        streamingTask = nil
-        stepProgressTask?.cancel()
-        stepProgressTask = nil
+    // MARK: - Streaming path (Task 12)
+
+    /// Storage for the .answer event's full PredictionResponse — captured ahead
+    /// of .done so the SINGLE atomic flip in commitFinalAnswer has everything
+    /// (answer, lifeArea, advice, executionTimeMs, followUpSuggestions).
+    private var pendingFinalResponse: PredictionResponse?
+    private var streamErrorMessage: String?
+
+    /// Streaming send path. Consumes SSE events from StreamingPredictionService
+    /// and feeds streamingContent (only — never messages[idx].content). The
+    /// atomic flip into the persisted bubble happens in commitFinalAnswer
+    /// (called from the single .done handler).
+    func sendMessageStreaming() async {
+        print("[STREAM] step 1 — entered sendMessageStreaming")
+        let query = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty, !isLoading, !isStreaming else {
+            print("[STREAM] EARLY-RETURN guard@694: empty=\(query.isEmpty) isLoading=\(isLoading) isStreaming=\(isStreaming)")
+            return
+        }
+        print("[STREAM] step 2 — past guard, query='\(query.prefix(40))'")
+
+        // Re-entry safety: tear down any prior generation cleanly.
+        tearDownGenerationState(reason: .sendReentry)
+        print("[STREAM] step 3 — past tearDown")
+
+        // Short label for the user bubble; full query still goes to LLM.
+        let displayContent = pendingDisplayLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? query
+        pendingDisplayLabel = nil
+
+        lastSentQuery = query
+        inputText = ""
+        errorMessage = nil
+        suggestedQuestions = []
+        interruptedQuestion = nil
+        isLoading = true
+
+        let currentEmail = userEmail
+
+        // Verify quota with backend BEFORE inserting the user bubble (mirrors sync path).
+        print("[STREAM] step 4 — about to call canAccessFeature")
+        do {
+            let accessResponse = try await QuotaManager.shared.canAccessFeature(.aiQuestions, email: currentEmail)
+            print("[STREAM] step 5 — quota returned canAccess=\(accessResponse.canAccess) reason=\(accessResponse.reason ?? "nil")")
+            if !accessResponse.canAccess {
+                print("[STREAM] EARLY-RETURN quota denied reason=\(accessResponse.reason ?? "nil")")
+                isLoading = false
+                pendingPostUpgradeQuery = query
+                quotaError = QuotaErrorInfo(
+                    reason: accessResponse.reason,
+                    planId: accessResponse.planId,
+                    featureId: accessResponse.feature,
+                    message: accessResponse.upgradeCta?.message,
+                    action: nil,
+                    suggestedPlan: accessResponse.upgradeCta?.suggestedPlan,
+                    supportEmail: nil,
+                    resetAt: accessResponse.resetAt,
+                    serverIsFairUseViolation: accessResponse.isFairUseViolation
+                )
+                if accessResponse.reason == "daily_limit_reached" {
+                    if let resetAtStr = accessResponse.resetAt,
+                       let date = ISO8601DateFormatter().date(from: resetAtStr) {
+                        let timeFormatter = DateFormatter()
+                        timeFormatter.timeStyle = .short
+                        let timeStr = timeFormatter.string(from: date)
+                        errorMessage = String(format: "daily_limit_reset_time".localized, timeStr)
+                    } else {
+                        errorMessage = "daily_limit_reached_tomorrow".localized
+                    }
+                } else if accessResponse.reason == "subscription_expired" {
+                    quotaDetails = "subscription_expired_body".localized
+                    showQuotaSheet = true
+                } else if accessResponse.reason == "overall_limit_reached" {
+                    if let serverMessage = accessResponse.upgradeCta?.message, !serverMessage.isEmpty {
+                        quotaDetails = serverMessage
+                    } else if QuotaManager.isGuestEmail(currentEmail) {
+                        quotaDetails = "sign_in_to_continue_asking".localized
+                    } else {
+                        quotaDetails = "upgrade_to_keep_going".localized
+                    }
+                    showQuotaSheet = true
+                } else {
+                    quotaDetails = accessResponse.upgradeCta?.message ?? "feature_not_available".localized
+                    showQuotaSheet = true
+                }
+                return
+            }
+        } catch {
+            print("[STREAM] quota check threw: \(error)")
+        }
+        print("[STREAM] step 6 — past quota check")
+
+        guard let birthData = loadBirthData() else {
+            print("[STREAM] EARLY-RETURN loadBirthData returned nil")
+            errorMessage = "Please complete your birth data first"
+            isLoading = false
+            return
+        }
+        print("[STREAM] step 7 — birthData ok, building request")
+
+        let appLanguage = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
+        let responseLength = UserDefaults.standard.string(forKey: "userResponseLength") ?? "detailed"
+        let responseStyle = UserDefaults.standard.string(forKey: "userContentStyle") ?? "guidance"
+
+        // Build the user + assistant-placeholder pair atomically.
+        let userMessage = LocalChatMessage(
+            threadId: currentThreadId,
+            role: .user,
+            content: displayContent
+        )
+        let streamingMsg = LocalChatMessage(
+            threadId: currentThreadId,
+            role: .assistant,
+            content: "",
+            isStreaming: true
+        )
+        dataManager.context.insert(userMessage)
+        dataManager.context.insert(streamingMsg)
+        print("[STREAM] step 8 — inserted user + streaming msgs into SwiftData context")
+        if HistorySettingsManager.shared.isHistoryEnabled {
+            dataManager.saveMessage(userMessage)
+        }
+        messages.append(userMessage)
+        windowManager.append(userMessage)
+        messages.append(streamingMsg)
+        windowManager.append(streamingMsg)
+        print("[STREAM] step 9 — appended to messages array + windowManager")
+
+        let request = PredictionRequest(
+            query: query,
+            birthData: birthData,
+            sessionId: currentSessionId,
+            conversationId: currentThreadId,
+            userEmail: userEmail,
+            language: appLanguage,
+            responseStyle: responseStyle,
+            responseLength: responseLength,
+            profileId: ProfileContextManager.shared.activeProfileId
+        )
+        print("[STREAM] step 10 — built PredictionRequest")
+
+        isLoading = false
+        isStreaming = true
+        cosmicProgressSteps = []
+        startCosmicProgressTimer()
+        print("[STREAM] step 11 — set isStreaming=true, started cosmic timer")
+
+        let idempotencyKey = UUID().uuidString
+        print("[STREAM] step 12 — about to spawn streamingTask")
+
+        streamingTask = Task { [weak self] in
+            print("[StreamingTask] Task body began — self=\(self == nil ? "nil" : "alive")")
+            guard let self else {
+                print("[StreamingTask] ABORTED — weak self was nil; VM deallocated before Task ran")
+                return
+            }
+            print("[StreamingTask] entered — about to open SSE stream")
+            // 30 Hz coalescer note: the Bedrock backend currently emits the
+            // final answer as a single .finalAnswer event, so the coalescer
+            // runs effectively once. When token-level streaming lands
+            // server-side, this is the buffer that will replay at 30 Hz.
+            var accumulatedAnswer = ""
+
+            do {
+                try await StreamingPredictionService.shared.predictStream(
+                    request: request,
+                    idempotencyKey: idempotencyKey
+                ) { [weak self] event in
+                    guard let self else { return }
+                    #if DEBUG
+                    switch event {
+                    case .thought: print("[StreamingTask] event=.thought")
+                    case .action: print("[StreamingTask] event=.action")
+                    case .observation: print("[StreamingTask] event=.observation")
+                    case .progressStep: print("[StreamingTask] event=.progressStep")
+                    case .token: print("[StreamingTask] event=.token")
+                    case .finalAnswer: print("[StreamingTask] event=.finalAnswer")
+                    case .answer: print("[StreamingTask] event=.answer")
+                    case .done: print("[StreamingTask] event=.done")
+                    case .error(let msg): print("[StreamingTask] event=.error msg=\(msg)")
+                    case .backpressure(let r): print("[StreamingTask] event=.backpressure retry=\(r)s")
+                    }
+                    #endif
+                    Task { @MainActor in
+                        switch event {
+                        case .thought, .action, .observation, .progressStep:
+                            self.handleProgressEvent(event)
+                        case .token(let chunk):
+                            // Real per-token SSE path. Tokens grow the target
+                            // buffer; the smooth pump drives streamingContent
+                            // at a controlled 60Hz cadence so bursty Bedrock
+                            // chunks read as a steady typewriter — but the
+                            // pump rate is "drain backlog in ≤333ms" so it
+                            // catches up the moment new chunks arrive AND
+                            // commits to the final char within one frame of
+                            // .done. Combined with the .finalAnswer
+                            // reconciliation below (which strips the
+                            // FOLLOW_UP_QUESTIONS: marker block from any
+                            // already-revealed text), followups land
+                            // immediately after the typewriter finishes.
+                            self.revealTask?.cancel()
+                            self.revealComplete = true
+                            accumulatedAnswer += chunk
+                            // On the FIRST token: hide cosmic progress and pin the
+                            // user's question to the top so the answer has full
+                            // screen real estate to grow into. After this, no further
+                            // auto-scroll — the user reads top-down naturally.
+                            if !self.cosmicProgressSteps.isEmpty {
+                                self.cosmicProgressSteps = []
+                                self.stepProgressTask?.cancel(); self.stepProgressTask = nil
+                                self.progressTimerTask?.cancel(); self.progressTimerTask = nil
+                            }
+                            self.smoothPumpTarget = accumulatedAnswer
+                            self.smoothPumpStreamOpen = true
+                            if self.smoothPumpTask == nil {
+                                self.startSmoothPump()
+                            }
+                        case .finalAnswer(let content):
+                            // Two paths:
+                            //  (a) Backends that already streamed tokens — accumulatedAnswer
+                            //      is populated. Reconcile to the server's canonical text
+                            //      (in case of post-trim) by writing directly to
+                            //      streamingContent.
+                            //  (b) Backends that only emit a single .finalAnswer blob
+                            //      (e.g. flag rollback). Fall back to the existing
+                            //      typewriter reveal so users still get a paced reveal.
+                            if accumulatedAnswer.isEmpty {
+                                accumulatedAnswer = content
+                                self.startTypewriterReveal(fullText: content, streamingMsgId: streamingMsg.id)
+                            } else {
+                                // Server may have stripped the FOLLOW_UP_QUESTIONS:
+                                // marker block from the raw token stream — `content`
+                                // is the cleaned text. Reconcile:
+                                // - accumulatedAnswer becomes the canonical text
+                                //   (used by commitFinalAnswer for SwiftData persistence)
+                                // - smoothPumpTarget becomes the canonical text
+                                //   (so the pump stops growing past the visible end)
+                                // - if the pump has already revealed past the cleaned
+                                //   text's length, truncate streamingContent so the
+                                //   user doesn't briefly see the marker block before
+                                //   the bubble flips to MarkdownTextView on .done
+                                accumulatedAnswer = content
+                                self.smoothPumpTarget = content
+                                if self.streamingContent.count > content.count {
+                                    self.streamingContent = content
+                                }
+                                // Signal the pump that no more tokens are coming —
+                                // it will fast-drain any remaining backlog in 1 tick.
+                                self.smoothPumpStreamOpen = false
+                                self.revealComplete = true
+                            }
+                        case .answer(let response):
+                            // Capture full response for the single atomic flip in .done.
+                            print("[FOLLOWUPS] .answer received: followUpSuggestions.count=\(response.followUpSuggestions.count) values=\(response.followUpSuggestions)")
+                            self.pendingFinalResponse = response
+                        case .done:
+                            // C-2: defensive — if server emitted .done without ever
+                            // sending an .answer frame (malformed completion), treat as
+                            // a stream error and fall back to sync /predict instead of
+                            // letting commitFinalAnswer silently early-return and leave
+                            // the streaming bubble on screen.
+                            //
+                            // Tightened: also require streamingContent to be empty so a
+                            // token-only stream that lost its `.answer` frame doesn't
+                            // silently commit an empty message.
+                            if self.pendingFinalResponse == nil &&
+                               (self.messages.first(where: { $0.id == streamingMsg.id })?.content.isEmpty ?? true) &&
+                               self.streamingContent.isEmpty {
+                                self.tearDownGenerationState(reason: .userStop)
+                                self.inputText = query
+                                await self.sendMessageSync()
+                                return
+                            }
+                            // Close the smooth pump's stream window so it
+                            // fast-drains any remaining backlog in 1 tick
+                            // (typically ≤16ms). The pump exit triggers
+                            // waitForSmoothPumpDrain to return, then
+                            // commitFinalAnswer commits the message and
+                            // suggestedQuestions = response.followUpSuggestions
+                            // is assigned in the same runloop tick.
+                            self.smoothPumpStreamOpen = false
+                            await self.waitForRevealCompletion()
+                            await self.waitForSmoothPumpDrain()
+                            await self.commitFinalAnswer(
+                                streamingMsgId: streamingMsg.id,
+                                response: self.pendingFinalResponse
+                            )
+                        case .backpressure:
+                            // C-2: server is shedding load (semaphore overflow).
+                            // Transparently fall back to sync /predict — tear down the
+                            // streaming bubble and replay the user's query via sync so
+                            // the UI never hangs waiting for a stream that won't come.
+                            self.tearDownGenerationState(reason: .userStop)
+                            self.inputText = query
+                            await self.sendMessageSync()
+                            return
+                        case .error(let message):
+                            self.streamErrorMessage = message
+                        }
+                    }
+                }
+            } catch is CancellationError {
+                #if DEBUG
+                print("[StreamingTask] CancellationError — discarded partial")
+                #endif
+                // Stop button or teardown — discard partial; banner shows lastSentQuery.
+                self.tearDownGenerationState(reason: .userStop)
+                self.interruptedQuestion = self.lastSentQuery.isEmpty ? nil : self.lastSentQuery
+            } catch let quota as QuotaExhaustedError {
+                #if DEBUG
+                print("[StreamingTask] QuotaExhaustedError reason=\(quota.reason)")
+                #endif
+                await self.handleQuotaErrorFromStream(
+                    quota: quota,
+                    streamingMsgId: streamingMsg.id,
+                    userMessage: userMessage
+                )
+            } catch {
+                #if DEBUG
+                print("[StreamingTask] FALLBACK-TO-SYNC error=\(error) localizedDescription=\(error.localizedDescription)")
+                #endif
+                // Transparent fallback to sync /predict.
+                self.tearDownGenerationState(reason: .userStop)
+                self.inputText = query
+                await self.sendMessageSync()
+            }
+        }
+    }
+
+    // MARK: - Client-side Typewriter Reveal
+
+    /// Pace `fullText` into `streamingContent` character-by-character so the
+    /// UI shows a smooth reveal even when the backend emits the answer as a
+    /// single `.finalAnswer` blob (current Bedrock behavior — see Task 12).
+    ///
+    /// Rate: ~120 chars/sec (~8 chars per 66ms tick on a 15Hz timeline).
+    /// This is faster than typical human typing (~40–60 wpm = ~300 chars/min)
+    /// and slower than an instant paste — it reads as "AI is composing" without
+    /// dragging out 1KB+ answers to >10 seconds.
+    ///
+    /// Cancellable via `revealTask?.cancel()` (called by `tearDownGenerationState`
+    /// on user-stop / thread-switch / etc.). Honors Reduce Motion by skipping
+    /// the reveal entirely and showing the full text immediately.
+    @MainActor
+    private func startTypewriterReveal(fullText: String, streamingMsgId: String) {
+        revealTask?.cancel()
+        revealComplete = false
+
+        // Reduce Motion: skip the typewriter, show full text immediately.
+        if UIAccessibility.isReduceMotionEnabled {
+            streamingContent = fullText
+            revealComplete = true
+            return
+        }
+
+        let chars = Array(fullText)
+        let total = chars.count
+        guard total > 0 else {
+            revealComplete = true
+            return
+        }
+
+        // Adaptive pacing — total reveal time stays in the 3–8s window across
+        // all answer lengths so the user never waits >8s for the reveal to
+        // finish but short answers still feel deliberate. ~33ms tick = 30 Hz.
+        // Markdown re-parse cost is bounded by MarkdownTextView's 40 KB cap
+        // and `nonisolated` static helpers (commit 8dc2a32).
+        let targetSeconds: Double
+        if total < 300 { targetSeconds = 2.0 }       // short answer — quick
+        else if total < 1000 { targetSeconds = 3.5 } // normal
+        else if total < 3000 { targetSeconds = 5.0 } // long
+        else { targetSeconds = 7.0 }                  // very long — never drag past ~7s
+
+        let tickInterval: UInt64 = 33_000_000 // 33ms → 30 Hz
+        let totalTicks = max(1, Int(targetSeconds / 0.033))
+        let charsPerTick = max(1, Int(ceil(Double(total) / Double(totalTicks))))
+
+        revealTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            var revealed = 0
+            while revealed < total {
+                if Task.isCancelled { return }
+                let next = min(revealed + charsPerTick, total)
+                self.streamingContent = String(chars[0..<next])
+                revealed = next
+                if revealed >= total { break }
+                try? await Task.sleep(nanoseconds: tickInterval)
+            }
+            self.revealComplete = true
+        }
+    }
+
+    /// Wait until the typewriter reveal has consumed the full `.finalAnswer`
+    /// text, so `.done` doesn't flip to `MarkdownTextView` mid-reveal.
+    /// Polls every 50ms. Returns immediately if reveal is already done.
+    /// Bounded at 30s as a safety valve so a stuck reveal never blocks `.done`.
+    @MainActor
+    private func waitForRevealCompletion() async {
+        let deadline = Date().addingTimeInterval(30)
+        while !revealComplete && Date() < deadline {
+            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        }
+    }
+
+    // MARK: - Smooth Pump (rate-adaptive display interpolation)
+    //
+    // The .token handler feeds `smoothPumpTarget` raw (bursty) text from
+    // Bedrock. This pump runs at 60Hz on the main actor and reveals
+    // characters into `streamingContent` at a smooth cadence.
+    //
+    // Rate model (2026-06-29):
+    //   - Target: BASE_CHARS_PER_SEC chars/sec with ±JITTER_PCT random jitter
+    //     per tick — feels like a person typing, not a robot.
+    //   - At 60Hz this is BASE_CHARS_PER_SEC/60 chars/tick (fractional);
+    //     a Double accumulator carries the remainder forward so the
+    //     long-run rate is exact.
+    //   - Catchup: if backlog exceeds MAX_BUFFER_SECONDS worth of base
+    //     rate, scale this tick's reveal by (backlog/maxBuffer) so we
+    //     never fall more than ~MAX_BUFFER_SECONDS behind Bedrock during
+    //     bursts. Without this, the older bounded-frame pump (drain in
+    //     20 frames) was needed to keep up — but it was fixed-window,
+    //     not rate-targeted. New design gives us both: human-feeling rate
+    //     normally, automatic catch-up under burst.
+    //   - Stream closed (.finalAnswer or .done): drain in 1 tick. Followup
+    //     pills + chrome appear within ~16ms of stream close.
+    @MainActor
+    private func startSmoothPump() {
+        smoothPumpTask?.cancel()
+        smoothPumpTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            let tick: UInt64 = 16_666_667 // 60Hz
+            // Rate targets
+            let BASE_CHARS_PER_SEC: Double = 70.0
+            let TICK_HZ: Double = 60.0
+            let JITTER_PCT: Double = 0.20            // ±20%
+            let MAX_BUFFER_SECONDS: Double = 2.0     // accelerate if backlog > this many seconds of base rate
+            let basePerTick = BASE_CHARS_PER_SEC / TICK_HZ          // 1.1667
+            let maxBacklog = BASE_CHARS_PER_SEC * MAX_BUFFER_SECONDS // 140 chars
+            var fractionalAccum: Double = 0.0
+
+            while !Task.isCancelled {
+                let target = self.smoothPumpTarget
+                // Use utf8 byte count instead of grapheme cluster count —
+                // String.count is O(n) per tick and dominates the pump for
+                // long answers. utf8.count is O(1) (cached) and gives the
+                // same monotone-increasing measure for ASCII-heavy content.
+                let totalCh = target.utf8.count
+                let shownCh = self.streamingContent.utf8.count
+
+                if shownCh >= totalCh {
+                    if !self.smoothPumpStreamOpen { break }
+                    // Stream still open, nothing to draw. Brief wait.
+                    fractionalAccum = 0.0  // reset so the first new char doesn't burst
+                    try? await Task.sleep(nanoseconds: tick * 2)
+                    continue
+                }
+
+                let backlog = totalCh - shownCh
+                let charsThisTick: Int
+                if !self.smoothPumpStreamOpen {
+                    // Stream closed — flush everything in one frame so
+                    // followup chips render immediately.
+                    charsThisTick = backlog
+                } else {
+                    // Jitter: uniform in [1-JITTER_PCT, 1+JITTER_PCT]
+                    let jitter = 1.0 + Double.random(in: -JITTER_PCT...JITTER_PCT)
+                    var thisTick = basePerTick * jitter
+                    // Catchup: backlog above maxBacklog → scale up linearly
+                    if Double(backlog) > maxBacklog {
+                        thisTick *= Double(backlog) / maxBacklog
+                    }
+                    fractionalAccum += thisTick
+                    let whole = Int(fractionalAccum)
+                    fractionalAccum -= Double(whole)
+                    charsThisTick = whole
+                }
+
+                if charsThisTick == 0 {
+                    // Accumulator hasn't reached 1 yet — wait one tick
+                    // without advancing. Long-run rate stays correct.
+                    try? await Task.sleep(nanoseconds: tick)
+                    continue
+                }
+
+                let nextCount = min(shownCh + charsThisTick, totalCh)
+                // Slice safely on a utf8 byte offset that lands on a
+                // valid char boundary. For ASCII-heavy LLM output this is
+                // almost always nextCount itself; for multi-byte sequences
+                // we walk back to the previous boundary.
+                if let endIndex = target.utf8.index(target.utf8.startIndex, offsetBy: nextCount, limitedBy: target.utf8.endIndex),
+                   let safeEnd = endIndex.samePosition(in: target) {
+                    self.streamingContent = String(target[..<safeEnd])
+                } else {
+                    // Fallback: prefix by character count (slower but always valid).
+                    self.streamingContent = String(target.prefix(nextCount))
+                }
+                try? await Task.sleep(nanoseconds: tick)
+            }
+            self.smoothPumpTask = nil
+        }
+    }
+
+    /// Wait for the smooth pump to drain to the end of the target before
+    /// committing the final message. Mirrors waitForRevealCompletion's role
+    /// for the legacy single-blob typewriter path.
+    @MainActor
+    private func waitForSmoothPumpDrain() async {
+        let deadline = Date().addingTimeInterval(30)
+        while smoothPumpTask != nil && Date() < deadline {
+            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+        }
+    }
+
+    /// SINGLE point in this file where a streaming message's content is committed.
+    /// Called only from the .done event handler in sendMessageStreaming.
+    @MainActor
+    private func commitFinalAnswer(streamingMsgId: String, response: PredictionResponse?) async {
+        #if DEBUG
+        print("[FOLLOWUPS] commitFinalAnswer: pendingFinalResponse=\(self.pendingFinalResponse == nil ? "nil" : "set"), response.followUpSuggestions.count=\(response?.followUpSuggestions.count ?? -1)")
+        #endif
+        stepProgressTask?.cancel(); stepProgressTask = nil
+        progressTimerTask?.cancel(); progressTimerTask = nil
+
+        // Resolve the final content + followups. If the `.answer` SSE frame
+        // never arrived (server emitted `.done` without it), fall back to
+        // whatever the token stream / typewriter accumulated so we still
+        // commit the answer text — just with no followups. Prior behavior
+        // here was a guard-let-return that left the streaming bubble on
+        // screen AND wiped suggestedQuestions, which is what caused pills
+        // to vanish until the thread was reopened from History.
+        let finalAnswer: String
+        let finalArea: String?
+        let finalAdvice: String?
+        let finalExecutionMs: Double
+        let finalFollowUps: [String]
+        if let response {
+            finalAnswer = response.answer
+            finalArea = response.lifeArea
+            finalAdvice = response.advice
+            finalExecutionMs = response.executionTimeMs
+            finalFollowUps = response.followUpSuggestions
+        } else {
+            // Synthetic fallback: prefer the just-rendered streamingContent;
+            // if even that is empty fall back to the message bubble's current
+            // content (already committed token-by-token in some code paths).
+            let bubbleContent = messages.first(where: { $0.id == streamingMsgId })?.content ?? ""
+            let synthetic = !streamingContent.isEmpty ? streamingContent : bubbleContent
+            finalAnswer = synthetic
+            finalArea = nil
+            finalAdvice = nil
+            finalExecutionMs = 0
+            finalFollowUps = []
+            #if DEBUG
+            print("[FOLLOWUPS] commitFinalAnswer: response was nil — synthesizing commit (no followups)")
+            #endif
+        }
+
+        if let idx = messages.lastIndex(where: { $0.id == streamingMsgId }) {
+            // DONE-ONLY-MUTATION: the single point in this file where a streaming
+            // message's content is committed. Enforced by StreamingPredictionServiceTests.
+            messages[idx].content = capPersistedContent(finalAnswer)
+            messages[idx].area = finalArea
+            messages[idx].advice = capPersistedContent(finalAdvice)
+            messages[idx].executionTimeMs = finalExecutionMs
+            messages[idx].followUps = finalFollowUps
+            messages[idx].isStreaming = false
+            if HistorySettingsManager.shared.isHistoryEnabled {
+                dataManager.saveMessage(messages[idx])
+            }
+        }
+        suggestedQuestions = finalFollowUps
+        #if DEBUG
+        print("[FOLLOWUPS] suggestedQuestions set to \(finalFollowUps.count) items: \(finalFollowUps.prefix(3))")
+        #endif
+        streamingContent = ""
+        cosmicProgressSteps = []
+        isStreaming = false
+        pendingFinalResponse = nil
+    }
+
+    /// Translate streaming progress events into cosmicProgressSteps entries.
+    /// The startCosmicProgressTimer() fallback cycles canned messages every
+    /// 1.5s; when real .progressStep events arrive they overwrite that single
+    /// active step, so the timer becomes a no-op in practice.
+    private func handleProgressEvent(_ event: StreamingPredictionService.StreamEvent) {
+        switch event {
+        case .progressStep(_, _, _, _, let displayKey, _):
+            guard let key = displayKey else { return }
+            let msg = LocalizedString.get(key)
+            let step = CosmicProgressStep(text: msg, displayKey: key, isCompleted: false, isActive: true)
+            withAnimation(.easeInOut(duration: 0.4)) {
+                cosmicProgressSteps = [step]
+            }
+        default:
+            return
+        }
+    }
+
+    /// Mirror of the sync path's quota-error handling — drop both bubbles,
+    /// buffer the query for replay, present the paywall.
+    @MainActor
+    private func handleQuotaErrorFromStream(
+        quota: QuotaExhaustedError,
+        streamingMsgId: String,
+        userMessage: LocalChatMessage
+    ) async {
+        tearDownGenerationState(reason: .userStop)
+        if let userIdx = messages.lastIndex(where: { $0.id == userMessage.id }) {
+            messages.remove(at: userIdx)
+            windowManager.remove(id: userMessage.id)
+            dataManager.deleteMessage(userMessage)
+        }
+        pendingPostUpgradeQuery = lastSentQuery
+        quotaError = QuotaErrorInfo(
+            reason: quota.reason,
+            planId: quota.planId,
+            featureId: "ai_questions",
+            message: quota.upgradeMessage,
+            action: nil,
+            suggestedPlan: quota.suggestedPlan,
+            supportEmail: nil,
+            resetAt: quota.resetAt,
+            serverIsFairUseViolation: quota.isFairUseViolation
+        )
+        if let serverMsg = quota.upgradeMessage, !serverMsg.isEmpty {
+            quotaDetails = serverMsg
+        } else if quota.reason == "daily_limit_reached" {
+            quotaDetails = "daily_limit_reached_tomorrow".localized
+        } else if QuotaManager.isGuestEmail(userEmail) {
+            quotaDetails = "sign_in_to_continue_asking".localized
+        } else {
+            quotaDetails = "upgrade_to_keep_going".localized
+        }
+        showQuotaSheet = true
+    }
+
+    /// Public cancel — wired to the Stop button in ChatInputBar.
+    /// Idempotent; safe to call while no stream is active.
+    func stopGeneration() {
+        tearDownGenerationState(reason: .userStop)
     }
 
     func retryInterruptedQuestion() {

@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 // MARK: - Streaming Prediction Service
 /// SSE client for real-time streaming predictions with progress updates
@@ -6,6 +7,14 @@ import Foundation
 class StreamingPredictionService {
     static let shared = StreamingPredictionService()
     private init() {}
+
+    /// Instruments signpost log — bracketed around the .finalAnswer → .done
+    /// window so the coalescer's main-thread cost can be measured under
+    /// Time Profiler. Task 12 requirement.
+    private static let signpostLog = OSLog(
+        subsystem: "com.destinyai.streaming",
+        category: "predict_stream"
+    )
 
     // MARK: - Test Hooks
 
@@ -20,22 +29,32 @@ class StreamingPredictionService {
         case action(step: Int, tool: String, display: String)
         case observation(step: Int, display: String)
         case progressStep(phase: String, group: Int, groupCount: Int, isDone: Bool, displayKey: String?, elapsedMs: Int)
+        // Real per-token streaming frame emitted by the backend during final
+        // synthesis. iOS appends each chunk to streamingContent live; on
+        // backends that don't emit `.token`, the existing `.finalAnswer`
+        // typewriter fallback (see ChatViewModel) still works unchanged.
+        case token(content: String)
         case finalAnswer(content: String)
         case answer(response: PredictionResponse)
         case done(totalSteps: Int)
+        case backpressure(retryAfterSeconds: Int)
         case error(message: String)
     }
     
     // MARK: - Streaming Predict
     
     /// Stream predictions with progress updates via SSE
-    /// Has 30 second timeout, falls back to regular API on failure
+    /// 270s timeout (10% headroom under Cloud Run 300s); per-send Idempotency-Key
+    /// lets the server replay a cached final answer if a client retries inside
+    /// the 5-minute cache window. Prevents double-billing on transient network
+    /// loss after .done.
     func predictStream(
         request: PredictionRequest,
+        idempotencyKey: String,
         onEvent: @escaping (StreamEvent) -> Void
     ) async throws {
         let url = URL(string: "\(APIConfig.baseURL)/vedic/api/predict/stream")!
-        
+
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         // W7 — send session JWT when available, else fall back to bundled API key.
@@ -45,7 +64,12 @@ class StreamingPredictionService {
         urlRequest.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-        urlRequest.timeoutInterval = 300  // 5 min — Opus first-token can be slow
+        // Per docs/superpowers/plans/2026-06-28-streaming-typewriter-v2.md task 12:
+        // - Idempotency-Key lets the server replay a cached final answer if a
+        //   client retries inside the 5-minute cache window. Prevents
+        //   double-billing on transient network loss after .done.
+        urlRequest.setValue(idempotencyKey, forHTTPHeaderField: "Idempotency-Key")
+        urlRequest.timeoutInterval = 270  // 10% headroom under Cloud Run's 300s
         
         // Build request body using correct BirthData properties
         let body: [String: Any] = [
@@ -76,11 +100,24 @@ class StreamingPredictionService {
                 return factory()
             }
             let config = URLSessionConfiguration.default
-            config.timeoutIntervalForRequest = 300   // 5 min — Opus first-token latency
-            config.timeoutIntervalForResource = 600  // 10 min — full Opus stream
-            config.waitsForConnectivity = true
+            config.timeoutIntervalForRequest = 270   // 10% headroom under Cloud Run's 300s
+            config.timeoutIntervalForResource = 270
+            config.waitsForConnectivity = false  // airplane mode must surface in ≤5s, not 5min
             return URLSession(configuration: config)
         }()
+
+        defer {
+            // Per task 12: invalidateAndCancel() actually terminates the body
+            // byte stream when the consuming Task is cancelled, not just the
+            // Swift Task wrapper. Without this, cancelled streams still
+            // consume LLM tokens server-side.
+            session.invalidateAndCancel()
+        }
+
+        // Instruments signpost — bracket the .finalAnswer → .done window so
+        // the coalescer's main-thread cost is visible in Time Profiler.
+        let signpostID = OSSignpostID(log: Self.signpostLog)
+        var signpostStarted = false
 
         // Use bytes for SSE streaming
         let (asyncBytes, response) = try await session.bytes(for: urlRequest)
@@ -142,12 +179,21 @@ class StreamingPredictionService {
 
                 // Process complete event on main actor
                 if let event = parseEvent(type: currentEventType, data: currentData) {
+                    // Task 12 signpost: begin on .finalAnswer, end on .done — the
+                    // coalescer/atomic-flip window the brief asks Instruments to see.
+                    if case .finalAnswer = event, !signpostStarted {
+                        os_signpost(.begin, log: Self.signpostLog, name: "finalAnswer→done", signpostID: signpostID)
+                        signpostStarted = true
+                    }
                     await MainActor.run {
                         onEvent(event)
                     }
-                    
+
                     // If done event, break out of loop
                     if case .done = event {
+                        if signpostStarted {
+                            os_signpost(.end, log: Self.signpostLog, name: "finalAnswer→done", signpostID: signpostID)
+                        }
                         break
                     }
                 }
@@ -197,6 +243,12 @@ class StreamingPredictionService {
                 elapsedMs:  json["elapsed_ms"]  as? Int    ?? 0
             )
 
+        case "token":
+            // Per-token SSE frame: { "content": "..." }. Backend may emit
+            // many of these per answer. ChatViewModel appends each chunk
+            // into streamingContent live (no client-side typewriter).
+            return .token(content: json["content"] as? String ?? "")
+
         case "final_answer":
             return .finalAnswer(
                 content: json["content"] as? String ?? ""
@@ -236,6 +288,13 @@ class StreamingPredictionService {
             
         case "done":
             return .done(totalSteps: json["total_steps"] as? Int ?? 0)
+
+        case "backpressure":
+            // C-2: server is shedding load; client must fall back to sync /predict.
+            // ChatViewModel handles this event by tearing down the streaming bubble
+            // and replaying via sendMessageSync.
+            let retryAfter = json["retry_after_seconds"] as? Int ?? 5
+            return .backpressure(retryAfterSeconds: retryAfter)
             
         case "error":
             // Backend sends 'error' for exceptions, but 'message' for quota errors

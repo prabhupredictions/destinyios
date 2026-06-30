@@ -998,18 +998,8 @@ struct AskDestinySheet: View {
                                     ForEach(messages, id: \.id) { message in
                                         CompatChatBubble(
                                             message: message,
-                                            enableTypewriter: newMessageIds.contains(message.id),
                                             cosmicProgressSteps: message.id == redirectStreamingMessageId
-                                                ? redirectCosmicProgressSteps : [],
-                                            // When typewriter finishes we deliberately do NOT
-                                            // scroll to bottom — the user is reading from the
-                                            // top of the answer (pin-to-top behavior). Just
-                                            // remove the id from newMessageIds so the bubble
-                                            // stops animating; leave scroll position alone.
-                                            onTypewriterFinished: newMessageIds.contains(message.id) ? {
-                                                newMessageIds.remove(message.id)
-                                            } : nil,
-                                            onTypewriterProgress: nil
+                                                ? redirectCosmicProgressSteps : []
                                         )
                                         .id(message.id)
                                     }
@@ -1022,7 +1012,7 @@ struct AskDestinySheet: View {
                                     }
 
                                     // Follow-up suggestions (vertical rows matching ChatView)
-                                    if showFollowUpSuggestions && !suggestedQuestions.isEmpty && !isLoading && newMessageIds.isEmpty {
+                                    if showFollowUpSuggestions && !suggestedQuestions.isEmpty && !isLoading {
                                         FollowUpSuggestionsView(questions: suggestedQuestions) { question in
                                             HapticManager.shared.play(.light)
                                             isInputFocused = false
@@ -1792,10 +1782,7 @@ struct AskDestinySheet: View {
 // MARK: - Chat Bubble View (Matches ReadingMessageView fade-in pattern)
 private struct CompatChatBubble: View {
     let message: CompatChatMessage
-    var enableTypewriter: Bool = false  // true = new message, triggers fade-in
     var cosmicProgressSteps: [CosmicProgressStep] = []
-    var onTypewriterFinished: (() -> Void)? = nil
-    var onTypewriterProgress: (() -> Void)? = nil
 
     @State private var appeared = false
     @State private var showCopiedConfirmation = false
@@ -1819,7 +1806,7 @@ private struct CompatChatBubble: View {
                 messageContent
 
                 // Metadata row — only for completed AI messages (matches ChatView)
-                if !isUser && message.type == .ai && (!enableTypewriter || appeared) {
+                if !isUser && message.type == .ai && appeared {
                     metadataRow
                 }
             }
@@ -1831,11 +1818,10 @@ private struct CompatChatBubble: View {
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
         .accessibilityIdentifier(isUser ? "compat_user_message" : "compat_ai_message")
         .onAppear {
-            guard enableTypewriter && !appeared else { return }
+            guard !appeared else { return }
             withAnimation(.easeIn(duration: 0.5)) {
                 appeared = true
             }
-            onTypewriterFinished?()
         }
     }
 
@@ -1882,7 +1868,7 @@ private struct CompatChatBubble: View {
                     textColor: AppTheme.Colors.textPrimary,
                     fontSize: 17
                 )
-                .opacity(enableTypewriter && !appeared ? 0 : 1)
+                .opacity(appeared ? 1 : 0)
                 .animation(.easeIn(duration: 0.5), value: appeared)
                 .transition(.opacity)
             }

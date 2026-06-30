@@ -3,17 +3,17 @@ import SwiftUI
 /// Input bar for composing chat messages
 struct ChatInputBar: View {
     @Binding var text: String
-    @FocusState.Binding var isFocused: Bool
     let isLoading: Bool
     let isStreaming: Bool
-    let isTyping: Bool  // disable during typewriter effect
     let onSend: () -> Void
+    let onStop: () -> Void
 
+    @FocusState private var isFocused: Bool
     @State private var showStyleSelector = false
     @State private var lengthManager = ResponseLengthManager.shared
 
     private var canSend: Bool {
-        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming && !isTyping
+        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading && !isStreaming
     }
 
     var body: some View {
@@ -44,26 +44,28 @@ struct ChatInputBar: View {
                 .onSubmit { if canSend { onSend() } }
                 .accessibilityIdentifier("chat_input")
 
-            // Send / loading indicator (right, inside pill)
-            Button(action: onSend) {
-                ZStack {
-                    if isLoading || isStreaming {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.gold))
-                            .scaleEffect(0.75)
-                            .frame(width: 40, height: 36)
-                    } else {
-                        Image(systemName: "arrow.up")
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.4))
-                            .frame(width: 40, height: 36)
-                    }
+            // Right side: Send while idle, Stop while generating.
+            if isLoading || isStreaming {
+                Button(action: onStop) {
+                    Image(systemName: "stop.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(AppTheme.Colors.gold)
+                        .frame(width: 40, height: 36)
                 }
+                .accessibilityIdentifier("chat_stop_button")
+                .accessibilityLabel("Stop generating")
+            } else {
+                Button(action: onSend) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundColor(canSend ? AppTheme.Colors.gold : AppTheme.Colors.textSecondary.opacity(0.4))
+                        .frame(width: 40, height: 36)
+                }
+                .accessibilityIdentifier("chat_send_button")
+                .accessibilityLabel("Send")
+                .disabled(!canSend)
+                .animation(.spring(response: 0.3), value: canSend)
             }
-            .disabled(!canSend)
-            .accessibilityLabel("a11y_send_message".localized)
-            .accessibilityIdentifier("send_button")
-            .animation(.spring(response: 0.3), value: canSend)
         }
         .padding(.leading, 4)
         .padding(.trailing, 4)
@@ -91,21 +93,17 @@ struct ChatInputBar: View {
 #Preview {
     struct PreviewWrapper: View {
         @State private var text = ""
-        @FocusState private var isFocused: Bool
 
         var body: some View {
             VStack {
                 Spacer()
                 ChatInputBar(
                     text: $text,
-                    isFocused: $isFocused,
                     isLoading: false,
                     isStreaming: false,
-                    isTyping: false
-                ) {
-                    print("Send: \(text)")
-                    text = ""
-                }
+                    onSend: { print("Send") },
+                    onStop: { print("Stop") }
+                )
             }
             .background(AppTheme.Colors.mainBackground)
         }

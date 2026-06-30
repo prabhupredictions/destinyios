@@ -148,18 +148,26 @@ struct AppTheme {
         private static let canelaMedium = "Canela-Medium"   // Font name for canela_bold.otf
         
         /// Premium display font (Canela Regular) - for headlines that need luxury feel
+        ///
+        /// NOTE on Dynamic Type: previously these were `.custom(_, size:, relativeTo:)`
+        /// to scale with iOS text-size settings. That subtly altered Canela's leading
+        /// and visual size at default settings (bodies looked ~10% larger). Reverted
+        /// 2026-06-28 to absolute-size fonts to preserve the brand typography. Dynamic
+        /// Type still applies via SwiftUI's default scaling on `.system()` text outside
+        /// these helpers, and a future a11y pass can re-introduce relativeTo with proper
+        /// per-size baselines if needed.
         static func premiumDisplay(size: CGFloat) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
                 return .custom(canelaRegular, size: size)
             }
             return .system(size: size, weight: .regular, design: .serif)
         }
-        
+
         /// Semantic Alias for 'Soul' Font (Sensory Stack)
         static func soul(size: CGFloat) -> Font {
             return premiumDisplay(size: size)
         }
-        
+
         /// Standard display font - for general headlines
         static func display(size: CGFloat) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
@@ -167,14 +175,14 @@ struct AppTheme {
             }
             return .system(size: size, weight: .regular, design: .serif)
         }
-        
+
         static func title(size: CGFloat) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
                 return .custom(canelaRegular, size: size)
             }
             return .system(size: size, weight: .semibold, design: .serif)
         }
-        
+
         static func body(size: CGFloat) -> Font {
             // Canela Roman for body text
             if let _ = UIFont(name: canelaRegular, size: size) {
@@ -182,7 +190,7 @@ struct AppTheme {
             }
             return .system(size: size, weight: .regular, design: .serif)
         }
-        
+
         static func caption(size: CGFloat = 12) -> Font {
             if let _ = UIFont(name: canelaRegular, size: size) {
                 return .custom(canelaRegular, size: size)

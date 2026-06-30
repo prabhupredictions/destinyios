@@ -1,7 +1,7 @@
 import Foundation
 
-/// Fetches gate config from backend on launch.
-/// Drives: guest button visibility, gate mode awareness.
+/// Fetches gate config from backend on launch and foreground.
+/// Drives: guest button visibility, gate mode awareness, streaming kill-switch.
 @Observable
 final class AppStartupService {
     static let shared = AppStartupService()
@@ -12,36 +12,86 @@ final class AppStartupService {
     private var lastFetchedAt: Date?
     private let cacheTTL: TimeInterval = 900 // 15 min
 
-    private struct ConfigResponse: Decodable {
-        let gateMode: String
-        let allowGuest: Bool
-        enum CodingKeys: String, CodingKey {
-            case gateMode = "gate_mode"
-            case allowGuest = "allow_guest"
+    private struct AppConfigDTO: Decodable {
+        let gate_mode: String?
+        let allow_guest: Bool?
+        let streaming_enabled: Bool?
+        let streaming_cohort_percent: Int?
+        let streaming_min_app_version: String?
+    }
+
+    /// Internal — performs the network fetch + writes to both sinks.
+    /// Caller decides whether to gate on TTL.
+    ///
+    /// Cold-start hardening (2026-06-29): Cloud Run scales to zero after
+    /// ~15 min idle; cold starts of this image take 20–60s (Docker pull +
+    /// uvicorn boot + DB pool). The previous 10s timeout lost that race on
+    /// every "open app after 1 hr" launch, leaving AppConfig.streamingEnabled
+    /// at its conservative default (false) and silently routing chat to the
+    /// legacy non-streaming path until the user signed out + back in (which
+    /// inadvertently gave Cloud Run enough wall-clock to warm). Two changes:
+    ///   1. timeoutInterval 10 → 60 (covers the cold-start window)
+    ///   2. one retry after 5s on failure (catches transient timeouts so
+    ///      the user doesn't have to sign out to recover)
+    private func _fetch() async {
+        if await _attemptFetch() { return }
+        // First attempt failed (timeout, transient 5xx, parse error). Wait
+        // 5s — by now Cloud Run has almost certainly warmed from the first
+        // request hitting the container — then try once more. If this also
+        // fails, AppConfig defaults stay in place and the next foreground
+        // transition (refreshAppConfig) re-tries.
+        try? await Task.sleep(nanoseconds: 5_000_000_000)
+        _ = await _attemptFetch()
+    }
+
+    /// One fetch attempt. Returns true on success, false on any failure.
+    private func _attemptFetch() async -> Bool {
+        guard let url = URL(string: "\(APIConfig.baseURL)/api/v2/app/config") else { return false }
+        var req = URLRequest(url: url)
+        req.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        req.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
+        req.timeoutInterval = 60
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: req)
+            let dto = try JSONDecoder().decode(AppConfigDTO.self, from: data)
+            await MainActor.run {
+                // Dual-sink writes (I-2a from review): self.* for AuthView/AppRootView,
+                // AppConfig.shared for ChatViewModel streaming gate.
+                if let gate = dto.gate_mode {
+                    AppConfig.shared.gateMode = gate
+                    self.gateMode = gate
+                }
+                if let guest = dto.allow_guest {
+                    AppConfig.shared.allowGuest = guest
+                    self.allowGuest = guest
+                }
+                if let enabled = dto.streaming_enabled { AppConfig.shared.streamingEnabled = enabled }
+                if let cohort = dto.streaming_cohort_percent { AppConfig.shared.streamingCohortPercent = cohort }
+                if let minV = dto.streaming_min_app_version { AppConfig.shared.streamingMinAppVersion = minV }
+                self.lastFetchedAt = Date()
+            }
+            return true
+        } catch {
+            // Defaults are conservative — streaming stays off on network failure.
+            // Leave prior cached values intact.
+            return false
         }
     }
 
+    /// Launch-time fetch — TTL-guarded (15 min) to avoid duplicate hits during cold start.
     func fetchConfig() async {
         if let last = lastFetchedAt, Date().timeIntervalSince(last) < cacheTTL {
             return
         }
-        guard let url = URL(string: "\(APIConfig.baseURL)/api/v2/app/config") else { return }
-        var request = URLRequest(url: url)
-        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
-        request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
-        request.timeoutInterval = 10
+        await _fetch()
+    }
 
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let config = try JSONDecoder().decode(ConfigResponse.self, from: data)
-            await MainActor.run {
-                self.gateMode = config.gateMode
-                self.allowGuest = config.allowGuest
-                self.lastFetchedAt = Date()
-            }
-        } catch {
-            // Leave prior cached values intact on transient network failure.
-            // On first launch with no cache, defaults ("off", false) remain — safe.
-        }
+    /// Force-fresh fetch — used by scenePhase → .active foreground transitions and
+    /// the kill-switch SLA path. No TTL guard (C-1 fix from final review):
+    /// kill-switch propagation must be bounded by client poll cadence (≤60s),
+    /// not by the launch-time dedup window.
+    func refreshAppConfig() async {
+        await _fetch()
     }
 }

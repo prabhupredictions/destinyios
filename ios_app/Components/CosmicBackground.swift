@@ -20,7 +20,7 @@ struct OrbitalBackground: View {
                     .ignoresSafeArea()
                 
                 // Central sun/glow
-                CentralSun(center: center)
+                CentralSun(center: center) 
                 
                 // Orbits and planets
                 // Mercury - innermost, fastest

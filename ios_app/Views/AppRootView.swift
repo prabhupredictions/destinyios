@@ -51,6 +51,15 @@ struct AppRootView: View {
         UserDefaults.standard.set(env["E2E_CITY"]      ?? "Bhilai",     forKey: "cityOfBirth")
         UserDefaults.standard.set(env["E2E_LATITUDE"]  ?? "21.2138",    forKey: "latitude")
         UserDefaults.standard.set(env["E2E_LONGITUDE"] ?? "81.3943",    forKey: "longitude")
+
+        // Streaming E2E force-on: bypass cohort gate for streaming tests.
+        // STREAMING_E2E_FORCE_ON=1 is injected by the Appium conftest via
+        // launchEnvironment when running test_24_chat_streaming.py.
+        if env["STREAMING_E2E_FORCE_ON"] == "1" {
+            AppConfig.shared.streamingEnabled = true
+            AppConfig.shared.streamingCohortPercent = 100
+            AppConfig.shared.streamingMinAppVersion = "0.0.1"
+        }
     }
     #endif
 
