@@ -100,7 +100,15 @@ class SubscriptionManager: ObservableObject {
     // loops if the backend keeps rejecting (e.g. cross-account where the
     // token is owned by another user — distinct from "unknown").
     private var appAccountTokenSelfHealAttempts: [String: Int] = [:]
-    private let appAccountTokenSelfHealMaxAttempts = 1
+    /// W6 (2026-07-06): raised 1 → 2. One retry left legitimate users
+    /// with stale Keychain (e.g. after restore-from-backup, migrated
+    /// iCloud Keychain, or a device-swap) stranded — the first attempt
+    /// consumed the retry budget on the stale token, the second surfaced
+    /// the terminal error even though a clean re-mint would have worked.
+    /// Two attempts covers the common case; if the token is genuinely
+    /// unknown to the backend, both attempts still fail and we surface
+    /// the actionable error message below (with a Restore Purchases hint).
+    private let appAccountTokenSelfHealMaxAttempts = 2
 
     // MARK: - Foreground sync timer (INV-2 Gap A)
     /// Runs while the app is in foreground and triggers QuotaManager.syncStatus
@@ -1089,10 +1097,18 @@ class SubscriptionManager: ObservableObject {
                         return false
                     } else {
                         print("⛔ [Backend] app_account_token_unknown — exhausted self-heal retries, surfacing error and finishing transaction")
+                        // W6 (2026-07-06): more actionable error copy.
+                        // Prior copy hinted at "Restore Purchases" but users
+                        // in this state have never actually completed a
+                        // purchase to restore — the flow is stuck at
+                        // /verify, not at StoreKit. Direct them to the
+                        // recovery step that actually works: sign out of the
+                        // App Store on the device and back in, which
+                        // regenerates the appAccountToken from scratch.
                         self.errorMessage = NSLocalizedString(
                             "purchase_verification_failed",
-                            value: "We couldn't verify your purchase. Please tap 'Restore Purchases' from the subscription screen, or contact support if the problem persists.",
-                            comment: "Shown when /verify rejects a purchase that iOS could not self-heal"
+                            value: "We couldn't verify your purchase after several tries. Please sign out of the App Store on this device (Settings → Apple ID → Media & Purchases → Sign Out) and sign back in, then try purchasing again. If it still fails, contact support.",
+                            comment: "Shown when /verify rejects a purchase that iOS could not self-heal after 2 attempts"
                         )
                         // Fall through to terminal-finish below
                     }
@@ -1133,13 +1149,54 @@ class SubscriptionManager: ObservableObject {
             // future redelivery of the same originalID (e.g. after refund
             // reversal).
             self.appAccountTokenSelfHealAttempts.removeValue(forKey: "\(transaction.originalID)")
-            // Sync quota status after successful verification (force bypass cooldown)
-            try? await QuotaManager.shared.syncStatus(email: email, force: true)
+            // Sync quota status after successful verification.
+            //
+            // W6 (2026-07-06): retry with backoff if syncStatus network-fails.
+            // Previously used `try? await ... force: true` which silently
+            // swallowed errors — leaving isPremium=false even though the
+            // server-side verify succeeded. The paywall would dismiss, and
+            // the user would see free-tier UI for up to 60s until the next
+            // scenePhase-driven syncStatus poll. Users interpreted this as
+            // "I paid but nothing happened."
+            //
+            // Retry up to 3 times with 0.5s → 1.0s → 2.0s backoff. Total
+            // worst-case ~3.5s before we give up, well within acceptable
+            // post-purchase UX. If all attempts fail, isPremium stays
+            // whatever QuotaManager's cache holds; the next foreground poll
+            // will eventually recover (existing mechanism).
+            await syncStatusWithBackoff(email: email)
             return true
         } catch {
             print("❌ Backend verification error: \(error) — keeping transaction unfinished for retry")
             return false
         }
+    }
+
+    /// Retry QuotaManager.syncStatus with exponential backoff (0.5s / 1.0s / 2.0s).
+    /// Used after a successful verifyWithBackend so isPremium reliably flips
+    /// true before the paywall dismisses, even under transient network flakiness.
+    /// Bounded to ~3.5s worst-case total wait; falls back to next foreground
+    /// poll if all retries fail (unchanged existing behavior).
+    private func syncStatusWithBackoff(email: String) async {
+        let delays: [UInt64] = [
+            500_000_000,   // 0.5s
+            1_000_000_000, // 1.0s
+            2_000_000_000, // 2.0s
+        ]
+        for (attempt, delay) in delays.enumerated() {
+            do {
+                try await QuotaManager.shared.syncStatus(email: email, force: true)
+                if attempt > 0 {
+                    print("🔄 [syncStatus] recovered on attempt \(attempt + 1)")
+                }
+                return
+            } catch {
+                print("⚠️ [syncStatus] attempt \(attempt + 1) failed: \(error) — retrying in \(Double(delay) / 1e9)s")
+                try? await Task.sleep(nanoseconds: delay)
+            }
+        }
+        // Final best-effort attempt after the last delay.
+        try? await QuotaManager.shared.syncStatus(email: email, force: true)
     }
     
     private func getCurrentUserEmail() -> String? {

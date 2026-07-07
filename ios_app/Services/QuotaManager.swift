@@ -887,12 +887,31 @@ class QuotaManager: ObservableObject {
     }
 
     /// Subscription status display: "Active", "Expired", "Grace Period", "Canceled"
+    ///
+    /// W6 (2026-07-06): For status='canceled' — Apple's terminology for
+    /// "user turned off auto-renew" — show "Active" while `subscription_expires_at`
+    /// is still in the future. Users legitimately have entitlement during
+    /// this window; the raw word "Canceled" next to a still-paid plan
+    /// misleads paying customers into support tickets ("I paid but it says
+    /// canceled"). Once expires_at passes without renewal, the backend
+    /// promotes the row to 'expired' via lazy-heal (see quota_service.py
+    /// ghost_active_drift path), so this display mapping does NOT hide
+    /// truly-expired state.
+    ///
+    /// The nuance ("auto-renew off; ends {date}") is surfaced separately
+    /// by subscriptionStatusDetailText and subscriptionStatusCTA below.
     var subscriptionStatusDisplayText: String {
         switch subscriptionStatus {
         case "active": return "Active"
+        case "canceled":
+            // Still in the paid period → user still has entitlement → show Active.
+            if let expiry = subscriptionExpiresAt, expiry > Date() {
+                return "Active"
+            }
+            // Period has expired but the row wasn't yet promoted to 'expired'.
+            return "Expired"
         case "expired": return "Expired"
         case "grace_period": return "Grace Period"
-        case "canceled": return "Canceled"
         // W3: cover the rest of the state machine so ProfileView / paywall
         // copy is honest about why entitlement is/isn't granted.
         case "billing_retry": return "Payment Failed"
