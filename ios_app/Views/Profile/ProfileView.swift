@@ -37,6 +37,7 @@ struct ProfileView: View {
     @State private var showDeleteAccountSheet = false  // Delete account confirmation
     @State private var isDeletingAccount = false
     @State private var deleteErrorMessage: String? = nil
+    @State private var showSignInForDelete = false      // Re-auth prompt when session is stale
     
     // History settings
     @State private var historySettings = HistorySettingsManager.shared
@@ -181,6 +182,13 @@ struct ProfileView: View {
                 )
                 .environment(authViewModel)
             }
+            .sheet(isPresented: $showSignInForDelete) {
+                GuestSignInPromptView(
+                    message: "delete_session_expired_banner".localized,
+                    onBack: { showSignInForDelete = false }
+                )
+                .environment(authViewModel)
+            }
             .sheet(isPresented: $showNotificationPreferences) {
                 NotificationPreferencesSheet(userEmail: userEmail)
             }
@@ -194,8 +202,12 @@ struct ProfileView: View {
                     isDeleting: $isDeletingAccount,
                     errorMessage: $deleteErrorMessage,
                     hasActiveSubscription: hasActivePaidSubscription,
+                    sessionIsFresh: SessionTokenStore.shared.sessionIsFresh(),
                     onConfirmDelete: {
                         performAccountDeletion()
+                    },
+                    onSignInTapped: {
+                        showSignInForDelete = true
                     }
                 )
             }
@@ -940,23 +952,33 @@ struct ProfileView: View {
     private func performAccountDeletion() {
         isDeletingAccount = true
         deleteErrorMessage = nil
-        
+
         Task {
             do {
                 try await ProfileService.shared.deleteAccount(email: userEmail)
-                
+
                 // Success — close sheet, sign out, and dismiss profile
                 await MainActor.run {
                     isDeletingAccount = false
                     showDeleteAccountSheet = false
                 }
-                
+
                 // Small delay for sheet dismissal animation
                 try? await Task.sleep(nanoseconds: 400_000_000)
-                
+
                 await authViewModel.signOutAsync()
                 await MainActor.run {
                     dismiss()
+                }
+            } catch ProfileError.sessionExpired {
+                await MainActor.run {
+                    isDeletingAccount = false
+                    showDeleteAccountSheet = false
+                }
+                // Brief delay so the sheet dismisses before re-auth flow starts
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                await MainActor.run {
+                    showSignInForDelete = true
                 }
             } catch {
                 await MainActor.run {

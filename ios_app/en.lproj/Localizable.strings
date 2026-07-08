@@ -2174,6 +2174,8 @@
 "delete_your_account" = "Delete Your Account?";
 "cancel_subscription_first" = "Please cancel your subscription in the App Store before deleting your account.";
 "type_delete_to_confirm" = "Type DELETE to confirm";
+"delete_session_expired_banner" = "Please sign in again to delete your account.";
+"delete_session_expired_message" = "Your session has expired. Please sign in again to delete your account.";
 
 // ════════════════════════════════════════════════════════════════════════════
 // MARK: - History View

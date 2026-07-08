@@ -571,14 +571,24 @@ class ProfileService {
     
     /// Soft-delete the user account on server
     func deleteAccount(email: String) async throws {
+        // Do NOT use NetworkClient.authBearer() here — it silently falls back to the
+        // bundled API key when the session JWT is missing or stale. The backend
+        // correctly rejects that with 401 session_required for irreversible actions.
+        // We must have a fresh session JWT; if not, surface sessionExpired immediately
+        // so the UI can ask the user to sign in again rather than fire repeated 401s.
+        guard SessionTokenStore.shared.sessionIsFresh(),
+              let jwt = SessionTokenStore.shared.currentSessionJwt() else {
+            throw ProfileError.sessionExpired
+        }
+
         guard let url = URL(string: "\(APIConfig.baseURL)/subscription/account/delete") else {
             throw ProfileError.invalidURL
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(jwt)", forHTTPHeaderField: "Authorization")
         request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
         let body: [String: String] = [
@@ -593,6 +603,9 @@ class ProfileService {
             throw ProfileError.invalidResponse
         }
         
+        if httpResponse.statusCode == 401 {
+            throw ProfileError.sessionExpired
+        }
         if httpResponse.statusCode == 409 {
             // W7 fix (2026-06-20): backend returns 409 with dict body
             // {"code": "active_subscription", "message": "...",
@@ -743,6 +756,7 @@ enum ProfileError: Error, LocalizedError {
     case birthDataTaken(existingEmail: String?, provider: String?)  // Birth data belongs to another registered user
     case accountDeletionBlocked(String)
     case accountDeleted(String)  // Account was soft-deleted — sign-in blocked
+    case sessionExpired          // Session JWT missing or expired; user must re-sign-in
     
     /// Helper for pattern matching in catch clauses
     var isAccountDeleted: Bool {
@@ -773,6 +787,8 @@ enum ProfileError: Error, LocalizedError {
             return reason
         case .accountDeleted(let message):
             return message
+        case .sessionExpired:
+            return NSLocalizedString("delete_session_expired_message", comment: "Session expired error for delete account")
         }
     }
 }
