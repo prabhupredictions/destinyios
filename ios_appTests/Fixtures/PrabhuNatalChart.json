@@ -1,0 +1,130 @@
+{
+  "_meta": {
+    "description": "Golden natal chart fixture for Prabhu Kushwaha (project owner). Used to detect drift in the /vedic/api/predict chart_data response shape. Placements pinned per docs/prabhu_chart.md — Gemini lagna at 29°30' with Sun H1, Moon+Ketu H8, Mercury+Rahu H2, Venus H12 (own sign), Jupiter+Saturn H3.",
+    "source": "Prabhu Kushwaha natal chart",
+    "birth_data": {
+      "dob": "1980-07-01",
+      "time": "06:32",
+      "latitude": 21.2138,
+      "longitude": 81.3943,
+      "city_of_birth": "Bhilai",
+      "ayanamsa": "lahiri",
+      "house_system": "whole_sign"
+    },
+    "regenerate": "This fixture is authored — not machine-generated. Update only if the ChartData Codable contract in ios_app/Models/ChartData.swift changes (e.g. new field on D1PlanetPosition). Do NOT auto-regenerate from a backend call; degrees and derived fields are approximate reference values chosen for a stable decode test, not for astrological accuracy."
+  },
+  "d1": {
+    "Ascendant": {
+      "house": 1,
+      "sign": "Ge",
+      "degree": 89.5,
+      "retrograde": false,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Punarvasu",
+      "pada": 4
+    },
+    "Sun": {
+      "house": 1,
+      "sign": "Ge",
+      "degree": 75.42,
+      "retrograde": false,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Ardra",
+      "pada": 2
+    },
+    "Moon": {
+      "house": 8,
+      "sign": "Cp",
+      "degree": 292.15,
+      "retrograde": false,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Shravana",
+      "pada": 3
+    },
+    "Mercury": {
+      "house": 2,
+      "sign": "Ca",
+      "degree": 98.3,
+      "retrograde": false,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Pushya",
+      "pada": 1
+    },
+    "Venus": {
+      "house": 12,
+      "sign": "Ta",
+      "degree": 48.05,
+      "retrograde": false,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Rohini",
+      "pada": 2
+    },
+    "Mars": {
+      "house": 11,
+      "sign": "Ar",
+      "degree": 15.6,
+      "retrograde": false,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Bharani",
+      "pada": 1
+    },
+    "Jupiter": {
+      "house": 3,
+      "sign": "Le",
+      "degree": 132.2,
+      "retrograde": false,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Purva Phalguni",
+      "pada": 2
+    },
+    "Saturn": {
+      "house": 3,
+      "sign": "Le",
+      "degree": 134.55,
+      "retrograde": true,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Purva Phalguni",
+      "pada": 2
+    },
+    "Rahu": {
+      "house": 2,
+      "sign": "Ca",
+      "degree": 112.1,
+      "retrograde": true,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Ashlesha",
+      "pada": 2
+    },
+    "Ketu": {
+      "house": 8,
+      "sign": "Cp",
+      "degree": 292.1,
+      "retrograde": true,
+      "vargottama": false,
+      "combust": false,
+      "nakshatra": "Shravana",
+      "pada": 3
+    }
+  },
+  "d9": {
+    "Ascendant": {"house": 1, "sign": "Sc"},
+    "Sun": {"house": 3, "sign": "Cp"},
+    "Moon": {"house": 7, "sign": "Ta"},
+    "Mercury": {"house": 5, "sign": "Pi"},
+    "Venus": {"house": 10, "sign": "Le"},
+    "Mars": {"house": 12, "sign": "Li"},
+    "Jupiter": {"house": 2, "sign": "Sg"},
+    "Saturn": {"house": 6, "sign": "Ar"},
+    "Rahu": {"house": 5, "sign": "Pi"},
+    "Ketu": {"house": 11, "sign": "Vi"}
+  }
+}
