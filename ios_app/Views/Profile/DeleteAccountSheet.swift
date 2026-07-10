@@ -5,15 +5,17 @@ struct DeleteAccountSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var isDeleting: Bool
     @Binding var errorMessage: String?
-    
+
     let hasActiveSubscription: Bool
+    let sessionIsFresh: Bool
     let onConfirmDelete: () -> Void
-    
+    let onSignInTapped: () -> Void
+
     @State private var confirmationText = ""
     @FocusState private var isTextFieldFocused: Bool
-    
+
     private var canDelete: Bool {
-        confirmationText == "DELETE" && !hasActiveSubscription && !isDeleting
+        confirmationText == "DELETE" && !hasActiveSubscription && !isDeleting && sessionIsFresh
     }
     
     var body: some View {
@@ -64,7 +66,7 @@ struct DeleteAccountSheet: View {
                             Image(systemName: "creditcard.fill")
                                 .font(.system(size: 16))
                                 .foregroundColor(.orange)
-                            
+
                             Text("cancel_subscription_first".localized)
                                 .font(AppTheme.Fonts.caption(size: 13))
                                 .foregroundColor(.orange)
@@ -76,6 +78,44 @@ struct DeleteAccountSheet: View {
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                                )
+                        )
+                    }
+
+                    // Session-expired banner — shown when JWT is missing/stale
+                    if !sessionIsFresh {
+                        VStack(spacing: 10) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.yellow)
+                                Text("delete_session_expired_banner".localized)
+                                    .font(AppTheme.Fonts.caption(size: 13))
+                                    .foregroundColor(.yellow)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            Button(action: {
+                                dismiss()
+                                onSignInTapped()
+                            }) {
+                                Text("sign_in_button".localized)
+                                    .font(AppTheme.Fonts.body(size: 14).weight(.semibold))
+                                    .foregroundColor(AppTheme.Colors.mainBackground)
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color.yellow)
+                                    )
+                            }
+                        }
+                        .padding(14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.yellow.opacity(0.1))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.yellow.opacity(0.3), lineWidth: 1)
                                 )
                         )
                     }
