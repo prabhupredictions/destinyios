@@ -263,21 +263,42 @@ class BirthDataViewModel {
                 // chat-history migration. Without this, /subscription/upgrade
                 // returns 401 session_required and the migration is silently
                 // dropped (see ProfileService.upgradeGuestToRegistered).
+                //
+                // 1.10 hardening — the guest email written above is birth-
+                // derived; if this mint fails, the session token keeps an
+                // OLDER birth-derived email while requests carry the new one,
+                // producing 403 body_email_mismatch on predictions. We retry
+                // (3 attempts, exponential backoff) to shrink that drift
+                // window. The server also fuzzy-accepts small guest drift, and
+                // lazy-mint at upgrade remains the final safety net — so a
+                // total failure still never blocks the birth-data save.
                 let trimmedName = userName.trimmingCharacters(in: .whitespacesAndNewlines)
                 let guestUserName: String? = trimmedName.isEmpty ? nil : trimmedName
                 Task.detached(priority: .userInitiated) {
-                    do {
-                        _ = try await AuthExchangeClient.shared.signInAsGuest(
-                            email: email,
-                            isGeneratedEmail: true,
-                            userName: guestUserName
-                        )
-                        print("[BirthDataViewModel] ✅ W7 guest session JWT minted for \(email)")
-                    } catch {
-                        // Lazy-mint in ProfileService.upgradeGuestToRegistered
-                        // is the safety net — log but don't block birth-data
-                        // save (offline first launches still work).
-                        print("[BirthDataViewModel] ⚠️ W7 guest JWT mint failed (will lazy-mint at upgrade): \(error)")
+                    var attempt = 0
+                    let maxAttempts = 3
+                    while attempt < maxAttempts {
+                        attempt += 1
+                        do {
+                            _ = try await AuthExchangeClient.shared.signInAsGuest(
+                                email: email,
+                                isGeneratedEmail: true,
+                                userName: guestUserName
+                            )
+                            print("[BirthDataViewModel] ✅ W7 guest session JWT minted for \(email) (attempt \(attempt))")
+                            return
+                        } catch {
+                            if attempt >= maxAttempts {
+                                // Lazy-mint in ProfileService.upgradeGuestToRegistered
+                                // is the safety net — log but don't block birth-data
+                                // save (offline first launches still work).
+                                print("[BirthDataViewModel] ⚠️ W7 guest JWT mint failed after \(maxAttempts) attempts (will lazy-mint at upgrade): \(error)")
+                                return
+                            }
+                            // Exponential backoff: 1s, 2s
+                            let delaySeconds = UInt64(attempt) * 1_000_000_000
+                            try? await Task.sleep(nanoseconds: delaySeconds)
+                        }
                     }
                 }
             }
