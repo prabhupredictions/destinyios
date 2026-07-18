@@ -2914,6 +2914,7 @@
 "share_analytics_subtitle" = "通过分享使用分析帮助改善应用";
 "contact_us_title" = "联系我们";
 "history_cleared_title" = "历史已清除";
+"clear_history_failed_message" = "无法清除历史记录。请检查网络连接后重试。";
 "personalized_alerts_sign_in_prompt" = "登录以启用基于您出生星盘的个性化提醒。";
 "current_plan_label" = "当前套餐";
 

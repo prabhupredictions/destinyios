@@ -2914,6 +2914,7 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "share_analytics_subtitle" = "Ajude a melhorar o app compartilhando análises de uso";
 "contact_us_title" = "Fale conosco";
 "history_cleared_title" = "Histórico limpo";
+"clear_history_failed_message" = "Não foi possível limpar o histórico. Verifique sua conexão e tente novamente.";
 "personalized_alerts_sign_in_prompt" = "Faça login para ativar alertas personalizados com base no seu mapa natal.";
 "current_plan_label" = "Plano atual";
 

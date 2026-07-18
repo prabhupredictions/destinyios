@@ -2914,6 +2914,7 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "share_analytics_subtitle" = "Contribuez à améliorer l'application en partageant les analyses d'utilisation";
 "contact_us_title" = "Contactez-nous";
 "history_cleared_title" = "Historique effacé";
+"clear_history_failed_message" = "Impossible d'effacer l'historique. Vérifie ta connexion et réessaie.";
 "personalized_alerts_sign_in_prompt" = "Connectez-vous pour activer les alertes personnalisées basées sur votre thème natal.";
 "current_plan_label" = "Forfait actuel";
 

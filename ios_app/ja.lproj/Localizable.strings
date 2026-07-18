@@ -2914,6 +2914,7 @@
 "share_analytics_subtitle" = "使用状況の分析を共有してアプリの改善にご協力ください";
 "contact_us_title" = "お問い合わせ";
 "history_cleared_title" = "履歴を消去しました";
+"clear_history_failed_message" = "履歴を消去できませんでした。接続を確認して、もう一度お試しください。";
 "personalized_alerts_sign_in_prompt" = "出生チャートに基づいたパーソナライズされたアラートを有効にするにはサインインしてください。";
 "current_plan_label" = "現在のプラン";
 

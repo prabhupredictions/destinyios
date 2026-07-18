@@ -2777,6 +2777,7 @@
 "share_analytics_subtitle" = "उपयोग विश्लेषण साझा करके ऐप को बेहतर बनाने में मदद करें";
 "contact_us_title" = "हमसे संपर्क करें";
 "history_cleared_title" = "इतिहास साफ किया";
+"clear_history_failed_message" = "इतिहास साफ़ नहीं हो सका। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।";
 "personalized_alerts_sign_in_prompt" = "अपनी जन्म कुंडली के आधार पर व्यक्तिगत अलर्ट सक्षम करने के लिए साइन इन करें।";
 "current_plan_label" = "वर्तमान प्लान";
 

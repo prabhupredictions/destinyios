@@ -2881,6 +2881,7 @@
 "share_analytics_subtitle" = "Help improve the app by sharing usage analytics";
 "contact_us_title" = "Contact Us";
 "history_cleared_title" = "History Cleared";
+"clear_history_failed_message" = "Couldn't clear history. Please check your connection and try again.";
 "personalized_alerts_sign_in_prompt" = "Sign in to enable personalized alerts based on your birth chart.";
 "current_plan_label" = "Current Plan";
 

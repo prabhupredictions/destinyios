@@ -2910,6 +2910,7 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "share_analytics_subtitle" = "Hilf dabei, die App durch das Teilen von Nutzungsanalysen zu verbessern";
 "contact_us_title" = "Kontakt";
 "history_cleared_title" = "Verlauf gelöscht";
+"clear_history_failed_message" = "Verlauf konnte nicht gelöscht werden. Bitte überprüfe deine Verbindung und versuche es erneut.";
 "personalized_alerts_sign_in_prompt" = "Melde dich an, um personalisierte Benachrichtigungen basierend auf deinem Geburtshoroskop zu erhalten.";
 "current_plan_label" = "Aktueller Plan";
 

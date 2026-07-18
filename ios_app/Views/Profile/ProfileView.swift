@@ -45,6 +45,8 @@ struct ProfileView: View {
     @State private var showClearHistoryAlert = false
     @State private var showClearSuccessAlert = false
     @State private var clearedThreadCount = 0
+    // Shown when the server delete fails: local history is preserved (not falsely cleared).
+    @State private var showClearErrorAlert = false
     
     // Notification toggle
     @State private var notificationsEnabled = false
@@ -238,8 +240,15 @@ struct ProfileView: View {
                     Task {
                         let count = await historySettings.clearAllHistory(dataManager: DataManager.shared)
                         await MainActor.run {
-                            clearedThreadCount = count
-                            showClearSuccessAlert = true
+                            if let count = count {
+                                clearedThreadCount = count
+                                showClearSuccessAlert = true
+                            } else {
+                                // Server delete failed — local history was preserved.
+                                // Surface an error instead of a false "cleared" so the user
+                                // knows nothing was removed and can retry.
+                                showClearErrorAlert = true
+                            }
                         }
                         HapticManager.shared.play(.heavy)
                     }
@@ -252,6 +261,11 @@ struct ProfileView: View {
                 Button("ok_action".localized, role: .cancel) {}
             } message: {
                 Text(String(format: clearedThreadCount == 1 ? "deleted_conversation_singular".localized : "deleted_conversation_plural".localized, clearedThreadCount))
+            }
+            .alert("error".localized, isPresented: $showClearErrorAlert) {
+                Button("ok_action".localized, role: .cancel) {}
+            } message: {
+                Text("clear_history_failed_message".localized)
             }
         }
     }

@@ -2914,6 +2914,7 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "share_analytics_subtitle" = "Ayuda a mejorar la app compartiendo análisis de uso";
 "contact_us_title" = "Contáctanos";
 "history_cleared_title" = "Historial borrado";
+"clear_history_failed_message" = "No se pudo borrar el historial. Comprueba tu conexión e inténtalo de nuevo.";
 "personalized_alerts_sign_in_prompt" = "Inicia sesión para habilitar alertas personalizadas basadas en tu carta natal.";
 "current_plan_label" = "Plan actual";
 

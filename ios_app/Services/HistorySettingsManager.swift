@@ -110,49 +110,63 @@ final class HistorySettingsManager {
     /// Clears all chat threads + messages (SwiftData) and all compatibility history (UserDefaults)
     /// for the current user. This is irreversible.
     /// Also deletes all history from the backend server.
-    /// Returns the number of threads deleted from the server.
-    func clearAllHistory(dataManager: DataManager) async -> Int {
+    ///
+    /// Local history is wiped ONLY when the server delete succeeds — otherwise a failed
+    /// server delete (offline / 5xx / expired auth) would still clear local state and the
+    /// user would see everything reappear on the next login sync, having been told it was
+    /// cleared. Matches Android's ProfileViewModel.clearChatHistory failure handling.
+    ///
+    /// Returns `nil` when the server delete failed (local left intact — caller should show
+    /// an error), or the number of threads deleted from the server on success.
+    func clearAllHistory(dataManager: DataManager) async -> Int? {
         let userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest"
-        
-        // 1. Delete from server first (includes both chat and compatibility threads)
-        let deletedCount = await deleteAllHistoryFromServer(userEmail: userEmail)
-        
+
+        // 1. Delete from server first (includes both chat and compatibility threads).
+        //    Bail out WITHOUT touching local state if the server delete didn't succeed.
+        guard let deletedCount = await deleteAllHistoryFromServer(userEmail: userEmail) else {
+            print("[HistorySettingsManager] Server delete failed — local history preserved for \(userEmail)")
+            return nil
+        }
+
         // 2. Clear local chat threads and messages
         dataManager.deleteAllThreads(for: userEmail)
-        
+
         // 3. Clear local compatibility history
         CompatibilityHistoryService.shared.clearAll()
-        
+
         print("[HistorySettingsManager] Cleared all history (local + server) for \(userEmail)")
         return deletedCount
     }
-    
-    /// Deletes all chat history from the server (GDPR endpoint)
-    /// Returns the number of threads deleted
-    private func deleteAllHistoryFromServer(userEmail: String) async -> Int {
-        guard !userEmail.isEmpty else { return 0 }
-        
+
+    /// Deletes all chat history from the server (GDPR endpoint).
+    /// Returns the number of threads deleted on success, or `nil` on any failure
+    /// (invalid URL / network error / non-200) so the caller can preserve local state.
+    private func deleteAllHistoryFromServer(userEmail: String) async -> Int? {
+        guard !userEmail.isEmpty else { return nil }
+
         let urlString = "\(APIConfig.baseURL)/chat-history/all/\(userEmail)"
         guard let url = URL(string: urlString) else {
             print("[HistorySettingsManager] Invalid URL for delete all")
-            return 0
+            return nil
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
         request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
         request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
-        
+
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
-            
+
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 {
+                    // Success. deleted_count may be absent (e.g. 0 threads) — default to 0.
                     if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                        let deletedCount = json["deleted_count"] as? Int {
                         print("[HistorySettingsManager] Deleted \(deletedCount) threads from server")
                         return deletedCount
                     }
+                    return 0
                 } else {
                     print("[HistorySettingsManager] Server delete failed with status \(httpResponse.statusCode)")
                 }
@@ -160,7 +174,7 @@ final class HistorySettingsManager {
         } catch {
             print("[HistorySettingsManager] Failed to delete history from server: \(error)")
         }
-        
-        return 0
+
+        return nil
     }
 }
