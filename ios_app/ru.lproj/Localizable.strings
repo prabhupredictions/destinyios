@@ -3142,3 +3142,12 @@
 "subscription_plus_unavailable" = "Подписка Plus сейчас недоступна. Пожалуйста, попробуйте снова.";
 
 "delete_guest_not_allowed_message" = "Прежде чем удалить аккаунт, его нужно зарегистрировать. У гостей нет аккаунта для удаления.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "благоприятный";
+"yoga_token_inauspicious" = "неблагоприятный";
+"yoga_token_weak" = "слабый";
+"yoga_token_strong" = "сильный";
+"yoga_token_moderate" = "умеренный";
+"yoga_token_yoga_reduced" = "йога ослаблена";
+"yoga_token_yoga_cancelled" = "йога отменена";

@@ -137,6 +137,15 @@ struct AppRootView: View {
             await recheckWaitlistStatus()
         }
         .onReceive(NotificationCenter.default.publisher(for: .appLanguageChanged)) { _ in
+            // Clear language-dependent server content caches so stale
+            // English (or prior-language) predictions/charts don't persist
+            // after switching language. These caches are keyed by
+            // email+profileId only (NOT language), so a switch would
+            // otherwise keep showing the old-language content until natural
+            // expiry. Chat HISTORY is intentionally NOT cleared — it is not
+            // language-scoped and must survive a language switch.
+            TodaysPredictionCache.shared.clear()
+            AstroDataCache.shared.clearAll()
             // Force UI refresh when language changes
             withAnimation(.easeOut(duration: 0.3)) {
                 languageRefreshID = UUID()

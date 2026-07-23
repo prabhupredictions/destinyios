@@ -3143,3 +3143,12 @@
 "subscription_plus_unavailable" = "Plus സബ്സ്ക്രിപ്ഷൻ ഇപ്പോൾ ലഭ്യമല്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.";
 
 "delete_guest_not_allowed_message" = "അക്കൗണ്ട് ഇല്ലാതാക്കുന്നതിന് മുമ്പ് നിങ്ങൾ അത് രജിസ്റ്റർ ചെയ്യണം. അതിഥികൾക്ക് ഇല്ലാതാക്കാൻ അക്കൗണ്ട് ഇല്ല.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "ശുഭം";
+"yoga_token_inauspicious" = "അശുഭം";
+"yoga_token_weak" = "ദുർബലം";
+"yoga_token_strong" = "ശക്തം";
+"yoga_token_moderate" = "മിതം";
+"yoga_token_yoga_reduced" = "യോഗം കുറഞ്ഞു";
+"yoga_token_yoga_cancelled" = "യോഗം റദ്ദാക്കി";

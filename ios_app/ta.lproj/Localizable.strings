@@ -3140,3 +3140,12 @@
 "subscription_plus_unavailable" = "Plus சந்தா இப்போது கிடைக்கவில்லை. மீண்டும் முயற்சிக்கவும்.";
 
 "delete_guest_not_allowed_message" = "கணக்கை நீக்குவதற்கு முன் அதைப் பதிவு செய்ய வேண்டும். விருந்தினர்களுக்கு நீக்க கணக்கு இல்லை.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "நல்ல";
+"yoga_token_inauspicious" = "தீய";
+"yoga_token_weak" = "பலவீனம்";
+"yoga_token_strong" = "வலிமை";
+"yoga_token_moderate" = "மிதமான";
+"yoga_token_yoga_reduced" = "யோகம் குறைந்தது";
+"yoga_token_yoga_cancelled" = "யோகம் ரத்து";

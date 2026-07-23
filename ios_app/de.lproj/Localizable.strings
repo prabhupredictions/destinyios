@@ -3138,3 +3138,12 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "subscription_plus_unavailable" = "Das Plus-Abonnement ist derzeit nicht verfügbar. Bitte versuchen Sie es erneut.";
 
 "delete_guest_not_allowed_message" = "Du musst ein Konto registrieren, bevor du es löschen kannst. Gäste haben kein Konto zum Löschen.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "günstig";
+"yoga_token_inauspicious" = "ungünstig";
+"yoga_token_weak" = "schwach";
+"yoga_token_strong" = "stark";
+"yoga_token_moderate" = "mäßig";
+"yoga_token_yoga_reduced" = "Yoga abgeschwächt";
+"yoga_token_yoga_cancelled" = "Yoga aufgehoben";

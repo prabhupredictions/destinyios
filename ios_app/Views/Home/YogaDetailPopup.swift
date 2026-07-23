@@ -45,7 +45,7 @@ struct YogaDetailPopup: View {
                         // Category + Status Badge Row
                         HStack(spacing: 8) {
                             // Category Tag
-                            if let category = yoga.category {
+                            if let category = yoga.localizedCategory {
                                 Text(category)
                                     .font(AppTheme.Fonts.caption(size: 11))
                                     .foregroundColor(AppTheme.Colors.textSecondary)
@@ -95,7 +95,7 @@ struct YogaDetailPopup: View {
                     detailColumn(
                         icon: "sparkles",
                         label: "yoga_label_planets".localized,
-                        value: yoga.planets.isEmpty ? "—" : yoga.planets
+                        value: yoga.planets.isEmpty ? "—" : yoga.localizedPlanets
                     )
                     
                     Divider()

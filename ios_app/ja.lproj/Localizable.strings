@@ -3142,3 +3142,12 @@
 "subscription_plus_unavailable" = "Plus サブスクリプションは現在利用できません。もう一度お試しください。";
 
 "delete_guest_not_allowed_message" = "アカウントを削除するには、まず登録が必要です。ゲストには削除できるアカウントがありません。";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "吉";
+"yoga_token_inauspicious" = "凶";
+"yoga_token_weak" = "弱い";
+"yoga_token_strong" = "強い";
+"yoga_token_moderate" = "中程度";
+"yoga_token_yoga_reduced" = "ヨガ減弱";
+"yoga_token_yoga_cancelled" = "ヨガ無効";

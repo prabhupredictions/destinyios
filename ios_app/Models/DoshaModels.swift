@@ -517,30 +517,40 @@ struct YogaItem: Codable, Identifiable {
     }
     
     // MARK: - Localized Content (uses yogaKey to lookup from Localizable.strings)
-    
+
+    /// Number-stripped key candidates: the backend emits numbered variant keys
+    /// (e.g. "bhagya_yoga_241") while Localizable.strings has only the base key.
+    /// Try the exact key, then the "_<digits>"-stripped base. Mirrors the backend.
+    private func localizationKeyCandidates(_ key: String) -> [String] {
+        let base = key.replacingOccurrences(
+            of: "_\\d+$", with: "", options: .regularExpression
+        )
+        return base == key ? [key] : [key, base]
+    }
+
+    private func localizedForKey(prefix: String) -> String? {
+        guard let key = yogaKey, !key.isEmpty else { return nil }
+        for candidate in localizationKeyCandidates(key) {
+            let lookupKey = "\(prefix)_\(candidate)"
+            let localized = lookupKey.localized
+            if localized != lookupKey { return localized }
+        }
+        return nil
+    }
+
     /// Localized yoga name - looks up using yoga_key from Localizable.strings
     var localizedName: String {
-        guard let key = yogaKey, !key.isEmpty else { return displayName }
-        let lookupKey = "yoga_name_\(key)"
-        let localized = lookupKey.localized
-        // If localization returns the key itself, fallback to displayName
-        return localized == lookupKey ? displayName : localized
+        return localizedForKey(prefix: "yoga_name") ?? displayName
     }
-    
+
     /// Localized outcome description - from Localizable.strings or API fallback
     var localizedOutcome: String? {
-        guard let key = yogaKey, !key.isEmpty else { return outcome }
-        let lookupKey = "yoga_outcome_\(key)"
-        let localized = lookupKey.localized
-        return localized == lookupKey ? outcome : localized
+        return localizedForKey(prefix: "yoga_outcome") ?? outcome
     }
-    
+
     /// Localized formation description - from Localizable.strings or API fallback
     var localizedFormation: String? {
-        guard let key = yogaKey, !key.isEmpty else { return formation }
-        let lookupKey = "yoga_formation_\(key)"
-        let localized = lookupKey.localized
-        return localized == lookupKey ? formation : localized
+        return localizedForKey(prefix: "yoga_formation") ?? formation
     }
 }
 

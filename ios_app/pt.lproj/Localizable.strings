@@ -3142,3 +3142,12 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "subscription_plus_unavailable" = "A assinatura Plus não está disponível no momento. Tente novamente.";
 
 "delete_guest_not_allowed_message" = "Você precisa registrar uma conta antes de poder excluí-la. Os convidados não têm conta para excluir.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "auspicioso";
+"yoga_token_inauspicious" = "desfavorável";
+"yoga_token_weak" = "fraco";
+"yoga_token_strong" = "forte";
+"yoga_token_moderate" = "moderado";
+"yoga_token_yoga_reduced" = "yoga reduzido";
+"yoga_token_yoga_cancelled" = "yoga cancelado";

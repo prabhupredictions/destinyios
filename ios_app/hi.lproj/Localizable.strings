@@ -3005,3 +3005,12 @@
 "subscription_plus_unavailable" = "Plus सब्सक्रिप्शन अभी उपलब्ध नहीं है। कृपया पुनः प्रयास करें।";
 
 "delete_guest_not_allowed_message" = "खाता हटाने से पहले आपको उसे पंजीकृत करना होगा। अतिथि उपयोगकर्ताओं का कोई खाता नहीं होता।";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "शुभ";
+"yoga_token_inauspicious" = "अशुभ";
+"yoga_token_weak" = "कमज़ोर";
+"yoga_token_strong" = "मज़बूत";
+"yoga_token_moderate" = "मध्यम";
+"yoga_token_yoga_reduced" = "योग कम";
+"yoga_token_yoga_cancelled" = "योग रद्द";

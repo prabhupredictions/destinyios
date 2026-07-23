@@ -3142,3 +3142,12 @@
 "subscription_plus_unavailable" = "Plus ಚಂದಾದಾರಿಕೆ ಇದೀಗ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
 
 "delete_guest_not_allowed_message" = "ಖಾತೆಯನ್ನು ಅಳಿಸುವ ಮೊದಲು ನೀವು ಅದನ್ನು ನೋಂದಾಯಿಸಬೇಕು. ಅತಿಥಿಗಳಿಗೆ ಅಳಿಸಲು ಖಾತೆ ಇರುವುದಿಲ್ಲ.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "ಶುಭ";
+"yoga_token_inauspicious" = "ಅಶುಭ";
+"yoga_token_weak" = "ದುರ್ಬಲ";
+"yoga_token_strong" = "ಪ್ರಬಲ";
+"yoga_token_moderate" = "ಮಧ್ಯಮ";
+"yoga_token_yoga_reduced" = "ಯೋಗ ಕಡಿಮೆ";
+"yoga_token_yoga_cancelled" = "ಯೋಗ ರದ್ದು";

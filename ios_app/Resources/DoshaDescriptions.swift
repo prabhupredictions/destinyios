@@ -21,14 +21,14 @@ struct DoshaDescriptions {
     /// Replaces keys like "mars_strong_ashtakavarga" with "Mars has strong Ashtakavarga points"
     static func localizeExceptionKeys(in text: String) -> String {
         var result = text
-        
+
         // Pattern matches mars_*, moon_*, and chandra_* exception keys
         let exceptionPattern = #"(mars_[a-z0-9_]+|moon_strong|chandra_mangala_yoga)"#
-        
+
         if let regex = try? NSRegularExpression(pattern: exceptionPattern, options: []) {
             let range = NSRange(text.startIndex..., in: text)
             let matches = regex.matches(in: text, options: [], range: range)
-            
+
             // Process matches in reverse order to maintain string indices
             for match in matches.reversed() {
                 if let matchRange = Range(match.range, in: text) {
@@ -41,7 +41,46 @@ struct DoshaDescriptions {
                 }
             }
         }
-        
+
+        // Also localize the backend's composed yoga-reason sentence, e.g.
+        // "Mars is AUSPICIOUS + WEAK (yoga reduced)". These are fixed English
+        // enum tokens the backend emits as free-form prose (not lookup keys), so
+        // we token-replace them here. Whole-word, case-insensitive.
+        result = localizeReasonTokens(in: result)
+
+        return result
+    }
+
+    /// Fixed-vocabulary token replacements for the backend's composed yoga-reason
+    /// prose (character class + strength class + status phrases + planet names).
+    /// Whole-word matches only, so partial words are never corrupted.
+    private static func localizeReasonTokens(in text: String) -> String {
+        let tokenKeys: [String: String] = [
+            "AUSPICIOUS": "yoga_token_auspicious",
+            "INAUSPICIOUS": "yoga_token_inauspicious",
+            "WEAK": "yoga_token_weak",
+            "STRONG": "yoga_token_strong",
+            "MODERATE": "yoga_token_moderate",
+            "yoga reduced": "yoga_token_yoga_reduced",
+            "yoga cancelled": "yoga_token_yoga_cancelled",
+            "Mars": "planet_mars", "Moon": "planet_moon", "Sun": "planet_sun",
+            "Mercury": "planet_mercury", "Jupiter": "planet_jupiter",
+            "Venus": "planet_venus", "Saturn": "planet_saturn",
+            "Rahu": "planet_rahu", "Ketu": "planet_ketu",
+        ]
+        var result = text
+        for (token, key) in tokenKeys {
+            let localized = key.localized
+            // Skip if the string file has no translation (returns the key itself).
+            guard localized != key else { continue }
+            let pattern = "\\b" + NSRegularExpression.escapedPattern(for: token) + "\\b"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) {
+                let range = NSRange(result.startIndex..., in: result)
+                result = regex.stringByReplacingMatches(
+                    in: result, options: [], range: range, withTemplate: localized
+                )
+            }
+        }
         return result
     }
     

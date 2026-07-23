@@ -3142,3 +3142,12 @@
 "subscription_plus_unavailable" = "Plus 订阅当前不可用。请稍后重试。";
 
 "delete_guest_not_allowed_message" = "删除账户前需要先注册。访客没有可删除的账户。";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "吉";
+"yoga_token_inauspicious" = "凶";
+"yoga_token_weak" = "弱";
+"yoga_token_strong" = "强";
+"yoga_token_moderate" = "中等";
+"yoga_token_yoga_reduced" = "瑜伽减弱";
+"yoga_token_yoga_cancelled" = "瑜伽取消";

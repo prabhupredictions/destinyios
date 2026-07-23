@@ -3106,3 +3106,12 @@
 "notif_just_now" = "Just now";
 
 "delete_guest_not_allowed_message" = "You need to register an account before you can delete it. Guests have no account to delete.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "auspicious";
+"yoga_token_inauspicious" = "inauspicious";
+"yoga_token_weak" = "weak";
+"yoga_token_strong" = "strong";
+"yoga_token_moderate" = "moderate";
+"yoga_token_yoga_reduced" = "yoga reduced";
+"yoga_token_yoga_cancelled" = "yoga cancelled";

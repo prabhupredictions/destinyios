@@ -3142,3 +3142,12 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "subscription_plus_unavailable" = "L'abonnement Plus n'est pas disponible pour le moment. Veuillez réessayer.";
 
 "delete_guest_not_allowed_message" = "Vous devez créer un compte avant de pouvoir le supprimer. Les invités n'ont aucun compte à supprimer.";
+
+/* Yoga reason tokens (backend-composed reason prose) */
+"yoga_token_auspicious" = "favorable";
+"yoga_token_inauspicious" = "défavorable";
+"yoga_token_weak" = "faible";
+"yoga_token_strong" = "fort";
+"yoga_token_moderate" = "modéré";
+"yoga_token_yoga_reduced" = "yoga réduit";
+"yoga_token_yoga_cancelled" = "yoga annulé";

@@ -299,30 +299,73 @@ struct YogaDetail: Codable {
     }
     
     // MARK: - Localized Content (uses yogaKey to lookup from Localizable.strings)
-    
+
+    /// Normalizes a yoga_key for localization lookup. The backend emits NUMBERED
+    /// variant keys (e.g. "bhagya_yoga_241") while Localizable.strings only has
+    /// the BASE key ("bhagya_yoga"). Strip a trailing "_<digits>" so the lookup
+    /// hits, mirroring the backend's lookup_yoga_catalog normalization. Returns
+    /// [originalKey, baseKey] (deduped) to try in order.
+    private func localizationKeyCandidates(_ key: String) -> [String] {
+        let base = key.replacingOccurrences(
+            of: "_\\d+$", with: "", options: .regularExpression
+        )
+        return base == key ? [key] : [key, base]
+    }
+
+    /// Looks up "<prefix>_<key>" trying the exact key then the number-stripped
+    /// base key; returns nil if neither localizes (caller falls back to API value).
+    private func localizedForKey(prefix: String) -> String? {
+        guard let key = yogaKey, !key.isEmpty else { return nil }
+        for candidate in localizationKeyCandidates(key) {
+            let lookupKey = "\(prefix)_\(candidate)"
+            let localized = lookupKey.localized
+            if localized != lookupKey { return localized }
+        }
+        return nil
+    }
+
     /// Localized yoga name - looks up using yoga_key from Localizable.strings
     var localizedName: String {
-        guard let key = yogaKey, !key.isEmpty else { return displayName }
-        let lookupKey = "yoga_name_\(key)"
-        let localized = lookupKey.localized
-        // If localization returns the key itself, fallback to displayName
-        return localized == lookupKey ? displayName : localized
+        return localizedForKey(prefix: "yoga_name") ?? displayName
     }
-    
+
     /// Localized outcome description - from Localizable.strings or API fallback
     var localizedOutcome: String? {
-        guard let key = yogaKey, !key.isEmpty else { return outcome }
-        let lookupKey = "yoga_outcome_\(key)"
-        let localized = lookupKey.localized
-        return localized == lookupKey ? outcome : localized
+        return localizedForKey(prefix: "yoga_outcome") ?? outcome
     }
-    
+
     /// Localized formation description - from Localizable.strings or API fallback
     var localizedFormation: String? {
-        guard let key = yogaKey, !key.isEmpty else { return formation }
-        let lookupKey = "yoga_formation_\(key)"
-        let localized = lookupKey.localized
-        return localized == lookupKey ? formation : localized
+        return localizedForKey(prefix: "yoga_formation") ?? formation
+    }
+
+    /// Localized category tag (e.g. "Relationship" → "人間関係"). Falls back to
+    /// the raw backend value when no yoga_cat_<key> string exists.
+    var localizedCategory: String? {
+        guard let cat = category, !cat.isEmpty else { return category }
+        let key = "yoga_cat_" + cat.lowercased().replacingOccurrences(of: " ", with: "_")
+        let localized = key.localized
+        return localized == key ? cat : localized
+    }
+
+    /// Localized, comma-joined planet list (e.g. "Mars,Jupiter" → "火星, 木星").
+    /// Unknown planet tokens pass through unchanged.
+    var localizedPlanets: String {
+        let names = planets.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        return names.map { p -> String in
+            switch p.lowercased() {
+            case "sun": return "planet_sun".localized
+            case "moon": return "planet_moon".localized
+            case "mars": return "planet_mars".localized
+            case "mercury": return "planet_mercury".localized
+            case "jupiter": return "planet_jupiter".localized
+            case "venus": return "planet_venus".localized
+            case "saturn": return "planet_saturn".localized
+            case "rahu": return "planet_rahu".localized
+            case "ketu": return "planet_ketu".localized
+            default: return p
+            }
+        }.joined(separator: ", ")
     }
 }
 
