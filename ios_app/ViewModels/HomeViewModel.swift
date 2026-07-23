@@ -322,7 +322,17 @@ class HomeViewModel {
         print("[HomeViewModel] Cache MISS for profile: \(profileId) - calling API...")
         
         do {
-            let userEmail = UserDefaults.standard.string(forKey: "userEmail")
+            // W7 fix (body_email_mismatch): the request-body user_email MUST
+            // match the JWT-bound identity the backend ownership check enforces.
+            // The JWT identity is SessionTokenStore.activeEmail (set from the
+            // server-canonical /auth/exchange result). UserDefaults("userEmail")
+            // is written by multiple independent paths (IdP credential, /register,
+            // /profile) and can drift from the JWT email — sending it produced
+            // 403 body_email_mismatch on /vedic/api/todays-prediction. Prefer the
+            // JWT-bound email; fall back to UserDefaults only for guests (no active
+            // session), whose ownership is handled via allow_guest fuzzy match.
+            let userEmail = SessionTokenStore.shared.activeEmail
+                ?? UserDefaults.standard.string(forKey: "userEmail")
             // Get current app language from user selection (not system locale)
             let language = UserDefaults.standard.string(forKey: "appLanguageCode") ?? "en"
             let isFirstLogin = !hasSeenFirstPrediction

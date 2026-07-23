@@ -629,6 +629,32 @@ class ProfileService {
             )
         }
         if httpResponse.statusCode == 403 {
+            // W7 fix: backend returns 403 with a DICT body {"code": "..."} for
+            // guest_not_allowed and body_email_mismatch (ownership check) — NOT a
+            // subscription block (those are 409). Pre-fix iOS decoded 403 only as
+            // a String, so every 403 fell through to the misleading "cancel your
+            // subscription" message. Decode the dict and surface the real cause.
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               let code = detail["code"] as? String {
+                switch code {
+                case "body_email_mismatch", "session_required":
+                    // Identity/body-email drift or missing session — a fresh
+                    // sign-in re-syncs the JWT-bound email and unblocks delete.
+                    throw ProfileError.sessionExpired
+                case "guest_not_allowed":
+                    throw ProfileError.accountDeletionBlocked(
+                        NSLocalizedString(
+                            "delete_guest_not_allowed_message",
+                            comment: "Guests must register before deleting an account"
+                        )
+                    )
+                default:
+                    if let message = detail["message"] as? String {
+                        throw ProfileError.accountDeletionBlocked(message)
+                    }
+                }
+            }
             // Backwards-compat for any legacy 403 string-body response.
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let detail = json["detail"] as? String {

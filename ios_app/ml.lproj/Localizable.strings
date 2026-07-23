@@ -3141,3 +3141,5 @@
 // Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
 "paywall_v2_pricing_disclaimer_loading" = "7 ദിവസം സൗജന്യം, പിന്നീട് മാസ വരിസംഖ്യ. എപ്പോൾ വേണമെങ്കിലും റദ്ദാക്കാം.";
 "subscription_plus_unavailable" = "Plus സബ്സ്ക്രിപ്ഷൻ ഇപ്പോൾ ലഭ്യമല്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.";
+
+"delete_guest_not_allowed_message" = "അക്കൗണ്ട് ഇല്ലാതാക്കുന്നതിന് മുമ്പ് നിങ്ങൾ അത് രജിസ്റ്റർ ചെയ്യണം. അതിഥികൾക്ക് ഇല്ലാതാക്കാൻ അക്കൗണ്ട് ഇല്ല.";

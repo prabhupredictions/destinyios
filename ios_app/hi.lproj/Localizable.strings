@@ -3003,3 +3003,5 @@
 // Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
 "paywall_v2_pricing_disclaimer_loading" = "7 दिन निःशुल्क, फिर मासिक सदस्यता। कभी भी रद्द करें।";
 "subscription_plus_unavailable" = "Plus सब्सक्रिप्शन अभी उपलब्ध नहीं है। कृपया पुनः प्रयास करें।";
+
+"delete_guest_not_allowed_message" = "खाता हटाने से पहले आपको उसे पंजीकृत करना होगा। अतिथि उपयोगकर्ताओं का कोई खाता नहीं होता।";

@@ -3138,3 +3138,5 @@
 // Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
 "paywall_v2_pricing_disclaimer_loading" = "7 நாட்கள் இலவசம், பின்னர் மாதாந்திர சந்தா. எப்போது வேண்டுமானாலும் ரத்து செய்யலாம்.";
 "subscription_plus_unavailable" = "Plus சந்தா இப்போது கிடைக்கவில்லை. மீண்டும் முயற்சிக்கவும்.";
+
+"delete_guest_not_allowed_message" = "கணக்கை நீக்குவதற்கு முன் அதைப் பதிவு செய்ய வேண்டும். விருந்தினர்களுக்கு நீக்க கணக்கு இல்லை.";

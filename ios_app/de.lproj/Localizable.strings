@@ -3136,3 +3136,5 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 // Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
 "paywall_v2_pricing_disclaimer_loading" = "7 Tage gratis, danach Monats-Abo. Jederzeit kündbar.";
 "subscription_plus_unavailable" = "Das Plus-Abonnement ist derzeit nicht verfügbar. Bitte versuchen Sie es erneut.";
+
+"delete_guest_not_allowed_message" = "Du musst ein Konto registrieren, bevor du es löschen kannst. Gäste haben kein Konto zum Löschen.";

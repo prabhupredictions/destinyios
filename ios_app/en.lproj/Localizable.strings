@@ -3104,3 +3104,5 @@
 "notif_section_last_week" = "Last Week";
 "notif_section_earlier" = "Earlier";
 "notif_just_now" = "Just now";
+
+"delete_guest_not_allowed_message" = "You need to register an account before you can delete it. Guests have no account to delete.";

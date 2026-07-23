@@ -97,6 +97,13 @@ final class AuthExchangeClient: @unchecked Sendable {
             refreshExpiresAt: result.refresh_token_expires_at
         )
 
+        // W7 fix (body_email_mismatch): /auth/exchange is the canonical source
+        // of the account email (it mints the JWT bound to result.user_email).
+        // Keep the plaintext UserDefaults("userEmail") — used as request-body
+        // user_email by legacy call sites — in sync here so it can never drift
+        // from the JWT identity the backend ownership check enforces.
+        UserDefaults.standard.set(result.user_email, forKey: "userEmail")
+
         return ExchangeResult(
             userEmail: result.user_email,
             sessionJwt: result.session_jwt,

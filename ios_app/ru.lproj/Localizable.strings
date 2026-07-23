@@ -3140,3 +3140,5 @@
 // Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
 "paywall_v2_pricing_disclaimer_loading" = "7 дней бесплатно, затем месячная подписка. Отмена в любое время.";
 "subscription_plus_unavailable" = "Подписка Plus сейчас недоступна. Пожалуйста, попробуйте снова.";
+
+"delete_guest_not_allowed_message" = "Прежде чем удалить аккаунт, его нужно зарегистрировать. У гостей нет аккаунта для удаления.";

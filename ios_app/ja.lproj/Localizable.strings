@@ -3140,3 +3140,5 @@
 // Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
 "paywall_v2_pricing_disclaimer_loading" = "7日間無料、その後は月額サブスクリプション。いつでもキャンセル可能。";
 "subscription_plus_unavailable" = "Plus サブスクリプションは現在利用できません。もう一度お試しください。";
+
+"delete_guest_not_allowed_message" = "アカウントを削除するには、まず登録が必要です。ゲストには削除できるアカウントがありません。";

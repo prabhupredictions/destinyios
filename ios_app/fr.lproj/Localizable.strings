@@ -3140,3 +3140,5 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 // Paywall v2 loading-state disclaimer (when StoreKit price not yet loaded)
 "paywall_v2_pricing_disclaimer_loading" = "7 jours gratuits, puis abonnement mensuel. Annulez à tout moment.";
 "subscription_plus_unavailable" = "L'abonnement Plus n'est pas disponible pour le moment. Veuillez réessayer.";
+
+"delete_guest_not_allowed_message" = "Vous devez créer un compte avant de pouvoir le supprimer. Les invités n'ont aucun compte à supprimer.";

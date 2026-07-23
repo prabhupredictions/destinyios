@@ -39,9 +39,20 @@ class AuthViewModel {
         if keychain.exists(forKey: KeychainService.Keys.userId) {
             self.isAuthenticated = true
             self.isGuest = UserDefaults.standard.bool(forKey: "isGuest")
-            self.userEmail = UserDefaults.standard.string(forKey: "userEmail")
+            // W7 fix (body_email_mismatch): if an active session JWT exists, its
+            // bound email is the canonical account identity the backend enforces.
+            // Trust it over the persisted UserDefaults("userEmail"), which can be
+            // left stale by an incomplete prior sign-out/cleanup and would then be
+            // sent as a divergent request-body email → 403 body_email_mismatch.
+            // Re-sync UserDefaults so all legacy body-email call sites agree.
+            if let sessionEmail = SessionTokenStore.shared.activeEmail {
+                self.userEmail = sessionEmail
+                UserDefaults.standard.set(sessionEmail, forKey: "userEmail")
+            } else {
+                self.userEmail = UserDefaults.standard.string(forKey: "userEmail")
+            }
             self.userName = UserDefaults.standard.string(forKey: "userName")
-            
+
             // Register for push notifications on launch if already logged in
             // This ensures device token is always fresh and registered
             if let email = self.userEmail {
