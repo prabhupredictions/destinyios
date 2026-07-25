@@ -201,6 +201,13 @@ struct AppRootView: View {
                     }
                 }
             }
+        } catch let error as ProfileError where error.isAccountDeleted {
+            // Account was soft-deleted server-side (e.g. GDPR erasure). A stale
+            // local session must NOT keep working — force a full sign-out so the
+            // user returns to the auth screen. This is the launch-time enforcement
+            // that closes the "deleted but still logged in" gap.
+            print("🚫 [AppRootView] Account deleted server-side — signing out")
+            await AuthViewModel().signOutAsync()
         } catch {
             // silently ignore — keep existing access state on network failure
         }

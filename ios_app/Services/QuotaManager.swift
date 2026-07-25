@@ -682,6 +682,15 @@ class QuotaManager: ObservableObject {
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            // Soft-deleted account read → surface accountDeleted so the caller
+            // signs the user out (mirrors ProfileService).
+            if let http = response as? HTTPURLResponse, http.statusCode == 403,
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               (detail["error"] as? String) == "account_deleted" {
+                let message = detail["message"] as? String ?? "This account has been deleted."
+                throw ProfileError.accountDeleted(message)
+            }
             throw URLError(.badServerResponse)
         }
 

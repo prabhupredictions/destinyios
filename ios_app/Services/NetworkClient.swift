@@ -108,8 +108,14 @@ final class NetworkClient: NetworkClientProtocol, @unchecked Sendable {
                 } catch let exchangeErr as AuthExchangeError {
                     // refresh_reused / refresh_unknown / refresh_expired:
                     // server told us to re-sign-in. Clear local state.
-                    if case .reauthRequired = exchangeErr {
+                    // account_deleted / account_archived (GDPR erasure): the
+                    // email can no longer be used — also clear the stale
+                    // session so a deleted account can't keep hitting the API.
+                    switch exchangeErr {
+                    case .reauthRequired, .accountDeleted:
                         SessionTokenStore.shared.clearActiveSession()
+                    default:
+                        break
                     }
                     throw NetworkError.unauthorized
                 } catch {

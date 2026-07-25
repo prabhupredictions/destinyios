@@ -134,9 +134,18 @@ class ProfileService {
         }
         
         guard httpResponse.statusCode == 200 else {
+            // Soft-deleted account read → sign the user out (mirrors registerUser).
+            if httpResponse.statusCode == 403,
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               let errorType = detail["error"] as? String,
+               errorType == "account_deleted" {
+                let message = detail["message"] as? String ?? "This account has been deleted."
+                throw ProfileError.accountDeleted(message)
+            }
             throw ProfileError.serverError(statusCode: httpResponse.statusCode)
         }
-        
+
         // Debug: Print raw response to see what API returns
         if let jsonString = String(data: data, encoding: .utf8) {
             print("🔍 [ProfileService] Raw API response: \(jsonString)")
@@ -717,9 +726,18 @@ class ProfileService {
         }
         
         guard httpResponse.statusCode == 200 else {
+            // Soft-deleted account read → sign the user out (mirrors registerUser).
+            if httpResponse.statusCode == 403,
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? [String: Any],
+               let errorType = detail["error"] as? String,
+               errorType == "account_deleted" {
+                let message = detail["message"] as? String ?? "This account has been deleted."
+                throw ProfileError.accountDeleted(message)
+            }
             throw ProfileError.serverError(statusCode: httpResponse.statusCode)
         }
-        
+
         let decoder = JSONDecoder()
         return try decoder.decode(UserStatusResponse.self, from: data)
     }

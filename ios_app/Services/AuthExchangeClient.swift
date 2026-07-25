@@ -178,6 +178,11 @@ final class AuthExchangeClient: @unchecked Sendable {
             case "refresh_reused", "refresh_unknown", "refresh_expired",
                  "session_revoked", "google_reattest_required":
                 return .reauthRequired(code: code)
+            case "account_deleted", "account_archived":
+                // GDPR soft-delete / archive. Distinct from reauthRequired so
+                // the sign-in path can show a clear message and the refresh
+                // path can still clear the stale local session.
+                return .accountDeleted(code: code)
             case "cross_idp_collision":
                 // Server told us the email is already bound to a
                 // different IdP. Surface the bound_idp so AuthView can
@@ -241,6 +246,11 @@ enum AuthExchangeError: Error, LocalizedError {
     case network(String)
     /// No refresh token stored — caller should not have called refresh.
     case noRefreshToken
+    /// Server soft-deleted (or archived) this account (GDPR erasure). The
+    /// email can no longer sign in. On refresh this must clear the stale
+    /// local session, same as reauthRequired; on sign-in it blocks with a
+    /// human-readable message instead of leaking the raw code.
+    case accountDeleted(code: String)
 
     var errorDescription: String? {
         switch self {
@@ -266,6 +276,12 @@ enum AuthExchangeError: Error, LocalizedError {
             return "Network error: \(msg)"
         case .noRefreshToken:
             return "No refresh token stored"
+        case .accountDeleted:
+            return NSLocalizedString(
+                "auth.account_deleted",
+                value: "This account has been deleted and can no longer be used.",
+                comment: "Shown when a soft-deleted account tries to sign in"
+            )
         }
     }
 }
