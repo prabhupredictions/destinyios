@@ -364,7 +364,13 @@ struct MarkdownTextView: View {
     /// dangerous nested or italic-underscore markers. The blockquote
     /// view modifier already applies bold+italic so dropping italic is
     /// visually lossless within blockquotes.
-    nonisolated private static func neutralizeDangerousMarkers(_ text: String) -> String {
+    /// Compiled once at first use. NSRegularExpression compilation (DFA
+    /// construction) is expensive; the previous code compiled all 5 on
+    /// every call, per block, per render pass. These patterns are
+    /// compile-time literals so a single shared compile is safe.
+    /// Value-typed + immutable → safe as `nonisolated static let`
+    /// without reintroducing the v3 isolation hazards.
+    nonisolated private static let dangerousMarkerRegexes: [(NSRegularExpression, String)] = {
         // Apply outer-bold patterns BEFORE __italic__ strip, otherwise
         // `**__x__**` becomes `**_x_**` mid-pipeline (still dangerous).
         let patterns: [(String, String)] = [
@@ -374,13 +380,17 @@ struct MarkdownTextView: View {
             (#"_\*\*([\s\S]*?)\*\*_"#,   "**$1**"),
             (#"__([\s\S]*?)__"#,          "$1"),
         ]
+        return patterns.compactMap { pat, repl in
+            (try? NSRegularExpression(pattern: pat)).map { ($0, repl) }
+        }
+    }()
+
+    nonisolated private static func neutralizeDangerousMarkers(_ text: String) -> String {
         var result = text.replacingOccurrences(of: "|", with: "·")
-        for (pat, repl) in patterns {
-            if let re = try? NSRegularExpression(pattern: pat) {
-                let range = NSRange(result.startIndex..., in: result)
-                result = re.stringByReplacingMatches(
-                    in: result, range: range, withTemplate: repl)
-            }
+        for (re, repl) in dangerousMarkerRegexes {
+            let range = NSRange(result.startIndex..., in: result)
+            result = re.stringByReplacingMatches(
+                in: result, range: range, withTemplate: repl)
         }
         return result
     }

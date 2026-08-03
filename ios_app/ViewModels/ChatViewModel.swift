@@ -1160,15 +1160,28 @@ class ChatViewModel {
             let basePerTick = BASE_CHARS_PER_SEC / TICK_HZ          // 1.1667
             let maxBacklog = BASE_CHARS_PER_SEC * MAX_BUFFER_SECONDS // 140 chars
             var fractionalAccum: Double = 0.0
+            // Decouple display cadence from the 60Hz advance math. Each
+            // published write to `streamingContent` re-renders the streaming
+            // bubble and re-parses markdown synchronously on the main thread
+            // (MarkdownTextView has no parse cache by design — see v3 crash
+            // history). At 60Hz on a long answer that main-thread work can
+            // starve keyboard/UI input on older devices (iPhone 13 freeze
+            // reports). We still advance the reveal every tick for smooth
+            // timing, but only PUBLISH every RENDER_EVERY ticks (~20Hz),
+            // and always flush on stream close / reaching the end.
+            let RENDER_EVERY = 3
+            var shownBytes = self.streamingContent.utf8.count
+            var tickCount = 0
 
             while !Task.isCancelled {
+                tickCount += 1
                 let target = self.smoothPumpTarget
                 // Use utf8 byte count instead of grapheme cluster count —
                 // String.count is O(n) per tick and dominates the pump for
                 // long answers. utf8.count is O(1) (cached) and gives the
                 // same monotone-increasing measure for ASCII-heavy content.
                 let totalCh = target.utf8.count
-                let shownCh = self.streamingContent.utf8.count
+                let shownCh = shownBytes
 
                 if shownCh >= totalCh {
                     if !self.smoothPumpStreamOpen { break }
@@ -1206,16 +1219,27 @@ class ChatViewModel {
                 }
 
                 let nextCount = min(shownCh + charsThisTick, totalCh)
-                // Slice safely on a utf8 byte offset that lands on a
-                // valid char boundary. For ASCII-heavy LLM output this is
-                // almost always nextCount itself; for multi-byte sequences
-                // we walk back to the previous boundary.
-                if let endIndex = target.utf8.index(target.utf8.startIndex, offsetBy: nextCount, limitedBy: target.utf8.endIndex),
-                   let safeEnd = endIndex.samePosition(in: target) {
-                    self.streamingContent = String(target[..<safeEnd])
-                } else {
-                    // Fallback: prefix by character count (slower but always valid).
-                    self.streamingContent = String(target.prefix(nextCount))
+                shownBytes = nextCount
+
+                // Advance every tick, but only PUBLISH (~20Hz) to bound the
+                // main-thread render/parse cost. Always publish when the
+                // stream is closed or we've reached the end so the final
+                // answer is never left truncated.
+                let mustPublish = !self.smoothPumpStreamOpen
+                    || nextCount >= totalCh
+                    || tickCount % RENDER_EVERY == 0
+                if mustPublish {
+                    // Slice safely on a utf8 byte offset that lands on a
+                    // valid char boundary. For ASCII-heavy LLM output this is
+                    // almost always nextCount itself; for multi-byte sequences
+                    // we walk back to the previous boundary.
+                    if let endIndex = target.utf8.index(target.utf8.startIndex, offsetBy: nextCount, limitedBy: target.utf8.endIndex),
+                       let safeEnd = endIndex.samePosition(in: target) {
+                        self.streamingContent = String(target[..<safeEnd])
+                    } else {
+                        // Fallback: prefix by character count (slower but always valid).
+                        self.streamingContent = String(target.prefix(nextCount))
+                    }
                 }
                 try? await Task.sleep(nanoseconds: tick)
             }
