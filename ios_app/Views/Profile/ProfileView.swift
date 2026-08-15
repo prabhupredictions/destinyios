@@ -47,6 +47,10 @@ struct ProfileView: View {
     @State private var clearedThreadCount = 0
     // Shown when the server delete fails: local history is preserved (not falsely cleared).
     @State private var showClearErrorAlert = false
+
+    // Shown when a mailto: link can't be opened (e.g. no Mail app on the
+    // Simulator, or Mail removed on device) — we copy the address instead.
+    @State private var showNoMailAppAlert = false
     
     // Notification toggle
     @State private var notificationsEnabled = false
@@ -266,6 +270,11 @@ struct ProfileView: View {
                 Button("ok_action".localized, role: .cancel) {}
             } message: {
                 Text("clear_history_failed_message".localized)
+            }
+            .alert("No mail app found", isPresented: $showNoMailAppAlert) {
+                Button("ok_action".localized, role: .cancel) {}
+            } message: {
+                Text("We couldn't open your mail app. support@destinyaiastrology.com has been copied to your clipboard.")
             }
         }
     }
@@ -865,7 +874,15 @@ struct ProfileView: View {
                     icon: "envelope.fill",
                     action: {
                         if let url = URL(string: "mailto:support@destinyaiastrology.com") {
-                            openURL(url)
+                            openURL(url) { accepted in
+                                if !accepted {
+                                    // No mail handler (Simulator / Mail removed):
+                                    // copy the address so the user can still reach us.
+                                    UIPasteboard.general.string = "support@destinyaiastrology.com"
+                                    showNoMailAppAlert = true
+                                    HapticManager.shared.play(.light)
+                                }
+                            }
                         }
                     }
                 )

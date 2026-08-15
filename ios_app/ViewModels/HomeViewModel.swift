@@ -14,6 +14,13 @@ class HomeViewModel {
     var dailyInsight: String = ""
     var suggestedQuestions: [String] = []
     var isLoading = false
+    /// True while the rich chart data (dasha, transits, yogas) is being
+    /// (re)fetched after sign-in / profile-switch. The prediction text is
+    /// often still cached at that point (so `isLoading` is false), which
+    /// used to drop the feed into its empty default state until the async
+    /// chart fetch landed. This flag keeps the full-screen "syncing" loader
+    /// up during that gap. See `showHeroLoader`.
+    var isRichDataLoading = false
     var errorMessage: String?
     var isGuest = false
     var isPremium = false
@@ -81,6 +88,9 @@ class HomeViewModel {
         moonSign = ""
         // Reset loading flag to prevent race with any in-flight load
         isLoading = false
+        // Rich data was just cleared and a reload will follow — keep the
+        // "syncing" loader up so the feed doesn't flash its empty default.
+        isRichDataLoading = true
         loadUserInfo()
     }
 
@@ -109,7 +119,23 @@ class HomeViewModel {
         let abbrev = ChartConstants.orderedSigns[index]
         return ChartConstants.signFullNames[abbrev] ?? abbrev
     }
-    
+
+    /// Full-screen "syncing cosmic data" gate. Show the loader (not the empty
+    /// default feed) while the rich chart data is still arriving AND none of it
+    /// is on screen yet. The `isLoading` term preserves the existing cold-start
+    /// behavior; the second term covers the sign-in / profile-switch case where
+    /// the prediction text is cached (so `isLoading` is false) but dasha /
+    /// transits / yogas are still being fetched. Once ANY rich section lands —
+    /// or the fetch finishes empty — this drops to false so real content shows
+    /// and we never spin forever. Mirrors Android's `showHeroLoader`.
+    var showHeroLoader: Bool {
+        if isLoading { return true }
+        return isRichDataLoading
+            && dashaInsight == nil
+            && transitInfluences.isEmpty
+            && yogaCombinations.isEmpty
+    }
+
     // MARK: - Dependencies
     private let predictionService: PredictionServiceProtocol
     private let quotaManager = QuotaManager.shared
@@ -252,9 +278,10 @@ class HomeViewModel {
         // Fetch Prediction
         guard let birthData = loadBirthData() else {
             // Guest or no data - fallback to generic
-            await MainActor.run { 
+            await MainActor.run {
                 self.dailyInsight = "Sign in or add birth details to unlock your daily cosmic forecast."
-                self.isLoading = false 
+                self.isLoading = false
+                self.isRichDataLoading = false
             }
             return
         }
@@ -274,7 +301,15 @@ class HomeViewModel {
         } else {
             needsFullRefresh = true
         }
-        
+
+        // Keep the "syncing" loader up while the rich chart data (dasha /
+        // transits / yogas) is (re)fetched. showHeroLoader also gates on the
+        // data being absent, so this is a no-op when disk-cached content is
+        // already on screen.
+        if needsFullRefresh {
+            await MainActor.run { self.isRichDataLoading = true }
+        }
+
         await withTaskGroup(of: Void.self) { group in
             // 1. Fetch Todays Prediction (uses TodaysPredictionCache internally)
             group.addTask {
@@ -300,9 +335,10 @@ class HomeViewModel {
         
         await MainActor.run {
             self.isLoading = false
+            self.isRichDataLoading = false
         }
     }
-    
+
     private func fetchTodaysPrediction(birthData: UserBirthData, force: Bool = false) async {
         let profileId = ProfileContextManager.shared.activeProfileId
         let profileName = ProfileContextManager.shared.activeProfileName

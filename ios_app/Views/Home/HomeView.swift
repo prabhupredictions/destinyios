@@ -147,7 +147,7 @@ struct HomeView: View {
                             .padding(.horizontal, 4)
                         }
                         
-                        if viewModel.isLoading {
+                        if viewModel.showHeroLoader {
                             VStack(spacing: 20) {
                                 // Animated cosmic icon
                                 Image(systemName: "sparkles")
