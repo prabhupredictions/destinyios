@@ -169,4 +169,41 @@ final class SubscriptionManagerINV3Tests: XCTestCase {
         XCTAssertTrue(result,
             "Without explicit conflict, gating must allow trial for eligible new user")
     }
+
+    func test_blocks_store_purchase_when_premium_on_google() {
+        XCTAssertTrue(
+            SubscriptionManager.shouldBlockStorePurchase(
+                isPremium: true, accountPlatform: "google", thisStore: "apple"
+            )
+        )
+    }
+
+    func test_allows_store_purchase_when_premium_on_apple() {
+        XCTAssertFalse(
+            SubscriptionManager.shouldBlockStorePurchase(
+                isPremium: true, accountPlatform: "apple", thisStore: "apple"
+            )
+        )
+    }
+
+    func test_free_user_is_not_blocked_from_store_purchase() {
+        XCTAssertFalse(
+            SubscriptionManager.shouldBlockStorePurchase(
+                isPremium: false, accountPlatform: "google", thisStore: "apple"
+            )
+        )
+    }
+
+    func test_does_not_block_when_platform_unknown() {
+        XCTAssertFalse(
+            SubscriptionManager.shouldBlockStorePurchase(
+                isPremium: true, accountPlatform: nil, thisStore: "apple"
+            )
+        )
+        XCTAssertFalse(
+            SubscriptionManager.shouldBlockStorePurchase(
+                isPremium: true, accountPlatform: "manual", thisStore: "apple"
+            )
+        )
+    }
 }

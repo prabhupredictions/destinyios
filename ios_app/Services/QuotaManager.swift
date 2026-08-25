@@ -281,6 +281,7 @@ struct SubscriptionStatus: Codable, Sendable {
     let subscriptionExpiresAt: String?
     let hasEverSubscribed: Bool
     let autoRenewStatus: Bool?
+    let subscriptionPlatform: String?
 
     enum CodingKeys: String, CodingKey {
         case userEmail = "user_email"
@@ -294,6 +295,7 @@ struct SubscriptionStatus: Codable, Sendable {
         case subscriptionExpiresAt = "subscription_expires_at"
         case hasEverSubscribed = "has_ever_subscribed"
         case autoRenewStatus = "auto_renew_status"
+        case subscriptionPlatform = "subscription_platform"
     }
     
     /// Helper to get total questions across all features (for backward compat)
@@ -332,6 +334,7 @@ class QuotaManager: ObservableObject {
     @Published private(set) var subscriptionExpiresAtString: String?
     @Published private(set) var hasEverSubscribed: Bool = false
     @Published private(set) var autoRenewStatus: Bool? = nil
+    @Published private(set) var subscriptionPlatform: String?
 
     /// Set when a subscription change is detected via Transaction.updates
     /// (e.g. offer code redemption, plan switch). Consumed by AppRootView
@@ -406,6 +409,8 @@ class QuotaManager: ObservableObject {
         isPremium = UserDefaults.standard.bool(forKey: "isPremium")
         subscriptionStatus = UserDefaults.standard.string(forKey: "subscriptionStatus")
         subscriptionExpiresAtString = UserDefaults.standard.string(forKey: "subscriptionExpiresAt")
+        hasEverSubscribed = UserDefaults.standard.bool(forKey: "hasEverSubscribed")
+        subscriptionPlatform = UserDefaults.standard.string(forKey: "subscriptionPlatform")
         if UserDefaults.standard.object(forKey: "autoRenewStatus") != nil {
             autoRenewStatus = UserDefaults.standard.bool(forKey: "autoRenewStatus")
         }
@@ -633,6 +638,7 @@ class QuotaManager: ObservableObject {
         subscriptionExpiresAtString = nil
         autoRenewStatus = nil
         hasEverSubscribed = false
+        subscriptionPlatform = nil
         previousObservedPlanId = nil
         lastSyncTime = nil
         availableFeatures = []
@@ -742,11 +748,13 @@ class QuotaManager: ObservableObject {
         subscriptionExpiresAtString = status.subscriptionExpiresAt
         hasEverSubscribed = status.hasEverSubscribed
         autoRenewStatus = status.autoRenewStatus
+        subscriptionPlatform = status.subscriptionPlatform
 
         UserDefaults.standard.set(status.isPremium, forKey: "isPremium")
         UserDefaults.standard.set(status.planId, forKey: "currentPlanId")
         UserDefaults.standard.set(status.subscriptionStatus, forKey: "subscriptionStatus")
         UserDefaults.standard.set(status.subscriptionExpiresAt, forKey: "subscriptionExpiresAt")
+        UserDefaults.standard.set(status.subscriptionPlatform, forKey: "subscriptionPlatform")
         if let willRenew = status.autoRenewStatus {
             UserDefaults.standard.set(willRenew, forKey: "autoRenewStatus")
         }

@@ -3096,6 +3096,7 @@
 "paywall_cta_upgrade_to_plus" = "Upgrade to Plus";
 "paywall_cta_upgrade_premium" = "Upgrade to Premium";
 "purchase_verification_failed" = "We couldn't verify your purchase. Please tap 'Restore Purchases' from the subscription screen, or contact support if the problem persists.";
+"already_subscribed_other_store" = "You're already subscribed on another store. This account is unlocked — manage billing where you originally subscribed (App Store or Google Play).";
 
 // Inbox grouping (issue #4)
 "notif_section_today" = "Today";

@@ -256,6 +256,19 @@ class SubscriptionManager: ObservableObject {
         directPurchaseInProgress = true
         defer { directPurchaseInProgress = false }
 
+        if Self.shouldBlockStorePurchase(
+            isPremium: QuotaManager.shared.isPremium,
+            accountPlatform: QuotaManager.shared.subscriptionPlatform
+        ) {
+            isLoading = false
+            errorMessage = NSLocalizedString(
+                "already_subscribed_other_store",
+                value: "You're already subscribed on another store. This account is unlocked — manage billing where you originally subscribed (App Store or Google Play).",
+                comment: "Shown when the Destiny account already has a live Google/Stripe sub"
+            )
+            return false
+        }
+
         do {
             // W4b: bind a server-minted random UUID as `appAccountToken`.
             // iOS fetches the UUID from /subscription/app-account-token at
@@ -465,6 +478,23 @@ class SubscriptionManager: ObservableObject {
         guard !hasConflict else { return false }
         guard !hasEverSubscribed else { return false }
         return true
+    }
+
+    /// Block StoreKit only when this Destiny account is already entitled on a
+    /// *known other* store (google/stripe). Same-store Core→Plus stays allowed
+    /// when accountPlatform is apple. Null / manual / unknown must NOT block —
+    /// those are legacy Apple rows; fail-open keeps live App Store upgrades safe.
+    nonisolated static func shouldBlockStorePurchase(
+        isPremium: Bool,
+        accountPlatform: String?,
+        thisStore: String = "apple"
+    ) -> Bool {
+        guard isPremium else { return false }
+        let platform = (accountPlatform ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        let otherStores = Set(["apple", "google", "stripe"]).subtracting([thisStore])
+        return otherStores.contains(platform)
     }
 
     /// Get the active plan ID from purchased products
@@ -1125,6 +1155,12 @@ class SubscriptionManager: ObservableObject {
                         self.subscriptionConflict = SubscriptionConflict(productID: transaction.productID)
                         self.conflictDetectedThisSession = true
                     }
+                } else if errorCode == "active_subscription_on_other_platform" {
+                    self.errorMessage = NSLocalizedString(
+                        "already_subscribed_other_store",
+                        value: "You're already subscribed on another store. This account is unlocked — manage billing where you originally subscribed (App Store or Google Play).",
+                        comment: "Shown when /verify rejects a second-store purchase"
+                    )
                 } else if errorCode != "app_account_token_unknown" {
                     // Any other terminal rejection (invalid_bundle_id,
                     // sandbox_transaction_rejected_in_production, etc.) —
