@@ -187,7 +187,10 @@ class ProfileService {
         if let googleId = googleId {
             body["google_id"] = googleId
         }
-        
+        if let lang = UserDefaults.standard.string(forKey: "appLanguageCode") {
+            body["language"] = lang
+        }
+
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -338,7 +341,7 @@ class ProfileService {
         request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
         request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
-        let body: [String: Any] = [
+        var body: [String: Any] = [
             "email": email,
             "user_name": userName ?? "",
             "user_type": userType,
@@ -353,15 +356,18 @@ class ProfileService {
                 "birth_time_unknown": birthProfile.birthTimeUnknown
             ]
         ]
-        
+        if let lang = UserDefaults.standard.string(forKey: "appLanguageCode") {
+            body["language"] = lang
+        }
+
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw ProfileError.invalidResponse
         }
-        
+
         // Handle 409 Conflict - birth data already taken
         if httpResponse.statusCode == 409 {
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -399,7 +405,7 @@ class ProfileService {
         request.setValue(NetworkClient.authBearer(), forHTTPHeaderField: "Authorization")
         request.setValue(APIConfig.apiKey, forHTTPHeaderField: "X-API-Key")
         
-        let body: [String: Any] = [
+        var body: [String: Any] = [
             "email": email,
             "user_name": userName,
             "is_generated_email": isGuest,
@@ -413,7 +419,10 @@ class ProfileService {
                 "birth_time_unknown": false
             ]
         ]
-        
+        if let lang = UserDefaults.standard.string(forKey: "appLanguageCode") {
+            body["language"] = lang
+        }
+
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
         let (data, response) = try await URLSession.shared.data(for: request)
