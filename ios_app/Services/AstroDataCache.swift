@@ -11,7 +11,8 @@ class AstroDataCache {
     
     // Version bump to invalidate old cache when model changes
     // v2: Added formation and reason fields to YogaDetail
-    private let fullChartPrefix = "astro_chart_v2"
+    // v3: Force re-fetch after DST timezone fix (ascendant was wrong for DST-zone births)
+    private let fullChartPrefix = "astro_chart_v3"
     private let dashaPrefix = "astro_dasha"
     private let transitsPrefix = "astro_transits"
     

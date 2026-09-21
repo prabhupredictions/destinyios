@@ -729,7 +729,7 @@ struct ComparisonOverviewView: View {
                 let status = r.isRecommended ? "✅ " + "recommended".localized : "❌ " + "not_recommended".localized
                 shareText += "• \(r.partner.name): \(r.adjustedScore)/\(r.maxScore) – \(status)\n"
             }
-            shareText += "\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
+            shareText += "\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app: https://apps.apple.com/app/id6757418559"
             
             // Generate professional PDF
             let renderer = ComparisonPDFRenderer(results: results, userName: userName)
