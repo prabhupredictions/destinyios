@@ -106,18 +106,9 @@ struct FullReportSheet: View {
     
     private func presentNativeShareSheet() {
         Task { @MainActor in
-            // Generate professional vector PDF
-            let renderer = CompatibilityPDFRenderer(
-                result: result,
-                boyName: boyName,
-                girlName: girlName,
-                boyDob: boyDob,
-                girlDob: girlDob,
-                sections: sections
-            )
-            let pdfURL = renderer.generateReport()
-            
-            // Generate Score Card Image (for social media)
+            // Share a single image + caption. Attaching the PDF too would make this a
+            // multi-attachment share, which WhatsApp handles unreliably (Android parity).
+            // The full PDF stays available via the Save to Files action below.
             let cardView = ShareCardView(
                 boyName: boyName,
                 girlName: girlName,
@@ -127,27 +118,9 @@ struct FullReportSheet: View {
                 isRecommended: result.isRecommended,
                 adjustedScore: result.adjustedScore
             )
-            let shareImage = ReportShareService.shared.generateShareImage(from: cardView)
-            
-            // Prepare share items
-            var shareItems: [Any] = []
-            
-            // Add share text
-            let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
-            shareItems.append(shareText)
-            
-            // Add image if available
-            if let image = shareImage {
-                shareItems.append(image)
-            }
-            
-            // Add PDF if available
-            if let url = pdfURL {
-                shareItems.append(url)
-            }
-            
-            // Present native share sheet
-            ReportShareService.shared.presentShareSheet(items: shareItems)
+            guard let image = ReportShareService.shared.generateShareImage(from: cardView) else { return }
+            let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app: https://apps.apple.com/app/id6757418559"
+            ReportShareService.shared.shareImage(image, text: shareText)
         }
     }
     
@@ -761,7 +734,7 @@ struct FullReportSheet: View {
             )
             
             if let image = ReportShareService.shared.generateShareImage(from: cardView) {
-                let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n🔗 destinyaiastrology.com"
+                let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app: https://apps.apple.com/app/id6757418559"
                 ReportShareService.shared.shareImage(image, text: shareText)
             }
         }
