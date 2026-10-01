@@ -157,7 +157,8 @@ class StreamingPredictionService {
         // Parse SSE events
         var currentEventType = ""
         var currentData = ""
-        
+        var sawDone = false
+
         for try await line in asyncBytes.lines {
             // Check for cancellation
             try Task.checkCancellation()
@@ -172,9 +173,15 @@ class StreamingPredictionService {
                 // so ChatViewModel can route to the paywall instead of the
                 // generic stream-failed banner. Backend emits this for the
                 // streaming endpoint as event:error with code/reason markers.
-                if currentEventType == "error",
-                   let typed = Self.quotaErrorIfQuotaPayload(currentData) {
-                    throw typed
+                if currentEventType == "error" {
+                    if let typed = Self.quotaErrorIfQuotaPayload(currentData) {
+                        throw typed
+                    }
+                    // Non-quota error frame (internal 500, pipeline exception).
+                    // Throw instead of delivering it inline — a server error is
+                    // terminal, and the old inline delivery left the stream
+                    // hanging with no `done` ever arriving.
+                    throw StreamError.serverError(Self.messageFromErrorPayload(currentData))
                 }
 
                 // Process complete event on main actor
@@ -191,17 +198,39 @@ class StreamingPredictionService {
 
                     // If done event, break out of loop
                     if case .done = event {
+                        sawDone = true
                         if signpostStarted {
                             os_signpost(.end, log: Self.signpostLog, name: "finalAnswer→done", signpostID: signpostID)
                         }
                         break
                     }
                 }
-                
+
                 currentEventType = ""
                 currentData = ""
             }
         }
+
+        // The byte stream ended. If no terminal `done` arrived (TCP drop,
+        // truncated response, server crash mid-stream), throw so ChatViewModel
+        // falls back to sync instead of waiting forever on a `done` that will
+        // never come. A clean cancellation already threw CancellationError above.
+        if !sawDone {
+            throw StreamError.incompleteStream
+        }
+    }
+
+    /// Extract a message from a non-quota SSE error payload for logging.
+    /// Not user-displayed — ChatViewModel's catch falls back to sync and shows
+    /// its own retry banner — so this stays a plain (non-localized) string.
+    /// Backend emits either `{"error": "..."}` (generic 500) or `{"message": "..."}`.
+    private static func messageFromErrorPayload(_ data: String) -> String {
+        guard let jsonData = data.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+        else { return "stream error" }
+        if let msg = json["message"] as? String, !msg.isEmpty { return msg }
+        if let err = json["error"] as? String, !err.isEmpty { return err }
+        return "stream error"
     }
     
     // MARK: - Event Parsing
@@ -321,6 +350,16 @@ class StreamingPredictionService {
     enum StreamError: Error {
         case invalidResponse
         case connectionFailed
+        /// Backend emitted an SSE `event: error` frame that is NOT a quota
+        /// rejection (e.g. internal 500 / pipeline exception). Thrown so
+        /// ChatViewModel's catch tears down and falls back to sync — the SSE
+        /// error frame used to be delivered inline and silently dropped,
+        /// leaving the stream hanging.
+        case serverError(String)
+        /// The SSE byte stream ended without a terminal `done` event (TCP drop,
+        /// truncated response). Thrown so the generation never hangs waiting on
+        /// a `done` that will never arrive.
+        case incompleteStream
     }
 }
 

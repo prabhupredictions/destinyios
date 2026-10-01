@@ -14,6 +14,7 @@ struct MainTabView: View {
     @State private var showMatchResult = false  // Track if match result is showing
     @State private var homeViewModel = HomeViewModel()  // Shared for life areas data
     @State private var showGuestSignInSheet = false  // Guest sign-in prompt for Match tab
+    @State private var showSubscriptionSheet = false  // Paywall from expiry/renewal deep link
     @State private var isKeyboardVisible = false  // Track keyboard for tab bar hiding
 
     @State private var hasVisitedChat = false
@@ -173,8 +174,15 @@ struct MainTabView: View {
                 selectedTab = 2
             case .settings:
                 selectedTab = 0
+            case .paywall:
+                // Renewal/expiry deep link → present the subscription paywall
+                // over the current tab so the user has a direct renew path.
+                showSubscriptionSheet = true
             }
             notificationRouter.pendingDeepLink = nil
+        }
+        .sheet(isPresented: $showSubscriptionSheet) {
+            SubscriptionView()
         }
         .sheet(isPresented: $showAskSheet) {
             AskDestinyQuestionsSheet(

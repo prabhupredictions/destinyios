@@ -362,6 +362,13 @@ class ChatViewModel {
     }
     
     func startNewChat() {
+        // Cancel any in-flight generation before wiping `messages`. Without this,
+        // tapping "new chat" (bell → notification, deep link, etc.) while a stream
+        // is active left `streamingTask` running and `isStreaming`/`isLoading`
+        // stuck true — the root cause of the "keeps processing my request" hang.
+        // Idempotent: a no-op when nothing is streaming.
+        tearDownGenerationState(reason: .threadSwitch)
+
         // Create new thread with profile context
         if HistorySettingsManager.shared.isHistoryEnabled {
             let thread = dataManager.createThread(
@@ -728,7 +735,6 @@ class ChatViewModel {
     /// of .done so the SINGLE atomic flip in commitFinalAnswer has everything
     /// (answer, lifeArea, advice, executionTimeMs, followUpSuggestions).
     private var pendingFinalResponse: PredictionResponse?
-    private var streamErrorMessage: String?
 
     /// Streaming send path. Consumes SSE events from StreamingPredictionService
     /// and feeds streamingContent (only — never messages[idx].content). The
@@ -1018,7 +1024,17 @@ class ChatViewModel {
                             await self.sendMessageSync()
                             return
                         case .error(let message):
-                            self.streamErrorMessage = message
+                            // The service now throws (serverError / QuotaExhaustedError)
+                            // on an SSE error frame, so this inline case is normally
+                            // unreachable. Kept as a defensive terminal: if any path ever
+                            // delivers `.error` inline again, tear down and fall back to
+                            // sync so the stream can NEVER hang on a dead handler (the
+                            // original "keeps processing" bug was this case doing nothing).
+                            print("[StreamingTask] inline .error (defensive): \(message)")
+                            self.tearDownGenerationState(reason: .userStop)
+                            self.inputText = query
+                            await self.sendMessageSync()
+                            return
                         }
                     }
                 }
