@@ -23,11 +23,28 @@ jobs:
       - name: Show Xcode Version
         run: xcodebuild -version
 
+      # Resolve a concrete simulator UDID at runtime. Pinning the device by
+      # name (iPhone 17 Pro) breaks whenever the runner image / selected Xcode
+      # has no pre-created device of that exact name — the previous CI failure.
+      # Prefer iPhone 17 Pro (repo standard), fall back to any available iPhone.
+      - name: Select iOS Simulator
+        id: sim
+        run: |
+          UDID=$(xcrun simctl list devices available | grep 'iPhone 17 Pro (' | grep -oE '[0-9A-Fa-f-]{36}' | head -n1)
+          if [ -z "$UDID" ]; then
+            UDID=$(xcrun simctl list devices available | grep -m1 'iPhone' | grep -oE '[0-9A-Fa-f-]{36}')
+          fi
+          if [ -z "$UDID" ]; then
+            echo "No available iPhone simulator on this runner:"; xcrun simctl list devices; exit 1
+          fi
+          echo "Selected simulator UDID: $UDID"
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: |
           xcodebuild build \
             -scheme ios_app \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
@@ -36,7 +53,7 @@ jobs:
         run: |
           xcodebuild test \
             -scheme ios_app \
-            -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
