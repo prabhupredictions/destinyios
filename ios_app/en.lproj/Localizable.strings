@@ -3116,3 +3116,7 @@
 "yoga_token_moderate" = "moderate";
 "yoga_token_yoga_reduced" = "yoga reduced";
 "yoga_token_yoga_cancelled" = "yoga cancelled";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "Compatibility Matches";
+"comparison_share_card_for_format" = "for %@";

@@ -3147,3 +3147,7 @@
 "yoga_token_moderate" = "మధ్యస్థ";
 "yoga_token_yoga_reduced" = "యోగం తగ్గింది";
 "yoga_token_yoga_cancelled" = "యోగం రద్దు";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "అనుకూలత సరిపోలికలు";
+"comparison_share_card_for_format" = "%@ కోసం";

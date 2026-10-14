@@ -3149,3 +3149,7 @@
 "yoga_token_moderate" = "மிதமான";
 "yoga_token_yoga_reduced" = "யோகம் குறைந்தது";
 "yoga_token_yoga_cancelled" = "யோகம் ரத்து";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "பொருத்த முடிவுகள்";
+"comparison_share_card_for_format" = "%@ க்காக";

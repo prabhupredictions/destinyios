@@ -3151,3 +3151,7 @@
 "yoga_token_moderate" = "中等";
 "yoga_token_yoga_reduced" = "瑜伽减弱";
 "yoga_token_yoga_cancelled" = "瑜伽取消";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "相配结果";
+"comparison_share_card_for_format" = "为%@";

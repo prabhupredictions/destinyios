@@ -3151,3 +3151,7 @@ Por favor comparta información más profunda sobre cómo este tránsito influye
 "yoga_token_moderate" = "moderado";
 "yoga_token_yoga_reduced" = "yoga reducido";
 "yoga_token_yoga_cancelled" = "yoga cancelado";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "Coincidencias de Compatibilidad";
+"comparison_share_card_for_format" = "para %@";

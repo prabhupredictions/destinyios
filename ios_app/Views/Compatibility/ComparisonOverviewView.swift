@@ -730,20 +730,29 @@ struct ComparisonOverviewView: View {
                 shareText += "• \(r.partner.name): \(r.adjustedScore)/\(r.maxScore) – \(status)\n"
             }
             shareText += "\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app: https://apps.apple.com/app/id6757418559"
-            
+
+            // Generate ranked-list share card image (1080×1080)
+            let cardImage = ReportShareService.shared.generateShareImage(
+                from: ComparisonShareCardView(results: sortedResults, userName: userName)
+            )
+
             // Generate professional PDF
             let renderer = ComparisonPDFRenderer(results: results, userName: userName)
             let pdfData = renderer.render()
-            
+
             let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: "_")
             let firstName = userName.components(separatedBy: " ").first ?? userName
             let fileName = "\(firstName)_vs_\(partnerNames)_comparison.pdf"
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             try? pdfData.write(to: tempURL)
-            
+
+            // Build share items: text, image (if available), PDF
             var shareItems: [Any] = [shareText]
+            if let image = cardImage {
+                shareItems.append(image)
+            }
             shareItems.append(tempURL)
-            
+
             ReportShareService.shared.presentShareSheet(items: shareItems)
         }
     }

@@ -3151,3 +3151,7 @@ Veuillez partager des informations plus approfondies sur la façon dont ce trans
 "yoga_token_moderate" = "modéré";
 "yoga_token_yoga_reduced" = "yoga réduit";
 "yoga_token_yoga_cancelled" = "yoga annulé";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "Correspondances de Compatibilité";
+"comparison_share_card_for_format" = "pour %@";

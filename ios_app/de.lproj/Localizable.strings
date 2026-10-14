@@ -3147,3 +3147,7 @@ Bitte teilen Sie tiefere Einblicke, wie dieser Transit mein Leben beeinflusst, u
 "yoga_token_moderate" = "mäßig";
 "yoga_token_yoga_reduced" = "Yoga abgeschwächt";
 "yoga_token_yoga_cancelled" = "Yoga aufgehoben";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "Kompatibilitäts-Matches";
+"comparison_share_card_for_format" = "für %@";

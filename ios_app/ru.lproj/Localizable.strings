@@ -3151,3 +3151,7 @@
 "yoga_token_moderate" = "умеренный";
 "yoga_token_yoga_reduced" = "йога ослаблена";
 "yoga_token_yoga_cancelled" = "йога отменена";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "Совместимость партнёров";
+"comparison_share_card_for_format" = "для %@";

@@ -3151,3 +3151,7 @@
 "yoga_token_moderate" = "ಮಧ್ಯಮ";
 "yoga_token_yoga_reduced" = "ಯೋಗ ಕಡಿಮೆ";
 "yoga_token_yoga_cancelled" = "ಯೋಗ ರದ್ದು";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "ಹೊಂದಾಣಿಕೆ ಹೊಂದಿಕೆ";
+"comparison_share_card_for_format" = "%@ ಗಾಗಿ";

@@ -3152,3 +3152,7 @@
 "yoga_token_moderate" = "മിതം";
 "yoga_token_yoga_reduced" = "യോഗം കുറഞ്ഞു";
 "yoga_token_yoga_cancelled" = "യോഗം റദ്ദാക്കി";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "അനുയോജ്യതാ ഫലങ്ങൾ";
+"comparison_share_card_for_format" = "%@ വേണ്ടി";

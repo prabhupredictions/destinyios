@@ -3151,3 +3151,7 @@ Por favor, compartilhe percepções mais profundas sobre como este trânsito inf
 "yoga_token_moderate" = "moderado";
 "yoga_token_yoga_reduced" = "yoga reduzido";
 "yoga_token_yoga_cancelled" = "yoga cancelado";
+
+/* Comparison share card (1080×1080 ranked-list image) */
+"comparison_share_card_title" = "Correspondências de Compatibilidade";
+"comparison_share_card_for_format" = "para %@";

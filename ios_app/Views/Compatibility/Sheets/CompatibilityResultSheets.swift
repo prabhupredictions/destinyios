@@ -106,9 +106,9 @@ struct FullReportSheet: View {
     
     private func presentNativeShareSheet() {
         Task { @MainActor in
-            // Share a single image + caption. Attaching the PDF too would make this a
-            // multi-attachment share, which WhatsApp handles unreliably (Android parity).
-            // The full PDF stays available via the Save to Files action below.
+            // Share text caption + branded score-card image + full PDF report.
+            // The PDF arrives as a document attachment (e.g. WhatsApp) so the
+            // recipient gets the complete report, not just the social card.
             let cardView = ShareCardView(
                 boyName: boyName,
                 girlName: girlName,
@@ -118,9 +118,24 @@ struct FullReportSheet: View {
                 isRecommended: result.isRecommended,
                 adjustedScore: result.adjustedScore
             )
-            guard let image = ReportShareService.shared.generateShareImage(from: cardView) else { return }
             let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app: https://apps.apple.com/app/id6757418559"
-            ReportShareService.shared.shareImage(image, text: shareText)
+
+            var shareItems: [Any] = [shareText]
+            if let image = ReportShareService.shared.generateShareImage(from: cardView) {
+                shareItems.append(image)
+            }
+            let renderer = CompatibilityPDFRenderer(
+                result: result,
+                boyName: boyName,
+                girlName: girlName,
+                boyDob: boyDob,
+                girlDob: girlDob,
+                sections: sections
+            )
+            if let pdfURL = renderer.generateReport() {
+                shareItems.append(pdfURL)
+            }
+            ReportShareService.shared.presentShareSheet(items: shareItems)
         }
     }
     
