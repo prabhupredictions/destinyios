@@ -359,7 +359,7 @@ struct GroupHistoryRow: View {
                             HStack(spacing: 3) {
                                 Image(systemName: "star.fill")
                                     .font(AppTheme.Fonts.caption(size: 10))
-                                Text(String(format: "best_match_score".localized, best.totalScore, best.maxScore))
+                                Text(String(format: "best_match_score".localized, best.displayScore, best.maxScore))
                                     .font(AppTheme.Fonts.caption(size: 11))
                             }
                             .foregroundColor(accentPurple)
@@ -405,7 +405,7 @@ struct HistoryItemRow: View {
                         .frame(width: 50, height: 50)
                     
                     VStack(spacing: 0) {
-                        Text("\(item.totalScore)")
+                        Text("\(item.displayScore)")
                             .font(AppTheme.Fonts.title(size: 18))
                             .foregroundColor(scoreColor)
                         Text("/\(item.maxScore)")
@@ -452,7 +452,7 @@ struct HistoryItemRow: View {
     }
     
     private var scoreColor: Color {
-        let percentage = item.scorePercentage
+        let percentage = item.displayScorePercentage
         if percentage >= 70 { return .green }
         if percentage >= 50 { return .orange }
         return .red

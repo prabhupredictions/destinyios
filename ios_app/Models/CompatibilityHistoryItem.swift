@@ -56,6 +56,15 @@ struct CompatibilityHistoryItem: Codable, Identifiable, Equatable {
         guard maxScore > 0 else { return 0 }
         return Double(totalScore) / Double(maxScore) * 100
     }
+
+    // History shows the ADJUSTED score (post dosha-cancellation) when available —
+    // a raw 18/36 that cancels up to 31/36 must read 31 (green/recommended), not 18
+    // (orange). Mirrors PartnerData.adjustedScore = result.adjustedScore ?? totalScore.
+    var displayScore: Int { result?.adjustedScore ?? totalScore }
+    var displayScorePercentage: Double {
+        guard maxScore > 0 else { return 0 }
+        return Double(displayScore) / Double(maxScore) * 100
+    }
     
     /// Whether this item is part of a multi-partner comparison group
     var isInGroup: Bool {

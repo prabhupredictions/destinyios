@@ -404,10 +404,10 @@ struct HistoryRowView: View {
         case .match(let match):
             // Display score clearly with context
             VStack(alignment: .trailing, spacing: 2) {
-                // Raw score (e.g., "15/36")
-                Text(String(format: "score_fraction_format".localized, match.totalScore, match.maxScore))
+                // Adjusted score (post dosha-cancellation) when available
+                Text(String(format: "score_fraction_format".localized, match.displayScore, match.maxScore))
                     .font(AppTheme.Fonts.title(size: 14))
-                    .foregroundColor(matchScoreColor(match.scorePercentage / 100))
+                    .foregroundColor(matchScoreColor(match.displayScorePercentage / 100))
                 
                 // User question count if any chats exist
                 let userQuestionCount = match.chatMessages.filter { $0.isUser }.count
@@ -431,9 +431,9 @@ struct HistoryRowView: View {
                 // Best score in the group
                 let bestItem = group.items.max(by: { $0.totalScore < $1.totalScore })
                 if let best = bestItem {
-                    Text(String(format: "best_score_format".localized, best.totalScore, best.maxScore))
+                    Text(String(format: "best_score_format".localized, best.displayScore, best.maxScore))
                         .font(AppTheme.Fonts.title(size: 13))
-                        .foregroundColor(matchScoreColor(best.scorePercentage / 100))
+                        .foregroundColor(matchScoreColor(best.displayScorePercentage / 100))
                 }
                 
                 // Partner count badge
