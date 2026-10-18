@@ -1056,7 +1056,13 @@ struct AskDestinySheet: View {
                         .onChange(of: messages.count) { oldCount, newCount in
                             guard newCount > oldCount else { return }
                             let appendedSuffix = messages.suffix(newCount - oldCount)
-                            if let userMsg = appendedSuffix.first(where: { $0.isUser }) {
+                            // On bulk history load (0→N) pin the LAST question to the
+                            // top so the user resumes at the most recent exchange; on an
+                            // incremental send, pin the just-appended question.
+                            let target = oldCount == 0
+                                ? messages.last(where: { $0.isUser })
+                                : appendedSuffix.first(where: { $0.isUser })
+                            if let userMsg = target {
                                 compatPinToTopMessageId = userMsg.id
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                     compatPinToTopTrigger = UUID()
