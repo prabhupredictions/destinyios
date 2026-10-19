@@ -81,7 +81,14 @@ struct MarkdownTextView: View {
 
     nonisolated fileprivate static func parse(_ content: String) -> [Block] {
         var blocks: [Block] = []
-        let lines = content.components(separatedBy: "\n")
+        // Normalize CRLF/CR → LF before splitting. The backend answer can carry
+        // CR+LF; a trailing CR survives `.whitespaces` trimming (which is space+tab
+        // only), so "---\r" fails isDivider() and renders as a literal rule, and a
+        // "\r" blank line is not seen as empty → phantom paragraphs and big gaps.
+        let normalized = content
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        let lines = normalized.components(separatedBy: "\n")
         var i = 0
 
         while i < lines.count {
