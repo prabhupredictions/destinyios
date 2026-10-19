@@ -428,8 +428,10 @@ struct HistoryRowView: View {
         case .matchGroup(let group):
             // Display best score and partner count for groups
             VStack(alignment: .trailing, spacing: 2) {
-                // Best score in the group
-                let bestItem = group.items.max(by: { $0.totalScore < $1.totalScore })
+                // Best score in the group — rank by the SAME adjusted score that's
+                // displayed, so the chosen row's value and color stay consistent
+                // (ranking by raw totalScore could surface a different partner).
+                let bestItem = group.items.max(by: { $0.displayScore < $1.displayScore })
                 if let best = bestItem {
                     Text(String(format: "best_score_format".localized, best.displayScore, best.maxScore))
                         .font(AppTheme.Fonts.title(size: 13))
