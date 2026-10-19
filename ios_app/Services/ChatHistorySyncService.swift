@@ -104,12 +104,14 @@ class ChatHistorySyncService {
         let sources: [String]?
         let createdAt: String
         let rating: Int?
-        
+        let followUpSuggestions: [String]?
+
         enum CodingKeys: String, CodingKey {
             case id, role, content, area, confidence, sources, rating
             case traceId = "trace_id"
             case toolCalls = "tool_calls"
             case createdAt = "created_at"
+            case followUpSuggestions = "follow_up_suggestions"
         }
     }
     
@@ -233,7 +235,10 @@ class ChatHistorySyncService {
                             sources: message.sources ?? [],
                             createdAt: parseDate(message.createdAt),
                             isStreaming: false,
-                            rating: message.rating
+                            rating: message.rating,
+                            // Rehydrate follow-up chips persisted server-side so a
+                            // reopened saved chat shows them (parity with the live path).
+                            followUps: message.followUpSuggestions ?? []
                         )
                         dataManager.saveMessage(localMessage)
                     }
