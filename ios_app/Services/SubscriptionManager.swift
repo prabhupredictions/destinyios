@@ -499,10 +499,19 @@ class SubscriptionManager: ObservableObject {
 
     /// Get the active plan ID from purchased products
     var activePlanId: String? {
-        for productId in purchasedProductIDs {
-            if productId.contains(".core.") { return "core" }
-            if productId.contains(".plus.") { return "plus" }
-        }
+        Self.effectivePlanId(from: purchasedProductIDs)
+    }
+
+    /// The single effective plan tier for a set of owned product ids, preferring
+    /// the HIGHEST tier (Plus > Core). A user who holds two concurrent store
+    /// subscriptions must resolve to ONE current plan — never an arbitrary
+    /// Set-iteration order (the prior loop returned whichever product the Set
+    /// happened to yield first, so a Plus subscriber could display as "core").
+    /// For the normal single-subscription case this returns the same value as
+    /// before, so there is no behavioral change for entitled users.
+    nonisolated static func effectivePlanId(from productIDs: Set<String>) -> String? {
+        if productIDs.contains(where: { $0.contains(".plus.") }) { return "plus" }
+        if productIDs.contains(where: { $0.contains(".core.") }) { return "core" }
         return nil
     }
     
