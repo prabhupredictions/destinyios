@@ -723,18 +723,14 @@ struct ComparisonOverviewView: View {
     
     private func shareComparisonReport() {
         Task { @MainActor in
-            // Build a text summary for sharing
+            // Build a text summary for sharing (adjusted scores + same both-store
+            // links as the single-match share).
             var shareText = "✨ Compatibility Analysis – \(userName)\n\n"
             for r in sortedResults {
                 let status = r.isRecommended ? "✅ " + "recommended".localized : "❌ " + "not_recommended".localized
                 shareText += "• \(r.partner.name): \(r.adjustedScore)/\(r.maxScore) – \(status)\n"
             }
-            shareText += "\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app: https://apps.apple.com/app/id6757418559"
-
-            // Generate ranked-list share card image (1080×1080)
-            let cardImage = ReportShareService.shared.generateShareImage(
-                from: ComparisonShareCardView(results: sortedResults, userName: userName)
-            )
+            shareText += "\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app:\niOS: https://apps.apple.com/app/id6757418559\nAndroid: https://play.google.com/store/apps/details?id=com.destinyai.astrology"
 
             // Generate professional PDF
             let renderer = ComparisonPDFRenderer(results: results, userName: userName)
@@ -746,12 +742,9 @@ struct ComparisonOverviewView: View {
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             try? pdfData.write(to: tempURL)
 
-            // Build share items: text, image (if available), PDF
-            var shareItems: [Any] = [shareText]
-            if let image = cardImage {
-                shareItems.append(image)
-            }
-            shareItems.append(tempURL)
+            // Share caption text + the combined PDF ONLY (no separate card image —
+            // see presentNativeShareSheet; avoids the UUID-named .jpg attachment).
+            let shareItems: [Any] = [shareText, tempURL]
 
             ReportShareService.shared.presentShareSheet(items: shareItems)
         }

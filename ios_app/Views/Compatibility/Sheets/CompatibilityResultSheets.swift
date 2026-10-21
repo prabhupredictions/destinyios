@@ -106,24 +106,17 @@ struct FullReportSheet: View {
     
     private func presentNativeShareSheet() {
         Task { @MainActor in
-            // Share text caption + branded score-card image + full PDF report.
-            // The PDF arrives as a document attachment (e.g. WhatsApp) so the
-            // recipient gets the complete report, not just the social card.
-            let cardView = ShareCardView(
-                boyName: boyName,
-                girlName: girlName,
-                totalScore: result.totalScore,
-                maxScore: result.maxScore,
-                percentage: result.percentage,
-                isRecommended: result.isRecommended,
-                adjustedScore: result.adjustedScore
-            )
-            let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(result.totalScore)/\(result.maxScore) (\(Int(result.percentage * 100))%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app: https://apps.apple.com/app/id6757418559"
+            // Share caption text + the full PDF report ONLY. We no longer attach a
+            // separate card image: with a PDF in the bundle WhatsApp forces document
+            // mode, so the image never rendered inline and landed as an ugly
+            // UUID-named .jpg file. The PDF already carries the branded report.
+            // Score shown is the ADJUSTED score (post dosha-cancellation), matching
+            // History/Android, not the raw Ashtakoot total.
+            let shareScore = result.adjustedScore ?? result.totalScore
+            let sharePct = result.maxScore > 0 ? Int(Double(shareScore) / Double(result.maxScore) * 100) : 0
+            let shareText = "✨ \(boyName) & \(girlName) — Compatibility score: \(shareScore)/\(result.maxScore) (\(sharePct)%) \(ratingText)\n\nAnalyzed with Destiny AI Astrology\n📲 Get your own match — download the app:\niOS: https://apps.apple.com/app/id6757418559\nAndroid: https://play.google.com/store/apps/details?id=com.destinyai.astrology"
 
             var shareItems: [Any] = [shareText]
-            if let image = ReportShareService.shared.generateShareImage(from: cardView) {
-                shareItems.append(image)
-            }
             let renderer = CompatibilityPDFRenderer(
                 result: result,
                 boyName: boyName,
