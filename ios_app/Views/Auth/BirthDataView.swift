@@ -23,6 +23,8 @@ struct BirthDataView: View {
 
     // Response style picker — shown after birth data is saved, before profile setup loading
     @State private var showResponseStylePicker = false
+    // Final birth-details confirmation before save (details are non-editable in-app after).
+    @State private var showConfirmBirthDialog = false
 
     // Analytics consent — unchecked by default for non-US users
     @State private var analyticsConsent = false
@@ -449,39 +451,61 @@ struct BirthDataView: View {
     private var submitButton: some View {
         ShimmerButton(title: "continue".localized, icon: "arrow.right") {
             isNameFocused = false
-            // Play premium haptic and sound
-            HapticManager.shared.premiumContinue()
-            SoundManager.shared.playButtonTap()
+            // Birth details are non-editable in-app after save → confirm first.
+            showConfirmBirthDialog = true
+        }
+        .accessibilityIdentifier("birth_submit_button")
+        .disabled(!viewModel.isValid)
+        .alert("confirm_birth_title".localized, isPresented: $showConfirmBirthDialog) {
+            Button("cancel".localized, role: .cancel) { }
+            Button("ok".localized) { proceedBirthSubmit() }
+        } message: {
+            Text(birthConfirmDetails + "\n\n" + "confirm_birth_message".localized)
+        }
+        .opacity(viewModel.isValid ? 1 : 0.5)
+    }
 
-            if viewModel.save() {
-                // Register with backend subscription service FIRST
-                // Wait for result before proceeding to avoid race condition
-                Task {
-                    let shouldProceed = await registerWithBackend()
+    /// DOB · time · city summary shown in the confirmation alert.
+    private var birthConfirmDetails: String {
+        var parts = [viewModel.formattedDOB]
+        if !viewModel.timeUnknown { parts.append(viewModel.formattedTime) }
+        if !viewModel.cityOfBirth.isEmpty { parts.append(viewModel.cityOfBirth) }
+        return parts.joined(separator: " · ")
+    }
 
-                    if shouldProceed {
-                        // Only proceed if registration succeeded (no conflict)
-                        await MainActor.run {
-                            // Store birth data, then show response style picker before profile setup
-                            savedBirthData = BirthData(
-                                dob: viewModel.formattedDOB,
-                                time: viewModel.formattedTOB,
-                                latitude: viewModel.latitude,
-                                longitude: viewModel.longitude,
-                                cityOfBirth: viewModel.cityOfBirth
-                            )
-                            // Show response style picker; it will trigger ProfileSetupLoadingView on Continue
-                            showResponseStylePicker = true
-                            print("[DEBUG] BirthData saved, showing ResponseStylePicker before ProfileSetupLoadingView")
-                        }
+    /// Runs the actual save + backend registration after the user confirms. This was
+    /// previously the submit button's action, now gated behind the confirmation alert.
+    private func proceedBirthSubmit() {
+        // Play premium haptic and sound
+        HapticManager.shared.premiumContinue()
+        SoundManager.shared.playButtonTap()
+
+        if viewModel.save() {
+            // Register with backend subscription service FIRST
+            // Wait for result before proceeding to avoid race condition
+            Task {
+                let shouldProceed = await registerWithBackend()
+
+                if shouldProceed {
+                    // Only proceed if registration succeeded (no conflict)
+                    await MainActor.run {
+                        // Store birth data, then show response style picker before profile setup
+                        savedBirthData = BirthData(
+                            dob: viewModel.formattedDOB,
+                            time: viewModel.formattedTOB,
+                            latitude: viewModel.latitude,
+                            longitude: viewModel.longitude,
+                            cityOfBirth: viewModel.cityOfBirth
+                        )
+                        // Show response style picker; it will trigger ProfileSetupLoadingView on Continue
+                        showResponseStylePicker = true
+                        print("[DEBUG] BirthData saved, showing ResponseStylePicker before ProfileSetupLoadingView")
                     }
                 }
             }
         }
-        .accessibilityIdentifier("birth_submit_button")
-        .disabled(!viewModel.isValid)
-        .opacity(viewModel.isValid ? 1 : 0.5)
     }
+
     
     // MARK: - Backend Registration
     /// Returns true if registration AND profile sync succeeded, false if conflict error occurred

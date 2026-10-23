@@ -3151,3 +3151,7 @@
 /* Comparison share card (1080×1080 ranked-list image) */
 "comparison_share_card_title" = "అనుకూలత సరిపోలికలు";
 "comparison_share_card_for_format" = "%@ కోసం";
+
+/* Birth-details confirmation dialog (EN placeholder — pending translation) */
+"confirm_birth_title" = "Confirm your birth details";
+"confirm_birth_message" = "Your chart is calculated from these details. Please check them carefully.\n\nBirth details can't be edited in the app after you confirm. To request a correction, email support@destinyaiastrology.com";
