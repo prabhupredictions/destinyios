@@ -172,10 +172,8 @@ final class CompatibilityPDFRenderer {
     }
     
     private func reportFileName() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let dateStr = formatter.string(from: Date())
-        return "Compatibility Report – \(boyName) and \(girlName) – \(dateStr)"
+        // App-wide standard: Destiny_Matching_<You>_<Partner>_<yyyy-MM-dd> (Android parity).
+        destinyMatchingReportBaseName(you: boyName, partner: girlName)
     }
     
     // MARK: - Cover Page

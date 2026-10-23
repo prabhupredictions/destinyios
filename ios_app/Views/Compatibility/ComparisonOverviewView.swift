@@ -736,9 +736,8 @@ struct ComparisonOverviewView: View {
             let renderer = ComparisonPDFRenderer(results: results, userName: userName)
             let pdfData = renderer.render()
 
-            let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: "_")
-            let firstName = userName.components(separatedBy: " ").first ?? userName
-            let fileName = "\(firstName)_vs_\(partnerNames)_comparison.pdf"
+            // App-wide standard (Android parity): Destiny_Matching_<You>_Comparison_<date>.pdf
+            let fileName = destinyMatchingReportBaseName(you: userName, partner: "Comparison") + ".pdf"
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             try? pdfData.write(to: tempURL)
 
@@ -757,12 +756,11 @@ struct ComparisonOverviewView: View {
             let renderer = ComparisonPDFRenderer(results: results, userName: userName)
             let pdfData = renderer.render()
             
-            let partnerNames = sortedResults.map { $0.partner.name }.joined(separator: "_")
-            let firstName = userName.components(separatedBy: " ").first ?? userName
-            let fileName = "\(firstName)_vs_\(partnerNames)_comparison.pdf"
+            // App-wide standard (Android parity): Destiny_Matching_<You>_Comparison_<date>.pdf
+            let fileName = destinyMatchingReportBaseName(you: userName, partner: "Comparison") + ".pdf"
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             try? pdfData.write(to: tempURL)
-            
+
             ReportShareService.shared.presentSaveToFiles(fileURL: tempURL)
             
             isGeneratingPDF = false
