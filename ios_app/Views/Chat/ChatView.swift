@@ -436,6 +436,12 @@ struct ChatView: View {
     @State private var previousIsStreaming: Bool = false
     @State private var userScrolledAway: Bool = false
     @State private var lastContentOffset: CGFloat = 0
+    // Scroll-to-bottom FAB (Claude/ChatGPT-style). Measured viewport height + the bottom
+    // anchor's maxY in the "chatScroll" space: when the anchor sits well below the viewport
+    // the user has scrolled up, so show a jump-to-latest button. (Separate, correctly-
+    // calibrated signal — the older userScrolledAway threshold drove nothing and is unused.)
+    @State private var scrollViewHeight: CGFloat = 0
+    @State private var bottomAnchorMaxY: CGFloat = 0
     
     // MARK: - Messages View (matches compat chat scroll pattern exactly)
     private var messagesView: some View {
@@ -567,6 +573,9 @@ struct ChatView: View {
             .scrollDismissesKeyboard(.interactively)
             .coordinateSpace(name: "chatScroll")
             .onPreferenceChange(ChatScrollOffsetKey.self) { newOffset in
+                // Track the bottom-anchor position for the scroll-to-bottom FAB (always,
+                // including during streaming, so a user reading from the top still sees it).
+                bottomAnchorMaxY = newOffset
                 // Treat the user as "scrolled away" only on REAL scrolling.
                 // During streaming, cosmic-progress reveal + token-by-token
                 // text growth cause content-driven offset changes that the
@@ -684,6 +693,35 @@ struct ChatView: View {
             // keyboard slide animation.
             .onChange(of: isInputFocused) { _, focused in
                 if focused { requestScrollToBottom(delay: 0.3) }
+            }
+            // Measure the scroll viewport height (for the FAB's not-at-bottom check).
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear { scrollViewHeight = geo.size.height }
+                        .onChange(of: geo.size.height) { _, h in scrollViewHeight = h }
+                }
+            )
+            // Scroll-to-bottom affordance (Claude/ChatGPT-style). Pin-to-top stays the
+            // default; once the bottom anchor sits well below the viewport (user scrolled
+            // up) a floating down-arrow lets them jump back to the latest in one tap.
+            .overlay(alignment: .bottom) {
+                let scrolledUp = scrollViewHeight > 0 && bottomAnchorMaxY > scrollViewHeight + 120
+                if scrolledUp && !isNewChat {
+                    Button {
+                        requestScrollToBottom()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .frame(width: 40, height: 40)
+                            .background(Circle().fill(AppTheme.Colors.cardBackground.opacity(0.95)))
+                            .overlay(Circle().stroke(AppTheme.Colors.gold.opacity(0.35), lineWidth: 1))
+                            .shadow(radius: 6)
+                    }
+                    .padding(.bottom, 8)
+                    .accessibilityLabel(Text("Scroll to latest"))
+                }
             }
             // REMOVED (intentionally):
             //   .onChange(of: viewModel.isStreaming) { _, streaming in

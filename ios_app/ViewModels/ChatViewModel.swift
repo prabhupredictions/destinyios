@@ -31,6 +31,11 @@ class ChatViewModel {
     var messages: [LocalChatMessage] = []
     var isLoading = false
     var isStreaming = false
+    // Synchronous re-entry guard against double-send. isStreaming/isLoading are set only
+    // after awaits inside the stream/sync paths, so a rapid second Send tap could post the
+    // same question twice. @MainActor serializes the two tap Tasks, so setting this before
+    // any await in sendMessage() blocks the second one ("immediately blocked while processing").
+    private var sendInFlight = false
     var streamingContent = ""
 
     // MARK: - Teardown
@@ -431,6 +436,13 @@ class ChatViewModel {
     /// Public entry. Routes to streaming or sync based on AppConfig cohort flag.
     /// Per docs/superpowers/plans/2026-06-28-streaming-typewriter-v2.md task 12.
     func sendMessage() async {
+        // Block a double-send / sending while a request is already in flight. Set
+        // synchronously before any await so a rapid second tap (serialized on the main
+        // actor) is dropped instead of posting the same question twice.
+        guard !sendInFlight else { return }
+        guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        sendInFlight = true
+        defer { sendInFlight = false }
         let userId = userEmail
         let cfg = AppConfig.shared
         let stream = cfg.shouldStreamFor(userId: userId)
