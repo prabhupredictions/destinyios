@@ -1048,10 +1048,18 @@ struct AskDestinySheet: View {
                         // is already reading from the pinned position.
                         .onChange(of: messages.count) { oldCount, newCount in
                             guard newCount > oldCount else { return }
+                            // Opening a saved conversation from Destiny Matching History
+                            // restores the whole transcript in one assignment (0 → N, N > 1):
+                            // resume at the BOTTOM (latest exchange), ChatGPT/Claude-style.
+                            // A live first send (0 → 1) and incremental sends keep the
+                            // pin-the-user-question-to-top behavior.
+                            if oldCount == 0 && newCount > 1 {
+                                requestCompatScroll()
+                                return
+                            }
                             let appendedSuffix = messages.suffix(newCount - oldCount)
-                            // On bulk history load (0→N) pin the LAST question to the
-                            // top so the user resumes at the most recent exchange; on an
-                            // incremental send, pin the just-appended question.
+                            // On an incremental send, pin the just-appended question; on a
+                            // single first send (0 → 1), pin that question.
                             let target = oldCount == 0
                                 ? messages.last(where: { $0.isUser })
                                 : appendedSuffix.first(where: { $0.isUser })
