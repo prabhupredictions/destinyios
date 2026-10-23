@@ -1,6 +1,6 @@
 # iOS App — Swift/SwiftUI
 
-## Architecture: MVVM + SwiftData (zero external deps)
+## Architecture: MVVM + SwiftData (minimal deps — SPM: GoogleSignIn-iOS + transitive)
 ```
 ios_app/ios_app/
 ├── Models/       → Codable structs (API response shapes)
